@@ -49,6 +49,12 @@ All colors MUST be HSL.
     
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
+    
+    --chart-1: 262 83% 58%;
+    --chart-2: 340 82% 52%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 295 85% 60%;
   }
 
   .dark {
@@ -79,6 +85,12 @@ All colors MUST be HSL.
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 262 83% 58%;
+    
+    --chart-1: 262 83% 68%;
+    --chart-2: 340 82% 62%;
+    --chart-3: 142 76% 46%;
+    --chart-4: 38 92% 60%;
+    --chart-5: 295 85% 70%;
   }
 }
 

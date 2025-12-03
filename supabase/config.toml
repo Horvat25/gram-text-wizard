@@ -1,1 +1,13 @@
 project_id = "vtvvmikilbcalohutsmf"
+
+[functions.generate-caption]
+verify_jwt = false
+
+[functions.generate-image]
+verify_jwt = false
+
+[functions.publish-post]
+verify_jwt = false
+
+[functions.ai-agent-analyze]
+verify_jwt = false

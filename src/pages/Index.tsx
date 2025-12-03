@@ -1,92 +1,63 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Header from "@/components/Header";
-import PostGenerator from "@/components/PostGenerator";
-import PostHistory from "@/components/PostHistory";
-import InstagramPreview from "@/components/InstagramPreview";
-import PostScore from "@/components/PostScore";
-import MetricsDashboard from "@/components/MetricsDashboard";
-import DownloadActions from "@/components/DownloadActions";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sparkles, CalendarDays, BarChart3 } from "lucide-react";
+import ContentCreationTab from "@/components/tabs/ContentCreationTab";
+import PublicationQueueTab from "@/components/tabs/PublicationQueueTab";
+import AnalyticsTab from "@/components/tabs/AnalyticsTab";
+import { usePosts } from "@/hooks/usePosts";
 
 const Index = () => {
-  const previewRef = useRef<HTMLDivElement>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [previewCaption, setPreviewCaption] = useState("");
-  const [previewHashtags, setPreviewHashtags] = useState<string[]>([]);
-  const [previewImageUrl, setPreviewImageUrl] = useState("");
-
-  const handlePostCreated = () => {
-    setRefreshTrigger((prev) => prev + 1);
-    // Clear preview after saving
-    setPreviewCaption("");
-    setPreviewHashtags([]);
-    setPreviewImageUrl("");
-  };
-
-  const handleCaptionGenerated = (caption: string, hashtags: string[], imageUrl?: string) => {
-    setPreviewCaption(caption);
-    setPreviewHashtags(hashtags);
-    if (imageUrl) {
-      setPreviewImageUrl(imageUrl);
-    }
-  };
-
-  const handleEditPost = (post: any) => {
-    setPreviewCaption(post.caption);
-    setPreviewHashtags(post.hashtags);
-    setPreviewImageUrl(post.image_url || "");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleViewPost = (post: any) => {
-    setPreviewCaption(post.caption);
-    setPreviewHashtags(post.hashtags);
-    setPreviewImageUrl(post.image_url || "");
-  };
+  const [activeTab, setActiveTab] = useState("create");
+  const {
+    posts,
+    isLoading,
+    createPost,
+    updatePost,
+    deletePost,
+    publishPost,
+    reschedulePost,
+  } = usePosts();
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Metrics Dashboard */}
-        <MetricsDashboard />
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Generator */}
-          <div className="lg:col-span-1">
-            <PostGenerator
-              onPostCreated={handlePostCreated}
-              onCaptionGenerated={handleCaptionGenerated}
-            />
-          </div>
+      <main className="container mx-auto px-4 py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="create" className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Criação</span>
+            </TabsTrigger>
+            <TabsTrigger value="queue" className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />
+              <span className="hidden sm:inline">Fila</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Analytics</span>
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Preview & Score */}
-          <div className="lg:col-span-1 space-y-6">
-            <div ref={previewRef}>
-              <InstagramPreview
-                caption={previewCaption}
-                hashtags={previewHashtags}
-                imageUrl={previewImageUrl}
-              />
-            </div>
-            <DownloadActions
-              caption={previewCaption}
-              hashtags={previewHashtags}
-              imageUrl={previewImageUrl}
-              previewRef={previewRef}
-            />
-            <PostScore caption={previewCaption} hashtags={previewHashtags} />
-          </div>
+          <TabsContent value="create" className="space-y-6">
+            <ContentCreationTab onPostCreated={createPost} />
+          </TabsContent>
 
-          {/* History */}
-          <div className="lg:col-span-1">
-            <PostHistory 
-              refreshTrigger={refreshTrigger}
-              onEditPost={handleEditPost}
-              onViewPost={handleViewPost}
+          <TabsContent value="queue" className="space-y-6">
+            <PublicationQueueTab
+              posts={posts}
+              onPublish={publishPost}
+              onReschedule={reschedulePost}
+              onDelete={deletePost}
+              onUpdate={updatePost}
             />
-          </div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <AnalyticsTab posts={posts} />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
