@@ -12,20 +12,26 @@ export function ConnectAccountTab() {
   const { accounts, loading, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
   const { toast } = useToast();
 
-  // Check for OAuth callback
+  // Check for OAuth callback (when this page is opened in popup)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const error = urlParams.get('error');
 
     if (error) {
+      // Save error to localStorage for parent window
+      localStorage.setItem('oauth_result', JSON.stringify({
+        success: false,
+        error: urlParams.get('error_description') || 'Falha ao conectar com o Instagram'
+      }));
       toast({
         title: 'Erro na conexão',
         description: urlParams.get('error_description') || 'Falha ao conectar com o Instagram',
         variant: 'destructive'
       });
-      // Clean URL
+      // Clean URL and close if popup
       window.history.replaceState({}, '', window.location.pathname);
+      if (window.opener) window.close();
       return;
     }
 
@@ -46,19 +52,41 @@ export function ConnectAccountTab() {
       if (error) throw error;
 
       if (data.success) {
+        // Save success to localStorage for parent window
+        localStorage.setItem('oauth_result', JSON.stringify({
+          success: true,
+          accounts: data.accounts
+        }));
+        
         toast({
           title: 'Conta conectada!',
           description: `${data.accounts.length} conta(s) do Instagram conectada(s) com sucesso.`,
         });
         fetchAccounts();
+        
+        // Close popup if opened from parent
+        if (window.opener) {
+          window.close();
+        }
       }
     } catch (error: any) {
       console.error('OAuth callback error:', error);
+      
+      // Save error to localStorage for parent window
+      localStorage.setItem('oauth_result', JSON.stringify({
+        success: false,
+        error: error.message || 'Falha ao processar a autorização'
+      }));
+      
       toast({
         title: 'Erro ao conectar',
         description: error.message || 'Falha ao processar a autorização',
         variant: 'destructive'
       });
+      
+      if (window.opener) {
+        window.close();
+      }
     } finally {
       setConnecting(false);
       // Clean URL
@@ -80,8 +108,50 @@ export function ConnectAccountTab() {
       // Store state for CSRF validation
       sessionStorage.setItem('oauth_state', data.state);
       
-      // Redirect to Facebook OAuth
-      window.location.href = data.authUrl;
+      // Open Facebook OAuth in a new window (avoids iframe blocking)
+      const popup = window.open(
+        data.authUrl,
+        'instagram_oauth',
+        'width=600,height=700,scrollbars=yes'
+      );
+      
+      // Poll for popup close and check localStorage for result
+      const checkPopup = setInterval(() => {
+        const oauthResult = localStorage.getItem('oauth_result');
+        
+        if (oauthResult) {
+          clearInterval(checkPopup);
+          localStorage.removeItem('oauth_result');
+          
+          const result = JSON.parse(oauthResult);
+          if (result.success) {
+            toast({
+              title: 'Conta conectada!',
+              description: `${result.accounts?.length || 1} conta(s) do Instagram conectada(s) com sucesso.`,
+            });
+            fetchAccounts();
+          } else {
+            toast({
+              title: 'Erro ao conectar',
+              description: result.error || 'Falha ao processar a autorização',
+              variant: 'destructive'
+            });
+          }
+          setConnecting(false);
+        }
+        
+        if (popup?.closed) {
+          clearInterval(checkPopup);
+          setConnecting(false);
+        }
+      }, 500);
+      
+      // Timeout after 5 minutes
+      setTimeout(() => {
+        clearInterval(checkPopup);
+        setConnecting(false);
+      }, 300000);
+      
     } catch (error: any) {
       console.error('Start OAuth error:', error);
       toast({
