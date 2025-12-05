@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_accounts: {
+        Row: {
+          access_token: string
+          connected_at: string | null
+          expires_at: string | null
+          id: string
+          instagram_user_id: string
+          page_id: string | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string | null
+          expires_at?: string | null
+          id?: string
+          instagram_user_id: string
+          page_id?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string | null
+          expires_at?: string | null
+          id?: string
+          instagram_user_id?: string
+          page_id?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       instagram_credentials: {
         Row: {
           access_token: string | null
