@@ -11,3 +11,12 @@ verify_jwt = false
 
 [functions.ai-agent-analyze]
 verify_jwt = false
+
+[functions.start-oauth]
+verify_jwt = false
+
+[functions.oauth-callback]
+verify_jwt = false
+
+[functions.webhooks]
+verify_jwt = false
