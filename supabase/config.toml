@@ -32,3 +32,9 @@ verify_jwt = false
 
 [functions.sync-instagram-metrics]
 verify_jwt = false
+
+[functions.generate-suggestions]
+verify_jwt = false
+
+[functions.validate-signup-code]
+verify_jwt = false
