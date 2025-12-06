@@ -110,7 +110,7 @@ serve(async (req) => {
         for (const pageId of pageIds) {
           console.log(`Fetching page ${pageId} directly...`);
           
-          // Get page access token
+          // Get page access token with instagram_business_account
           const pageTokenUrl = `https://graph.facebook.com/v18.0/${pageId}?fields=id,name,access_token,instagram_business_account&access_token=${accessToken}`;
           const pageResponse = await fetch(pageTokenUrl);
           const pageData = await pageResponse.json();
@@ -129,6 +129,19 @@ serve(async (req) => {
       }
     }
 
+    // Check if Instagram permissions were granted
+    const instagramScopes = debugData.data?.scopes?.filter((s: string) => s.startsWith('instagram_')) || [];
+    const hasInstagramPermissions = instagramScopes.length > 0;
+    
+    console.log('Instagram scopes granted:', instagramScopes);
+    
+    // Try to get Instagram account ID directly from granular_scopes
+    const instagramAccountIds = debugData.data?.granular_scopes?.find(
+      (s: any) => s.scope === 'instagram_basic' || s.scope === 'instagram_content_publish'
+    )?.target_ids || [];
+    
+    console.log('Instagram account IDs from granular_scopes:', instagramAccountIds);
+
     console.log(`Found ${pagesData.data.length} pages, looking for Instagram accounts...`);
 
     // Step 4: Get Instagram Business Account for each page
@@ -137,21 +150,45 @@ serve(async (req) => {
 
     for (const page of pagesData.data) {
       const pageAccessToken = page.access_token;
+      let igAccountId = null;
       
-      // Get Instagram Business Account ID
-      const igResponse = await fetch(
-        `https://graph.facebook.com/v18.0/${page.id}?fields=instagram_business_account&access_token=${pageAccessToken}`
-      );
-      const igData = await igResponse.json();
+      // First check if page already has instagram_business_account from earlier fetch
+      if (page.instagram_business_account) {
+        igAccountId = page.instagram_business_account.id;
+        console.log(`Page ${page.id} already has instagram_business_account: ${igAccountId}`);
+      } else {
+        // Try to get Instagram Business Account ID from page
+        const igResponse = await fetch(
+          `https://graph.facebook.com/v18.0/${page.id}?fields=instagram_business_account&access_token=${pageAccessToken}`
+        );
+        const igData = await igResponse.json();
+        
+        console.log(`Instagram account check for page ${page.id}:`, JSON.stringify(igData));
+        
+        if (igData.instagram_business_account) {
+          igAccountId = igData.instagram_business_account.id;
+        }
+      }
+      
+      // If still no Instagram account, try using the ID from granular_scopes
+      if (!igAccountId && instagramAccountIds.length > 0) {
+        console.log('Trying Instagram account IDs from granular_scopes...');
+        igAccountId = instagramAccountIds[0]; // Use the first one
+      }
 
-      if (igData.instagram_business_account) {
-        const igAccountId = igData.instagram_business_account.id;
-
+      if (igAccountId) {
         // Get Instagram account details
         const igDetailsResponse = await fetch(
           `https://graph.facebook.com/v18.0/${igAccountId}?fields=id,username,profile_picture_url&access_token=${pageAccessToken}`
         );
         const igDetails = await igDetailsResponse.json();
+        
+        console.log('Instagram details response:', JSON.stringify(igDetails));
+
+        if (igDetails.error) {
+          console.error('Error fetching Instagram details:', igDetails.error);
+          continue;
+        }
 
         console.log(`Found Instagram account: @${igDetails.username}`);
 
@@ -166,6 +203,7 @@ serve(async (req) => {
             page_id: page.id,
             instagram_user_id: igAccountId,
             username: igDetails.username,
+            profile_picture_url: igDetails.profile_picture_url || null,
             access_token: pageAccessToken, // Use page token for Instagram API
             expires_at: expiresAt.toISOString(),
             connected_at: new Date().toISOString(),
@@ -190,7 +228,10 @@ serve(async (req) => {
     }
 
     if (connectedAccounts.length === 0) {
-      throw new Error('No Instagram Business Accounts found. Make sure your Facebook Page is connected to an Instagram Business Account.');
+      if (!hasInstagramPermissions) {
+        throw new Error('Permissões do Instagram não foram concedidas. Por favor, ao autorizar, certifique-se de SELECIONAR sua conta do Instagram e conceder as permissões solicitadas.');
+      }
+      throw new Error('Nenhuma conta Instagram Business encontrada vinculada à sua Página do Facebook. Certifique-se de que sua conta Instagram está configurada como Business ou Creator e vinculada à Página.');
     }
 
     console.log(`Successfully connected ${connectedAccounts.length} Instagram account(s)`);
