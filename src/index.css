@@ -126,6 +126,11 @@
     box-shadow: 0 0 10px hsl(var(--glow-primary) / 0.2);
   }
   
+  .glow {
+    box-shadow: 0 0 15px hsl(var(--glow-primary) / 0.4),
+                0 0 30px hsl(var(--glow-primary) / 0.2);
+  }
+  
   .neural-gradient {
     background: linear-gradient(135deg, 
       hsl(var(--gradient-start)), 
