@@ -9,6 +9,8 @@ import AnalyticsTab from "@/components/tabs/AnalyticsTab";
 import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
 import { SuggestionsTab } from "@/components/tabs/SuggestionsTab";
 import { usePosts } from "@/hooks/usePosts";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +26,69 @@ const Index = () => {
     publishPost,
     reschedulePost,
   } = usePosts();
+
+  // Handle OAuth callback from Facebook
+  useEffect(() => {
+    const code = searchParams.get("code");
+    const error = searchParams.get("error");
+    const errorDescription = searchParams.get("error_description");
+    
+    if (error) {
+      console.error("OAuth error:", error, errorDescription);
+      localStorage.setItem('oauth_result', JSON.stringify({
+        success: false,
+        error: errorDescription || error
+      }));
+      // Clear URL params
+      setSearchParams({});
+      // Close popup if we're in one
+      if (window.opener) {
+        window.close();
+      }
+      return;
+    }
+    
+    if (code) {
+      console.log("Processing OAuth code...");
+      processOAuthCode(code);
+    }
+  }, []);
+
+  const processOAuthCode = async (code: string) => {
+    try {
+      const redirectUri = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.functions.invoke('oauth-callback', {
+        body: { code, redirectUri }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        localStorage.setItem('oauth_result', JSON.stringify({
+          success: true,
+          accounts: data.accounts
+        }));
+        toast.success(`${data.accounts?.length || 1} conta(s) do Instagram conectada(s)!`);
+      } else {
+        throw new Error(data.error || 'Falha ao processar autorização');
+      }
+    } catch (err: any) {
+      console.error("OAuth callback error:", err);
+      localStorage.setItem('oauth_result', JSON.stringify({
+        success: false,
+        error: err.message
+      }));
+      toast.error(err.message || 'Erro ao conectar Instagram');
+    } finally {
+      // Clear URL params
+      setSearchParams({});
+      // Close popup if we're in one
+      if (window.opener) {
+        window.close();
+      }
+    }
+  };
 
   // Sync tab with URL
   useEffect(() => {
