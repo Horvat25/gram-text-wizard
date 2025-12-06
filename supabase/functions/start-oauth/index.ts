@@ -24,7 +24,7 @@ serve(async (req) => {
       throw new Error('redirectUri is required');
     }
 
-    // Facebook OAuth scopes for Instagram Business Account
+    // Facebook Login for Business OAuth scopes for Instagram Business Account
     const scopes = [
       'instagram_basic',
       'instagram_content_publish',
@@ -37,15 +37,20 @@ serve(async (req) => {
     // Generate state for CSRF protection
     const state = crypto.randomUUID();
 
-    // Build Facebook OAuth URL
+    // Extras parameter for Instagram API onboarding
+    const extras = JSON.stringify({ setup: { channel: "IG_API_ONBOARDING" } });
+
+    // Build Facebook Login for Business OAuth URL
     const authUrl = new URL('https://www.facebook.com/v18.0/dialog/oauth');
     authUrl.searchParams.set('client_id', FACEBOOK_APP_ID);
+    authUrl.searchParams.set('display', 'page');
+    authUrl.searchParams.set('extras', extras);
     authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'token');
     authUrl.searchParams.set('scope', scopes);
-    authUrl.searchParams.set('response_type', 'code');
     authUrl.searchParams.set('state', state);
 
-    console.log('Generated OAuth URL for redirect:', authUrl.toString());
+    console.log('Generated Facebook Login for Business OAuth URL:', authUrl.toString());
 
     return new Response(
       JSON.stringify({ 

@@ -36,14 +36,33 @@ export function ConnectAccountTab() {
     }
   };
 
-  // Check for OAuth callback (when this page is opened in popup)
+  // Parse token data from URL fragment (hash)
+  const parseHashFragment = (hash: string) => {
+    if (!hash || hash.length <= 1) return null;
+    
+    const params = new URLSearchParams(hash.substring(1));
+    const accessToken = params.get('access_token');
+    const longLivedToken = params.get('long_lived_token');
+    const expiresIn = params.get('expires_in');
+    const dataAccessExpirationTime = params.get('data_access_expiration_time');
+
+    if (!accessToken && !longLivedToken) return null;
+
+    return {
+      accessToken,
+      longLivedToken,
+      expiresIn: expiresIn ? parseInt(expiresIn, 10) : null,
+      dataAccessExpirationTime: dataAccessExpirationTime ? parseInt(dataAccessExpirationTime, 10) : null
+    };
+  };
+
+  // Check for OAuth callback - now handles token in URL fragment
   useEffect(() => {
+    // Check for error in query params
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
     const error = urlParams.get('error');
 
     if (error) {
-      // Save error to localStorage for parent window
       localStorage.setItem('oauth_result', JSON.stringify({
         success: false,
         error: urlParams.get('error_description') || 'Falha ao conectar com o Instagram'
@@ -53,30 +72,35 @@ export function ConnectAccountTab() {
         description: urlParams.get('error_description') || 'Falha ao conectar com o Instagram',
         variant: 'destructive'
       });
-      // Clean URL and close if popup
       window.history.replaceState({}, '', window.location.pathname);
       if (window.opener) window.close();
       return;
     }
 
-    if (code) {
-      handleOAuthCallback(code);
+    // Check for token in URL fragment (hash)
+    const tokenData = parseHashFragment(window.location.hash);
+    if (tokenData) {
+      handleTokenCallback(tokenData);
     }
   }, []);
 
-  const handleOAuthCallback = async (code: string) => {
+  const handleTokenCallback = async (tokenData: {
+    accessToken: string | null;
+    longLivedToken: string | null;
+    expiresIn: number | null;
+    dataAccessExpirationTime: number | null;
+  }) => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}${window.location.pathname}`;
-      
-      const { data, error } = await supabase.functions.invoke('oauth-callback', {
-        body: { code, redirectUri }
+      console.log('Processing token callback with data:', tokenData);
+
+      const { data, error } = await supabase.functions.invoke('process-token', {
+        body: tokenData
       });
 
       if (error) throw error;
 
       if (data.success) {
-        // Save success to localStorage for parent window
         localStorage.setItem('oauth_result', JSON.stringify({
           success: true,
           accounts: data.accounts
@@ -84,19 +108,19 @@ export function ConnectAccountTab() {
         
         toast({
           title: 'Conta conectada!',
-          description: `${data.accounts.length} conta(s) do Instagram conectada(s) com sucesso.`,
+          description: data.message || `${data.accounts.length} conta(s) do Instagram conectada(s) com sucesso.`,
         });
         fetchAccounts();
         
-        // Close popup if opened from parent
         if (window.opener) {
           window.close();
         }
+      } else {
+        throw new Error(data.error || 'Falha ao processar o token');
       }
     } catch (error: any) {
-      console.error('OAuth callback error:', error);
+      console.error('Token callback error:', error);
       
-      // Save error to localStorage for parent window
       localStorage.setItem('oauth_result', JSON.stringify({
         success: false,
         error: error.message || 'Falha ao processar a autorização'
@@ -113,7 +137,7 @@ export function ConnectAccountTab() {
       }
     } finally {
       setConnecting(false);
-      // Clean URL
+      // Clean URL (remove hash fragment)
       window.history.replaceState({}, '', window.location.pathname);
     }
   };
@@ -271,7 +295,7 @@ export function ConnectAccountTab() {
             >
               Abrir Facebook Developers Console
             </a>
-            <span>→ Seu App → Login do Facebook → Configurações</span>
+            <span>→ Seu App → Facebook Login for Business → Configurações</span>
           </div>
         </CardContent>
       </Card>
