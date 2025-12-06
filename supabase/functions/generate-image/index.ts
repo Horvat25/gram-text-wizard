@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, format = "square" } = await req.json();
+    const { prompt, format = "square", customStyle } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       throw new Error("Prompt é obrigatório");
@@ -28,10 +28,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Build style instructions
+    const styleInstructions = customStyle || "Profissional, alta qualidade, cores vibrantes, composição equilibrada.";
+
     // Otimizar prompt para Instagram
     const optimizedPrompt = `${prompt}
 
-Estilo: Profissional, alta qualidade, cores vibrantes, composição equilibrada.
+Estilo: ${styleInstructions}
 Formato: ${format === "portrait" ? "Vertical (4:5 ratio)" : "Quadrado (1:1 ratio)"}.
 Qualidade: Ultra alta resolução, adequado para Instagram feed.
 Sem texto: Não incluir textos ou palavras na imagem.`;

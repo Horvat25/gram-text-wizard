@@ -117,7 +117,7 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, postType = "engajamento" } = await req.json();
+    const { topic, postType = "engajamento", customInstructions } = await req.json();
 
     if (!topic || typeof topic !== "string") {
       throw new Error("Topic é obrigatório e deve ser uma string");
@@ -132,6 +132,12 @@ serve(async (req) => {
 
     console.log(`Gerando caption tipo: ${selectedType.name} para tópico: ${topic}`);
 
+    // Build system prompt with custom instructions if provided
+    let systemPrompt = selectedType.systemPrompt;
+    if (customInstructions) {
+      systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -141,13 +147,16 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: selectedType.systemPrompt },
+          { role: "system", content: systemPrompt },
           {
             role: "user",
             content: `Crie uma legenda de Instagram otimizada sobre: "${topic}"
             
-IMPORTANTE:
+IMPORTANTE - REGRAS DE FORMATAÇÃO:
 - Retorne APENAS a legenda pronta (não inclua títulos como "Legenda:" ou explicações)
+- NÃO USE FORMATAÇÃO MARKDOWN: sem asteriscos (**), sem underline (_), sem backticks (\`)
+- O Instagram NÃO suporta negrito ou itálico, então escreva tudo em texto simples
+- Use CAPS LOCK para dar ênfase quando necessário (ex: "ISSO é muito importante")
 - As hashtags devem vir DEPOIS da legenda, separadas por linha em branco
 - Use quebras de linha estratégicas para facilitar leitura
 - Tamanho ideal: 800-1500 caracteres
@@ -172,7 +181,15 @@ IMPORTANTE:
     }
 
     const data = await response.json();
-    const fullText = data.choices[0].message.content;
+    let fullText = data.choices[0].message.content;
+
+    // Remove any remaining markdown formatting
+    fullText = fullText
+      .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove **bold**
+      .replace(/\*([^*]+)\*/g, '$1')       // Remove *italic*
+      .replace(/__([^_]+)__/g, '$1')       // Remove __bold__
+      .replace(/_([^_]+)_/g, '$1')         // Remove _italic_
+      .replace(/`([^`]+)`/g, '$1');        // Remove `code`
 
     // Separar caption e hashtags
     const parts = fullText.split("\n\n");
