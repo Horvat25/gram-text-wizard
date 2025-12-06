@@ -75,19 +75,40 @@ serve(async (req) => {
 
     console.log('Got long-lived token, fetching pages...');
 
+    // First, check what permissions were granted
+    const debugTokenUrl = `https://graph.facebook.com/v18.0/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`;
+    const debugResponse = await fetch(debugTokenUrl);
+    const debugData = await debugResponse.json();
+    console.log('Token debug info:', JSON.stringify(debugData, null, 2));
+
     // Step 3: Get user's Facebook pages
     const pagesResponse = await fetch(
       `https://graph.facebook.com/v18.0/me/accounts?access_token=${accessToken}`
     );
     const pagesData = await pagesResponse.json();
 
+    console.log('Pages API response:', JSON.stringify(pagesData, null, 2));
+
     if (pagesData.error) {
       console.error('Pages fetch error:', pagesData.error);
       throw new Error(pagesData.error.message || 'Failed to fetch pages');
     }
 
+    // Check if pages data is empty
     if (!pagesData.data || pagesData.data.length === 0) {
-      throw new Error('No Facebook pages found. You need a Facebook Page connected to an Instagram Business Account.');
+      // Try alternative approach - get pages from user object
+      console.log('No pages from /me/accounts, trying /me?fields=accounts...');
+      const altPagesResponse = await fetch(
+        `https://graph.facebook.com/v18.0/me?fields=accounts{id,name,access_token,instagram_business_account}&access_token=${accessToken}`
+      );
+      const altPagesData = await altPagesResponse.json();
+      console.log('Alternative pages response:', JSON.stringify(altPagesData, null, 2));
+      
+      if (altPagesData.accounts?.data?.length > 0) {
+        pagesData.data = altPagesData.accounts.data;
+      } else {
+        throw new Error('Nenhuma página do Facebook encontrada. Verifique se: 1) Você tem uma Página do Facebook, 2) A permissão pages_show_list foi concedida, 3) Você é administrador da Página.');
+      }
     }
 
     console.log(`Found ${pagesData.data.length} pages, looking for Instagram accounts...`);
