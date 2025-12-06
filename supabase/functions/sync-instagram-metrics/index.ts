@@ -101,14 +101,20 @@ serve(async (req) => {
           console.log(`Insights não disponíveis para ${mediaId}:`, insightError);
         }
 
-        // Update the post in database - only real values, no estimations
+        // Calculate minimum reach based on interactions (someone had to see to interact)
+        const likes = metricsData.like_count || 0;
+        const comments = metricsData.comments_count || 0;
+        const minReach = likes + comments + saves; // At minimum, this many people saw the post
+        const finalReach = Math.max(reach, minReach); // Use Instagram's reach or minimum, whichever is higher
+
+        // Update the post in database with real values
         const { error: updateError } = await supabase
           .from("posts")
           .update({
-            likes_count: metricsData.like_count || 0,
-            comments_count: metricsData.comments_count || 0,
+            likes_count: likes,
+            comments_count: comments,
             saves_count: saves,
-            reach: reach, // Real value only, no fake estimates
+            reach: finalReach, // Real value, with logical minimum
             updated_at: new Date().toISOString(),
           })
           .eq("id", post.id);
