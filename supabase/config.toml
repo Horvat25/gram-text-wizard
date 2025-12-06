@@ -26,3 +26,9 @@ verify_jwt = false
 
 [functions.scheduled-publisher]
 verify_jwt = false
+
+[functions.sync-profile-picture]
+verify_jwt = false
+
+[functions.sync-instagram-metrics]
+verify_jwt = false

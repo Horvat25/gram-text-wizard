@@ -175,6 +175,7 @@ serve(async (req) => {
       let instagramAccountId: string;
       let pageAccessToken: string;
       let igUsername: string | null = null;
+      let igProfilePicture: string | null = null;
 
       if (pagesData.directInstagram) {
         // Direct Instagram access (from granular scopes)
@@ -207,6 +208,7 @@ serve(async (req) => {
           continue;
         }
         igUsername = igData.username;
+        igProfilePicture = igData.profile_picture_url || null;
       }
 
       // Calculate expiration date
@@ -227,6 +229,7 @@ serve(async (req) => {
           instagram_user_id: instagramAccountId,
           page_id: page.id || null,
           username: igUsername || null,
+          profile_picture_url: igProfilePicture,
           access_token: pageAccessToken,
           expires_at: expiresAt,
           connected_at: new Date().toISOString(),
@@ -247,7 +250,8 @@ serve(async (req) => {
         username: igUsername,
         instagramUserId: instagramAccountId,
         pageId: page.id,
-        pageName: page.name
+        pageName: page.name,
+        profilePictureUrl: igProfilePicture
       });
 
       console.log(`Successfully saved Instagram account: ${igUsername || instagramAccountId}`);
