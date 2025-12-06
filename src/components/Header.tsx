@@ -1,4 +1,4 @@
-import { Instagram, Settings, Package, Brain } from "lucide-react";
+import { Instagram, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
@@ -47,32 +47,14 @@ const Header = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Button
-            variant={location.pathname === "/insights" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => navigate("/insights")}
-            title="Insights do Agente"
-          >
-            <Brain className="h-5 w-5" />
-          </Button>
-          <Button
-            variant={location.pathname === "/backup" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => navigate("/backup")}
-            title="Backup"
-          >
-            <Package className="h-5 w-5" />
-          </Button>
-          <Button
-            variant={location.pathname === "/settings" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => navigate("/settings")}
-            title="Configurações"
-          >
-            <Settings className="h-5 w-5" />
-          </Button>
-        </div>
+        <Button
+          variant={location.pathname === "/settings" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => navigate("/settings")}
+          title="Configurações"
+        >
+          <Settings className="h-5 w-5" />
+        </Button>
       </div>
     </header>
   );
