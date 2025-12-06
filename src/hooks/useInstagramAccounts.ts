@@ -7,6 +7,7 @@ export interface InstagramAccount {
   page_id: string | null;
   instagram_user_id: string;
   username: string | null;
+  profile_picture_url: string | null;
   access_token: string;
   expires_at: string | null;
   connected_at: string | null;

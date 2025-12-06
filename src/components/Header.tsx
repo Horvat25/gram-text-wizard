@@ -11,10 +11,14 @@ const Header = () => {
   const { settings } = useBrandSettings();
   const { accounts } = useInstagramAccounts();
   
-  // Use brand logo from settings, or first letter of brand name as fallback
+  // Use brand logo from settings, or Instagram profile picture, or first letter as fallback
   const brandLogo = settings.brandLogoUrl;
   const brandName = settings.brandName || "Agente IA Instagram";
   const connectedUsername = accounts[0]?.username;
+  const instagramProfilePic = accounts[0]?.profile_picture_url;
+  
+  // Priority: Brand logo > Instagram profile pic > Instagram icon
+  const displayLogo = brandLogo || instagramProfilePic;
 
   return (
     <header className="border-b bg-card sticky top-0 z-50 backdrop-blur-sm">
@@ -23,11 +27,11 @@ const Header = () => {
           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => navigate("/")}
         >
-          {brandLogo ? (
+          {displayLogo ? (
             <Avatar className="h-10 w-10 rounded-xl">
-              <AvatarImage src={brandLogo} alt={brandName} className="object-cover" />
+              <AvatarImage src={displayLogo} alt={brandName} className="object-cover" />
               <AvatarFallback className="bg-gradient-instagram rounded-xl text-white font-bold">
-                {brandName.charAt(0).toUpperCase()}
+                {(connectedUsername || brandName).charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
           ) : (

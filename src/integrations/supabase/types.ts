@@ -52,6 +52,7 @@ export type Database = {
           id: string
           instagram_user_id: string
           page_id: string | null
+          profile_picture_url: string | null
           updated_at: string | null
           username: string | null
         }
@@ -62,6 +63,7 @@ export type Database = {
           id?: string
           instagram_user_id: string
           page_id?: string | null
+          profile_picture_url?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -72,6 +74,7 @@ export type Database = {
           id?: string
           instagram_user_id?: string
           page_id?: string | null
+          profile_picture_url?: string | null
           updated_at?: string | null
           username?: string | null
         }
