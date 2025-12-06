@@ -661,26 +661,95 @@ const Settings = () => {
                   </Card>
                 </>
               ) : (
-                <Card className="bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-purple-500/20">
-                  <CardContent className="flex flex-col items-center justify-center py-12">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center mb-4">
-                      <Instagram className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2">Conecte sua conta</h3>
-                    <p className="text-muted-foreground text-center mb-6 max-w-md text-sm">
-                      Conecte sua conta Business ou Creator do Instagram para publicar automaticamente.
-                    </p>
-                    
-                    <Button onClick={startOAuth} disabled={connecting} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
-                      {connecting ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Instagram className="w-4 h-4 mr-2" />
-                      )}
-                      Conectar Instagram
-                    </Button>
-                  </CardContent>
-                </Card>
+                <div className="space-y-6">
+                  {/* Main Connect Card */}
+                  <Card className="bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-purple-500/20">
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center mb-4">
+                        <Instagram className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">Conecte sua conta</h3>
+                      <p className="text-muted-foreground text-center mb-6 max-w-md text-sm">
+                        Conecte sua conta Business ou Creator do Instagram para publicar automaticamente.
+                      </p>
+                      
+                      <Button onClick={startOAuth} disabled={connecting} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
+                        {connecting ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Instagram className="w-4 h-4 mr-2" />
+                        )}
+                        Conectar Instagram
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Instructions Card */}
+                  <Card className="border-primary/20">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-primary" />
+                        Como conectar sua conta
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Prerequisites */}
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Pré-requisitos:</h4>
+                        <ul className="text-sm text-muted-foreground space-y-2">
+                          <li className="flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
+                            <span>Conta do Instagram configurada como <strong>Business</strong> ou <strong>Creator</strong></span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
+                            <span>Uma <strong>Página do Facebook</strong> vinculada ao Instagram</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
+                            <span>Ser <strong>administrador</strong> da Página do Facebook</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Steps */}
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Durante a autorização:</h4>
+                        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</div>
+                            <div className="text-sm">
+                              <p className="font-medium">Selecione sua Página do Facebook</p>
+                              <p className="text-muted-foreground text-xs">Escolha a página que está vinculada ao seu Instagram</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</div>
+                            <div className="text-sm">
+                              <p className="font-medium">Selecione sua conta do Instagram</p>
+                              <p className="text-muted-foreground text-xs">Marque a conta que deseja conectar ao app</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</div>
+                            <div className="text-sm">
+                              <p className="font-medium">Conceda TODAS as permissões</p>
+                              <p className="text-muted-foreground text-xs">Mantenha todas as opções marcadas para o app funcionar</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Warning */}
+                      <Alert className="bg-amber-500/10 border-amber-500/30">
+                        <AlertCircle className="h-4 w-4 text-amber-600" />
+                        <AlertDescription className="text-sm">
+                          Se você <strong>desmarcar</strong> alguma permissão ou não selecionar seu Instagram, a conexão falhará.
+                        </AlertDescription>
+                      </Alert>
+                    </CardContent>
+                  </Card>
+                </div>
               )}
             </TabsContent>
           </Tabs>
