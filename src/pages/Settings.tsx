@@ -33,6 +33,7 @@ import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { AccountCard } from "@/components/AccountCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
+import { OAuthInstructionsModal } from "@/components/OAuthInstructionsModal";
 
 // AI Settings Types
 interface AISettings {
@@ -78,6 +79,7 @@ const Settings = () => {
   const [connecting, setConnecting] = useState(false);
   const [aiSettings, setAiSettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
   const [isSavingAI, setIsSavingAI] = useState(false);
+  const [showOAuthModal, setShowOAuthModal] = useState(false);
   
   const { settings, updateSettings } = useBrandSettings();
   const { accounts, loading: loadingAccounts, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
@@ -201,10 +203,25 @@ const Settings = () => {
     setAiSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  // Show instructions modal before OAuth
+  const handleConnectClick = () => {
+    setShowOAuthModal(true);
+  };
+
   // Instagram OAuth
   const startOAuth = async () => {
+    setShowOAuthModal(false);
     setConnecting(true);
+    
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Você precisa estar logado para conectar o Instagram');
+        setConnecting(false);
+        return;
+      }
+      
       const redirectUri = `${window.location.origin}/`;
       
       const { data, error } = await supabase.functions.invoke('start-oauth', {
@@ -213,13 +230,15 @@ const Settings = () => {
 
       if (error) throw error;
 
+      // Store state and userId for callback
       sessionStorage.setItem('oauth_state', data.state);
+      sessionStorage.setItem('oauth_user_id', user.id);
       localStorage.removeItem('oauth_result');
       
       const popup = window.open(
         data.authUrl,
         'instagram_oauth',
-        'width=600,height=700,scrollbars=yes,resizable=yes'
+        'width=600,height=800,scrollbars=yes,resizable=yes'
       );
       
       if (!popup) {
@@ -240,7 +259,10 @@ const Settings = () => {
             toast.success(`${result.accounts?.length || 1} conta(s) conectada(s)!`);
             fetchAccounts();
           } else {
-            toast.error(result.error || 'Falha ao processar a autorização');
+            // Show detailed error message
+            toast.error(result.error || 'Falha ao processar a autorização', {
+              duration: 8000
+            });
           }
           setConnecting(false);
         }
@@ -602,7 +624,7 @@ const Settings = () => {
                     Gerencie suas contas do Instagram
                   </p>
                 </div>
-                <Button onClick={startOAuth} disabled={connecting}>
+                <Button onClick={handleConnectClick} disabled={connecting}>
                   {connecting ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
@@ -673,7 +695,7 @@ const Settings = () => {
                         Conecte sua conta Business ou Creator do Instagram para publicar automaticamente.
                       </p>
                       
-                      <Button onClick={startOAuth} disabled={connecting} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
+                      <Button onClick={handleConnectClick} disabled={connecting} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
                         {connecting ? (
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         ) : (
@@ -755,6 +777,13 @@ const Settings = () => {
           </Tabs>
         </div>
       </main>
+
+      {/* OAuth Instructions Modal */}
+      <OAuthInstructionsModal
+        open={showOAuthModal}
+        onOpenChange={setShowOAuthModal}
+        onContinue={startOAuth}
+      />
     </div>
   );
 };
