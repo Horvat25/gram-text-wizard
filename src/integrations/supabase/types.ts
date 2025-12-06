@@ -54,6 +54,7 @@ export type Database = {
           page_id: string | null
           profile_picture_url: string | null
           updated_at: string | null
+          user_id: string | null
           username: string | null
         }
         Insert: {
@@ -65,6 +66,7 @@ export type Database = {
           page_id?: string | null
           profile_picture_url?: string | null
           updated_at?: string | null
+          user_id?: string | null
           username?: string | null
         }
         Update: {
@@ -76,6 +78,7 @@ export type Database = {
           page_id?: string | null
           profile_picture_url?: string | null
           updated_at?: string | null
+          user_id?: string | null
           username?: string | null
         }
         Relationships: []
@@ -210,6 +213,7 @@ export type Database = {
           created_at: string | null
           id: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           brand_logo_url?: string | null
@@ -217,6 +221,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           brand_logo_url?: string | null
@@ -224,6 +229,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
