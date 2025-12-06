@@ -18,6 +18,7 @@ const Index = () => {
   const {
     posts,
     isLoading,
+    fetchPosts,
     createPost,
     updatePost,
     deletePost,
@@ -90,7 +91,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <AnalyticsTab posts={posts} />
+            <AnalyticsTab posts={posts} onRefresh={fetchPosts} />
           </TabsContent>
 
           <TabsContent value="ai-settings" className="space-y-6">

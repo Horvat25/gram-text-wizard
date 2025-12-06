@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   TrendingUp,
   TrendingDown,
@@ -14,6 +15,8 @@ import {
   Zap,
   Users,
   Calendar,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import {
   LineChart,
@@ -31,9 +34,12 @@ import {
 } from "recharts";
 import { Post } from "@/hooks/usePosts";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AnalyticsTabProps {
   posts: Post[];
+  onRefresh?: () => void;
 }
 
 const COLORS = [
@@ -44,7 +50,8 @@ const COLORS = [
   "hsl(var(--destructive))",
 ];
 
-const AnalyticsTab = ({ posts }: AnalyticsTabProps) => {
+const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
+  const [isSyncing, setIsSyncing] = useState(false);
   const { summary, topPosts, insights, postsWithMetrics } = useAnalytics(posts);
 
   const formatNumber = (num: number) => {
@@ -61,6 +68,29 @@ const AnalyticsTab = ({ posts }: AnalyticsTabProps) => {
       engagement: data.avgEngagement,
     }));
   }, [summary.performanceByType]);
+
+  const handleSyncMetrics = async () => {
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-instagram-metrics");
+      
+      if (error) throw error;
+      
+      if (data.updated > 0) {
+        toast.success(`${data.updated} posts sincronizados com sucesso!`);
+        onRefresh?.();
+      } else if (data.errors?.length) {
+        toast.warning(`Sincronização parcial: ${data.errors.length} erros`);
+      } else {
+        toast.info(data.message || "Nenhum post para sincronizar");
+      }
+    } catch (error: any) {
+      console.error("Sync error:", error);
+      toast.error(error.message || "Erro ao sincronizar métricas");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   if (summary.publishedPosts === 0) {
     return (
@@ -85,6 +115,28 @@ const AnalyticsTab = ({ posts }: AnalyticsTabProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Header with Sync Button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Analytics</h2>
+          <p className="text-muted-foreground">
+            Métricas e insights dos seus posts
+          </p>
+        </div>
+        <Button 
+          onClick={handleSyncMetrics} 
+          disabled={isSyncing}
+          variant="outline"
+        >
+          {isSyncing ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4 mr-2" />
+          )}
+          Sincronizar do Instagram
+        </Button>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
