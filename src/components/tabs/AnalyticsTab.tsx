@@ -79,6 +79,10 @@ const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
       if (data.updated > 0) {
         toast.success(`${data.updated} posts sincronizados com sucesso!`);
         onRefresh?.();
+      } else if (data.apiError) {
+        toast.warning("Permissões do Instagram limitadas. Reconecte sua conta nas Configurações para obter métricas em tempo real.", {
+          duration: 6000,
+        });
       } else if (data.errors?.length) {
         toast.warning(`Sincronização parcial: ${data.errors.length} erros`);
       } else {
