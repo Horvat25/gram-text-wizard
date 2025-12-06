@@ -13,7 +13,6 @@ serve(async (req) => {
 
   try {
     const FACEBOOK_APP_ID = Deno.env.get('FACEBOOK_APP_ID');
-    const FACEBOOK_CONFIG_ID = Deno.env.get('FACEBOOK_CONFIG_ID');
     
     if (!FACEBOOK_APP_ID) {
       throw new Error('FACEBOOK_APP_ID not configured');
@@ -29,15 +28,14 @@ serve(async (req) => {
     const state = crypto.randomUUID();
 
     // Build OAuth URL with explicit scopes
-    // Even with config_id, we add scopes explicitly for better compatibility
+    // DO NOT use config_id as it overrides the scopes
     const authUrl = new URL('https://www.facebook.com/v18.0/dialog/oauth');
     authUrl.searchParams.set('client_id', FACEBOOK_APP_ID);
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('response_type', 'code');
     authUrl.searchParams.set('state', state);
     
-    // CRITICAL: Add explicit scopes for Instagram Business
-    // These are the required permissions for Instagram Content Publishing
+    // CRITICAL: Explicit scopes for Instagram Business API
     const scopes = [
       'pages_show_list',
       'pages_read_engagement',
@@ -49,15 +47,9 @@ serve(async (req) => {
     ].join(',');
     
     authUrl.searchParams.set('scope', scopes);
-    
-    // Add config_id if available (for Facebook Login for Business)
-    if (FACEBOOK_CONFIG_ID) {
-      authUrl.searchParams.set('config_id', FACEBOOK_CONFIG_ID);
-    }
 
-    console.log('Generated OAuth URL with explicit scopes');
+    console.log('Generated OAuth URL with explicit scopes (no config_id)');
     console.log('Scopes requested:', scopes);
-    console.log('Config ID:', FACEBOOK_CONFIG_ID || 'not set');
     console.log('Redirect URI:', redirectUri);
 
     return new Response(
