@@ -26,7 +26,7 @@ serve(async (req) => {
       throw new Error('Supabase credentials not configured');
     }
 
-    const { code, redirectUri } = await req.json();
+    const { code, redirectUri, userId } = await req.json();
 
     if (!code) {
       throw new Error('Authorization code is required');
@@ -35,6 +35,8 @@ serve(async (req) => {
     if (!redirectUri) {
       throw new Error('Redirect URI is required');
     }
+
+    console.log('Processing OAuth callback with code:', code.substring(0, 10) + '...', 'userId:', userId);
 
     console.log('Processing OAuth callback with code:', code.substring(0, 10) + '...');
 
@@ -207,7 +209,8 @@ serve(async (req) => {
             access_token: pageAccessToken, // Use page token for Instagram API
             expires_at: expiresAt.toISOString(),
             connected_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            user_id: userId || null
           }, {
             onConflict: 'instagram_user_id'
           })
