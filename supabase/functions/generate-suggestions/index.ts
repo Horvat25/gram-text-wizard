@@ -100,18 +100,25 @@ Retorne APENAS o JSON válido, sem texto adicional.`;
       throw new Error("No content received from AI");
     }
 
-    // Parse JSON from response
+    // Parse JSON from response - handle markdown code blocks
     let suggestions;
     try {
-      // Try to extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        suggestions = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
+      let jsonContent = content;
+      
+      // Remove markdown code blocks if present
+      if (jsonContent.includes("```json")) {
+        jsonContent = jsonContent.replace(/```json\s*/g, "").replace(/```\s*/g, "");
+      } else if (jsonContent.includes("```")) {
+        jsonContent = jsonContent.replace(/```\s*/g, "");
       }
+      
+      // Trim whitespace
+      jsonContent = jsonContent.trim();
+      
+      // Try to parse the JSON
+      suggestions = JSON.parse(jsonContent);
     } catch (parseError) {
-      console.error("Parse error:", parseError, "Content:", content);
+      console.error("Parse error:", parseError, "Content:", content.substring(0, 500));
       throw new Error("Failed to parse AI response");
     }
 
