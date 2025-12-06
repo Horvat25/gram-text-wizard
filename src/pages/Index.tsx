@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, CalendarDays, BarChart3, Link2 } from "lucide-react";
+import { Sparkles, CalendarDays, BarChart3, Link2, History } from "lucide-react";
 import ContentCreationTab from "@/components/tabs/ContentCreationTab";
 import PublicationQueueTab from "@/components/tabs/PublicationQueueTab";
 import AnalyticsTab from "@/components/tabs/AnalyticsTab";
 import { ConnectAccountTab } from "@/components/tabs/ConnectAccountTab";
+import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
 import { usePosts } from "@/hooks/usePosts";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("create");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "create");
+  
   const {
     posts,
     isLoading,
@@ -20,13 +24,26 @@ const Index = () => {
     reschedulePost,
   } = usePosts();
 
+  // Sync tab with URL
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       <main className="container mx-auto px-4 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
             <TabsTrigger value="create" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               <span className="hidden sm:inline">Criação</span>
@@ -34,6 +51,10 @@ const Index = () => {
             <TabsTrigger value="queue" className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
               <span className="hidden sm:inline">Fila</span>
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              <span className="hidden sm:inline">Histórico</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -57,6 +78,10 @@ const Index = () => {
               onDelete={deletePost}
               onUpdate={updatePost}
             />
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6">
+            <PostHistoryTab />
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
