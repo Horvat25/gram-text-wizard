@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { postId } = await req.json();
+    const { postId, accountId } = await req.json();
 
     if (!postId) {
       throw new Error("postId é obrigatório");
@@ -37,22 +37,105 @@ serve(async (req) => {
       throw new Error("Post não encontrado");
     }
 
-    // Simular métricas de publicação (por enquanto, sem API real do Instagram)
-    const likes_count = Math.floor(Math.random() * 5000 + 500);
-    const comments_count = Math.floor(Math.random() * 200 + 20);
-    const saves_count = Math.floor(Math.random() * 800 + 100);
-    const reach = Math.floor(Math.random() * 15000 + 2000);
+    // Buscar conta do Instagram (usa accountId se fornecido, senão pega a primeira)
+    let accountQuery = supabase.from("instagram_accounts").select("*");
+    
+    if (accountId) {
+      accountQuery = accountQuery.eq("id", accountId);
+    }
+    
+    const { data: accounts, error: accountError } = await accountQuery.limit(1);
 
-    // Atualizar o post para publicado
+    if (accountError || !accounts || accounts.length === 0) {
+      console.log("Nenhuma conta Instagram conectada, simulando publicação...");
+      
+      // Simular métricas de publicação
+      const likes_count = Math.floor(Math.random() * 5000 + 500);
+      const comments_count = Math.floor(Math.random() * 200 + 20);
+      const saves_count = Math.floor(Math.random() * 800 + 100);
+      const reach = Math.floor(Math.random() * 15000 + 2000);
+
+      const { error: updateError } = await supabase
+        .from("posts")
+        .update({
+          status: "published",
+          published_at: new Date().toISOString(),
+          likes_count,
+          comments_count,
+          saves_count,
+          reach,
+        })
+        .eq("id", postId);
+
+      if (updateError) {
+        throw new Error(`Erro ao atualizar post: ${updateError.message}`);
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          postId,
+          simulated: true,
+          message: "Post publicado (simulação - nenhuma conta conectada)",
+          metrics: { likes_count, comments_count, saves_count, reach },
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const account = accounts[0];
+    const accessToken = account.access_token;
+    const instagramUserId = account.instagram_user_id;
+
+    console.log(`Publicando no Instagram para conta: ${account.username || instagramUserId}`);
+
+    // Verificar se tem imagem (necessário para publicar no Instagram)
+    if (!post.image_url) {
+      throw new Error("Uma imagem é necessária para publicar no Instagram. Adicione uma imagem ao post.");
+    }
+
+    // Step 1: Create media container
+    const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
+    createMediaUrl.searchParams.set('image_url', post.image_url);
+    createMediaUrl.searchParams.set('caption', `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`);
+    createMediaUrl.searchParams.set('access_token', accessToken);
+
+    console.log("Creating media container...");
+    const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
+    const mediaData = await mediaResponse.json();
+
+    if (mediaData.error) {
+      console.error("Instagram API error (create media):", mediaData.error);
+      throw new Error(`Instagram API: ${mediaData.error.message}`);
+    }
+
+    const creationId = mediaData.id;
+    console.log(`Media container created: ${creationId}`);
+
+    // Step 2: Publish the media
+    const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);
+    publishUrl.searchParams.set('creation_id', creationId);
+    publishUrl.searchParams.set('access_token', accessToken);
+
+    console.log("Publishing media...");
+    const publishResponse = await fetch(publishUrl.toString(), { method: 'POST' });
+    const publishData = await publishResponse.json();
+
+    if (publishData.error) {
+      console.error("Instagram API error (publish):", publishData.error);
+      throw new Error(`Instagram API: ${publishData.error.message}`);
+    }
+
+    const instagramPostId = publishData.id;
+    console.log(`Post published successfully! Instagram Post ID: ${instagramPostId}`);
+
+    // Atualizar o post no banco
     const { error: updateError } = await supabase
       .from("posts")
       .update({
         status: "published",
         published_at: new Date().toISOString(),
-        likes_count,
-        comments_count,
-        saves_count,
-        reach,
+        instagram_post_id: instagramPostId,
       })
       .eq("id", postId);
 
@@ -60,22 +143,15 @@ serve(async (req) => {
       throw new Error(`Erro ao atualizar post: ${updateError.message}`);
     }
 
-    console.log(`Post ${postId} publicado com sucesso`);
-
     return new Response(
       JSON.stringify({
         success: true,
         postId,
-        metrics: {
-          likes_count,
-          comments_count,
-          saves_count,
-          reach,
-        },
+        instagramPostId,
+        accountUsername: account.username,
+        message: `Post publicado com sucesso no Instagram @${account.username}!`,
       }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("Erro em publish-post:", error);

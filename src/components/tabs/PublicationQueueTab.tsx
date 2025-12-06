@@ -13,13 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   CalendarDays,
   Clock,
   Send,
@@ -28,12 +21,15 @@ import {
   Eye,
   ListOrdered,
   CalendarCheck,
+  Instagram,
   AlertCircle,
 } from "lucide-react";
-import { format, isSameDay, parseISO, isAfter, isBefore } from "date-fns";
+import { format, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
+import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -55,6 +51,9 @@ const PublicationQueueTab = ({
   const [reschedulePost, setReschedulePost] = useState<Post | null>(null);
   const [newScheduleDate, setNewScheduleDate] = useState("");
   const [viewingPost, setViewingPost] = useState<Post | null>(null);
+  
+  const { accounts, loading: loadingAccounts } = useInstagramAccounts();
+  const hasConnectedAccount = accounts.length > 0;
 
   // Filter scheduled and draft posts
   const queuedPosts = useMemo(
@@ -206,7 +205,24 @@ const PublicationQueueTab = ({
 
   return (
     <div className="space-y-6">
-      {/* Header Stats */}
+      {/* Connected Account Info */}
+      {!loadingAccounts && (
+        hasConnectedAccount ? (
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+            <Instagram className="h-4 w-4 text-green-600" />
+            <span className="text-sm text-green-700 dark:text-green-400">
+              Publicações serão feitas em: <strong>@{accounts[0].username || 'Conta conectada'}</strong>
+            </span>
+          </div>
+        ) : (
+          <Alert className="border-amber-500/30 bg-amber-500/5">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-700 dark:text-amber-400">
+              Nenhuma conta conectada. Os posts serão salvos mas não publicados automaticamente no Instagram.
+            </AlertDescription>
+          </Alert>
+        )
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4 pb-4">
