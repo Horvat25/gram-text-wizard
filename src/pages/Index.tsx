@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, CalendarDays, BarChart3, Link2, History, Wand2 } from "lucide-react";
+import { Sparkles, CalendarDays, BarChart3, Link2, History, Wand2, Lightbulb } from "lucide-react";
 import ContentCreationTab from "@/components/tabs/ContentCreationTab";
 import PublicationQueueTab from "@/components/tabs/PublicationQueueTab";
 import AnalyticsTab from "@/components/tabs/AnalyticsTab";
 import { ConnectAccountTab } from "@/components/tabs/ConnectAccountTab";
 import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
 import { AISettingsTab } from "@/components/tabs/AISettingsTab";
+import { SuggestionsTab } from "@/components/tabs/SuggestionsTab";
 import { usePosts } from "@/hooks/usePosts";
 
 const Index = () => {
@@ -45,10 +46,14 @@ const Index = () => {
 
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
             <TabsTrigger value="create" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               <span className="hidden sm:inline">Criação</span>
+            </TabsTrigger>
+            <TabsTrigger value="suggestions" className="flex items-center gap-2">
+              <Lightbulb className="h-4 w-4" />
+              <span className="hidden sm:inline">Sugestões</span>
             </TabsTrigger>
             <TabsTrigger value="queue" className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
@@ -74,6 +79,10 @@ const Index = () => {
 
           <TabsContent value="create" className="space-y-6">
             <ContentCreationTab onPostCreated={createPost} />
+          </TabsContent>
+
+          <TabsContent value="suggestions" className="space-y-6">
+            <SuggestionsTab />
           </TabsContent>
 
           <TabsContent value="queue" className="space-y-6">
