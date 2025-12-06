@@ -58,8 +58,11 @@ const Index = () => {
     try {
       const redirectUri = `${window.location.origin}/`;
       
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase.functions.invoke('oauth-callback', {
-        body: { code, redirectUri }
+        body: { code, redirectUri, userId: user?.id }
       });
 
       if (error) throw error;
