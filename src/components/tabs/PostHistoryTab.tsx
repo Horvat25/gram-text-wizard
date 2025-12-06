@@ -430,38 +430,48 @@ function DayCell({ date, posts, isToday, isCurrentMonth, viewMode, onPostClick, 
         {dayNumber}
       </div>
       
-      <div className={`space-y-1 ${viewMode === 'weekly' ? 'max-h-[400px]' : 'max-h-[80px]'} overflow-y-auto`}>
-        {posts.map((post) => (
-          <div 
-            key={post.id}
-            className="cursor-pointer group"
-            onClick={() => onPostClick(post)}
-          >
-            {post.image_url ? (
-              <div className={`relative rounded overflow-hidden ${viewMode === 'weekly' ? 'aspect-square' : 'h-[50px]'}`}>
-                <img 
-                  src={post.image_url} 
-                  alt="Post" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
-                {viewMode === 'weekly' && (
-                  <div className="absolute bottom-1 left-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="flex items-center gap-2 text-white text-xs">
-                      <span className="flex items-center gap-0.5">
-                        <Heart className="w-3 h-3" /> {post.likes_count || 0}
-                      </span>
+      <div className={`space-y-1 ${viewMode === 'weekly' ? 'max-h-[400px]' : 'max-h-[70px]'} overflow-y-auto`}>
+        {posts.map((post) => {
+          const postTitle = post.caption?.split('\n')[0]?.slice(0, 20) || 'Post';
+          const postTime = post.published_at ? format(parseISO(post.published_at), "HH:mm") : '';
+          
+          return (
+            <div 
+              key={post.id}
+              className="cursor-pointer group"
+              onClick={() => onPostClick(post)}
+            >
+              {post.image_url ? (
+                <div className={`relative rounded overflow-hidden ${viewMode === 'weekly' ? 'aspect-square' : 'h-[40px]'}`}>
+                  <img 
+                    src={post.image_url} 
+                    alt="Post" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
+                  {viewMode === 'weekly' && (
+                    <div className="absolute bottom-1 left-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2 text-white text-xs">
+                        <span className="flex items-center gap-0.5">
+                          <Heart className="w-3 h-3" /> {post.likes_count || 0}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              ) : (
+                <div className={`bg-muted rounded flex items-center justify-center text-xs text-muted-foreground ${viewMode === 'weekly' ? 'aspect-square' : 'h-[40px]'}`}>
+                  Post
+                </div>
+              )}
+              {/* Title and Time */}
+              <div className="mt-0.5 px-0.5">
+                <p className="text-[10px] font-medium truncate leading-tight">{postTitle}{postTitle.length >= 20 ? '...' : ''}</p>
+                <p className="text-[9px] text-muted-foreground">{postTime}</p>
               </div>
-            ) : (
-              <div className={`bg-muted rounded flex items-center justify-center text-xs text-muted-foreground ${viewMode === 'weekly' ? 'aspect-square' : 'h-[50px]'}`}>
-                Post
-              </div>
-            )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
