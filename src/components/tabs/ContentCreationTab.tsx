@@ -389,6 +389,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             hashtags={hashtags}
             imageUrl={imageUrl}
             username={accounts[0]?.username}
+            avatarUrl={accounts[0]?.profile_picture_url || undefined}
           />
         </div>
         {generatedText && (
