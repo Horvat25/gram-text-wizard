@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -68,6 +68,28 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
+
+  // Load suggestion data from sessionStorage on mount
+  useEffect(() => {
+    const suggestionData = sessionStorage.getItem('suggestionData');
+    if (suggestionData) {
+      try {
+        const data = JSON.parse(suggestionData);
+        if (data.topic) setTopic(data.topic);
+        if (data.postType) setPostType(data.postType);
+        if (data.captionIdea) setGeneratedText(data.captionIdea);
+        if (data.imagePrompt) setImagePrompt(data.imagePrompt);
+        if (data.hashtags) setHashtags(data.hashtags);
+        
+        // Clear sessionStorage after loading
+        sessionStorage.removeItem('suggestionData');
+        
+        toast.success('Sugestão carregada! Personalize e gere seu post.');
+      } catch (e) {
+        console.error('Error loading suggestion data:', e);
+      }
+    }
+  }, []);
 
   const buildCustomInstructions = () => {
     const settings = getAISettings();
