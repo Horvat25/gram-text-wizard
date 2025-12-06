@@ -42,6 +42,17 @@ interface ContentCreationTabProps {
   onPostCreated: (post: CreatePostData) => Promise<any>;
 }
 
+const AI_SETTINGS_KEY = 'ai_generation_settings';
+
+const getAISettings = () => {
+  try {
+    const saved = localStorage.getItem(AI_SETTINGS_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
+
 const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const [topic, setTopic] = useState("");
@@ -58,6 +69,41 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
 
+  const buildCustomInstructions = () => {
+    const settings = getAISettings();
+    if (!settings) return '';
+
+    const parts: string[] = [];
+    
+    if (settings.brandName) {
+      parts.push(`Nome da marca: ${settings.brandName}`);
+    }
+    if (settings.targetAudience) {
+      parts.push(`Público-alvo: ${settings.targetAudience}`);
+    }
+    if (settings.brandVoice) {
+      parts.push(`Tom de voz: ${settings.brandVoice}`);
+    }
+    if (!settings.useEmojis) {
+      parts.push('NÃO use emojis na legenda');
+    } else if (settings.emojiAmount) {
+      const amounts: Record<string, string> = {
+        poucos: 'Use poucos emojis (1-2 no máximo)',
+        moderado: 'Use emojis com moderação (3-5)',
+        muitos: 'Use bastante emojis (6+)',
+      };
+      parts.push(amounts[settings.emojiAmount] || '');
+    }
+    if (settings.preferredHashtagCount) {
+      parts.push(`Use aproximadamente ${settings.preferredHashtagCount} hashtags`);
+    }
+    if (settings.captionInstructions) {
+      parts.push(`Instruções adicionais: ${settings.captionInstructions}`);
+    }
+
+    return parts.filter(Boolean).join('\n');
+  };
+
   const generateCaption = async () => {
     if (!topic.trim()) {
       toast.error("Por favor, insira um tópico");
@@ -66,8 +112,10 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
     setIsGenerating(true);
     try {
+      const customInstructions = buildCustomInstructions();
+      
       const { data, error } = await supabase.functions.invoke("generate-caption", {
-        body: { topic: topic.trim(), postType },
+        body: { topic: topic.trim(), postType, customInstructions },
       });
 
       if (error) throw error;
@@ -92,8 +140,11 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
     setIsGeneratingImage(true);
     try {
+      const settings = getAISettings();
+      const customStyle = settings?.imageStyle || null;
+
       const { data, error } = await supabase.functions.invoke("generate-image", {
-        body: { prompt, format: "square" },
+        body: { prompt, format: "square", customStyle },
       });
 
       if (error) throw error;
