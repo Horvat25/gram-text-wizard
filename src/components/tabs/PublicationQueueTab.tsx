@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +23,7 @@ import {
   Instagram,
   AlertCircle,
 } from "lucide-react";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
@@ -46,8 +45,6 @@ const PublicationQueueTab = ({
   onDelete,
   onUpdate,
 }: PublicationQueueTabProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [viewMode, setViewMode] = useState<"calendar" | "list">("list");
   const [reschedulePost, setReschedulePost] = useState<Post | null>(null);
   const [newScheduleDate, setNewScheduleDate] = useState("");
   const [viewingPost, setViewingPost] = useState<Post | null>(null);
@@ -78,19 +75,14 @@ const PublicationQueueTab = ({
     [queuedPosts]
   );
 
-  // Posts for selected date
-  const postsForSelectedDate = useMemo(() => {
-    if (!selectedDate) return [];
-    return scheduledPosts.filter(
-      (p) => p.scheduled_for && isSameDay(parseISO(p.scheduled_for), selectedDate)
-    );
-  }, [scheduledPosts, selectedDate]);
-
-  // Dates with scheduled posts (for calendar highlighting)
-  const datesWithPosts = useMemo(() => {
-    return scheduledPosts
-      .filter((p) => p.scheduled_for)
-      .map((p) => parseISO(p.scheduled_for!));
+  // Posts scheduled for today
+  const todayPosts = useMemo(() => {
+    const today = new Date();
+    return scheduledPosts.filter((p) => {
+      if (!p.scheduled_for) return false;
+      const postDate = parseISO(p.scheduled_for);
+      return postDate.toDateString() === today.toDateString();
+    });
   }, [scheduledPosts]);
 
   const handleReschedule = async () => {
@@ -125,12 +117,8 @@ const PublicationQueueTab = ({
     }
   };
 
-  const PostCard = ({ post, compact = false }: { post: Post; compact?: boolean }) => (
-    <div
-      className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${
-        compact ? "p-3" : ""
-      }`}
-    >
+  const PostCard = ({ post }: { post: Post }) => (
+    <div className="p-4 border rounded-lg bg-card hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-2 flex-wrap">
           <Badge className={getStatusColor(post.status)}>
@@ -150,11 +138,9 @@ const PublicationQueueTab = ({
         )}
       </div>
 
-      <p className={`text-sm mb-3 ${compact ? "line-clamp-2" : "line-clamp-3"}`}>
-        {post.caption}
-      </p>
+      <p className="text-sm mb-3 line-clamp-3">{post.caption}</p>
 
-      {post.image_url && !compact && (
+      {post.image_url && (
         <div className="mb-3">
           <img
             src={post.image_url}
@@ -223,6 +209,8 @@ const PublicationQueueTab = ({
           </Alert>
         )
       )}
+
+      {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4 pb-4">
@@ -259,7 +247,7 @@ const PublicationQueueTab = ({
                 <CalendarCheck className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{postsForSelectedDate.length}</p>
+                <p className="text-2xl font-bold">{todayPosts.length}</p>
                 <p className="text-xs text-muted-foreground">Hoje</p>
               </div>
             </div>
@@ -281,139 +269,60 @@ const PublicationQueueTab = ({
         </Card>
       </div>
 
-      {/* View Toggle */}
-      <div className="flex gap-2">
-        <Button
-          variant={viewMode === "list" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setViewMode("list")}
-        >
-          <ListOrdered className="h-4 w-4 mr-2" />
-          Lista
-        </Button>
-        <Button
-          variant={viewMode === "calendar" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setViewMode("calendar")}
-        >
-          <CalendarDays className="h-4 w-4 mr-2" />
-          Calendário
-        </Button>
+      {/* Posts Lists */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Scheduled Posts */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-warning" />
+              Posts Agendados
+            </CardTitle>
+            <CardDescription>
+              Ordenados por data de publicação
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {scheduledPosts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Clock className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>Nenhum post agendado</p>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                {scheduledPosts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Draft Posts */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5 text-muted-foreground" />
+              Rascunhos
+            </CardTitle>
+            <CardDescription>Posts aguardando agendamento</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {draftPosts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Edit className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>Nenhum rascunho</p>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                {draftPosts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
-
-      {viewMode === "calendar" ? (
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Calendar */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Calendário de Publicações</CardTitle>
-              <CardDescription>
-                Selecione um dia para ver os posts agendados
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                locale={ptBR}
-                modifiers={{
-                  hasPost: datesWithPosts,
-                }}
-                modifiersStyles={{
-                  hasPost: {
-                    backgroundColor: "hsl(var(--primary) / 0.2)",
-                    borderRadius: "50%",
-                  },
-                }}
-                className="rounded-md border"
-              />
-            </CardContent>
-          </Card>
-
-          {/* Posts for selected date */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {selectedDate
-                  ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR })
-                  : "Selecione uma data"}
-              </CardTitle>
-              <CardDescription>
-                {postsForSelectedDate.length} post(s) agendado(s)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {postsForSelectedDate.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CalendarDays className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                  <p>Nenhum post agendado para este dia</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {postsForSelectedDate.map((post) => (
-                    <PostCard key={post.id} post={post} compact />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Scheduled Posts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-warning" />
-                Posts Agendados
-              </CardTitle>
-              <CardDescription>
-                Ordenados por data de publicação
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {scheduledPosts.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Clock className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                  <p>Nenhum post agendado</p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto">
-                  {scheduledPosts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Draft Posts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Edit className="h-5 w-5 text-muted-foreground" />
-                Rascunhos
-              </CardTitle>
-              <CardDescription>Posts aguardando agendamento</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {draftPosts.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Edit className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                  <p>Nenhum rascunho</p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto">
-                  {draftPosts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       {/* Reschedule Dialog */}
       <Dialog open={!!reschedulePost} onOpenChange={() => setReschedulePost(null)}>
