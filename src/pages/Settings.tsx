@@ -5,15 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Upload, Loader2, Instagram, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Instagram, CheckCircle, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import { loadSettings, saveSettings } from "@/lib/local-storage";
-import { 
-  isInstagramConnected, 
-  getInstagramCredentials, 
-  connectInstagram, 
-  disconnectInstagram 
-} from "@/lib/instagram-api";
+import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -21,14 +16,12 @@ const Settings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [brandName, setBrandName] = useState("");
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
-  const [instagramAppId, setInstagramAppId] = useState("");
-  const [instagramAppSecret, setInstagramAppSecret] = useState("");
-  const [isConnected, setIsConnected] = useState(false);
-  const [instagramUsername, setInstagramUsername] = useState("");
+  
+  const { accounts, loading: loadingAccounts } = useInstagramAccounts();
+  const hasConnectedAccount = accounts.length > 0;
 
   useEffect(() => {
     loadSettingsFromStorage();
-    checkInstagramConnection();
   }, []);
 
   const loadSettingsFromStorage = () => {
@@ -37,27 +30,11 @@ const Settings = () => {
       const settings = loadSettings();
       setBrandName(settings.brandName || "");
       setBrandLogoUrl(settings.brandLogoUrl || "");
-      
-      // Load Instagram App credentials
-      const appId = localStorage.getItem("instagram_app_id") || "";
-      const appSecret = localStorage.getItem("instagram_app_secret") || "";
-      setInstagramAppId(appId);
-      setInstagramAppSecret(appSecret);
     } catch (error: any) {
       console.error("Error loading settings:", error);
       toast.error("Erro ao carregar configurações");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const checkInstagramConnection = () => {
-    const connected = isInstagramConnected();
-    setIsConnected(connected);
-    
-    if (connected) {
-      const credentials = getInstagramCredentials();
-      setInstagramUsername(credentials?.username || "");
     }
   };
 
@@ -70,7 +47,6 @@ const Settings = () => {
       return;
     }
 
-    // Convert image to base64 for local storage
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
@@ -96,14 +72,6 @@ const Settings = () => {
         brandLogoUrl: brandLogoUrl || undefined,
       });
 
-      // Save Instagram App credentials
-      if (instagramAppId) {
-        localStorage.setItem("instagram_app_id", instagramAppId);
-      }
-      if (instagramAppSecret) {
-        localStorage.setItem("instagram_app_secret", instagramAppSecret);
-      }
-
       toast.success("Configurações salvas com sucesso!");
     } catch (error: any) {
       console.error("Error saving settings:", error);
@@ -111,23 +79,6 @@ const Settings = () => {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleConnectInstagram = () => {
-    if (!instagramAppId) {
-      toast.error("Configure o App ID do Instagram primeiro");
-      return;
-    }
-    
-    const redirectUri = `${window.location.origin}/instagram/callback`;
-    connectInstagram(instagramAppId, redirectUri);
-  };
-
-  const handleDisconnectInstagram = () => {
-    disconnectInstagram();
-    setIsConnected(false);
-    setInstagramUsername("");
-    toast.success("Conta Instagram desconectada");
   };
 
   if (isLoading) {
@@ -231,98 +182,49 @@ const Settings = () => {
                   Integração com Instagram
                 </CardTitle>
                 <CardDescription>
-                  Conecte sua conta comercial do Instagram para publicar automaticamente
+                  Gerencie suas contas do Instagram conectadas
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Instagram App Credentials */}
-                <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                  <div className="space-y-2">
-                    <Label htmlFor="instagram-app-id">Instagram App ID</Label>
-                    <Input
-                      id="instagram-app-id"
-                      type="text"
-                      placeholder="Digite o App ID do Facebook Developers"
-                      value={instagramAppId}
-                      onChange={(e) => setInstagramAppId(e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Obtenha em{" "}
-                      <a
-                        href="https://developers.facebook.com/apps"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        Facebook Developers
-                      </a>
-                    </p>
+              <CardContent className="space-y-4">
+                {loadingAccounts ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="instagram-app-secret">Instagram App Secret</Label>
-                    <Input
-                      id="instagram-app-secret"
-                      type="password"
-                      placeholder="Digite o App Secret"
-                      value={instagramAppSecret}
-                      onChange={(e) => setInstagramAppSecret(e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Mantenha este valor em segredo
-                    </p>
-                  </div>
-                </div>
-
-                {/* Connection Status */}
-                {isConnected ? (
+                ) : hasConnectedAccount ? (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg bg-green-50 dark:bg-green-950/20">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
-                        <div>
-                          <p className="font-medium text-green-900 dark:text-green-100">
-                            Conectado
-                          </p>
-                          <p className="text-sm text-green-700 dark:text-green-300">
-                            @{instagramUsername}
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <div className="flex-1">
+                        <p className="font-medium text-green-700 dark:text-green-400">
+                          {accounts.length} conta(s) conectada(s)
+                        </p>
+                        <p className="text-sm text-green-600 dark:text-green-500">
+                          @{accounts.map(a => a.username || 'Conta').join(', @')}
+                        </p>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleDisconnectInstagram}
-                        className="border-red-200 text-red-600 hover:bg-red-50"
-                      >
-                        <XCircle className="mr-2 h-4 w-4" />
-                        Desconectar
-                      </Button>
                     </div>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate("/?tab=connect")}
+                      className="w-full"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Gerenciar Contas
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="p-4 border rounded-lg bg-muted/50">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        ⚠️ Antes de conectar, certifique-se de:
-                      </p>
-                      <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-                        <li>Ter uma conta comercial do Instagram</li>
-                        <li>Ter configurado o App ID e App Secret acima</li>
-                        <li>Adicionar a URL de redirect no Facebook Developers:</li>
-                        <code className="block mt-1 p-2 bg-background rounded text-xs">
-                          {window.location.origin}/instagram/callback
-                        </code>
-                      </ul>
-                    </div>
-
+                    <p className="text-sm text-muted-foreground">
+                      Nenhuma conta do Instagram conectada. Conecte uma conta para publicar automaticamente.
+                    </p>
+                    
                     <Button
-                      onClick={handleConnectInstagram}
-                      disabled={!instagramAppId}
-                      className="w-full"
+                      onClick={() => navigate("/?tab=connect")}
+                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90"
                     >
                       <Instagram className="mr-2 h-4 w-4" />
-                      Conectar com Instagram
+                      Conectar Instagram
                     </Button>
                   </div>
                 )}
