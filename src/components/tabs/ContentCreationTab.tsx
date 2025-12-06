@@ -17,15 +17,18 @@ import {
   Calendar,
   Image as ImageIcon,
   Loader2,
-  Brain,
   Sparkles,
+  Instagram,
+  AlertCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CreatePostData } from "@/hooks/usePosts";
+import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import InstagramPreview from "@/components/InstagramPreview";
 import PostScore from "@/components/PostScore";
 import DownloadActions from "@/components/DownloadActions";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const POST_TYPES = [
   { value: "engajamento", label: "Engajamento", description: "Máxima interação" },
@@ -51,6 +54,9 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
+  
+  const { accounts, loading: loadingAccounts } = useInstagramAccounts();
+  const hasConnectedAccount = accounts.length > 0;
 
   const generateCaption = async () => {
     if (!topic.trim()) {
@@ -150,6 +156,25 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Connected Account Info */}
+          {!loadingAccounts && (
+            hasConnectedAccount ? (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <Instagram className="h-4 w-4 text-green-600" />
+                <span className="text-sm text-green-700 dark:text-green-400">
+                  Publicando em: <strong>@{accounts[0].username || 'Conta conectada'}</strong>
+                </span>
+              </div>
+            ) : (
+              <Alert className="border-amber-500/30 bg-amber-500/5">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <AlertDescription className="text-amber-700 dark:text-amber-400">
+                  Nenhuma conta conectada. Conecte uma conta na aba "Conectar" para publicar automaticamente.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
+          
           <div className="space-y-2">
             <Label htmlFor="postType">Tipo de Post</Label>
             <Select value={postType} onValueChange={setPostType}>
@@ -230,7 +255,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
               {/* Image Generation */}
               <div className="space-y-2 pt-2 border-t">
-                <Label htmlFor="imagePrompt">Gerar Imagem (Opcional)</Label>
+                <Label htmlFor="imagePrompt">Gerar Imagem (Obrigatório para publicar)</Label>
                 <Input
                   id="imagePrompt"
                   placeholder="Descrição da imagem..."
@@ -255,6 +280,11 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                     </>
                   )}
                 </Button>
+                {!imageUrl && (
+                  <p className="text-xs text-amber-600">
+                    ⚠️ Uma imagem é necessária para publicar no Instagram
+                  </p>
+                )}
               </div>
 
               {/* Schedule */}
@@ -300,6 +330,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             caption={generatedText}
             hashtags={hashtags}
             imageUrl={imageUrl}
+            username={accounts[0]?.username}
           />
         </div>
         {generatedText && (
