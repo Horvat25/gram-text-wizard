@@ -168,8 +168,13 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             ) : (
               <Alert className="border-amber-500/30 bg-amber-500/5">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
-                <AlertDescription className="text-amber-700 dark:text-amber-400">
-                  Nenhuma conta conectada. Conecte uma conta na aba "Conectar" para publicar automaticamente.
+                <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
+                  <strong>Conta não conectada.</strong> Para publicar no Instagram, você precisa:
+                  <ol className="list-decimal list-inside mt-1 space-y-0.5 text-xs">
+                    <li>Ter uma Página do Facebook</li>
+                    <li>Vincular seu Instagram Business à Página</li>
+                    <li>Conectar na aba "Conectar"</li>
+                  </ol>
                 </AlertDescription>
               </Alert>
             )
