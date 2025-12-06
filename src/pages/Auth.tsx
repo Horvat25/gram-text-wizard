@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Instagram, Loader2, Mail, Lock, User, AlertCircle } from "lucide-react";
+import { Instagram, Loader2, Mail, Lock, User, AlertCircle, Key } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -22,6 +22,7 @@ const signupSchema = z.object({
   email: z.string().trim().email({ message: "Email inválido" }),
   password: z.string().min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
   confirmPassword: z.string(),
+  accessCode: z.string().min(1, { message: "Código de acesso é obrigatório" }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Senhas não coincidem",
   path: ["confirmPassword"],
@@ -41,6 +42,7 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+  const [signupAccessCode, setSignupAccessCode] = useState("");
 
   // Check if user is already logged in
   useEffect(() => {
@@ -107,6 +109,7 @@ const Auth = () => {
       email: signupEmail,
       password: signupPassword,
       confirmPassword: signupConfirmPassword,
+      accessCode: signupAccessCode,
     });
     
     if (!result.success) {
@@ -116,6 +119,24 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
+      // First, validate the access code
+      const { data: codeData, error: codeError } = await supabase.functions.invoke('validate-signup-code', {
+        body: { code: signupAccessCode.trim() }
+      });
+
+      if (codeError) {
+        setError("Erro ao validar código de acesso");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!codeData?.valid) {
+        setError("Código de acesso inválido");
+        setIsLoading(false);
+        return;
+      }
+
+      // Code is valid, proceed with signup
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
@@ -233,6 +254,25 @@ const Auth = () => {
               {/* Signup Tab */}
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-access-code">Código de Acesso</Label>
+                    <div className="relative">
+                      <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-access-code"
+                        type="password"
+                        placeholder="Digite o código de acesso"
+                        value={signupAccessCode}
+                        onChange={(e) => setSignupAccessCode(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Código fornecido pelo administrador
+                    </p>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Nome Completo</Label>
                     <div className="relative">
