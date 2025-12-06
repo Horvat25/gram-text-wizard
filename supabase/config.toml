@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.webhooks]
 verify_jwt = false
+
+[functions.process-token]
+verify_jwt = false
