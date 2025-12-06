@@ -638,17 +638,38 @@ const Settings = () => {
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Erro de conexão</AlertTitle>
-                  <AlertDescription className="flex items-center justify-between">
-                    <span>{error}</span>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => fetchAccounts()}
-                      className="ml-4"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Tentar novamente
-                    </Button>
+                  <AlertDescription className="space-y-3">
+                    <p>{error}</p>
+                    
+                    {error.includes('PERMISSÕES') && (
+                      <div className="bg-background/50 rounded p-2 text-sm">
+                        <p className="font-medium mb-1">O que fazer:</p>
+                        <ol className="list-decimal list-inside text-xs space-y-1">
+                          <li>Clique em "Revogar Acesso" abaixo</li>
+                          <li>Remova o acesso do app "Neural Update"</li>
+                          <li>Volte e clique em "Conectar Instagram" novamente</li>
+                          <li>Selecione sua conta do Instagram na lista</li>
+                        </ol>
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2 flex-wrap">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => fetchAccounts()}
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Verificar novamente
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => window.open('https://www.facebook.com/settings?tab=business_tools', '_blank')}
+                      >
+                        Revogar Acesso
+                      </Button>
+                    </div>
                   </AlertDescription>
                 </Alert>
               )}
@@ -769,6 +790,21 @@ const Settings = () => {
                           Se você <strong>desmarcar</strong> alguma permissão ou não selecionar seu Instagram, a conexão falhará.
                         </AlertDescription>
                       </Alert>
+
+                      {/* Revoke Previous Access */}
+                      <div className="pt-2 border-t">
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Já tentou conectar antes e falhou? Remova o acesso anterior primeiro:
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open('https://www.facebook.com/settings?tab=business_tools', '_blank')}
+                          className="w-full"
+                        >
+                          Revogar Acesso Anterior no Facebook
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
