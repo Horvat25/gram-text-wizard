@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect, useRef } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Instagram, Plus, Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,9 +10,18 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function ConnectAccountTab() {
   const [connecting, setConnecting] = useState(false);
-  const [processed, setProcessed] = useState(false);
+  const processedRef = useRef(false);
   const { accounts, loading, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
   const { toast } = useToast();
+
+  // Check if this is a popup window
+  const isPopup = () => {
+    try {
+      return window.opener !== null && window.opener !== window;
+    } catch {
+      return false;
+    }
+  };
 
   // Parse token data from URL fragment (hash)
   const parseHashFragment = (hash: string) => {
@@ -34,37 +43,52 @@ export function ConnectAccountTab() {
     };
   };
 
-  // Check for OAuth callback - handles token in URL fragment
+  // Check for OAuth callback - only process once and only if there's token data
   useEffect(() => {
-    if (processed) return;
+    // Don't process if already processed
+    if (processedRef.current) return;
     
     // Check for error in query params
     const urlParams = new URLSearchParams(window.location.search);
     const errorParam = urlParams.get('error');
 
     if (errorParam) {
-      setProcessed(true);
+      processedRef.current = true;
+      const errorDesc = urlParams.get('error_description') || 'Falha ao conectar com o Instagram';
+      
+      // Store result for parent window
       localStorage.setItem('oauth_result', JSON.stringify({
         success: false,
-        error: urlParams.get('error_description') || 'Falha ao conectar com o Instagram'
+        error: errorDesc
       }));
+      
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      
+      // If popup, close it
+      if (isPopup()) {
+        window.close();
+        return;
+      }
+      
+      // If not popup, show error toast
       toast({
         title: 'Erro na conexão',
-        description: urlParams.get('error_description') || 'Falha ao conectar com o Instagram',
+        description: errorDesc,
         variant: 'destructive'
       });
-      window.history.replaceState({}, '', window.location.pathname);
-      if (window.opener) window.close();
       return;
     }
 
     // Check for token in URL fragment (hash)
     const tokenData = parseHashFragment(window.location.hash);
     if (tokenData) {
-      setProcessed(true);
+      processedRef.current = true;
+      // Clean URL immediately to prevent re-processing
+      window.history.replaceState({}, '', window.location.pathname);
       handleTokenCallback(tokenData);
     }
-  }, [processed]);
+  }, []);
 
   const handleTokenCallback = async (tokenData: {
     accessToken: string | null;
@@ -73,8 +97,6 @@ export function ConnectAccountTab() {
     dataAccessExpirationTime: number | null;
   }) => {
     setConnecting(true);
-    // Clean URL immediately to prevent loop
-    window.history.replaceState({}, '', window.location.pathname);
     
     try {
       console.log('Processing token callback with data:', tokenData);
@@ -86,40 +108,48 @@ export function ConnectAccountTab() {
       if (error) throw error;
 
       if (data.success) {
+        // Store result for parent window
         localStorage.setItem('oauth_result', JSON.stringify({
           success: true,
           accounts: data.accounts
         }));
         
+        // If popup, close and let parent handle the result
+        if (isPopup()) {
+          window.close();
+          return;
+        }
+        
+        // If not popup (direct navigation), show success and refresh
         toast({
           title: 'Conta conectada!',
           description: data.message || `${data.accounts.length} conta(s) do Instagram conectada(s) com sucesso.`,
         });
         fetchAccounts();
-        
-        if (window.opener) {
-          window.close();
-        }
       } else {
         throw new Error(data.error || 'Falha ao processar o token');
       }
     } catch (error: any) {
       console.error('Token callback error:', error);
       
+      // Store error for parent window
       localStorage.setItem('oauth_result', JSON.stringify({
         success: false,
         error: error.message || 'Falha ao processar a autorização'
       }));
       
+      // If popup, close it
+      if (isPopup()) {
+        window.close();
+        return;
+      }
+      
+      // If not popup, show error
       toast({
         title: 'Erro ao conectar',
         description: error.message || 'Falha ao processar a autorização',
         variant: 'destructive'
       });
-      
-      if (window.opener) {
-        window.close();
-      }
     } finally {
       setConnecting(false);
     }
@@ -139,12 +169,25 @@ export function ConnectAccountTab() {
       // Store state for CSRF validation
       sessionStorage.setItem('oauth_state', data.state);
       
+      // Clear any previous result
+      localStorage.removeItem('oauth_result');
+      
       // Open Facebook OAuth in a new window
       const popup = window.open(
         data.authUrl,
         'instagram_oauth',
-        'width=600,height=700,scrollbars=yes'
+        'width=600,height=700,scrollbars=yes,resizable=yes'
       );
+      
+      if (!popup) {
+        toast({
+          title: 'Popup bloqueado',
+          description: 'Por favor, permita popups para este site e tente novamente.',
+          variant: 'destructive'
+        });
+        setConnecting(false);
+        return;
+      }
       
       // Poll for popup close and check localStorage for result
       const checkPopup = setInterval(() => {
@@ -171,9 +214,15 @@ export function ConnectAccountTab() {
           setConnecting(false);
         }
         
-        if (popup?.closed) {
-          clearInterval(checkPopup);
-          setConnecting(false);
+        try {
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            setConnecting(false);
+            // Refresh accounts in case something changed
+            fetchAccounts();
+          }
+        } catch {
+          // Cross-origin access error, popup is still open
         }
       }, 500);
       
