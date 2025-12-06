@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { decode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,6 +23,10 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Otimizar prompt para Instagram
     const optimizedPrompt = `${prompt}
@@ -65,18 +71,55 @@ Sem texto: Não incluir textos ou palavras na imagem.`;
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    const base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    if (!imageUrl) {
+    if (!base64ImageUrl) {
       throw new Error("Imagem não foi gerada pela API");
     }
 
-    console.log("Imagem gerada com sucesso");
+    console.log("Imagem gerada, fazendo upload para Storage...");
+
+    // Extract base64 data from data URL
+    const base64Match = base64ImageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!base64Match) {
+      throw new Error("Formato de imagem inválido");
+    }
+
+    const imageType = base64Match[1]; // png, jpeg, etc.
+    const base64Data = base64Match[2];
+    const imageBytes = decode(base64Data);
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomId = crypto.randomUUID().split("-")[0];
+    const fileName = `generated/${timestamp}-${randomId}.${imageType}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("post-images")
+      .upload(fileName, imageBytes, {
+        contentType: `image/${imageType}`,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Erro no upload:", uploadError);
+      throw new Error(`Erro ao salvar imagem: ${uploadError.message}`);
+    }
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from("post-images")
+      .getPublicUrl(fileName);
+
+    const permanentUrl = publicUrlData.publicUrl;
+    console.log("Imagem salva com sucesso:", permanentUrl);
 
     return new Response(
       JSON.stringify({
-        imageUrl,
+        imageUrl: permanentUrl,
         format,
+        storagePath: fileName,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
