@@ -8,6 +8,8 @@ import Settings from "./pages/Settings";
 import Backup from "./pages/Backup";
 import Insights from "./pages/Insights";
 import InstagramCallback from "./pages/InstagramCallback";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DataDeletion from "./pages/DataDeletion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/backup" element={<Backup />} />
           <Route path="/insights" element={<Insights />} />
           <Route path="/instagram/callback" element={<InstagramCallback />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/data-deletion" element={<DataDeletion />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
