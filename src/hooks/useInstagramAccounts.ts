@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,11 +16,15 @@ export interface InstagramAccount {
 export function useInstagramAccounts() {
   const [accounts, setAccounts] = useState<InstagramAccount[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = useCallback(async (isRetry = false) => {
     try {
       setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('instagram_accounts')
         .select('*')
@@ -28,17 +32,33 @@ export function useInstagramAccounts() {
 
       if (error) throw error;
       setAccounts(data || []);
-    } catch (error: any) {
-      console.error('Error fetching accounts:', error);
-      toast({
-        title: 'Erro ao carregar contas',
-        description: error.message,
-        variant: 'destructive'
-      });
+      setRetryCount(0);
+    } catch (err: any) {
+      console.error('Error fetching accounts:', err);
+      const errorMessage = err.message?.includes('Failed to fetch') 
+        ? 'Erro de conexão com o servidor. Verifique sua internet.'
+        : err.message || 'Erro ao carregar contas';
+      
+      setError(errorMessage);
+      
+      // Auto-retry up to 3 times with exponential backoff
+      if (!isRetry && retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchAccounts(true);
+        }, delay);
+      } else if (!isRetry) {
+        toast({
+          title: 'Erro ao carregar contas',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [retryCount, toast]);
 
   const disconnectAccount = async (accountId: string) => {
     try {
@@ -92,6 +112,7 @@ export function useInstagramAccounts() {
   return {
     accounts,
     loading,
+    error,
     fetchAccounts,
     disconnectAccount,
     getTokenStatus,
