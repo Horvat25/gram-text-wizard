@@ -1,16 +1,40 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Instagram, Plus, Loader2, ExternalLink, CheckCircle } from 'lucide-react';
+import { Instagram, Plus, Loader2, ExternalLink, CheckCircle, AlertCircle, RefreshCw, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useInstagramAccounts } from '@/hooks/useInstagramAccounts';
 import { AccountCard } from '@/components/AccountCard';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function ConnectAccountTab() {
   const [connecting, setConnecting] = useState(false);
-  const { accounts, loading, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
+  const [copiedUri, setCopiedUri] = useState<string | null>(null);
+  const { accounts, loading, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
   const { toast } = useToast();
+
+  // Get the URIs that need to be configured in Facebook
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const redirectUris = [
+    `${currentOrigin}/`,
+    `${currentOrigin}/settings`,
+    currentOrigin
+  ];
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedUri(text);
+      toast({
+        title: 'Copiado!',
+        description: 'URI copiada para a área de transferência'
+      });
+      setTimeout(() => setCopiedUri(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   // Check for OAuth callback (when this page is opened in popup)
   useEffect(() => {
@@ -182,6 +206,75 @@ export function ConnectAccountTab() {
           Conectar Instagram
         </Button>
       </div>
+
+      {/* Error Alert with Retry */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro de conexão</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>{error}</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => fetchAccounts()}
+              className="ml-4"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Facebook Developer Configuration Card */}
+      <Card className="border-amber-500/30 bg-amber-500/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-amber-600">
+            <AlertCircle className="w-5 h-5" />
+            Configuração do Facebook Developers
+          </CardTitle>
+          <CardDescription>
+            Adicione estas URIs no Facebook Developers Console para permitir a conexão
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <p className="text-sm font-medium mb-2">URIs de redirecionamento do OAuth válidos:</p>
+            <div className="space-y-2">
+              {redirectUris.map((uri, index) => (
+                <div key={index} className="flex items-center gap-2 bg-muted/50 p-2 rounded-md font-mono text-sm">
+                  <code className="flex-1 break-all">{uri}</code>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(uri)}
+                    className="shrink-0"
+                  >
+                    {copiedUri === uri ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-2 text-sm text-muted-foreground">
+            <ExternalLink className="w-3 h-3" />
+            <a 
+              href="https://developers.facebook.com/apps" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Abrir Facebook Developers Console
+            </a>
+            <span>→ Seu App → Login do Facebook → Configurações</span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Instructions Card */}
       <Card className="bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10 border-purple-500/20">
