@@ -65,6 +65,8 @@ export default {
       },
       backgroundImage: {
         'gradient-instagram': 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-middle)), hsl(var(--gradient-end)))',
+        'gradient-neural': 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-middle)), hsl(var(--gradient-end)))',
+        'gradient-neural-soft': 'linear-gradient(180deg, hsl(var(--primary) / 0.1), transparent)',
       },
       borderRadius: {
         lg: "var(--radius)",
