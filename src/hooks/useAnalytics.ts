@@ -31,7 +31,7 @@ const calculateEngagementRate = (post: Post): number => {
 
 export const useAnalytics = (posts: Post[]) => {
   const publishedPosts = useMemo(
-    () => posts.filter((p) => p.status === "published" && p.reach),
+    () => posts.filter((p) => p.status === "published"),
     [posts]
   );
 
