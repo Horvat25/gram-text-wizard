@@ -39,7 +39,7 @@ serve(async (req) => {
     }
 
     if (!pagesData.data || pagesData.data.length === 0) {
-      throw new Error('Nenhuma página do Facebook encontrada. Certifique-se de que sua conta Instagram está conectada a uma Página do Facebook.');
+      throw new Error('Nenhuma Página do Facebook encontrada. Para usar a API do Instagram, você precisa: 1) Ter uma Página do Facebook, 2) Vincular sua conta Instagram Business a essa Página.');
     }
 
     // Initialize Supabase client

@@ -114,13 +114,6 @@ export function ConnectAccountTab() {
           accounts: data.accounts
         }));
         
-        // If popup, close and let parent handle the result
-        if (isPopup()) {
-          window.close();
-          return;
-        }
-        
-        // If not popup (direct navigation), show success and refresh
         toast({
           title: 'Conta conectada!',
           description: data.message || `${data.accounts.length} conta(s) do Instagram conectada(s) com sucesso.`,
@@ -132,26 +125,28 @@ export function ConnectAccountTab() {
     } catch (error: any) {
       console.error('Token callback error:', error);
       
+      const errorMessage = error.message || 'Falha ao processar a autorização';
+      
       // Store error for parent window
       localStorage.setItem('oauth_result', JSON.stringify({
         success: false,
-        error: error.message || 'Falha ao processar a autorização'
+        error: errorMessage
       }));
       
-      // If popup, close it
-      if (isPopup()) {
-        window.close();
-        return;
-      }
-      
-      // If not popup, show error
       toast({
         title: 'Erro ao conectar',
-        description: error.message || 'Falha ao processar a autorização',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
       setConnecting(false);
+      
+      // If this is a popup, close it after a short delay to show the toast
+      if (isPopup()) {
+        setTimeout(() => {
+          window.close();
+        }, 2000);
+      }
     }
   };
 
