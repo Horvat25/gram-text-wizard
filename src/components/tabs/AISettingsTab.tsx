@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 interface AISettings {
   captionInstructions: string;
-  imageStyle: string;
+  imageStyles: string[];
   brandName: string;
   brandVoice: string;
   targetAudience: string;
@@ -19,9 +19,18 @@ interface AISettings {
   preferredHashtagCount: number;
 }
 
+const STYLE_PRESETS = [
+  { label: 'Minimalista', value: 'Minimalista, clean, cores neutras, muito espaço em branco' },
+  { label: 'Tech', value: 'Futurista, tons de azul e roxo, elementos de tecnologia, gradientes' },
+  { label: 'Vibrante', value: 'Cores vibrantes, alto contraste, energia visual, moderno' },
+  { label: 'Natural', value: 'Tons terrosos, orgânico, iluminação natural, calmo' },
+  { label: 'Luxo', value: 'Elegante, dourado, preto, sofisticado, premium' },
+  { label: 'Artístico', value: 'Ilustração artística, criativo, cores únicas, expressivo' },
+];
+
 const DEFAULT_SETTINGS: AISettings = {
   captionInstructions: '',
-  imageStyle: 'Profissional, alta qualidade, cores vibrantes, composição equilibrada',
+  imageStyles: [],
   brandName: '',
   brandVoice: 'Conversacional e autêntico',
   targetAudience: '',
@@ -214,42 +223,32 @@ export function AISettingsTab() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="imageStyle">Estilo Visual</Label>
-              <Textarea
-                id="imageStyle"
-                placeholder="Descreva o estilo visual que você quer..."
-                value={settings.imageStyle}
-                onChange={(e) => updateSetting('imageStyle', e.target.value)}
-                rows={4}
-              />
-              <p className="text-xs text-muted-foreground">
-                Esse estilo será aplicado a todas as imagens geradas
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t">
-              <Label>Estilos Pré-definidos</Label>
+            <div className="space-y-3">
+              <Label>Estilos Pré-definidos (selecione um ou mais)</Label>
               <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: 'Minimalista', value: 'Minimalista, clean, cores neutras, muito espaço em branco' },
-                  { label: 'Vibrante', value: 'Cores vibrantes, alto contraste, energia visual, moderno' },
-                  { label: 'Tech', value: 'Futurista, tons de azul e roxo, elementos de tecnologia, gradientes' },
-                  { label: 'Natural', value: 'Tons terrosos, orgânico, iluminação natural, calmo' },
-                  { label: 'Luxo', value: 'Elegante, dourado, preto, sofisticado, premium' },
-                  { label: 'Artístico', value: 'Ilustração artística, criativo, cores únicas, expressivo' },
-                ].map((style) => (
-                  <Button
-                    key={style.label}
-                    variant={settings.imageStyle === style.value ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => updateSetting('imageStyle', style.value)}
-                    className="w-full"
-                  >
-                    {style.label}
-                  </Button>
-                ))}
+                {STYLE_PRESETS.map((style) => {
+                  const isSelected = settings.imageStyles.includes(style.value);
+                  return (
+                    <Button
+                      key={style.label}
+                      variant={isSelected ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        const newStyles = isSelected
+                          ? settings.imageStyles.filter(s => s !== style.value)
+                          : [...settings.imageStyles, style.value];
+                        updateSetting('imageStyles', newStyles);
+                      }}
+                      className="w-full"
+                    >
+                      {style.label}
+                    </Button>
+                  );
+                })}
               </div>
+              <p className="text-xs text-muted-foreground">
+                Os estilos selecionados serão combinados na geração da imagem
+              </p>
             </div>
 
             <div className="p-4 rounded-lg bg-muted/50 mt-4">

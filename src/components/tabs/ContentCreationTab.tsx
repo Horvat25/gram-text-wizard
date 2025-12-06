@@ -141,7 +141,9 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     setIsGeneratingImage(true);
     try {
       const settings = getAISettings();
-      const customStyle = settings?.imageStyle || null;
+      const customStyle = settings?.imageStyles?.length > 0 
+        ? settings.imageStyles.join('. ') 
+        : null;
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
         body: { prompt, format: "square", customStyle },
