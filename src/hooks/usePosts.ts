@@ -16,6 +16,7 @@ export interface Post {
   comments_count: number | null;
   saves_count: number | null;
   reach: number | null;
+  user_id: string | null;
 }
 
 export interface CreatePostData {
@@ -36,6 +37,12 @@ export const usePosts = () => {
     setIsLoading(true);
     setError(null);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setPosts([]);
+        return;
+      }
+
       const { data, error: fetchError } = await supabase
         .from("posts")
         .select("*")
@@ -53,6 +60,12 @@ export const usePosts = () => {
 
   const createPost = async (postData: CreatePostData): Promise<Post | null> => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Você precisa estar logado para criar posts");
+        return null;
+      }
+
       const { data, error } = await supabase
         .from("posts")
         .insert({
@@ -62,6 +75,7 @@ export const usePosts = () => {
           status: postData.status || "draft",
           scheduled_for: postData.scheduled_for || null,
           image_url: postData.image_url || null,
+          user_id: user.id,
         })
         .select()
         .single();

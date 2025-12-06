@@ -1,15 +1,25 @@
-import { Instagram, Settings } from "lucide-react";
+import { Instagram, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
+import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useBrandSettings();
   const { accounts } = useInstagramAccounts();
+  const { user, signOut } = useAuth();
   
   // Use brand logo from settings, or Instagram profile picture, or first letter as fallback
   const brandLogo = settings.brandLogoUrl;
@@ -19,6 +29,12 @@ const Header = () => {
   
   // Priority: Brand logo > Instagram profile pic > Instagram icon
   const displayLogo = brandLogo || instagramProfilePic;
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("Logout realizado com sucesso!");
+    navigate("/auth");
+  };
 
   return (
     <header className="border-b bg-card sticky top-0 z-50 backdrop-blur-sm">
@@ -47,14 +63,44 @@ const Header = () => {
           </div>
         </div>
         
-        <Button
-          variant={location.pathname === "/settings" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => navigate("/settings")}
-          title="Configurações"
-        >
-          <Settings className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={location.pathname === "/settings" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => navigate("/settings")}
+            title="Configurações"
+          >
+            <Settings className="h-5 w-5" />
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                    {user?.email?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="px-2 py-1.5">
+                <p className="text-sm font-medium">{user?.user_metadata?.full_name || "Usuário"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <Settings className="mr-2 h-4 w-4" />
+                Configurações
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );
