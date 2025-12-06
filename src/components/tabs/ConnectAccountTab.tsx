@@ -23,35 +23,15 @@ export function ConnectAccountTab() {
     }
   };
 
-  // Parse token data from URL fragment (hash)
-  const parseHashFragment = (hash: string) => {
-    if (!hash || hash.length <= 1) return null;
-    
-    const params = new URLSearchParams(hash.substring(1));
-    const accessToken = params.get('access_token');
-    const longLivedToken = params.get('long_lived_token');
-    const expiresIn = params.get('expires_in');
-    const dataAccessExpirationTime = params.get('data_access_expiration_time');
-
-    if (!accessToken && !longLivedToken) return null;
-
-    return {
-      accessToken,
-      longLivedToken,
-      expiresIn: expiresIn ? parseInt(expiresIn, 10) : null,
-      dataAccessExpirationTime: dataAccessExpirationTime ? parseInt(dataAccessExpirationTime, 10) : null
-    };
-  };
-
-  // Check for OAuth callback - only process once and only if there's token data
+  // Check for OAuth callback - only process once
   useEffect(() => {
     // Don't process if already processed
     if (processedRef.current) return;
     
-    // Check for error in query params
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // Check for error in query params
     const errorParam = urlParams.get('error');
-
     if (errorParam) {
       processedRef.current = true;
       const errorDesc = urlParams.get('error_description') || 'Falha ao conectar com o Instagram';
@@ -80,29 +60,51 @@ export function ConnectAccountTab() {
       return;
     }
 
-    // Check for token in URL fragment (hash)
-    const tokenData = parseHashFragment(window.location.hash);
-    if (tokenData) {
+    // Check for authorization code in query params (standard Facebook OAuth)
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    
+    if (code) {
       processedRef.current = true;
       // Clean URL immediately to prevent re-processing
       window.history.replaceState({}, '', window.location.pathname);
-      handleTokenCallback(tokenData);
+      
+      // Validate state
+      const savedState = sessionStorage.getItem('oauth_state');
+      if (savedState && state !== savedState) {
+        const errorMsg = 'Estado de segurança inválido. Tente conectar novamente.';
+        localStorage.setItem('oauth_result', JSON.stringify({
+          success: false,
+          error: errorMsg
+        }));
+        
+        if (isPopup()) {
+          window.close();
+          return;
+        }
+        
+        toast({
+          title: 'Erro de segurança',
+          description: errorMsg,
+          variant: 'destructive'
+        });
+        return;
+      }
+      
+      handleCodeCallback(code);
     }
   }, []);
 
-  const handleTokenCallback = async (tokenData: {
-    accessToken: string | null;
-    longLivedToken: string | null;
-    expiresIn: number | null;
-    dataAccessExpirationTime: number | null;
-  }) => {
+  const handleCodeCallback = async (code: string) => {
     setConnecting(true);
     
     try {
-      console.log('Processing token callback with data:', tokenData);
+      console.log('Processing authorization code...');
+      
+      const redirectUri = `${window.location.origin}/`;
 
-      const { data, error } = await supabase.functions.invoke('process-token', {
-        body: tokenData
+      const { data, error } = await supabase.functions.invoke('oauth-callback', {
+        body: { code, redirectUri }
       });
 
       if (error) throw error;
@@ -120,10 +122,10 @@ export function ConnectAccountTab() {
         });
         fetchAccounts();
       } else {
-        throw new Error(data.error || 'Falha ao processar o token');
+        throw new Error(data.error || 'Falha ao processar o código de autorização');
       }
     } catch (error: any) {
-      console.error('Token callback error:', error);
+      console.error('Code callback error:', error);
       
       const errorMessage = error.message || 'Falha ao processar a autorização';
       
