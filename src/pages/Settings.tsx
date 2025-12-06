@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { ArrowLeft, Upload, Loader2, Instagram, CheckCircle, ExternalLink, ImageIcon } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Instagram, CheckCircle, ExternalLink, ImageIcon, Moon, Sun } from "lucide-react";
 import Header from "@/components/Header";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
@@ -16,6 +17,7 @@ const Settings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [brandName, setBrandName] = useState("");
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
   
   const { settings, updateSettings } = useBrandSettings();
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
@@ -24,8 +26,35 @@ const Settings = () => {
   useEffect(() => {
     setBrandName(settings.brandName || "");
     setBrandLogoUrl(settings.brandLogoUrl || "");
+    
+    // Check current theme
+    const isDark = document.documentElement.classList.contains('dark');
+    setDarkMode(isDark);
+    
+    // Also check localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      setDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    }
+    
     setIsLoading(false);
   }, [settings]);
+
+  const toggleDarkMode = (enabled: boolean) => {
+    setDarkMode(enabled);
+    if (enabled) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+    toast.success(enabled ? "Modo noturno ativado" : "Modo claro ativado");
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -49,9 +78,12 @@ const Settings = () => {
   };
 
   const handleUseInstagramPhoto = () => {
-    // Instagram Graph API doesn't provide profile photo directly
-    // But we can use the username to hint the user
-    toast.info("Para usar sua foto do Instagram, faça upload manualmente da imagem do seu perfil");
+    if (accounts[0]?.profile_picture_url) {
+      setBrandLogoUrl(accounts[0].profile_picture_url);
+      toast.success("Foto do Instagram aplicada!");
+    } else {
+      toast.info("Foto do Instagram não disponível. Sincronizando...");
+    }
   };
 
   const handleSave = async () => {
@@ -105,7 +137,40 @@ const Settings = () => {
           </Button>
 
           <div className="space-y-6">
-            <Card>
+            {/* Appearance Settings */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {darkMode ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-primary" />}
+                  Aparência
+                </CardTitle>
+                <CardDescription>
+                  Personalize a aparência do aplicativo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Moon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Modo Noturno</p>
+                      <p className="text-sm text-muted-foreground">
+                        Ativar tema escuro para reduzir cansaço visual
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={darkMode}
+                    onCheckedChange={toggleDarkMode}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Brand Settings */}
+            <Card className="border-primary/20">
               <CardHeader>
                 <CardTitle>Configurações da Marca</CardTitle>
                 <CardDescription>
@@ -127,7 +192,7 @@ const Settings = () => {
                   <Label htmlFor="brand-logo">Logo da Marca</Label>
                   <div className="flex items-start gap-4">
                     {brandLogoUrl ? (
-                      <div className="w-24 h-24 rounded-lg border overflow-hidden flex-shrink-0">
+                      <div className="w-24 h-24 rounded-lg border-2 border-primary/20 overflow-hidden flex-shrink-0">
                         <img
                           src={brandLogoUrl}
                           alt="Logo"
@@ -135,7 +200,7 @@ const Settings = () => {
                         />
                       </div>
                     ) : (
-                      <div className="w-24 h-24 rounded-lg border border-dashed flex items-center justify-center bg-muted/50 flex-shrink-0">
+                      <div className="w-24 h-24 rounded-lg border-2 border-dashed border-primary/30 flex items-center justify-center bg-muted/50 flex-shrink-0">
                         <ImageIcon className="w-8 h-8 text-muted-foreground" />
                       </div>
                     )}
@@ -150,10 +215,17 @@ const Settings = () => {
                       <p className="text-xs text-muted-foreground">
                         Formatos aceitos: PNG, JPG, GIF (máx. 5MB)
                       </p>
-                      {hasConnectedAccount && (
-                        <p className="text-xs text-muted-foreground">
-                          💡 Dica: Faça upload da foto de perfil do seu Instagram (@{accounts[0]?.username})
-                        </p>
+                      {hasConnectedAccount && accounts[0]?.profile_picture_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleUseInstagramPhoto}
+                          className="border-primary/30 hover:bg-primary/10"
+                        >
+                          <Instagram className="mr-2 h-4 w-4" />
+                          Usar foto do Instagram
+                        </Button>
                       )}
                       {brandLogoUrl && (
                         <Button
@@ -190,10 +262,11 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Instagram Integration */}
+            <Card className="border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Instagram className="h-5 w-5" />
+                  <Instagram className="h-5 w-5 text-primary" />
                   Integração com Instagram
                 </CardTitle>
                 <CardDescription>
@@ -207,13 +280,13 @@ const Settings = () => {
                   </div>
                 ) : hasConnectedAccount ? (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <div className="flex items-center gap-3 p-4 rounded-lg bg-success/10 border border-success/20">
+                      <CheckCircle className="h-5 w-5 text-success" />
                       <div className="flex-1">
-                        <p className="font-medium text-green-700 dark:text-green-400">
+                        <p className="font-medium text-success">
                           {accounts.length} conta(s) conectada(s)
                         </p>
-                        <p className="text-sm text-green-600 dark:text-green-500">
+                        <p className="text-sm text-success/80">
                           @{accounts.map(a => a.username || 'Conta').join(', @')}
                         </p>
                       </div>
@@ -222,7 +295,7 @@ const Settings = () => {
                     <Button
                       variant="outline"
                       onClick={() => navigate("/?tab=connect")}
-                      className="w-full"
+                      className="w-full border-primary/30 hover:bg-primary/10"
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
                       Gerenciar Contas
@@ -236,7 +309,7 @@ const Settings = () => {
                     
                     <Button
                       onClick={() => navigate("/?tab=connect")}
-                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90"
+                      className="w-full neural-gradient text-white hover:opacity-90"
                     >
                       <Instagram className="mr-2 h-4 w-4" />
                       Conectar Instagram
