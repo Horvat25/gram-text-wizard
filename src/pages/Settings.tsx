@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Upload, Loader2, Instagram, CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Instagram, CheckCircle, ExternalLink, ImageIcon } from "lucide-react";
 import Header from "@/components/Header";
-import { loadSettings, saveSettings } from "@/lib/local-storage";
+import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 
 const Settings = () => {
@@ -17,26 +17,15 @@ const Settings = () => {
   const [brandName, setBrandName] = useState("");
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
   
+  const { settings, updateSettings } = useBrandSettings();
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
 
   useEffect(() => {
-    loadSettingsFromStorage();
-  }, []);
-
-  const loadSettingsFromStorage = () => {
-    setIsLoading(true);
-    try {
-      const settings = loadSettings();
-      setBrandName(settings.brandName || "");
-      setBrandLogoUrl(settings.brandLogoUrl || "");
-    } catch (error: any) {
-      console.error("Error loading settings:", error);
-      toast.error("Erro ao carregar configurações");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setBrandName(settings.brandName || "");
+    setBrandLogoUrl(settings.brandLogoUrl || "");
+    setIsLoading(false);
+  }, [settings]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,6 +48,12 @@ const Settings = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleUseInstagramPhoto = () => {
+    // Instagram Graph API doesn't provide profile photo directly
+    // But we can use the username to hint the user
+    toast.info("Para usar sua foto do Instagram, faça upload manualmente da imagem do seu perfil");
+  };
+
   const handleSave = async () => {
     if (!brandName.trim()) {
       toast.error("Por favor, insira o nome da marca");
@@ -67,9 +62,9 @@ const Settings = () => {
 
     setIsSaving(true);
     try {
-      saveSettings({
+      updateSettings({
         brandName,
-        brandLogoUrl: brandLogoUrl || undefined,
+        brandLogoUrl: brandLogoUrl || null,
       });
 
       toast.success("Configurações salvas com sucesso!");
@@ -131,7 +126,7 @@ const Settings = () => {
                 <div className="space-y-2">
                   <Label htmlFor="brand-logo">Logo da Marca</Label>
                   <div className="flex items-start gap-4">
-                    {brandLogoUrl && (
+                    {brandLogoUrl ? (
                       <div className="w-24 h-24 rounded-lg border overflow-hidden flex-shrink-0">
                         <img
                           src={brandLogoUrl}
@@ -139,8 +134,12 @@ const Settings = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
+                    ) : (
+                      <div className="w-24 h-24 rounded-lg border border-dashed flex items-center justify-center bg-muted/50 flex-shrink-0">
+                        <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                      </div>
                     )}
-                    <div className="flex-1">
+                    <div className="flex-1 space-y-2">
                       <Input
                         id="brand-logo"
                         type="file"
@@ -148,9 +147,25 @@ const Settings = () => {
                         onChange={handleImageUpload}
                         className="cursor-pointer"
                       />
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs text-muted-foreground">
                         Formatos aceitos: PNG, JPG, GIF (máx. 5MB)
                       </p>
+                      {hasConnectedAccount && (
+                        <p className="text-xs text-muted-foreground">
+                          💡 Dica: Faça upload da foto de perfil do seu Instagram (@{accounts[0]?.username})
+                        </p>
+                      )}
+                      {brandLogoUrl && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setBrandLogoUrl("")}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          Remover logo
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
