@@ -96,17 +96,35 @@ serve(async (req) => {
 
     // Check if pages data is empty
     if (!pagesData.data || pagesData.data.length === 0) {
-      // Try alternative approach - get pages from user object
-      console.log('No pages from /me/accounts, trying /me?fields=accounts...');
-      const altPagesResponse = await fetch(
-        `https://graph.facebook.com/v18.0/me?fields=accounts{id,name,access_token,instagram_business_account}&access_token=${accessToken}`
-      );
-      const altPagesData = await altPagesResponse.json();
-      console.log('Alternative pages response:', JSON.stringify(altPagesData, null, 2));
+      console.log('No pages from /me/accounts, checking granular_scopes target_ids...');
       
-      if (altPagesData.accounts?.data?.length > 0) {
-        pagesData.data = altPagesData.accounts.data;
-      } else {
+      // Try to get page IDs from the granular_scopes in debug data
+      const pageIds = debugData.data?.granular_scopes?.find(
+        (s: any) => s.scope === 'pages_show_list'
+      )?.target_ids || [];
+      
+      console.log('Found page IDs from granular_scopes:', pageIds);
+      
+      if (pageIds.length > 0) {
+        // Fetch each page directly using the page ID
+        for (const pageId of pageIds) {
+          console.log(`Fetching page ${pageId} directly...`);
+          
+          // Get page access token
+          const pageTokenUrl = `https://graph.facebook.com/v18.0/${pageId}?fields=id,name,access_token,instagram_business_account&access_token=${accessToken}`;
+          const pageResponse = await fetch(pageTokenUrl);
+          const pageData = await pageResponse.json();
+          
+          console.log('Direct page response:', JSON.stringify(pageData, null, 2));
+          
+          if (pageData.id && !pageData.error) {
+            pagesData.data = pagesData.data || [];
+            pagesData.data.push(pageData);
+          }
+        }
+      }
+      
+      if (!pagesData.data || pagesData.data.length === 0) {
         throw new Error('Nenhuma página do Facebook encontrada. Verifique se: 1) Você tem uma Página do Facebook, 2) A permissão pages_show_list foi concedida, 3) Você é administrador da Página.');
       }
     }
