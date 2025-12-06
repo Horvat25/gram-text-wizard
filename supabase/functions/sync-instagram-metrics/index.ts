@@ -101,14 +101,14 @@ serve(async (req) => {
           console.log(`Insights não disponíveis para ${mediaId}:`, insightError);
         }
 
-        // Update the post in database
+        // Update the post in database - only real values, no estimations
         const { error: updateError } = await supabase
           .from("posts")
           .update({
             likes_count: metricsData.like_count || 0,
             comments_count: metricsData.comments_count || 0,
             saves_count: saves,
-            reach: reach || Math.max(metricsData.like_count * 10, 100), // Estimate if not available
+            reach: reach, // Real value only, no fake estimates
             updated_at: new Date().toISOString(),
           })
           .eq("id", post.id);
