@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Instagram, Loader2, Mail, Lock, User, AlertCircle, Key } from "lucide-react";
+import { Instagram, Loader2, Mail, Lock, User, AlertCircle, Key, ArrowLeft, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -28,10 +28,16 @@ const signupSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const resetSchema = z.object({
+  email: z.string().trim().email({ message: "Email inválido" }),
+});
+
 const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   
   // Login form
   const [loginEmail, setLoginEmail] = useState("");
@@ -43,6 +49,9 @@ const Auth = () => {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
   const [signupAccessCode, setSignupAccessCode] = useState("");
+  
+  // Reset password form
+  const [resetEmail, setResetEmail] = useState("");
 
   // Check if user is already logged in
   useEffect(() => {
@@ -168,6 +177,139 @@ const Auth = () => {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
+    const result = resetSchema.safeParse({ email: resetEmail });
+    if (!result.success) {
+      setError(result.error.errors[0].message);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      setResetEmailSent(true);
+      toast.success("Email de recuperação enviado!");
+    } catch (err: any) {
+      setError(err.message || "Erro ao enviar email");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset password form view
+  if (showResetForm) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <div className="bg-gradient-instagram p-3 rounded-2xl">
+                <Instagram className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold neural-gradient-text">Agente IA Instagram</h1>
+          </div>
+
+          <Card className="border-primary/20 bg-gradient-neural-soft">
+            <CardHeader className="text-center">
+              <CardTitle>Recuperar Senha</CardTitle>
+              <CardDescription>
+                {resetEmailSent 
+                  ? "Verifique seu email para redefinir a senha"
+                  : "Digite seu email para receber o link de recuperação"
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {resetEmailSent ? (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-green-500/10 flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-green-500" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Enviamos um email para <strong>{resetEmail}</strong> com instruções para redefinir sua senha.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      setShowResetForm(false);
+                      setResetEmailSent(false);
+                      setResetEmail("");
+                    }}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Voltar ao login
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="reset-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full glow-sm" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      "Enviar Email de Recuperação"
+                    )}
+                  </Button>
+
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    className="w-full"
+                    onClick={() => {
+                      setShowResetForm(false);
+                      setError(null);
+                    }}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Voltar ao login
+                  </Button>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -247,6 +389,18 @@ const Auth = () => {
                     ) : (
                       "Entrar"
                     )}
+                  </Button>
+
+                  <Button 
+                    type="button"
+                    variant="link" 
+                    className="w-full text-sm text-muted-foreground"
+                    onClick={() => {
+                      setShowResetForm(true);
+                      setError(null);
+                    }}
+                  >
+                    Esqueceu sua senha?
                   </Button>
                 </form>
               </TabsContent>
