@@ -175,6 +175,18 @@ serve(async (req) => {
     const connectedAccounts = [];
     let foundInstagramButNoPermissions = false;
 
+    // First, check if user already has an account (for reconnection scenarios)
+    const { data: existingAccounts, error: existingError } = await supabase
+      .from('instagram_accounts')
+      .select('*')
+      .eq('user_id', userId);
+    
+    if (existingError) {
+      console.log('Error checking existing accounts:', existingError);
+    } else {
+      console.log(`Found ${existingAccounts?.length || 0} existing accounts for user ${userId}`);
+    }
+
     for (const page of pagesData.data) {
       const pageAccessToken = page.access_token;
       let igAccountId = null;
@@ -226,36 +238,86 @@ serve(async (req) => {
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + expiresIn);
 
-        // Save to database with user_id for RLS
-        console.log(`Saving account to database with user_id: ${userId}`);
+        // Check if there's an existing account with this instagram_user_id or for this user
+        const existingByInstagramId = existingAccounts?.find(a => a.instagram_user_id === igAccountId);
+        const existingByUserId = existingAccounts?.find(a => a.user_id === userId);
         
-        const { data, error } = await supabase
-          .from('instagram_accounts')
-          .upsert({
-            page_id: page.id,
-            instagram_user_id: igAccountId,
-            username: igDetails.username,
-            profile_picture_url: igDetails.profile_picture_url || null,
-            access_token: pageAccessToken,
-            expires_at: expiresAt.toISOString(),
-            connected_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            user_id: userId
-          }, {
-            onConflict: 'instagram_user_id'
-          })
-          .select()
-          .single();
+        console.log(`Existing by instagram_id: ${existingByInstagramId?.id || 'none'}`);
+        console.log(`Existing by user_id: ${existingByUserId?.id || 'none'}`);
 
-        if (error) {
-          console.error('Database error:', error);
-          throw new Error(`Failed to save account to database: ${error.message}`);
+        let result;
+        
+        if (existingByInstagramId) {
+          // Update existing account by instagram_user_id
+          console.log(`Updating existing account ${existingByInstagramId.id} for instagram_user_id ${igAccountId}`);
+          const { data, error } = await supabase
+            .from('instagram_accounts')
+            .update({
+              page_id: page.id,
+              username: igDetails.username,
+              profile_picture_url: igDetails.profile_picture_url || null,
+              access_token: pageAccessToken,
+              expires_at: expiresAt.toISOString(),
+              connected_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              user_id: userId
+            })
+            .eq('instagram_user_id', igAccountId)
+            .select()
+            .single();
+          
+          result = { data, error };
+        } else if (existingByUserId) {
+          // Update existing account for this user (reconnecting with different IG account)
+          console.log(`Updating existing account ${existingByUserId.id} for user ${userId} with new instagram_user_id ${igAccountId}`);
+          const { data, error } = await supabase
+            .from('instagram_accounts')
+            .update({
+              page_id: page.id,
+              instagram_user_id: igAccountId,
+              username: igDetails.username,
+              profile_picture_url: igDetails.profile_picture_url || null,
+              access_token: pageAccessToken,
+              expires_at: expiresAt.toISOString(),
+              connected_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingByUserId.id)
+            .select()
+            .single();
+          
+          result = { data, error };
+        } else {
+          // Insert new account
+          console.log(`Creating new account for user ${userId} with instagram_user_id ${igAccountId}`);
+          const { data, error } = await supabase
+            .from('instagram_accounts')
+            .insert({
+              page_id: page.id,
+              instagram_user_id: igAccountId,
+              username: igDetails.username,
+              profile_picture_url: igDetails.profile_picture_url || null,
+              access_token: pageAccessToken,
+              expires_at: expiresAt.toISOString(),
+              connected_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              user_id: userId
+            })
+            .select()
+            .single();
+          
+          result = { data, error };
         }
 
-        console.log('Successfully saved to database:', data.id);
+        if (result.error) {
+          console.error('Database error:', result.error);
+          throw new Error(`Failed to save account to database: ${result.error.message}`);
+        }
+
+        console.log('Successfully saved to database:', result.data.id);
 
         connectedAccounts.push({
-          id: data.id,
+          id: result.data.id,
           username: igDetails.username,
           instagram_user_id: igAccountId
         });
