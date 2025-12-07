@@ -32,63 +32,13 @@ serve(async (req) => {
 
     const account = accounts[0];
     const accessToken = account.access_token;
-    const instagramUserId = account.instagram_user_id;
 
-    console.log(`🔄 Buscando mídias recentes da conta ${account.username}...`);
-
-    // Buscar as mídias recentes do Instagram
-    // Usar instagram_user_id para a Instagram Graph API
-    const mediaListUrl = `https://graph.facebook.com/v18.0/${instagramUserId}/media?fields=id,caption,timestamp,like_count,comments_count&limit=50&access_token=${accessToken}`;
-    
-    console.log(`🔗 Buscando mídias de: ${instagramUserId}`);
-    
-    const mediaListResponse = await fetch(mediaListUrl);
-    const mediaListData = await mediaListResponse.json();
-    
-    if (mediaListData.error) {
-      console.error("Erro ao buscar mídias:", mediaListData.error);
-      
-      // Se falhar, tentar sincronizar sem buscar a lista (usar IDs existentes com fallback)
-      console.log("Tentando sincronização alternativa...");
-      
-      // Get all published posts
-      const { data: posts, error: postsError } = await supabase
-        .from("posts")
-        .select("id, instagram_post_id, caption, published_at, likes_count")
-        .eq("status", "published");
-
-      if (postsError || !posts?.length) {
-        return new Response(
-          JSON.stringify({ 
-            message: "Não foi possível sincronizar métricas. Verifique as permissões do Instagram.", 
-            error: mediaListData.error.message,
-            updated: 0 
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Retornar os posts existentes sem atualização da API
-      return new Response(
-        JSON.stringify({ 
-          message: "Sincronização limitada - usando dados locais. Reconecte o Instagram para obter métricas em tempo real.",
-          updated: 0,
-          total: posts.length,
-          apiError: mediaListData.error.message
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const instagramMedia = mediaListData.data || [];
-    
-    console.log(`📱 Encontradas ${instagramMedia.length} mídias no Instagram`);
-
-    // Get all published posts
+    // Get all published posts with instagram_post_id
     const { data: posts, error: postsError } = await supabase
       .from("posts")
-      .select("id, instagram_post_id, caption, published_at")
-      .eq("status", "published");
+      .select("id, instagram_post_id")
+      .eq("status", "published")
+      .not("instagram_post_id", "is", null);
 
     if (postsError) {
       console.error("Error fetching posts:", postsError);
@@ -102,56 +52,41 @@ serve(async (req) => {
       );
     }
 
-    console.log(`📊 Sincronizando ${posts.length} posts com ${instagramMedia.length} mídias do Instagram...`);
+    console.log(`🔄 Sincronizando métricas de ${posts.length} posts...`);
 
     let updatedCount = 0;
     const errors: string[] = [];
-    const matched: string[] = [];
 
     for (const post of posts) {
       try {
-        let matchedMedia = null;
-
-        // Tentar encontrar pelo instagram_post_id primeiro
-        if (post.instagram_post_id) {
-          matchedMedia = instagramMedia.find((m: any) => m.id === post.instagram_post_id);
-        }
-
-        // Se não encontrou, tentar match por caption (primeiros 50 chars)
-        if (!matchedMedia && post.caption) {
-          const postCaptionStart = post.caption.substring(0, 50).toLowerCase().trim();
-          matchedMedia = instagramMedia.find((m: any) => {
-            if (!m.caption) return false;
-            const mediaCaptionStart = m.caption.substring(0, 50).toLowerCase().trim();
-            return mediaCaptionStart === postCaptionStart;
-          });
-
-          // Se encontrou por caption, atualizar o instagram_post_id
-          if (matchedMedia) {
-            console.log(`🔗 Match por caption encontrado: post ${post.id} -> media ${matchedMedia.id}`);
-          }
-        }
-
-        if (!matchedMedia) {
-          console.log(`⚠️ Nenhum match encontrado para post ${post.id}`);
+        // Fetch insights from Instagram Graph API
+        const mediaId = post.instagram_post_id;
+        
+        // Get basic metrics
+        const metricsUrl = `https://graph.facebook.com/v18.0/${mediaId}?fields=like_count,comments_count&access_token=${accessToken}`;
+        const metricsResponse = await fetch(metricsUrl);
+        
+        if (!metricsResponse.ok) {
+          const errorData = await metricsResponse.json();
+          console.error(`Error fetching metrics for ${mediaId}:`, errorData);
+          errors.push(`Post ${mediaId}: ${errorData.error?.message || 'Unknown error'}`);
           continue;
         }
 
-        matched.push(matchedMedia.id);
-        
-        const likes = matchedMedia.like_count || 0;
-        const comments = matchedMedia.comments_count || 0;
+        const metricsData = await metricsResponse.json();
+        console.log(`📊 Métricas do post ${mediaId}:`, metricsData);
 
-        // Buscar insights adicionais (reach, saved)
+        // Try to get insights (reach, saved) - requires business account
         let reach = 0;
         let saves = 0;
 
         try {
-          const insightsUrl = `https://graph.facebook.com/v18.0/${matchedMedia.id}/insights?metric=reach,saved&access_token=${accessToken}`;
+          const insightsUrl = `https://graph.facebook.com/v18.0/${mediaId}/insights?metric=reach,saved&access_token=${accessToken}`;
           const insightsResponse = await fetch(insightsUrl);
           
           if (insightsResponse.ok) {
             const insightsData = await insightsResponse.json();
+            console.log(`📈 Insights do post ${mediaId}:`, insightsData);
             
             for (const insight of insightsData.data || []) {
               if (insight.name === "reach") {
@@ -163,22 +98,23 @@ serve(async (req) => {
             }
           }
         } catch (insightError) {
-          console.log(`Insights não disponíveis para ${matchedMedia.id}`);
+          console.log(`Insights não disponíveis para ${mediaId}:`, insightError);
         }
 
-        // Calcular reach mínimo
-        const minReach = likes + comments + saves;
-        const finalReach = Math.max(reach, minReach);
+        // Calculate minimum reach based on interactions (someone had to see to interact)
+        const likes = metricsData.like_count || 0;
+        const comments = metricsData.comments_count || 0;
+        const minReach = likes + comments + saves; // At minimum, this many people saw the post
+        const finalReach = Math.max(reach, minReach); // Use Instagram's reach or minimum, whichever is higher
 
-        // Atualizar o post
+        // Update the post in database with real values
         const { error: updateError } = await supabase
           .from("posts")
           .update({
-            instagram_post_id: matchedMedia.id, // Atualizar com ID correto
             likes_count: likes,
             comments_count: comments,
             saves_count: saves,
-            reach: finalReach,
+            reach: finalReach, // Real value, with logical minimum
             updated_at: new Date().toISOString(),
           })
           .eq("id", post.id);
@@ -188,7 +124,7 @@ serve(async (req) => {
           errors.push(`Update ${post.id}: ${updateError.message}`);
         } else {
           updatedCount++;
-          console.log(`✅ Post ${post.id} atualizado: ${likes} likes, ${comments} comments, ${saves} saves, ${finalReach} reach`);
+          console.log(`✅ Post ${post.id} atualizado com sucesso`);
         }
       } catch (postError: any) {
         console.error(`Error processing post ${post.id}:`, postError);
@@ -201,8 +137,6 @@ serve(async (req) => {
         message: `Sincronização concluída`, 
         updated: updatedCount,
         total: posts.length,
-        mediaFound: instagramMedia.length,
-        matched: matched.length,
         errors: errors.length > 0 ? errors : undefined
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

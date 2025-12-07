@@ -33,7 +33,6 @@ import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { AccountCard } from "@/components/AccountCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import { OAuthInstructionsModal } from "@/components/OAuthInstructionsModal";
 
 // AI Settings Types
 interface AISettings {
@@ -79,7 +78,6 @@ const Settings = () => {
   const [connecting, setConnecting] = useState(false);
   const [aiSettings, setAiSettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
   const [isSavingAI, setIsSavingAI] = useState(false);
-  const [showOAuthModal, setShowOAuthModal] = useState(false);
   
   const { settings, updateSettings } = useBrandSettings();
   const { accounts, loading: loadingAccounts, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
@@ -203,25 +201,10 @@ const Settings = () => {
     setAiSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  // Show instructions modal before OAuth
-  const handleConnectClick = () => {
-    setShowOAuthModal(true);
-  };
-
   // Instagram OAuth
   const startOAuth = async () => {
-    setShowOAuthModal(false);
     setConnecting(true);
-    
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('Você precisa estar logado para conectar o Instagram');
-        setConnecting(false);
-        return;
-      }
-      
       const redirectUri = `${window.location.origin}/`;
       
       const { data, error } = await supabase.functions.invoke('start-oauth', {
@@ -230,15 +213,13 @@ const Settings = () => {
 
       if (error) throw error;
 
-      // Store state and userId for callback
       sessionStorage.setItem('oauth_state', data.state);
-      sessionStorage.setItem('oauth_user_id', user.id);
       localStorage.removeItem('oauth_result');
       
       const popup = window.open(
         data.authUrl,
         'instagram_oauth',
-        'width=600,height=800,scrollbars=yes,resizable=yes'
+        'width=600,height=700,scrollbars=yes,resizable=yes'
       );
       
       if (!popup) {
@@ -259,10 +240,7 @@ const Settings = () => {
             toast.success(`${result.accounts?.length || 1} conta(s) conectada(s)!`);
             fetchAccounts();
           } else {
-            // Show detailed error message
-            toast.error(result.error || 'Falha ao processar a autorização', {
-              duration: 8000
-            });
+            toast.error(result.error || 'Falha ao processar a autorização');
           }
           setConnecting(false);
         }
@@ -624,7 +602,7 @@ const Settings = () => {
                     Gerencie suas contas do Instagram
                   </p>
                 </div>
-                <Button onClick={handleConnectClick} disabled={connecting}>
+                <Button onClick={startOAuth} disabled={connecting}>
                   {connecting ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
@@ -638,38 +616,17 @@ const Settings = () => {
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Erro de conexão</AlertTitle>
-                  <AlertDescription className="space-y-3">
-                    <p>{error}</p>
-                    
-                    {error.includes('PERMISSÕES') && (
-                      <div className="bg-background/50 rounded p-2 text-sm">
-                        <p className="font-medium mb-1">O que fazer:</p>
-                        <ol className="list-decimal list-inside text-xs space-y-1">
-                          <li>Clique em "Revogar Acesso" abaixo</li>
-                          <li>Remova o acesso do app "Neural Update"</li>
-                          <li>Volte e clique em "Conectar Instagram" novamente</li>
-                          <li>Selecione sua conta do Instagram na lista</li>
-                        </ol>
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-2 flex-wrap">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => fetchAccounts()}
-                      >
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Verificar novamente
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => window.open('https://www.facebook.com/settings?tab=business_tools', '_blank')}
-                      >
-                        Revogar Acesso
-                      </Button>
-                    </div>
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>{error}</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => fetchAccounts()}
+                      className="ml-4"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Tentar novamente
+                    </Button>
                   </AlertDescription>
                 </Alert>
               )}
@@ -716,7 +673,7 @@ const Settings = () => {
                         Conecte sua conta Business ou Creator do Instagram para publicar automaticamente.
                       </p>
                       
-                      <Button onClick={handleConnectClick} disabled={connecting} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
+                      <Button onClick={startOAuth} disabled={connecting} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
                         {connecting ? (
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         ) : (
@@ -790,21 +747,6 @@ const Settings = () => {
                           Se você <strong>desmarcar</strong> alguma permissão ou não selecionar seu Instagram, a conexão falhará.
                         </AlertDescription>
                       </Alert>
-
-                      {/* Revoke Previous Access */}
-                      <div className="pt-2 border-t">
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Já tentou conectar antes e falhou? Remova o acesso anterior primeiro:
-                        </p>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => window.open('https://www.facebook.com/settings?tab=business_tools', '_blank')}
-                          className="w-full"
-                        >
-                          Revogar Acesso Anterior no Facebook
-                        </Button>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -813,13 +755,6 @@ const Settings = () => {
           </Tabs>
         </div>
       </main>
-
-      {/* OAuth Instructions Modal */}
-      <OAuthInstructionsModal
-        open={showOAuthModal}
-        onOpenChange={setShowOAuthModal}
-        onContinue={startOAuth}
-      />
     </div>
   );
 };

@@ -36,11 +36,9 @@ serve(async (req) => {
       throw new Error('Redirect URI is required');
     }
 
-    if (!userId) {
-      throw new Error('User ID is required for authentication');
-    }
+    console.log('Processing OAuth callback with code:', code.substring(0, 10) + '...', 'userId:', userId);
 
-    console.log('Processing OAuth callback with code:', code.substring(0, 10) + '... userId:', userId);
+    console.log('Processing OAuth callback with code:', code.substring(0, 10) + '...');
 
     // Step 1: Exchange code for short-lived access token
     const tokenUrl = new URL('https://graph.facebook.com/v18.0/oauth/access_token');
@@ -77,40 +75,17 @@ serve(async (req) => {
     const accessToken = longLivedData.access_token;
     const expiresIn = longLivedData.expires_in || 5184000; // Default 60 days
 
-    console.log('Got long-lived token, fetching debug info and pages...');
+    console.log('Got long-lived token, fetching pages...');
 
-    // Check what permissions were granted
+    // First, check what permissions were granted
     const debugTokenUrl = `https://graph.facebook.com/v18.0/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`;
     const debugResponse = await fetch(debugTokenUrl);
     const debugData = await debugResponse.json();
     console.log('Token debug info:', JSON.stringify(debugData, null, 2));
 
-    // Check for required Instagram scopes
-    const grantedScopes = debugData.data?.scopes || [];
-    const instagramScopes = grantedScopes.filter((s: string) => s.startsWith('instagram_'));
-    const hasInstagramBasic = grantedScopes.includes('instagram_basic');
-    const hasInstagramContentPublish = grantedScopes.includes('instagram_content_publish');
-    
-    console.log('Granted scopes:', grantedScopes);
-    console.log('Instagram scopes:', instagramScopes);
-    console.log('Has instagram_basic:', hasInstagramBasic);
-    console.log('Has instagram_content_publish:', hasInstagramContentPublish);
-
-    // If no Instagram permissions, give clear error
-    if (instagramScopes.length === 0) {
-      console.error('No Instagram permissions granted!');
-      throw new Error(
-        'PERMISSÕES NÃO CONCEDIDAS: Você precisa selecionar sua conta do Instagram durante a autorização. ' +
-        'Por favor, tente novamente e certifique-se de: ' +
-        '1) Selecionar sua CONTA DO INSTAGRAM na lista, ' +
-        '2) Manter TODAS as permissões marcadas, ' +
-        '3) Clicar em "Permitir" ou "Continuar".'
-      );
-    }
-
     // Step 3: Get user's Facebook pages
     const pagesResponse = await fetch(
-      `https://graph.facebook.com/v18.0/me/accounts?fields=id,name,access_token,instagram_business_account&access_token=${accessToken}`
+      `https://graph.facebook.com/v18.0/me/accounts?access_token=${accessToken}`
     );
     const pagesData = await pagesResponse.json();
 
@@ -121,7 +96,7 @@ serve(async (req) => {
       throw new Error(pagesData.error.message || 'Failed to fetch pages');
     }
 
-    // Check if pages data is empty - try granular_scopes
+    // Check if pages data is empty
     if (!pagesData.data || pagesData.data.length === 0) {
       console.log('No pages from /me/accounts, checking granular_scopes target_ids...');
       
@@ -152,40 +127,28 @@ serve(async (req) => {
       }
       
       if (!pagesData.data || pagesData.data.length === 0) {
-        throw new Error(
-          'PÁGINA NÃO ENCONTRADA: Não foi possível acessar sua Página do Facebook. ' +
-          'Certifique-se de: ' +
-          '1) Ter uma Página do Facebook, ' +
-          '2) Ser administrador da Página, ' +
-          '3) Selecionar a Página durante a autorização.'
-        );
+        throw new Error('Nenhuma página do Facebook encontrada. Verifique se: 1) Você tem uma Página do Facebook, 2) A permissão pages_show_list foi concedida, 3) Você é administrador da Página.');
       }
     }
 
-    // Try to get Instagram account IDs from granular_scopes
+    // Check if Instagram permissions were granted
+    const instagramScopes = debugData.data?.scopes?.filter((s: string) => s.startsWith('instagram_')) || [];
+    const hasInstagramPermissions = instagramScopes.length > 0;
+    
+    console.log('Instagram scopes granted:', instagramScopes);
+    
+    // Try to get Instagram account ID directly from granular_scopes
     const instagramAccountIds = debugData.data?.granular_scopes?.find(
       (s: any) => s.scope === 'instagram_basic' || s.scope === 'instagram_content_publish'
     )?.target_ids || [];
     
     console.log('Instagram account IDs from granular_scopes:', instagramAccountIds);
+
     console.log(`Found ${pagesData.data.length} pages, looking for Instagram accounts...`);
 
     // Step 4: Get Instagram Business Account for each page
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const connectedAccounts = [];
-    let foundInstagramButNoPermissions = false;
-
-    // First, check if user already has an account (for reconnection scenarios)
-    const { data: existingAccounts, error: existingError } = await supabase
-      .from('instagram_accounts')
-      .select('*')
-      .eq('user_id', userId);
-    
-    if (existingError) {
-      console.log('Error checking existing accounts:', existingError);
-    } else {
-      console.log(`Found ${existingAccounts?.length || 0} existing accounts for user ${userId}`);
-    }
 
     for (const page of pagesData.data) {
       const pageAccessToken = page.access_token;
@@ -194,10 +157,9 @@ serve(async (req) => {
       // First check if page already has instagram_business_account from earlier fetch
       if (page.instagram_business_account) {
         igAccountId = page.instagram_business_account.id;
-        console.log(`Page ${page.id} (${page.name}) has instagram_business_account: ${igAccountId}`);
+        console.log(`Page ${page.id} already has instagram_business_account: ${igAccountId}`);
       } else {
         // Try to get Instagram Business Account ID from page
-        console.log(`Checking page ${page.id} (${page.name}) for Instagram...`);
         const igResponse = await fetch(
           `https://graph.facebook.com/v18.0/${page.id}?fields=instagram_business_account&access_token=${pageAccessToken}`
         );
@@ -213,12 +175,11 @@ serve(async (req) => {
       // If still no Instagram account, try using the ID from granular_scopes
       if (!igAccountId && instagramAccountIds.length > 0) {
         console.log('Trying Instagram account IDs from granular_scopes...');
-        igAccountId = instagramAccountIds[0];
+        igAccountId = instagramAccountIds[0]; // Use the first one
       }
 
       if (igAccountId) {
-        // Get Instagram account details using page access token
-        console.log(`Fetching Instagram details for account ${igAccountId}...`);
+        // Get Instagram account details
         const igDetailsResponse = await fetch(
           `https://graph.facebook.com/v18.0/${igAccountId}?fields=id,username,profile_picture_url&access_token=${pageAccessToken}`
         );
@@ -228,96 +189,41 @@ serve(async (req) => {
 
         if (igDetails.error) {
           console.error('Error fetching Instagram details:', igDetails.error);
-          foundInstagramButNoPermissions = true;
           continue;
         }
 
-        console.log(`Found Instagram account: @${igDetails.username} (ID: ${igAccountId})`);
+        console.log(`Found Instagram account: @${igDetails.username}`);
 
         // Calculate expiration date
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + expiresIn);
 
-        // Check if there's an existing account with this instagram_user_id or for this user
-        const existingByInstagramId = existingAccounts?.find(a => a.instagram_user_id === igAccountId);
-        const existingByUserId = existingAccounts?.find(a => a.user_id === userId);
-        
-        console.log(`Existing by instagram_id: ${existingByInstagramId?.id || 'none'}`);
-        console.log(`Existing by user_id: ${existingByUserId?.id || 'none'}`);
+        // Save to database (upsert based on instagram_user_id)
+        const { data, error } = await supabase
+          .from('instagram_accounts')
+          .upsert({
+            page_id: page.id,
+            instagram_user_id: igAccountId,
+            username: igDetails.username,
+            profile_picture_url: igDetails.profile_picture_url || null,
+            access_token: pageAccessToken, // Use page token for Instagram API
+            expires_at: expiresAt.toISOString(),
+            connected_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            user_id: userId || null
+          }, {
+            onConflict: 'instagram_user_id'
+          })
+          .select()
+          .single();
 
-        let result;
-        
-        if (existingByInstagramId) {
-          // Update existing account by instagram_user_id
-          console.log(`Updating existing account ${existingByInstagramId.id} for instagram_user_id ${igAccountId}`);
-          const { data, error } = await supabase
-            .from('instagram_accounts')
-            .update({
-              page_id: page.id,
-              username: igDetails.username,
-              profile_picture_url: igDetails.profile_picture_url || null,
-              access_token: pageAccessToken,
-              expires_at: expiresAt.toISOString(),
-              connected_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              user_id: userId
-            })
-            .eq('instagram_user_id', igAccountId)
-            .select()
-            .single();
-          
-          result = { data, error };
-        } else if (existingByUserId) {
-          // Update existing account for this user (reconnecting with different IG account)
-          console.log(`Updating existing account ${existingByUserId.id} for user ${userId} with new instagram_user_id ${igAccountId}`);
-          const { data, error } = await supabase
-            .from('instagram_accounts')
-            .update({
-              page_id: page.id,
-              instagram_user_id: igAccountId,
-              username: igDetails.username,
-              profile_picture_url: igDetails.profile_picture_url || null,
-              access_token: pageAccessToken,
-              expires_at: expiresAt.toISOString(),
-              connected_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', existingByUserId.id)
-            .select()
-            .single();
-          
-          result = { data, error };
-        } else {
-          // Insert new account
-          console.log(`Creating new account for user ${userId} with instagram_user_id ${igAccountId}`);
-          const { data, error } = await supabase
-            .from('instagram_accounts')
-            .insert({
-              page_id: page.id,
-              instagram_user_id: igAccountId,
-              username: igDetails.username,
-              profile_picture_url: igDetails.profile_picture_url || null,
-              access_token: pageAccessToken,
-              expires_at: expiresAt.toISOString(),
-              connected_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              user_id: userId
-            })
-            .select()
-            .single();
-          
-          result = { data, error };
+        if (error) {
+          console.error('Database error:', error);
+          throw new Error('Failed to save account to database');
         }
-
-        if (result.error) {
-          console.error('Database error:', result.error);
-          throw new Error(`Failed to save account to database: ${result.error.message}`);
-        }
-
-        console.log('Successfully saved to database:', result.data.id);
 
         connectedAccounts.push({
-          id: result.data.id,
+          id: data.id,
           username: igDetails.username,
           instagram_user_id: igAccountId
         });
@@ -325,31 +231,13 @@ serve(async (req) => {
     }
 
     if (connectedAccounts.length === 0) {
-      if (foundInstagramButNoPermissions) {
-        throw new Error(
-          'CONTA ENCONTRADA MAS SEM ACESSO: Encontramos sua conta do Instagram, mas não conseguimos acessá-la. ' +
-          'Isso geralmente acontece quando as permissões do Instagram não foram concedidas. ' +
-          'Por favor, desconecte e conecte novamente, selecionando sua conta do Instagram na tela de autorização.'
-        );
+      if (!hasInstagramPermissions) {
+        throw new Error('Permissões do Instagram não foram concedidas. Por favor, ao autorizar, certifique-se de SELECIONAR sua conta do Instagram e conceder as permissões solicitadas.');
       }
-      
-      if (instagramScopes.length === 0) {
-        throw new Error(
-          'PERMISSÕES DO INSTAGRAM NÃO FORAM SELECIONADAS: ' +
-          'Durante a autorização, você precisa selecionar sua conta do Instagram. ' +
-          'Clique em "Conectar Instagram" novamente e certifique-se de marcar sua conta Instagram na lista.'
-        );
-      }
-      
-      throw new Error(
-        'INSTAGRAM NÃO VINCULADO À PÁGINA: ' +
-        'Não encontramos uma conta Instagram Business vinculada à sua Página do Facebook. ' +
-        'Para vincular: 1) Acesse as configurações do Instagram, 2) Vá em "Conta" > "Compartilhamento em outros apps", ' +
-        '3) Selecione "Facebook" e vincule à sua Página.'
-      );
+      throw new Error('Nenhuma conta Instagram Business encontrada vinculada à sua Página do Facebook. Certifique-se de que sua conta Instagram está configurada como Business ou Creator e vinculada à Página.');
     }
 
-    console.log(`Successfully connected ${connectedAccounts.length} Instagram account(s) for user ${userId}`);
+    console.log(`Successfully connected ${connectedAccounts.length} Instagram account(s)`);
 
     return new Response(
       JSON.stringify({ 

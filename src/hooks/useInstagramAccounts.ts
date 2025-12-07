@@ -18,9 +18,10 @@ export function useInstagramAccounts() {
   const [accounts, setAccounts] = useState<InstagramAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
-  const fetchAccounts = useCallback(async () => {
+  const fetchAccounts = useCallback(async (isRetry = false) => {
     try {
       setLoading(true);
       setError(null);
@@ -32,6 +33,7 @@ export function useInstagramAccounts() {
 
       if (error) throw error;
       setAccounts(data || []);
+      setRetryCount(0);
     } catch (err: any) {
       console.error('Error fetching accounts:', err);
       const errorMessage = err.message?.includes('Failed to fetch') 
@@ -39,15 +41,25 @@ export function useInstagramAccounts() {
         : err.message || 'Erro ao carregar contas';
       
       setError(errorMessage);
-      toast({
-        title: 'Erro ao carregar contas',
-        description: errorMessage,
-        variant: 'destructive'
-      });
+      
+      // Auto-retry up to 3 times with exponential backoff
+      if (!isRetry && retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchAccounts(true);
+        }, delay);
+      } else if (!isRetry) {
+        toast({
+          title: 'Erro ao carregar contas',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [retryCount, toast]);
 
   const disconnectAccount = async (accountId: string) => {
     try {
@@ -96,7 +108,7 @@ export function useInstagramAccounts() {
 
   useEffect(() => {
     fetchAccounts();
-  }, [fetchAccounts]);
+  }, []);
 
   return {
     accounts,
