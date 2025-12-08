@@ -90,24 +90,24 @@ serve(async (req) => {
     const realTimeTrends = await searchRealTimeTrends(niche, LOVABLE_API_KEY);
 
     const systemPrompt = `Você é um especialista em marketing digital e criação de conteúdo para Instagram. 
-Sua tarefa é gerar sugestões criativas e ATUAIS de posts baseadas em tendências, notícias recentes e temas virais.
+Sua tarefa é gerar sugestões criativas e ATUAIS de posts baseadas em tendências.
 
 Data atual: ${currentDate}
 
 IMPORTANTE: 
-- Use as tendências e notícias REAIS fornecidas no contexto
+- Use as tendências REAIS fornecidas
 - Crie sugestões que aproveitem os assuntos do MOMENTO
 - Foque em conteúdo com alto potencial de engajamento
-- Seja criativo e inovador`;
+- LEGENDAS CURTAS: máximo 2-3 parágrafos (300-500 caracteres)`;
 
     const userPrompt = `Gere 6 sugestões de posts para Instagram no nicho: "${niche || 'tecnologia e inovação'}"
 
 ${realTimeTrends ? `
-=== TENDÊNCIAS E NOTÍCIAS ATUAIS (${currentDate}) ===
+=== TENDÊNCIAS ATUAIS (${currentDate}) ===
 ${realTimeTrends}
-=== FIM DAS TENDÊNCIAS ===
+=== FIM ===
 
-IMPORTANTE: Use essas informações REAIS e ATUAIS para criar sugestões relevantes. Mencione eventos, notícias ou tendências específicas quando apropriado.
+Use essas informações REAIS para criar sugestões relevantes.
 ` : ''}
 
 Para cada sugestão, forneça em formato JSON:
@@ -115,25 +115,25 @@ Para cada sugestão, forneça em formato JSON:
   "suggestions": [
     {
       "id": "1",
-      "title": "Título chamativo e curto relacionado à tendência atual",
-      "topic": "Tema/Tendência/Notícia atual específica",
+      "title": "Título chamativo e curto",
+      "topic": "Tema/Tendência específica",
       "postType": "engajamento|educacional|storytelling|viral|vendas",
-      "captionIdea": "Ideia completa de legenda com emojis, mencionando o assunto atual (máximo 300 caracteres)",
-      "imagePrompt": "Prompt detalhado em inglês para gerar imagem com IA (estilo, cores, elementos visuais)",
-      "hashtags": ["hashtag1", "hashtag2", "hashtag3", "hashtag4", "hashtag5"],
-      "whyItWorks": "Por que esse post funcionaria bem AGORA, conectado à tendência atual",
-      "bestTime": "Melhor horário para postar (ex: 19h)",
+      "captionIdea": "Ideia de legenda CURTA (2-3 parágrafos, máx 300 caracteres, direto ao ponto)",
+      "imagePrompt": "Prompt em inglês para gerar imagem",
+      "hashtags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
+      "whyItWorks": "Por que esse post funcionaria bem AGORA",
+      "bestTime": "Melhor horário (ex: 19h)",
       "trendScore": 85
     }
   ]
 }
 
 REGRAS:
-1. Cada sugestão DEVE estar conectada a uma tendência ou notícia atual quando possível
-2. Varie os tipos de post (engajamento, educacional, storytelling, viral, vendas)
-3. Crie sugestões que realmente engajem aproveitando o momento
-4. trendScore deve refletir o quão atual/viral é o tema (70-95)
-5. Retorne APENAS o JSON válido, sem texto adicional`;
+1. Legendas CURTAS (2-3 parágrafos, máx 300 caracteres na captionIdea)
+2. Varie os tipos de post
+3. trendScore: 70-95
+4. 8 hashtags por sugestão
+5. Retorne APENAS o JSON válido`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
