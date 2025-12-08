@@ -19,11 +19,13 @@ import {
   MessageSquare,
   BookOpen,
   ShoppingBag,
-  Users
+  Users,
+  CalendarDays,
+  CalendarRange
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 interface Suggestion {
   id: string;
@@ -36,6 +38,12 @@ interface Suggestion {
   whyItWorks: string;
   bestTime: string;
   trendScore: number;
+}
+
+interface ScheduledPost {
+  suggestion: Suggestion;
+  scheduledTime: string;
+  day: string;
 }
 
 const postTypeIcons: Record<string, React.ReactNode> = {
@@ -62,10 +70,16 @@ const postTypeColors: Record<string, string> = {
   vendas: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
 };
 
+// Best times to post on Instagram (Brazilian timezone)
+const BEST_TIMES = ['09:00', '12:30', '19:00'];
+
+const DAYS_PT = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
 export function SuggestionsTab() {
   const [niche, setNiche] = useState('');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [batchLoading, setBatchLoading] = useState<'day' | 'week' | null>(null);
   const [, setSearchParams] = useSearchParams();
 
   const fetchSuggestions = async () => {
@@ -116,6 +130,48 @@ export function SuggestionsTab() {
     toast.success('Sugestão aplicada! Personalize e gere seu post.');
   };
 
+  const generateBatchContent = async (period: 'day' | 'week') => {
+    if (!niche.trim()) {
+      toast.error('Digite um nicho primeiro');
+      return;
+    }
+
+    setBatchLoading(period);
+    const postsPerDay = 3;
+    const days = period === 'day' ? 1 : 7;
+    const totalPosts = postsPerDay * days;
+
+    try {
+      toast.info(`Gerando ${totalPosts} posts para ${period === 'day' ? 'hoje' : 'a semana'}...`);
+
+      const { data, error } = await supabase.functions.invoke('generate-batch-content', {
+        body: { 
+          niche: niche.trim(),
+          period,
+          postsPerDay
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.scheduledPosts) {
+        // Store scheduled posts in sessionStorage
+        sessionStorage.setItem('batchScheduledPosts', JSON.stringify(data.scheduledPosts));
+        
+        // Navigate to queue tab to see the scheduled posts
+        setSearchParams({ tab: 'queue' });
+        toast.success(`${data.scheduledPosts.length} posts criados e agendados!`);
+      } else if (data?.error) {
+        toast.error(data.error);
+      }
+    } catch (error: any) {
+      console.error('Error generating batch content:', error);
+      toast.error('Erro ao gerar conteúdo em lote. Tente novamente.');
+    } finally {
+      setBatchLoading(null);
+    }
+  };
+
   const getTrendScoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald-400';
     if (score >= 60) return 'text-yellow-400';
@@ -134,8 +190,8 @@ export function SuggestionsTab() {
           Sugestões Inteligentes
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Descubra tendências, notícias e temas virais do momento. 
-          Nossa IA analisa o que está em alta e gera ideias de posts otimizadas para engajamento.
+          Descubra tendências e gere ideias de posts. 
+          Crie conteúdo para o dia todo ou semana inteira com 3 posts diários nos melhores horários.
         </p>
       </div>
 
@@ -155,7 +211,7 @@ export function SuggestionsTab() {
             </div>
             <Button 
               onClick={fetchSuggestions} 
-              disabled={loading}
+              disabled={loading || batchLoading !== null}
               size="lg"
               className="h-12 px-8 glow-sm"
             >
@@ -188,6 +244,53 @@ export function SuggestionsTab() {
                 {item}
               </Badge>
             ))}
+          </div>
+
+          {/* Batch Content Generation */}
+          <div className="mt-6 pt-4 border-t border-primary/20">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="text-sm text-muted-foreground">
+                <strong>Criação em lote:</strong> 3 posts por dia nos melhores horários (09h, 12h30, 19h)
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => generateBatchContent('day')}
+                  disabled={loading || batchLoading !== null || !niche.trim()}
+                  variant="outline"
+                  className="border-emerald-500/30 hover:bg-emerald-500/10"
+                >
+                  {batchLoading === 'day' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Gerando...
+                    </>
+                  ) : (
+                    <>
+                      <CalendarDays className="w-4 h-4 mr-2" />
+                      Criar pro Dia (3 posts)
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => generateBatchContent('week')}
+                  disabled={loading || batchLoading !== null || !niche.trim()}
+                  variant="outline"
+                  className="border-purple-500/30 hover:bg-purple-500/10"
+                >
+                  {batchLoading === 'week' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Gerando...
+                    </>
+                  ) : (
+                    <>
+                      <CalendarRange className="w-4 h-4 mr-2" />
+                      Criar pra Semana (21 posts)
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -363,13 +466,13 @@ export function SuggestionsTab() {
             </div>
             <h3 className="text-xl font-semibold mb-2">Descubra Ideias Incríveis</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              Digite seu nicho ou área de atuação acima e nossa IA vai buscar 
-              as tendências mais quentes e gerar sugestões personalizadas de posts.
+              Digite seu nicho acima e nossa IA vai gerar sugestões personalizadas.
+              Você também pode criar conteúdo para o dia todo ou a semana inteira!
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               <Badge variant="outline" className="py-1">🔥 Tendências do momento</Badge>
-              <Badge variant="outline" className="py-1">📊 Posts otimizados</Badge>
-              <Badge variant="outline" className="py-1">🎯 Alta conversão</Badge>
+              <Badge variant="outline" className="py-1">📅 3 posts/dia</Badge>
+              <Badge variant="outline" className="py-1">⏰ Melhores horários</Badge>
             </div>
           </CardContent>
         </Card>
