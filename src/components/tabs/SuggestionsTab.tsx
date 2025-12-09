@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +40,13 @@ interface Suggestion {
   trendScore: number;
 }
 
+// Session storage keys for state persistence
+const STORAGE_KEYS = {
+  niche: 'suggestions_niche',
+  suggestions: 'suggestions_data',
+  loading: 'suggestions_loading'
+};
+
 interface ScheduledPost {
   suggestion: Suggestion;
   scheduledTime: string;
@@ -76,11 +83,28 @@ const BEST_TIMES = ['09:00', '12:30', '19:00'];
 const DAYS_PT = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
 export function SuggestionsTab() {
-  const [niche, setNiche] = useState('');
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  // Restore state from sessionStorage on mount
+  const [niche, setNiche] = useState(() => {
+    return sessionStorage.getItem(STORAGE_KEYS.niche) || '';
+  });
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(() => {
+    const saved = sessionStorage.getItem(STORAGE_KEYS.suggestions);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [loading, setLoading] = useState(false);
   const [batchLoading, setBatchLoading] = useState<'day' | 'week' | null>(null);
   const [, setSearchParams] = useSearchParams();
+
+  // Persist state to sessionStorage when it changes
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEYS.niche, niche);
+  }, [niche]);
+
+  useEffect(() => {
+    if (suggestions.length > 0) {
+      sessionStorage.setItem(STORAGE_KEYS.suggestions, JSON.stringify(suggestions));
+    }
+  }, [suggestions]);
 
   const fetchSuggestions = async () => {
     if (!niche.trim()) {
