@@ -76,8 +76,18 @@ const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
       
       if (error) throw error;
       
+      let message = "";
+      
+      if (data.deleted > 0) {
+        message += `${data.deleted} posts deletados no Instagram removidos. `;
+      }
+      
       if (data.updated > 0) {
-        toast.success(`${data.updated} posts sincronizados com sucesso!`);
+        message += `${data.updated} posts sincronizados!`;
+        toast.success(message || `${data.updated} posts sincronizados com sucesso!`);
+        onRefresh?.();
+      } else if (data.deleted > 0) {
+        toast.success(message);
         onRefresh?.();
       } else if (data.errors?.length) {
         toast.warning(`Sincronização parcial: ${data.errors.length} erros`);

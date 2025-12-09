@@ -12,6 +12,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { 
   format, 
   parseISO, 
@@ -70,6 +71,77 @@ export function PostHistoryTab() {
       console.error('Error fetching published posts:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Sync with Instagram to verify which posts still exist
+  const syncWithInstagram = async () => {
+    setLoading(true);
+    try {
+      // Get Instagram account
+      const { data: accounts } = await supabase
+        .from('instagram_accounts')
+        .select('access_token')
+        .limit(1);
+
+      if (!accounts?.length) {
+        // Just refresh from database
+        await fetchPublishedPosts();
+        return;
+      }
+
+      const accessToken = accounts[0].access_token;
+
+      // Get posts with instagram_post_id
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('id, instagram_post_id')
+        .eq('status', 'published')
+        .not('instagram_post_id', 'is', null);
+
+      if (!posts?.length) {
+        await fetchPublishedPosts();
+        return;
+      }
+
+      // Check each post if it still exists on Instagram
+      const deletedPostIds: string[] = [];
+      
+      for (const post of posts) {
+        if (!post.instagram_post_id) continue;
+        
+        try {
+          const response = await fetch(
+            `https://graph.facebook.com/v18.0/${post.instagram_post_id}?fields=id&access_token=${accessToken}`
+          );
+          
+          if (!response.ok) {
+            const error = await response.json();
+            // If post doesn't exist (error code 100), mark for deletion
+            if (error.error?.code === 100 || response.status === 404) {
+              deletedPostIds.push(post.id);
+            }
+          }
+        } catch (e) {
+          console.log(`Could not verify post ${post.instagram_post_id}`);
+        }
+      }
+
+      // Delete posts that no longer exist on Instagram
+      if (deletedPostIds.length > 0) {
+        await supabase
+          .from('posts')
+          .delete()
+          .in('id', deletedPostIds);
+        
+        toast.success(`${deletedPostIds.length} post(s) removido(s) que foram deletados do Instagram`);
+      }
+
+      // Refresh the list
+      await fetchPublishedPosts();
+    } catch (error) {
+      console.error('Error syncing with Instagram:', error);
+      await fetchPublishedPosts();
     }
   };
 
@@ -170,9 +242,13 @@ export function PostHistoryTab() {
             {posts.length} post{posts.length !== 1 ? 's' : ''} publicado{posts.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchPublishedPosts} className="border-primary/30 hover:bg-primary/10">
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Atualizar
+        <Button variant="outline" size="sm" onClick={syncWithInstagram} disabled={loading} className="border-primary/30 hover:bg-primary/10">
+          {loading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4 mr-2" />
+          )}
+          Sincronizar com Instagram
         </Button>
       </div>
 

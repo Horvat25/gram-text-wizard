@@ -55,6 +55,7 @@ serve(async (req) => {
     console.log(`🔄 Sincronizando métricas de ${posts.length} posts...`);
 
     let updatedCount = 0;
+    let deletedCount = 0;
     const errors: string[] = [];
 
     for (const post of posts) {
@@ -69,6 +70,26 @@ serve(async (req) => {
         if (!metricsResponse.ok) {
           const errorData = await metricsResponse.json();
           console.error(`Error fetching metrics for ${mediaId}:`, errorData);
+          
+          // Check if post was deleted on Instagram (error code 100 = object doesn't exist)
+          if (errorData.error?.code === 100 || metricsResponse.status === 404) {
+            console.log(`🗑️ Post ${mediaId} foi deletado no Instagram, removendo do banco...`);
+            
+            // Delete the post from database since it doesn't exist on Instagram anymore
+            const { error: deleteError } = await supabase
+              .from("posts")
+              .delete()
+              .eq("id", post.id);
+            
+            if (!deleteError) {
+              deletedCount++;
+              console.log(`✅ Post ${post.id} removido do banco`);
+            } else {
+              errors.push(`Delete ${post.id}: ${deleteError.message}`);
+            }
+            continue;
+          }
+          
           errors.push(`Post ${mediaId}: ${errorData.error?.message || 'Unknown error'}`);
           continue;
         }
@@ -136,6 +157,7 @@ serve(async (req) => {
       JSON.stringify({ 
         message: `Sincronização concluída`, 
         updated: updatedCount,
+        deleted: deletedCount,
         total: posts.length,
         errors: errors.length > 0 ? errors : undefined
       }),
