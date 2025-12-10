@@ -12,6 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Wand2,
   Save,
   Calendar,
@@ -20,6 +25,10 @@ import {
   Sparkles,
   Instagram,
   AlertCircle,
+  ChevronDown,
+  Video,
+  Type,
+  RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -28,7 +37,11 @@ import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import InstagramPreview from "@/components/InstagramPreview";
 import PostScore from "@/components/PostScore";
 import DownloadActions from "@/components/DownloadActions";
+import ModelSelector, { MediaType, AIModel } from "@/components/ModelSelector";
+import TextOverlayEditor, { OverlayMetadata } from "@/components/TextOverlayEditor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 const POST_TYPES = [
   { value: "engajamento", label: "Engajamento", description: "Máxima interação" },
@@ -53,6 +66,16 @@ const getAISettings = () => {
   }
 };
 
+const DEFAULT_OVERLAY: OverlayMetadata = {
+  text: "",
+  x: 50,
+  y: 50,
+  font: "Inter",
+  size: 32,
+  color: "#ffffff",
+  opacity: 100,
+};
+
 const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const [topic, setTopic] = useState("");
@@ -60,11 +83,27 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const [generatedText, setGeneratedText] = useState("");
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [scheduledFor, setScheduledFor] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isGeneratingMedia, setIsGeneratingMedia] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
+  const [advancedPromptOpen, setAdvancedPromptOpen] = useState(false);
+  const [advancedPrompt, setAdvancedPrompt] = useState("");
+  
+  // New state for model selection
+  const [mediaType, setMediaType] = useState<MediaType>("image");
+  const [selectedModel, setSelectedModel] = useState<AIModel>("dalle3");
+  
+  // Video generation state
+  const [videoPredictionId, setVideoPredictionId] = useState<string | null>(null);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [isCheckingVideo, setIsCheckingVideo] = useState(false);
+  
+  // Overlay state
+  const [showOverlayEditor, setShowOverlayEditor] = useState(false);
+  const [overlay, setOverlay] = useState<OverlayMetadata>(DEFAULT_OVERLAY);
   
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
@@ -81,15 +120,51 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         if (data.imagePrompt) setImagePrompt(data.imagePrompt);
         if (data.hashtags) setHashtags(data.hashtags);
         
-        // Clear sessionStorage after loading
         sessionStorage.removeItem('suggestionData');
-        
         toast.success('Sugestão carregada! Personalize e gere seu post.');
       } catch (e) {
         console.error('Error loading suggestion data:', e);
       }
     }
   }, []);
+
+  // Poll for video status
+  useEffect(() => {
+    if (!videoPredictionId || isCheckingVideo) return;
+
+    const checkVideoStatus = async () => {
+      setIsCheckingVideo(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("generate-video", {
+          body: { predictionId: videoPredictionId },
+        });
+
+        if (error) throw error;
+
+        if (data.status === "succeeded") {
+          setVideoUrl(data.storedVideoUrl || data.output);
+          setVideoPredictionId(null);
+          setVideoProgress(100);
+          setIsGeneratingMedia(false);
+          toast.success("Vídeo gerado com sucesso!");
+        } else if (data.status === "failed") {
+          setVideoPredictionId(null);
+          setIsGeneratingMedia(false);
+          toast.error("Falha na geração do vídeo");
+        } else {
+          // Still processing
+          setVideoProgress((prev) => Math.min(prev + 10, 90));
+        }
+      } catch (error) {
+        console.error("Error checking video status:", error);
+      } finally {
+        setIsCheckingVideo(false);
+      }
+    };
+
+    const interval = setInterval(checkVideoStatus, 5000);
+    return () => clearInterval(interval);
+  }, [videoPredictionId, isCheckingVideo]);
 
   const buildCustomInstructions = () => {
     const settings = getAISettings();
@@ -153,33 +228,70 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     }
   };
 
-  const generateImage = async () => {
-    const prompt = imagePrompt.trim() || topic.trim();
-    if (!prompt) {
-      toast.error("Insira uma descrição para a imagem");
+  const generateMedia = async () => {
+    const basePrompt = imagePrompt.trim() || topic.trim();
+    if (!basePrompt) {
+      toast.error("Insira uma descrição para a mídia");
       return;
     }
 
-    setIsGeneratingImage(true);
+    const fullPrompt = advancedPrompt ? `${basePrompt}. ${advancedPrompt}` : basePrompt;
+    
+    setIsGeneratingMedia(true);
+    setVideoProgress(0);
+
     try {
-      const settings = getAISettings();
-      const customStyle = settings?.imageStyles?.length > 0 
-        ? settings.imageStyles.join('. ') 
-        : null;
+      if (mediaType === "image") {
+        // Image generation
+        const settings = getAISettings();
+        const customStyle = settings?.imageStyles?.length > 0 
+          ? settings.imageStyles.join('. ') 
+          : null;
 
-      const { data, error } = await supabase.functions.invoke("generate-image", {
-        body: { prompt, format: "square", customStyle },
-      });
+        const { data, error } = await supabase.functions.invoke("generate-image", {
+          body: { 
+            prompt: fullPrompt, 
+            format: "square", 
+            customStyle,
+            model: selectedModel,
+          },
+        });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      setImageUrl(data.imageUrl);
-      toast.success("Imagem gerada com sucesso!");
+        setImageUrl(data.imageUrl);
+        
+        // Show overlay editor if model doesn't support text
+        if (!data.supportsText && overlay.text) {
+          setShowOverlayEditor(true);
+          toast.info("Este modelo não suporta texto. Use o editor de overlay.");
+        } else {
+          toast.success(`Imagem gerada com ${data.modelUsed}!`);
+        }
+        
+        setIsGeneratingMedia(false);
+      } else {
+        // Video generation
+        const duration = mediaType === "reels" ? 5 : 10;
+        const aspectRatio = mediaType === "reels" ? "9:16" : "16:9";
+
+        const { data, error } = await supabase.functions.invoke("generate-video", {
+          body: { 
+            prompt: fullPrompt,
+            duration,
+            aspectRatio,
+          },
+        });
+
+        if (error) throw error;
+
+        setVideoPredictionId(data.predictionId);
+        toast.info("Vídeo em geração. Você será notificado quando pronto.");
+      }
     } catch (error: any) {
-      console.error("Error generating image:", error);
-      toast.error(error.message || "Erro ao gerar imagem");
-    } finally {
-      setIsGeneratingImage(false);
+      console.error("Error generating media:", error);
+      toast.error(error.message || "Erro ao gerar mídia");
+      setIsGeneratingMedia(false);
     }
   };
 
@@ -196,14 +308,20 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
     setIsSaving(true);
     try {
-      await onPostCreated({
+      const postData: any = {
         caption: generatedText,
         hashtags,
         status,
         scheduled_for: status === "scheduled" ? scheduledFor : null,
         post_type: postType,
         image_url: imageUrl || null,
-      });
+        media_type: mediaType,
+        ai_model_used: selectedModel,
+        video_url: videoUrl || null,
+        overlay_metadata: showOverlayEditor && overlay.text ? overlay : null,
+      };
+
+      await onPostCreated(postData);
 
       // Reset form
       setTopic("");
@@ -211,9 +329,23 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
       setHashtags([]);
       setScheduledFor("");
       setImageUrl("");
+      setVideoUrl("");
       setImagePrompt("");
+      setAdvancedPrompt("");
+      setOverlay(DEFAULT_OVERLAY);
+      setShowOverlayEditor(false);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleMediaTypeChange = (type: MediaType) => {
+    setMediaType(type);
+    // Reset media URLs when changing type
+    if (type !== "image") {
+      setImageUrl("");
+    } else {
+      setVideoUrl("");
     }
   };
 
@@ -227,7 +359,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             Gerador de Posts IA
           </CardTitle>
           <CardDescription>
-            Crie legendas otimizadas e imagens com inteligência artificial
+            Crie legendas otimizadas e mídia com inteligência artificial
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -244,16 +376,19 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
               <Alert className="border-amber-500/30 bg-amber-500/5">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
-                  <strong>Conta não conectada.</strong> Para publicar no Instagram, você precisa:
-                  <ol className="list-decimal list-inside mt-1 space-y-0.5 text-xs">
-                    <li>Ter uma Página do Facebook</li>
-                    <li>Vincular seu Instagram Business à Página</li>
-                    <li>Conectar na aba "Conectar"</li>
-                  </ol>
+                  <strong>Conta não conectada.</strong> Conecte na aba Instagram em Configurações.
                 </AlertDescription>
               </Alert>
             )
           )}
+
+          {/* Model Selector */}
+          <ModelSelector
+            mediaType={mediaType}
+            selectedModel={selectedModel}
+            onMediaTypeChange={handleMediaTypeChange}
+            onModelChange={setSelectedModel}
+          />
           
           <div className="space-y-2">
             <Label htmlFor="postType">Tipo de Post</Label>
@@ -333,39 +468,118 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                 </div>
               )}
 
-              {/* Image Generation */}
-              <div className="space-y-2 pt-2 border-t">
-                <Label htmlFor="imagePrompt">Gerar Imagem (Obrigatório para publicar)</Label>
+              {/* Media Generation */}
+              <div className="space-y-3 pt-2 border-t">
+                <Label htmlFor="imagePrompt">
+                  {mediaType === "image" ? "Prompt da Imagem" : "Prompt do Vídeo"}
+                </Label>
                 <Input
                   id="imagePrompt"
-                  placeholder="Descrição da imagem..."
+                  placeholder={`Descrição para ${mediaType === "image" ? "a imagem" : "o vídeo"}...`}
                   value={imagePrompt}
                   onChange={(e) => setImagePrompt(e.target.value)}
                 />
+
+                {/* Advanced Prompt */}
+                <Collapsible open={advancedPromptOpen} onOpenChange={setAdvancedPromptOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-full justify-between">
+                      <span className="text-xs">Prompt Avançado</span>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${advancedPromptOpen ? "rotate-180" : ""}`} />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-2">
+                    <Textarea
+                      placeholder="Instruções adicionais (estilo, cores, composição...)"
+                      value={advancedPrompt}
+                      onChange={(e) => setAdvancedPrompt(e.target.value)}
+                      rows={3}
+                      className="resize-none text-sm"
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
+
+                {/* Generate Button */}
                 <Button
-                  onClick={generateImage}
-                  disabled={isGeneratingImage}
+                  onClick={generateMedia}
+                  disabled={isGeneratingMedia}
                   variant="outline"
                   className="w-full"
                 >
-                  {isGeneratingImage ? (
+                  {isGeneratingMedia ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Gerando imagem...
+                      {mediaType === "image" ? "Gerando imagem..." : "Gerando vídeo..."}
                     </>
                   ) : (
                     <>
-                      <ImageIcon className="mr-2 h-4 w-4" />
-                      Gerar Imagem com IA
+                      {mediaType === "image" ? (
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                      ) : (
+                        <Video className="mr-2 h-4 w-4" />
+                      )}
+                      Gerar {mediaType === "image" ? "Imagem" : "Vídeo"} com IA
                     </>
                   )}
                 </Button>
-                {!imageUrl && (
+
+                {/* Video Progress */}
+                {videoPredictionId && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Gerando vídeo...</span>
+                      <span className="text-primary">{videoProgress}%</span>
+                    </div>
+                    <Progress value={videoProgress} />
+                    <p className="text-xs text-muted-foreground">
+                      A geração pode levar 1-5 minutos
+                    </p>
+                  </div>
+                )}
+
+                {/* Model Badge */}
+                {selectedModel === "dalle3" && (
+                  <Badge variant="secondary" className="text-xs">
+                    Usando OpenAI DALL-E 3 (pode consumir créditos)
+                  </Badge>
+                )}
+                {selectedModel === "runway" && (
+                  <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600">
+                    Usando Runway via Replicate (geração em background)
+                  </Badge>
+                )}
+
+                {!imageUrl && !videoUrl && mediaType === "image" && (
                   <p className="text-xs text-amber-600">
                     ⚠️ Uma imagem é necessária para publicar no Instagram
                   </p>
                 )}
               </div>
+
+              {/* Text Overlay Editor */}
+              {imageUrl && !showOverlayEditor && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowOverlayEditor(true)}
+                  className="w-full"
+                >
+                  <Type className="mr-2 h-4 w-4" />
+                  Adicionar Texto na Imagem
+                </Button>
+              )}
+
+              {showOverlayEditor && (
+                <TextOverlayEditor
+                  overlay={overlay}
+                  onChange={setOverlay}
+                  onRemove={() => {
+                    setShowOverlayEditor(false);
+                    setOverlay(DEFAULT_OVERLAY);
+                  }}
+                  imageUrl={imageUrl}
+                />
+              )}
 
               {/* Schedule */}
               <div className="space-y-2 pt-2 border-t">
@@ -414,6 +628,27 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             avatarUrl={accounts[0]?.profile_picture_url || undefined}
           />
         </div>
+
+        {/* Video Preview */}
+        {videoUrl && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Video className="h-4 w-4" />
+                Vídeo Gerado
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <video
+                src={videoUrl}
+                controls
+                className="w-full rounded-lg"
+                style={{ maxHeight: "400px" }}
+              />
+            </CardContent>
+          </Card>
+        )}
+
         {generatedText && (
           <>
             <DownloadActions

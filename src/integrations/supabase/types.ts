@@ -118,15 +118,20 @@ export type Database = {
       }
       posts: {
         Row: {
+          ai_model_used: string | null
           caption: string
           comments_count: number | null
+          cost_estimate: number | null
           created_at: string | null
           error_message: string | null
+          external_job_id: string | null
           hashtags: string[] | null
           id: string
           image_url: string | null
           instagram_post_id: string | null
           likes_count: number | null
+          media_type: string | null
+          overlay_metadata: Json | null
           post_type: string | null
           published_at: string | null
           reach: number | null
@@ -135,17 +140,23 @@ export type Database = {
           status: string
           updated_at: string | null
           user_id: string | null
+          video_url: string | null
         }
         Insert: {
+          ai_model_used?: string | null
           caption: string
           comments_count?: number | null
+          cost_estimate?: number | null
           created_at?: string | null
           error_message?: string | null
+          external_job_id?: string | null
           hashtags?: string[] | null
           id?: string
           image_url?: string | null
           instagram_post_id?: string | null
           likes_count?: number | null
+          media_type?: string | null
+          overlay_metadata?: Json | null
           post_type?: string | null
           published_at?: string | null
           reach?: number | null
@@ -154,17 +165,23 @@ export type Database = {
           status?: string
           updated_at?: string | null
           user_id?: string | null
+          video_url?: string | null
         }
         Update: {
+          ai_model_used?: string | null
           caption?: string
           comments_count?: number | null
+          cost_estimate?: number | null
           created_at?: string | null
           error_message?: string | null
+          external_job_id?: string | null
           hashtags?: string[] | null
           id?: string
           image_url?: string | null
           instagram_post_id?: string | null
           likes_count?: number | null
+          media_type?: string | null
+          overlay_metadata?: Json | null
           post_type?: string | null
           published_at?: string | null
           reach?: number | null
@@ -173,6 +190,7 @@ export type Database = {
           status?: string
           updated_at?: string | null
           user_id?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
