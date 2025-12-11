@@ -18,7 +18,18 @@ serve(async (req) => {
       throw new Error("REPLICATE_API_KEY não configurada");
     }
 
-    const body = await req.json();
+    // Handle empty body gracefully
+    const text = await req.text();
+    if (!text || text.trim() === "") {
+      throw new Error("Request body is empty. Please provide prompt or predictionId.");
+    }
+
+    let body;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON in request body");
+    }
 
     // If it's a status check request
     if (body.predictionId) {
