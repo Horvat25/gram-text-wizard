@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, format = "square", customStyle, model = "dalle3" } = await req.json();
+    const { prompt, format = "square", customStyle, model = "gemini" } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       throw new Error("Prompt é obrigatório");

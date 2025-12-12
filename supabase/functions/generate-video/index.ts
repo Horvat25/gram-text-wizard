@@ -103,20 +103,20 @@ serve(async (req) => {
       throw new Error("Prompt é obrigatório");
     }
 
-    console.log("Starting video generation with Runway Gen-3 via Replicate");
+    console.log("Starting video generation with economic model via Replicate");
     console.log("Prompt:", prompt);
     console.log("Duration:", duration, "seconds");
     console.log("Aspect ratio:", aspectRatio);
 
     const replicate = new Replicate({ auth: REPLICATE_API_KEY });
 
-    // Use Runway Gen-3 Alpha Turbo via Replicate
+    // Use Minimax video-01 - more economic model
+    // Alternative economic models: "minimax/video-01" or "luma/ray"
     const prediction = await replicate.predictions.create({
-      model: "runwayml/gen3a_turbo",
+      model: "minimax/video-01",
       input: {
         prompt: prompt,
-        duration: duration,
-        aspect_ratio: aspectRatio,
+        prompt_optimizer: true,
       },
     });
 
@@ -127,8 +127,8 @@ serve(async (req) => {
       JSON.stringify({
         predictionId: prediction.id,
         status: prediction.status,
-        modelUsed: "runway/gen-3-turbo",
-        costEstimate: duration <= 5 ? 0.25 : 0.50,
+        modelUsed: "minimax/video-01",
+        costEstimate: 0.05, // Economic model cost
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
