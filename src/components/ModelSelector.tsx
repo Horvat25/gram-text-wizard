@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/tooltip";
 import { DollarSign, Sparkles, Video, Image as ImageIcon } from "lucide-react";
 
-export type MediaType = "image" | "video" | "reels";
-export type AIModel = "dalle3" | "gemini" | "runway";
+export type MediaType = "image" | "video" | "reels" | "carousel";
+export type AIModel = "gemini" | "dalle3" | "minimax";
 
 interface ModelSelectorProps {
   mediaType: MediaType;
@@ -29,41 +29,51 @@ const MEDIA_TYPES = [
   { value: "image" as MediaType, label: "Imagem", icon: ImageIcon },
   { value: "video" as MediaType, label: "Vídeo", icon: Video },
   { value: "reels" as MediaType, label: "Reels", icon: Video },
+  { value: "carousel" as MediaType, label: "Carrossel", icon: ImageIcon },
 ];
 
 const AI_MODELS = {
   image: [
     {
-      value: "dalle3" as AIModel,
-      label: "OpenAI DALL-E 3",
-      description: "Melhor para imagens com texto",
-      cost: "$$$",
-      costLevel: 3,
+      value: "gemini" as AIModel,
+      label: "Gemini Flash Image",
+      description: "Gratuito via Lovable AI",
+      cost: "Grátis",
+      costLevel: 0,
     },
     {
-      value: "gemini" as AIModel,
-      label: "Gemini Flash",
-      description: "Rápido e gratuito*",
-      cost: "$",
-      costLevel: 1,
+      value: "dalle3" as AIModel,
+      label: "OpenAI DALL-E 3",
+      description: "Premium, suporta texto",
+      cost: "$$$",
+      costLevel: 3,
     },
   ],
   video: [
     {
-      value: "runway" as AIModel,
-      label: "Runway Gen-3",
-      description: "Alta qualidade, via Replicate",
-      cost: "$$$$$",
-      costLevel: 5,
+      value: "minimax" as AIModel,
+      label: "Minimax Video-01",
+      description: "Econômico via Replicate",
+      cost: "$",
+      costLevel: 1,
     },
   ],
   reels: [
     {
-      value: "runway" as AIModel,
-      label: "Runway Gen-3",
-      description: "Vídeos curtos (5-10s)",
-      cost: "$$$$$",
-      costLevel: 5,
+      value: "minimax" as AIModel,
+      label: "Minimax Video-01",
+      description: "Vídeos curtos (5-6s)",
+      cost: "$",
+      costLevel: 1,
+    },
+  ],
+  carousel: [
+    {
+      value: "gemini" as AIModel,
+      label: "Gemini Flash Image",
+      description: "Múltiplas imagens gratuitas",
+      cost: "Grátis",
+      costLevel: 0,
     },
   ],
 };
@@ -170,7 +180,12 @@ const ModelSelector = ({
                   Suporta texto na imagem
                 </Badge>
               )}
-              {selectedModel === "runway" && (
+              {selectedModel === "gemini" && (
+                <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-600 border-green-600/30">
+                  Gratuito
+                </Badge>
+              )}
+              {selectedModel === "minimax" && (
                 <Badge variant="outline" className="text-xs text-amber-600 border-amber-600/30">
                   Geração em background
                 </Badge>

@@ -94,7 +94,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   
   // New state for model selection
   const [mediaType, setMediaType] = useState<MediaType>("image");
-  const [selectedModel, setSelectedModel] = useState<AIModel>("dalle3");
+  const [selectedModel, setSelectedModel] = useState<AIModel>("gemini");
   
   // Video generation state
   const [videoPredictionId, setVideoPredictionId] = useState<string | null>(null);
@@ -543,9 +543,14 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                     Usando OpenAI DALL-E 3 (pode consumir créditos)
                   </Badge>
                 )}
-                {selectedModel === "runway" && (
+                {selectedModel === "gemini" && (
+                  <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-600">
+                    Usando Gemini Flash (gratuito)
+                  </Badge>
+                )}
+                {selectedModel === "minimax" && (
                   <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600">
-                    Usando Runway via Replicate (geração em background)
+                    Usando Minimax via Replicate (geração em background)
                   </Badge>
                 )}
 
