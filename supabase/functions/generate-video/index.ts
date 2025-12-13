@@ -70,8 +70,21 @@ serve(async (req) => {
           });
 
         if (uploadError) {
-          console.error("Upload error:", uploadError);
-          throw new Error(`Erro ao salvar vídeo: ${uploadError.message}`);
+          console.error("Upload error (falling back to Replicate URL):", uploadError);
+          // If storage rejects the mime type or any other error happens,
+          // we still return the original Replicate URL so the client can use the video.
+          return new Response(
+            JSON.stringify({
+              ...prediction,
+              storedVideoUrl: Array.isArray(prediction.output)
+                ? prediction.output[0]
+                : prediction.output,
+              storageUploadError: uploadError.message,
+            }),
+            {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
         }
 
         const { data: publicUrlData } = supabase.storage
