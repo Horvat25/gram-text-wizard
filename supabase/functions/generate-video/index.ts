@@ -57,13 +57,13 @@ serve(async (req) => {
         const videoArrayBuffer = await videoBlob.arrayBuffer();
         const videoBytes = new Uint8Array(videoArrayBuffer);
 
-        // Upload to Supabase Storage
+        // Upload to Supabase Storage (dedicated video bucket)
         const timestamp = Date.now();
         const randomId = crypto.randomUUID().split("-")[0];
-        const fileName = `videos/${timestamp}-${randomId}.mp4`;
+        const fileName = `${timestamp}-${randomId}.mp4`;
 
         const { error: uploadError } = await supabase.storage
-          .from("post-images")
+          .from("post-videos")
           .upload(fileName, videoBytes, {
             contentType: "video/mp4",
             upsert: false,
@@ -75,7 +75,7 @@ serve(async (req) => {
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from("post-images")
+          .from("post-videos")
           .getPublicUrl(fileName);
 
         console.log("Video saved to storage:", publicUrlData.publicUrl);
