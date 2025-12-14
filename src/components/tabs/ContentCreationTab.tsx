@@ -34,6 +34,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CreatePostData } from "@/hooks/usePosts";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
+import { useBrandSettings } from "@/hooks/useBrandSettings";
 import InstagramPreview from "@/components/InstagramPreview";
 import PostScore from "@/components/PostScore";
 import DownloadActions from "@/components/DownloadActions";
@@ -107,6 +108,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const [overlay, setOverlay] = useState<OverlayMetadata>(DEFAULT_OVERLAY);
   
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
+  const { settings: brandSettings } = useBrandSettings();
   const hasConnectedAccount = accounts.length > 0;
 
   // Load suggestion data from sessionStorage on mount
@@ -324,6 +326,8 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             format: "square", 
             customStyle,
             model: selectedModel,
+            brandName: brandSettings.brandName || "NeuralUpdate",
+            brandLogoUrl: brandSettings.brandLogoUrl,
           },
         });
 
@@ -350,6 +354,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             prompt: fullPrompt,
             duration,
             aspectRatio,
+            brandName: brandSettings.brandName || "NeuralUpdate",
           },
         });
 

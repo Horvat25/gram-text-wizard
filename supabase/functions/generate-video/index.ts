@@ -110,15 +110,17 @@ serve(async (req) => {
     }
 
     // Generation request
-    const { prompt, duration = 5, aspectRatio = "16:9" } = body;
+    const { prompt, duration = 5, aspectRatio = "16:9", brandName } = body;
 
     if (!prompt) {
       throw new Error("Prompt é obrigatório");
     }
 
     // Neural Update branding for videos
+    const brandingName = brandName || "NeuralUpdate";
     const brandingStyle = `Estilo Neural Update: visual futurista tech com tons de roxo (#8B5CF6), azul elétrico (#06B6D4) e gradientes neon. 
-Estética clean, minimalista com elementos de IA/tecnologia. Aspecto profissional e inovador.`;
+Estética clean, minimalista com elementos de IA/tecnologia. Aspecto profissional e inovador.
+IMPORTANTE: Inclua o texto "${brandingName}" como marca d'água sutil no início do vídeo.`;
 
     const optimizedPrompt = `${prompt}. ${brandingStyle}`;
 

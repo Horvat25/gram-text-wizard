@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, format = "square", customStyle, model = "gemini" } = await req.json();
+    const { prompt, format = "square", customStyle, model = "gemini", brandName, brandLogoUrl } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       throw new Error("Prompt é obrigatório");
@@ -28,16 +28,25 @@ serve(async (req) => {
     let costEstimate: number;
 
     // Neural Update branding default
+    const brandingName = brandName || "NeuralUpdate";
     const brandingInstructions = `
+IMPORTANTE - Marca d'água obrigatória:
+- Adicione o texto "${brandingName}" discretamente no canto inferior direito da imagem
+- Use fonte moderna e clean (estilo tech/minimal)
+- Cor: branco com leve transparência ou gradiente roxo/ciano
+- Tamanho pequeno mas legível
+
 Estilo Neural Update: 
-- Estética futurista/tech com tons de roxo, azul elétrico e gradientes neon
+- Estética futurista/tech com tons de roxo (#8B5CF6), azul elétrico (#06B6D4) e gradientes neon
 - Visual clean e minimalista com elementos de IA/tecnologia
 - Bordas ou elementos sutis que remetem a circuitos/redes neurais
-- Paleta: #8B5CF6 (roxo), #06B6D4 (ciano), #1E293B (dark slate)
+- Paleta: roxo, ciano, dark slate
 - Aspecto profissional e inovador`;
 
     // Build style instructions
-    const styleInstructions = customStyle || `${brandingInstructions}. Profissional, alta qualidade, cores vibrantes, composição equilibrada.`;
+    const styleInstructions = customStyle 
+      ? `${customStyle}. ${brandingInstructions}` 
+      : `${brandingInstructions}. Profissional, alta qualidade, cores vibrantes, composição equilibrada.`;
 
     // Determine size based on format
     const size = format === "portrait" ? "1024x1792" : "1024x1024";
