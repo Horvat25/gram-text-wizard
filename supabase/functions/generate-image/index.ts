@@ -27,8 +27,17 @@ serve(async (req) => {
     let modelUsed: string;
     let costEstimate: number;
 
+    // Neural Update branding default
+    const brandingInstructions = `
+Estilo Neural Update: 
+- Estética futurista/tech com tons de roxo, azul elétrico e gradientes neon
+- Visual clean e minimalista com elementos de IA/tecnologia
+- Bordas ou elementos sutis que remetem a circuitos/redes neurais
+- Paleta: #8B5CF6 (roxo), #06B6D4 (ciano), #1E293B (dark slate)
+- Aspecto profissional e inovador`;
+
     // Build style instructions
-    const styleInstructions = customStyle || "Profissional, alta qualidade, cores vibrantes, composição equilibrada.";
+    const styleInstructions = customStyle || `${brandingInstructions}. Profissional, alta qualidade, cores vibrantes, composição equilibrada.`;
 
     // Determine size based on format
     const size = format === "portrait" ? "1024x1792" : "1024x1024";

@@ -89,18 +89,39 @@ serve(async (req) => {
 
     console.log(`Publicando no Instagram para conta: ${account.username || instagramUserId}`);
 
-    // Verificar se tem imagem (necessário para publicar no Instagram)
-    if (!post.image_url) {
-      throw new Error("Uma imagem é necessária para publicar no Instagram. Adicione uma imagem ao post.");
+    const isVideo = post.media_type === "video" || post.media_type === "reels";
+    const mediaUrl = isVideo ? post.video_url : post.image_url;
+
+    // Verificar se tem mídia
+    if (!mediaUrl) {
+      throw new Error(isVideo 
+        ? "Um vídeo é necessário para publicar. Gere um vídeo primeiro."
+        : "Uma imagem é necessária para publicar no Instagram. Adicione uma imagem ao post."
+      );
     }
 
+    const caption = `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`;
+    
     // Step 1: Create media container
     const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-    createMediaUrl.searchParams.set('image_url', post.image_url);
-    createMediaUrl.searchParams.set('caption', `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`);
-    createMediaUrl.searchParams.set('access_token', accessToken);
+    
+    if (isVideo) {
+      // Video/Reels requires different parameters
+      createMediaUrl.searchParams.set('video_url', mediaUrl);
+      createMediaUrl.searchParams.set('caption', caption);
+      createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
+      createMediaUrl.searchParams.set('access_token', accessToken);
+      
+      console.log("Creating video media container...");
+    } else {
+      // Image post
+      createMediaUrl.searchParams.set('image_url', mediaUrl);
+      createMediaUrl.searchParams.set('caption', caption);
+      createMediaUrl.searchParams.set('access_token', accessToken);
+      
+      console.log("Creating image media container...");
+    }
 
-    console.log("Creating media container...");
     const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
     const mediaData = await mediaResponse.json();
 
@@ -111,6 +132,43 @@ serve(async (req) => {
 
     const creationId = mediaData.id;
     console.log(`Media container created: ${creationId}`);
+
+    // For videos, we need to wait for processing
+    if (isVideo) {
+      console.log("Aguardando processamento do vídeo pelo Instagram...");
+      
+      let status = "IN_PROGRESS";
+      let attempts = 0;
+      const maxAttempts = 30; // ~2.5 minutes max wait
+      
+      while (status === "IN_PROGRESS" && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+        
+        const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
+        statusUrl.searchParams.set('fields', 'status_code');
+        statusUrl.searchParams.set('access_token', accessToken);
+        
+        const statusResponse = await fetch(statusUrl.toString());
+        const statusData = await statusResponse.json();
+        
+        status = statusData.status_code || "FINISHED";
+        attempts++;
+        
+        console.log(`Video processing status: ${status} (attempt ${attempts})`);
+        
+        if (statusData.error) {
+          throw new Error(`Erro ao verificar status: ${statusData.error.message}`);
+        }
+      }
+      
+      if (status === "ERROR") {
+        throw new Error("Erro no processamento do vídeo pelo Instagram. Verifique o formato.");
+      }
+      
+      if (attempts >= maxAttempts && status === "IN_PROGRESS") {
+        throw new Error("Timeout: Vídeo ainda processando. Tente novamente mais tarde.");
+      }
+    }
 
     // Step 2: Publish the media
     const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);

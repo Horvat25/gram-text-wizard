@@ -116,8 +116,14 @@ serve(async (req) => {
       throw new Error("Prompt é obrigatório");
     }
 
+    // Neural Update branding for videos
+    const brandingStyle = `Estilo Neural Update: visual futurista tech com tons de roxo (#8B5CF6), azul elétrico (#06B6D4) e gradientes neon. 
+Estética clean, minimalista com elementos de IA/tecnologia. Aspecto profissional e inovador.`;
+
+    const optimizedPrompt = `${prompt}. ${brandingStyle}`;
+
     console.log("Starting video generation with economic model via Replicate");
-    console.log("Prompt:", prompt);
+    console.log("Prompt:", optimizedPrompt);
     console.log("Duration:", duration, "seconds");
     console.log("Aspect ratio:", aspectRatio);
 
@@ -128,7 +134,7 @@ serve(async (req) => {
     const prediction = await replicate.predictions.create({
       model: "minimax/video-01",
       input: {
-        prompt: prompt,
+        prompt: optimizedPrompt,
         prompt_optimizer: true,
       },
     });
