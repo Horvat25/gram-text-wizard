@@ -12,6 +12,10 @@ export interface Post {
   published_at: string | null;
   created_at: string | null;
   image_url: string | null;
+  video_url: string | null;
+  media_type: string | null;
+  ai_model_used: string | null;
+  instagram_post_id: string | null;
   likes_count: number | null;
   comments_count: number | null;
   saves_count: number | null;

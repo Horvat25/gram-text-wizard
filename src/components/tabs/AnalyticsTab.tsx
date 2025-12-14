@@ -52,7 +52,7 @@ const COLORS = [
 
 const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
   const [isSyncing, setIsSyncing] = useState(false);
-  const { summary, topPosts, insights, postsWithMetrics } = useAnalytics(posts);
+  const { summary, topPosts, insights, postsWithMetrics, postsWithRealMetrics } = useAnalytics(posts);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -113,10 +113,22 @@ const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
           <div className="text-center py-16 text-muted-foreground">
             <BarChart3 className="h-16 w-16 mx-auto mb-6 opacity-20" />
             <p className="text-xl mb-2">Nenhuma métrica ainda</p>
-            <p className="text-sm max-w-md mx-auto">
-              Publique posts e adicione métricas para ver análises detalhadas de
-              performance, insights do agente IA e recomendações personalizadas.
+            <p className="text-sm max-w-md mx-auto mb-6">
+              Publique posts no Instagram para ver análises detalhadas de
+              performance, insights e recomendações personalizadas.
             </p>
+            <Button 
+              onClick={handleSyncMetrics} 
+              disabled={isSyncing}
+              className="bg-gradient-instagram text-white"
+            >
+              {isSyncing ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              Sincronizar do Instagram
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -126,17 +138,22 @@ const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
   return (
     <div className="space-y-6">
       {/* Header with Sync Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Analytics</h2>
+          <h2 className="text-2xl font-bold neural-gradient-text">Analytics</h2>
           <p className="text-muted-foreground">
-            Métricas e insights dos seus posts
+            Métricas reais dos seus posts no Instagram
           </p>
+          {postsWithRealMetrics > 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Baseado em {postsWithRealMetrics} posts com métricas reais
+            </p>
+          )}
         </div>
         <Button 
           onClick={handleSyncMetrics} 
           disabled={isSyncing}
-          variant="outline"
+          className="bg-gradient-instagram text-white hover:opacity-90"
         >
           {isSyncing ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
