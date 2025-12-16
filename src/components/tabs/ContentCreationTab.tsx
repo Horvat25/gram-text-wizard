@@ -30,6 +30,9 @@ import {
   Type,
   RefreshCw,
   Send,
+  Plus,
+  X,
+  Images,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -104,6 +107,10 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const [videoPredictionId, setVideoPredictionId] = useState<string | null>(null);
   const [videoProgress, setVideoProgress] = useState(0);
   const [isCheckingVideo, setIsCheckingVideo] = useState(false);
+  
+  // Carousel state
+  const [carouselImages, setCarouselImages] = useState<string[]>([]);
+  const [carouselGeneratingIndex, setCarouselGeneratingIndex] = useState<number | null>(null);
   
   // Overlay state
   const [showOverlayEditor, setShowOverlayEditor] = useState(false);
@@ -315,16 +322,21 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     setVideoProgress(0);
 
     try {
-      if (mediaType === "image") {
-        // Image generation
+      if (mediaType === "image" || mediaType === "carousel") {
+        // Image generation (single or for carousel)
         const settings = getAISettings();
         const customStyle = settings?.imageStyles?.length > 0 
           ? settings.imageStyles.join('. ') 
           : null;
 
+        // For carousel, add slide number context
+        const carouselContext = mediaType === "carousel" && carouselImages.length > 0
+          ? ` (Slide ${carouselImages.length + 1} of carousel series, maintain visual consistency)`
+          : "";
+
         const { data, error } = await supabase.functions.invoke("generate-image", {
           body: { 
-            prompt: fullPrompt, 
+            prompt: fullPrompt + carouselContext, 
             format: "square", 
             customStyle,
             model: selectedModel,
@@ -335,18 +347,23 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
         if (error) throw error;
 
-        setImageUrl(data.imageUrl);
+        if (mediaType === "carousel") {
+          // Add to carousel array
+          setCarouselImages(prev => [...prev, data.imageUrl]);
+          toast.success(`Imagem ${carouselImages.length + 1} do carrossel gerada!`);
+        } else {
+          setImageUrl(data.imageUrl);
+          toast.success(`Imagem gerada com ${data.modelUsed}!`);
+        }
         
         // Show overlay editor if model doesn't support text
         if (!data.supportsText && overlay.text) {
           setShowOverlayEditor(true);
           toast.info("Este modelo não suporta texto. Use o editor de overlay.");
-        } else {
-          toast.success(`Imagem gerada com ${data.modelUsed}!`);
         }
         
         setIsGeneratingMedia(false);
-      } else {
+      } else if (mediaType === "video" || mediaType === "reels") {
         // Video generation
         const duration = mediaType === "reels" ? 5 : 10;
         const aspectRatio = mediaType === "reels" ? "9:16" : "16:9";
@@ -360,7 +377,17 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          // Check for payment required error
+          if (error.message?.includes("402") || error.message?.includes("Payment")) {
+            throw new Error("Limite gratuito do Replicate atingido. Configure billing em replicate.com/account/billing");
+          }
+          throw error;
+        }
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
 
         setVideoPredictionId(data.predictionId);
         toast.info("Vídeo em geração. Você será notificado quando pronto.");
@@ -370,6 +397,11 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
       toast.error(error.message || "Erro ao gerar mídia");
       setIsGeneratingMedia(false);
     }
+  };
+
+  const removeCarouselImage = (index: number) => {
+    setCarouselImages(prev => prev.filter((_, i) => i !== index));
+    toast.success("Imagem removida do carrossel");
   };
 
   const savePost = async (status: "draft" | "scheduled") => {
@@ -383,6 +415,12 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
       return;
     }
 
+    // Validate carousel has at least 2 images
+    if (mediaType === "carousel" && carouselImages.length < 2) {
+      toast.error("O carrossel precisa de pelo menos 2 imagens");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const postData: any = {
@@ -391,11 +429,12 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         status,
         scheduled_for: status === "scheduled" ? scheduledFor : null,
         post_type: postType,
-        image_url: imageUrl || null,
+        image_url: mediaType === "carousel" ? carouselImages[0] : (imageUrl || null),
         media_type: mediaType,
         ai_model_used: selectedModel,
         video_url: videoUrl || null,
         overlay_metadata: showOverlayEditor && overlay.text ? overlay : null,
+        carousel_images: mediaType === "carousel" ? carouselImages : null,
       };
 
       await onPostCreated(postData);
@@ -413,10 +452,22 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
       return;
     }
 
-    const currentMediaUrl = mediaType === "image" ? imageUrl : videoUrl;
-    if (!currentMediaUrl) {
-      toast.error(`Uma ${mediaType === "image" ? "imagem" : "vídeo"} é necessária para publicar no Instagram`);
-      return;
+    // Validate media based on type
+    if (mediaType === "carousel") {
+      if (carouselImages.length < 2) {
+        toast.error("O carrossel precisa de pelo menos 2 imagens");
+        return;
+      }
+    } else if (mediaType === "image") {
+      if (!imageUrl) {
+        toast.error("Uma imagem é necessária para publicar no Instagram");
+        return;
+      }
+    } else if (mediaType === "video" || mediaType === "reels") {
+      if (!videoUrl) {
+        toast.error("Um vídeo é necessário para publicar no Instagram");
+        return;
+      }
     }
 
     setIsPublishing(true);
@@ -427,7 +478,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         hashtags,
         status: "draft",
         post_type: postType,
-        image_url: imageUrl || null,
+        image_url: mediaType === "carousel" ? carouselImages[0] : (imageUrl || null),
         media_type: mediaType,
         ai_model_used: selectedModel,
         video_url: videoUrl || null,
@@ -474,16 +525,47 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     setAdvancedPrompt("");
     setOverlay(DEFAULT_OVERLAY);
     setShowOverlayEditor(false);
+    setCarouselImages([]);
     localStorage.removeItem(CONTENT_CREATION_STATE_KEY);
   };
 
   const handleMediaTypeChange = (type: MediaType) => {
     setMediaType(type);
     // Reset media URLs when changing type
-    if (type !== "image") {
+    if (type === "carousel") {
       setImageUrl("");
-    } else {
       setVideoUrl("");
+    } else if (type === "image") {
+      setVideoUrl("");
+      setCarouselImages([]);
+    } else {
+      setImageUrl("");
+      setCarouselImages([]);
+    }
+  };
+
+  const getMediaLabel = () => {
+    switch (mediaType) {
+      case "carousel": return "das Imagens do Carrossel";
+      case "video": return "do Vídeo";
+      case "reels": return "do Reels";
+      default: return "da Imagem";
+    }
+  };
+
+  const getGenerateButtonLabel = () => {
+    if (isGeneratingMedia) {
+      return mediaType === "carousel" 
+        ? `Gerando imagem ${carouselImages.length + 1}...` 
+        : mediaType === "image" 
+          ? "Gerando imagem..." 
+          : "Gerando vídeo...";
+    }
+    switch (mediaType) {
+      case "carousel": return `Adicionar Imagem ao Carrossel (${carouselImages.length}/10)`;
+      case "video": return "Gerar Vídeo com IA";
+      case "reels": return "Gerar Reels com IA";
+      default: return "Gerar Imagem com IA";
     }
   };
 
@@ -609,14 +691,51 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
               {/* Media Generation */}
               <div className="space-y-3 pt-2 border-t">
                 <Label htmlFor="imagePrompt">
-                  {mediaType === "image" ? "Prompt da Imagem" : "Prompt do Vídeo"}
+                  Prompt {getMediaLabel()}
                 </Label>
                 <Input
                   id="imagePrompt"
-                  placeholder={`Descrição para ${mediaType === "image" ? "a imagem" : "o vídeo"}...`}
+                  placeholder={mediaType === "carousel" 
+                    ? "Descrição para a próxima imagem do carrossel..." 
+                    : `Descrição para ${mediaType === "image" ? "a imagem" : "o vídeo"}...`}
                   value={imagePrompt}
                   onChange={(e) => setImagePrompt(e.target.value)}
                 />
+
+                {/* Carousel Images Preview */}
+                {mediaType === "carousel" && carouselImages.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Images className="h-4 w-4" />
+                      Imagens do Carrossel ({carouselImages.length}/10)
+                    </Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {carouselImages.map((img, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={img} 
+                            alt={`Slide ${index + 1}`}
+                            className="w-full aspect-square object-cover rounded-lg border"
+                          />
+                          <button
+                            onClick={() => removeCarouselImage(index)}
+                            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                          <span className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                            {index + 1}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    {carouselImages.length < 2 && (
+                      <p className="text-xs text-amber-600">
+                        ⚠️ Mínimo 2 imagens para publicar carrossel
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {/* Advanced Prompt */}
                 <Collapsible open={advancedPromptOpen} onOpenChange={setAdvancedPromptOpen}>
@@ -640,23 +759,25 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                 {/* Generate Button */}
                 <Button
                   onClick={generateMedia}
-                  disabled={isGeneratingMedia}
+                  disabled={isGeneratingMedia || (mediaType === "carousel" && carouselImages.length >= 10)}
                   variant="outline"
                   className="w-full"
                 >
                   {isGeneratingMedia ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {mediaType === "image" ? "Gerando imagem..." : "Gerando vídeo..."}
+                      {getGenerateButtonLabel()}
                     </>
                   ) : (
                     <>
-                      {mediaType === "image" ? (
+                      {mediaType === "carousel" ? (
+                        <Plus className="mr-2 h-4 w-4" />
+                      ) : mediaType === "image" ? (
                         <ImageIcon className="mr-2 h-4 w-4" />
                       ) : (
                         <Video className="mr-2 h-4 w-4" />
                       )}
-                      Gerar {mediaType === "image" ? "Imagem" : "Vídeo"} com IA
+                      {getGenerateButtonLabel()}
                     </>
                   )}
                 </Button>
@@ -740,7 +861,13 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                 {/* Primary Action - Publish Now */}
                 <Button
                   onClick={publishNow}
-                  disabled={isPublishing || isSaving || (!imageUrl && mediaType === "image") || (!videoUrl && mediaType !== "image")}
+                  disabled={
+                    isPublishing || 
+                    isSaving || 
+                    (mediaType === "image" && !imageUrl) || 
+                    (mediaType === "carousel" && carouselImages.length < 2) ||
+                    ((mediaType === "video" || mediaType === "reels") && !videoUrl)
+                  }
                   className="w-full"
                   size="lg"
                 >
@@ -770,7 +897,12 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                   </Button>
                   <Button
                     onClick={() => savePost("scheduled")}
-                    disabled={isSaving || isPublishing || !scheduledFor}
+                    disabled={
+                      isSaving || 
+                      isPublishing || 
+                      !scheduledFor ||
+                      (mediaType === "carousel" && carouselImages.length < 2)
+                    }
                     variant="secondary"
                     className="flex-1"
                   >
@@ -790,11 +922,35 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
           <InstagramPreview
             caption={generatedText}
             hashtags={hashtags}
-            imageUrl={imageUrl}
+            imageUrl={mediaType === "carousel" ? carouselImages[0] : imageUrl}
             username={accounts[0]?.username}
             avatarUrl={accounts[0]?.profile_picture_url || undefined}
           />
         </div>
+
+        {/* Carousel Full Preview */}
+        {mediaType === "carousel" && carouselImages.length > 0 && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Images className="h-4 w-4" />
+                Preview do Carrossel ({carouselImages.length} imagens)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {carouselImages.map((img, index) => (
+                  <img 
+                    key={index}
+                    src={img} 
+                    alt={`Slide ${index + 1}`}
+                    className="w-32 h-32 object-cover rounded-lg border flex-shrink-0"
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Video Preview */}
         {videoUrl && (

@@ -34,6 +34,7 @@ export interface CreatePostData {
   media_type?: string;
   ai_model_used?: string;
   overlay_metadata?: any;
+  carousel_images?: string[] | null;
 }
 
 export const usePosts = () => {
