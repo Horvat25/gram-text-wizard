@@ -30,6 +30,10 @@ export interface CreatePostData {
   status?: string;
   scheduled_for?: string | null;
   image_url?: string | null;
+  video_url?: string | null;
+  media_type?: string;
+  ai_model_used?: string;
+  overlay_metadata?: any;
 }
 
 export const usePosts = () => {
@@ -79,6 +83,10 @@ export const usePosts = () => {
           status: postData.status || "draft",
           scheduled_for: postData.scheduled_for || null,
           image_url: postData.image_url || null,
+          video_url: postData.video_url || null,
+          media_type: postData.media_type || "image",
+          ai_model_used: postData.ai_model_used || null,
+          overlay_metadata: postData.overlay_metadata || null,
           user_id: user.id,
         })
         .select()
@@ -87,11 +95,14 @@ export const usePosts = () => {
       if (error) throw error;
 
       setPosts((prev) => [data, ...prev]);
-      toast.success(
-        postData.status === "scheduled"
-          ? "Post agendado com sucesso!"
-          : "Rascunho salvo!"
-      );
+      
+      // Only show toast for draft/scheduled, not for publish flow
+      if (postData.status === "scheduled") {
+        toast.success("Post agendado com sucesso!");
+      } else if (postData.status === "draft") {
+        toast.success("Rascunho salvo!");
+      }
+      
       return data;
     } catch (err: any) {
       console.error("Error creating post:", err);
