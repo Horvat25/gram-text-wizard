@@ -59,7 +59,10 @@ serve(async (req) => {
       console.log(`📝 Processando post ${post.id}: ${post.caption?.substring(0, 50)}...`);
 
       try {
-        if (hasConnectedAccount && post.image_url) {
+        const isVideo = post.media_type === "video" || post.media_type === "reels";
+        const mediaUrl = isVideo ? post.video_url : post.image_url;
+
+        if (hasConnectedAccount && mediaUrl) {
           // Real Instagram publishing
           const account = accounts[0];
           const accessToken = account.access_token;
@@ -70,8 +73,15 @@ serve(async (req) => {
           // Step 1: Create media container
           const caption = `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`;
           const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-          createMediaUrl.searchParams.set('image_url', post.image_url);
-          createMediaUrl.searchParams.set('caption', caption);
+          
+          if (isVideo) {
+            createMediaUrl.searchParams.set('video_url', mediaUrl);
+            createMediaUrl.searchParams.set('caption', caption);
+            createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
+          } else {
+            createMediaUrl.searchParams.set('image_url', mediaUrl);
+            createMediaUrl.searchParams.set('caption', caption);
+          }
           createMediaUrl.searchParams.set('access_token', accessToken);
 
           const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
@@ -83,6 +93,37 @@ serve(async (req) => {
 
           const creationId = mediaData.id;
           console.log(`✅ Container criado: ${creationId}`);
+
+          // Wait for media processing
+          console.log("⏳ Aguardando processamento da mídia...");
+          let status = "IN_PROGRESS";
+          let attempts = 0;
+          const maxAttempts = isVideo ? 60 : 12;
+
+          while (status === "IN_PROGRESS" && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+            const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
+            statusUrl.searchParams.set('fields', 'status_code');
+            statusUrl.searchParams.set('access_token', accessToken);
+            
+            const statusResponse = await fetch(statusUrl.toString());
+            const statusData = await statusResponse.json();
+            
+            status = statusData.status_code || "FINISHED";
+            attempts++;
+            
+            console.log(`📊 Status: ${status} (tentativa ${attempts}/${maxAttempts})`);
+            
+            if (statusData.error || !statusData.status_code || statusData.status_code === "FINISHED") {
+              status = "FINISHED";
+              break;
+            }
+          }
+
+          if (status === "ERROR") {
+            throw new Error("Erro no processamento da mídia pelo Instagram");
+          }
 
           // Step 2: Publish
           const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);
@@ -115,10 +156,10 @@ serve(async (req) => {
 
           console.log(`🎉 Post ${post.id} publicado com sucesso no Instagram!`);
         } else {
-          // Simulation mode - no account connected or no image
+          // Simulation mode - no account connected or no media
           const reason = !hasConnectedAccount 
             ? "Nenhuma conta Instagram conectada" 
-            : "Post sem imagem";
+            : "Post sem mídia";
           
           console.log(`⚠️ Modo simulação para post ${post.id}: ${reason}`);
 

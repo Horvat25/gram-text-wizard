@@ -133,42 +133,52 @@ serve(async (req) => {
     const creationId = mediaData.id;
     console.log(`Media container created: ${creationId}`);
 
-    // For videos, we need to wait for processing
-    if (isVideo) {
-      console.log("Aguardando processamento do vídeo pelo Instagram...");
+    // Wait for media processing (both images and videos need this)
+    console.log("Aguardando processamento da mídia pelo Instagram...");
+    
+    let status = "IN_PROGRESS";
+    let attempts = 0;
+    const maxAttempts = isVideo ? 60 : 12; // Videos: 5 min, Images: 1 min
+    const waitTime = 5000; // 5 seconds between checks
+    
+    while (status === "IN_PROGRESS" && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, waitTime));
       
-      let status = "IN_PROGRESS";
-      let attempts = 0;
-      const maxAttempts = 30; // ~2.5 minutes max wait
+      const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
+      statusUrl.searchParams.set('fields', 'status_code');
+      statusUrl.searchParams.set('access_token', accessToken);
       
-      while (status === "IN_PROGRESS" && attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-        
-        const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
-        statusUrl.searchParams.set('fields', 'status_code');
-        statusUrl.searchParams.set('access_token', accessToken);
-        
-        const statusResponse = await fetch(statusUrl.toString());
-        const statusData = await statusResponse.json();
-        
-        status = statusData.status_code || "FINISHED";
-        attempts++;
-        
-        console.log(`Video processing status: ${status} (attempt ${attempts})`);
-        
-        if (statusData.error) {
-          throw new Error(`Erro ao verificar status: ${statusData.error.message}`);
-        }
+      const statusResponse = await fetch(statusUrl.toString());
+      const statusData = await statusResponse.json();
+      
+      status = statusData.status_code || "FINISHED";
+      attempts++;
+      
+      console.log(`Media processing status: ${status} (attempt ${attempts}/${maxAttempts})`);
+      
+      if (statusData.error) {
+        console.error("Status check error:", statusData.error);
+        // If we get an error checking status, assume it's ready (some media types don't have status)
+        status = "FINISHED";
+        break;
       }
       
-      if (status === "ERROR") {
-        throw new Error("Erro no processamento do vídeo pelo Instagram. Verifique o formato.");
-      }
-      
-      if (attempts >= maxAttempts && status === "IN_PROGRESS") {
-        throw new Error("Timeout: Vídeo ainda processando. Tente novamente mais tarde.");
+      // If status is undefined or FINISHED, break out
+      if (!statusData.status_code || statusData.status_code === "FINISHED") {
+        status = "FINISHED";
+        break;
       }
     }
+    
+    if (status === "ERROR") {
+      throw new Error("Erro no processamento da mídia pelo Instagram. Verifique o formato e tamanho.");
+    }
+    
+    if (attempts >= maxAttempts && status === "IN_PROGRESS") {
+      throw new Error("Timeout: Mídia ainda processando. Tente novamente em alguns minutos.");
+    }
+    
+    console.log("Media processing complete, publishing...");
 
     // Step 2: Publish the media
     const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);

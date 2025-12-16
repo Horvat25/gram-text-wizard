@@ -29,6 +29,7 @@ import {
   Video,
   Type,
   RefreshCw,
+  Send,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -90,6 +91,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingMedia, setIsGeneratingMedia] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
   const [advancedPromptOpen, setAdvancedPromptOpen] = useState(false);
   const [advancedPrompt, setAdvancedPrompt] = useState("");
@@ -399,19 +401,80 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
       await onPostCreated(postData);
 
       // Reset form
-      setTopic("");
-      setGeneratedText("");
-      setHashtags([]);
-      setScheduledFor("");
-      setImageUrl("");
-      setVideoUrl("");
-      setImagePrompt("");
-      setAdvancedPrompt("");
-      setOverlay(DEFAULT_OVERLAY);
-      setShowOverlayEditor(false);
+      resetForm();
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const publishNow = async () => {
+    if (!generatedText.trim()) {
+      toast.error("Nenhum texto para publicar");
+      return;
+    }
+
+    const currentMediaUrl = mediaType === "image" ? imageUrl : videoUrl;
+    if (!currentMediaUrl) {
+      toast.error(`Uma ${mediaType === "image" ? "imagem" : "vídeo"} é necessária para publicar no Instagram`);
+      return;
+    }
+
+    setIsPublishing(true);
+    try {
+      // First save the post
+      const postData: any = {
+        caption: generatedText,
+        hashtags,
+        status: "draft",
+        post_type: postType,
+        image_url: imageUrl || null,
+        media_type: mediaType,
+        ai_model_used: selectedModel,
+        video_url: videoUrl || null,
+        overlay_metadata: showOverlayEditor && overlay.text ? overlay : null,
+      };
+
+      const savedPost = await onPostCreated(postData);
+      
+      if (!savedPost?.id) {
+        throw new Error("Erro ao salvar post antes de publicar");
+      }
+
+      // Now publish immediately
+      toast.info("Publicando no Instagram... Isso pode levar alguns segundos.");
+      
+      const { data, error } = await supabase.functions.invoke("publish-post", {
+        body: { postId: savedPost.id },
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      toast.success(data.message || "Post publicado com sucesso!");
+      resetForm();
+    } catch (error: any) {
+      console.error("Error publishing:", error);
+      toast.error(error.message || "Erro ao publicar. Tente novamente.");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const resetForm = () => {
+    setTopic("");
+    setGeneratedText("");
+    setHashtags([]);
+    setScheduledFor("");
+    setImageUrl("");
+    setVideoUrl("");
+    setImagePrompt("");
+    setAdvancedPrompt("");
+    setOverlay(DEFAULT_OVERLAY);
+    setShowOverlayEditor(false);
+    localStorage.removeItem(CONTENT_CREATION_STATE_KEY);
   };
 
   const handleMediaTypeChange = (type: MediaType) => {
@@ -673,24 +736,48 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-2">
+              <div className="flex flex-col gap-2 pt-2">
+                {/* Primary Action - Publish Now */}
                 <Button
-                  onClick={() => savePost("draft")}
-                  disabled={isSaving}
-                  variant="outline"
-                  className="flex-1"
+                  onClick={publishNow}
+                  disabled={isPublishing || isSaving || (!imageUrl && mediaType === "image") || (!videoUrl && mediaType !== "image")}
+                  className="w-full"
+                  size="lg"
                 >
-                  <Save className="mr-2 h-4 w-4" />
-                  Rascunho
+                  {isPublishing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Publicando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Publicar Agora
+                    </>
+                  )}
                 </Button>
-                <Button
-                  onClick={() => savePost("scheduled")}
-                  disabled={isSaving || !scheduledFor}
-                  className="flex-1"
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Agendar
-                </Button>
+
+                {/* Secondary Actions */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => savePost("draft")}
+                    disabled={isSaving || isPublishing}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Rascunho
+                  </Button>
+                  <Button
+                    onClick={() => savePost("scheduled")}
+                    disabled={isSaving || isPublishing || !scheduledFor}
+                    variant="secondary"
+                    className="flex-1"
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Agendar
+                  </Button>
+                </div>
               </div>
             </>
           )}
