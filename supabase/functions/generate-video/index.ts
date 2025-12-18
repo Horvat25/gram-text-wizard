@@ -157,10 +157,23 @@ IMPORTANTE: Inclua o texto "${brandingName}" como marca d'água sutil no início
     );
   } catch (error: any) {
     console.error("Error in generate-video:", error);
+    
+    // Check for payment required error from Replicate
+    let errorMessage = error.message || "Erro ao gerar vídeo";
+    let statusCode = 500;
+    
+    if (error.message?.includes("402") || error.message?.includes("Payment Required") || error.message?.includes("Free time limit")) {
+      errorMessage = "Limite gratuito do Replicate atingido. Para gerar vídeos, configure billing em replicate.com/account/billing";
+      statusCode = 402;
+    } else if (error.message?.includes("429") || error.message?.includes("Rate limit")) {
+      errorMessage = "Muitas requisições. Aguarde alguns minutos e tente novamente.";
+      statusCode = 429;
+    }
+    
     return new Response(
-      JSON.stringify({ error: error.message || "Erro ao gerar vídeo" }),
+      JSON.stringify({ error: errorMessage }),
       {
-        status: 500,
+        status: statusCode,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
