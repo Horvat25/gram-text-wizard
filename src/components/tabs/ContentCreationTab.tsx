@@ -483,6 +483,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         ai_model_used: selectedModel,
         video_url: videoUrl || null,
         overlay_metadata: showOverlayEditor && overlay.text ? overlay : null,
+        carousel_images: mediaType === "carousel" ? carouselImages : null,
       };
 
       const savedPost = await onPostCreated(postData);
