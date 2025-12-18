@@ -90,55 +90,113 @@ serve(async (req) => {
     console.log(`Publicando no Instagram para conta: ${account.username || instagramUserId}`);
 
     const isVideo = post.media_type === "video" || post.media_type === "reels";
-    const mediaUrl = isVideo ? post.video_url : post.image_url;
-
-    // Verificar se tem mídia
-    if (!mediaUrl) {
-      throw new Error(isVideo 
-        ? "Um vídeo é necessário para publicar. Gere um vídeo primeiro."
-        : "Uma imagem é necessária para publicar no Instagram. Adicione uma imagem ao post."
-      );
-    }
-
+    const isCarousel = post.media_type === "carousel";
+    
     const caption = `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`;
     
-    // Step 1: Create media container
-    const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-    
-    if (isVideo) {
-      // Video/Reels requires different parameters
-      createMediaUrl.searchParams.set('video_url', mediaUrl);
-      createMediaUrl.searchParams.set('caption', caption);
-      createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
-      createMediaUrl.searchParams.set('access_token', accessToken);
+    let creationId: string;
+
+    if (isCarousel) {
+      // Carousel post - multiple images
+      const carouselImages = post.carousel_images as string[] || [];
       
-      console.log("Creating video media container...");
+      if (carouselImages.length < 2) {
+        throw new Error("Carrossel precisa de pelo menos 2 imagens");
+      }
+      
+      console.log(`Creating carousel with ${carouselImages.length} images...`);
+      
+      // Step 1: Create media containers for each item (without caption)
+      const childrenIds: string[] = [];
+      
+      for (let i = 0; i < carouselImages.length; i++) {
+        const imageUrl = carouselImages[i];
+        console.log(`Creating media container for image ${i + 1}/${carouselImages.length}...`);
+        
+        const itemUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
+        itemUrl.searchParams.set('image_url', imageUrl);
+        itemUrl.searchParams.set('is_carousel_item', 'true');
+        itemUrl.searchParams.set('access_token', accessToken);
+        
+        const itemResponse = await fetch(itemUrl.toString(), { method: 'POST' });
+        const itemData = await itemResponse.json();
+        
+        if (itemData.error) {
+          console.error(`Error creating carousel item ${i + 1}:`, itemData.error);
+          throw new Error(`Instagram API (item ${i + 1}): ${itemData.error.message}`);
+        }
+        
+        childrenIds.push(itemData.id);
+        console.log(`Carousel item ${i + 1} created: ${itemData.id}`);
+        
+        // Small delay between requests to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      // Step 2: Create carousel container with children
+      console.log("Creating carousel container...");
+      const carouselUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
+      carouselUrl.searchParams.set('media_type', 'CAROUSEL');
+      carouselUrl.searchParams.set('caption', caption);
+      carouselUrl.searchParams.set('children', childrenIds.join(','));
+      carouselUrl.searchParams.set('access_token', accessToken);
+      
+      const carouselResponse = await fetch(carouselUrl.toString(), { method: 'POST' });
+      const carouselData = await carouselResponse.json();
+      
+      if (carouselData.error) {
+        console.error("Error creating carousel container:", carouselData.error);
+        throw new Error(`Instagram API (carousel): ${carouselData.error.message}`);
+      }
+      
+      creationId = carouselData.id;
+      console.log(`Carousel container created: ${creationId}`);
+      
     } else {
-      // Image post
-      createMediaUrl.searchParams.set('image_url', mediaUrl);
-      createMediaUrl.searchParams.set('caption', caption);
-      createMediaUrl.searchParams.set('access_token', accessToken);
+      // Single media post (image or video)
+      const mediaUrl = isVideo ? post.video_url : post.image_url;
+
+      if (!mediaUrl) {
+        throw new Error(isVideo 
+          ? "Um vídeo é necessário para publicar. Gere um vídeo primeiro."
+          : "Uma imagem é necessária para publicar no Instagram. Adicione uma imagem ao post."
+        );
+      }
       
-      console.log("Creating image media container...");
+      // Create media container
+      const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
+      
+      if (isVideo) {
+        createMediaUrl.searchParams.set('video_url', mediaUrl);
+        createMediaUrl.searchParams.set('caption', caption);
+        createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
+        createMediaUrl.searchParams.set('access_token', accessToken);
+        console.log("Creating video media container...");
+      } else {
+        createMediaUrl.searchParams.set('image_url', mediaUrl);
+        createMediaUrl.searchParams.set('caption', caption);
+        createMediaUrl.searchParams.set('access_token', accessToken);
+        console.log("Creating image media container...");
+      }
+
+      const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
+      const mediaData = await mediaResponse.json();
+
+      if (mediaData.error) {
+        console.error("Instagram API error (create media):", mediaData.error);
+        throw new Error(`Instagram API: ${mediaData.error.message}`);
+      }
+
+      creationId = mediaData.id;
+      console.log(`Media container created: ${creationId}`);
     }
 
-    const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
-    const mediaData = await mediaResponse.json();
-
-    if (mediaData.error) {
-      console.error("Instagram API error (create media):", mediaData.error);
-      throw new Error(`Instagram API: ${mediaData.error.message}`);
-    }
-
-    const creationId = mediaData.id;
-    console.log(`Media container created: ${creationId}`);
-
-    // Wait for media processing (both images and videos need this)
+    // Wait for media processing (carousels, images, and videos need this)
     console.log("Aguardando processamento da mídia pelo Instagram...");
     
     let status = "IN_PROGRESS";
     let attempts = 0;
-    const maxAttempts = isVideo ? 60 : 12; // Videos: 5 min, Images: 1 min
+    const maxAttempts = isVideo ? 60 : 15; // Videos: 5 min, Others: 1.25 min
     const waitTime = 5000; // 5 seconds between checks
     
     while (status === "IN_PROGRESS" && attempts < maxAttempts) {
@@ -158,12 +216,10 @@ serve(async (req) => {
       
       if (statusData.error) {
         console.error("Status check error:", statusData.error);
-        // If we get an error checking status, assume it's ready (some media types don't have status)
         status = "FINISHED";
         break;
       }
       
-      // If status is undefined or FINISHED, break out
       if (!statusData.status_code || statusData.status_code === "FINISHED") {
         status = "FINISHED";
         break;
@@ -180,7 +236,7 @@ serve(async (req) => {
     
     console.log("Media processing complete, publishing...");
 
-    // Step 2: Publish the media
+    // Publish the media
     const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);
     publishUrl.searchParams.set('creation_id', creationId);
     publishUrl.searchParams.set('access_token', accessToken);
@@ -195,7 +251,8 @@ serve(async (req) => {
     }
 
     const instagramPostId = publishData.id;
-    console.log(`Post published successfully! Instagram Post ID: ${instagramPostId}`);
+    const mediaTypeLabel = isCarousel ? "Carrossel" : isVideo ? "Vídeo" : "Imagem";
+    console.log(`${mediaTypeLabel} published successfully! Instagram Post ID: ${instagramPostId}`);
 
     // Atualizar o post no banco
     const { error: updateError } = await supabase
@@ -217,7 +274,7 @@ serve(async (req) => {
         postId,
         instagramPostId,
         accountUsername: account.username,
-        message: `Post publicado com sucesso no Instagram @${account.username}!`,
+        message: `${mediaTypeLabel} publicado com sucesso no Instagram @${account.username}!`,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

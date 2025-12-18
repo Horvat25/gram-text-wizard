@@ -120,6 +120,7 @@ export type Database = {
         Row: {
           ai_model_used: string | null
           caption: string
+          carousel_images: string[] | null
           comments_count: number | null
           cost_estimate: number | null
           created_at: string | null
@@ -145,6 +146,7 @@ export type Database = {
         Insert: {
           ai_model_used?: string | null
           caption: string
+          carousel_images?: string[] | null
           comments_count?: number | null
           cost_estimate?: number | null
           created_at?: string | null
@@ -170,6 +172,7 @@ export type Database = {
         Update: {
           ai_model_used?: string | null
           caption?: string
+          carousel_images?: string[] | null
           comments_count?: number | null
           cost_estimate?: number | null
           created_at?: string | null

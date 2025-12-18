@@ -21,6 +21,7 @@ export interface Post {
   saves_count: number | null;
   reach: number | null;
   user_id: string | null;
+  carousel_images: string[] | null;
 }
 
 export interface CreatePostData {
@@ -88,8 +89,9 @@ export const usePosts = () => {
           media_type: postData.media_type || "image",
           ai_model_used: postData.ai_model_used || null,
           overlay_metadata: postData.overlay_metadata || null,
+          carousel_images: postData.carousel_images || null,
           user_id: user.id,
-        })
+        } as any)
         .select()
         .single();
 
