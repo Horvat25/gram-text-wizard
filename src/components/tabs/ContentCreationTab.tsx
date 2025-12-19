@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,6 +33,8 @@ import {
   Plus,
   X,
   Images,
+  Mic,
+  Music,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,6 +46,7 @@ import PostScore from "@/components/PostScore";
 import DownloadActions from "@/components/DownloadActions";
 import ModelSelector, { MediaType, AIModel } from "@/components/ModelSelector";
 import TextOverlayEditor, { OverlayMetadata } from "@/components/TextOverlayEditor";
+import NarrativeVideoGenerator from "@/components/NarrativeVideoGenerator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -112,6 +115,11 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const [carouselImages, setCarouselImages] = useState<string[]>([]);
   const [carouselGeneratingIndex, setCarouselGeneratingIndex] = useState<number | null>(null);
   
+  // Narrative video state
+  const [narrativeScript, setNarrativeScript] = useState("");
+  const [narrationUrl, setNarrationUrl] = useState("");
+  const [musicUrl, setMusicUrl] = useState("");
+  
   // Overlay state
   const [showOverlayEditor, setShowOverlayEditor] = useState(false);
   const [overlay, setOverlay] = useState<OverlayMetadata>(DEFAULT_OVERLAY);
@@ -119,6 +127,19 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const { settings: brandSettings } = useBrandSettings();
   const hasConnectedAccount = accounts.length > 0;
+
+  // Handle narrative video completion
+  const handleNarrativeVideoGenerated = useCallback((
+    generatedVideoUrl: string, 
+    generatedNarrationUrl: string, 
+    generatedMusicUrl: string, 
+    script: string
+  ) => {
+    setVideoUrl(generatedVideoUrl);
+    setNarrationUrl(generatedNarrationUrl);
+    setMusicUrl(generatedMusicUrl);
+    setNarrativeScript(script);
+  }, []);
 
   // Load suggestion data from sessionStorage on mount
   useEffect(() => {
@@ -689,7 +710,15 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                 </div>
               )}
 
-              {/* Media Generation */}
+              {/* Media Generation - Show narrative generator for reels with narrative model */}
+              {selectedModel === "narrative" && mediaType === "reels" ? (
+                <div className="pt-2 border-t">
+                  <NarrativeVideoGenerator
+                    topic={topic}
+                    onVideoGenerated={handleNarrativeVideoGenerated}
+                  />
+                </div>
+              ) : (
               <div className="space-y-3 pt-2 border-t">
                 <Label htmlFor="imagePrompt">
                   Prompt {getMediaLabel()}
@@ -820,6 +849,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                   </p>
                 )}
               </div>
+              )}
 
               {/* Text Overlay Editor */}
               {imageUrl && !showOverlayEditor && (
