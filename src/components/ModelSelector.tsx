@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/tooltip";
 import { DollarSign, Sparkles, Video, Image as ImageIcon } from "lucide-react";
 
-export type MediaType = "image" | "video" | "reels" | "carousel";
-export type AIModel = "gemini" | "dalle3" | "minimax";
+export type MediaType = "image" | "video" | "reels" | "carousel" | "narrative";
+export type AIModel = "gemini" | "dalle3" | "minimax" | "narrative";
 
 interface ModelSelectorProps {
   mediaType: MediaType;
@@ -28,7 +28,7 @@ interface ModelSelectorProps {
 const MEDIA_TYPES = [
   { value: "image" as MediaType, label: "Imagem", icon: ImageIcon },
   { value: "video" as MediaType, label: "Vídeo", icon: Video },
-  { value: "reels" as MediaType, label: "Reels", icon: Video },
+  { value: "reels" as MediaType, label: "Reels Narrado", icon: Video, badge: "Novo" },
   { value: "carousel" as MediaType, label: "Carrossel", icon: ImageIcon },
 ];
 
@@ -60,9 +60,16 @@ const AI_MODELS = {
   ],
   reels: [
     {
+      value: "narrative" as AIModel,
+      label: "Pipeline Narrativo",
+      description: "Vídeo + Narração + Música (ElevenLabs)",
+      cost: "$",
+      costLevel: 1,
+    },
+    {
       value: "minimax" as AIModel,
-      label: "Minimax Video-01",
-      description: "Vídeos curtos (5-6s)",
+      label: "Vídeo Simples",
+      description: "Apenas vídeo, sem áudio",
       cost: "$",
       costLevel: 1,
     },
@@ -74,6 +81,15 @@ const AI_MODELS = {
       description: "Múltiplas imagens gratuitas",
       cost: "Grátis",
       costLevel: 0,
+    },
+  ],
+  narrative: [
+    {
+      value: "narrative" as AIModel,
+      label: "Pipeline Narrativo Completo",
+      description: "Imagem → Vídeo → Narração → Música",
+      cost: "$",
+      costLevel: 1,
     },
   ],
 };
@@ -113,7 +129,7 @@ const ModelSelector = ({
         {/* Media Type */}
         <div className="space-y-2">
           <Label>Tipo de Mídia</Label>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {MEDIA_TYPES.map((type) => {
               const Icon = type.icon;
               const isSelected = mediaType === type.value;
@@ -121,7 +137,7 @@ const ModelSelector = ({
                 <button
                   key={type.value}
                   onClick={() => handleMediaTypeChange(type.value)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg border transition-all ${
+                  className={`relative flex items-center justify-center gap-2 py-2 px-3 rounded-lg border transition-all ${
                     isSelected
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
@@ -129,6 +145,11 @@ const ModelSelector = ({
                 >
                   <Icon className="h-4 w-4" />
                   <span className="text-sm font-medium">{type.label}</span>
+                  {"badge" in type && type.badge && (
+                    <Badge variant="secondary" className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0 bg-primary text-primary-foreground">
+                      {type.badge}
+                    </Badge>
+                  )}
                 </button>
               );
             })}
@@ -188,6 +209,11 @@ const ModelSelector = ({
               {selectedModel === "minimax" && (
                 <Badge variant="outline" className="text-xs text-amber-600 border-amber-600/30">
                   Geração em background
+                </Badge>
+              )}
+              {selectedModel === "narrative" && (
+                <Badge variant="secondary" className="text-xs bg-purple-500/10 text-purple-600 border-purple-600/30">
+                  Narração + Música
                 </Badge>
               )}
             </div>
