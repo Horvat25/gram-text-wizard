@@ -61,7 +61,7 @@ const getDefaultData = (): LocalData => ({
     lastUpdated: new Date().toISOString(),
   },
   settings: {
-    brandName: "Minha Marca",
+    brandName: "NeuralUpdate",
     brandLogoUrl: null,
     preferredPostTimes: [],
   },
