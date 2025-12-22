@@ -116,16 +116,19 @@ serve(async (req) => {
 
     const replicate = new Replicate({ auth: REPLICATE_API_KEY });
 
-    // Use Stable Video Diffusion - economic image-to-video model
-    // This generates video from a still image with subtle motion
+    // Use Wan 2.6 I2V - economic and available image-to-video model
     const prediction = await replicate.predictions.create({
-      model: "stability-ai/stable-video-diffusion",
+      model: "wan-video/wan-2.6-i2v",
       input: {
-        input_image: imageUrl,
-        motion_bucket_id: 127, // Motion amount (lower = subtle, higher = dramatic)
-        cond_aug: 0.02, // Conditioning augmentation
-        decoding_t: 14, // Number of frames decoded at a time
-        fps: 6, // Frames per second
+        image: imageUrl,
+        prompt: prompt || "Subtle camera movement with gentle zoom and pan",
+        max_area: "832x480",
+        duration: duration <= 5 ? "5s" : "10s",
+        fast_mode: "Enabled",
+        frame_rate: 16,
+        sample_steps: 30,
+        sample_guide_scale: 5,
+        sample_shift: 8,
       },
     });
 
@@ -136,8 +139,8 @@ serve(async (req) => {
       JSON.stringify({
         predictionId: prediction.id,
         status: prediction.status,
-        modelUsed: "stable-video-diffusion",
-        costEstimate: 0.02, // Economic model cost
+        modelUsed: "wan-2.6-i2v",
+        costEstimate: 0.03, // Economic model cost
         type: "image-to-video",
       }),
       {
