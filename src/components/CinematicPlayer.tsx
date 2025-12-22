@@ -153,16 +153,21 @@ const CinematicPlayer = ({
     }
   }, []);
 
-  const toggleFullscreen = useCallback(() => {
+  const toggleFullscreen = useCallback(async () => {
     if (!containerRef.current) return;
     
-    if (!isFullscreen) {
-      containerRef.current.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current.requestFullscreen?.();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen?.();
+        setIsFullscreen(false);
+      }
+    } catch (err) {
+      console.warn("Fullscreen not supported:", err);
     }
-    setIsFullscreen(!isFullscreen);
-  }, [isFullscreen]);
+  }, []);
 
   const handleProgressClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();

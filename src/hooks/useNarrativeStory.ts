@@ -28,7 +28,7 @@ interface UseNarrativeStoryOptions {
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  const { brandName = "NeuralUpdate", segmentCount = 4, segmentDuration = 5 } = options;
+  const { segmentCount = 4, segmentDuration = 5 } = options;
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
@@ -78,8 +78,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           segmentCount,
           wordsPerSegment,
           totalDuration,
-          style: "narrativo, envolvente, com começo-meio-fim, para Instagram Reels",
-          brandName,
+          style: "informativo, envolvente, com começo-meio-fim",
         },
       });
 
@@ -117,7 +116,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       setError(error.message || "Erro ao gerar roteiro");
       return null;
     }
-  }, [segmentCount, segmentDuration, brandName, setError]);
+  }, [segmentCount, segmentDuration, setError]);
 
   // Step 2: Generate images for each segment (parallel with progress)
   const generateImages = useCallback(async (segments: StorySegment[]) => {
@@ -136,10 +135,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           try {
             const { data, error } = await supabase.functions.invoke("generate-image", {
               body: { 
-                prompt: `${segment.imagePrompt}. Estilo cinematográfico, alta qualidade, resolução 9:16 vertical para Instagram Reels.`,
+                prompt: `${segment.imagePrompt}. Cinematic style, high quality, 9:16 vertical aspect ratio.`,
                 format: "portrait",
                 model: "gemini",
-                brandName,
               },
             });
 
@@ -186,7 +184,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
     toast.success(`${validSegments.length} imagens cinematográficas criadas!`);
     return validSegments;
-  }, [brandName, setError]);
+  }, [setError]);
 
   // Step 3: Generate narration audio
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
@@ -197,16 +195,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const fullScript = segments.map(s => s.text).join(" ");
     
     try {
-      // Try ElevenLabs first
-      let narrationResult = await supabase.functions.invoke("elevenlabs-tts", {
-        body: { text: fullScript, language: "pt-BR" },
+      // Try OpenAI TTS first (ElevenLabs free tier is blocked)
+      let narrationResult = await supabase.functions.invoke("openai-tts", {
+        body: { text: fullScript, voice: "onyx" },
       });
 
-      // Fallback to OpenAI
+      // Fallback: try ElevenLabs if OpenAI fails
       if (narrationResult.error) {
-        console.log("ElevenLabs failed, trying OpenAI TTS...");
-        narrationResult = await supabase.functions.invoke("openai-tts", {
-          body: { text: fullScript, voice: "onyx" },
+        console.log("OpenAI TTS failed, trying ElevenLabs...");
+        narrationResult = await supabase.functions.invoke("elevenlabs-tts", {
+          body: { text: fullScript, language: "pt-BR" },
         });
       }
 
