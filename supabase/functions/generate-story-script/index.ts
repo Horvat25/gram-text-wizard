@@ -25,25 +25,28 @@ serve(async (req) => {
     console.log("Generating story script for:", topic);
     console.log("Segments:", segmentCount, "| Words per segment:", wordsPerSegment);
 
-    const systemPrompt = `Você é um roteirista profissional de vídeos curtos virais para Instagram Reels.
-Crie histórias envolventes com COMEÇO, MEIO e FIM claros.
-Cada segmento deve ter uma imagem distinta e impactante.
+    const systemPrompt = `Você é um roteirista de vídeos curtos virais para um canal de notícias de tecnologia e ideias do futuro.
+Crie conteúdo informativo e envolvente com COMEÇO, MEIO e FIM claros.
+Cada segmento deve ter uma cena visual distinta e impactante.
 Use linguagem conversacional em português brasileiro.
-Seja direto, impactante e mantenha a atenção do espectador.`;
+NÃO mencione nomes de empresas, marcas ou sites fictícios.
+NÃO faça propaganda ou marketing.
+Seja informativo, direto e mantenha a atenção do espectador.`;
 
     const userPrompt = `Crie um roteiro para um vídeo sobre: "${topic}"
 
 REGRAS IMPORTANTES:
 - Exatamente ${segmentCount} segmentos/cenas
 - Cada segmento deve ter ${wordsPerSegment}-${wordsPerSegment + 5} palavras para narração
-- Estilo: ${style || "profissional e envolvente"}
-- Marca: ${brandName || "não especificada"}
+- Estilo: ${style || "informativo e envolvente"}
+- NUNCA mencione nomes de empresas, marcas ou URLs
+- Foque apenas no conteúdo educativo/informativo
 
 ESTRUTURA OBRIGATÓRIA:
-1. ABERTURA (gancho forte, pergunta ou fato impactante)
-2. DESENVOLVIMENTO (informação principal, benefícios, exemplos)
-3. CLÍMAX (ponto alto, revelação, momento de impacto)
-4. FECHAMENTO (call-to-action, conclusão memorável)
+1. ABERTURA (gancho forte, pergunta ou fato impactante sobre o tema)
+2. DESENVOLVIMENTO (explicação principal, como funciona, benefícios)
+3. CONTEXTO (aplicações práticas, exemplos do mundo real)
+4. FECHAMENTO (reflexão sobre o futuro, conclusão inspiradora)
 
 Para cada segmento, forneça:
 - text: texto exato para narração (${wordsPerSegment} palavras)
