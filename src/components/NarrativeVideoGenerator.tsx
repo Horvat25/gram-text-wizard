@@ -7,20 +7,20 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
-  ImageIcon, 
   Loader2, 
   Wand2, 
   RefreshCw,
   FileText,
+  ImageIcon,
   Music,
-  Mic,
   Check,
   AlertCircle,
-  Download,
+  Film,
   Sparkles,
 } from "lucide-react";
-import { useNarrativeVideo } from "@/hooks/useNarrativeVideo";
+import { useNarrativeStory } from "@/hooks/useNarrativeStory";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
+import CinematicPlayer from "./CinematicPlayer";
 
 interface NarrativeVideoGeneratorProps {
   topic: string;
@@ -28,178 +28,174 @@ interface NarrativeVideoGeneratorProps {
 }
 
 const STEP_LABELS = {
-  idle: "Pronto para começar",
-  script: "Gerando roteiro...",
-  image: "Criando imagem...",
+  idle: "Pronto para criar",
+  script: "Escrevendo roteiro cinematográfico...",
+  images: "Gerando cenas visuais...",
   audio: "Produzindo narração...",
-  complete: "Conteúdo pronto!",
-  error: "Erro na geração",
+  complete: "Story cinematográfico pronto!",
+  error: "Erro na produção",
+};
+
+const STEP_DESCRIPTIONS = {
+  idle: "Clique para iniciar",
+  script: "Criando narrativa com começo, meio e fim",
+  images: "Renderizando imagens de alta qualidade",
+  audio: "Sincronizando narração profissional",
+  complete: "Seu conteúdo está pronto para publicar",
+  error: "Tente novamente",
 };
 
 const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGeneratorProps) => {
   const { settings: brandSettings } = useBrandSettings();
-  const [imagePrompt, setImagePrompt] = useState("");
-  const [customScript, setCustomScript] = useState("");
-  const [useCustomScript, setUseCustomScript] = useState(false);
+  const [customTopic, setCustomTopic] = useState(topic);
 
   const {
     state,
     isGenerating,
-    generateNarrativeVideo,
+    generateStory,
     reset,
-  } = useNarrativeVideo({
+  } = useNarrativeStory({
     brandName: brandSettings.brandName || "NeuralUpdate",
-    duration: 10,
+    segmentCount: 4,
+    segmentDuration: 5,
   });
+
+  // Sync topic prop
+  useEffect(() => {
+    if (topic && topic !== customTopic) {
+      setCustomTopic(topic);
+    }
+  }, [topic]);
 
   // Notify parent when complete
   useEffect(() => {
-    if (state.step === "complete" && state.imageUrl) {
-      onVideoGenerated(state.imageUrl, state.narrationUrl, "", state.script);
+    if (state.step === "complete" && state.segments.length > 0) {
+      const fullScript = state.segments.map(s => s.text).join(" ");
+      const firstImageUrl = state.segments[0]?.imageUrl || "";
+      onVideoGenerated(firstImageUrl, state.narrationUrl, "", fullScript);
     }
-  }, [state.step, state.imageUrl, state.narrationUrl, state.script, onVideoGenerated]);
+  }, [state.step, state.segments, state.narrationUrl, onVideoGenerated]);
 
   const handleGenerate = async () => {
-    const prompt = imagePrompt || topic;
-    await generateNarrativeVideo(
-      topic, 
-      prompt, 
-      useCustomScript ? customScript : undefined
-    );
+    if (!customTopic.trim()) return;
+    await generateStory(customTopic);
   };
 
   const getStepIcon = (step: string) => {
     switch (step) {
       case "script": return <FileText className="h-4 w-4" />;
-      case "image": return <ImageIcon className="h-4 w-4" />;
+      case "images": return <ImageIcon className="h-4 w-4" />;
       case "audio": return <Music className="h-4 w-4" />;
       case "complete": return <Check className="h-4 w-4" />;
       case "error": return <AlertCircle className="h-4 w-4" />;
-      default: return <Wand2 className="h-4 w-4" />;
+      default: return <Film className="h-4 w-4" />;
     }
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-primary/10">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkles className="h-5 w-5 text-primary" />
-          Gerador de Conteúdo Narrativo
+          <Film className="h-5 w-5 text-primary" />
+          Gerador de Story Cinematográfico
+          <Badge variant="secondary" className="text-[10px] ml-auto">PRO</Badge>
         </CardTitle>
         <CardDescription className="text-xs">
-          Crie imagens com narração para Instagram (quase gratuito!)
+          Múltiplas cenas, transições suaves, legendas sincronizadas
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Image Prompt */}
+      <CardContent className="space-y-4 pt-4">
+        {/* Topic Input */}
         <div className="space-y-2">
-          <Label className="text-sm">Descrição Visual</Label>
-          <Input
-            placeholder="Descrição da imagem (ex: paisagem futurista, interface tech...)"
-            value={imagePrompt}
-            onChange={(e) => setImagePrompt(e.target.value)}
+          <Label className="text-sm font-medium">Tema do Story</Label>
+          <Textarea
+            placeholder="Ex: Como a inteligência artificial está transformando o mercado de trabalho..."
+            value={customTopic}
+            onChange={(e) => setCustomTopic(e.target.value)}
             disabled={isGenerating}
+            rows={2}
+            className="resize-none text-sm"
           />
-        </div>
-
-        {/* Custom Script Toggle */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="useCustomScript"
-              checked={useCustomScript}
-              onChange={(e) => setUseCustomScript(e.target.checked)}
-              disabled={isGenerating}
-              className="rounded border-border"
-            />
-            <Label htmlFor="useCustomScript" className="text-sm cursor-pointer">
-              Usar roteiro personalizado
-            </Label>
-          </div>
-          
-          {useCustomScript && (
-            <Textarea
-              placeholder="Digite seu roteiro de narração aqui..."
-              value={customScript}
-              onChange={(e) => setCustomScript(e.target.value)}
-              rows={4}
-              disabled={isGenerating}
-              className="resize-none text-sm"
-            />
-          )}
         </div>
 
         {/* Progress Section */}
         {isGenerating && (
-          <div className="space-y-3 p-3 rounded-lg bg-muted/50">
+          <div className="space-y-3 p-4 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {getStepIcon(state.step)}
-                <span className="text-sm font-medium">{STEP_LABELS[state.step]}</span>
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  {getStepIcon(state.step)}
+                </div>
+                <div>
+                  <span className="text-sm font-medium block">{STEP_LABELS[state.step]}</span>
+                  <span className="text-xs text-muted-foreground">{STEP_DESCRIPTIONS[state.step]}</span>
+                </div>
               </div>
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="outline" className="text-xs font-mono">
                 {state.progress}%
               </Badge>
             </div>
-            <Progress value={state.progress} />
+            <Progress value={state.progress} className="h-2" />
             
             {/* Step indicators */}
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span className={state.progress >= 25 ? "text-primary" : ""}>Roteiro</span>
-              <span className={state.progress >= 60 ? "text-primary" : ""}>Imagem</span>
-              <span className={state.progress >= 100 ? "text-primary" : ""}>Narração</span>
+            <div className="flex justify-between text-xs text-muted-foreground pt-1">
+              <span className={state.progress >= 15 ? "text-primary font-medium" : ""}>
+                ✍️ Roteiro
+              </span>
+              <span className={state.progress >= 70 ? "text-primary font-medium" : ""}>
+                🎨 {state.segments.filter(s => s.imageUrl).length}/{state.segments.length} Cenas
+              </span>
+              <span className={state.progress >= 100 ? "text-primary font-medium" : ""}>
+                🎙️ Narração
+              </span>
             </div>
           </div>
         )}
 
-        {/* Generated Script Preview */}
-        {state.script && (
-          <div className="space-y-2 p-3 rounded-lg bg-muted/30 border">
-            <Label className="text-xs flex items-center gap-1">
-              <Mic className="h-3 w-3" />
-              Roteiro de Narração
-            </Label>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {state.script}
-            </p>
-          </div>
-        )}
-
-        {/* Image Preview */}
-        {state.imageUrl && (
+        {/* Preview generated images during generation */}
+        {isGenerating && state.segments.some(s => s.imageUrl) && (
           <div className="space-y-2">
-            <Label className="text-xs flex items-center gap-1">
-              <ImageIcon className="h-3 w-3" />
-              Imagem Gerada
-            </Label>
-            <div className="relative rounded-lg overflow-hidden bg-muted aspect-[9/16] max-h-[300px]">
-              <img
-                src={state.imageUrl}
-                alt="Imagem gerada"
-                className="w-full h-full object-contain"
-              />
+            <Label className="text-xs text-muted-foreground">Cenas geradas:</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {state.segments.map((seg, i) => (
+                <div 
+                  key={seg.id} 
+                  className="aspect-[9/16] rounded-lg overflow-hidden bg-muted relative"
+                >
+                  {seg.imageUrl ? (
+                    <img 
+                      src={seg.imageUrl} 
+                      alt={`Cena ${i + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
+                    {i + 1}
+                  </div>
+                </div>
+              ))}
             </div>
-            <a 
-              href={state.imageUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              <Download className="h-3 w-3" />
-              Baixar imagem
-            </a>
           </div>
         )}
 
-        {/* Audio Player */}
-        {state.narrationUrl && (
+        {/* Cinematic Player when complete */}
+        {state.step === "complete" && state.segments.length > 0 && (
           <div className="space-y-2">
             <Label className="text-xs flex items-center gap-1">
-              <Mic className="h-3 w-3" />
-              Narração
+              <Sparkles className="h-3 w-3" />
+              Seu Story Cinematográfico
             </Label>
-            <audio src={state.narrationUrl} controls className="w-full h-10" />
+            <CinematicPlayer
+              segments={state.segments}
+              narrationUrl={state.narrationUrl}
+              title={state.title}
+              totalDuration={state.totalDuration}
+              onComplete={() => console.log("Story complete")}
+            />
           </div>
         )}
 
@@ -214,34 +210,36 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
         <div className="flex gap-2">
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !topic.trim()}
+            disabled={isGenerating || !customTopic.trim()}
             className="flex-1"
+            size="lg"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Gerando...
+                Produzindo...
               </>
             ) : (
               <>
                 <Wand2 className="mr-2 h-4 w-4" />
-                Gerar Conteúdo
+                Criar Story Cinematográfico
               </>
             )}
           </Button>
           
           {(state.step === "complete" || state.step === "error") && (
-            <Button variant="outline" onClick={reset}>
+            <Button variant="outline" onClick={reset} size="lg">
               <RefreshCw className="h-4 w-4" />
             </Button>
           )}
         </div>
 
         {/* Cost Info */}
-        <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
-          <p className="text-xs text-green-700 dark:text-green-400 text-center">
-            💰 Custo estimado: ~R$0,05 por geração (Imagem grátis + Narração ~$0.01)
-          </p>
+        <div className="flex items-center justify-between text-xs text-muted-foreground p-2 rounded-lg bg-muted/30">
+          <span>🎬 4 cenas com transições</span>
+          <span className="text-green-600 dark:text-green-400 font-medium">
+            ~R$0,10 por story
+          </span>
         </div>
       </CardContent>
     </Card>
