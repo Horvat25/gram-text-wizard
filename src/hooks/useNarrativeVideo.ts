@@ -2,36 +2,30 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export interface NarrativeVideoState {
-  step: "idle" | "script" | "image" | "video" | "audio" | "complete" | "error";
+export interface NarrativeContentState {
+  step: "idle" | "script" | "image" | "audio" | "complete" | "error";
   progress: number;
   script: string;
   imageUrl: string;
-  videoUrl: string;
   narrationUrl: string;
-  musicUrl: string;
   error: string | null;
-  predictionId: string | null;
 }
 
-interface UseNarrativeVideoOptions {
+interface UseNarrativeContentOptions {
   brandName?: string;
   duration?: number;
 }
 
-export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
+export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
   const { brandName = "NeuralUpdate", duration = 10 } = options;
 
-  const [state, setState] = useState<NarrativeVideoState>({
+  const [state, setState] = useState<NarrativeContentState>({
     step: "idle",
     progress: 0,
     script: "",
     imageUrl: "",
-    videoUrl: "",
     narrationUrl: "",
-    musicUrl: "",
     error: null,
-    predictionId: null,
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -42,11 +36,8 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
       progress: 0,
       script: "",
       imageUrl: "",
-      videoUrl: "",
       narrationUrl: "",
-      musicUrl: "",
       error: null,
-      predictionId: null,
     });
     setIsGenerating(false);
   }, []);
@@ -60,11 +51,11 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
   // Step 1: Generate script
   const generateScript = useCallback(async (topic: string, customScript?: string) => {
     if (customScript) {
-      setState(prev => ({ ...prev, script: customScript, step: "script", progress: 20 }));
+      setState(prev => ({ ...prev, script: customScript, step: "script", progress: 25 }));
       return customScript;
     }
 
-    setState(prev => ({ ...prev, step: "script", progress: 5 }));
+    setState(prev => ({ ...prev, step: "script", progress: 10 }));
     
     try {
       const { data, error } = await supabase.functions.invoke("generate-script", {
@@ -74,8 +65,8 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
       if (error) throw error;
       if (!data?.script) throw new Error("Nenhum roteiro gerado");
 
-      setState(prev => ({ ...prev, script: data.script, progress: 20 }));
-      toast.success(`Roteiro gerado: ${data.wordCount} palavras (~${data.estimatedDuration}s)`);
+      setState(prev => ({ ...prev, script: data.script, progress: 25 }));
+      toast.success(`Roteiro gerado: ${data.wordCount} palavras`);
       return data.script;
     } catch (error: any) {
       setError(error.message || "Erro ao gerar roteiro");
@@ -83,16 +74,16 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
     }
   }, [duration, setError]);
 
-  // Step 2: Generate image
+  // Step 2: Generate image (FREE with Lovable AI/Gemini)
   const generateImage = useCallback(async (prompt: string) => {
-    setState(prev => ({ ...prev, step: "image", progress: 30 }));
+    setState(prev => ({ ...prev, step: "image", progress: 40 }));
     
     try {
       const { data, error } = await supabase.functions.invoke("generate-image", {
         body: { 
-          prompt: `${prompt}. Resolução 9:16 vertical para Instagram Reels. Marca d'água sutil "${brandName}" no canto inferior direito.`,
+          prompt: `${prompt}. Resolução 9:16 vertical para Instagram Reels. Imagem impactante e profissional.`,
           format: "portrait",
-          model: "gemini", // Economic model
+          model: "gemini",
           brandName,
         },
       });
@@ -100,8 +91,8 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
       if (error) throw error;
       if (!data?.imageUrl) throw new Error("Nenhuma imagem gerada");
 
-      setState(prev => ({ ...prev, imageUrl: data.imageUrl, progress: 50 }));
-      toast.success("Imagem base gerada!");
+      setState(prev => ({ ...prev, imageUrl: data.imageUrl, progress: 60 }));
+      toast.success("Imagem gerada com sucesso!");
       return data.imageUrl;
     } catch (error: any) {
       setError(error.message || "Erro ao gerar imagem");
@@ -109,70 +100,13 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
     }
   }, [brandName, setError]);
 
-  // Step 3: Generate video from image
-  const generateVideo = useCallback(async (imageUrl: string, prompt: string) => {
-    setState(prev => ({ ...prev, step: "video", progress: 55 }));
-    
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-narrative-video", {
-        body: { imageUrl, prompt, duration },
-      });
-
-      if (error) throw error;
-      if (!data?.predictionId) throw new Error("Falha ao iniciar geração de vídeo");
-
-      setState(prev => ({ ...prev, predictionId: data.predictionId }));
-      toast.info("Vídeo em geração... Isso pode levar 1-3 minutos.");
-      return data.predictionId;
-    } catch (error: any) {
-      setError(error.message || "Erro ao gerar vídeo");
-      return null;
-    }
-  }, [duration, setError]);
-
-  // Poll video status
-  const checkVideoStatus = useCallback(async () => {
-    if (!state.predictionId) return null;
-
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-narrative-video", {
-        body: { predictionId: state.predictionId },
-      });
-
-      if (error) throw error;
-
-      if (data.status === "succeeded") {
-        const videoUrl = data.storedVideoUrl || (Array.isArray(data.output) ? data.output[0] : data.output);
-        setState(prev => ({ 
-          ...prev, 
-          videoUrl, 
-          predictionId: null, 
-          progress: 70,
-        }));
-        toast.success("Vídeo gerado com sucesso!");
-        return videoUrl;
-      } else if (data.status === "failed") {
-        setError("Falha na geração do vídeo");
-        return null;
-      } else {
-        // Still processing
-        setState(prev => ({ ...prev, progress: Math.min(prev.progress + 5, 68) }));
-        return "processing";
-      }
-    } catch (error: any) {
-      console.error("Error checking video status:", error);
-      return null;
-    }
-  }, [state.predictionId, setError]);
-
-  // Step 4: Generate audio (narration only - using OpenAI TTS)
+  // Step 3: Generate audio narration (OpenAI TTS - very cheap ~$0.01)
   const generateAudio = useCallback(async (script: string) => {
-    setState(prev => ({ ...prev, step: "audio", progress: 75 }));
+    setState(prev => ({ ...prev, step: "audio", progress: 80 }));
     
     try {
-      // Generate narration using OpenAI TTS
       const narrationResult = await supabase.functions.invoke("openai-tts", {
-        body: { text: script, voice: "alloy" },
+        body: { text: script, voice: "onyx" }, // onyx = voz masculina profissional
       });
 
       if (narrationResult.error) throw narrationResult.error;
@@ -182,20 +116,19 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
       setState(prev => ({ 
         ...prev, 
         narrationUrl, 
-        musicUrl: "", // Music not available without ElevenLabs paid plan
-        progress: 95,
+        progress: 100,
         step: "complete",
       }));
       
       toast.success("Narração gerada com sucesso!");
-      return { narrationUrl, musicUrl: "" };
+      return narrationUrl;
     } catch (error: any) {
       setError(error.message || "Erro ao gerar narração");
       return null;
     }
   }, [setError]);
 
-  // Full pipeline
+  // Full pipeline (without video - much cheaper!)
   const generateNarrativeVideo = useCallback(async (
     topic: string, 
     imagePrompt: string,
@@ -208,28 +141,16 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
     const script = await generateScript(topic, customScript);
     if (!script) return;
 
-    // Step 2: Image
+    // Step 2: Image (FREE)
     const imageUrl = await generateImage(imagePrompt);
     if (!imageUrl) return;
 
-    // Step 3: Video (async - will poll)
-    const predictionId = await generateVideo(imageUrl, imagePrompt);
-    if (!predictionId) return;
+    // Step 3: Audio (~$0.01)
+    const narrationUrl = await generateAudio(script);
+    if (!narrationUrl) return;
 
-    // Note: Video generation is async, will need to poll
-    // Audio generation happens after video is ready
-  }, [generateScript, generateImage, generateVideo]);
-
-  // Complete the pipeline after video is ready
-  const completeWithAudio = useCallback(async () => {
-    if (!state.script || !state.videoUrl) return;
-    
-    const audio = await generateAudio(state.script);
-    if (audio) {
-      setState(prev => ({ ...prev, step: "complete", progress: 100 }));
-      setIsGenerating(false);
-    }
-  }, [state.script, state.videoUrl, generateAudio]);
+    setIsGenerating(false);
+  }, [generateScript, generateImage, generateAudio]);
 
   return {
     state,
@@ -237,10 +158,7 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
     generateNarrativeVideo,
     generateScript,
     generateImage,
-    generateVideo,
     generateAudio,
-    checkVideoStatus,
-    completeWithAudio,
     reset,
   };
 }
