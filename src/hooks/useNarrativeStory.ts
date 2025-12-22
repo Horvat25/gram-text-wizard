@@ -195,32 +195,33 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const fullScript = segments.map(s => s.text).join(" ");
     
     try {
-      // Try OpenAI TTS first
-      const openaiResult = await supabase.functions.invoke("openai-tts", {
-        body: { text: fullScript, voice: "onyx" },
+      // Try ElevenLabs first (new API key configured)
+      console.log("Trying ElevenLabs TTS...");
+      const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
+        body: { text: fullScript, language: "pt-BR" },
       });
 
       // Check if we got valid audio (not an error response)
-      if (!openaiResult.error && openaiResult.data?.audioContent) {
-        const narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
+      if (!elevenResult.error && elevenResult.data?.audioContent) {
+        const narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
         setState(prev => ({ 
           ...prev, 
           narrationUrl, 
           progress: 100,
           step: "complete",
         }));
-        toast.success("Story cinematográfico completo com narração!");
+        toast.success("Story cinematográfico completo com narração ElevenLabs!");
         return narrationUrl;
       }
 
-      // OpenAI failed, try ElevenLabs
-      console.log("OpenAI TTS failed, trying ElevenLabs...");
-      const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
-        body: { text: fullScript, language: "pt-BR" },
+      // ElevenLabs failed, try OpenAI as fallback
+      console.log("ElevenLabs failed, trying OpenAI TTS...");
+      const openaiResult = await supabase.functions.invoke("openai-tts", {
+        body: { text: fullScript, voice: "onyx" },
       });
 
-      if (!elevenResult.error && elevenResult.data?.audioContent) {
-        const narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
+      if (!openaiResult.error && openaiResult.data?.audioContent) {
+        const narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
         setState(prev => ({ 
           ...prev, 
           narrationUrl, 
@@ -239,7 +240,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         progress: 100,
         step: "complete",
       }));
-      toast.success("Story criado! (Leia as legendas - narração indisponível no momento)");
+      toast.success("Story criado! (Narração indisponível no momento)");
       return "";
     } catch (error: any) {
       console.warn("TTS error:", error);
