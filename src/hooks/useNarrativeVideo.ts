@@ -100,16 +100,36 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     }
   }, [brandName, setError]);
 
-  // Step 3: Generate audio narration (OpenAI TTS - very cheap ~$0.01)
+  // Step 3: Generate audio narration (try ElevenLabs first, then OpenAI as fallback)
   const generateAudio = useCallback(async (script: string) => {
     setState(prev => ({ ...prev, step: "audio", progress: 80 }));
     
     try {
-      const narrationResult = await supabase.functions.invoke("openai-tts", {
-        body: { text: script, voice: "onyx" }, // onyx = voz masculina profissional
+      // Try ElevenLabs first (already configured)
+      let narrationResult = await supabase.functions.invoke("elevenlabs-tts", {
+        body: { text: script, language: "pt-BR" },
       });
 
-      if (narrationResult.error) throw narrationResult.error;
+      // If ElevenLabs fails, try OpenAI
+      if (narrationResult.error) {
+        console.log("ElevenLabs failed, trying OpenAI TTS...");
+        narrationResult = await supabase.functions.invoke("openai-tts", {
+          body: { text: script, voice: "onyx" },
+        });
+      }
+
+      if (narrationResult.error) {
+        // If both fail, complete without audio
+        console.warn("TTS failed, completing without audio:", narrationResult.error);
+        setState(prev => ({ 
+          ...prev, 
+          narrationUrl: "", 
+          progress: 100,
+          step: "complete",
+        }));
+        toast.warning("Conteúdo criado! (Narração indisponível no momento)");
+        return "";
+      }
 
       const narrationUrl = `data:audio/mp3;base64,${narrationResult.data.audioContent}`;
 
@@ -120,13 +140,21 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
         step: "complete",
       }));
       
-      toast.success("Narração gerada com sucesso!");
+      toast.success("Conteúdo completo com narração!");
       return narrationUrl;
     } catch (error: any) {
-      setError(error.message || "Erro ao gerar narração");
-      return null;
+      // Complete without audio on error
+      console.warn("TTS error, completing without audio:", error);
+      setState(prev => ({ 
+        ...prev, 
+        narrationUrl: "", 
+        progress: 100,
+        step: "complete",
+      }));
+      toast.warning("Conteúdo criado! (Narração indisponível)");
+      return "";
     }
-  }, [setError]);
+  }, []);
 
   // Full pipeline (without video - much cheaper!)
   const generateNarrativeVideo = useCallback(async (
