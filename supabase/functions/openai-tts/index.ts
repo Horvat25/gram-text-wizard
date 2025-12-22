@@ -45,7 +45,18 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("OpenAI TTS error:", response.status, errorText);
-      throw new Error(`OpenAI TTS error: ${response.status}`);
+      
+      // Return error in body with 200 status so client can handle gracefully
+      return new Response(
+        JSON.stringify({ 
+          error: `OpenAI TTS error: ${response.status}`,
+          status: response.status,
+          retryable: response.status === 429,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     const audioBuffer = await response.arrayBuffer();
@@ -71,10 +82,10 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Error in openai-tts:", error);
+    // Return error in body with 200 status for graceful handling
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar narração" }),
       {
-        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
