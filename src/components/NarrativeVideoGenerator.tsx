@@ -7,35 +7,32 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Video, 
+  ImageIcon, 
   Loader2, 
   Wand2, 
-  Play, 
-  VolumeX, 
-  Volume2,
   RefreshCw,
   FileText,
-  Image as ImageIcon,
   Music,
   Mic,
   Check,
   AlertCircle,
+  Download,
+  Sparkles,
 } from "lucide-react";
 import { useNarrativeVideo } from "@/hooks/useNarrativeVideo";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 
 interface NarrativeVideoGeneratorProps {
   topic: string;
-  onVideoGenerated: (videoUrl: string, narrationUrl: string, musicUrl: string, script: string) => void;
+  onVideoGenerated: (imageUrl: string, narrationUrl: string, musicUrl: string, script: string) => void;
 }
 
 const STEP_LABELS = {
   idle: "Pronto para começar",
   script: "Gerando roteiro...",
-  image: "Criando imagem base...",
-  video: "Gerando vídeo...",
-  audio: "Produzindo narração e música...",
-  complete: "Vídeo narrativo pronto!",
+  image: "Criando imagem...",
+  audio: "Produzindo narração...",
+  complete: "Conteúdo pronto!",
   error: "Erro na geração",
 };
 
@@ -44,48 +41,23 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
   const [imagePrompt, setImagePrompt] = useState("");
   const [customScript, setCustomScript] = useState("");
   const [useCustomScript, setUseCustomScript] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
 
   const {
     state,
     isGenerating,
     generateNarrativeVideo,
-    checkVideoStatus,
-    completeWithAudio,
     reset,
   } = useNarrativeVideo({
     brandName: brandSettings.brandName || "NeuralUpdate",
     duration: 10,
   });
 
-  // Poll for video status when predictionId exists
-  useEffect(() => {
-    if (!state.predictionId) return;
-
-    const interval = setInterval(async () => {
-      const result = await checkVideoStatus();
-      if (result && result !== "processing") {
-        clearInterval(interval);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [state.predictionId, checkVideoStatus]);
-
-  // Auto-generate audio when video is ready
-  useEffect(() => {
-    if (state.videoUrl && !state.narrationUrl && state.step === "video") {
-      completeWithAudio();
-    }
-  }, [state.videoUrl, state.narrationUrl, state.step, completeWithAudio]);
-
   // Notify parent when complete
   useEffect(() => {
-    if (state.step === "complete" && state.videoUrl) {
-      onVideoGenerated(state.videoUrl, state.narrationUrl, state.musicUrl, state.script);
+    if (state.step === "complete" && state.imageUrl) {
+      onVideoGenerated(state.imageUrl, state.narrationUrl, "", state.script);
     }
-  }, [state.step, state.videoUrl, state.narrationUrl, state.musicUrl, state.script, onVideoGenerated]);
+  }, [state.step, state.imageUrl, state.narrationUrl, state.script, onVideoGenerated]);
 
   const handleGenerate = async () => {
     const prompt = imagePrompt || topic;
@@ -100,7 +72,6 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
     switch (step) {
       case "script": return <FileText className="h-4 w-4" />;
       case "image": return <ImageIcon className="h-4 w-4" />;
-      case "video": return <Video className="h-4 w-4" />;
       case "audio": return <Music className="h-4 w-4" />;
       case "complete": return <Check className="h-4 w-4" />;
       case "error": return <AlertCircle className="h-4 w-4" />;
@@ -112,11 +83,11 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Video className="h-5 w-5 text-primary" />
-          Gerador de Vídeo Narrativo
+          <Sparkles className="h-5 w-5 text-primary" />
+          Gerador de Conteúdo Narrativo
         </CardTitle>
         <CardDescription className="text-xs">
-          Crie Reels com narração, música e legendas automáticas
+          Crie imagens com narração para Instagram (quase gratuito!)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -124,7 +95,7 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
         <div className="space-y-2">
           <Label className="text-sm">Descrição Visual</Label>
           <Input
-            placeholder="Descrição da imagem base (ex: paisagem futurista, interface tech...)"
+            placeholder="Descrição da imagem (ex: paisagem futurista, interface tech...)"
             value={imagePrompt}
             onChange={(e) => setImagePrompt(e.target.value)}
             disabled={isGenerating}
@@ -175,10 +146,9 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
             
             {/* Step indicators */}
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span className={state.progress >= 20 ? "text-primary" : ""}>Roteiro</span>
-              <span className={state.progress >= 50 ? "text-primary" : ""}>Imagem</span>
-              <span className={state.progress >= 70 ? "text-primary" : ""}>Vídeo</span>
-              <span className={state.progress >= 100 ? "text-primary" : ""}>Áudio</span>
+              <span className={state.progress >= 25 ? "text-primary" : ""}>Roteiro</span>
+              <span className={state.progress >= 60 ? "text-primary" : ""}>Imagem</span>
+              <span className={state.progress >= 100 ? "text-primary" : ""}>Narração</span>
             </div>
           </div>
         )}
@@ -196,41 +166,40 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
           </div>
         )}
 
-        {/* Video Preview */}
-        {state.videoUrl && (
+        {/* Image Preview */}
+        {state.imageUrl && (
           <div className="space-y-2">
-            <Label className="text-xs">Vídeo Gerado</Label>
-            <div className="relative rounded-lg overflow-hidden bg-black aspect-[9/16] max-h-[300px]">
-              <video
-                src={state.videoUrl}
-                controls
+            <Label className="text-xs flex items-center gap-1">
+              <ImageIcon className="h-3 w-3" />
+              Imagem Gerada
+            </Label>
+            <div className="relative rounded-lg overflow-hidden bg-muted aspect-[9/16] max-h-[300px]">
+              <img
+                src={state.imageUrl}
+                alt="Imagem gerada"
                 className="w-full h-full object-contain"
-                muted={isMuted}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
               />
             </div>
+            <a 
+              href={state.imageUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            >
+              <Download className="h-3 w-3" />
+              Baixar imagem
+            </a>
           </div>
         )}
 
-        {/* Audio Players */}
+        {/* Audio Player */}
         {state.narrationUrl && (
           <div className="space-y-2">
             <Label className="text-xs flex items-center gap-1">
               <Mic className="h-3 w-3" />
               Narração
             </Label>
-            <audio src={state.narrationUrl} controls className="w-full h-8" />
-          </div>
-        )}
-
-        {state.musicUrl && (
-          <div className="space-y-2">
-            <Label className="text-xs flex items-center gap-1">
-              <Music className="h-3 w-3" />
-              Música Ambiente
-            </Label>
-            <audio src={state.musicUrl} controls className="w-full h-8" />
+            <audio src={state.narrationUrl} controls className="w-full h-10" />
           </div>
         )}
 
@@ -256,7 +225,7 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
             ) : (
               <>
                 <Wand2 className="mr-2 h-4 w-4" />
-                Gerar Vídeo Narrado
+                Gerar Conteúdo
               </>
             )}
           </Button>
@@ -268,10 +237,12 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
           )}
         </div>
 
-        {/* Info */}
-        <p className="text-xs text-muted-foreground text-center">
-          Pipeline econômico: Gemini (imagem) → SVD (vídeo) → ElevenLabs (áudio)
-        </p>
+        {/* Cost Info */}
+        <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
+          <p className="text-xs text-green-700 dark:text-green-400 text-center">
+            💰 Custo estimado: ~R$0,05 por geração (Imagem grátis + Narração ~$0.01)
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
