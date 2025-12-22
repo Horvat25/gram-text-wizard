@@ -195,42 +195,52 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const fullScript = segments.map(s => s.text).join(" ");
     
     try {
-      // Try OpenAI TTS first (ElevenLabs free tier is blocked)
-      let narrationResult = await supabase.functions.invoke("openai-tts", {
+      // Try OpenAI TTS first
+      const openaiResult = await supabase.functions.invoke("openai-tts", {
         body: { text: fullScript, voice: "onyx" },
       });
 
-      // Fallback: try ElevenLabs if OpenAI fails
-      if (narrationResult.error) {
-        console.log("OpenAI TTS failed, trying ElevenLabs...");
-        narrationResult = await supabase.functions.invoke("elevenlabs-tts", {
-          body: { text: fullScript, language: "pt-BR" },
-        });
-      }
-
-      if (narrationResult.error) {
-        console.warn("TTS failed, completing without audio");
+      // Check if we got valid audio (not an error response)
+      if (!openaiResult.error && openaiResult.data?.audioContent) {
+        const narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
         setState(prev => ({ 
           ...prev, 
-          narrationUrl: "", 
+          narrationUrl, 
           progress: 100,
           step: "complete",
         }));
-        toast.warning("Story criado! (Narração indisponível)");
-        return "";
+        toast.success("Story cinematográfico completo com narração!");
+        return narrationUrl;
       }
 
-      const narrationUrl = `data:audio/mp3;base64,${narrationResult.data.audioContent}`;
+      // OpenAI failed, try ElevenLabs
+      console.log("OpenAI TTS failed, trying ElevenLabs...");
+      const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
+        body: { text: fullScript, language: "pt-BR" },
+      });
 
+      if (!elevenResult.error && elevenResult.data?.audioContent) {
+        const narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
+        setState(prev => ({ 
+          ...prev, 
+          narrationUrl, 
+          progress: 100,
+          step: "complete",
+        }));
+        toast.success("Story cinematográfico completo com narração!");
+        return narrationUrl;
+      }
+
+      // Both TTS services failed - complete without audio
+      console.warn("All TTS services unavailable, completing without audio");
       setState(prev => ({ 
         ...prev, 
-        narrationUrl, 
+        narrationUrl: "", 
         progress: 100,
         step: "complete",
       }));
-      
-      toast.success("Story cinematográfico completo!");
-      return narrationUrl;
+      toast.success("Story criado! (Leia as legendas - narração indisponível no momento)");
+      return "";
     } catch (error: any) {
       console.warn("TTS error:", error);
       setState(prev => ({ 
