@@ -123,7 +123,7 @@ serve(async (req) => {
         image: imageUrl,
         prompt: prompt || "Subtle camera movement with gentle zoom and pan",
         max_area: "832x480",
-        duration: duration <= 5 ? "5s" : "10s",
+        duration: duration <= 5 ? 5 : 10,
         fast_mode: "Enabled",
         frame_rate: 16,
         sample_steps: 30,
