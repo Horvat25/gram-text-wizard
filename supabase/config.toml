@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.openai-tts]
 verify_jwt = false
+
+[functions.generate-story-script]
+verify_jwt = false
