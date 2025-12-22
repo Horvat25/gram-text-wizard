@@ -165,42 +165,32 @@ export function useNarrativeVideo(options: UseNarrativeVideoOptions = {}) {
     }
   }, [state.predictionId, setError]);
 
-  // Step 4: Generate audio (narration + music)
+  // Step 4: Generate audio (narration only - using OpenAI TTS)
   const generateAudio = useCallback(async (script: string) => {
     setState(prev => ({ ...prev, step: "audio", progress: 75 }));
     
     try {
-      // Generate narration and music in parallel
-      const [narrationResult, musicResult] = await Promise.all([
-        supabase.functions.invoke("elevenlabs-tts", {
-          body: { text: script, language: "pt-BR" },
-        }),
-        supabase.functions.invoke("elevenlabs-music", {
-          body: { 
-            prompt: "Ambient tech futuristic background music, subtle synth, modern, clean, 70bpm",
-            duration: Math.ceil(script.length / 15) + 3, // narration duration + buffer
-          },
-        }),
-      ]);
+      // Generate narration using OpenAI TTS
+      const narrationResult = await supabase.functions.invoke("openai-tts", {
+        body: { text: script, voice: "alloy" },
+      });
 
       if (narrationResult.error) throw narrationResult.error;
-      if (musicResult.error) throw musicResult.error;
 
       const narrationUrl = `data:audio/mp3;base64,${narrationResult.data.audioContent}`;
-      const musicUrl = `data:audio/mp3;base64,${musicResult.data.audioContent}`;
 
       setState(prev => ({ 
         ...prev, 
         narrationUrl, 
-        musicUrl, 
+        musicUrl: "", // Music not available without ElevenLabs paid plan
         progress: 95,
         step: "complete",
       }));
       
-      toast.success("Áudio gerado com sucesso!");
-      return { narrationUrl, musicUrl };
+      toast.success("Narração gerada com sucesso!");
+      return { narrationUrl, musicUrl: "" };
     } catch (error: any) {
-      setError(error.message || "Erro ao gerar áudio");
+      setError(error.message || "Erro ao gerar narração");
       return null;
     }
   }, [setError]);
