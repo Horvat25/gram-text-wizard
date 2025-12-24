@@ -331,20 +331,25 @@ export async function blobToDataUrl(blob: Blob): Promise<string> {
 
 /**
  * Upload video blob to Supabase storage
+ * @param blob - Video blob (WebM or MP4)
+ * @param supabase - Supabase client
+ * @param bucketName - Storage bucket name
+ * @param format - Video format ("webm" or "mp4")
  */
 export async function uploadVideoToStorage(
   blob: Blob,
   supabase: any,
-  bucketName: string = "post-videos"
+  bucketName: string = "post-videos",
+  format: "webm" | "mp4" = "webm"
 ): Promise<string> {
   const timestamp = Date.now();
   const randomId = Math.random().toString(36).substring(2, 10);
-  const fileName = `cinematic-${timestamp}-${randomId}.webm`;
+  const fileName = `cinematic-${timestamp}-${randomId}.${format}`;
 
   const { error: uploadError } = await supabase.storage
     .from(bucketName)
     .upload(fileName, blob, {
-      contentType: "video/webm",
+      contentType: format === "mp4" ? "video/mp4" : "video/webm",
       upsert: false,
     });
 

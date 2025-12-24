@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
+import { initFFmpeg, convertWebMToMP4 } from "@/lib/video-converter";
 
 export interface StorySegment {
   id: string;
@@ -255,16 +256,21 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, []);
 
-  // Step 4: Generate video from images and audio
+  // Step 4: Generate video from images and audio (with MP4 conversion)
   const generateVideo = useCallback(async (segments: StorySegment[], narrationUrl: string) => {
     if (abortRef.current) return null;
     setState(prev => ({ ...prev, step: "video", progress: 82 }));
     
     try {
-      toast.info("Renderizando vídeo... isso pode levar alguns segundos");
+      // Initialize FFmpeg for conversion
+      toast.info("Carregando conversor de vídeo (~31MB)...");
+      await initFFmpeg((msg) => console.log(msg));
       
-      // Generate video blob from segments
-      const videoBlob = await generateVideoFromSegments({
+      toast.info("Renderizando vídeo WebM...");
+      setState(prev => ({ ...prev, progress: 84 }));
+      
+      // Generate video blob from segments (WebM)
+      const webmBlob = await generateVideoFromSegments({
         width: 1080,
         height: 1920,
         fps: 24,
@@ -277,16 +283,27 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         onProgress: (progress) => {
           setState(prev => ({ 
             ...prev, 
-            progress: 82 + Math.floor(progress * 0.15), // 82-97%
+            progress: 84 + Math.floor(progress * 0.06), // 84-90%
           }));
         },
       });
 
-      toast.info("Enviando vídeo para o servidor...");
+      toast.info("Convertendo para MP4 (formato Instagram)...");
+      setState(prev => ({ ...prev, progress: 90 }));
+
+      // Convert WebM to MP4
+      const mp4Blob = await convertWebMToMP4(webmBlob, (progress) => {
+        setState(prev => ({ 
+          ...prev, 
+          progress: 90 + Math.floor(progress * 0.07), // 90-97%
+        }));
+      });
+
+      toast.info("Enviando vídeo MP4 para o servidor...");
       setState(prev => ({ ...prev, progress: 97 }));
 
-      // Upload to Supabase storage
-      const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos");
+      // Upload MP4 to Supabase storage
+      const videoUrl = await uploadVideoToStorage(mp4Blob, supabase, "post-videos", "mp4");
       
       setState(prev => ({ 
         ...prev, 
@@ -295,12 +312,41 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         step: "complete",
       }));
       
-      toast.success("Vídeo cinematográfico pronto para publicar!");
+      toast.success("Vídeo MP4 pronto para publicar no Instagram!");
       return videoUrl;
     } catch (error: any) {
       console.error("Video generation error:", error);
-      setError(`Erro ao gerar vídeo: ${error.message}`);
-      return null;
+      
+      // Fallback: try without conversion (upload WebM anyway)
+      toast.warning("Conversão falhou, tentando upload direto...");
+      try {
+        const webmBlob = await generateVideoFromSegments({
+          width: 1080,
+          height: 1920,
+          fps: 24,
+          audioUrl: narrationUrl || undefined,
+          segments: segments.map(seg => ({
+            imageUrl: seg.imageUrl,
+            duration: seg.duration,
+            text: seg.text,
+          })),
+        });
+        
+        const videoUrl = await uploadVideoToStorage(webmBlob, supabase, "post-videos", "webm");
+        
+        setState(prev => ({ 
+          ...prev, 
+          videoUrl,
+          progress: 100,
+          step: "complete",
+        }));
+        
+        toast.warning("Vídeo gerado em WebM (pode não funcionar no Instagram)");
+        return videoUrl;
+      } catch (fallbackError: any) {
+        setError(`Erro ao gerar vídeo: ${fallbackError.message}`);
+        return null;
+      }
     }
   }, [setError]);
 

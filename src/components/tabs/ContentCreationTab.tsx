@@ -128,22 +128,30 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const { settings: brandSettings } = useBrandSettings();
   const hasConnectedAccount = accounts.length > 0;
 
-  // Handle narrative video completion
-  // Note: Instagram doesn't support WebM, so we publish as image instead
+  // Handle narrative video completion - now with MP4 support!
   const handleNarrativeVideoGenerated = useCallback((
     generatedVideoUrl: string,
     generatedImageUrl: string,
     generatedNarrationUrl: string, 
     script: string
   ) => {
-    // Don't use the video URL since Instagram doesn't support WebM
-    // Keep the image for publishing as a regular post
-    setVideoUrl(""); // Clear video URL to force image publishing
-    setImageUrl(generatedImageUrl);
+    // Check if the video is MP4 (Instagram compatible)
+    const isMP4 = generatedVideoUrl.toLowerCase().endsWith('.mp4');
+    
+    if (isMP4 && generatedVideoUrl) {
+      // Use the MP4 video for Reels
+      setVideoUrl(generatedVideoUrl);
+      setImageUrl(generatedImageUrl); // Keep image as thumbnail/fallback
+      setMediaType("reels");
+    } else {
+      // Fallback to image if video is WebM or not available
+      setVideoUrl("");
+      setImageUrl(generatedImageUrl);
+      setMediaType("image");
+    }
+    
     setNarrationUrl(generatedNarrationUrl);
     setNarrativeScript(script);
-    // Set media type to image since Instagram doesn't support WebM videos
-    setMediaType("image");
   }, []);
 
   // Load suggestion data from sessionStorage on mount
