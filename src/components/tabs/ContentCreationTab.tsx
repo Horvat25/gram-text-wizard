@@ -130,15 +130,17 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
   // Handle narrative video completion
   const handleNarrativeVideoGenerated = useCallback((
-    generatedVideoUrl: string, 
+    generatedVideoUrl: string,
+    generatedImageUrl: string,
     generatedNarrationUrl: string, 
-    generatedMusicUrl: string, 
     script: string
   ) => {
     setVideoUrl(generatedVideoUrl);
+    setImageUrl(generatedImageUrl);
     setNarrationUrl(generatedNarrationUrl);
-    setMusicUrl(generatedMusicUrl);
     setNarrativeScript(script);
+    // Set media type to reels since we now have a real video
+    setMediaType("reels");
   }, []);
 
   // Load suggestion data from sessionStorage on mount

@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.generate-story-script]
 verify_jwt = false
+
+[functions.convert-video-to-mp4]
+verify_jwt = false
