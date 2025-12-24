@@ -157,20 +157,27 @@ serve(async (req) => {
       let mediaUrl = isVideo ? post.video_url : post.image_url;
       let actuallyIsVideo = isVideo;
 
-      // Check if video_url is actually a video (not an image)
+      // Check if video_url is actually a video (not an image) and in supported format
       if (isVideo && mediaUrl) {
         const lowerUrl = mediaUrl.toLowerCase();
         const isActuallyImage = lowerUrl.endsWith('.png') || lowerUrl.endsWith('.jpg') || lowerUrl.endsWith('.jpeg') || lowerUrl.endsWith('.gif');
         const isWebM = lowerUrl.endsWith('.webm');
+        const isUnsupportedVideo = isWebM || lowerUrl.endsWith('.mkv') || lowerUrl.endsWith('.avi');
         
         if (isActuallyImage) {
           // video_url contains an image - publish as image instead
           console.log("video_url contains an image file, switching to image post...");
           actuallyIsVideo = false;
-        } else if (isWebM) {
-          // Instagram doesn't support WebM - need MP4
-          console.error("Instagram does not support WebM format. Video URL:", mediaUrl);
-          throw new Error("O Instagram não suporta vídeos no formato WebM. Use o formato MP4 com codec H.264. Considere publicar como imagem ou use uma ferramenta externa para converter o vídeo.");
+        } else if (isUnsupportedVideo) {
+          // Instagram doesn't support WebM/MKV/AVI - fall back to image if available
+          console.log("Video format not supported by Instagram (WebM/MKV/AVI). Falling back to image...");
+          if (post.image_url) {
+            actuallyIsVideo = false;
+            mediaUrl = post.image_url;
+            console.log("Using image_url instead:", mediaUrl);
+          } else {
+            throw new Error("O Instagram não suporta vídeos WebM. O post não tem imagem alternativa. Adicione uma imagem ou converta o vídeo para MP4.");
+          }
         }
       }
 
