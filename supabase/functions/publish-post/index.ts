@@ -154,11 +154,36 @@ serve(async (req) => {
       
     } else {
       // Single media post (image or video)
-      const mediaUrl = isVideo ? post.video_url : post.image_url;
+      let mediaUrl = isVideo ? post.video_url : post.image_url;
+      let actuallyIsVideo = isVideo;
+
+      // Check if video_url is actually a video (not an image)
+      if (isVideo && mediaUrl) {
+        const lowerUrl = mediaUrl.toLowerCase();
+        const isActuallyImage = lowerUrl.endsWith('.png') || lowerUrl.endsWith('.jpg') || lowerUrl.endsWith('.jpeg') || lowerUrl.endsWith('.gif');
+        const isWebM = lowerUrl.endsWith('.webm');
+        
+        if (isActuallyImage) {
+          // video_url contains an image - publish as image instead
+          console.log("video_url contains an image file, switching to image post...");
+          actuallyIsVideo = false;
+        } else if (isWebM) {
+          // Instagram doesn't support WebM - need MP4
+          console.error("Instagram does not support WebM format. Video URL:", mediaUrl);
+          throw new Error("O Instagram não suporta vídeos no formato WebM. Use o formato MP4 com codec H.264. Considere publicar como imagem ou use uma ferramenta externa para converter o vídeo.");
+        }
+      }
+
+      // If we're supposed to be video but have no valid video, try to use image_url instead
+      if (actuallyIsVideo && !mediaUrl && post.image_url) {
+        console.log("No valid video URL, falling back to image...");
+        actuallyIsVideo = false;
+        mediaUrl = post.image_url;
+      }
 
       if (!mediaUrl) {
-        throw new Error(isVideo 
-          ? "Um vídeo é necessário para publicar. Gere um vídeo primeiro."
+        throw new Error(actuallyIsVideo 
+          ? "Um vídeo MP4 é necessário para publicar como Reels. Gere um vídeo primeiro ou publique como imagem."
           : "Uma imagem é necessária para publicar no Instagram. Adicione uma imagem ao post."
         );
       }
@@ -166,7 +191,7 @@ serve(async (req) => {
       // Create media container
       const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
       
-      if (isVideo) {
+      if (actuallyIsVideo) {
         createMediaUrl.searchParams.set('video_url', mediaUrl);
         createMediaUrl.searchParams.set('caption', caption);
         createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
@@ -176,7 +201,7 @@ serve(async (req) => {
         createMediaUrl.searchParams.set('image_url', mediaUrl);
         createMediaUrl.searchParams.set('caption', caption);
         createMediaUrl.searchParams.set('access_token', accessToken);
-        console.log("Creating image media container...");
+        console.log("Creating image media container... (fallback from video)");
       }
 
       const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });

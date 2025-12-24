@@ -129,18 +129,21 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const hasConnectedAccount = accounts.length > 0;
 
   // Handle narrative video completion
+  // Note: Instagram doesn't support WebM, so we publish as image instead
   const handleNarrativeVideoGenerated = useCallback((
     generatedVideoUrl: string,
     generatedImageUrl: string,
     generatedNarrationUrl: string, 
     script: string
   ) => {
-    setVideoUrl(generatedVideoUrl);
+    // Don't use the video URL since Instagram doesn't support WebM
+    // Keep the image for publishing as a regular post
+    setVideoUrl(""); // Clear video URL to force image publishing
     setImageUrl(generatedImageUrl);
     setNarrationUrl(generatedNarrationUrl);
     setNarrativeScript(script);
-    // Set media type to reels since we now have a real video
-    setMediaType("reels");
+    // Set media type to image since Instagram doesn't support WebM videos
+    setMediaType("image");
   }, []);
 
   // Load suggestion data from sessionStorage on mount
