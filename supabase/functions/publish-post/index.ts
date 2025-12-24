@@ -161,6 +161,7 @@ serve(async (req) => {
       if (isVideo && mediaUrl) {
         const lowerUrl = mediaUrl.toLowerCase();
         const isActuallyImage = lowerUrl.endsWith('.png') || lowerUrl.endsWith('.jpg') || lowerUrl.endsWith('.jpeg') || lowerUrl.endsWith('.gif');
+        const isMP4 = lowerUrl.endsWith('.mp4');
         const isWebM = lowerUrl.endsWith('.webm');
         const isUnsupportedVideo = isWebM || lowerUrl.endsWith('.mkv') || lowerUrl.endsWith('.avi');
         
@@ -168,6 +169,10 @@ serve(async (req) => {
           // video_url contains an image - publish as image instead
           console.log("video_url contains an image file, switching to image post...");
           actuallyIsVideo = false;
+        } else if (isMP4) {
+          // MP4 is supported by Instagram - proceed with video
+          console.log("MP4 video detected, proceeding with Reels upload...");
+          actuallyIsVideo = true;
         } else if (isUnsupportedVideo) {
           // Instagram doesn't support WebM/MKV/AVI - fall back to image if available
           console.log("Video format not supported by Instagram (WebM/MKV/AVI). Falling back to image...");
