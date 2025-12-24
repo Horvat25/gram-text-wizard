@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
 
 export interface StorySegment {
   id: string;
@@ -12,11 +13,12 @@ export interface StorySegment {
 }
 
 export interface NarrativeStoryState {
-  step: "idle" | "script" | "images" | "audio" | "complete" | "error";
+  step: "idle" | "script" | "images" | "audio" | "video" | "complete" | "error";
   progress: number;
   title: string;
   segments: StorySegment[];
   narrationUrl: string;
+  videoUrl: string;
   totalDuration: number;
   error: string | null;
 }
@@ -36,6 +38,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     title: "",
     segments: [],
     narrationUrl: "",
+    videoUrl: "",
     totalDuration: 0,
     error: null,
   });
@@ -51,6 +54,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       title: "",
       segments: [],
       narrationUrl: "",
+      videoUrl: "",
       totalDuration: 0,
       error: null,
     });
@@ -189,7 +193,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
   // Step 3: Generate narration audio
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return null;
-    setState(prev => ({ ...prev, step: "audio", progress: 75 }));
+    setState(prev => ({ ...prev, step: "audio", progress: 72 }));
     
     // Combine all segment texts for full narration
     const fullScript = segments.map(s => s.text).join(" ");
@@ -207,10 +211,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         setState(prev => ({ 
           ...prev, 
           narrationUrl, 
-          progress: 100,
-          step: "complete",
+          progress: 80,
         }));
-        toast.success("Story cinematográfico completo com narração ElevenLabs!");
+        toast.success("Narração gerada com ElevenLabs!");
         return narrationUrl;
       }
 
@@ -225,41 +228,87 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         setState(prev => ({ 
           ...prev, 
           narrationUrl, 
-          progress: 100,
-          step: "complete",
+          progress: 80,
         }));
-        toast.success("Story cinematográfico completo com narração!");
+        toast.success("Narração gerada com OpenAI!");
         return narrationUrl;
       }
 
-      // Both TTS services failed - complete without audio
-      console.warn("All TTS services unavailable, completing without audio");
+      // Both TTS services failed - continue without audio
+      console.warn("All TTS services unavailable, continuing without audio");
       setState(prev => ({ 
         ...prev, 
         narrationUrl: "", 
-        progress: 100,
-        step: "complete",
+        progress: 80,
       }));
-      toast.success("Story criado! (Narração indisponível no momento)");
+      toast.warning("Narração indisponível, gerando vídeo sem áudio");
       return "";
     } catch (error: any) {
       console.warn("TTS error:", error);
       setState(prev => ({ 
         ...prev, 
         narrationUrl: "", 
-        progress: 100,
-        step: "complete",
+        progress: 80,
       }));
-      toast.warning("Story criado sem narração");
+      toast.warning("Continuando sem narração");
       return "";
     }
   }, []);
+
+  // Step 4: Generate video from images and audio
+  const generateVideo = useCallback(async (segments: StorySegment[], narrationUrl: string) => {
+    if (abortRef.current) return null;
+    setState(prev => ({ ...prev, step: "video", progress: 82 }));
+    
+    try {
+      toast.info("Renderizando vídeo... isso pode levar alguns segundos");
+      
+      // Generate video blob from segments
+      const videoBlob = await generateVideoFromSegments({
+        width: 1080,
+        height: 1920,
+        fps: 24,
+        audioUrl: narrationUrl || undefined,
+        segments: segments.map(seg => ({
+          imageUrl: seg.imageUrl,
+          duration: seg.duration,
+          text: seg.text,
+        })),
+        onProgress: (progress) => {
+          setState(prev => ({ 
+            ...prev, 
+            progress: 82 + Math.floor(progress * 0.15), // 82-97%
+          }));
+        },
+      });
+
+      toast.info("Enviando vídeo para o servidor...");
+      setState(prev => ({ ...prev, progress: 97 }));
+
+      // Upload to Supabase storage
+      const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos");
+      
+      setState(prev => ({ 
+        ...prev, 
+        videoUrl,
+        progress: 100,
+        step: "complete",
+      }));
+      
+      toast.success("Vídeo cinematográfico pronto para publicar!");
+      return videoUrl;
+    } catch (error: any) {
+      console.error("Video generation error:", error);
+      setError(`Erro ao gerar vídeo: ${error.message}`);
+      return null;
+    }
+  }, [setError]);
 
   // Full pipeline
   const generateStory = useCallback(async (topic: string) => {
     abortRef.current = false;
     setIsGenerating(true);
-    setState(prev => ({ ...prev, step: "idle", progress: 0, error: null }));
+    setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
     // Step 1: Script
     const segments = await generateScript(topic);
@@ -276,9 +325,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
 
     // Step 3: Audio
-    await generateAudio(segmentsWithImages);
+    const narrationUrl = await generateAudio(segmentsWithImages);
+    if (abortRef.current) {
+      setIsGenerating(false);
+      return;
+    }
+
+    // Step 4: Video
+    await generateVideo(segmentsWithImages, narrationUrl || "");
     setIsGenerating(false);
-  }, [generateScript, generateImages, generateAudio]);
+  }, [generateScript, generateImages, generateAudio, generateVideo]);
 
   return {
     state,

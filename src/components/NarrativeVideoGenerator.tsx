@@ -24,7 +24,7 @@ import CinematicPlayer from "./CinematicPlayer";
 
 interface NarrativeVideoGeneratorProps {
   topic: string;
-  onVideoGenerated: (imageUrl: string, narrationUrl: string, musicUrl: string, script: string) => void;
+  onVideoGenerated: (videoUrl: string, imageUrl: string, narrationUrl: string, script: string) => void;
 }
 
 const STEP_LABELS = {
@@ -32,7 +32,8 @@ const STEP_LABELS = {
   script: "Escrevendo roteiro cinematográfico...",
   images: "Gerando cenas visuais...",
   audio: "Produzindo narração...",
-  complete: "Story cinematográfico pronto!",
+  video: "Renderizando vídeo...",
+  complete: "Vídeo cinematográfico pronto!",
   error: "Erro na produção",
 };
 
@@ -41,7 +42,8 @@ const STEP_DESCRIPTIONS = {
   script: "Criando narrativa com começo, meio e fim",
   images: "Renderizando imagens de alta qualidade",
   audio: "Sincronizando narração profissional",
-  complete: "Seu conteúdo está pronto para publicar",
+  video: "Combinando cenas, áudio e transições",
+  complete: "Seu vídeo está pronto para publicar no Instagram",
   error: "Tente novamente",
 };
 
@@ -67,14 +69,14 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
     }
   }, [topic]);
 
-  // Notify parent when complete
+  // Notify parent when video is complete
   useEffect(() => {
-    if (state.step === "complete" && state.segments.length > 0) {
+    if (state.step === "complete" && state.videoUrl) {
       const fullScript = state.segments.map(s => s.text).join(" ");
       const firstImageUrl = state.segments[0]?.imageUrl || "";
-      onVideoGenerated(firstImageUrl, state.narrationUrl, "", fullScript);
+      onVideoGenerated(state.videoUrl, firstImageUrl, state.narrationUrl, fullScript);
     }
-  }, [state.step, state.segments, state.narrationUrl, onVideoGenerated]);
+  }, [state.step, state.videoUrl, state.segments, state.narrationUrl, onVideoGenerated]);
 
   const handleGenerate = async () => {
     if (!customTopic.trim()) return;
@@ -86,6 +88,7 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
       case "script": return <FileText className="h-4 w-4" />;
       case "images": return <ImageIcon className="h-4 w-4" />;
       case "audio": return <Music className="h-4 w-4" />;
+      case "video": return <Film className="h-4 w-4" />;
       case "complete": return <Check className="h-4 w-4" />;
       case "error": return <AlertCircle className="h-4 w-4" />;
       default: return <Film className="h-4 w-4" />;
@@ -145,8 +148,11 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
               <span className={state.progress >= 70 ? "text-primary font-medium" : ""}>
                 🎨 {state.segments.filter(s => s.imageUrl).length}/{state.segments.length} Cenas
               </span>
+              <span className={state.progress >= 80 ? "text-primary font-medium" : ""}>
+                🎙️ Áudio
+              </span>
               <span className={state.progress >= 100 ? "text-primary font-medium" : ""}>
-                🎙️ Narração
+                🎬 Vídeo
               </span>
             </div>
           </div>
@@ -182,12 +188,33 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
           </div>
         )}
 
-        {/* Cinematic Player when complete */}
-        {state.step === "complete" && state.segments.length > 0 && (
+        {/* Video Preview when complete */}
+        {state.step === "complete" && state.videoUrl && (
           <div className="space-y-2">
             <Label className="text-xs flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
-              Seu Story Cinematográfico
+              Seu Vídeo Cinematográfico
+            </Label>
+            <div className="aspect-[9/16] max-h-[400px] rounded-lg overflow-hidden bg-black">
+              <video
+                src={state.videoUrl}
+                controls
+                className="w-full h-full object-contain"
+                poster={state.segments[0]?.imageUrl}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Vídeo pronto para publicar como Reels no Instagram
+            </p>
+          </div>
+        )}
+
+        {/* Fallback: Cinematic Player if no video but has segments */}
+        {state.step === "complete" && !state.videoUrl && state.segments.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-xs flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Preview do Story
             </Label>
             <CinematicPlayer
               segments={state.segments}
