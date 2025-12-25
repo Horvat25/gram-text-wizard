@@ -195,13 +195,15 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
               <Sparkles className="h-3 w-3" />
               Seu Vídeo Cinematográfico
             </Label>
-            <div className="aspect-[9/16] max-h-[400px] rounded-lg overflow-hidden bg-black">
-              <video
-                src={state.videoUrl}
-                controls
-                className="w-full h-full object-contain"
-                poster={state.segments[0]?.imageUrl}
-              />
+            <div className="flex justify-center">
+              <div className="aspect-[9/16] w-full max-w-[200px] max-h-[320px] rounded-lg overflow-hidden bg-black">
+                <video
+                  src={state.videoUrl}
+                  controls
+                  className="w-full h-full object-contain"
+                  poster={state.segments[0]?.imageUrl}
+                />
+              </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">
               Vídeo pronto para publicar como Reels no Instagram
@@ -216,13 +218,15 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
               <Sparkles className="h-3 w-3" />
               Preview do Story
             </Label>
-            <CinematicPlayer
-              segments={state.segments}
-              narrationUrl={state.narrationUrl}
-              title={state.title}
-              totalDuration={state.totalDuration}
-              onComplete={() => console.log("Story complete")}
-            />
+            <div className="flex justify-center">
+              <CinematicPlayer
+                segments={state.segments}
+                narrationUrl={state.narrationUrl}
+                title={state.title}
+                totalDuration={state.totalDuration}
+                onComplete={() => console.log("Story complete")}
+              />
+            </div>
           </div>
         )}
 
