@@ -152,43 +152,67 @@ Formato: ${format === "portrait" ? "Vertical (4:5 ratio)" : "Quadrado (1:1 ratio
 Qualidade: Ultra alta resolução, adequado para Instagram feed.
 Sem texto: Não incluir textos ou palavras na imagem.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: optimizedPrompt,
-          },
-        ],
-        modalities: ["image", "text"],
-      }),
-    });
+    // Try up to 2 times for image generation
+    let base64ImageUrl: string | undefined;
+    let lastError: string = "";
+    
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      console.log(`Tentativa ${attempt} de gerar imagem com Gemini...`);
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-image-preview",
+          messages: [
+            {
+              role: "user",
+              content: optimizedPrompt,
+            },
+          ],
+          modalities: ["image", "text"],
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Erro na API Lovable:", response.status, errorText);
-      
-      if (response.status === 429) {
-        throw new Error("Limite de requisições excedido. Aguarde alguns minutos.");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Tentativa ${attempt} - Erro na API Lovable:`, response.status, errorText);
+        
+        if (response.status === 429) {
+          lastError = "Limite de requisições excedido. Aguarde alguns minutos.";
+          // Wait 2 seconds before retry
+          await new Promise(r => setTimeout(r, 2000));
+          continue;
+        }
+        if (response.status === 402) {
+          throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
+        }
+        
+        lastError = `Erro na API: ${response.status}`;
+        continue;
       }
-      if (response.status === 402) {
-        throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
-      }
+
+      const data = await response.json();
+      console.log(`Tentativa ${attempt} - Resposta recebida:`, JSON.stringify(data.choices?.[0]?.message).substring(0, 200));
       
-      throw new Error(`Erro na API: ${response.status}`);
+      base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+      if (base64ImageUrl) {
+        console.log(`Tentativa ${attempt} - Imagem gerada com sucesso!`);
+        break;
+      } else {
+        lastError = "API não retornou imagem no formato esperado";
+        console.warn(`Tentativa ${attempt} - Imagem não encontrada na resposta, tentando novamente...`);
+        // Wait 1 second before retry
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
 
-    const data = await response.json();
-    const base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
     if (!base64ImageUrl) {
-      throw new Error("Imagem não foi gerada pela API");
+      throw new Error(`Imagem não foi gerada após 2 tentativas: ${lastError}`);
     }
 
     console.log("Imagem Gemini gerada, fazendo upload para Storage...");
