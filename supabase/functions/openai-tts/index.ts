@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -61,14 +62,10 @@ serve(async (req) => {
 
     const audioBuffer = await response.arrayBuffer();
     
-    // Encode as base64 for JSON response
-    const base64Audio = btoa(
-      Array.from(new Uint8Array(audioBuffer))
-        .map(b => String.fromCharCode(b))
-        .join('')
-    );
+    // Use Deno's base64 encoder (safer for large buffers)
+    const base64Audio = base64Encode(audioBuffer);
 
-    console.log("TTS generated successfully, audio size:", audioBuffer.byteLength);
+    console.log("OpenAI TTS generated successfully, audio size:", audioBuffer.byteLength, "base64 length:", base64Audio.length);
 
     return new Response(
       JSON.stringify({ 
