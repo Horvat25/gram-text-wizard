@@ -201,8 +201,10 @@ const CinematicPlayer = ({
     <div 
       ref={containerRef}
       className={cn(
-        "relative rounded-xl overflow-hidden bg-black",
-        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "aspect-[9/16] max-h-[500px]"
+        "relative rounded-xl overflow-hidden bg-black mx-auto",
+        isFullscreen 
+          ? "fixed inset-0 z-50 rounded-none" 
+          : "aspect-[9/16] w-full max-w-[280px] max-h-[400px]"
       )}
     >
       {/* Hidden audio element */}
