@@ -60,6 +60,22 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("ElevenLabs TTS error:", response.status, errorText);
+      
+      // Return specific error codes for client-side fallback handling
+      if (response.status === 401 || response.status === 403) {
+        return new Response(
+          JSON.stringify({ 
+            error: "ElevenLabs account issue - use fallback",
+            code: "ELEVENLABS_BLOCKED",
+            fallback: true 
+          }),
+          {
+            status: 503, // Service unavailable - signals to use fallback
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
       throw new Error(`ElevenLabs TTS error: ${response.status}`);
     }
 
