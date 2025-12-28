@@ -15,13 +15,15 @@ let isLoaded = false;
 export async function initFFmpeg(
   onProgress?: (message: string) => void
 ): Promise<void> {
-  if (isLoaded && ffmpeg) return;
+  if (isLoaded && ffmpeg) {
+    console.log("FFmpeg already loaded");
+    return;
+  }
 
   ffmpeg = new FFmpeg();
 
   ffmpeg.on("log", ({ message }) => {
     console.log("[FFmpeg]", message);
-    onProgress?.(message);
   });
 
   ffmpeg.on("progress", ({ progress }) => {
@@ -29,17 +31,31 @@ export async function initFFmpeg(
   });
 
   try {
+    onProgress?.("Baixando FFmpeg...");
     const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
     
+    // Pre-fetch with progress indication
+    onProgress?.("Carregando núcleo FFmpeg...");
+    
+    const [coreURL, wasmURL] = await Promise.all([
+      toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+      toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+    ]);
+    
+    onProgress?.("Inicializando FFmpeg...");
+    
     await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+      coreURL,
+      wasmURL,
     });
 
     isLoaded = true;
+    onProgress?.("FFmpeg pronto!");
     console.log("FFmpeg.wasm loaded successfully");
   } catch (error) {
     console.error("Failed to load FFmpeg.wasm:", error);
+    ffmpeg = null;
+    isLoaded = false;
     throw new Error("Não foi possível carregar o conversor de vídeo");
   }
 }
