@@ -19,16 +19,40 @@ interface VideoEncoderOptions {
 }
 
 /**
- * Load an image and return it as HTMLImageElement
+ * Load an image and return it as HTMLImageElement with retry logic
  */
-async function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
-    img.src = url;
-  });
+async function loadImage(url: string, retries = 3): Promise<HTMLImageElement> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const image = new Image();
+        image.crossOrigin = "anonymous";
+        
+        const timeout = setTimeout(() => {
+          reject(new Error(`Image load timeout: ${url}`));
+        }, 15000); // 15 second timeout
+        
+        image.onload = () => {
+          clearTimeout(timeout);
+          resolve(image);
+        };
+        image.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error(`Failed to load image: ${url}`));
+        };
+        image.src = url;
+      });
+      return img;
+    } catch (error) {
+      console.warn(`Image load attempt ${attempt}/${retries} failed:`, error);
+      if (attempt === retries) {
+        throw error;
+      }
+      // Wait before retry
+      await new Promise(r => setTimeout(r, 1000 * attempt));
+    }
+  }
+  throw new Error(`Failed to load image after ${retries} attempts: ${url}`);
 }
 
 /**
@@ -175,10 +199,34 @@ export async function generateVideoFromSegments(
     onProgress,
   } = options;
 
-  // Pre-load all images
-  const images = await Promise.all(
-    segments.map(seg => loadImage(seg.imageUrl))
-  );
+  // Pre-load all images with error handling
+  const imagePromises = segments.map(async (seg, index) => {
+    try {
+      return await loadImage(seg.imageUrl);
+    } catch (error) {
+      console.error(`Failed to load image for segment ${index}:`, error);
+      // Create a fallback solid color image
+      const fallbackCanvas = document.createElement("canvas");
+      fallbackCanvas.width = width;
+      fallbackCanvas.height = height;
+      const ctx = fallbackCanvas.getContext("2d")!;
+      ctx.fillStyle = "#1a1a2e"; // Dark purple background
+      ctx.fillRect(0, 0, width, height);
+      
+      // Add segment number indicator
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 48px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`Cena ${index + 1}`, width / 2, height / 2);
+      
+      const img = new Image();
+      img.src = fallbackCanvas.toDataURL();
+      await new Promise(r => setTimeout(r, 100));
+      return img;
+    }
+  });
+  
+  const images = await Promise.all(imagePromises);
 
   // Create canvas
   const canvas = document.createElement("canvas");

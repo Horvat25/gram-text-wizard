@@ -152,67 +152,81 @@ Formato: ${format === "portrait" ? "Vertical (4:5 ratio)" : "Quadrado (1:1 ratio
 Qualidade: Ultra alta resolução, adequado para Instagram feed.
 Sem texto: Não incluir textos ou palavras na imagem.`;
 
-    // Try up to 2 times for image generation
+    // Try up to 3 times for image generation with exponential backoff
     let base64ImageUrl: string | undefined;
     let lastError: string = "";
+    const maxAttempts = 3;
     
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      console.log(`Tentativa ${attempt} de gerar imagem com Gemini...`);
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(`Tentativa ${attempt}/${maxAttempts} de gerar imagem com Gemini...`);
       
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image-preview",
-          messages: [
-            {
-              role: "user",
-              content: optimizedPrompt,
-            },
-          ],
-          modalities: ["image", "text"],
-        }),
-      });
+      try {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-image-preview",
+            messages: [
+              {
+                role: "user",
+                content: optimizedPrompt,
+              },
+            ],
+            modalities: ["image", "text"],
+          }),
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Tentativa ${attempt} - Erro na API Lovable:`, response.status, errorText);
-        
-        if (response.status === 429) {
-          lastError = "Limite de requisições excedido. Aguarde alguns minutos.";
-          // Wait 2 seconds before retry
-          await new Promise(r => setTimeout(r, 2000));
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Tentativa ${attempt} - Erro na API Lovable:`, response.status, errorText);
+          
+          if (response.status === 429) {
+            lastError = "Limite de requisições excedido. Aguarde alguns minutos.";
+            // Exponential backoff: 2s, 4s, 8s
+            const waitTime = Math.pow(2, attempt) * 1000;
+            console.log(`Rate limited, waiting ${waitTime}ms before retry...`);
+            await new Promise(r => setTimeout(r, waitTime));
+            continue;
+          }
+          if (response.status === 402) {
+            throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
+          }
+          
+          lastError = `Erro na API: ${response.status}`;
+          await new Promise(r => setTimeout(r, 1500));
           continue;
         }
-        if (response.status === 402) {
-          throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
-        }
+
+        const data = await response.json();
+        console.log(`Tentativa ${attempt} - Resposta recebida, verificando estrutura...`);
         
-        lastError = `Erro na API: ${response.status}`;
-        continue;
-      }
+        // Check multiple possible locations for the image
+        base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url 
+          || data.choices?.[0]?.message?.content?.images?.[0]?.url
+          || data.images?.[0]?.url;
 
-      const data = await response.json();
-      console.log(`Tentativa ${attempt} - Resposta recebida:`, JSON.stringify(data.choices?.[0]?.message).substring(0, 200));
-      
-      base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-      if (base64ImageUrl) {
-        console.log(`Tentativa ${attempt} - Imagem gerada com sucesso!`);
-        break;
-      } else {
-        lastError = "API não retornou imagem no formato esperado";
-        console.warn(`Tentativa ${attempt} - Imagem não encontrada na resposta, tentando novamente...`);
-        // Wait 1 second before retry
-        await new Promise(r => setTimeout(r, 1000));
+        if (base64ImageUrl && base64ImageUrl.startsWith('data:image/')) {
+          console.log(`Tentativa ${attempt} - Imagem gerada com sucesso!`);
+          break;
+        } else {
+          lastError = "API não retornou imagem no formato esperado";
+          console.warn(`Tentativa ${attempt} - Estrutura de resposta inesperada:`, 
+            JSON.stringify(data.choices?.[0]?.message).substring(0, 300));
+          // Wait before retry with increasing delay
+          await new Promise(r => setTimeout(r, 1000 * attempt));
+        }
+      } catch (fetchError: any) {
+        console.error(`Tentativa ${attempt} - Erro de fetch:`, fetchError);
+        lastError = fetchError.message || "Erro de conexão";
+        await new Promise(r => setTimeout(r, 1500));
       }
     }
 
     if (!base64ImageUrl) {
-      throw new Error(`Imagem não foi gerada após 2 tentativas: ${lastError}`);
+      throw new Error(`Imagem não foi gerada após ${maxAttempts} tentativas: ${lastError}`);
     }
 
     console.log("Imagem Gemini gerada, fazendo upload para Storage...");
