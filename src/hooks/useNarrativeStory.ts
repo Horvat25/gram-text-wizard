@@ -255,34 +255,31 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         body: { text: fullScript, language: "pt-BR" },
       });
 
-      // Check if we got valid audio (not an error response)
-      if (!elevenResult.error && elevenResult.data?.audioContent) {
+      // Check if we got valid audio (not an error response - check for .error in data too)
+      if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
         const narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
-        setState(prev => ({ 
-          ...prev, 
-          narrationUrl, 
-          progress: 80,
-        }));
+        setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
         toast.success("Narração gerada com ElevenLabs!");
         return narrationUrl;
       }
 
       // ElevenLabs failed, try OpenAI as fallback
-      console.log("ElevenLabs failed, trying OpenAI TTS...");
+      console.log("ElevenLabs failed or blocked, trying OpenAI TTS...");
+      console.log("ElevenLabs response:", elevenResult.data?.error || elevenResult.data?.code || "unknown");
+      
       const openaiResult = await supabase.functions.invoke("openai-tts", {
         body: { text: fullScript, voice: "onyx" },
       });
 
-      if (!openaiResult.error && openaiResult.data?.audioContent) {
+      // Check for valid response (OpenAI may return error in body with 200 status)
+      if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
         const narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
-        setState(prev => ({ 
-          ...prev, 
-          narrationUrl, 
-          progress: 80,
-        }));
+        setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
         toast.success("Narração gerada com OpenAI!");
         return narrationUrl;
       }
+      
+      console.log("OpenAI TTS also failed:", openaiResult.data?.error || openaiResult.error);
 
       // Both TTS services failed - continue without audio
       console.warn("All TTS services unavailable, continuing without audio");
@@ -305,37 +302,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, []);
 
-  // Step 4: Generate video from images and audio (with MP4 conversion)
+  // Step 4: Generate video from images (WebM first, then try MP4 conversion)
   const generateVideo = useCallback(async (segments: StorySegment[], narrationUrl: string) => {
     if (abortRef.current) return null;
     setState(prev => ({ ...prev, step: "video", progress: 82 }));
     
     try {
-      // Initialize FFmpeg for conversion with timeout
-      toast.info("Carregando conversor de vídeo...");
-      setState(prev => ({ ...prev, progress: 83 }));
-      
-      // Use a Promise.race to add timeout for FFmpeg loading
-      const ffmpegLoadPromise = initFFmpeg((msg) => {
-        console.log("[FFmpeg]", msg);
-      });
-      
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("Timeout carregando FFmpeg")), 45000); // 45s timeout
-      });
-      
-      try {
-        await Promise.race([ffmpegLoadPromise, timeoutPromise]);
-      } catch (loadError: any) {
-        console.warn("FFmpeg load timeout/error, trying WebM fallback:", loadError);
-        throw new Error("FFmpeg timeout - usando fallback");
-      }
-      
+      // FIRST: Generate WebM video (this always works, no external dependencies)
       toast.info("Renderizando vídeo...");
-      setState(prev => ({ ...prev, progress: 85 }));
+      setState(prev => ({ ...prev, progress: 84 }));
       
-      // Generate video blob from segments (WebM) with timeout
-      const webmPromise = generateVideoFromSegments({
+      // Generate video blob from segments (WebM)
+      const webmBlob = await generateVideoFromSegments({
         width: 1080,
         height: 1920,
         fps: 24,
@@ -348,39 +326,48 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         onProgress: (progress) => {
           setState(prev => ({ 
             ...prev, 
-            progress: 85 + Math.floor(progress * 0.05), // 85-90%
+            progress: 84 + Math.floor(progress * 0.08), // 84-92%
           }));
         },
       });
       
-      const webmTimeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("Timeout renderizando vídeo")), 120000); // 2 min timeout
-      });
+      console.log("WebM video generated successfully, size:", webmBlob.size);
+      setState(prev => ({ ...prev, progress: 92 }));
       
-      const webmBlob = await Promise.race([webmPromise, webmTimeoutPromise]);
-
-      toast.info("Convertendo para MP4...");
-      setState(prev => ({ ...prev, progress: 91 }));
-
-      // Convert WebM to MP4 with timeout
-      const mp4Promise = convertWebMToMP4(webmBlob, (progress) => {
-        setState(prev => ({ 
-          ...prev, 
-          progress: 91 + Math.floor(progress * 0.06), // 91-97%
-        }));
-      });
+      // SECOND: Try to convert to MP4 (optional - don't fail if it doesn't work)
+      let finalBlob = webmBlob;
+      let format: "mp4" | "webm" = "webm";
       
-      const mp4TimeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("Timeout convertendo para MP4")), 180000); // 3 min timeout
-      });
+      try {
+        toast.info("Tentando converter para MP4...");
+        
+        // Quick timeout for FFmpeg load - 15 seconds max
+        const ffmpegLoadPromise = initFFmpeg((msg) => console.log("[FFmpeg]", msg));
+        const quickTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("FFmpeg timeout")), 15000);
+        });
+        
+        await Promise.race([ffmpegLoadPromise, quickTimeout]);
+        setState(prev => ({ ...prev, progress: 94 }));
+        
+        // Convert to MP4
+        const mp4Blob = await convertWebMToMP4(webmBlob, (progress) => {
+          setState(prev => ({ ...prev, progress: 94 + Math.floor(progress * 0.03) }));
+        });
+        
+        finalBlob = mp4Blob;
+        format = "mp4";
+        console.log("MP4 conversion successful, size:", mp4Blob.size);
+      } catch (convError: any) {
+        console.log("MP4 conversion skipped:", convError.message);
+        // Continue with WebM - not a fatal error
+      }
       
-      const mp4Blob = await Promise.race([mp4Promise, mp4TimeoutPromise]);
-
+      // Upload the video
       toast.info("Enviando vídeo...");
       setState(prev => ({ ...prev, progress: 97 }));
-
-      // Upload MP4 to Supabase storage
-      const videoUrl = await uploadVideoToStorage(mp4Blob, supabase, "post-videos", "mp4");
+      
+      const videoUrl = await uploadVideoToStorage(finalBlob, supabase, "post-videos", format);
       
       setState(prev => ({ 
         ...prev, 
@@ -389,50 +376,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         step: "complete",
       }));
       
-      toast.success("Vídeo MP4 pronto para Instagram!");
+      if (format === "mp4") {
+        toast.success("Vídeo MP4 pronto para Instagram!");
+      } else {
+        toast.success("Vídeo criado! (Formato WebM - converta para MP4 para Instagram)");
+      }
+      
       return videoUrl;
     } catch (error: any) {
       console.error("Video generation error:", error);
-      
-      // Fallback: try WebM only (skip FFmpeg conversion)
-      toast.warning("Conversão MP4 falhou, gerando WebM...");
-      setState(prev => ({ ...prev, progress: 85 }));
-      
-      try {
-        const webmBlob = await generateVideoFromSegments({
-          width: 1080,
-          height: 1920,
-          fps: 24,
-          audioUrl: narrationUrl || undefined,
-          segments: segments.map(seg => ({
-            imageUrl: seg.imageUrl,
-            duration: seg.duration,
-            text: seg.text,
-          })),
-          onProgress: (progress) => {
-            setState(prev => ({ 
-              ...prev, 
-              progress: 85 + Math.floor(progress * 0.12), // 85-97%
-            }));
-          },
-        });
-        
-        setState(prev => ({ ...prev, progress: 98 }));
-        const videoUrl = await uploadVideoToStorage(webmBlob, supabase, "post-videos", "webm");
-        
-        setState(prev => ({ 
-          ...prev, 
-          videoUrl,
-          progress: 100,
-          step: "complete",
-        }));
-        
-        toast.warning("Vídeo WebM gerado (pode precisar conversão externa para Instagram)");
-        return videoUrl;
-      } catch (fallbackError: any) {
-        setError(`Erro ao gerar vídeo: ${fallbackError.message}`);
-        return null;
-      }
+      setError(`Erro ao gerar vídeo: ${error.message}`);
+      return null;
     }
   }, [setError]);
 
