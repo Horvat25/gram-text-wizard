@@ -311,15 +311,31 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setState(prev => ({ ...prev, step: "video", progress: 82 }));
     
     try {
-      // Initialize FFmpeg for conversion
-      toast.info("Carregando conversor de vídeo (~31MB)...");
-      await initFFmpeg((msg) => console.log(msg));
+      // Initialize FFmpeg for conversion with timeout
+      toast.info("Carregando conversor de vídeo...");
+      setState(prev => ({ ...prev, progress: 83 }));
       
-      toast.info("Renderizando vídeo WebM...");
-      setState(prev => ({ ...prev, progress: 84 }));
+      // Use a Promise.race to add timeout for FFmpeg loading
+      const ffmpegLoadPromise = initFFmpeg((msg) => {
+        console.log("[FFmpeg]", msg);
+      });
       
-      // Generate video blob from segments (WebM)
-      const webmBlob = await generateVideoFromSegments({
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout carregando FFmpeg")), 45000); // 45s timeout
+      });
+      
+      try {
+        await Promise.race([ffmpegLoadPromise, timeoutPromise]);
+      } catch (loadError: any) {
+        console.warn("FFmpeg load timeout/error, trying WebM fallback:", loadError);
+        throw new Error("FFmpeg timeout - usando fallback");
+      }
+      
+      toast.info("Renderizando vídeo...");
+      setState(prev => ({ ...prev, progress: 85 }));
+      
+      // Generate video blob from segments (WebM) with timeout
+      const webmPromise = generateVideoFromSegments({
         width: 1080,
         height: 1920,
         fps: 24,
@@ -332,23 +348,35 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         onProgress: (progress) => {
           setState(prev => ({ 
             ...prev, 
-            progress: 84 + Math.floor(progress * 0.06), // 84-90%
+            progress: 85 + Math.floor(progress * 0.05), // 85-90%
           }));
         },
       });
+      
+      const webmTimeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout renderizando vídeo")), 120000); // 2 min timeout
+      });
+      
+      const webmBlob = await Promise.race([webmPromise, webmTimeoutPromise]);
 
-      toast.info("Convertendo para MP4 (formato Instagram)...");
-      setState(prev => ({ ...prev, progress: 90 }));
+      toast.info("Convertendo para MP4...");
+      setState(prev => ({ ...prev, progress: 91 }));
 
-      // Convert WebM to MP4
-      const mp4Blob = await convertWebMToMP4(webmBlob, (progress) => {
+      // Convert WebM to MP4 with timeout
+      const mp4Promise = convertWebMToMP4(webmBlob, (progress) => {
         setState(prev => ({ 
           ...prev, 
-          progress: 90 + Math.floor(progress * 0.07), // 90-97%
+          progress: 91 + Math.floor(progress * 0.06), // 91-97%
         }));
       });
+      
+      const mp4TimeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout convertendo para MP4")), 180000); // 3 min timeout
+      });
+      
+      const mp4Blob = await Promise.race([mp4Promise, mp4TimeoutPromise]);
 
-      toast.info("Enviando vídeo MP4 para o servidor...");
+      toast.info("Enviando vídeo...");
       setState(prev => ({ ...prev, progress: 97 }));
 
       // Upload MP4 to Supabase storage
@@ -361,13 +389,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         step: "complete",
       }));
       
-      toast.success("Vídeo MP4 pronto para publicar no Instagram!");
+      toast.success("Vídeo MP4 pronto para Instagram!");
       return videoUrl;
     } catch (error: any) {
       console.error("Video generation error:", error);
       
-      // Fallback: try without conversion (upload WebM anyway)
-      toast.warning("Conversão falhou, tentando upload direto...");
+      // Fallback: try WebM only (skip FFmpeg conversion)
+      toast.warning("Conversão MP4 falhou, gerando WebM...");
+      setState(prev => ({ ...prev, progress: 85 }));
+      
       try {
         const webmBlob = await generateVideoFromSegments({
           width: 1080,
@@ -379,8 +409,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
             duration: seg.duration,
             text: seg.text,
           })),
+          onProgress: (progress) => {
+            setState(prev => ({ 
+              ...prev, 
+              progress: 85 + Math.floor(progress * 0.12), // 85-97%
+            }));
+          },
         });
         
+        setState(prev => ({ ...prev, progress: 98 }));
         const videoUrl = await uploadVideoToStorage(webmBlob, supabase, "post-videos", "webm");
         
         setState(prev => ({ 
@@ -390,7 +427,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           step: "complete",
         }));
         
-        toast.warning("Vídeo gerado em WebM (pode não funcionar no Instagram)");
+        toast.warning("Vídeo WebM gerado (pode precisar conversão externa para Instagram)");
         return videoUrl;
       } catch (fallbackError: any) {
         setError(`Erro ao gerar vídeo: ${fallbackError.message}`);
