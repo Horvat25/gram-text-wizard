@@ -302,18 +302,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, []);
 
-  // Step 4: Generate video from images (WebM first, then try MP4 conversion)
+  // Step 4: Generate video from images (WebM - reliable browser encoding)
   const generateVideo = useCallback(async (segments: StorySegment[], narrationUrl: string) => {
     if (abortRef.current) return null;
     setState(prev => ({ ...prev, step: "video", progress: 82 }));
     
     try {
-      // FIRST: Generate WebM video (this always works, no external dependencies)
       toast.info("Renderizando vídeo...");
-      setState(prev => ({ ...prev, progress: 84 }));
+      console.log("[generateVideo] Starting with", segments.length, "segments");
       
-      // Generate video blob from segments (WebM)
-      const webmBlob = await generateVideoFromSegments({
+      // Generate WebM video (reliable browser-native encoding)
+      const videoBlob = await generateVideoFromSegments({
         width: 1080,
         height: 1920,
         fps: 24,
@@ -324,50 +323,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           text: seg.text,
         })),
         onProgress: (progress) => {
-          setState(prev => ({ 
-            ...prev, 
-            progress: 84 + Math.floor(progress * 0.08), // 84-92%
-          }));
+          // Map 0-100 progress to 82-95 range
+          const mappedProgress = 82 + Math.floor(progress * 0.13);
+          setState(prev => ({ ...prev, progress: mappedProgress }));
         },
       });
       
-      console.log("WebM video generated successfully, size:", webmBlob.size);
-      setState(prev => ({ ...prev, progress: 92 }));
-      
-      // SECOND: Try to convert to MP4 (optional - don't fail if it doesn't work)
-      let finalBlob = webmBlob;
-      let format: "mp4" | "webm" = "webm";
-      
-      try {
-        toast.info("Tentando converter para MP4...");
-        
-        // Quick timeout for FFmpeg load - 15 seconds max
-        const ffmpegLoadPromise = initFFmpeg((msg) => console.log("[FFmpeg]", msg));
-        const quickTimeout = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error("FFmpeg timeout")), 15000);
-        });
-        
-        await Promise.race([ffmpegLoadPromise, quickTimeout]);
-        setState(prev => ({ ...prev, progress: 94 }));
-        
-        // Convert to MP4
-        const mp4Blob = await convertWebMToMP4(webmBlob, (progress) => {
-          setState(prev => ({ ...prev, progress: 94 + Math.floor(progress * 0.03) }));
-        });
-        
-        finalBlob = mp4Blob;
-        format = "mp4";
-        console.log("MP4 conversion successful, size:", mp4Blob.size);
-      } catch (convError: any) {
-        console.log("MP4 conversion skipped:", convError.message);
-        // Continue with WebM - not a fatal error
-      }
+      console.log("[generateVideo] WebM generated, size:", (videoBlob.size / 1024 / 1024).toFixed(2), "MB");
+      setState(prev => ({ ...prev, progress: 96 }));
       
       // Upload the video
       toast.info("Enviando vídeo...");
-      setState(prev => ({ ...prev, progress: 97 }));
+      const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos", "webm");
       
-      const videoUrl = await uploadVideoToStorage(finalBlob, supabase, "post-videos", format);
+      console.log("[generateVideo] Upload complete:", videoUrl);
       
       setState(prev => ({ 
         ...prev, 
@@ -376,15 +345,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         step: "complete",
       }));
       
-      if (format === "mp4") {
-        toast.success("Vídeo MP4 pronto para Instagram!");
-      } else {
-        toast.success("Vídeo criado! (Formato WebM - converta para MP4 para Instagram)");
-      }
-      
+      toast.success("Vídeo criado com sucesso!");
       return videoUrl;
     } catch (error: any) {
-      console.error("Video generation error:", error);
+      console.error("[generateVideo] Error:", error);
       setError(`Erro ao gerar vídeo: ${error.message}`);
       return null;
     }
