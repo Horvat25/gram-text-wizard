@@ -1,6 +1,7 @@
 /**
  * Browser-based video encoder using Canvas + MediaRecorder
  * Creates real video files from images and audio
+ * OPTIMIZED: Uses requestAnimationFrame for smoother rendering
  */
 
 interface VideoSegment {
@@ -30,7 +31,7 @@ async function loadImage(url: string, retries = 3): Promise<HTMLImageElement> {
         
         const timeout = setTimeout(() => {
           reject(new Error(`Image load timeout: ${url}`));
-        }, 15000); // 15 second timeout
+        }, 15000);
         
         image.onload = () => {
           clearTimeout(timeout);
@@ -48,7 +49,6 @@ async function loadImage(url: string, retries = 3): Promise<HTMLImageElement> {
       if (attempt === retries) {
         throw error;
       }
-      // Wait before retry
       await new Promise(r => setTimeout(r, 1000 * attempt));
     }
   }
@@ -73,11 +73,9 @@ function drawImageCover(
   let offsetY = 0;
   
   if (imgRatio > canvasRatio) {
-    // Image is wider - fit by height
     drawWidth = height * imgRatio;
     offsetX = (width - drawWidth) / 2;
   } else {
-    // Image is taller - fit by width
     drawHeight = width / imgRatio;
     offsetY = (height - drawHeight) / 2;
   }
@@ -93,18 +91,16 @@ function applyKenBurns(
   img: HTMLImageElement,
   width: number,
   height: number,
-  progress: number, // 0 to 1
+  progress: number,
   effectType: number
 ) {
   ctx.save();
   
-  // Different effects based on type
-  const scale = 1 + (progress * 0.1); // Zoom from 100% to 110%
+  const scale = 1 + (progress * 0.1);
   
   ctx.translate(width / 2, height / 2);
   ctx.scale(scale, scale);
   
-  // Subtle pan
   const panX = (effectType % 2 === 0 ? 1 : -1) * progress * 20;
   const panY = (effectType % 3 === 0 ? 1 : -1) * progress * 15;
   
@@ -134,7 +130,6 @@ function drawTextOverlay(
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";
   
-  // Word wrap
   const words = text.split(" ");
   const lines: string[] = [];
   let currentLine = "";
@@ -152,12 +147,10 @@ function drawTextOverlay(
   }
   if (currentLine) lines.push(currentLine);
   
-  // Draw background for text
   const lineHeight = fontSize * 1.3;
   const totalHeight = lines.length * lineHeight + padding;
   const startY = height - padding - totalHeight;
   
-  // Semi-transparent background
   const gradient = ctx.createLinearGradient(0, startY, 0, height);
   gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
   gradient.addColorStop(0.3, "rgba(0, 0, 0, 0.7)");
@@ -166,7 +159,6 @@ function drawTextOverlay(
   ctx.fillStyle = gradient;
   ctx.fillRect(0, startY, width, height - startY);
   
-  // Draw text
   ctx.fillStyle = "white";
   ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
   ctx.shadowBlur = 4;
@@ -184,8 +176,50 @@ function drawTextOverlay(
 }
 
 /**
+ * Render a single frame to the canvas
+ */
+function renderFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  segments: VideoSegment[],
+  images: HTMLImageElement[],
+  currentTime: number
+): void {
+  // Find current segment
+  let elapsed = 0;
+  let segmentIndex = 0;
+  let segmentProgress = 0;
+  
+  for (let i = 0; i < segments.length; i++) {
+    if (currentTime < elapsed + segments[i].duration) {
+      segmentIndex = i;
+      segmentProgress = (currentTime - elapsed) / segments[i].duration;
+      break;
+    }
+    elapsed += segments[i].duration;
+  }
+
+  const segment = segments[segmentIndex];
+  const img = images[segmentIndex];
+
+  // Clear canvas
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, width, height);
+
+  // Draw image with Ken Burns effect
+  applyKenBurns(ctx, img, width, height, segmentProgress, segmentIndex);
+
+  // Draw text overlay
+  if (segment.text) {
+    drawTextOverlay(ctx, segment.text, width, height);
+  }
+}
+
+/**
  * Generate video from images and audio
  * Returns a Blob of the video file
+ * OPTIMIZED: Uses real-time recording instead of frame-by-frame
  */
 export async function generateVideoFromSegments(
   options: VideoEncoderOptions
@@ -193,27 +227,28 @@ export async function generateVideoFromSegments(
   const {
     width = 1080,
     height = 1920,
-    fps = 30,
+    fps = 24,
     audioUrl,
     segments,
     onProgress,
   } = options;
 
-  // Pre-load all images with error handling
+  console.log("[VideoEncoder] Starting video generation...");
+  console.log(`[VideoEncoder] Segments: ${segments.length}, FPS: ${fps}`);
+
+  // Pre-load all images
   const imagePromises = segments.map(async (seg, index) => {
     try {
+      console.log(`[VideoEncoder] Loading image ${index + 1}/${segments.length}`);
       return await loadImage(seg.imageUrl);
     } catch (error) {
       console.error(`Failed to load image for segment ${index}:`, error);
-      // Create a fallback solid color image
       const fallbackCanvas = document.createElement("canvas");
       fallbackCanvas.width = width;
       fallbackCanvas.height = height;
       const ctx = fallbackCanvas.getContext("2d")!;
-      ctx.fillStyle = "#1a1a2e"; // Dark purple background
+      ctx.fillStyle = "#1a1a2e";
       ctx.fillRect(0, 0, width, height);
-      
-      // Add segment number indicator
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 48px sans-serif";
       ctx.textAlign = "center";
@@ -227,6 +262,7 @@ export async function generateVideoFromSegments(
   });
   
   const images = await Promise.all(imagePromises);
+  console.log(`[VideoEncoder] All ${images.length} images loaded`);
 
   // Create canvas
   const canvas = document.createElement("canvas");
@@ -236,26 +272,42 @@ export async function generateVideoFromSegments(
 
   // Calculate total duration
   const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
-  const totalFrames = Math.floor(totalDuration * fps);
+  console.log(`[VideoEncoder] Total duration: ${totalDuration}s`);
 
   // Create video stream from canvas
   const stream = canvas.captureStream(fps);
 
   // Add audio track if available
   let audioElement: HTMLAudioElement | null = null;
+  let audioContext: AudioContext | null = null;
+  
   if (audioUrl) {
     try {
+      console.log("[VideoEncoder] Setting up audio...");
       audioElement = new Audio();
       audioElement.crossOrigin = "anonymous";
       audioElement.src = audioUrl;
+      
       await new Promise<void>((resolve, reject) => {
-        audioElement!.oncanplaythrough = () => resolve();
-        audioElement!.onerror = () => reject(new Error("Failed to load audio"));
+        const timeout = setTimeout(() => {
+          console.warn("[VideoEncoder] Audio load timeout, continuing without audio");
+          resolve();
+        }, 10000);
+        
+        audioElement!.oncanplaythrough = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        audioElement!.onerror = () => {
+          clearTimeout(timeout);
+          console.warn("[VideoEncoder] Audio load error, continuing without audio");
+          resolve();
+        };
         audioElement!.load();
       });
 
       // Create audio context and source
-      const audioContext = new AudioContext();
+      audioContext = new AudioContext();
       const source = audioContext.createMediaElementSource(audioElement);
       const destination = audioContext.createMediaStreamDestination();
       source.connect(destination);
@@ -265,8 +317,10 @@ export async function generateVideoFromSegments(
       destination.stream.getAudioTracks().forEach(track => {
         stream.addTrack(track);
       });
+      console.log("[VideoEncoder] Audio setup complete");
     } catch (e) {
-      console.warn("Failed to add audio track:", e);
+      console.warn("[VideoEncoder] Failed to add audio track:", e);
+      audioElement = null;
     }
   }
 
@@ -277,9 +331,11 @@ export async function generateVideoFromSegments(
     ? "video/webm;codecs=vp8"
     : "video/webm";
 
+  console.log(`[VideoEncoder] Using codec: ${mimeType}`);
+
   const recorder = new MediaRecorder(stream, {
     mimeType,
-    videoBitsPerSecond: 8000000, // 8 Mbps for good quality
+    videoBitsPerSecond: 8000000,
   });
 
   const chunks: Blob[] = [];
@@ -289,79 +345,75 @@ export async function generateVideoFromSegments(
     }
   };
 
-  // Start recording
-  recorder.start(100); // Collect data every 100ms
-
-  // Start audio if available
-  if (audioElement) {
-    audioElement.currentTime = 0;
-    audioElement.play().catch(console.warn);
-  }
-
-  // Render frames
   return new Promise((resolve, reject) => {
-    let frameIndex = 0;
-    const frameInterval = 1000 / fps;
+    // Timeout safety - max 2 minutes for video generation
+    const maxTimeout = setTimeout(() => {
+      console.error("[VideoEncoder] Generation timeout after 2 minutes");
+      recorder.stop();
+      reject(new Error("Video generation timeout"));
+    }, 120000);
 
-    const renderFrame = () => {
-      if (frameIndex >= totalFrames) {
-        // Stop recording
-        recorder.stop();
+    recorder.onstop = () => {
+      clearTimeout(maxTimeout);
+      console.log(`[VideoEncoder] Recording stopped, chunks: ${chunks.length}`);
+      const blob = new Blob(chunks, { type: mimeType });
+      console.log(`[VideoEncoder] Final blob size: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
+      resolve(blob);
+    };
+
+    recorder.onerror = (e) => {
+      clearTimeout(maxTimeout);
+      console.error("[VideoEncoder] Recorder error:", e);
+      reject(new Error("MediaRecorder error"));
+    };
+
+    // Start recording
+    recorder.start(100);
+    console.log("[VideoEncoder] Recording started");
+
+    // Start audio if available
+    if (audioElement) {
+      audioElement.currentTime = 0;
+      audioElement.play().catch(console.warn);
+    }
+
+    // Track time using performance.now() for accuracy
+    const startTime = performance.now();
+    let lastProgress = 0;
+
+    const animate = () => {
+      const elapsed = (performance.now() - startTime) / 1000; // Convert to seconds
+      
+      if (elapsed >= totalDuration) {
+        // Done - stop recording
+        console.log("[VideoEncoder] Animation complete, stopping recorder");
         if (audioElement) {
           audioElement.pause();
         }
-        
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: mimeType });
-          resolve(blob);
-        };
+        if (audioContext) {
+          audioContext.close().catch(console.warn);
+        }
+        recorder.stop();
         return;
       }
 
-      const currentTime = frameIndex / fps;
-      
-      // Find current segment
-      let elapsed = 0;
-      let segmentIndex = 0;
-      let segmentProgress = 0;
-      
-      for (let i = 0; i < segments.length; i++) {
-        if (currentTime < elapsed + segments[i].duration) {
-          segmentIndex = i;
-          segmentProgress = (currentTime - elapsed) / segments[i].duration;
-          break;
-        }
-        elapsed += segments[i].duration;
+      // Render current frame
+      renderFrame(ctx, width, height, segments, images, elapsed);
+
+      // Report progress (throttled to avoid too many updates)
+      const progress = Math.round((elapsed / totalDuration) * 100);
+      if (progress !== lastProgress) {
+        lastProgress = progress;
+        onProgress?.(progress);
       }
 
-      const segment = segments[segmentIndex];
-      const img = images[segmentIndex];
-
-      // Clear canvas
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw image with Ken Burns effect
-      applyKenBurns(ctx, img, width, height, segmentProgress, segmentIndex);
-
-      // Draw text overlay
-      if (segment.text) {
-        drawTextOverlay(ctx, segment.text, width, height);
-      }
-
-      // Report progress
-      if (onProgress) {
-        onProgress(Math.round((frameIndex / totalFrames) * 100));
-      }
-
-      frameIndex++;
-      
-      // Use setTimeout for frame timing
-      setTimeout(renderFrame, frameInterval);
+      // Continue animation
+      requestAnimationFrame(animate);
     };
 
-    // Start rendering
-    renderFrame();
+    // Start animation loop
+    console.log("[VideoEncoder] Starting animation loop");
+    requestAnimationFrame(animate);
   });
 }
 
@@ -379,10 +431,6 @@ export async function blobToDataUrl(blob: Blob): Promise<string> {
 
 /**
  * Upload video blob to Supabase storage
- * @param blob - Video blob (WebM or MP4)
- * @param supabase - Supabase client
- * @param bucketName - Storage bucket name
- * @param format - Video format ("webm" or "mp4")
  */
 export async function uploadVideoToStorage(
   blob: Blob,
@@ -393,6 +441,8 @@ export async function uploadVideoToStorage(
   const timestamp = Date.now();
   const randomId = Math.random().toString(36).substring(2, 10);
   const fileName = `cinematic-${timestamp}-${randomId}.${format}`;
+
+  console.log(`[VideoEncoder] Uploading ${format} video: ${fileName}`);
 
   const { error: uploadError } = await supabase.storage
     .from(bucketName)
@@ -409,5 +459,6 @@ export async function uploadVideoToStorage(
     .from(bucketName)
     .getPublicUrl(fileName);
 
+  console.log(`[VideoEncoder] Upload complete: ${publicUrlData.publicUrl}`);
   return publicUrlData.publicUrl;
 }
