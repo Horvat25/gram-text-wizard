@@ -16,6 +16,7 @@ interface VideoEncoderOptions {
   height?: number;
   fps?: number;
   audioUrl?: string;
+  ctaAudioUrl?: string; // Narration for the CTA at the end
   segments: VideoSegment[];
   onProgress?: (progress: number) => void;
   brandName?: string;
@@ -115,7 +116,8 @@ function applyKenBurns(
 }
 
 /**
- * Draw text overlay with styling
+ * Draw text overlay with styling - CENTERED on screen
+ * Position: Middle of screen (not bottom) to avoid Instagram caption overlap
  */
 function drawTextOverlay(
   ctx: CanvasRenderingContext2D,
@@ -125,13 +127,13 @@ function drawTextOverlay(
 ) {
   if (!text) return;
   
-  const fontSize = Math.floor(width * 0.045);
-  const padding = width * 0.05;
+  const fontSize = Math.floor(width * 0.05);
+  const padding = width * 0.08;
   const maxWidth = width - (padding * 2);
   
   ctx.font = `bold ${fontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
+  ctx.textBaseline = "middle";
   
   const words = text.split(" ");
   const lines: string[] = [];
@@ -150,26 +152,35 @@ function drawTextOverlay(
   }
   if (currentLine) lines.push(currentLine);
   
-  const lineHeight = fontSize * 1.3;
-  const totalHeight = lines.length * lineHeight + padding;
-  const startY = height - padding - totalHeight;
+  const lineHeight = fontSize * 1.4;
+  const totalTextHeight = lines.length * lineHeight;
   
-  const gradient = ctx.createLinearGradient(0, startY, 0, height);
-  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
-  gradient.addColorStop(0.3, "rgba(0, 0, 0, 0.7)");
-  gradient.addColorStop(1, "rgba(0, 0, 0, 0.9)");
+  // CENTER position - middle of screen
+  const centerY = height / 2;
+  const boxPadding = width * 0.04;
+  const boxWidth = maxWidth + boxPadding * 2;
+  const boxHeight = totalTextHeight + boxPadding * 2;
+  const boxX = (width - boxWidth) / 2;
+  const boxY = centerY - boxHeight / 2;
   
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, startY, width, height - startY);
+  // Semi-transparent background box
+  ctx.save();
+  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  ctx.beginPath();
+  ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
+  ctx.fill();
+  ctx.restore();
   
+  // Draw text
   ctx.fillStyle = "white";
-  ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-  ctx.shadowBlur = 4;
+  ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+  ctx.shadowBlur = 8;
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 2;
   
+  const startY = centerY - (totalTextHeight / 2) + (lineHeight / 2);
   lines.forEach((line, i) => {
-    const y = height - padding - (lines.length - 1 - i) * lineHeight;
+    const y = startY + i * lineHeight;
     ctx.fillText(line, width / 2, y);
   });
   
@@ -179,7 +190,8 @@ function drawTextOverlay(
 }
 
 /**
- * Draw watermark (Neural Update branding)
+ * Draw watermark (Neural Update branding) - STATIC, no animations
+ * Position: Top-right corner, fixed in all 4 images
  */
 function drawWatermark(
   ctx: CanvasRenderingContext2D,
@@ -187,45 +199,37 @@ function drawWatermark(
   height: number,
   brandName: string = "Neural Update"
 ) {
-  const fontSize = Math.floor(width * 0.03);
+  const fontSize = Math.floor(width * 0.028);
   const padding = width * 0.03;
   
   ctx.save();
   
-  // Position: top-right corner
+  // Position: top-right corner (static)
   ctx.font = `600 ${fontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   
-  // Glow effect
-  ctx.shadowColor = "rgba(138, 43, 226, 0.8)";
-  ctx.shadowBlur = 10;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-  
-  // Draw background pill
   const text = `⚡ ${brandName}`;
   const metrics = ctx.measureText(text);
-  const pillPadding = fontSize * 0.4;
+  const pillPadding = fontSize * 0.5;
   const pillWidth = metrics.width + pillPadding * 2;
-  const pillHeight = fontSize + pillPadding * 1.5;
+  const pillHeight = fontSize + pillPadding * 1.2;
   const pillX = width - padding - pillWidth;
   const pillY = padding;
   
-  // Gradient background
+  // Static gradient background (no glow animation)
   const gradient = ctx.createLinearGradient(pillX, pillY, pillX + pillWidth, pillY + pillHeight);
-  gradient.addColorStop(0, "rgba(138, 43, 226, 0.85)");
-  gradient.addColorStop(1, "rgba(75, 0, 130, 0.85)");
+  gradient.addColorStop(0, "rgba(138, 43, 226, 0.9)");
+  gradient.addColorStop(1, "rgba(75, 0, 130, 0.9)");
   
   ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.roundRect(pillX, pillY, pillWidth, pillHeight, pillHeight / 2);
   ctx.fill();
   
-  // Draw text
-  ctx.shadowBlur = 0;
+  // Draw text (static, no shadow animation)
   ctx.fillStyle = "white";
-  ctx.fillText(text, width - padding - pillPadding, padding + pillPadding * 0.75);
+  ctx.fillText(text, width - padding - pillPadding, padding + pillPadding * 0.6);
   
   ctx.restore();
 }
@@ -508,6 +512,7 @@ export async function generateVideoFromSegments(
     height = 1920,
     fps = 24,
     audioUrl,
+    ctaAudioUrl,
     segments,
     onProgress,
     brandName = "Neural Update",
@@ -562,49 +567,85 @@ export async function generateVideoFromSegments(
   // Create video stream from canvas
   const stream = canvas.captureStream(fps);
 
-  // Add audio track if available
+  // Add audio track if available (main narration + CTA audio)
   let audioElement: HTMLAudioElement | null = null;
+  let ctaAudioElement: HTMLAudioElement | null = null;
   let audioContext: AudioContext | null = null;
+  let ctaAudioStarted = false;
   
-  if (audioUrl) {
+  if (audioUrl || ctaAudioUrl) {
     try {
-      console.log("[VideoEncoder] Setting up audio...");
-      audioElement = new Audio();
-      audioElement.crossOrigin = "anonymous";
-      audioElement.src = audioUrl;
-      
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          console.warn("[VideoEncoder] Audio load timeout, continuing without audio");
-          resolve();
-        }, 10000);
-        
-        audioElement!.oncanplaythrough = () => {
-          clearTimeout(timeout);
-          resolve();
-        };
-        audioElement!.onerror = () => {
-          clearTimeout(timeout);
-          console.warn("[VideoEncoder] Audio load error, continuing without audio");
-          resolve();
-        };
-        audioElement!.load();
-      });
-
-      // Create audio context and source
       audioContext = new AudioContext();
-      const source = audioContext.createMediaElementSource(audioElement);
       const destination = audioContext.createMediaStreamDestination();
-      source.connect(destination);
+      
+      // Load main narration audio
+      if (audioUrl) {
+        console.log("[VideoEncoder] Setting up main audio...");
+        audioElement = new Audio();
+        audioElement.crossOrigin = "anonymous";
+        audioElement.src = audioUrl;
+        
+        await new Promise<void>((resolve) => {
+          const timeout = setTimeout(() => {
+            console.warn("[VideoEncoder] Audio load timeout, continuing without audio");
+            resolve();
+          }, 10000);
+          
+          audioElement!.oncanplaythrough = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          audioElement!.onerror = () => {
+            clearTimeout(timeout);
+            console.warn("[VideoEncoder] Audio load error, continuing without audio");
+            resolve();
+          };
+          audioElement!.load();
+        });
 
-      // Add audio track to stream
+        const source = audioContext.createMediaElementSource(audioElement);
+        source.connect(destination);
+        console.log("[VideoEncoder] Main audio setup complete");
+      }
+      
+      // Load CTA audio
+      if (ctaAudioUrl) {
+        console.log("[VideoEncoder] Setting up CTA audio...");
+        ctaAudioElement = new Audio();
+        ctaAudioElement.crossOrigin = "anonymous";
+        ctaAudioElement.src = ctaAudioUrl;
+        
+        await new Promise<void>((resolve) => {
+          const timeout = setTimeout(() => {
+            console.warn("[VideoEncoder] CTA audio load timeout");
+            resolve();
+          }, 10000);
+          
+          ctaAudioElement!.oncanplaythrough = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          ctaAudioElement!.onerror = () => {
+            clearTimeout(timeout);
+            console.warn("[VideoEncoder] CTA audio load error");
+            resolve();
+          };
+          ctaAudioElement!.load();
+        });
+
+        const ctaSource = audioContext.createMediaElementSource(ctaAudioElement);
+        ctaSource.connect(destination);
+        console.log("[VideoEncoder] CTA audio setup complete");
+      }
+
+      // Add combined audio track to stream
       destination.stream.getAudioTracks().forEach(track => {
         stream.addTrack(track);
       });
-      console.log("[VideoEncoder] Audio setup complete");
     } catch (e) {
       console.warn("[VideoEncoder] Failed to add audio track:", e);
       audioElement = null;
+      ctaAudioElement = null;
     }
   }
 
@@ -667,11 +708,22 @@ export async function generateVideoFromSegments(
         if (audioElement) {
           audioElement.pause();
         }
+        if (ctaAudioElement) {
+          ctaAudioElement.pause();
+        }
         if (audioContext) {
           audioContext.close().catch(console.warn);
         }
         recorder.stop();
         return;
+      }
+
+      // Start CTA audio when entering CTA phase
+      if (elapsed >= contentDuration && !ctaAudioStarted && ctaAudioElement) {
+        ctaAudioStarted = true;
+        console.log("[VideoEncoder] Starting CTA audio");
+        ctaAudioElement.currentTime = 0;
+        ctaAudioElement.play().catch(console.warn);
       }
 
       // Render current frame with watermark and CTA support
