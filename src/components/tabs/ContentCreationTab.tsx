@@ -128,23 +128,20 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const { settings: brandSettings } = useBrandSettings();
   const hasConnectedAccount = accounts.length > 0;
 
-  // Handle narrative video completion - now with MP4 support!
+  // Handle narrative video completion - accepts WebM and MP4
   const handleNarrativeVideoGenerated = useCallback((
     generatedVideoUrl: string,
     generatedImageUrl: string,
     generatedNarrationUrl: string, 
     script: string
   ) => {
-    // Check if the video is MP4 (Instagram compatible)
-    const isMP4 = generatedVideoUrl.toLowerCase().endsWith('.mp4');
-    
-    if (isMP4 && generatedVideoUrl) {
-      // Use the MP4 video for Reels
+    // Accept any video format (WebM or MP4)
+    if (generatedVideoUrl) {
       setVideoUrl(generatedVideoUrl);
       setImageUrl(generatedImageUrl); // Keep image as thumbnail/fallback
       setMediaType("reels");
     } else {
-      // Fallback to image if video is WebM or not available
+      // Fallback to image if no video URL
       setVideoUrl("");
       setImageUrl(generatedImageUrl);
       setMediaType("image");

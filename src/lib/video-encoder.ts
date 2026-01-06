@@ -311,7 +311,7 @@ export async function generateVideoFromSegments(
       const source = audioContext.createMediaElementSource(audioElement);
       const destination = audioContext.createMediaStreamDestination();
       source.connect(destination);
-      source.connect(audioContext.destination);
+      // NOTE: Do NOT connect to audioContext.destination - that would play audio through speakers during rendering
 
       // Add audio track to stream
       destination.stream.getAudioTracks().forEach(track => {
