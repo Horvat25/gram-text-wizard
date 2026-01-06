@@ -19,6 +19,7 @@ export interface NarrativeStoryState {
   title: string;
   segments: StorySegment[];
   narrationUrl: string;
+  ctaNarrationUrl: string;
   videoUrl: string;
   totalDuration: number;
   error: string | null;
@@ -39,6 +40,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     title: "",
     segments: [],
     narrationUrl: "",
+    ctaNarrationUrl: "",
     videoUrl: "",
     totalDuration: 0,
     error: null,
@@ -55,6 +57,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       title: "",
       segments: [],
       narrationUrl: "",
+      ctaNarrationUrl: "",
       videoUrl: "",
       totalDuration: 0,
       error: null,
@@ -267,68 +270,73 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio
+  // Step 3: Generate narration audio (main + CTA)
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
-    if (abortRef.current) return null;
+    if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "" };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
     
     // Combine all segment texts for full narration
     const fullScript = segments.map(s => s.text).join(" ");
     
+    // CTA script - engaging call to action
+    const ctaTexts = [
+      "E aí, curtiu? Então segue a gente pra não perder nenhuma novidade sobre tecnologia e inteligência artificial!",
+      "Gostou do conteúdo? Segue o Neural Update pra ficar por dentro das últimas notícias de IA e tecnologia!",
+      "Quer mais conteúdo assim? Então já segue a gente e ativa o sininho pra não perder nada!",
+      "Isso foi só uma amostra! Segue o Neural Update e acompanhe as notícias mais quentes de tecnologia!",
+    ];
+    const ctaScript = ctaTexts[Math.floor(Math.random() * ctaTexts.length)];
+    
+    let narrationUrl = "";
+    let ctaNarrationUrl = "";
+    
     try {
-      // Try ElevenLabs first (new API key configured)
-      console.log("Trying ElevenLabs TTS...");
+      // Generate main narration
+      console.log("Generating main narration...");
       const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
         body: { text: fullScript, language: "pt-BR" },
       });
 
-      // Check if we got valid audio (not an error response - check for .error in data too)
       if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
-        const narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
+        narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
+        console.log("Main narration generated with ElevenLabs");
+      } else {
+        // Fallback to OpenAI
+        console.log("ElevenLabs failed, trying OpenAI for main narration...");
+        const openaiResult = await supabase.functions.invoke("openai-tts", {
+          body: { text: fullScript, voice: "onyx" },
+        });
         
-        // Get real audio duration and update segment timings
-        const audioDuration = await getAudioDuration(narrationUrl);
-        if (audioDuration > 0) {
-          const durationPerSegment = audioDuration / segments.length;
-          console.log(`[generateAudio] Audio duration: ${audioDuration}s, per segment: ${durationPerSegment}s`);
-          
-          // Update segment durations based on real audio
-          setState(prev => {
-            let currentTime = 0;
-            const updatedSegments = prev.segments.map(seg => {
-              const updated = { ...seg, duration: durationPerSegment, startTime: currentTime };
-              currentTime += durationPerSegment;
-              return updated;
-            });
-            return { 
-              ...prev, 
-              segments: updatedSegments,
-              totalDuration: audioDuration,
-              narrationUrl, 
-              progress: 80 
-            };
-          });
-        } else {
-          setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
+        if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
+          narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
+          console.log("Main narration generated with OpenAI");
         }
-        
-        toast.success("Narração gerada com ElevenLabs!");
-        return narrationUrl;
       }
 
-      // ElevenLabs failed, try OpenAI as fallback
-      console.log("ElevenLabs failed or blocked, trying OpenAI TTS...");
-      console.log("ElevenLabs response:", elevenResult.data?.error || elevenResult.data?.code || "unknown");
-      
-      const openaiResult = await supabase.functions.invoke("openai-tts", {
-        body: { text: fullScript, voice: "onyx" },
+      // Generate CTA narration
+      console.log("Generating CTA narration...");
+      const ctaResult = await supabase.functions.invoke("elevenlabs-tts", {
+        body: { text: ctaScript, language: "pt-BR" },
       });
 
-      // Check for valid response (OpenAI may return error in body with 200 status)
-      if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
-        const narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
+      if (!ctaResult.error && ctaResult.data?.audioContent && !ctaResult.data?.error && !ctaResult.data?.fallback) {
+        ctaNarrationUrl = `data:audio/mp3;base64,${ctaResult.data.audioContent}`;
+        console.log("CTA narration generated with ElevenLabs");
+      } else {
+        // Fallback to OpenAI for CTA
+        console.log("Trying OpenAI for CTA narration...");
+        const openaiCta = await supabase.functions.invoke("openai-tts", {
+          body: { text: ctaScript, voice: "onyx" },
+        });
         
-        // Get real audio duration and update segment timings
+        if (!openaiCta.error && openaiCta.data?.audioContent && !openaiCta.data?.error) {
+          ctaNarrationUrl = `data:audio/mp3;base64,${openaiCta.data.audioContent}`;
+          console.log("CTA narration generated with OpenAI");
+        }
+      }
+
+      // Update state with narration URLs and segment timings
+      if (narrationUrl) {
         const audioDuration = await getAudioDuration(narrationUrl);
         if (audioDuration > 0) {
           const durationPerSegment = audioDuration / segments.length;
@@ -346,42 +354,35 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
               segments: updatedSegments,
               totalDuration: audioDuration,
               narrationUrl, 
+              ctaNarrationUrl,
               progress: 80 
             };
           });
         } else {
-          setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
+          setState(prev => ({ ...prev, narrationUrl, ctaNarrationUrl, progress: 80 }));
         }
         
-        toast.success("Narração gerada com OpenAI!");
-        return narrationUrl;
+        toast.success("Narrações geradas com sucesso!");
+      } else {
+        setState(prev => ({ ...prev, narrationUrl: "", ctaNarrationUrl: "", progress: 80 }));
+        toast.warning("Narração indisponível, gerando vídeo sem áudio");
       }
       
-      console.log("OpenAI TTS also failed:", openaiResult.data?.error || openaiResult.error);
-
-      // Both TTS services failed - continue without audio
-      console.warn("All TTS services unavailable, continuing without audio");
-      setState(prev => ({ 
-        ...prev, 
-        narrationUrl: "", 
-        progress: 80,
-      }));
-      toast.warning("Narração indisponível, gerando vídeo sem áudio");
-      return "";
+      return { narrationUrl, ctaNarrationUrl };
     } catch (error: any) {
       console.warn("TTS error:", error);
-      setState(prev => ({ 
-        ...prev, 
-        narrationUrl: "", 
-        progress: 80,
-      }));
+      setState(prev => ({ ...prev, narrationUrl: "", ctaNarrationUrl: "", progress: 80 }));
       toast.warning("Continuando sem narração");
-      return "";
+      return { narrationUrl: "", ctaNarrationUrl: "" };
     }
   }, [getAudioDuration]);
 
   // Step 4: Generate video from images (WebM - reliable browser encoding)
-  const generateVideo = useCallback(async (segmentsInput: StorySegment[], narrationUrl: string) => {
+  const generateVideo = useCallback(async (
+    segmentsInput: StorySegment[], 
+    narrationUrl: string,
+    ctaNarrationUrl: string
+  ) => {
     if (abortRef.current) return null;
     
     // Get the latest segments from state (with updated durations from audio)
@@ -400,6 +401,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s)...`);
       console.log("[generateVideo] Starting with", segments.length, "segments, total duration:", totalDuration);
       console.log("[generateVideo] Segment durations:", segments.map(s => s.duration));
+      console.log("[generateVideo] Has CTA audio:", !!ctaNarrationUrl);
       
       // Generate WebM video (reliable browser-native encoding)
       const videoBlob = await generateVideoFromSegments({
@@ -407,6 +409,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         height: 1920,
         fps: 24,
         audioUrl: narrationUrl || undefined,
+        ctaAudioUrl: ctaNarrationUrl || undefined,
         segments: segments.map(seg => ({
           imageUrl: seg.imageUrl,
           duration: seg.duration,
@@ -464,15 +467,19 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return;
     }
 
-    // Step 3: Audio
-    const narrationUrl = await generateAudio(segmentsWithImages);
+    // Step 3: Audio (main + CTA)
+    const audioResult = await generateAudio(segmentsWithImages);
     if (abortRef.current) {
       setIsGenerating(false);
       return;
     }
 
     // Step 4: Video
-    await generateVideo(segmentsWithImages, narrationUrl || "");
+    await generateVideo(
+      segmentsWithImages, 
+      audioResult?.narrationUrl || "", 
+      audioResult?.ctaNarrationUrl || ""
+    );
     setIsGenerating(false);
   }, [generateScript, generateImages, generateAudio, generateVideo]);
 
