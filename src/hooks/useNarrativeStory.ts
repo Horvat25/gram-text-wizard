@@ -308,18 +308,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setState(prev => ({ ...prev, step: "video", progress: 82 }));
     
     try {
-      // Calculate expected duration
-      const expectedDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
+      toast.info("Renderizando vídeo...");
       console.log("[generateVideo] Starting with", segments.length, "segments");
-      console.log("[generateVideo] Expected total duration:", expectedDuration, "seconds");
-      console.log("[generateVideo] Segments detail:", segments.map(s => ({
-        id: s.id,
-        duration: s.duration,
-        hasImage: !!s.imageUrl,
-        textLength: s.text?.length || 0,
-      })));
-      
-      toast.info(`Renderizando vídeo de ${expectedDuration}s...`);
       
       // Generate WebM video (reliable browser-native encoding)
       const videoBlob = await generateVideoFromSegments({
@@ -355,7 +345,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         step: "complete",
       }));
       
-      toast.success(`Vídeo de ${expectedDuration}s criado com sucesso!`);
+      toast.success("Vídeo criado com sucesso!");
       return videoUrl;
     } catch (error: any) {
       console.error("[generateVideo] Error:", error);
