@@ -173,15 +173,56 @@ serve(async (req) => {
           // MP4 is supported by Instagram - proceed with video
           console.log("MP4 video detected, proceeding with Reels upload...");
           actuallyIsVideo = true;
+        } else if (isWebM) {
+          // WebM needs conversion to MP4
+          console.log("WebM detected, converting to MP4 for Instagram compatibility...");
+          
+          try {
+            const convertResponse = await fetch(`${supabaseUrl}/functions/v1/convert-video-to-mp4`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${supabaseKey}`,
+              },
+              body: JSON.stringify({ videoUrl: mediaUrl }),
+            });
+            
+            const convertData = await convertResponse.json();
+            
+            if (convertData.videoUrl && !convertData.error) {
+              console.log("Video converted successfully:", convertData.videoUrl);
+              mediaUrl = convertData.videoUrl;
+              actuallyIsVideo = true;
+            } else {
+              console.error("Conversion failed:", convertData.error);
+              // Fall back to image if conversion fails and image is available
+              if (post.image_url) {
+                console.log("Conversion failed, falling back to image...");
+                actuallyIsVideo = false;
+                mediaUrl = post.image_url;
+              } else {
+                throw new Error("Falha na conversão do vídeo WebM para MP4. Tente novamente.");
+              }
+            }
+          } catch (convError: any) {
+            console.error("Conversion error:", convError);
+            if (post.image_url) {
+              console.log("Conversion error, falling back to image...");
+              actuallyIsVideo = false;
+              mediaUrl = post.image_url;
+            } else {
+              throw new Error(`Erro na conversão do vídeo: ${convError.message}`);
+            }
+          }
         } else if (isUnsupportedVideo) {
-          // Instagram doesn't support WebM/MKV/AVI - fall back to image if available
-          console.log("Video format not supported by Instagram (WebM/MKV/AVI). Falling back to image...");
+          // Other unsupported formats - fall back to image if available
+          console.log("Video format not supported by Instagram. Falling back to image...");
           if (post.image_url) {
             actuallyIsVideo = false;
             mediaUrl = post.image_url;
             console.log("Using image_url instead:", mediaUrl);
           } else {
-            throw new Error("O Instagram não suporta vídeos WebM. O post não tem imagem alternativa. Adicione uma imagem ou converta o vídeo para MP4.");
+            throw new Error("Formato de vídeo não suportado pelo Instagram. Adicione uma imagem ou converta para MP4.");
           }
         }
       }
