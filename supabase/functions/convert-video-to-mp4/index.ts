@@ -33,37 +33,98 @@ serve(async (req) => {
       );
     }
 
-    // For WebM videos, we'll use a cloud service or just accept WebM for now
-    // Since FFmpeg is not available in Deno Deploy, we'll handle this differently
-    
-    // Option 1: Use Replicate for video conversion (if available)
+    // For WebM videos, use Replicate for conversion
     const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY");
     
-    if (REPLICATE_API_KEY) {
-      // Note: Replicate doesn't have a direct WebM to MP4 converter
-      // For now, we'll just rename and hope Instagram accepts it
-      console.log("Converting via download and re-upload as MP4...");
+    if (!REPLICATE_API_KEY) {
+      console.warn("REPLICATE_API_KEY not set, cannot convert video");
+      throw new Error("Serviço de conversão não configurado");
     }
 
-    // Option 2: Download, and re-upload with MP4 extension
-    // This is a workaround - Instagram might still reject it
-    // The proper solution would be to use a video conversion API
-    
-    console.log("Downloading video for re-upload...");
-    const videoResponse = await fetch(videoUrl);
-    if (!videoResponse.ok) {
-      throw new Error("Failed to download video");
+    console.log("Using Replicate for video conversion...");
+
+    // Use a video-to-video model on Replicate that can handle format conversion
+    // We'll use the video2video-webm-to-mp4 approach via ffmpeg model
+    const response = await fetch("https://api.replicate.com/v1/predictions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${REPLICATE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // Using a general video processing model
+        version: "9ca73752fc3c1b4f70069f8dd8b2a4a8bf38220a9bc0b7ed89ce2d76bb5c7d4e",
+        input: {
+          video: videoUrl,
+          output_format: "mp4",
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Replicate API error:", errorText);
+      throw new Error("Falha ao iniciar conversão de vídeo");
     }
 
-    const videoBlob = await videoResponse.blob();
+    const prediction = await response.json();
+    console.log("Replicate prediction started:", prediction.id);
+
+    // Poll for completion
+    let status = prediction.status;
+    let outputUrl = null;
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes max
+
+    while ((status === "starting" || status === "processing") && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+      
+      const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
+        headers: {
+          "Authorization": `Bearer ${REPLICATE_API_KEY}`,
+        },
+      });
+      
+      const statusData = await statusResponse.json();
+      status = statusData.status;
+      attempts++;
+      
+      console.log(`Conversion status: ${status} (attempt ${attempts}/${maxAttempts})`);
+      
+      if (status === "succeeded") {
+        outputUrl = statusData.output;
+        break;
+      } else if (status === "failed" || status === "canceled") {
+        console.error("Conversion failed:", statusData.error);
+        throw new Error(statusData.error || "Conversão falhou");
+      }
+    }
+
+    if (!outputUrl) {
+      throw new Error("Timeout na conversão de vídeo");
+    }
+
+    // If output is an array, get the first item
+    if (Array.isArray(outputUrl)) {
+      outputUrl = outputUrl[0];
+    }
+
+    console.log("Video converted successfully:", outputUrl);
+
+    // Download the converted video and re-upload to our storage
+    const convertedResponse = await fetch(outputUrl);
+    if (!convertedResponse.ok) {
+      throw new Error("Falha ao baixar vídeo convertido");
+    }
+
+    const videoBlob = await convertedResponse.blob();
     const videoArrayBuffer = await videoBlob.arrayBuffer();
     const videoBytes = new Uint8Array(videoArrayBuffer);
 
     const timestamp = Date.now();
     const randomId = crypto.randomUUID().split("-")[0];
-    const fileName = `cinematic-${timestamp}-${randomId}.mp4`;
+    const fileName = `cinematic-converted-${timestamp}-${randomId}.mp4`;
 
-    // Upload as MP4 (note: content is still WebM internally)
     const { error: uploadError } = await supabase.storage
       .from("post-videos")
       .upload(fileName, videoBytes, {
@@ -80,13 +141,13 @@ serve(async (req) => {
       .from("post-videos")
       .getPublicUrl(fileName);
 
-    console.log("Video re-uploaded as MP4:", publicUrlData.publicUrl);
+    console.log("Converted video uploaded:", publicUrlData.publicUrl);
 
     return new Response(
       JSON.stringify({ 
         videoUrl: publicUrlData.publicUrl, 
         converted: true,
-        note: "Video re-uploaded with MP4 extension" 
+        originalUrl: videoUrl,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
