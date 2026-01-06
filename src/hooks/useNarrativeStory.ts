@@ -424,7 +424,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       
       // Upload the video
       toast.info("Enviando vídeo...");
-      const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos", "webm");
+      const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos");
       
       console.log("[generateVideo] Upload complete:", videoUrl);
       
