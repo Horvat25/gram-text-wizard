@@ -240,6 +240,33 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     return validSegments;
   }, [setError]);
 
+  // Helper to get audio duration from URL
+  const getAudioDuration = useCallback((audioUrl: string): Promise<number> => {
+    return new Promise((resolve) => {
+      const audio = new Audio();
+      audio.preload = "metadata";
+      
+      const timeout = setTimeout(() => {
+        console.warn("[getAudioDuration] Timeout, using estimate");
+        resolve(0);
+      }, 10000);
+      
+      audio.onloadedmetadata = () => {
+        clearTimeout(timeout);
+        console.log("[getAudioDuration] Audio duration:", audio.duration, "seconds");
+        resolve(audio.duration);
+      };
+      
+      audio.onerror = () => {
+        clearTimeout(timeout);
+        console.warn("[getAudioDuration] Error loading audio");
+        resolve(0);
+      };
+      
+      audio.src = audioUrl;
+    });
+  }, []);
+
   // Step 3: Generate narration audio
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return null;
@@ -258,7 +285,33 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       // Check if we got valid audio (not an error response - check for .error in data too)
       if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
         const narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
-        setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
+        
+        // Get real audio duration and update segment timings
+        const audioDuration = await getAudioDuration(narrationUrl);
+        if (audioDuration > 0) {
+          const durationPerSegment = audioDuration / segments.length;
+          console.log(`[generateAudio] Audio duration: ${audioDuration}s, per segment: ${durationPerSegment}s`);
+          
+          // Update segment durations based on real audio
+          setState(prev => {
+            let currentTime = 0;
+            const updatedSegments = prev.segments.map(seg => {
+              const updated = { ...seg, duration: durationPerSegment, startTime: currentTime };
+              currentTime += durationPerSegment;
+              return updated;
+            });
+            return { 
+              ...prev, 
+              segments: updatedSegments,
+              totalDuration: audioDuration,
+              narrationUrl, 
+              progress: 80 
+            };
+          });
+        } else {
+          setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
+        }
+        
         toast.success("Narração gerada com ElevenLabs!");
         return narrationUrl;
       }
@@ -274,7 +327,32 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       // Check for valid response (OpenAI may return error in body with 200 status)
       if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
         const narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
-        setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
+        
+        // Get real audio duration and update segment timings
+        const audioDuration = await getAudioDuration(narrationUrl);
+        if (audioDuration > 0) {
+          const durationPerSegment = audioDuration / segments.length;
+          console.log(`[generateAudio] Audio duration: ${audioDuration}s, per segment: ${durationPerSegment}s`);
+          
+          setState(prev => {
+            let currentTime = 0;
+            const updatedSegments = prev.segments.map(seg => {
+              const updated = { ...seg, duration: durationPerSegment, startTime: currentTime };
+              currentTime += durationPerSegment;
+              return updated;
+            });
+            return { 
+              ...prev, 
+              segments: updatedSegments,
+              totalDuration: audioDuration,
+              narrationUrl, 
+              progress: 80 
+            };
+          });
+        } else {
+          setState(prev => ({ ...prev, narrationUrl, progress: 80 }));
+        }
+        
         toast.success("Narração gerada com OpenAI!");
         return narrationUrl;
       }
@@ -300,16 +378,28 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       toast.warning("Continuando sem narração");
       return "";
     }
-  }, []);
+  }, [getAudioDuration]);
 
   // Step 4: Generate video from images (WebM - reliable browser encoding)
-  const generateVideo = useCallback(async (segments: StorySegment[], narrationUrl: string) => {
+  const generateVideo = useCallback(async (segmentsInput: StorySegment[], narrationUrl: string) => {
     if (abortRef.current) return null;
-    setState(prev => ({ ...prev, step: "video", progress: 82 }));
+    
+    // Get the latest segments from state (with updated durations from audio)
+    const latestState = await new Promise<NarrativeStoryState>(resolve => {
+      setState(prev => {
+        resolve(prev);
+        return { ...prev, step: "video", progress: 82 };
+      });
+    });
+    
+    // Use segments from state if they have updated durations
+    const segments = latestState.segments.length > 0 ? latestState.segments : segmentsInput;
     
     try {
-      toast.info("Renderizando vídeo...");
-      console.log("[generateVideo] Starting with", segments.length, "segments");
+      const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
+      toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s)...`);
+      console.log("[generateVideo] Starting with", segments.length, "segments, total duration:", totalDuration);
+      console.log("[generateVideo] Segment durations:", segments.map(s => s.duration));
       
       // Generate WebM video (reliable browser-native encoding)
       const videoBlob = await generateVideoFromSegments({
