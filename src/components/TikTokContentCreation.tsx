@@ -93,13 +93,13 @@ const TikTokContentCreation = () => {
 
   const hasConnectedAccount = accounts.length > 0;
 
-  // Filter posts for TikTok only
+  // Filter posts for TikTok only - must have tiktok_post_id or be explicitly for tiktok platform
   const tiktokPosts = posts.filter(p => 
-    p.platforms?.includes('tiktok') || 
-    (p.media_type === 'reels' && p.video_url)
+    p.platforms?.includes('tiktok') || p.tiktok_post_id
   );
   const scheduledPosts = tiktokPosts.filter(p => p.status === 'scheduled');
-  const publishedPosts = tiktokPosts.filter(p => p.status === 'published');
+  // Only show posts that were actually published to TikTok (have tiktok_post_id)
+  const publishedPosts = tiktokPosts.filter(p => p.status === 'published' && p.tiktok_post_id);
 
   const {
     state,
