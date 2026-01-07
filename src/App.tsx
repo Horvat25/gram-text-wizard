@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import InstagramCallback from "./pages/InstagramCallback";
+import TikTokCallback from "./pages/TikTokCallback";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DataDeletion from "./pages/DataDeletion";
 import NotFound from "./pages/NotFound";
@@ -53,6 +54,7 @@ const App = () => (
             </ProtectedRoute>
           } />
           <Route path="/instagram/callback" element={<InstagramCallback />} />
+          <Route path="/tiktok-callback" element={<TikTokCallback />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/data-deletion" element={<DataDeletion />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -25,11 +25,13 @@ import {
   RefreshCw,
   Save,
   RotateCcw,
-  Image
+  Image,
+  Video
 } from "lucide-react";
 import Header from "@/components/Header";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
+import { useTikTokAccounts } from "@/hooks/useTikTokAccounts";
 import { AccountCard } from "@/components/AccountCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,11 +78,21 @@ const Settings = () => {
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [connectingTikTok, setConnectingTikTok] = useState(false);
   const [aiSettings, setAiSettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
   const [isSavingAI, setIsSavingAI] = useState(false);
   
   const { settings, updateSettings } = useBrandSettings();
   const { accounts, loading: loadingAccounts, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
+  const { 
+    accounts: tiktokAccounts, 
+    isLoading: loadingTikTok, 
+    error: tiktokError, 
+    fetchAccounts: fetchTikTokAccounts, 
+    disconnectAccount: disconnectTikTok,
+    getTokenStatus: getTikTokTokenStatus,
+    getDaysUntilExpiry: getTikTokDaysUntilExpiry
+  } = useTikTokAccounts();
   const hasConnectedAccount = accounts.length > 0;
 
   useEffect(() => {
@@ -268,6 +280,72 @@ const Settings = () => {
     }
   };
 
+  // TikTok OAuth
+  const startTikTokOAuth = async () => {
+    setConnectingTikTok(true);
+    try {
+      const redirectUri = `${window.location.origin}/tiktok-callback`;
+      
+      const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', {
+        body: { redirectUri }
+      });
+
+      if (error) throw error;
+
+      sessionStorage.setItem('tiktok_oauth_state', data.state);
+      
+      const popup = window.open(
+        data.authUrl,
+        'tiktok_oauth',
+        'width=600,height=700,scrollbars=yes,resizable=yes'
+      );
+      
+      if (!popup) {
+        toast.error('Por favor, permita popups para este site e tente novamente.');
+        setConnectingTikTok(false);
+        return;
+      }
+      
+      const checkPopup = setInterval(() => {
+        const tiktokResult = localStorage.getItem('tiktok_oauth_result');
+        
+        if (tiktokResult) {
+          clearInterval(checkPopup);
+          localStorage.removeItem('tiktok_oauth_result');
+          
+          const result = JSON.parse(tiktokResult);
+          if (result.success) {
+            toast.success('Conta TikTok conectada com sucesso!');
+            fetchTikTokAccounts();
+          } else {
+            toast.error(result.error || 'Falha ao processar a autorização');
+          }
+          setConnectingTikTok(false);
+        }
+        
+        try {
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            setConnectingTikTok(false);
+            fetchTikTokAccounts();
+          }
+        } catch {
+          // Cross-origin access error
+        }
+      }, 500);
+      
+      setTimeout(() => {
+        clearInterval(checkPopup);
+        setConnectingTikTok(false);
+      }, 300000);
+      
+    } catch (error: any) {
+      console.error('Start TikTok OAuth error:', error);
+      toast.error(error.message || 'Falha ao iniciar o processo de autorização');
+      setConnectingTikTok(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -302,7 +380,7 @@ const Settings = () => {
           </div>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <SettingsIcon className="h-4 w-4" />
                 <span className="hidden sm:inline">Geral</span>
@@ -314,6 +392,10 @@ const Settings = () => {
               <TabsTrigger value="instagram" className="flex items-center gap-2">
                 <Instagram className="h-4 w-4" />
                 <span className="hidden sm:inline">Instagram</span>
+              </TabsTrigger>
+              <TabsTrigger value="tiktok" className="flex items-center gap-2">
+                <Video className="h-4 w-4" />
+                <span className="hidden sm:inline">TikTok</span>
               </TabsTrigger>
             </TabsList>
 
@@ -745,6 +827,164 @@ const Settings = () => {
                         <AlertCircle className="h-4 w-4 text-amber-600" />
                         <AlertDescription className="text-sm">
                           Se você <strong>desmarcar</strong> alguma permissão ou não selecionar seu Instagram, a conexão falhará.
+                        </AlertDescription>
+                      </Alert>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* TikTok Settings Tab */}
+            <TabsContent value="tiktok" className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold">Contas TikTok</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Gerencie suas contas do TikTok
+                  </p>
+                </div>
+                <Button onClick={startTikTokOAuth} disabled={connectingTikTok}>
+                  {connectingTikTok ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Plus className="w-4 h-4 mr-2" />
+                  )}
+                  Conectar TikTok
+                </Button>
+              </div>
+
+              {tiktokError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Erro de conexão</AlertTitle>
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>{tiktokError}</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => fetchTikTokAccounts()}
+                      className="ml-4"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Tentar novamente
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {loadingTikTok ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : tiktokAccounts.length > 0 ? (
+                <>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {tiktokAccounts.map(account => (
+                      <Card key={account.id} className="border-primary/20">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-4">
+                            {account.avatar_url ? (
+                              <img 
+                                src={account.avatar_url} 
+                                alt={account.username || 'TikTok'} 
+                                className="w-12 h-12 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 via-purple-500 to-pink-500 flex items-center justify-center">
+                                <Video className="w-6 h-6 text-white" />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <p className="font-semibold">@{account.username || account.display_name || 'TikTok User'}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {getTikTokTokenStatus(account) === 'active' ? (
+                                  <span className="text-green-500">● Ativo</span>
+                                ) : getTikTokTokenStatus(account) === 'expiring' ? (
+                                  <span className="text-amber-500">● Expira em {getTikTokDaysUntilExpiry(account)} dias</span>
+                                ) : (
+                                  <span className="text-red-500">● Expirado</span>
+                                )}
+                              </p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => disconnectTikTok(account.id)}
+                              className="text-destructive hover:bg-destructive/10"
+                            >
+                              Desconectar
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  <Card className="bg-muted/30">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="w-4 h-4 text-success" />
+                        <span>
+                          Pronto para publicar no TikTok! Apenas vídeos são suportados.
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <div className="space-y-6">
+                  {/* Main Connect Card */}
+                  <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 border-purple-500/20">
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 via-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                        <Video className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">Conecte sua conta TikTok</h3>
+                      <p className="text-muted-foreground text-center mb-6 max-w-md text-sm">
+                        Conecte sua conta do TikTok para publicar vídeos automaticamente.
+                      </p>
+                      
+                      <Button onClick={startTikTokOAuth} disabled={connectingTikTok} className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:opacity-90">
+                        {connectingTikTok ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Video className="w-4 h-4 mr-2" />
+                        )}
+                        Conectar TikTok
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Instructions Card */}
+                  <Card className="border-primary/20">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-primary" />
+                        Como conectar sua conta TikTok
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Prerequisites */}
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Pré-requisitos:</h4>
+                        <ul className="text-sm text-muted-foreground space-y-2">
+                          <li className="flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
+                            <span>Conta do TikTok <strong>verificada</strong></span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
+                            <span>Aceitar as permissões de <strong>publicação de vídeo</strong></span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Warning */}
+                      <Alert className="bg-cyan-500/10 border-cyan-500/30">
+                        <Video className="h-4 w-4 text-cyan-600" />
+                        <AlertDescription className="text-sm">
+                          <strong>Importante:</strong> O TikTok só permite publicar <strong>vídeos</strong>. Posts com imagens não serão publicados no TikTok.
                         </AlertDescription>
                       </Alert>
                     </CardContent>

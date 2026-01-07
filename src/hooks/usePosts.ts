@@ -16,6 +16,8 @@ export interface Post {
   media_type: string | null;
   ai_model_used: string | null;
   instagram_post_id: string | null;
+  tiktok_post_id: string | null;
+  platforms: string[] | null;
   likes_count: number | null;
   comments_count: number | null;
   saves_count: number | null;
@@ -36,6 +38,7 @@ export interface CreatePostData {
   ai_model_used?: string;
   overlay_metadata?: any;
   carousel_images?: string[] | null;
+  platforms?: string[];
 }
 
 export const usePosts = () => {
@@ -90,6 +93,7 @@ export const usePosts = () => {
           ai_model_used: postData.ai_model_used || null,
           overlay_metadata: postData.overlay_metadata || null,
           carousel_images: postData.carousel_images || null,
+          platforms: postData.platforms || ['instagram'],
           user_id: user.id,
         } as any)
         .select()
