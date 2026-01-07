@@ -25,7 +25,7 @@ const PrivacyPolicy = () => {
             <p>
               A Neural Update ("nós", "nosso" ou "aplicativo") está comprometida em proteger sua privacidade. 
               Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações 
-              quando você usa nosso aplicativo de gerenciamento de conteúdo para Instagram.
+              quando você usa nosso aplicativo de gerenciamento de conteúdo para Instagram e TikTok.
             </p>
           </section>
 
@@ -38,7 +38,11 @@ const PrivacyPolicy = () => {
                 acessamos seu nome de usuário, ID do usuário e token de acesso para permitir a publicação de conteúdo.
               </li>
               <li>
-                <strong>Conteúdo de Posts:</strong> Armazenamos as legendas, imagens e hashtags dos posts que 
+                <strong>Informações da Conta TikTok:</strong> Quando você conecta sua conta do TikTok, 
+                acessamos seu nome de usuário, foto de perfil e token de acesso para permitir a publicação de vídeos.
+              </li>
+              <li>
+                <strong>Conteúdo de Posts:</strong> Armazenamos as legendas, imagens, vídeos e hashtags dos posts que 
                 você cria através do nosso aplicativo.
               </li>
               <li>
@@ -52,7 +56,7 @@ const PrivacyPolicy = () => {
             <h2 className="text-2xl font-semibold">3. Como Usamos Suas Informações</h2>
             <p>Utilizamos as informações coletadas para:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Permitir a criação e publicação de posts no Instagram</li>
+              <li>Permitir a criação e publicação de posts no Instagram e TikTok</li>
               <li>Agendar publicações conforme suas preferências</li>
               <li>Fornecer análises e insights sobre seu conteúdo</li>
               <li>Melhorar nossos serviços e experiência do usuário</li>
@@ -68,6 +72,9 @@ const PrivacyPolicy = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>
                 <strong>Com a Meta/Instagram:</strong> Para publicar conteúdo em sua conta conforme solicitado.
+              </li>
+              <li>
+                <strong>Com o TikTok:</strong> Para publicar vídeos em sua conta conforme solicitado.
               </li>
               <li>
                 <strong>Por Obrigação Legal:</strong> Quando exigido por lei ou ordem judicial.
@@ -99,7 +106,7 @@ const PrivacyPolicy = () => {
               <li>Acessar seus dados pessoais</li>
               <li>Corrigir informações incorretas</li>
               <li>Solicitar a exclusão de seus dados</li>
-              <li>Desconectar sua conta do Instagram a qualquer momento</li>
+              <li>Desconectar suas contas do Instagram e TikTok a qualquer momento</li>
               <li>Exportar seus dados</li>
             </ul>
           </section>
@@ -130,7 +137,24 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold">9. Alterações nesta Política</h2>
+            <h2 className="text-2xl font-semibold">9. Uso de APIs do TikTok</h2>
+            <p>
+              Nosso aplicativo utiliza as APIs do TikTok para:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Autenticar usuários via TikTok Login Kit</li>
+              <li>Publicar vídeos diretamente em contas do TikTok via Content Posting API</li>
+              <li>Acessar informações básicas do perfil (nome de usuário, foto de perfil)</li>
+            </ul>
+            <p>
+              Seguimos rigorosamente as políticas de uso de dados do TikTok. Coletamos apenas 
+              as informações necessárias para o funcionamento do serviço e não compartilhamos 
+              dados com terceiros não autorizados.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">10. Alterações nesta Política</h2>
             <p>
               Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos sobre 
               quaisquer alterações significativas através do aplicativo ou por email.
@@ -138,7 +162,7 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold">10. Contato</h2>
+            <h2 className="text-2xl font-semibold">11. Contato</h2>
             <p>
               Se você tiver dúvidas sobre esta Política de Privacidade ou sobre o tratamento de 
               seus dados, entre em contato conosco:
