@@ -53,15 +53,21 @@ import { Progress } from "@/components/ui/progress";
 import { addMinutes, format } from "date-fns";
 
 // Brasília timezone offset (UTC-3)
-const BRASILIA_OFFSET = -3;
+const BRASILIA_OFFSET_HOURS = 3;
 
-// Convert local datetime-local input to UTC ISO string for storage
-// The datetime-local input gives us the time the user selected (interpreted as Brasília time)
+// Convert datetime-local input (which is in Brasília time) to UTC ISO string for storage
+// datetime-local gives us a string like "2026-01-07T22:20" without timezone info
+// We need to treat this as Brasília time (UTC-3) and convert to UTC
 const localToUTC = (localDatetime: string): string => {
   if (!localDatetime) return "";
-  const date = new Date(localDatetime);
-  // Adjust for Brasília offset (add 3 hours to get UTC)
-  const utcDate = addMinutes(date, -BRASILIA_OFFSET * 60);
+  // Parse the datetime string parts directly to avoid browser timezone interference
+  const [datePart, timePart] = localDatetime.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+  
+  // Create a UTC date by treating the input as Brasília time (UTC-3)
+  // If user selects 22:20 Brasília, that's 01:20 next day UTC
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hours + BRASILIA_OFFSET_HOURS, minutes));
   return utcDate.toISOString();
 };
 
