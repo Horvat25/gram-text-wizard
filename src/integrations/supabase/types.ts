@@ -133,12 +133,14 @@ export type Database = {
           likes_count: number | null
           media_type: string | null
           overlay_metadata: Json | null
+          platforms: string[] | null
           post_type: string | null
           published_at: string | null
           reach: number | null
           saves_count: number | null
           scheduled_for: string | null
           status: string
+          tiktok_post_id: string | null
           updated_at: string | null
           user_id: string | null
           video_url: string | null
@@ -159,12 +161,14 @@ export type Database = {
           likes_count?: number | null
           media_type?: string | null
           overlay_metadata?: Json | null
+          platforms?: string[] | null
           post_type?: string | null
           published_at?: string | null
           reach?: number | null
           saves_count?: number | null
           scheduled_for?: string | null
           status?: string
+          tiktok_post_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           video_url?: string | null
@@ -185,12 +189,14 @@ export type Database = {
           likes_count?: number | null
           media_type?: string | null
           overlay_metadata?: Json | null
+          platforms?: string[] | null
           post_type?: string | null
           published_at?: string | null
           reach?: number | null
           saves_count?: number | null
           scheduled_for?: string | null
           status?: string
+          tiktok_post_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           video_url?: string | null
@@ -251,6 +257,48 @@ export type Database = {
           id?: string
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      tiktok_accounts: {
+        Row: {
+          access_token: string
+          avatar_url: string | null
+          connected_at: string | null
+          display_name: string | null
+          expires_at: string | null
+          id: string
+          open_id: string
+          refresh_token: string | null
+          updated_at: string | null
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          access_token: string
+          avatar_url?: string | null
+          connected_at?: string | null
+          display_name?: string | null
+          expires_at?: string | null
+          id?: string
+          open_id: string
+          refresh_token?: string | null
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          access_token?: string
+          avatar_url?: string | null
+          connected_at?: string | null
+          display_name?: string | null
+          expires_at?: string | null
+          id?: string
+          open_id?: string
+          refresh_token?: string | null
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
         }
         Relationships: []
       }
