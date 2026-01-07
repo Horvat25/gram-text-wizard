@@ -95,28 +95,20 @@ serve(async (req) => {
       caption = `${caption}\n\n${hashtagsString}`;
     }
 
-    // TikTok Content Posting API v2 - Initialize FILE_UPLOAD (no domain verification needed)
-    console.log('Initializing TikTok upload with FILE_UPLOAD method...');
-    const initResponse = await fetch('https://open.tiktokapis.com/v2/post/publish/video/init/', {
+    // TikTok Content Posting API v2 - Initialize with Inbox (drafts) for unaudited apps
+    // This is required for sandbox apps - videos go to drafts for manual publishing
+    console.log('Initializing TikTok upload to INBOX (drafts) for sandbox app...');
+    const initResponse = await fetch('https://open.tiktokapis.com/v2/post/publish/inbox/video/init/', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${account.access_token}`,
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: JSON.stringify({
-        post_info: {
-          title: caption.substring(0, 2200), // TikTok limit
-          // SELF_ONLY for unaudited/sandbox apps - change to PUBLIC_TO_EVERYONE after TikTok approval
-          privacy_level: 'SELF_ONLY',
-          disable_duet: false,
-          disable_comment: false,
-          disable_stitch: false,
-          video_cover_timestamp_ms: 1000,
-        },
         source_info: {
           source: 'FILE_UPLOAD',
           video_size: videoSize,
-          chunk_size: videoSize, // Single chunk upload for simplicity
+          chunk_size: videoSize,
           total_chunk_count: 1,
         },
       }),
