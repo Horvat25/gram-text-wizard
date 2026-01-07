@@ -17,6 +17,12 @@ import {
   Calendar,
   RefreshCw,
   Loader2,
+  Lightbulb,
+  Video,
+  Image as ImageIcon,
+  Hash,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import {
   LineChart,
@@ -52,7 +58,7 @@ const COLORS = [
 
 const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
   const [isSyncing, setIsSyncing] = useState(false);
-  const { summary, topPosts, insights, postsWithMetrics, postsWithRealMetrics } = useAnalytics(posts);
+  const { summary, topPosts, insights, postsWithMetrics, postsWithRealMetrics, nextPostRecommendation } = useAnalytics(posts);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -248,7 +254,146 @@ const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
         </Card>
       </div>
 
-      {/* Metrics Row */}
+      {/* 🎯 Next Post Recommendation - AI Powered */}
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-background to-accent/5">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Recomendação para Próximo Post
+            <Badge 
+              variant="outline" 
+              className={
+                nextPostRecommendation.confidence === "high" 
+                  ? "bg-success/10 text-success border-success/30" 
+                  : nextPostRecommendation.confidence === "medium"
+                  ? "bg-warning/10 text-warning border-warning/30"
+                  : "bg-muted text-muted-foreground"
+              }
+            >
+              {nextPostRecommendation.confidence === "high" ? "Alta confiança" : 
+               nextPostRecommendation.confidence === "medium" ? "Média confiança" : "Baixa confiança"}
+            </Badge>
+          </CardTitle>
+          <CardDescription>
+            Baseado na análise dos seus {postsWithRealMetrics} posts com métricas reais
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Recommended Post Type */}
+            <div className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 rounded-full bg-primary/10">
+                  <Target className="h-4 w-4 text-primary" />
+                </div>
+                <span className="font-medium text-sm">Tipo de Post</span>
+              </div>
+              <p className="text-xl font-bold capitalize text-primary mb-1">
+                {nextPostRecommendation.postType}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {nextPostRecommendation.postTypeReason}
+              </p>
+            </div>
+
+            {/* Recommended Media Type */}
+            <div className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 rounded-full bg-accent/10">
+                  {nextPostRecommendation.mediaType === "reels" ? (
+                    <Video className="h-4 w-4 text-accent-foreground" />
+                  ) : (
+                    <ImageIcon className="h-4 w-4 text-accent-foreground" />
+                  )}
+                </div>
+                <span className="font-medium text-sm">Formato</span>
+              </div>
+              <p className="text-xl font-bold capitalize mb-1">
+                {nextPostRecommendation.mediaType === "reels" ? "Reels" : 
+                 nextPostRecommendation.mediaType === "image" ? "Imagem" :
+                 nextPostRecommendation.mediaType === "carousel" ? "Carrossel" : 
+                 nextPostRecommendation.mediaType}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {nextPostRecommendation.mediaTypeReason}
+              </p>
+            </div>
+
+            {/* Suggested Hashtags */}
+            <div className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 rounded-full bg-success/10">
+                  <Hash className="h-4 w-4 text-success" />
+                </div>
+                <span className="font-medium text-sm">Hashtags</span>
+              </div>
+              {nextPostRecommendation.suggestedHashtags.length > 0 ? (
+                <div className="flex flex-wrap gap-1">
+                  {nextPostRecommendation.suggestedHashtags.slice(0, 3).map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-xs">
+                      #{tag}
+                    </Badge>
+                  ))}
+                  {nextPostRecommendation.suggestedHashtags.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{nextPostRecommendation.suggestedHashtags.length - 3}
+                    </Badge>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Publique mais posts para sugestões
+                </p>
+              )}
+            </div>
+
+            {/* Suggested Topics */}
+            <div className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 rounded-full bg-warning/10">
+                  <Lightbulb className="h-4 w-4 text-warning" />
+                </div>
+                <span className="font-medium text-sm">Temas</span>
+              </div>
+              {nextPostRecommendation.suggestedTopics.length > 0 ? (
+                <div className="flex flex-wrap gap-1">
+                  {nextPostRecommendation.suggestedTopics.slice(0, 3).map((topic) => (
+                    <Badge key={topic} variant="outline" className="text-xs">
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Baseado nos seus melhores posts
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* CTA to create post */}
+          <div className="mt-4 pt-4 border-t flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              💡 Use essas recomendações ao criar seu próximo post para maximizar engajamento
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Navigate to create tab with recommendation data
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', 'create');
+                window.history.pushState({}, '', url.toString());
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+            >
+              Criar Post
+              <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4 pb-4">
