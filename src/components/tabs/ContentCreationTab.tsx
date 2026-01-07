@@ -50,6 +50,27 @@ import NarrativeVideoGenerator from "@/components/NarrativeVideoGenerator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { addMinutes, format } from "date-fns";
+
+// Brasília timezone offset (UTC-3)
+const BRASILIA_OFFSET = -3;
+
+// Convert local datetime-local input to UTC ISO string for storage
+// The datetime-local input gives us the time the user selected (interpreted as Brasília time)
+const localToUTC = (localDatetime: string): string => {
+  if (!localDatetime) return "";
+  const date = new Date(localDatetime);
+  // Adjust for Brasília offset (add 3 hours to get UTC)
+  const utcDate = addMinutes(date, -BRASILIA_OFFSET * 60);
+  return utcDate.toISOString();
+};
+
+// Get minimum datetime for scheduling (now + 5 minutes)
+const getMinScheduleDatetime = (): string => {
+  const now = new Date();
+  const minDate = addMinutes(now, 5);
+  return format(minDate, "yyyy-MM-dd'T'HH:mm");
+};
 
 const POST_TYPES = [
   { value: "engajamento", label: "Engajamento", description: "Máxima interação" },
@@ -458,7 +479,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         caption: generatedText,
         hashtags,
         status,
-        scheduled_for: status === "scheduled" ? scheduledFor : null,
+        scheduled_for: status === "scheduled" ? localToUTC(scheduledFor) : null,
         post_type: postType,
         image_url: mediaType === "carousel" ? carouselImages[0] : (imageUrl || null),
         media_type: mediaType,
@@ -888,13 +909,17 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
 
               {/* Schedule */}
               <div className="space-y-2 pt-2 border-t">
-                <Label htmlFor="schedule">Agendar para (opcional)</Label>
+                <Label htmlFor="schedule">Agendar para - Brasília (UTC-3)</Label>
                 <Input
                   id="schedule"
                   type="datetime-local"
                   value={scheduledFor}
                   onChange={(e) => setScheduledFor(e.target.value)}
+                  min={getMinScheduleDatetime()}
                 />
+                <p className="text-xs text-muted-foreground">
+                  O horário será salvo em UTC e exibido em Brasília na fila
+                </p>
               </div>
 
               {/* Actions */}
