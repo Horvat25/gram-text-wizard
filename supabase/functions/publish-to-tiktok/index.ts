@@ -106,7 +106,8 @@ serve(async (req) => {
       body: JSON.stringify({
         post_info: {
           title: caption.substring(0, 2200), // TikTok limit
-          privacy_level: 'PUBLIC_TO_EVERYONE',
+          // SELF_ONLY for unaudited/sandbox apps - change to PUBLIC_TO_EVERYONE after TikTok approval
+          privacy_level: 'SELF_ONLY',
           disable_duet: false,
           disable_comment: false,
           disable_stitch: false,
