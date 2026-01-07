@@ -270,7 +270,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio (main + CTA)
+  // Step 3: Generate narration audio (main + CTA) - uses Lovable AI Gateway
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "" };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -290,50 +290,67 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    try {
-      // Generate main narration
-      console.log("Generating main narration...");
-      const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
-        body: { text: fullScript, language: "pt-BR" },
-      });
-
-      if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
-        narrationUrl = `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
-        console.log("Main narration generated with ElevenLabs");
-      } else {
-        // Fallback to OpenAI
-        console.log("ElevenLabs failed, trying OpenAI for main narration...");
+    // Helper to try TTS with multiple providers
+    const tryGenerateTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
+      // Try Lovable AI Gateway first (uses project's LOVABLE_API_KEY)
+      console.log("Trying Lovable AI Gateway TTS...");
+      try {
+        const lovableResult = await supabase.functions.invoke("lovable-tts", {
+          body: { text, voice },
+        });
+        
+        if (!lovableResult.error && lovableResult.data?.audioContent && !lovableResult.data?.error) {
+          console.log("TTS generated with Lovable AI Gateway");
+          return `data:audio/mp3;base64,${lovableResult.data.audioContent}`;
+        }
+        console.warn("Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
+      } catch (e) {
+        console.warn("Lovable TTS exception:", e);
+      }
+      
+      // Try ElevenLabs as fallback
+      console.log("Trying ElevenLabs TTS...");
+      try {
+        const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
+          body: { text, language: "pt-BR" },
+        });
+        
+        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
+          console.log("TTS generated with ElevenLabs");
+          return `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
+        }
+        console.warn("ElevenLabs failed:", elevenResult.data?.error || elevenResult.error);
+      } catch (e) {
+        console.warn("ElevenLabs exception:", e);
+      }
+      
+      // Try OpenAI as final fallback
+      console.log("Trying OpenAI TTS...");
+      try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
-          body: { text: fullScript, voice: "onyx" },
+          body: { text, voice },
         });
         
         if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
-          narrationUrl = `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
-          console.log("Main narration generated with OpenAI");
+          console.log("TTS generated with OpenAI");
+          return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
         }
+        console.warn("OpenAI TTS failed:", openaiResult.data?.error || openaiResult.error);
+      } catch (e) {
+        console.warn("OpenAI TTS exception:", e);
       }
+      
+      return null;
+    };
+    
+    try {
+      // Generate main narration
+      console.log("Generating main narration...");
+      narrationUrl = await tryGenerateTTS(fullScript) || "";
 
       // Generate CTA narration
       console.log("Generating CTA narration...");
-      const ctaResult = await supabase.functions.invoke("elevenlabs-tts", {
-        body: { text: ctaScript, language: "pt-BR" },
-      });
-
-      if (!ctaResult.error && ctaResult.data?.audioContent && !ctaResult.data?.error && !ctaResult.data?.fallback) {
-        ctaNarrationUrl = `data:audio/mp3;base64,${ctaResult.data.audioContent}`;
-        console.log("CTA narration generated with ElevenLabs");
-      } else {
-        // Fallback to OpenAI for CTA
-        console.log("Trying OpenAI for CTA narration...");
-        const openaiCta = await supabase.functions.invoke("openai-tts", {
-          body: { text: ctaScript, voice: "onyx" },
-        });
-        
-        if (!openaiCta.error && openaiCta.data?.audioContent && !openaiCta.data?.error) {
-          ctaNarrationUrl = `data:audio/mp3;base64,${openaiCta.data.audioContent}`;
-          console.log("CTA narration generated with OpenAI");
-        }
-      }
+      ctaNarrationUrl = await tryGenerateTTS(ctaScript) || "";
 
       // Update state with narration URLs and segment timings
       if (narrationUrl) {
