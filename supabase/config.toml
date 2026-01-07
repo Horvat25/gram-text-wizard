@@ -68,3 +68,12 @@ verify_jwt = false
 
 [functions.convert-video-to-mp4]
 verify_jwt = false
+
+[functions.start-tiktok-oauth]
+verify_jwt = false
+
+[functions.tiktok-callback]
+verify_jwt = false
+
+[functions.publish-to-tiktok]
+verify_jwt = false
