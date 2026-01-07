@@ -14,11 +14,22 @@ export interface AnalyticsSummary {
   bestPostType: string;
   bestPerformingHashtags: string[];
   performanceByType: Record<string, { count: number; avgEngagement: number }>;
+  performanceByMediaType: Record<string, { count: number; avgEngagement: number }>;
   weeklyTrend: { date: string; posts: number; engagement: number }[];
   avgLikesPerPost: number;
   avgCommentsPerPost: number;
   avgSavesPerPost: number;
   avgReachPerPost: number;
+}
+
+export interface NextPostRecommendation {
+  postType: string;
+  postTypeReason: string;
+  mediaType: string;
+  mediaTypeReason: string;
+  suggestedHashtags: string[];
+  suggestedTopics: string[];
+  confidence: "high" | "medium" | "low";
 }
 
 export interface PostWithMetrics extends Post {
@@ -131,6 +142,12 @@ export const useAnalytics = (posts: Post[]) => {
       { count: number; totalEngagement: number; avgEngagement: number }
     > = {};
 
+    // Performance by media type (image, reels, carousel, video)
+    const performanceByMediaType: Record<
+      string,
+      { count: number; totalEngagement: number; avgEngagement: number }
+    > = {};
+
     realMetricsPosts.forEach((post) => {
       const type = post.post_type || "outros";
       if (!performanceByType[type]) {
@@ -138,12 +155,27 @@ export const useAnalytics = (posts: Post[]) => {
       }
       performanceByType[type].count++;
       performanceByType[type].totalEngagement += post.engagementRate;
+
+      // Track media type performance
+      const mediaType = post.media_type || "image";
+      if (!performanceByMediaType[mediaType]) {
+        performanceByMediaType[mediaType] = { count: 0, totalEngagement: 0, avgEngagement: 0 };
+      }
+      performanceByMediaType[mediaType].count++;
+      performanceByMediaType[mediaType].totalEngagement += post.engagementRate;
     });
 
     Object.keys(performanceByType).forEach((type) => {
       performanceByType[type].avgEngagement =
         performanceByType[type].count > 0
           ? performanceByType[type].totalEngagement / performanceByType[type].count
+          : 0;
+    });
+
+    Object.keys(performanceByMediaType).forEach((type) => {
+      performanceByMediaType[type].avgEngagement =
+        performanceByMediaType[type].count > 0
+          ? performanceByMediaType[type].totalEngagement / performanceByMediaType[type].count
           : 0;
     });
 
@@ -212,6 +244,7 @@ export const useAnalytics = (posts: Post[]) => {
       bestPostType,
       bestPerformingHashtags,
       performanceByType,
+      performanceByMediaType,
       weeklyTrend,
       avgLikesPerPost,
       avgCommentsPerPost,
@@ -319,11 +352,88 @@ export const useAnalytics = (posts: Post[]) => {
     return insights;
   }, [summary, postsWithRealMetrics.length, publishedPosts.length]);
 
+  // Generate next post recommendation based on analytics
+  const nextPostRecommendation: NextPostRecommendation = useMemo(() => {
+    const hasData = publishedPosts.length > 0;
+    
+    // Find best performing post type
+    const sortedTypes = Object.entries(summary.performanceByType)
+      .filter(([_, data]) => data.count > 0)
+      .sort((a, b) => b[1].avgEngagement - a[1].avgEngagement);
+    
+    const bestType = sortedTypes[0]?.[0] || "engajamento";
+    const typeEngagement = sortedTypes[0]?.[1]?.avgEngagement || 0;
+    
+    // Find best performing media type
+    const sortedMediaTypes = Object.entries(summary.performanceByMediaType)
+      .filter(([_, data]) => data.count > 0)
+      .sort((a, b) => b[1].avgEngagement - a[1].avgEngagement);
+    
+    const bestMediaType = sortedMediaTypes[0]?.[0] || "reels";
+    const mediaEngagement = sortedMediaTypes[0]?.[1]?.avgEngagement || 0;
+
+    // Extract topics from best performing posts
+    const topPostsCaptions = topPosts.slice(0, 3).map(p => p.caption);
+    const commonWords = extractTopicKeywords(topPostsCaptions);
+
+    // Determine confidence level
+    let confidence: "high" | "medium" | "low" = "low";
+    if (postsWithRealMetrics.length >= 10) {
+      confidence = "high";
+    } else if (postsWithRealMetrics.length >= 3) {
+      confidence = "medium";
+    }
+
+    return {
+      postType: bestType,
+      postTypeReason: hasData && typeEngagement > 0
+        ? `Posts "${bestType}" têm ${typeEngagement.toFixed(1)}% de engajamento médio`
+        : "Recomendação baseada em boas práticas de mercado",
+      mediaType: bestMediaType,
+      mediaTypeReason: hasData && mediaEngagement > 0
+        ? `Formato "${bestMediaType}" performa melhor com ${mediaEngagement.toFixed(1)}% engajamento`
+        : "Reels têm maior alcance orgânico no Instagram atualmente",
+      suggestedHashtags: summary.bestPerformingHashtags.slice(0, 5),
+      suggestedTopics: commonWords.slice(0, 5),
+      confidence,
+    };
+  }, [summary, topPosts, publishedPosts.length, postsWithRealMetrics.length]);
+
   return {
     summary,
     topPosts,
     postsWithMetrics,
     insights: generateInsights,
     postsWithRealMetrics: postsWithRealMetrics.length,
+    nextPostRecommendation,
   };
 };
+
+// Helper to extract common topic keywords from captions
+function extractTopicKeywords(captions: string[]): string[] {
+  const stopWords = new Set([
+    "a", "o", "e", "de", "da", "do", "que", "é", "em", "para", "com", "um", "uma",
+    "os", "as", "no", "na", "por", "se", "mais", "como", "já", "ou", "seu", "sua",
+    "ao", "dos", "das", "não", "isso", "esse", "essa", "ser", "vai", "são", "está",
+    "você", "sua", "seu", "nos", "nas", "pelos", "pelas", "entre", "sobre", "também"
+  ]);
+  
+  const wordCount: Record<string, number> = {};
+  
+  captions.forEach(caption => {
+    const words = caption
+      .toLowerCase()
+      .replace(/[^\w\sáàâãéèêíïóôõöúüçñ]/g, " ")
+      .split(/\s+/)
+      .filter(w => w.length > 3 && !stopWords.has(w));
+    
+    words.forEach(word => {
+      wordCount[word] = (wordCount[word] || 0) + 1;
+    });
+  });
+  
+  return Object.entries(wordCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([word]) => word.charAt(0).toUpperCase() + word.slice(1));
+}
