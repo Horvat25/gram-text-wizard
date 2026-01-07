@@ -75,6 +75,17 @@ serve(async (req) => {
 
     console.log('Publishing to TikTok for account:', account.username || account.open_id);
 
+    // Download the video first
+    console.log('Downloading video from:', post.video_url);
+    const videoResponse = await fetch(post.video_url);
+    if (!videoResponse.ok) {
+      throw new Error(`Failed to download video: ${videoResponse.status}`);
+    }
+    
+    const videoBuffer = await videoResponse.arrayBuffer();
+    const videoSize = videoBuffer.byteLength;
+    console.log('Video downloaded, size:', videoSize, 'bytes');
+
     // Prepare caption with hashtags
     let caption = post.caption || '';
     if (post.hashtags && post.hashtags.length > 0) {
@@ -84,7 +95,8 @@ serve(async (req) => {
       caption = `${caption}\n\n${hashtagsString}`;
     }
 
-    // TikTok Content Posting API v2 - Initialize video upload
+    // TikTok Content Posting API v2 - Initialize FILE_UPLOAD (no domain verification needed)
+    console.log('Initializing TikTok upload with FILE_UPLOAD method...');
     const initResponse = await fetch('https://open.tiktokapis.com/v2/post/publish/video/init/', {
       method: 'POST',
       headers: {
@@ -98,22 +110,23 @@ serve(async (req) => {
           disable_duet: false,
           disable_comment: false,
           disable_stitch: false,
-          video_cover_timestamp_ms: 1000, // Use frame at 1 second as cover
+          video_cover_timestamp_ms: 1000,
         },
         source_info: {
-          source: 'PULL_FROM_URL',
-          video_url: post.video_url,
+          source: 'FILE_UPLOAD',
+          video_size: videoSize,
+          chunk_size: videoSize, // Single chunk upload for simplicity
+          total_chunk_count: 1,
         },
       }),
     });
 
     const initData = await initResponse.json();
-    console.log('TikTok init response:', initData);
+    console.log('TikTok init response:', JSON.stringify(initData));
 
     if (initData.error?.code || !initData.data?.publish_id) {
       console.error('Failed to initialize TikTok post:', initData);
       
-      // Update post with error
       await supabase
         .from('posts')
         .update({ 
@@ -131,7 +144,45 @@ serve(async (req) => {
     }
 
     const publishId = initData.data.publish_id;
+    const uploadUrl = initData.data.upload_url;
     console.log('TikTok publish initiated with ID:', publishId);
+    console.log('Upload URL:', uploadUrl);
+
+    // Upload the video file to TikTok
+    console.log('Uploading video to TikTok...');
+    const uploadResponse = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Length': videoSize.toString(),
+        'Content-Range': `bytes 0-${videoSize - 1}/${videoSize}`,
+      },
+      body: videoBuffer,
+    });
+
+    console.log('Upload response status:', uploadResponse.status);
+    
+    if (!uploadResponse.ok && uploadResponse.status !== 201) {
+      const uploadError = await uploadResponse.text();
+      console.error('Video upload failed:', uploadError);
+      
+      await supabase
+        .from('posts')
+        .update({ 
+          error_message: `Video upload failed: ${uploadResponse.status}`
+        })
+        .eq('id', postId);
+
+      return new Response(
+        JSON.stringify({ 
+          error: `Video upload failed: ${uploadResponse.status}`,
+          details: uploadError
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Video uploaded successfully, waiting for processing...');
 
     // Poll for publish status (TikTok processes the video asynchronously)
     let attempts = 0;
@@ -154,7 +205,7 @@ serve(async (req) => {
       });
 
       const statusData = await statusResponse.json();
-      console.log(`TikTok status check ${attempts}:`, statusData);
+      console.log(`TikTok status check ${attempts}:`, JSON.stringify(statusData));
 
       if (statusData.data?.status === 'PUBLISH_COMPLETE') {
         publishStatus = statusData.data;
@@ -197,6 +248,8 @@ serve(async (req) => {
       .from('posts')
       .update({
         tiktok_post_id: publishStatus.publicaly_available_post_id?.[0] || publishId,
+        status: 'published',
+        published_at: new Date().toISOString(),
         platforms: updatedPlatforms,
         error_message: null,
       })
