@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Loader2, 
   Wand2, 
@@ -25,10 +26,14 @@ import {
   Clock,
   Play,
   Trash2,
+  Instagram,
+  Zap,
+  Timer,
 } from "lucide-react";
 import { useNarrativeStory } from "@/hooks/useNarrativeStory";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useTikTokAccounts } from "@/hooks/useTikTokAccounts";
+import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { usePosts } from "@/hooks/usePosts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -79,9 +84,18 @@ const getMinScheduleDatetime = (): string => {
   return format(minDate, "yyyy-MM-dd'T'HH:mm");
 };
 
+// Duration presets for video generation
+const DURATION_PRESETS = [
+  { label: "~15s", description: "Rápido", segments: 3, duration: 5, icon: Zap },
+  { label: "~30s", description: "Ideal", segments: 4, duration: 7, icon: Timer },
+  { label: "~60s", description: "Deep", segments: 6, duration: 10, icon: Film },
+  { label: "~90s", description: "Story", segments: 8, duration: 11, icon: FileText },
+];
+
 const TikTokContentCreation = () => {
   const { settings: brandSettings } = useBrandSettings();
-  const { accounts } = useTikTokAccounts();
+  const { accounts: tiktokAccounts } = useTikTokAccounts();
+  const { accounts: instagramAccounts } = useInstagramAccounts();
   const { posts, createPost, publishPost, deletePost, reschedulePost } = usePosts();
   const [activeTab, setActiveTab] = useState("create");
   const [topic, setTopic] = useState("");
@@ -90,8 +104,18 @@ const TikTokContentCreation = () => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [scheduledFor, setScheduledFor] = useState("");
+  
+  // Duration selection
+  const [selectedDuration, setSelectedDuration] = useState(1); // Index of DURATION_PRESETS (default: ~30s)
+  const currentPreset = DURATION_PRESETS[selectedDuration];
+  
+  // Platform selection for multiplatform publishing
+  const [publishToTikTok, setPublishToTikTok] = useState(true);
+  const [publishToInstagram, setPublishToInstagram] = useState(false);
 
-  const hasConnectedAccount = accounts.length > 0;
+  const hasTikTokAccount = tiktokAccounts.length > 0;
+  const hasInstagramAccount = instagramAccounts.length > 0;
+  const hasConnectedAccount = hasTikTokAccount || hasInstagramAccount;
 
   // Filter posts for TikTok only - must have tiktok_post_id or be explicitly for tiktok platform
   const tiktokPosts = posts.filter(p => 
@@ -108,8 +132,8 @@ const TikTokContentCreation = () => {
     reset,
   } = useNarrativeStory({
     brandName: brandSettings.brandName || "NeuralUpdate",
-    segmentCount: 4,
-    segmentDuration: 4,
+    segmentCount: currentPreset.segments,
+    segmentDuration: currentPreset.duration,
   });
 
   const handleGenerate = async () => {
@@ -150,6 +174,14 @@ const TikTokContentCreation = () => {
     }
   };
 
+  // Determine which platforms to save/publish to
+  const getSelectedPlatforms = (): string[] => {
+    const platforms: string[] = [];
+    if (publishToTikTok) platforms.push('tiktok');
+    if (publishToInstagram) platforms.push('instagram');
+    return platforms.length > 0 ? platforms : ['tiktok']; // Default to tiktok
+  };
+
   const savePost = async (status: "draft" | "scheduled") => {
     if (!generatedVideoUrl) {
       toast.error("Nenhum vídeo para salvar");
@@ -170,7 +202,7 @@ const TikTokContentCreation = () => {
         media_type: "reels",
         status,
         scheduled_for: status === "scheduled" ? localToUTC(scheduledFor) : undefined,
-        platforms: ["tiktok"],
+        platforms: getSelectedPlatforms(),
         post_type: "storytelling",
       });
 
@@ -209,8 +241,19 @@ const TikTokContentCreation = () => {
       return;
     }
 
-    if (!hasConnectedAccount) {
+    const platforms = getSelectedPlatforms();
+    
+    // Validate accounts
+    if (publishToTikTok && !hasTikTokAccount) {
       toast.error("Conecte uma conta TikTok nas configurações");
+      return;
+    }
+    if (publishToInstagram && !hasInstagramAccount) {
+      toast.error("Conecte uma conta Instagram nas configurações");
+      return;
+    }
+    if (platforms.length === 0) {
+      toast.error("Selecione pelo menos uma plataforma");
       return;
     }
 
@@ -223,22 +266,58 @@ const TikTokContentCreation = () => {
         video_url: generatedVideoUrl,
         media_type: "reels",
         status: "draft",
-        platforms: ["tiktok"],
+        platforms,
         post_type: "storytelling",
       });
 
       if (!post?.id) throw new Error("Falha ao criar post");
 
-      // Then publish
-      const { data, error } = await supabase.functions.invoke("publish-to-tiktok", {
-        body: { postId: post.id },
-      });
+      const publishPromises: Promise<any>[] = [];
+      
+      // Publish to TikTok
+      if (publishToTikTok && hasTikTokAccount) {
+        publishPromises.push(
+          supabase.functions.invoke("publish-to-tiktok", {
+            body: { postId: post.id },
+          }).then(({ data, error }) => {
+            if (error) throw error;
+            if (data?.error) throw new Error(data.error);
+            return { platform: 'tiktok', success: true };
+          }).catch(err => ({ platform: 'tiktok', success: false, error: err.message }))
+        );
+      }
+      
+      // Publish to Instagram
+      if (publishToInstagram && hasInstagramAccount) {
+        publishPromises.push(
+          supabase.functions.invoke("publish-post", {
+            body: { postId: post.id },
+          }).then(({ data, error }) => {
+            if (error) throw error;
+            if (data?.error) throw new Error(data.error);
+            return { platform: 'instagram', success: true };
+          }).catch(err => ({ platform: 'instagram', success: false, error: err.message }))
+        );
+      }
 
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
-
-      toast.success("Vídeo publicado no TikTok!");
-      handleReset();
+      const results = await Promise.all(publishPromises);
+      
+      const successes = results.filter(r => r.success);
+      const failures = results.filter(r => !r.success);
+      
+      if (successes.length > 0) {
+        const platformNames = successes.map(r => r.platform === 'tiktok' ? 'TikTok' : 'Instagram').join(' e ');
+        toast.success(`Publicado no ${platformNames}!`);
+      }
+      
+      if (failures.length > 0) {
+        const failedPlatforms = failures.map(r => r.platform === 'tiktok' ? 'TikTok' : 'Instagram').join(' e ');
+        toast.error(`Falha ao publicar no ${failedPlatforms}`);
+      }
+      
+      if (successes.length > 0) {
+        handleReset();
+      }
     } catch (error: any) {
       console.error("Error publishing:", error);
       toast.error(error.message || "Erro ao publicar");
@@ -303,6 +382,41 @@ const TikTokContentCreation = () => {
                   rows={3}
                   className="resize-none text-sm border-[#25F4EE]/30 focus:border-[#25F4EE]"
                 />
+              </div>
+
+              {/* Duration Selector */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Timer className="h-4 w-4" />
+                  Duração do Vídeo
+                </Label>
+                <div className="grid grid-cols-4 gap-2">
+                  {DURATION_PRESETS.map((preset, index) => {
+                    const Icon = preset.icon;
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setSelectedDuration(index)}
+                        disabled={isGenerating}
+                        className={`p-3 rounded-lg border-2 transition-all text-center ${
+                          selectedDuration === index
+                            ? 'border-[#25F4EE] bg-[#25F4EE]/10'
+                            : 'border-border hover:border-[#25F4EE]/50'
+                        } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <Icon className={`h-4 w-4 mx-auto mb-1 ${selectedDuration === index ? 'text-[#25F4EE]' : 'text-muted-foreground'}`} />
+                        <p className={`text-sm font-bold ${selectedDuration === index ? 'text-[#25F4EE]' : ''}`}>
+                          {preset.label}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">{preset.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-muted-foreground text-center">
+                  {currentPreset.segments} cenas × {currentPreset.duration}s cada
+                </p>
               </div>
 
               {/* Progress Section */}
@@ -376,6 +490,46 @@ const TikTokContentCreation = () => {
                     </div>
                   </div>
                   
+                  {/* Platform Selection */}
+                  <div className="space-y-3 p-3 rounded-lg border border-[#25F4EE]/20 bg-gradient-to-r from-black/5 to-[#25F4EE]/5">
+                    <Label className="text-xs font-medium">Publicar em:</Label>
+                    <div className="flex gap-4">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="tiktok" 
+                          checked={publishToTikTok}
+                          onCheckedChange={(checked) => setPublishToTikTok(checked === true)}
+                        />
+                        <label htmlFor="tiktok" className="text-sm flex items-center gap-1.5 cursor-pointer">
+                          <TikTokIcon className="h-4 w-4" />
+                          TikTok
+                          {hasTikTokAccount && <Check className="h-3 w-3 text-green-500" />}
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="instagram" 
+                          checked={publishToInstagram}
+                          onCheckedChange={(checked) => setPublishToInstagram(checked === true)}
+                        />
+                        <label htmlFor="instagram" className="text-sm flex items-center gap-1.5 cursor-pointer">
+                          <Instagram className="h-4 w-4" />
+                          Instagram
+                          {hasInstagramAccount && <Check className="h-3 w-3 text-green-500" />}
+                        </label>
+                      </div>
+                    </div>
+                    {(!hasTikTokAccount || !hasInstagramAccount) && (
+                      <p className="text-[10px] text-muted-foreground">
+                        {!hasTikTokAccount && !hasInstagramAccount 
+                          ? "Conecte suas contas nas configurações"
+                          : !hasTikTokAccount 
+                            ? "TikTok não conectado" 
+                            : "Instagram não conectado"}
+                      </p>
+                    )}
+                  </div>
+                  
                   {/* Schedule Input */}
                   <div className="space-y-2">
                     <Label className="text-xs flex items-center gap-1">
@@ -415,19 +569,13 @@ const TikTokContentCreation = () => {
                       <Button
                         onClick={publishDirectly}
                         className="bg-gradient-to-r from-[#25F4EE] to-[#FE2C55] hover:opacity-90"
-                        disabled={isSaving || !hasConnectedAccount}
+                        disabled={isSaving || (!publishToTikTok && !publishToInstagram)}
                       >
                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                        Publicar
+                        {publishToTikTok && publishToInstagram ? "Publicar nos 2" : "Publicar"}
                       </Button>
                     )}
                   </div>
-                  
-                  {!hasConnectedAccount && (
-                    <p className="text-xs text-center text-muted-foreground">
-                      Conecte sua conta TikTok nas configurações para publicar
-                    </p>
-                  )}
                 </div>
               )}
 
@@ -474,8 +622,8 @@ const TikTokContentCreation = () => {
 
               {/* Cost Info */}
               <div className="flex items-center justify-between text-xs text-muted-foreground p-2 rounded-lg bg-gradient-to-r from-black/5 to-[#25F4EE]/5">
-                <span>🎬 4 cenas com transições</span>
-                <span className="text-[#25F4EE] font-medium">~R$0,10 por vídeo</span>
+                <span>🎬 {currentPreset.segments} cenas com transições</span>
+                <span className="text-[#25F4EE] font-medium">~R${(currentPreset.segments * 0.025).toFixed(2)} por vídeo</span>
               </div>
             </CardContent>
           </Card>
