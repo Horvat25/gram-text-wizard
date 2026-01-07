@@ -55,19 +55,20 @@ const calculateEngagementRate = (post: Post): number => {
   return ((likes + comments * 2 + saves * 3) / reach) * 100;
 };
 
-// Check if post has real metrics (not just placeholder values)
+// Check if post has real metrics from Instagram (not simulated)
 const hasRealMetrics = (post: Post): boolean => {
+  // MUST have instagram_post_id to be considered real
+  if (!post.instagram_post_id) {
+    return false;
+  }
+  
   const likes = post.likes_count || 0;
   const comments = post.comments_count || 0;
   const saves = post.saves_count || 0;
   const reach = post.reach || 0;
   
-  // Consider real if has instagram_post_id and some metrics, or reach > 10
-  if (post.instagram_post_id && (likes > 0 || comments > 0 || saves > 0)) {
-    return true;
-  }
-  
-  return reach > 10 || likes > 10 || (likes + comments + saves) > 5;
+  // Has some engagement data (even if 0, it's real if it has instagram_post_id)
+  return likes >= 0 || comments >= 0 || saves >= 0 || reach >= 0;
 };
 
 export const useAnalytics = (posts: Post[]) => {
