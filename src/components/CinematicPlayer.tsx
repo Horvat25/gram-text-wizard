@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { waitForVoices, getPortugueseVoices } from "@/lib/browser-tts";
 import type { StorySegment } from "@/hooks/useNarrativeStory";
 
 interface CinematicPlayerProps {
@@ -20,6 +21,7 @@ interface CinematicPlayerProps {
   title: string;
   totalDuration: number;
   onComplete?: () => void;
+  useBrowserTTS?: boolean; // Enable browser TTS when no audio URL
 }
 
 const TRANSITION_VARIANTS = [
@@ -54,23 +56,81 @@ const CinematicPlayer = ({
   narrationUrl, 
   title, 
   totalDuration,
-  onComplete 
+  onComplete,
+  useBrowserTTS = true,
 }: CinematicPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [ttsReady, setTtsReady] = useState(false);
+  const [lastSpokenSegment, setLastSpokenSegment] = useState(-1);
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const speechSynthRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const currentSegment = segments[currentSegmentIndex];
   const progress = totalDuration > 0 ? (currentTime / totalDuration) * 100 : 0;
 
   // Ken Burns effect for current image
   const segmentDuration = currentSegment?.duration || 5;
+
+  // Initialize browser TTS
+  useEffect(() => {
+    if (useBrowserTTS && !narrationUrl) {
+      waitForVoices().then(() => {
+        setTtsReady(true);
+        console.log("[CinematicPlayer] Browser TTS ready, voices:", getPortugueseVoices().map(v => v.name));
+      });
+    }
+    
+    return () => {
+      // Cancel any ongoing speech
+      window.speechSynthesis?.cancel();
+    };
+  }, [useBrowserTTS, narrationUrl]);
+
+  // Browser TTS: speak current segment
+  useEffect(() => {
+    if (!useBrowserTTS || narrationUrl || !ttsReady || !isPlaying || isMuted) return;
+    if (currentSegmentIndex === lastSpokenSegment) return;
+    
+    const text = currentSegment?.text;
+    if (!text) return;
+    
+    // Cancel previous speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    
+    // Try to use a good Portuguese voice
+    const voices = getPortugueseVoices();
+    if (voices.length > 0) {
+      const preferredVoice = voices.find(v => 
+        v.name.includes('Google') || v.name.includes('Microsoft')
+      ) || voices[0];
+      utterance.voice = preferredVoice;
+    }
+    
+    speechSynthRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+    setLastSpokenSegment(currentSegmentIndex);
+    
+    console.log("[CinematicPlayer] Speaking segment", currentSegmentIndex + 1);
+  }, [currentSegmentIndex, isPlaying, isMuted, useBrowserTTS, narrationUrl, ttsReady, lastSpokenSegment, currentSegment?.text]);
+
+  // Stop TTS when paused or muted
+  useEffect(() => {
+    if (!isPlaying || isMuted) {
+      window.speechSynthesis?.cancel();
+    }
+  }, [isPlaying, isMuted]);
 
   // Update current segment based on time
   useEffect(() => {
@@ -98,6 +158,7 @@ const CinematicPlayer = ({
           const next = prev + 0.1;
           if (next >= totalDuration) {
             setIsPlaying(false);
+            window.speechSynthesis?.cancel();
             onComplete?.();
             return totalDuration;
           }
@@ -117,7 +178,7 @@ const CinematicPlayer = ({
     };
   }, [isPlaying, totalDuration, onComplete]);
 
-  // Sync audio with playback
+  // Sync audio with playback (for pre-recorded narration)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !narrationUrl) return;
@@ -140,6 +201,7 @@ const CinematicPlayer = ({
     if (currentTime >= totalDuration) {
       setCurrentTime(0);
       setCurrentSegmentIndex(0);
+      setLastSpokenSegment(-1);
     }
     setIsPlaying(!isPlaying);
   }, [isPlaying, currentTime, totalDuration]);
@@ -148,6 +210,8 @@ const CinematicPlayer = ({
     setIsPlaying(false);
     setCurrentTime(0);
     setCurrentSegmentIndex(0);
+    setLastSpokenSegment(-1);
+    window.speechSynthesis?.cancel();
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
     }
