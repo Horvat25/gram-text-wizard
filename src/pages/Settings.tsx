@@ -236,30 +236,33 @@ const Settings = () => {
   const testVoice = async (voiceId: string) => {
     setTestingVoice(voiceId);
     try {
-      const voice = VOICE_OPTIONS.find(v => v.id === voiceId);
-      const testText = voice?.lang === 'pt-PT' 
-        ? "Olá! Esta é uma demonstração da minha voz."
-        : "Olá! Esta é uma demonstração da minha voz. Gostou?";
+      // Use browser TTS for instant free voice testing
+      const testText = "Olá! Esta é uma demonstração da voz selecionada.";
       
-      // Use lovable-tts for high quality OpenAI HD voices
-      const { data, error } = await supabase.functions.invoke('lovable-tts', {
-        body: { text: testText, voice: voiceId }
-      });
-
-      if (error) throw error;
-
-      if (data?.audioContent) {
-        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
-        await audio.play();
-        console.log(`Voice test: ${voiceId} -> OpenAI: ${data.openaiVoice}`);
-      } else if (data?.error) {
-        throw new Error(data.error);
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(testText);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 1.0;
+      
+      // Try to find a Portuguese voice
+      const voices = window.speechSynthesis.getVoices();
+      const ptVoice = voices.find(v => v.lang.startsWith('pt'));
+      if (ptVoice) {
+        utterance.voice = ptVoice;
       }
+      
+      utterance.onend = () => setTestingVoice(null);
+      utterance.onerror = () => setTestingVoice(null);
+      
+      window.speechSynthesis.speak(utterance);
+      toast.success(`Testando voz: ${VOICE_OPTIONS.find(v => v.id === voiceId)?.name || voiceId}`);
     } catch (error: any) {
-      console.error('Voice test error:', error);
-      toast.error('Erro ao testar voz: ' + (error.message || 'Tente novamente'));
+      console.error('Erro ao testar voz:', error);
+      toast.error('Erro ao testar voz');
     } finally {
-      setTestingVoice(null);
+      setTimeout(() => setTestingVoice(null), 3000);
     }
   };
 
