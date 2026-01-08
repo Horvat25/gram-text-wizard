@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.lovable-tts]
 verify_jwt = false
+
+[functions.free-tts]
+verify_jwt = false

@@ -289,48 +289,58 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try cloud TTS providers (silent failures - browser TTS is fallback)
-    const tryCloudTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
-      // Try OpenAI first
+    // Helper to try TTS providers: Free TTS first (Google Translate), then paid APIs
+    const tryCloudTTS = async (text: string): Promise<string | null> => {
+      // 🆓 Try FREE TTS first (Google Translate - no API key needed!)
+      try {
+        console.log("[TTS] Trying Free TTS (Google Translate)...");
+        const freeResult = await supabase.functions.invoke("free-tts", {
+          body: { text, language: "pt-BR" },
+        });
+        
+        if (!freeResult.error && freeResult.data?.audioContent && !freeResult.data?.error) {
+          console.log("[TTS] ✅ Free TTS success!");
+          return `data:audio/mp3;base64,${freeResult.data.audioContent}`;
+        }
+        console.log("[TTS] Free TTS failed:", freeResult.data?.error || freeResult.error);
+      } catch (e) {
+        console.log("[TTS] Free TTS error:", e);
+      }
+      
+      // Try OpenAI (if user has credits)
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
-          body: { text, voice },
+          body: { text, voice: "onyx" },
         });
         
         if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
+          console.log("[TTS] ✅ OpenAI TTS success!");
           return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
         }
-        // Silent fail - log only
-        console.log("[TTS] OpenAI unavailable, trying next...");
       } catch {
-        console.log("[TTS] OpenAI error, trying next...");
+        // Silent fail
       }
       
-      // Try ElevenLabs (skip if known blocked)
+      // Try ElevenLabs (if user has credits)
       try {
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, language: "pt-BR" },
         });
         
-        // Check for blocking/fallback flags
-        if (elevenResult.data?.fallback || elevenResult.data?.code === "ELEVENLABS_BLOCKED") {
-          console.log("[TTS] ElevenLabs blocked, using browser TTS");
-          return null;
-        }
-        
-        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error) {
+        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
+          console.log("[TTS] ✅ ElevenLabs TTS success!");
           return `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
         }
       } catch {
-        console.log("[TTS] ElevenLabs error");
+        // Silent fail
       }
       
       return null;
     };
     
     try {
-      // Try cloud TTS first
-      console.log("Trying cloud TTS providers...");
+      // Generate narration
+      console.log("[TTS] Starting narration generation...");
       narrationUrl = await tryCloudTTS(fullScript) || "";
       
       if (narrationUrl) {
