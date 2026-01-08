@@ -289,34 +289,40 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try cloud TTS providers
+    // Helper to try cloud TTS providers (silent failures - browser TTS is fallback)
     const tryCloudTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
-      // Try OpenAI
+      // Try OpenAI first
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
           body: { text, voice },
         });
         
         if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
-          console.log("TTS generated with OpenAI");
           return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
         }
-      } catch (e) {
-        console.warn("OpenAI TTS failed:", e);
+        // Silent fail - log only
+        console.log("[TTS] OpenAI unavailable, trying next...");
+      } catch {
+        console.log("[TTS] OpenAI error, trying next...");
       }
       
-      // Try ElevenLabs
+      // Try ElevenLabs (skip if known blocked)
       try {
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, language: "pt-BR" },
         });
         
-        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
-          console.log("TTS generated with ElevenLabs");
+        // Check for blocking/fallback flags
+        if (elevenResult.data?.fallback || elevenResult.data?.code === "ELEVENLABS_BLOCKED") {
+          console.log("[TTS] ElevenLabs blocked, using browser TTS");
+          return null;
+        }
+        
+        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error) {
           return `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
         }
-      } catch (e) {
-        console.warn("ElevenLabs TTS failed:", e);
+      } catch {
+        console.log("[TTS] ElevenLabs error");
       }
       
       return null;
