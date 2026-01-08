@@ -59,13 +59,13 @@ const STYLE_PRESETS = [
   { label: 'Artístico', value: 'Ilustração artística, criativo, cores únicas, expressivo' },
 ];
 
-// Voice options for TTS
+// Voice options for TTS - Uses OpenAI HD voices via Lovable AI
 const VOICE_OPTIONS = [
-  { id: 'camila', name: 'Camila', gender: 'Feminino', description: 'Voz brasileira natural e profissional', lang: 'pt-BR' },
-  { id: 'vitoria', name: 'Vitória', gender: 'Feminino', description: 'Voz feminina suave e acolhedora', lang: 'pt-BR' },
-  { id: 'thiago', name: 'Thiago', gender: 'Masculino', description: 'Voz masculina jovem e dinâmica', lang: 'pt-BR' },
-  { id: 'ricardo', name: 'Ricardo', gender: 'Masculino', description: 'Voz masculina grave e séria', lang: 'pt-BR' },
-  { id: 'fernanda', name: 'Fernanda', gender: 'Feminino', description: 'Voz portuguesa elegante', lang: 'pt-PT' },
+  { id: 'camila', name: 'Camila (Nova)', gender: 'Feminino', description: 'Voz calorosa e amigável, ideal para conteúdo profissional', lang: 'pt-BR' },
+  { id: 'vitoria', name: 'Vitória (Shimmer)', gender: 'Feminino', description: 'Voz suave e gentil, perfeita para bem-estar e lifestyle', lang: 'pt-BR' },
+  { id: 'thiago', name: 'Thiago (Echo)', gender: 'Masculino', description: 'Voz dinâmica e envolvente, ótima para tech e games', lang: 'pt-BR' },
+  { id: 'ricardo', name: 'Ricardo (Onyx)', gender: 'Masculino', description: 'Voz grave e autoritária, perfeita para notícias', lang: 'pt-BR' },
+  { id: 'fernanda', name: 'Fernanda (Alloy)', gender: 'Feminino', description: 'Voz neutra e equilibrada, versátil para qualquer conteúdo', lang: 'pt-PT' },
 ];
 
 const DEFAULT_AI_SETTINGS: AISettings = {
