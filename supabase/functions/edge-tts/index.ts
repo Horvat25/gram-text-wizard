@@ -20,17 +20,23 @@ interface VoiceConfig {
 
 // Mapping to Amazon Polly neural voices via Streamlabs
 const VOICES: Record<string, VoiceConfig> = {
-  // Brazilian Portuguese - Neural voices
+  // Brazilian Portuguese - Neural voices (matching Settings page options)
+  "camila": { name: "Camila", pollyVoice: "Camila", lang: "pt-BR", gender: "Female" },
+  "vitoria": { name: "Vitória", pollyVoice: "Vitoria", lang: "pt-BR", gender: "Female" },
+  "thiago": { name: "Thiago", pollyVoice: "Thiago", lang: "pt-BR", gender: "Male" },
+  "ricardo": { name: "Ricardo", pollyVoice: "Ricardo", lang: "pt-BR", gender: "Male" },
+  // Portuguese Portugal
+  "fernanda": { name: "Fernanda", pollyVoice: "Ines", lang: "pt-PT", gender: "Female" },
+  // Aliases for backward compatibility
   "antonio": { name: "Thiago", pollyVoice: "Thiago", lang: "pt-BR", gender: "Male" },
   "francisca": { name: "Camila", pollyVoice: "Camila", lang: "pt-BR", gender: "Female" },
-  "vitoria": { name: "Vitoria", pollyVoice: "Vitoria", lang: "pt-BR", gender: "Female" },
   // English
   "matthew": { name: "Matthew", pollyVoice: "Matthew", lang: "en-US", gender: "Male" },
   "joanna": { name: "Joanna", pollyVoice: "Joanna", lang: "en-US", gender: "Female" },
   "brian": { name: "Brian", pollyVoice: "Brian", lang: "en-GB", gender: "Male" },
 };
 
-const DEFAULT_VOICE = "antonio";
+const DEFAULT_VOICE = "camila";
 
 /**
  * Generate speech using Streamlabs Polly API (free, high quality)
