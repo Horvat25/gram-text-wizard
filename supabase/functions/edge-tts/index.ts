@@ -7,235 +7,110 @@ const corsHeaders = {
 };
 
 /**
- * Microsoft Edge TTS - FREE with high-quality neural voices!
- * Uses the same technology as Microsoft Edge's "Read Aloud" feature.
- * No API key required.
- * 
- * Supports many Portuguese voices:
- * - pt-BR-FranciscaNeural (female, warm)
- * - pt-BR-AntonioNeural (male, professional)
- * - pt-BR-ThalitaNeural (female, young)
- * - pt-BR-BrendaNeural (female, friendly)
+ * Free TTS using Streamlabs Polly API (neural voices)
+ * High quality voices, no API key required
  */
 
 interface VoiceConfig {
   name: string;
+  pollyVoice: string;
   lang: string;
   gender: string;
 }
 
+// Mapping to Amazon Polly neural voices via Streamlabs
 const VOICES: Record<string, VoiceConfig> = {
   // Brazilian Portuguese - Neural voices
-  "francisca": { name: "pt-BR-FranciscaNeural", lang: "pt-BR", gender: "Female" },
-  "antonio": { name: "pt-BR-AntonioNeural", lang: "pt-BR", gender: "Male" },
-  "thalita": { name: "pt-BR-ThalitaNeural", lang: "pt-BR", gender: "Female" },
-  "brenda": { name: "pt-BR-BrendaNeural", lang: "pt-BR", gender: "Female" },
-  // European Portuguese
-  "fernanda": { name: "pt-PT-FernandaNeural", lang: "pt-PT", gender: "Female" },
-  "duarte": { name: "pt-PT-DuarteNeural", lang: "pt-PT", gender: "Male" },
+  "antonio": { name: "Thiago", pollyVoice: "Thiago", lang: "pt-BR", gender: "Male" },
+  "francisca": { name: "Camila", pollyVoice: "Camila", lang: "pt-BR", gender: "Female" },
+  "vitoria": { name: "Vitoria", pollyVoice: "Vitoria", lang: "pt-BR", gender: "Female" },
   // English
-  "jenny": { name: "en-US-JennyNeural", lang: "en-US", gender: "Female" },
-  "guy": { name: "en-US-GuyNeural", lang: "en-US", gender: "Male" },
+  "matthew": { name: "Matthew", pollyVoice: "Matthew", lang: "en-US", gender: "Male" },
+  "joanna": { name: "Joanna", pollyVoice: "Joanna", lang: "en-US", gender: "Female" },
+  "brian": { name: "Brian", pollyVoice: "Brian", lang: "en-GB", gender: "Male" },
 };
 
-// Default voice - Francisca is great for content
-const DEFAULT_VOICE = "antonio"; // Male, professional voice
+const DEFAULT_VOICE = "antonio";
 
 /**
- * Generate SSML for Edge TTS
+ * Generate speech using Streamlabs Polly API (free, high quality)
  */
-function generateSSML(text: string, voice: VoiceConfig, rate: number = 1.0, pitch: number = 0): string {
-  // Rate: 0.5 to 2.0, Pitch: -50 to +50
-  const ratePercent = Math.round((rate - 1) * 100);
-  const rateStr = ratePercent >= 0 ? `+${ratePercent}%` : `${ratePercent}%`;
-  const pitchStr = pitch >= 0 ? `+${pitch}Hz` : `${pitch}Hz`;
-  
-  return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${voice.lang}">
-    <voice name="${voice.name}">
-      <prosody rate="${rateStr}" pitch="${pitchStr}">
-        ${escapeXML(text)}
-      </prosody>
-    </voice>
-  </speak>`;
-}
-
-function escapeXML(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-/**
- * Get Edge TTS token for authentication
- */
-async function getEdgeToken(): Promise<{ token: string; region: string }> {
-  const tokenUrl = "https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/";
-  
-  // Use the free Edge endpoint that doesn't require authentication
-  // This mimics what Edge browser does internally
-  const response = await fetch(
-    "https://dev.microsofttranslator.com/apps/endpoint?api-version=1.0",
-    {
-      method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
-      },
-    }
-  );
-  
-  if (!response.ok) {
-    throw new Error("Failed to get Edge token");
-  }
-  
-  // Alternative: use the WebSocket approach
-  return { token: "", region: "eastus" };
-}
-
-/**
- * Generate speech using Edge TTS WebSocket
- */
-async function generateEdgeTTS(text: string, voiceKey: string = DEFAULT_VOICE, rate: number = 1.0): Promise<Uint8Array> {
+async function generatePollyTTS(text: string, voiceKey: string = DEFAULT_VOICE): Promise<Uint8Array> {
   const voice = VOICES[voiceKey] || VOICES[DEFAULT_VOICE];
   
-  console.log(`[EdgeTTS] Generating with voice: ${voice.name}`);
+  console.log(`[EdgeTTS] Using Polly voice: ${voice.pollyVoice}`);
   console.log(`[EdgeTTS] Text length: ${text.length} chars`);
   
-  // Edge TTS WebSocket endpoint (free, no auth required)
-  const wsUrl = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=${generateUUID()}`;
-  
-  return new Promise((resolve, reject) => {
-    const audioChunks: Uint8Array[] = [];
-    let resolved = false;
-    
-    const timeout = setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        reject(new Error("EdgeTTS timeout"));
-      }
-    }, 60000); // 60 second timeout
-    
-    try {
-      const ws = new WebSocket(wsUrl);
-      
-      ws.onopen = () => {
-        console.log("[EdgeTTS] WebSocket connected");
-        
-        // Send configuration
-        const configMessage = `Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
-        ws.send(configMessage);
-        
-        // Send SSML request
-        const ssml = generateSSML(text, voice, rate);
-        const requestId = generateUUID();
-        const ssmlMessage = `X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n${ssml}`;
-        ws.send(ssmlMessage);
-      };
-      
-      ws.onmessage = (event) => {
-        if (typeof event.data === "string") {
-          // Text message (metadata, turn.end, etc)
-          if (event.data.includes("Path:turn.end")) {
-            console.log("[EdgeTTS] Turn ended, closing connection");
-            ws.close();
-          }
-        } else if (event.data instanceof Blob) {
-          // Binary audio data
-          event.data.arrayBuffer().then((buffer) => {
-            // Audio data starts after the header (separated by double CRLF)
-            const data = new Uint8Array(buffer);
-            const headerEnd = findHeaderEnd(data);
-            if (headerEnd > 0) {
-              const audioData = data.slice(headerEnd);
-              if (audioData.length > 0) {
-                audioChunks.push(audioData);
-              }
-            }
-          });
-        }
-      };
-      
-      ws.onclose = () => {
-        clearTimeout(timeout);
-        if (!resolved) {
-          resolved = true;
-          console.log(`[EdgeTTS] Connection closed, chunks: ${audioChunks.length}`);
-          
-          // Concatenate all audio chunks
-          const totalLength = audioChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-          const result = new Uint8Array(totalLength);
-          let offset = 0;
-          for (const chunk of audioChunks) {
-            result.set(chunk, offset);
-            offset += chunk.length;
-          }
-          
-          resolve(result);
-        }
-      };
-      
-      ws.onerror = (error) => {
-        clearTimeout(timeout);
-        if (!resolved) {
-          resolved = true;
-          console.error("[EdgeTTS] WebSocket error:", error);
-          reject(new Error("EdgeTTS WebSocket error"));
-        }
-      };
-      
-    } catch (error) {
-      clearTimeout(timeout);
-      if (!resolved) {
-        resolved = true;
-        reject(error);
-      }
-    }
+  // Streamlabs Polly API - free and high quality
+  const response = await fetch("https://streamlabs.com/polly/speak", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    },
+    body: JSON.stringify({
+      text: text,
+      voice: voice.pollyVoice,
+    }),
   });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[EdgeTTS] Polly API error: ${response.status} - ${errorText}`);
+    throw new Error(`Polly API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  
+  if (!data.speak_url) {
+    throw new Error("No audio URL in response");
+  }
+
+  console.log(`[EdgeTTS] Got audio URL, downloading...`);
+  
+  // Download the audio file
+  const audioResponse = await fetch(data.speak_url);
+  
+  if (!audioResponse.ok) {
+    throw new Error(`Failed to download audio: ${audioResponse.status}`);
+  }
+
+  const audioBuffer = await audioResponse.arrayBuffer();
+  console.log(`[EdgeTTS] Downloaded ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+  
+  return new Uint8Array(audioBuffer);
 }
 
 /**
- * Find the end of the header in binary message
+ * Fallback: Use VoiceRSS API (also free tier available)
  */
-function findHeaderEnd(data: Uint8Array): number {
-  // Look for double CRLF (header/body separator)
-  for (let i = 0; i < data.length - 3; i++) {
-    if (data[i] === 0x0D && data[i + 1] === 0x0A && data[i + 2] === 0x0D && data[i + 3] === 0x0A) {
-      return i + 4;
-    }
-  }
-  // Look for "Path:audio" header
-  const pathAudio = new TextEncoder().encode("Path:audio");
-  for (let i = 0; i < data.length - pathAudio.length; i++) {
-    let found = true;
-    for (let j = 0; j < pathAudio.length; j++) {
-      if (data[i + j] !== pathAudio[j]) {
-        found = false;
-        break;
-      }
-    }
-    if (found) {
-      // Find the next CRLF after "Path:audio"
-      for (let k = i + pathAudio.length; k < data.length - 1; k++) {
-        if (data[k] === 0x0D && data[k + 1] === 0x0A) {
-          return k + 2;
-        }
-      }
-    }
-  }
-  return -1;
-}
+async function generateVoiceRSSTTS(text: string, lang: string = "pt-br"): Promise<Uint8Array> {
+  console.log(`[EdgeTTS] Fallback to VoiceRSS`);
+  
+  // VoiceRSS has a free tier - this is a demo key
+  const params = new URLSearchParams({
+    key: "f16d908cfc664ad7a5b13a89f4de84a4", // Free demo key
+    src: text,
+    hl: lang,
+    v: "Luciana", // Brazilian Portuguese voice
+    c: "MP3",
+    f: "44khz_16bit_stereo",
+  });
 
-/**
- * Generate UUID for requests
- */
-function generateUUID(): string {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  }).replace(/-/g, "");
+  const response = await fetch(`https://api.voicerss.org/?${params.toString()}`);
+  
+  if (!response.ok) {
+    throw new Error(`VoiceRSS error: ${response.status}`);
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.includes("text")) {
+    const errorText = await response.text();
+    throw new Error(`VoiceRSS error: ${errorText}`);
+  }
+
+  const audioBuffer = await response.arrayBuffer();
+  return new Uint8Array(audioBuffer);
 }
 
 serve(async (req) => {
@@ -254,16 +129,57 @@ serve(async (req) => {
     }
 
     console.log(`[EdgeTTS] Request: ${text.substring(0, 80)}...`);
-    console.log(`[EdgeTTS] Voice: ${voice || DEFAULT_VOICE}, Rate: ${rate || 1.0}`);
+    console.log(`[EdgeTTS] Voice: ${voice || DEFAULT_VOICE}`);
 
-    // Generate audio using Edge TTS
-    const audioData = await generateEdgeTTS(text, voice || DEFAULT_VOICE, rate || 1.0);
+    let audioData: Uint8Array;
+    
+    try {
+      // Try Streamlabs Polly first
+      audioData = await generatePollyTTS(text, voice || DEFAULT_VOICE);
+    } catch (pollyError) {
+      console.error(`[EdgeTTS] Polly failed:`, pollyError);
+      
+      // Fallback to Google Translate TTS
+      console.log(`[EdgeTTS] Falling back to Google TTS`);
+      const chunks: Uint8Array[] = [];
+      const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+      
+      for (const sentence of sentences) {
+        const trimmed = sentence.trim();
+        if (trimmed.length === 0) continue;
+        
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(trimmed)}&tl=pt-BR&client=tw-ob`;
+        
+        const response = await fetch(url, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          },
+        });
+        
+        if (response.ok) {
+          const buffer = await response.arrayBuffer();
+          chunks.push(new Uint8Array(buffer));
+        }
+      }
+      
+      if (chunks.length === 0) {
+        throw new Error("All TTS methods failed");
+      }
+      
+      // Concatenate
+      const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
+      audioData = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        audioData.set(chunk, offset);
+        offset += chunk.length;
+      }
+    }
     
     if (audioData.length === 0) {
       throw new Error("No audio data generated");
     }
     
-    // Encode to base64 - convert to ArrayBuffer explicitly
     const base64Audio = base64Encode(new Uint8Array(audioData).buffer as ArrayBuffer);
     
     console.log(`[EdgeTTS] Success! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
@@ -273,7 +189,7 @@ serve(async (req) => {
         audioContent: base64Audio,
         format: "mp3",
         voice: voice || DEFAULT_VOICE,
-        duration_estimate: Math.ceil(text.length / 14), // ~14 chars per second
+        duration_estimate: Math.ceil(text.length / 14),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
