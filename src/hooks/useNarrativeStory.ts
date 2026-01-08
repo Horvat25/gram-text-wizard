@@ -289,9 +289,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS providers: Free TTS first (Google Translate), then paid APIs
+    // Helper to try TTS providers: Edge TTS (neural) → Free TTS → paid APIs
     const tryCloudTTS = async (text: string): Promise<string | null> => {
-      // 🆓 Try FREE TTS first (Google Translate - no API key needed!)
+      // 🎯 Try Edge TTS first (Microsoft neural voices - FREE and high quality!)
+      try {
+        console.log("[TTS] Trying Edge TTS (Microsoft neural voices)...");
+        const edgeResult = await supabase.functions.invoke("edge-tts", {
+          body: { text, voice: "antonio" }, // Professional male voice
+        });
+        
+        if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
+          console.log("[TTS] ✅ Edge TTS success! (neural voice)");
+          return `data:audio/mp3;base64,${edgeResult.data.audioContent}`;
+        }
+        console.log("[TTS] Edge TTS failed:", edgeResult.data?.error || edgeResult.error);
+      } catch (e) {
+        console.log("[TTS] Edge TTS error:", e);
+      }
+      
+      // 🆓 Try Free TTS (Google Translate) as fallback
       try {
         console.log("[TTS] Trying Free TTS (Google Translate)...");
         const freeResult = await supabase.functions.invoke("free-tts", {
@@ -302,12 +318,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           console.log("[TTS] ✅ Free TTS success!");
           return `data:audio/mp3;base64,${freeResult.data.audioContent}`;
         }
-        console.log("[TTS] Free TTS failed:", freeResult.data?.error || freeResult.error);
-      } catch (e) {
-        console.log("[TTS] Free TTS error:", e);
+      } catch {
+        // Silent fail
       }
       
-      // Try OpenAI (if user has credits)
+      // Try paid APIs (OpenAI, ElevenLabs) if user has credits
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
           body: { text, voice: "onyx" },
@@ -321,7 +336,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         // Silent fail
       }
       
-      // Try ElevenLabs (if user has credits)
       try {
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, language: "pt-BR" },

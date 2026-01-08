@@ -83,3 +83,6 @@ verify_jwt = false
 
 [functions.free-tts]
 verify_jwt = false
+
+[functions.edge-tts]
+verify_jwt = false
