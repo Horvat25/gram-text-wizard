@@ -88,9 +88,64 @@ function drawImageCover(
 }
 
 /**
- * Apply Ken Burns effect (subtle zoom/pan)
+ * Apply Ken Burns effect (subtle zoom/pan) to a specific region
  */
-function applyKenBurns(
+function applyKenBurnsToRegion(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  regionX: number,
+  regionY: number,
+  regionWidth: number,
+  regionHeight: number,
+  progress: number,
+  effectType: number
+) {
+  ctx.save();
+  
+  // Clip to the region
+  ctx.beginPath();
+  ctx.rect(regionX, regionY, regionWidth, regionHeight);
+  ctx.clip();
+  
+  const scale = 1 + (progress * 0.08);
+  const centerX = regionX + regionWidth / 2;
+  const centerY = regionY + regionHeight / 2;
+  
+  ctx.translate(centerX, centerY);
+  ctx.scale(scale, scale);
+  
+  const panX = (effectType % 2 === 0 ? 1 : -1) * progress * 15;
+  const panY = (effectType % 3 === 0 ? 1 : -1) * progress * 10;
+  
+  ctx.translate(-centerX + panX, -centerY + panY);
+  
+  // Draw image to cover the region
+  const imgRatio = img.width / img.height;
+  const regionRatio = regionWidth / regionHeight;
+  
+  let drawWidth = regionWidth;
+  let drawHeight = regionHeight;
+  let offsetX = regionX;
+  let offsetY = regionY;
+  
+  if (imgRatio > regionRatio) {
+    drawWidth = regionHeight * imgRatio;
+    offsetX = regionX + (regionWidth - drawWidth) / 2;
+  } else {
+    drawHeight = regionWidth / imgRatio;
+    offsetY = regionY + (regionHeight - drawHeight) / 2;
+  }
+  
+  ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  
+  ctx.restore();
+}
+
+/**
+ * Draw split images - one on top (0-38%), one on bottom (62-100%)
+ * Leaves middle (38-62%) clear for text overlay
+ */
+function drawSplitImages(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
   width: number,
@@ -98,26 +153,38 @@ function applyKenBurns(
   progress: number,
   effectType: number
 ) {
+  // Top image region: 0% to 38% of height
+  const topHeight = height * 0.38;
+  applyKenBurnsToRegion(ctx, img, 0, 0, width, topHeight, progress, effectType);
+  
+  // Bottom image region: 62% to 100% of height
+  const bottomY = height * 0.62;
+  const bottomHeight = height * 0.38;
+  applyKenBurnsToRegion(ctx, img, 0, bottomY, width, bottomHeight, progress, effectType + 1);
+  
+  // Add subtle gradient overlays for smooth transitions to center
   ctx.save();
   
-  const scale = 1 + (progress * 0.1);
+  // Gradient at bottom of top image
+  const topGradient = ctx.createLinearGradient(0, topHeight - 40, 0, topHeight);
+  topGradient.addColorStop(0, "rgba(0, 0, 0, 0)");
+  topGradient.addColorStop(1, "rgba(0, 0, 0, 0.8)");
+  ctx.fillStyle = topGradient;
+  ctx.fillRect(0, topHeight - 40, width, 40);
   
-  ctx.translate(width / 2, height / 2);
-  ctx.scale(scale, scale);
-  
-  const panX = (effectType % 2 === 0 ? 1 : -1) * progress * 20;
-  const panY = (effectType % 3 === 0 ? 1 : -1) * progress * 15;
-  
-  ctx.translate(-width / 2 + panX, -height / 2 + panY);
-  
-  drawImageCover(ctx, img, width, height);
+  // Gradient at top of bottom image
+  const bottomGradient = ctx.createLinearGradient(0, bottomY, 0, bottomY + 40);
+  bottomGradient.addColorStop(0, "rgba(0, 0, 0, 0.8)");
+  bottomGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+  ctx.fillStyle = bottomGradient;
+  ctx.fillRect(0, bottomY, width, 40);
   
   ctx.restore();
 }
 
 /**
  * Draw text overlay with styling - CENTERED on screen
- * Position: Middle of screen (not bottom) to avoid Instagram caption overlap
+ * Position: Middle of screen (40-60% height area)
  */
 function drawTextOverlay(
   ctx: CanvasRenderingContext2D,
@@ -127,8 +194,8 @@ function drawTextOverlay(
 ) {
   if (!text) return;
   
-  const fontSize = Math.floor(width * 0.05);
-  const padding = width * 0.08;
+  const fontSize = Math.floor(width * 0.048);
+  const padding = width * 0.06;
   const maxWidth = width - (padding * 2);
   
   ctx.font = `bold ${fontSize}px 'Inter', 'Segoe UI', sans-serif`;
@@ -152,31 +219,40 @@ function drawTextOverlay(
   }
   if (currentLine) lines.push(currentLine);
   
-  const lineHeight = fontSize * 1.4;
+  const lineHeight = fontSize * 1.35;
   const totalTextHeight = lines.length * lineHeight;
   
-  // CENTER position - middle of screen
+  // CENTER position - exactly middle of screen (40-60% zone)
   const centerY = height / 2;
-  const boxPadding = width * 0.04;
+  const boxPadding = width * 0.035;
   const boxWidth = maxWidth + boxPadding * 2;
   const boxHeight = totalTextHeight + boxPadding * 2;
   const boxX = (width - boxWidth) / 2;
   const boxY = centerY - boxHeight / 2;
   
-  // Semi-transparent background box
+  // Semi-transparent background box with gradient
   ctx.save();
-  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  const bgGradient = ctx.createLinearGradient(boxX, boxY, boxX, boxY + boxHeight);
+  bgGradient.addColorStop(0, "rgba(0, 0, 0, 0.85)");
+  bgGradient.addColorStop(0.5, "rgba(20, 20, 40, 0.9)");
+  bgGradient.addColorStop(1, "rgba(0, 0, 0, 0.85)");
+  ctx.fillStyle = bgGradient;
   ctx.beginPath();
   ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
   ctx.fill();
+  
+  // Subtle border
+  ctx.strokeStyle = "rgba(138, 43, 226, 0.4)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
   ctx.restore();
   
-  // Draw text
+  // Draw text with shadow
   ctx.fillStyle = "white";
   ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-  ctx.shadowBlur = 8;
-  ctx.shadowOffsetX = 2;
-  ctx.shadowOffsetY = 2;
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetX = 1;
+  ctx.shadowOffsetY = 1;
   
   const startY = centerY - (totalTextHeight / 2) + (lineHeight / 2);
   lines.forEach((line, i) => {
@@ -405,6 +481,7 @@ function drawMarketingCTA(
 
 /**
  * Render a single frame to the canvas
+ * Uses split image layout: top image + center text + bottom image
  */
 function renderFrame(
   ctx: CanvasRenderingContext2D,
@@ -444,17 +521,17 @@ function renderFrame(
   const segment = segments[segmentIndex];
   const img = images[segmentIndex];
 
-  // Clear canvas
-  ctx.fillStyle = "black";
+  // Clear canvas with dark background for center area
+  ctx.fillStyle = "#0a0a0f";
   ctx.fillRect(0, 0, width, height);
 
-  // Draw image with Ken Burns effect
-  applyKenBurns(ctx, img, width, height, segmentProgress, segmentIndex);
+  // Draw split images (top and bottom) with Ken Burns effect
+  drawSplitImages(ctx, img, width, height, segmentProgress, segmentIndex);
 
   // Draw watermark
   drawWatermark(ctx, width, height, brandName);
 
-  // Draw text overlay
+  // Draw text overlay in center
   if (segment.text) {
     drawTextOverlay(ctx, segment.text, width, height);
   }

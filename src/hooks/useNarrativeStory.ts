@@ -270,7 +270,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio (main + CTA) - uses Lovable AI Gateway
+  // Step 3: Generate narration audio (main + CTA) - ElevenLabs primary, OpenAI fallback
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "" };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -290,26 +290,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS with multiple providers
+    // Helper to try TTS with multiple providers (ElevenLabs → OpenAI)
     const tryGenerateTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
-      // Try Lovable AI Gateway first (uses project's LOVABLE_API_KEY)
-      console.log("Trying Lovable AI Gateway TTS...");
-      try {
-        const lovableResult = await supabase.functions.invoke("lovable-tts", {
-          body: { text, voice },
-        });
-        
-        if (!lovableResult.error && lovableResult.data?.audioContent && !lovableResult.data?.error) {
-          console.log("TTS generated with Lovable AI Gateway");
-          return `data:audio/mp3;base64,${lovableResult.data.audioContent}`;
-        }
-        console.warn("Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
-      } catch (e) {
-        console.warn("Lovable TTS exception:", e);
-      }
-      
-      // Try ElevenLabs as fallback
-      console.log("Trying ElevenLabs TTS...");
+      // Try ElevenLabs first (primary TTS provider)
+      console.log("Trying ElevenLabs TTS (primary)...");
       try {
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, language: "pt-BR" },
@@ -324,8 +308,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.warn("ElevenLabs exception:", e);
       }
       
-      // Try OpenAI as final fallback
-      console.log("Trying OpenAI TTS...");
+      // Try OpenAI as fallback
+      console.log("Trying OpenAI TTS (fallback)...");
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
           body: { text, voice },
