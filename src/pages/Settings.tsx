@@ -236,33 +236,27 @@ const Settings = () => {
   const testVoice = async (voiceId: string) => {
     setTestingVoice(voiceId);
     try {
-      // Use browser TTS for instant free voice testing
-      const testText = "Olá! Esta é uma demonstração da voz selecionada.";
+      const testText = "Olá! Esta é uma demonstração da voz neural da Microsoft.";
       
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
+      // Use Microsoft Edge TTS (FREE neural voices)
+      const { data, error } = await supabase.functions.invoke('lovable-tts', {
+        body: { text: testText, voice: voiceId }
+      });
+
+      if (error) throw error;
+      if (!data?.audioContent) throw new Error('Sem áudio na resposta');
+
+      // Play the audio
+      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+      audio.onended = () => setTestingVoice(null);
+      audio.onerror = () => setTestingVoice(null);
+      await audio.play();
       
-      const utterance = new SpeechSynthesisUtterance(testText);
-      utterance.lang = 'pt-BR';
-      utterance.rate = 1.0;
-      
-      // Try to find a Portuguese voice
-      const voices = window.speechSynthesis.getVoices();
-      const ptVoice = voices.find(v => v.lang.startsWith('pt'));
-      if (ptVoice) {
-        utterance.voice = ptVoice;
-      }
-      
-      utterance.onend = () => setTestingVoice(null);
-      utterance.onerror = () => setTestingVoice(null);
-      
-      window.speechSynthesis.speak(utterance);
-      toast.success(`Testando voz: ${VOICE_OPTIONS.find(v => v.id === voiceId)?.name || voiceId}`);
+      toast.success(`Voz neural: ${data.edgeVoice || voiceId}`);
     } catch (error: any) {
       console.error('Erro ao testar voz:', error);
-      toast.error('Erro ao testar voz');
-    } finally {
-      setTimeout(() => setTestingVoice(null), 3000);
+      toast.error(`Erro: ${error.message}`);
+      setTestingVoice(null);
     }
   };
 
