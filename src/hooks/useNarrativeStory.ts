@@ -290,9 +290,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS providers: Edge TTS (neural) → Free TTS → paid APIs
+    // Helper to try TTS providers: Lovable TTS (HD) → Edge TTS → Free TTS → paid APIs
     const tryCloudTTS = async (text: string): Promise<string | null> => {
-      // 🎯 Try Edge TTS first (Microsoft neural voices - FREE and high quality!)
+      // 🎯 Try Lovable TTS first (OpenAI HD voices via Lovable AI Gateway - FREE and HIGH QUALITY!)
+      try {
+        console.log(`[TTS] Trying Lovable TTS (HD) with voice: ${preferredVoice}...`);
+        const lovableResult = await supabase.functions.invoke("lovable-tts", {
+          body: { text, voice: preferredVoice },
+        });
+        
+        if (!lovableResult.error && lovableResult.data?.audioContent && !lovableResult.data?.error) {
+          console.log(`[TTS] ✅ Lovable TTS success! Voice: ${lovableResult.data.openaiVoice || preferredVoice}`);
+          return `data:audio/mp3;base64,${lovableResult.data.audioContent}`;
+        }
+        console.log("[TTS] Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
+      } catch (e) {
+        console.log("[TTS] Lovable TTS error:", e);
+      }
+      
+      // 🔄 Fallback to Edge TTS (Microsoft neural voices)
       try {
         console.log(`[TTS] Trying Edge TTS with voice: ${preferredVoice}...`);
         const edgeResult = await supabase.functions.invoke("edge-tts", {
@@ -300,15 +316,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         });
         
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          console.log("[TTS] ✅ Edge TTS success! (neural voice)");
+          console.log("[TTS] ✅ Edge TTS success!");
           return `data:audio/mp3;base64,${edgeResult.data.audioContent}`;
         }
-        console.log("[TTS] Edge TTS failed:", edgeResult.data?.error || edgeResult.error);
-      } catch (e) {
-        console.log("[TTS] Edge TTS error:", e);
+      } catch {
+        // Silent fail
       }
       
-      // 🆓 Try Free TTS (Google Translate) as fallback
+      // 🆓 Try Free TTS (Google Translate) as last resort
       try {
         console.log("[TTS] Trying Free TTS (Google Translate)...");
         const freeResult = await supabase.functions.invoke("free-tts", {
@@ -323,7 +338,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         // Silent fail
       }
       
-      // Try paid APIs (OpenAI, ElevenLabs) if user has credits
+      // Try paid APIs if user has credits configured
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
           body: { text, voice: "onyx" },

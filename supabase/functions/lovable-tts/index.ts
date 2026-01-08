@@ -6,6 +6,32 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/**
+ * Lovable TTS - High quality voices via Lovable AI Gateway (FREE)
+ * 
+ * OpenAI TTS voices available:
+ * - alloy: Neutral, balanced
+ * - echo: Warm, conversational male
+ * - fable: Expressive, storytelling
+ * - onyx: Deep, authoritative male
+ * - nova: Warm, friendly female
+ * - shimmer: Soft, gentle female
+ */
+
+// Map our voice IDs to OpenAI TTS voices
+const VOICE_MAPPING: Record<string, string> = {
+  // Female voices
+  "camila": "nova",      // Warm, friendly Brazilian-style
+  "vitoria": "shimmer",  // Soft, gentle
+  "fernanda": "alloy",   // Neutral, European-style
+  // Male voices  
+  "thiago": "echo",      // Warm, dynamic
+  "ricardo": "onyx",     // Deep, authoritative
+  // Fallbacks
+  "antonio": "echo",
+  "francisca": "nova",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -16,10 +42,13 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+      console.error("[LovableTTS] LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "LOVABLE_API_KEY não configurada" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { 
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
       );
     }
 
@@ -30,12 +59,14 @@ serve(async (req) => {
       );
     }
 
-    console.log("Generating TTS via Lovable AI Gateway for text:", text.substring(0, 100) + "...");
-    console.log("Voice:", voice || "alloy");
+    // Map voice to OpenAI voice
+    const requestedVoice = voice || "camila";
+    const openaiVoice = VOICE_MAPPING[requestedVoice] || "nova";
+    
+    console.log(`[LovableTTS] Voice mapping: ${requestedVoice} -> ${openaiVoice}`);
+    console.log(`[LovableTTS] Text: ${text.substring(0, 60)}...`);
 
-    // Use OpenAI TTS via Lovable AI Gateway
-    const selectedVoice = voice || "alloy";
-
+    // Use TTS-1-HD for better quality
     const response = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
       method: "POST",
       headers: {
@@ -43,46 +74,53 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "tts-1",
+        model: "tts-1-hd", // HD model for better quality
         input: text,
-        voice: selectedVoice,
+        voice: openaiVoice,
         response_format: "mp3",
+        speed: 1.0,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable TTS error:", response.status, errorText);
+      console.error(`[LovableTTS] Error: ${response.status} - ${errorText}`);
       
       return new Response(
         JSON.stringify({ 
           error: `Lovable TTS error: ${response.status}`,
           status: response.status,
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { 
+          status: response.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
       );
     }
 
     const audioBuffer = await response.arrayBuffer();
-    
-    // Use Deno's base64 encoder (safer for large buffers)
     const base64Audio = base64Encode(audioBuffer);
 
-    console.log("Lovable TTS generated successfully, audio size:", audioBuffer.byteLength, "base64 length:", base64Audio.length);
+    console.log(`[LovableTTS] ✅ Success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB, Voice: ${openaiVoice}`);
 
     return new Response(
       JSON.stringify({ 
         audioContent: base64Audio,
         format: "mp3",
+        voice: requestedVoice,
+        openaiVoice: openaiVoice,
         duration_estimate: Math.ceil(text.length / 15),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error in lovable-tts:", error);
+    console.error("[LovableTTS] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar narração" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { 
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      }
     );
   }
 });
