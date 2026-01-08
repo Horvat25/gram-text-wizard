@@ -241,7 +241,8 @@ const Settings = () => {
         ? "Olá! Esta é uma demonstração da minha voz."
         : "Olá! Esta é uma demonstração da minha voz. Gostou?";
       
-      const { data, error } = await supabase.functions.invoke('edge-tts', {
+      // Use lovable-tts for high quality OpenAI HD voices
+      const { data, error } = await supabase.functions.invoke('lovable-tts', {
         body: { text: testText, voice: voiceId }
       });
 
@@ -250,10 +251,13 @@ const Settings = () => {
       if (data?.audioContent) {
         const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
         await audio.play();
+        console.log(`Voice test: ${voiceId} -> OpenAI: ${data.openaiVoice}`);
+      } else if (data?.error) {
+        throw new Error(data.error);
       }
     } catch (error: any) {
       console.error('Voice test error:', error);
-      toast.error('Erro ao testar voz');
+      toast.error('Erro ao testar voz: ' + (error.message || 'Tente novamente'));
     } finally {
       setTestingVoice(null);
     }
