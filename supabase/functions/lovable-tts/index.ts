@@ -6,192 +6,26 @@ const corsHeaders = {
 };
 
 /**
- * Microsoft Edge TTS - FREE high-quality neural voices
- * Uses Microsoft's Edge browser TTS service (same as edge-tts Python library)
+ * FREE TTS using StreamElements (Amazon Polly voices)
  * 
- * Portuguese Brazilian voices:
- * - pt-BR-FranciscaNeural (female, warm)
- * - pt-BR-AntonioNeural (male, professional)
- * - pt-BR-ThalitaNeural (female, young)
- * - pt-BR-NicolauNeural (male, casual)
- * - pt-BR-LeticiaNeural (female, expressive)
- * - pt-BR-ManuelaNeural (female, friendly)
- * - pt-BR-ElzaNeural (female, calm)
- * - pt-BR-BrendaNeural (female, cheerful)
- * - pt-BR-DonatoNeural (male, warm)
- * - pt-BR-FabioNeural (male, dynamic)
- * - pt-BR-GiovannaNeural (female, natural)
- * - pt-BR-HumbertoNeural (male, deep)
- * - pt-BR-JulioNeural (male, professional)
- * - pt-BR-LeilaNeural (female, soft)
- * - pt-BR-ValerioNeural (male, confident)
- * - pt-BR-YaraNeural (female, energetic)
+ * Portuguese Brazilian voices available:
+ * - Camila (female, neural) - Natural and warm
+ * - Vitoria (female, standard) - Clear and professional
+ * - Ricardo (male, standard) - Deep and authoritative
  */
 
-// Map our voice IDs to Microsoft Edge neural voices
+// Map our voice IDs to StreamElements/Polly voices
 const VOICE_MAPPING: Record<string, string> = {
-  // Female voices - each is DISTINCT
-  "camila": "pt-BR-ThalitaNeural",     // Young, energetic
-  "vitoria": "pt-BR-LeticiaNeural",    // Expressive, dramatic
-  "fernanda": "pt-BR-FranciscaNeural", // Warm, professional
-  // Male voices - each is DISTINCT
-  "thiago": "pt-BR-FabioNeural",       // Dynamic, engaging
-  "ricardo": "pt-BR-HumbertoNeural",   // Deep, authoritative
-  // Additional mappings
-  "antonio": "pt-BR-AntonioNeural",
-  "francisca": "pt-BR-FranciscaNeural",
-  "default": "pt-BR-FranciscaNeural",
+  // Female voices
+  "camila": "Camila",      // Neural, warm (best quality)
+  "vitoria": "Vitoria",    // Standard, clear
+  "fernanda": "Camila",    // Map to Camila
+  // Male voices
+  "thiago": "Ricardo",     // Standard male
+  "ricardo": "Ricardo",    // Standard male
+  // Fallback
+  "default": "Camila",
 };
-
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-function buildSSML(text: string, voice: string): string {
-  return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="pt-BR">
-    <voice name="${voice}">
-      <prosody rate="0%" pitch="0%">
-        ${escapeXml(text)}
-      </prosody>
-    </voice>
-  </speak>`;
-}
-
-async function synthesizeSpeech(text: string, voiceName: string): Promise<Uint8Array> {
-  const requestId = generateUUID().replace(/-/g, '');
-  const timestamp = new Date().toISOString();
-  
-  // Microsoft Edge TTS WebSocket endpoint
-  const wsUrl = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=${requestId}`;
-  
-  console.log(`[EdgeTTS] Connecting for voice: ${voiceName}`);
-  
-  return new Promise((resolve, reject) => {
-    const audioChunks: Uint8Array[] = [];
-    let resolved = false;
-    
-    const ws = new WebSocket(wsUrl);
-    
-    const timeout = setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        ws.close();
-        reject(new Error("WebSocket timeout"));
-      }
-    }, 30000);
-    
-    ws.onopen = () => {
-      console.log("[EdgeTTS] WebSocket connected");
-      
-      // Send configuration
-      const configMessage = `X-Timestamp:${timestamp}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
-      ws.send(configMessage);
-      
-      // Send SSML
-      const ssml = buildSSML(text, voiceName);
-      const ssmlMessage = `X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:${timestamp}\r\nPath:ssml\r\n\r\n${ssml}`;
-      ws.send(ssmlMessage);
-    };
-    
-    ws.onmessage = (event) => {
-      if (typeof event.data === 'string') {
-        // Text message - check for turn.end
-        if (event.data.includes('turn.end')) {
-          console.log(`[EdgeTTS] Received turn.end, total chunks: ${audioChunks.length}`);
-          clearTimeout(timeout);
-          ws.close();
-          
-          if (!resolved) {
-            resolved = true;
-            // Combine all audio chunks
-            const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
-            const combined = new Uint8Array(totalLength);
-            let offset = 0;
-            for (const chunk of audioChunks) {
-              combined.set(chunk, offset);
-              offset += chunk.length;
-            }
-            resolve(combined);
-          }
-        }
-      } else if (event.data instanceof Blob) {
-        // Binary audio data
-        event.data.arrayBuffer().then((buffer) => {
-          const data = new Uint8Array(buffer);
-          // Audio data starts after the header "Path:audio\r\n"
-          const headerEnd = findHeaderEnd(data);
-          if (headerEnd !== -1) {
-            const audioData = data.slice(headerEnd);
-            if (audioData.length > 0) {
-              audioChunks.push(audioData);
-            }
-          }
-        });
-      }
-    };
-    
-    ws.onerror = (error) => {
-      console.error("[EdgeTTS] WebSocket error:", error);
-      clearTimeout(timeout);
-      if (!resolved) {
-        resolved = true;
-        reject(new Error("WebSocket error"));
-      }
-    };
-    
-    ws.onclose = () => {
-      console.log("[EdgeTTS] WebSocket closed");
-      clearTimeout(timeout);
-      if (!resolved) {
-        resolved = true;
-        // Return whatever we have
-        const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
-        if (totalLength > 0) {
-          const combined = new Uint8Array(totalLength);
-          let offset = 0;
-          for (const chunk of audioChunks) {
-            combined.set(chunk, offset);
-            offset += chunk.length;
-          }
-          resolve(combined);
-        } else {
-          reject(new Error("No audio data received"));
-        }
-      }
-    };
-  });
-}
-
-function findHeaderEnd(data: Uint8Array): number {
-  // Look for "Path:audio\r\n" followed by binary data
-  const pathAudio = new TextEncoder().encode("Path:audio\r\n");
-  for (let i = 0; i < data.length - pathAudio.length; i++) {
-    let match = true;
-    for (let j = 0; j < pathAudio.length; j++) {
-      if (data[i + j] !== pathAudio[j]) {
-        match = false;
-        break;
-      }
-    }
-    if (match) {
-      return i + pathAudio.length;
-    }
-  }
-  return -1;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -208,37 +42,68 @@ serve(async (req) => {
       );
     }
 
-    // Map voice to Microsoft Edge neural voice
+    // Map voice to Polly voice
     const requestedVoice = voice || "camila";
-    const edgeVoice = VOICE_MAPPING[requestedVoice] || VOICE_MAPPING["default"];
+    const pollyVoice = VOICE_MAPPING[requestedVoice] || VOICE_MAPPING["default"];
     
-    console.log(`[EdgeTTS] Voice: ${requestedVoice} -> ${edgeVoice}`);
-    console.log(`[EdgeTTS] Text: ${text.substring(0, 60)}...`);
+    console.log(`[TTS] Voice: ${requestedVoice} -> Polly: ${pollyVoice}`);
+    console.log(`[TTS] Text length: ${text.length} chars`);
 
-    // Synthesize speech using Microsoft Edge TTS
-    const audioData = await synthesizeSpeech(text, edgeVoice);
+    // Use StreamElements API (free Amazon Polly)
+    const encodedText = encodeURIComponent(text);
+    const ttsUrl = `https://api.streamelements.com/kappa/v2/speech?voice=${pollyVoice}&text=${encodedText}`;
+    
+    console.log(`[TTS] Calling StreamElements API...`);
+    
+    const response = await fetch(ttsUrl, {
+      method: "GET",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[TTS] StreamElements Error: ${response.status} - ${errorText}`);
+      
+      // Fallback to Google Translate TTS
+      console.log(`[TTS] Trying Google TTS fallback...`);
+      return await googleTTSFallback(text, corsHeaders);
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const audioArray = new Uint8Array(audioBuffer);
     
     // Convert to base64
     let binary = '';
-    for (let i = 0; i < audioData.length; i++) {
-      binary += String.fromCharCode(audioData[i]);
+    for (let i = 0; i < audioArray.length; i++) {
+      binary += String.fromCharCode(audioArray[i]);
     }
     const base64Audio = btoa(binary);
 
-    console.log(`[EdgeTTS] ✅ Success! Size: ${(audioData.length / 1024).toFixed(1)}KB, Voice: ${edgeVoice}`);
+    console.log(`[TTS] ✅ Success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
 
     return new Response(
       JSON.stringify({ 
         audioContent: base64Audio,
         format: "mp3",
         voice: requestedVoice,
-        edgeVoice: edgeVoice,
+        pollyVoice: pollyVoice,
         duration_estimate: Math.ceil(text.length / 15),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("[EdgeTTS] Error:", error);
+    console.error("[TTS] Error:", error);
+    
+    // Try Google TTS as ultimate fallback
+    try {
+      const { text } = await req.clone().json();
+      if (text) {
+        return await googleTTSFallback(text, corsHeaders);
+      }
+    } catch {}
+    
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar narração" }),
       { 
@@ -248,3 +113,83 @@ serve(async (req) => {
     );
   }
 });
+
+async function googleTTSFallback(text: string, corsHeaders: Record<string, string>): Promise<Response> {
+  try {
+    // Split text into chunks (Google TTS has a limit)
+    const maxLength = 200;
+    const chunks: string[] = [];
+    
+    let remaining = text;
+    while (remaining.length > 0) {
+      if (remaining.length <= maxLength) {
+        chunks.push(remaining);
+        break;
+      }
+      
+      // Find a good break point
+      let breakPoint = remaining.lastIndexOf('.', maxLength);
+      if (breakPoint === -1) breakPoint = remaining.lastIndexOf(' ', maxLength);
+      if (breakPoint === -1) breakPoint = maxLength;
+      
+      chunks.push(remaining.substring(0, breakPoint + 1));
+      remaining = remaining.substring(breakPoint + 1).trim();
+    }
+    
+    console.log(`[TTS] Google fallback: ${chunks.length} chunks`);
+    
+    // Get audio for each chunk
+    const audioChunks: Uint8Array[] = [];
+    
+    for (const chunk of chunks) {
+      const encodedChunk = encodeURIComponent(chunk);
+      const googleUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=pt-BR&client=tw-ob&q=${encodedChunk}`;
+      
+      const response = await fetch(googleUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      });
+      
+      if (response.ok) {
+        const buffer = await response.arrayBuffer();
+        audioChunks.push(new Uint8Array(buffer));
+      }
+    }
+    
+    if (audioChunks.length === 0) {
+      throw new Error("No audio generated");
+    }
+    
+    // Combine all chunks
+    const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const combined = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of audioChunks) {
+      combined.set(chunk, offset);
+      offset += chunk.length;
+    }
+    
+    // Convert to base64
+    let binary = '';
+    for (let i = 0; i < combined.length; i++) {
+      binary += String.fromCharCode(combined[i]);
+    }
+    const base64Audio = btoa(binary);
+    
+    console.log(`[TTS] ✅ Google fallback success! Size: ${(combined.length / 1024).toFixed(1)}KB`);
+    
+    return new Response(
+      JSON.stringify({ 
+        audioContent: base64Audio,
+        format: "mp3",
+        voice: "google",
+        duration_estimate: Math.ceil(text.length / 15),
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    console.error("[TTS] Google fallback error:", error);
+    throw error;
+  }
+}
