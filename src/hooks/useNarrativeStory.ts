@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
 import { initFFmpeg, convertWebMToMP4 } from "@/lib/video-converter";
-
+import { estimateSpeechDuration } from "@/lib/browser-tts";
 export interface StorySegment {
   id: string;
   text: string;
@@ -270,52 +270,42 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio (main + CTA) - ElevenLabs primary, OpenAI fallback
+  // Step 3: Generate narration audio - try cloud APIs first, fallback to browser TTS
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
-    if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "" };
+    if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", fullScript: "" };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
     
     // Combine all segment texts for full narration
     const fullScript = segments.map(s => s.text).join(" ");
     
-    // CTA script - engaging call to action
+    // CTA script
     const ctaTexts = [
-      "E aí, curtiu? Então segue a gente pra não perder nenhuma novidade sobre tecnologia e inteligência artificial!",
-      "Gostou do conteúdo? Segue o Neural Update pra ficar por dentro das últimas notícias de IA e tecnologia!",
-      "Quer mais conteúdo assim? Então já segue a gente e ativa o sininho pra não perder nada!",
-      "Isso foi só uma amostra! Segue o Neural Update e acompanhe as notícias mais quentes de tecnologia!",
+      "E aí, curtiu? Então segue a gente pra não perder nenhuma novidade!",
+      "Gostou do conteúdo? Segue pra ficar por dentro das últimas notícias!",
+      "Quer mais conteúdo assim? Então já segue a gente!",
     ];
     const ctaScript = ctaTexts[Math.floor(Math.random() * ctaTexts.length)];
     
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS with multiple providers (OpenAI → ElevenLabs)
-    const tryGenerateTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
-      // Try OpenAI first (more reliable for PT-BR)
-      console.log("Trying OpenAI TTS (primary)...");
+    // Helper to try cloud TTS providers
+    const tryCloudTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
+      // Try OpenAI
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
           body: { text, voice },
         });
         
-        if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error && !openaiResult.data?.retryable) {
+        if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
           console.log("TTS generated with OpenAI");
           return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
         }
-        const errorMsg = openaiResult.data?.error || openaiResult.error;
-        console.warn("OpenAI TTS failed:", errorMsg);
-        
-        // If quota exceeded, show toast once
-        if (errorMsg?.includes("quota") || errorMsg?.includes("429")) {
-          toast.warning("OpenAI TTS: quota excedida. Adicione créditos para narração.");
-        }
       } catch (e) {
-        console.warn("OpenAI TTS exception:", e);
+        console.warn("OpenAI TTS failed:", e);
       }
       
-      // Try ElevenLabs as fallback
-      console.log("Trying ElevenLabs TTS (fallback)...");
+      // Try ElevenLabs
       try {
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, language: "pt-BR" },
@@ -325,29 +315,24 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           console.log("TTS generated with ElevenLabs");
           return `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
         }
-        console.warn("ElevenLabs failed:", elevenResult.data?.error || elevenResult.error);
       } catch (e) {
-        console.warn("ElevenLabs exception:", e);
+        console.warn("ElevenLabs TTS failed:", e);
       }
       
       return null;
     };
     
     try {
-      // Generate main narration
-      console.log("Generating main narration...");
-      narrationUrl = await tryGenerateTTS(fullScript) || "";
-
-      // Generate CTA narration
-      console.log("Generating CTA narration...");
-      ctaNarrationUrl = await tryGenerateTTS(ctaScript) || "";
-
-      // Update state with narration URLs and segment timings
+      // Try cloud TTS first
+      console.log("Trying cloud TTS providers...");
+      narrationUrl = await tryCloudTTS(fullScript) || "";
+      
       if (narrationUrl) {
+        ctaNarrationUrl = await tryCloudTTS(ctaScript) || "";
+        
         const audioDuration = await getAudioDuration(narrationUrl);
         if (audioDuration > 0) {
           const durationPerSegment = audioDuration / segments.length;
-          console.log(`[generateAudio] Audio duration: ${audioDuration}s, per segment: ${durationPerSegment}s`);
           
           setState(prev => {
             let currentTime = 0;
@@ -365,22 +350,43 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
               progress: 80 
             };
           });
-        } else {
-          setState(prev => ({ ...prev, narrationUrl, ctaNarrationUrl, progress: 80 }));
         }
         
-        toast.success("Narrações geradas com sucesso!");
-      } else {
-        setState(prev => ({ ...prev, narrationUrl: "", ctaNarrationUrl: "", progress: 80 }));
-        toast.warning("Narração indisponível, gerando vídeo sem áudio");
+        toast.success("Narração gerada com sucesso!");
+        return { narrationUrl, ctaNarrationUrl, fullScript };
       }
       
-      return { narrationUrl, ctaNarrationUrl };
+      // Cloud TTS unavailable - use browser TTS timing
+      console.log("Cloud TTS unavailable, using browser speech timing...");
+      toast.info("Usando narração do navegador (gratuita)");
+      
+      // Estimate duration based on text length
+      const estimatedDuration = estimateSpeechDuration(fullScript);
+      const durationPerSegment = estimatedDuration / segments.length;
+      
+      setState(prev => {
+        let currentTime = 0;
+        const updatedSegments = prev.segments.map(seg => {
+          const updated = { ...seg, duration: durationPerSegment, startTime: currentTime };
+          currentTime += durationPerSegment;
+          return updated;
+        });
+        return { 
+          ...prev, 
+          segments: updatedSegments,
+          totalDuration: estimatedDuration,
+          narrationUrl: "", 
+          ctaNarrationUrl: "",
+          progress: 80 
+        };
+      });
+      
+      // Return script for browser TTS playback
+      return { narrationUrl: "", ctaNarrationUrl: "", fullScript };
     } catch (error: any) {
       console.warn("TTS error:", error);
-      setState(prev => ({ ...prev, narrationUrl: "", ctaNarrationUrl: "", progress: 80 }));
-      toast.warning("Continuando sem narração");
-      return { narrationUrl: "", ctaNarrationUrl: "" };
+      setState(prev => ({ ...prev, progress: 80 }));
+      return { narrationUrl: "", ctaNarrationUrl: "", fullScript };
     }
   }, [getAudioDuration]);
 
