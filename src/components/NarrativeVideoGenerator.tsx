@@ -60,6 +60,7 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
     brandName: brandSettings.brandName || "NeuralUpdate",
     segmentCount: 4,
     segmentDuration: 5,
+    preferredVoice: brandSettings.preferredVoice || "camila",
   });
 
   // Sync topic prop

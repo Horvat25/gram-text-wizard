@@ -36,6 +36,7 @@ export interface UserSettings {
   brandName: string;
   brandLogoUrl: string | null;
   preferredPostTimes: string[];
+  preferredVoice: string;
 }
 
 interface LocalData {
@@ -64,6 +65,7 @@ const getDefaultData = (): LocalData => ({
     brandName: "NeuralUpdate",
     brandLogoUrl: null,
     preferredPostTimes: [],
+    preferredVoice: "camila",
   },
 });
 

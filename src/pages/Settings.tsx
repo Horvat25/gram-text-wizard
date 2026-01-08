@@ -26,7 +26,9 @@ import {
   Save,
   RotateCcw,
   Image,
-  Video
+  Video,
+  Mic,
+  Play
 } from "lucide-react";
 import Header from "@/components/Header";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
@@ -57,6 +59,15 @@ const STYLE_PRESETS = [
   { label: 'Artístico', value: 'Ilustração artística, criativo, cores únicas, expressivo' },
 ];
 
+// Voice options for TTS
+const VOICE_OPTIONS = [
+  { id: 'camila', name: 'Camila', gender: 'Feminino', description: 'Voz brasileira natural e profissional', lang: 'pt-BR' },
+  { id: 'vitoria', name: 'Vitória', gender: 'Feminino', description: 'Voz feminina suave e acolhedora', lang: 'pt-BR' },
+  { id: 'thiago', name: 'Thiago', gender: 'Masculino', description: 'Voz masculina jovem e dinâmica', lang: 'pt-BR' },
+  { id: 'ricardo', name: 'Ricardo', gender: 'Masculino', description: 'Voz masculina grave e séria', lang: 'pt-BR' },
+  { id: 'fernanda', name: 'Fernanda', gender: 'Feminino', description: 'Voz portuguesa elegante', lang: 'pt-PT' },
+];
+
 const DEFAULT_AI_SETTINGS: AISettings = {
   captionInstructions: '',
   imageStyles: [],
@@ -81,6 +92,8 @@ const Settings = () => {
   const [connectingTikTok, setConnectingTikTok] = useState(false);
   const [aiSettings, setAiSettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
   const [isSavingAI, setIsSavingAI] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState("camila");
+  const [testingVoice, setTestingVoice] = useState<string | null>(null);
   
   const { settings, updateSettings } = useBrandSettings();
   const { accounts, loading: loadingAccounts, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
@@ -98,6 +111,7 @@ const Settings = () => {
   useEffect(() => {
     setBrandName(settings.brandName || "");
     setBrandLogoUrl(settings.brandLogoUrl || "");
+    setSelectedVoice(settings.preferredVoice || "camila");
     
     // Check current theme
     const isDark = document.documentElement.classList.contains('dark');
@@ -211,6 +225,38 @@ const Settings = () => {
 
   const updateAISetting = <K extends keyof AISettings>(key: K, value: AISettings[K]) => {
     setAiSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleVoiceSelect = (voiceId: string) => {
+    setSelectedVoice(voiceId);
+    updateSettings({ preferredVoice: voiceId });
+    toast.success(`Voz "${VOICE_OPTIONS.find(v => v.id === voiceId)?.name}" selecionada!`);
+  };
+
+  const testVoice = async (voiceId: string) => {
+    setTestingVoice(voiceId);
+    try {
+      const voice = VOICE_OPTIONS.find(v => v.id === voiceId);
+      const testText = voice?.lang === 'pt-PT' 
+        ? "Olá! Esta é uma demonstração da minha voz."
+        : "Olá! Esta é uma demonstração da minha voz. Gostou?";
+      
+      const { data, error } = await supabase.functions.invoke('edge-tts', {
+        body: { text: testText, voice: voiceId }
+      });
+
+      if (error) throw error;
+
+      if (data?.audioContent) {
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+        await audio.play();
+      }
+    } catch (error: any) {
+      console.error('Voice test error:', error);
+      toast.error('Erro ao testar voz');
+    } finally {
+      setTestingVoice(null);
+    }
   };
 
   // Instagram OAuth
@@ -668,6 +714,89 @@ const Settings = () => {
                         <li>• Seja específico sobre cores e atmosfera</li>
                         <li>• Mencione o tipo de iluminação</li>
                         <li>• Descreva a composição desejada</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Voice Settings */}
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Mic className="h-5 w-5 text-primary" />
+                      Voz para Narração
+                    </CardTitle>
+                    <CardDescription>
+                      Escolha a voz que será usada nos vídeos narrados
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-3">
+                      {VOICE_OPTIONS.map((voice) => {
+                        const isSelected = selectedVoice === voice.id;
+                        return (
+                          <div
+                            key={voice.id}
+                            className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                              isSelected 
+                                ? 'border-primary bg-primary/5' 
+                                : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            }`}
+                            onClick={() => handleVoiceSelect(voice.id)}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                              }`}>
+                                <Mic className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{voice.name}</span>
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                    {voice.gender}
+                                  </span>
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                    {voice.lang}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{voice.description}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  testVoice(voice.id);
+                                }}
+                                disabled={testingVoice === voice.id}
+                              >
+                                {testingVoice === voice.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Play className="w-4 h-4" />
+                                )}
+                                <span className="ml-1">Testar</span>
+                              </Button>
+                              {isSelected && (
+                                <CheckCircle className="w-5 h-5 text-primary" />
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    <div className="p-4 rounded-lg bg-muted/50">
+                      <h4 className="font-medium mb-2 text-sm">💡 Sobre as vozes:</h4>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        <li>• <strong>Camila</strong> - Ideal para conteúdo profissional e empresarial</li>
+                        <li>• <strong>Vitória</strong> - Ótima para conteúdo lifestyle e bem-estar</li>
+                        <li>• <strong>Thiago</strong> - Perfeita para tech, games e entretenimento</li>
+                        <li>• <strong>Ricardo</strong> - Excelente para documentários e notícias</li>
+                        <li>• <strong>Fernanda</strong> - Ideal para conteúdo de Portugal</li>
                       </ul>
                     </div>
                   </CardContent>

@@ -29,10 +29,11 @@ interface UseNarrativeStoryOptions {
   brandName?: string;
   segmentCount?: number;
   segmentDuration?: number;
+  preferredVoice?: string;
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  const { segmentCount = 4, segmentDuration = 5 } = options;
+  const { segmentCount = 4, segmentDuration = 5, preferredVoice = "camila" } = options;
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
@@ -293,9 +294,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const tryCloudTTS = async (text: string): Promise<string | null> => {
       // 🎯 Try Edge TTS first (Microsoft neural voices - FREE and high quality!)
       try {
-        console.log("[TTS] Trying Edge TTS (Microsoft neural voices)...");
+        console.log(`[TTS] Trying Edge TTS with voice: ${preferredVoice}...`);
         const edgeResult = await supabase.functions.invoke("edge-tts", {
-          body: { text, voice: "antonio" }, // Professional male voice
+          body: { text, voice: preferredVoice },
         });
         
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
