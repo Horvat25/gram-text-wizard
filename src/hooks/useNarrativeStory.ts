@@ -290,10 +290,32 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS with multiple providers (ElevenLabs → OpenAI)
+    // Helper to try TTS with multiple providers (OpenAI → ElevenLabs)
     const tryGenerateTTS = async (text: string, voice: string = "onyx"): Promise<string | null> => {
-      // Try ElevenLabs first (primary TTS provider)
-      console.log("Trying ElevenLabs TTS (primary)...");
+      // Try OpenAI first (more reliable for PT-BR)
+      console.log("Trying OpenAI TTS (primary)...");
+      try {
+        const openaiResult = await supabase.functions.invoke("openai-tts", {
+          body: { text, voice },
+        });
+        
+        if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error && !openaiResult.data?.retryable) {
+          console.log("TTS generated with OpenAI");
+          return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
+        }
+        const errorMsg = openaiResult.data?.error || openaiResult.error;
+        console.warn("OpenAI TTS failed:", errorMsg);
+        
+        // If quota exceeded, show toast once
+        if (errorMsg?.includes("quota") || errorMsg?.includes("429")) {
+          toast.warning("OpenAI TTS: quota excedida. Adicione créditos para narração.");
+        }
+      } catch (e) {
+        console.warn("OpenAI TTS exception:", e);
+      }
+      
+      // Try ElevenLabs as fallback
+      console.log("Trying ElevenLabs TTS (fallback)...");
       try {
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, language: "pt-BR" },
@@ -306,22 +328,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.warn("ElevenLabs failed:", elevenResult.data?.error || elevenResult.error);
       } catch (e) {
         console.warn("ElevenLabs exception:", e);
-      }
-      
-      // Try OpenAI as fallback
-      console.log("Trying OpenAI TTS (fallback)...");
-      try {
-        const openaiResult = await supabase.functions.invoke("openai-tts", {
-          body: { text, voice },
-        });
-        
-        if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
-          console.log("TTS generated with OpenAI");
-          return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
-        }
-        console.warn("OpenAI TTS failed:", openaiResult.data?.error || openaiResult.error);
-      } catch (e) {
-        console.warn("OpenAI TTS exception:", e);
       }
       
       return null;
