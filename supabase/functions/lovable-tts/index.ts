@@ -7,23 +7,24 @@ const corsHeaders = {
 };
 
 /**
- * Lovable TTS - High quality voices via Lovable AI Gateway (FREE)
+ * OpenAI TTS - High quality neural voices
+ * Uses OPENAI_API_KEY directly for TTS
  * 
- * OpenAI TTS voices available:
+ * OpenAI TTS voices - each has DISTINCT personality:
  * - alloy: Neutral, balanced
- * - echo: Warm, conversational male
+ * - echo: Warm, conversational
  * - fable: Expressive, storytelling
- * - onyx: Deep, authoritative male
- * - nova: Warm, friendly female
- * - shimmer: Soft, gentle female
+ * - onyx: Deep, authoritative
+ * - nova: Warm, friendly
+ * - shimmer: Soft, gentle
  */
 
 // Map our voice IDs to OpenAI TTS voices
 const VOICE_MAPPING: Record<string, string> = {
   // Female voices
-  "camila": "nova",      // Warm, friendly Brazilian-style
+  "camila": "nova",      // Warm, friendly
   "vitoria": "shimmer",  // Soft, gentle
-  "fernanda": "alloy",   // Neutral, European-style
+  "fernanda": "alloy",   // Neutral, balanced
   // Male voices  
   "thiago": "echo",      // Warm, dynamic
   "ricardo": "onyx",     // Deep, authoritative
@@ -39,12 +40,12 @@ serve(async (req) => {
 
   try {
     const { text, voice } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      console.error("[LovableTTS] LOVABLE_API_KEY not configured");
+    if (!OPENAI_API_KEY) {
+      console.error("[LovableTTS] OPENAI_API_KEY not configured");
       return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY não configurada" }),
+        JSON.stringify({ error: "OPENAI_API_KEY não configurada" }),
         { 
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" } 
@@ -63,18 +64,18 @@ serve(async (req) => {
     const requestedVoice = voice || "camila";
     const openaiVoice = VOICE_MAPPING[requestedVoice] || "nova";
     
-    console.log(`[LovableTTS] Voice mapping: ${requestedVoice} -> ${openaiVoice}`);
+    console.log(`[LovableTTS] Voice: ${requestedVoice} -> OpenAI: ${openaiVoice}`);
     console.log(`[LovableTTS] Text: ${text.substring(0, 60)}...`);
 
-    // Use TTS-1-HD for better quality
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
+    // Call OpenAI TTS API directly
+    const response = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "tts-1-hd", // HD model for better quality
+        model: "tts-1-hd", // HD model for best quality
         input: text,
         voice: openaiVoice,
         response_format: "mp3",
@@ -84,12 +85,12 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[LovableTTS] Error: ${response.status} - ${errorText}`);
+      console.error(`[LovableTTS] OpenAI Error: ${response.status} - ${errorText}`);
       
       return new Response(
         JSON.stringify({ 
-          error: `Lovable TTS error: ${response.status}`,
-          status: response.status,
+          error: `OpenAI TTS error: ${response.status}`,
+          details: errorText,
         }),
         { 
           status: response.status,
