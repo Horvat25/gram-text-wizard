@@ -596,7 +596,7 @@ export async function generateVideoFromSegments(
     instagramHandle = "@neuralupdate",
   } = options;
 
-  const ctaDuration = 4; // 4 seconds for marketing CTA at end
+  const ctaDuration = 6; // 6 seconds for marketing CTA at end (was 4, increased for full narration)
 
   console.log("[VideoEncoder] Starting video generation with branding...");
   console.log(`[VideoEncoder] Segments: ${segments.length}, FPS: ${fps}`);
