@@ -39,6 +39,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, addMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { unlockAudio } from "@/lib/audio-unlock";
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -141,6 +142,11 @@ const TikTokContentCreation = () => {
       toast.error("Por favor, insira um tema");
       return;
     }
+    
+    // 🔊 CRITICAL: Unlock audio BEFORE any await - this is synchronous!
+    unlockAudio();
+    console.log('[TikTokContentCreation] Audio unlocked on user click');
+    
     await generateStory(topic);
   };
 

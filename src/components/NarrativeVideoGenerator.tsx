@@ -21,6 +21,7 @@ import {
 import { useNarrativeStory } from "@/hooks/useNarrativeStory";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import CinematicPlayer from "./CinematicPlayer";
+import { unlockAudio } from "@/lib/audio-unlock";
 
 interface NarrativeVideoGeneratorProps {
   topic: string;
@@ -81,6 +82,11 @@ const NarrativeVideoGenerator = ({ topic, onVideoGenerated }: NarrativeVideoGene
 
   const handleGenerate = async () => {
     if (!customTopic.trim()) return;
+    
+    // 🔊 CRITICAL: Unlock audio BEFORE any await - this is synchronous!
+    unlockAudio();
+    console.log('[NarrativeVideoGenerator] Audio unlocked on user click');
+    
     await generateStory(customTopic);
   };
 

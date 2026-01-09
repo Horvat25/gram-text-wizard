@@ -5,6 +5,8 @@
  * BRANDING: Neural Update watermark + marketing CTA at end
  */
 
+import { ensureAudioReady, getAudioContext } from "./audio-unlock";
+
 interface VideoSegment {
   imageUrl: string;
   duration: number; // in seconds
@@ -652,37 +654,50 @@ export async function generateVideoFromSegments(
   
   if (audioUrl || ctaAudioUrl) {
     try {
-      audioContext = new AudioContext();
+      // 🔊 Use the pre-unlocked global AudioContext
+      audioContext = await ensureAudioReady();
+      console.log("[VideoEncoder] AudioContext state:", audioContext.state);
+      
       const destination = audioContext.createMediaStreamDestination();
       
       // Load main narration audio
       if (audioUrl) {
-        console.log("[VideoEncoder] Setting up main audio...");
+        console.log("[VideoEncoder] Setting up main audio from:", audioUrl.substring(0, 50) + "...");
         audioElement = new Audio();
         audioElement.crossOrigin = "anonymous";
         audioElement.src = audioUrl;
+        audioElement.volume = 1.0;
         
         await new Promise<void>((resolve) => {
           const timeout = setTimeout(() => {
             console.warn("[VideoEncoder] Audio load timeout, continuing without audio");
             resolve();
-          }, 10000);
+          }, 15000); // Increased timeout
           
           audioElement!.oncanplaythrough = () => {
             clearTimeout(timeout);
+            console.log("[VideoEncoder] Main audio loaded, duration:", audioElement!.duration);
             resolve();
           };
-          audioElement!.onerror = () => {
+          audioElement!.onerror = (e) => {
             clearTimeout(timeout);
-            console.warn("[VideoEncoder] Audio load error, continuing without audio");
+            console.warn("[VideoEncoder] Audio load error:", e);
             resolve();
           };
           audioElement!.load();
         });
 
-        const source = audioContext.createMediaElementSource(audioElement);
-        source.connect(destination);
-        console.log("[VideoEncoder] Main audio setup complete");
+        // Only connect if audio loaded successfully
+        if (audioElement.readyState >= 2) {
+          try {
+            const source = audioContext.createMediaElementSource(audioElement);
+            source.connect(destination);
+            source.connect(audioContext.destination); // Also play through speakers for debugging
+            console.log("[VideoEncoder] Main audio connected to destination");
+          } catch (e) {
+            console.warn("[VideoEncoder] Could not connect audio source:", e);
+          }
+        }
       }
       
       // Load CTA audio
@@ -691,6 +706,7 @@ export async function generateVideoFromSegments(
         ctaAudioElement = new Audio();
         ctaAudioElement.crossOrigin = "anonymous";
         ctaAudioElement.src = ctaAudioUrl;
+        ctaAudioElement.volume = 1.0;
         
         await new Promise<void>((resolve) => {
           const timeout = setTimeout(() => {
@@ -700,6 +716,7 @@ export async function generateVideoFromSegments(
           
           ctaAudioElement!.oncanplaythrough = () => {
             clearTimeout(timeout);
+            console.log("[VideoEncoder] CTA audio loaded, duration:", ctaAudioElement!.duration);
             resolve();
           };
           ctaAudioElement!.onerror = () => {
@@ -710,13 +727,23 @@ export async function generateVideoFromSegments(
           ctaAudioElement!.load();
         });
 
-        const ctaSource = audioContext.createMediaElementSource(ctaAudioElement);
-        ctaSource.connect(destination);
-        console.log("[VideoEncoder] CTA audio setup complete");
+        // Only connect if audio loaded successfully
+        if (ctaAudioElement.readyState >= 2) {
+          try {
+            const ctaSource = audioContext.createMediaElementSource(ctaAudioElement);
+            ctaSource.connect(destination);
+            ctaSource.connect(audioContext.destination);
+            console.log("[VideoEncoder] CTA audio connected to destination");
+          } catch (e) {
+            console.warn("[VideoEncoder] Could not connect CTA audio source:", e);
+          }
+        }
       }
 
       // Add combined audio track to stream
-      destination.stream.getAudioTracks().forEach(track => {
+      const audioTracks = destination.stream.getAudioTracks();
+      console.log("[VideoEncoder] Audio tracks available:", audioTracks.length);
+      audioTracks.forEach(track => {
         stream.addTrack(track);
       });
     } catch (e) {
@@ -724,6 +751,8 @@ export async function generateVideoFromSegments(
       audioElement = null;
       ctaAudioElement = null;
     }
+  } else {
+    console.log("[VideoEncoder] No audio URLs provided, generating video without audio");
   }
 
   // Get best available codec (prefer MP4 for Instagram)

@@ -290,18 +290,22 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS providers: Lovable TTS (HD) → Edge TTS → Free TTS → paid APIs
-    const tryCloudTTS = async (text: string): Promise<string | null> => {
-      // 🎯 Try Lovable TTS first (OpenAI HD voices via Lovable AI Gateway - FREE and HIGH QUALITY!)
+    // Helper to try TTS providers: Lovable TTS (Polly) → Edge TTS → Free TTS (Google)
+    const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
+      // 🎯 Try Lovable TTS first (StreamElements/Amazon Polly - FREE and GOOD QUALITY!)
       try {
-        console.log(`[TTS] Trying Lovable TTS (HD) with voice: ${preferredVoice}...`);
+        console.log(`[TTS] Trying Lovable TTS (Polly) with voice: ${preferredVoice}...`);
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
           body: { text, voice: preferredVoice },
         });
         
         if (!lovableResult.error && lovableResult.data?.audioContent && !lovableResult.data?.error) {
-          console.log(`[TTS] ✅ Lovable TTS success! Voice: ${lovableResult.data.openaiVoice || preferredVoice}`);
-          return `data:audio/mp3;base64,${lovableResult.data.audioContent}`;
+          console.log(`[TTS] ✅ Lovable TTS success! Voice: ${lovableResult.data.pollyVoice || preferredVoice}`);
+          toast.success(`🎙️ Narração gerada (voz: ${lovableResult.data.pollyVoice || 'Camila'})`);
+          return { 
+            url: `data:audio/mp3;base64,${lovableResult.data.audioContent}`,
+            provider: "Polly"
+          };
         }
         console.log("[TTS] Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
       } catch (e) {
@@ -317,7 +321,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
           console.log("[TTS] ✅ Edge TTS success!");
-          return `data:audio/mp3;base64,${edgeResult.data.audioContent}`;
+          toast.success("🎙️ Narração gerada (Microsoft Edge)");
+          return { 
+            url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
+            provider: "Edge"
+          };
         }
       } catch {
         // Silent fail
@@ -331,14 +339,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         });
         
         if (!freeResult.error && freeResult.data?.audioContent && !freeResult.data?.error) {
-          console.log("[TTS] ✅ Free TTS success!");
-          return `data:audio/mp3;base64,${freeResult.data.audioContent}`;
+          console.log("[TTS] ✅ Free TTS (Google) success!");
+          toast.success("🎙️ Narração gerada (Google TTS)");
+          return { 
+            url: `data:audio/mp3;base64,${freeResult.data.audioContent}`,
+            provider: "Google"
+          };
         }
       } catch {
         // Silent fail
       }
       
-      // Try paid APIs if user has credits configured
+      // Try paid APIs if user has credits configured (probably will fail but worth trying)
       try {
         const openaiResult = await supabase.functions.invoke("openai-tts", {
           body: { text, voice: "onyx" },
@@ -346,7 +358,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         
         if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
           console.log("[TTS] ✅ OpenAI TTS success!");
-          return `data:audio/mp3;base64,${openaiResult.data.audioContent}`;
+          return { url: `data:audio/mp3;base64,${openaiResult.data.audioContent}`, provider: "OpenAI" };
         }
       } catch {
         // Silent fail
@@ -359,7 +371,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         
         if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
           console.log("[TTS] ✅ ElevenLabs TTS success!");
-          return `data:audio/mp3;base64,${elevenResult.data.audioContent}`;
+          return { url: `data:audio/mp3;base64,${elevenResult.data.audioContent}`, provider: "ElevenLabs" };
         }
       } catch {
         // Silent fail
@@ -371,12 +383,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     try {
       // Generate narration
       console.log("[TTS] Starting narration generation...");
-      narrationUrl = await tryCloudTTS(fullScript) || "";
+      const narrationResult = await tryCloudTTS(fullScript);
+      narrationUrl = narrationResult?.url || "";
       
       if (narrationUrl) {
-        ctaNarrationUrl = await tryCloudTTS(ctaScript) || "";
+        console.log(`[TTS] Main narration generated with provider: ${narrationResult?.provider}`);
+        
+        const ctaResult = await tryCloudTTS(ctaScript);
+        ctaNarrationUrl = ctaResult?.url || "";
         
         const audioDuration = await getAudioDuration(narrationUrl);
+        console.log("[TTS] Audio duration detected:", audioDuration, "seconds");
+        
         if (audioDuration > 0) {
           const durationPerSegment = audioDuration / segments.length;
           
@@ -398,13 +416,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           });
         }
         
-        toast.success("Narração gerada com sucesso!");
         return { narrationUrl, ctaNarrationUrl, fullScript };
       }
       
-      // Cloud TTS unavailable - use browser TTS timing
-      console.log("Cloud TTS unavailable, using browser speech timing...");
-      toast.info("Usando narração do navegador (gratuita)");
+      // Cloud TTS unavailable - warn user
+      console.warn("[TTS] All TTS providers failed! Video will be generated without audio.");
+      toast.warning("⚠️ Narração não disponível - vídeo será gerado sem áudio", {
+        description: "Verifique os logs do console para detalhes"
+      });
       
       // Estimate duration based on text length
       const estimatedDuration = estimateSpeechDuration(fullScript);
@@ -427,7 +446,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         };
       });
       
-      // Return script for browser TTS playback
+      // Return script for reference even without audio
       return { narrationUrl: "", ctaNarrationUrl: "", fullScript };
     } catch (error: any) {
       console.warn("TTS error:", error);
