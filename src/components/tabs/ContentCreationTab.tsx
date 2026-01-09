@@ -35,6 +35,9 @@ import {
   Images,
   Mic,
   Music,
+  Search,
+  Newspaper,
+  Check,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -151,6 +154,12 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   // Overlay state
   const [showOverlayEditor, setShowOverlayEditor] = useState(false);
   const [overlay, setOverlay] = useState<OverlayMetadata>(DEFAULT_OVERLAY);
+  
+  // News search state (for "noticia" post type)
+  const [isSearchingNews, setIsSearchingNews] = useState(false);
+  const [newsResults, setNewsResults] = useState<any[]>([]);
+  const [selectedNewsImages, setSelectedNewsImages] = useState<string[]>([]);
+  const [newsSourceUrl, setNewsSourceUrl] = useState("");
   
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const { settings: brandSettings } = useBrandSettings();
@@ -341,6 +350,100 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     return parts.filter(Boolean).join('\n');
   };
 
+  // Search news using Firecrawl
+  const searchNews = async () => {
+    if (!topic.trim()) {
+      toast.error("Por favor, descreva a notícia que deseja pesquisar");
+      return;
+    }
+
+    setIsSearchingNews(true);
+    setNewsResults([]);
+    setSelectedNewsImages([]);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("firecrawl-search", {
+        body: { 
+          query: `${topic.trim()} notícia`,
+          limit: 5,
+          lang: "pt",
+          country: "BR",
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data?.length > 0) {
+        // Extract images from the results
+        const resultsWithImages = data.data.map((result: any) => ({
+          ...result,
+          images: extractImagesFromContent(result.markdown || result.description || ''),
+        }));
+        
+        setNewsResults(resultsWithImages);
+        toast.success(`Encontradas ${resultsWithImages.length} notícias!`);
+      } else {
+        toast.warning("Nenhuma notícia encontrada. Tente outro termo.");
+      }
+    } catch (error: any) {
+      console.error("Error searching news:", error);
+      toast.error(error.message || "Erro ao pesquisar notícias");
+    } finally {
+      setIsSearchingNews(false);
+    }
+  };
+
+  // Extract image URLs from markdown/content
+  const extractImagesFromContent = (content: string): string[] => {
+    const imageRegex = /!\[.*?\]\((https?:\/\/[^\s)]+)\)|<img[^>]+src=["'](https?:\/\/[^\s"']+)["']/gi;
+    const images: string[] = [];
+    let match;
+    
+    while ((match = imageRegex.exec(content)) !== null) {
+      const url = match[1] || match[2];
+      if (url && !images.includes(url)) {
+        images.push(url);
+      }
+    }
+    
+    return images;
+  };
+
+  // Select a news article and its content
+  const selectNewsArticle = (news: any) => {
+    // Set the news source
+    setNewsSourceUrl(news.url);
+    
+    // Create a summary of the news for the caption
+    const newsContent = news.description || news.title || '';
+    setTopic(news.title || topic);
+    
+    // Auto-generate caption context
+    toast.success("Notícia selecionada! Agora gere a legenda.");
+  };
+
+  // Toggle image selection for news
+  const toggleNewsImage = (imageUrl: string) => {
+    setSelectedNewsImages(prev => {
+      if (prev.includes(imageUrl)) {
+        return prev.filter(url => url !== imageUrl);
+      }
+      if (prev.length >= 3) {
+        toast.warning("Máximo de 3 imagens selecionadas");
+        return prev;
+      }
+      return [...prev, imageUrl];
+    });
+  };
+
+  // Use selected news image
+  const useSelectedNewsImage = (imageUrl: string) => {
+    setImageUrl(imageUrl);
+    setNewsResults([]);
+    setSelectedNewsImages([]);
+    toast.success("Imagem da notícia aplicada!");
+  };
+
   const generateCaption = async () => {
     if (!topic.trim()) {
       toast.error("Por favor, insira um tópico");
@@ -351,8 +454,17 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     try {
       const customInstructions = buildCustomInstructions();
       
+      // Add news context if it's a news post
+      const newsContext = postType === "noticia" && newsSourceUrl 
+        ? `\nEsta é uma notícia baseada em: ${newsSourceUrl}. Escreva em tom jornalístico e informativo.`
+        : '';
+      
       const { data, error } = await supabase.functions.invoke("generate-caption", {
-        body: { topic: topic.trim(), postType, customInstructions },
+        body: { 
+          topic: topic.trim() + newsContext, 
+          postType, 
+          customInstructions 
+        },
       });
 
       if (error) throw error;
@@ -674,33 +786,177 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="topic">Tópico ou Tema</Label>
-            <Input
-              id="topic"
-              placeholder="Ex: Dicas de produtividade, receita saudável, motivação..."
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
-          </div>
+          {/* Topic/News Input - Different UI for "noticia" type */}
+          {postType === "noticia" ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="topic" className="flex items-center gap-2">
+                  <Newspaper className="h-4 w-4" />
+                  Descreva a Notícia
+                </Label>
+                <Input
+                  id="topic"
+                  placeholder="Ex: Nova descoberta sobre inteligência artificial, avanços em computação quântica..."
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Descreva o tema da notícia para pesquisar na web e encontrar imagens reais
+                </p>
+              </div>
 
-          <Button
-            onClick={generateCaption}
-            disabled={isGenerating || !topic.trim()}
-            className="w-full"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Gerando...
-              </>
-            ) : (
-              <>
-                <Wand2 className="mr-2 h-4 w-4" />
-                Gerar Legenda com IA
-              </>
-            )}
-          </Button>
+              <Button
+                onClick={searchNews}
+                disabled={isSearchingNews || !topic.trim()}
+                className="w-full"
+                variant="outline"
+              >
+                {isSearchingNews ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Pesquisando notícias...
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Pesquisar Notícias na Web
+                  </>
+                )}
+              </Button>
+
+              {/* News Results */}
+              {newsResults.length > 0 && (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  <Label className="text-sm font-medium">Notícias Encontradas</Label>
+                  {newsResults.map((news, index) => (
+                    <Card 
+                      key={index} 
+                      className="p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => selectNewsArticle(news)}
+                    >
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm line-clamp-2">{news.title}</h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {news.description}
+                        </p>
+                        {news.url && (
+                          <p className="text-xs text-primary/70 truncate">{news.url}</p>
+                        )}
+                        
+                        {/* Images from this news */}
+                        {news.images && news.images.length > 0 && (
+                          <div className="pt-2">
+                            <p className="text-xs text-muted-foreground mb-2">
+                              Imagens disponíveis:
+                            </p>
+                            <div className="flex gap-2 flex-wrap">
+                              {news.images.slice(0, 4).map((img: string, imgIdx: number) => (
+                                <div 
+                                  key={imgIdx} 
+                                  className="relative group"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    useSelectedNewsImage(img);
+                                  }}
+                                >
+                                  <img 
+                                    src={img} 
+                                    alt={`Imagem ${imgIdx + 1}`}
+                                    className="w-16 h-16 object-cover rounded border hover:border-primary transition-colors"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                  />
+                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
+                                    <Check className="h-4 w-4 text-white" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Selected image from news */}
+              {imageUrl && postType === "noticia" && (
+                <div className="space-y-2">
+                  <Label className="text-sm">Imagem Selecionada da Notícia</Label>
+                  <div className="relative">
+                    <img 
+                      src={imageUrl} 
+                      alt="Imagem da notícia"
+                      className="w-full aspect-square object-cover rounded-lg border"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-6 w-6"
+                      onClick={() => setImageUrl("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {newsSourceUrl && (
+                    <p className="text-xs text-muted-foreground">
+                      Fonte: {newsSourceUrl}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <Button
+                onClick={generateCaption}
+                disabled={isGenerating || !topic.trim()}
+                className="w-full"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Gerar Legenda da Notícia
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="topic">Tópico ou Tema</Label>
+                <Input
+                  id="topic"
+                  placeholder="Ex: Dicas de produtividade, receita saudável, motivação..."
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                />
+              </div>
+
+              <Button
+                onClick={generateCaption}
+                disabled={isGenerating || !topic.trim()}
+                className="w-full"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Gerar Legenda com IA
+                  </>
+                )}
+              </Button>
+            </>
+          )}
 
           {generatedText && (
             <>

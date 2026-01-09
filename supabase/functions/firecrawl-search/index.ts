@@ -45,7 +45,7 @@ serve(async (req) => {
         lang,
         country,
         scrapeOptions: {
-          formats: ['markdown'],
+          formats: ['markdown', 'links'],
         },
       }),
     });
@@ -60,12 +60,43 @@ serve(async (req) => {
       );
     }
 
-    console.log('Search successful, found', data.data?.length || 0, 'results');
+    // Process results to extract images from markdown content
+    const processedResults = (data.data || []).map((result: any) => {
+      // Extract image URLs from markdown
+      const imageRegex = /!\[.*?\]\((https?:\/\/[^\s)]+)\)/gi;
+      const images: string[] = [];
+      let match;
+      
+      const content = result.markdown || '';
+      while ((match = imageRegex.exec(content)) !== null) {
+        const url = match[1];
+        // Filter out small icons, logos, and tracking pixels
+        if (url && !url.includes('icon') && !url.includes('logo') && !url.includes('avatar') && 
+            !url.includes('1x1') && !url.includes('pixel') && !images.includes(url)) {
+          images.push(url);
+        }
+      }
+      
+      // Also check for og:image in metadata if available
+      if (result.metadata?.ogImage && !images.includes(result.metadata.ogImage)) {
+        images.unshift(result.metadata.ogImage);
+      }
+      
+      return {
+        title: result.metadata?.title || result.title || '',
+        description: result.metadata?.description || result.description || '',
+        url: result.metadata?.sourceURL || result.url || '',
+        markdown: content,
+        images: images.slice(0, 5), // Limit to 5 images per result
+      };
+    });
+
+    console.log('Search successful, found', processedResults.length, 'results');
     
     return new Response(
       JSON.stringify({ 
         success: true, 
-        results: data.data || [],
+        data: processedResults,
         query 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
