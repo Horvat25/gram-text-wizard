@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.edge-tts]
 verify_jwt = false
+
+[functions.firecrawl-search]
+verify_jwt = false
