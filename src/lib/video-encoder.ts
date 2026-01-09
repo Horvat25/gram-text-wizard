@@ -19,6 +19,7 @@ interface VideoEncoderOptions {
   fps?: number;
   audioUrl?: string;
   ctaAudioUrl?: string; // Narration for the CTA at the end
+  backgroundMusicUrl?: string; // Background music track
   segments: VideoSegment[];
   onProgress?: (progress: number) => void;
   brandName?: string;
@@ -592,6 +593,7 @@ export async function generateVideoFromSegments(
     fps = 24,
     audioUrl,
     ctaAudioUrl,
+    backgroundMusicUrl,
     segments,
     onProgress,
     brandName = "Neural Update",
@@ -646,13 +648,14 @@ export async function generateVideoFromSegments(
   // Create video stream from canvas
   const stream = canvas.captureStream(fps);
 
-  // Add audio track if available (main narration + CTA audio)
+  // Add audio tracks if available (main narration + CTA audio + background music)
   let audioElement: HTMLAudioElement | null = null;
   let ctaAudioElement: HTMLAudioElement | null = null;
+  let musicAudioElement: HTMLAudioElement | null = null;
   let audioContext: AudioContext | null = null;
   let ctaAudioStarted = false;
   
-  if (audioUrl || ctaAudioUrl) {
+  if (audioUrl || ctaAudioUrl || backgroundMusicUrl) {
     try {
       // 🔊 Use the pre-unlocked global AudioContext
       audioContext = await ensureAudioReady();
@@ -740,6 +743,50 @@ export async function generateVideoFromSegments(
           }
         }
       }
+      
+      // Load background music
+      if (backgroundMusicUrl) {
+        console.log("[VideoEncoder] Setting up background music...");
+        musicAudioElement = new Audio();
+        musicAudioElement.crossOrigin = "anonymous";
+        musicAudioElement.src = backgroundMusicUrl;
+        musicAudioElement.volume = 0.15; // Low volume for background
+        musicAudioElement.loop = true; // Loop the music
+        
+        await new Promise<void>((resolve) => {
+          const timeout = setTimeout(() => {
+            console.warn("[VideoEncoder] Background music load timeout");
+            resolve();
+          }, 10000);
+          
+          musicAudioElement!.oncanplaythrough = () => {
+            clearTimeout(timeout);
+            console.log("[VideoEncoder] Background music loaded, duration:", musicAudioElement!.duration);
+            resolve();
+          };
+          musicAudioElement!.onerror = () => {
+            clearTimeout(timeout);
+            console.warn("[VideoEncoder] Background music load error");
+            resolve();
+          };
+          musicAudioElement!.load();
+        });
+
+        // Only connect if audio loaded successfully
+        if (musicAudioElement.readyState >= 2) {
+          try {
+            const musicSource = audioContext.createMediaElementSource(musicAudioElement);
+            // Create gain node for volume control
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.15; // Background volume
+            musicSource.connect(gainNode);
+            gainNode.connect(destination);
+            console.log("[VideoEncoder] Background music connected to video stream");
+          } catch (e) {
+            console.warn("[VideoEncoder] Could not connect background music source:", e);
+          }
+        }
+      }
 
       // Add combined audio track to stream
       const audioTracks = destination.stream.getAudioTracks();
@@ -751,6 +798,7 @@ export async function generateVideoFromSegments(
       console.warn("[VideoEncoder] Failed to add audio track:", e);
       audioElement = null;
       ctaAudioElement = null;
+      musicAudioElement = null;
     }
   } else {
     console.log("[VideoEncoder] No audio URLs provided, generating video without audio");
@@ -802,6 +850,12 @@ export async function generateVideoFromSegments(
       audioElement.currentTime = 0;
       audioElement.play().catch(console.warn);
     }
+    
+    // Start background music at the beginning
+    if (musicAudioElement) {
+      musicAudioElement.currentTime = 0;
+      musicAudioElement.play().catch(console.warn);
+    }
 
     // Track time using performance.now() for accuracy
     const startTime = performance.now();
@@ -817,6 +871,9 @@ export async function generateVideoFromSegments(
         }
         if (ctaAudioElement) {
           ctaAudioElement.pause();
+        }
+        if (musicAudioElement) {
+          musicAudioElement.pause();
         }
         if (audioContext) {
           audioContext.close().catch(console.warn);
