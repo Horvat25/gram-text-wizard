@@ -24,15 +24,45 @@ serve(async (req) => {
     }
 
     console.log("Generating TTS for text:", text.substring(0, 100) + "...");
-    console.log("Voice ID:", voiceId || "default (Brian)");
+    console.log("Voice ID/Name requested:", voiceId || "default");
     console.log("Language:", language || "pt-BR");
 
-    // Default voice: Brian (Portuguese-friendly)
-    // Alternative voices: 
-    // - "onwK4e9ZLuTAKqWW03F9" (Daniel - male, clear)
-    // - "EXAVITQu4vr4xnSDxMaL" (Sarah - female)
-    // - "nPczCjzI2devNBz1zQrb" (Brian - male, narrator)
-    const selectedVoiceId = voiceId || "nPczCjzI2devNBz1zQrb";
+    // Map voice names to ElevenLabs voice IDs
+    const voiceIdMap: Record<string, string> = {
+      // Portuguese-friendly voices
+      "camila": "onwK4e9ZLuTAKqWW03F9", // Daniel - works well with Portuguese
+      "vitoria": "EXAVITQu4vr4xnSDxMaL", // Sarah - female
+      "ricardo": "JBFqnCBsd6RMkjVDRZzb", // George - male
+      "fernanda": "XrExE9yKIg1WjnnlVkGX", // Matilda - female
+      // Standard ElevenLabs voices
+      "brian": "nPczCjzI2devNBz1zQrb",
+      "daniel": "onwK4e9ZLuTAKqWW03F9",
+      "sarah": "EXAVITQu4vr4xnSDxMaL",
+      "george": "JBFqnCBsd6RMkjVDRZzb",
+      "matilda": "XrExE9yKIg1WjnnlVkGX",
+      "alice": "Xb7hH8MSUJpSbSDYk0k2",
+      "charlie": "IKne3meq5aSn9XLyUdCD",
+      "jessica": "cgSgspJ2msm6clMCkdW9",
+      "chris": "iP95p4xoKVk53GoZ742B",
+      "lily": "pFZP5JQG7iQjIQuC4Bku",
+    };
+    
+    // Resolve voice: check if it's already an ID, otherwise look up in map
+    let selectedVoiceId = voiceId || "onwK4e9ZLuTAKqWW03F9"; // Default: Daniel
+    
+    // If it looks like a name (lowercase, no special chars), try to map it
+    if (selectedVoiceId && selectedVoiceId.length < 25 && /^[a-z]+$/i.test(selectedVoiceId)) {
+      const mappedId = voiceIdMap[selectedVoiceId.toLowerCase()];
+      if (mappedId) {
+        console.log(`Mapped voice name "${selectedVoiceId}" to ID "${mappedId}"`);
+        selectedVoiceId = mappedId;
+      } else {
+        console.log(`Voice name "${selectedVoiceId}" not found in map, using default`);
+        selectedVoiceId = "onwK4e9ZLuTAKqWW03F9"; // Default to Daniel
+      }
+    }
+    
+    console.log("Final voice ID:", selectedVoiceId);
 
     // IMPORTANT: output_format MUST be passed as query parameter, NOT in body!
     const response = await fetch(
