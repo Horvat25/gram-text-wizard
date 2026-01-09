@@ -421,33 +421,16 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         }
         
         setIsGeneratingMedia(false);
-      } else if (mediaType === "video" || mediaType === "reels") {
-        // Video generation
-        const duration = mediaType === "reels" ? 5 : 10;
-        const aspectRatio = mediaType === "reels" ? "9:16" : "16:9";
-
-        const { data, error } = await supabase.functions.invoke("generate-video", {
-          body: { 
-            prompt: fullPrompt,
-            duration,
-            aspectRatio,
-            brandName: brandSettings.brandName || "NeuralUpdate",
-          },
-        });
-
-        if (error) {
-          // Check for payment required error
-          if (error.message?.includes("402") || error.message?.includes("Payment")) {
-            throw new Error("Limite gratuito do Replicate atingido. Configure billing em replicate.com/account/billing");
-          }
-          throw error;
-        }
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        setVideoPredictionId(data.predictionId);
+      } else if (mediaType === "video") {
+        // Regular video - use image as poster, reels should use NarrativeVideoGenerator
+        toast.error("Para vídeos, selecione o modo 'Reels Narrado' e use o gerador de stories cinematográficos.");
+        setIsGeneratingMedia(false);
+        return;
+      } else if (mediaType === "reels") {
+        // Reels should use NarrativeVideoGenerator - redirect user
+        toast.error("Para Reels, use o gerador de Stories Cinematográficos abaixo. Selecione o modelo 'Narrativo'.");
+        setIsGeneratingMedia(false);
+        return;
         toast.info("Vídeo em geração. Você será notificado quando pronto.");
       }
     } catch (error: any) {
@@ -747,8 +730,8 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                 </div>
               )}
 
-              {/* Media Generation - Show narrative generator for reels with narrative model */}
-              {selectedModel === "narrative" && mediaType === "reels" ? (
+              {/* Media Generation - Show narrative generator for ALL reels (no Replicate) */}
+              {mediaType === "reels" ? (
                 <div className="pt-2 border-t">
                   <NarrativeVideoGenerator
                     topic={topic}
