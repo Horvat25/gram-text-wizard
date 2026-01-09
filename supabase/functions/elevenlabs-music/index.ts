@@ -40,6 +40,23 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("ElevenLabs Music error:", response.status, errorText);
+      
+      // Return graceful fallback for payment/quota issues (music is optional)
+      if (response.status === 402 || response.status === 401 || response.status === 403 || response.status === 429) {
+        console.log("ElevenLabs Music unavailable (requires paid plan), returning empty");
+        return new Response(
+          JSON.stringify({ 
+            audioContent: null,
+            error: "Music generation requires ElevenLabs paid plan",
+            fallback: true,
+          }),
+          {
+            status: 200, // Return 200 so client handles gracefully
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
       throw new Error(`ElevenLabs Music error: ${response.status}`);
     }
 
