@@ -9,6 +9,39 @@ const corsHeaders = {
 // Helper function to wait
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Refresh TikTok access token using refresh_token
+async function refreshTikTokToken(refreshToken: string, clientKey: string, clientSecret: string) {
+  console.log('Refreshing TikTok access token...');
+  
+  const response = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      client_key: clientKey,
+      client_secret: clientSecret,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
+  });
+
+  const data = await response.json();
+  
+  if (data.error || !data.access_token) {
+    console.error('Failed to refresh token:', data);
+    throw new Error(data.error_description || 'Failed to refresh TikTok token');
+  }
+
+  console.log('Token refreshed successfully, new expiry:', data.expires_in, 'seconds');
+  
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_in: data.expires_in,
+  };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -18,6 +51,8 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const clientKey = Deno.env.get('TIKTOK_CLIENT_KEY');
+    const clientSecret = Deno.env.get('TIKTOK_CLIENT_SECRET');
 
     const { postId, accountId } = await req.json();
 
@@ -73,6 +108,67 @@ serve(async (req) => {
       );
     }
 
+    // Check if token is expired or about to expire (within 5 minutes)
+    let accessToken = account.access_token;
+    const expiresAt = new Date(account.expires_at);
+    const now = new Date();
+    const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+
+    if (expiresAt < fiveMinutesFromNow) {
+      console.log('Token expired or expiring soon, refreshing...');
+      
+      if (!account.refresh_token) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Token expirado e sem refresh_token. Por favor, reconecte sua conta TikTok nas Configurações.' 
+          }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!clientKey || !clientSecret) {
+        return new Response(
+          JSON.stringify({ error: 'TikTok credentials not configured for token refresh' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      try {
+        const newTokens = await refreshTikTokToken(account.refresh_token, clientKey, clientSecret);
+        accessToken = newTokens.access_token;
+
+        // Calculate new expiry - set to 30 days from now (or actual expiry, whichever is less)
+        // TikTok access tokens last 24h but we refresh automatically
+        const newExpiresAt = new Date(Date.now() + newTokens.expires_in * 1000).toISOString();
+
+        // Update the account with new tokens
+        const { error: updateError } = await supabase
+          .from('tiktok_accounts')
+          .update({
+            access_token: newTokens.access_token,
+            refresh_token: newTokens.refresh_token,
+            expires_at: newExpiresAt,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', account.id);
+
+        if (updateError) {
+          console.error('Failed to update tokens in database:', updateError);
+        } else {
+          console.log('Tokens updated in database, new expiry:', newExpiresAt);
+        }
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Falha ao renovar token. Por favor, reconecte sua conta TikTok nas Configurações.',
+            details: refreshError instanceof Error ? refreshError.message : 'Unknown error'
+          }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     console.log('Publishing to TikTok for account:', account.username || account.open_id);
 
     // Download the video first
@@ -101,7 +197,7 @@ serve(async (req) => {
     const initResponse = await fetch('https://open.tiktokapis.com/v2/post/publish/inbox/video/init/', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${account.access_token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: JSON.stringify({
@@ -189,7 +285,7 @@ serve(async (req) => {
       const statusResponse = await fetch('https://open.tiktokapis.com/v2/post/publish/status/fetch/', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${account.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: JSON.stringify({
