@@ -91,22 +91,37 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error("ElevenLabs TTS error:", response.status, errorText);
       
-      // Return specific error codes for client-side fallback handling
-      if (response.status === 401 || response.status === 403) {
+      // Return 200 with fallback flag so client can properly detect and use next provider
+      // Using 200 instead of 503 because supabase.functions.invoke treats non-2xx as errors
+      if (response.status === 401 || response.status === 403 || response.status === 429) {
+        console.log("ElevenLabs blocked/rate-limited, signaling client to use fallback");
         return new Response(
           JSON.stringify({ 
-            error: "ElevenLabs account issue - use fallback",
+            error: "ElevenLabs unavailable",
             code: "ELEVENLABS_BLOCKED",
-            fallback: true 
+            fallback: true,
+            audioContent: null, // Explicit null so client knows no audio
           }),
           {
-            status: 503, // Service unavailable - signals to use fallback
+            status: 200, // Return 200 so client can read the fallback flag
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
       }
       
-      throw new Error(`ElevenLabs TTS error: ${response.status}`);
+      // For other errors, also signal fallback
+      console.log("ElevenLabs error, signaling client to use fallback");
+      return new Response(
+        JSON.stringify({ 
+          error: `ElevenLabs error: ${response.status}`,
+          fallback: true,
+          audioContent: null,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     const audioBuffer = await response.arrayBuffer();
