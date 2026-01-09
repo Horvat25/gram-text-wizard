@@ -42,27 +42,31 @@ interface PublicationQueueTabProps {
 }
 
 // Brasília timezone offset (UTC-3)
-const BRASILIA_OFFSET = -3;
+const BRASILIA_OFFSET_HOURS = 3; // Brasília is UTC-3, so we add 3 to go to UTC
 
-// Convert local datetime-local input to UTC ISO string for storage
+// Convert datetime-local input (interpreted as Brasília time) to UTC ISO string
 const localToUTC = (localDatetime: string): string => {
   if (!localDatetime) return "";
-  // datetime-local gives us the local time the user selected
-  // We interpret it as Brasília time and convert to UTC
-  const date = new Date(localDatetime);
-  // Adjust for Brasília offset (add 3 hours to get UTC)
-  const utcDate = addMinutes(date, -BRASILIA_OFFSET * 60);
+  // datetime-local gives us a string like "2026-01-09T15:00"
+  // We interpret this as Brasília time (UTC-3)
+  // To convert to UTC, we add 3 hours
+  const [datePart, timePart] = localDatetime.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+  
+  // Create date in UTC directly by adding the offset
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hours + BRASILIA_OFFSET_HOURS, minutes, 0));
   return utcDate.toISOString();
 };
 
-// Convert UTC ISO string from database to local Brasília time for display
+// Convert UTC ISO string from database to Brasília Date for display
 const utcToBrasilia = (utcDatetime: string): Date => {
   const date = parseISO(utcDatetime);
-  // Adjust for Brasília offset (subtract 3 hours from UTC)
-  return addMinutes(date, BRASILIA_OFFSET * 60);
+  // Subtract 3 hours from UTC to get Brasília time
+  return addMinutes(date, -BRASILIA_OFFSET_HOURS * 60);
 };
 
-// Format datetime for datetime-local input (Brasília time)
+// Format datetime for datetime-local input (shows Brasília time)
 const formatForInput = (utcDatetime: string): string => {
   if (!utcDatetime) return "";
   const brasiliaDate = utcToBrasilia(utcDatetime);
@@ -76,11 +80,11 @@ const formatForDisplay = (utcDatetime: string, formatStr: string): string => {
   return format(brasiliaDate, formatStr, { locale: ptBR });
 };
 
-// Get time remaining until publication
+// Get time remaining until publication (comparing UTC times)
 const getTimeRemaining = (utcDatetime: string): string => {
-  const brasiliaDate = utcToBrasilia(utcDatetime);
-  const now = new Date();
-  const diff = differenceInMinutes(brasiliaDate, now);
+  const scheduledUtc = parseISO(utcDatetime);
+  const nowUtc = new Date();
+  const diff = differenceInMinutes(scheduledUtc, nowUtc);
   
   if (diff < 0) return "Atrasado";
   if (diff < 60) return `Em ${diff} min`;
@@ -88,7 +92,7 @@ const getTimeRemaining = (utcDatetime: string): string => {
   return `Em ${Math.floor(diff / 1440)} dias`;
 };
 
-// Get relative date label
+// Get relative date label (in Brasília time for display)
 const getDateLabel = (utcDatetime: string): string => {
   const brasiliaDate = utcToBrasilia(utcDatetime);
   if (isToday(brasiliaDate)) return "Hoje";
@@ -96,11 +100,13 @@ const getDateLabel = (utcDatetime: string): string => {
   return format(brasiliaDate, "dd/MM", { locale: ptBR });
 };
 
-// Get minimum datetime for scheduling (now + 5 minutes in Brasília)
+// Get minimum datetime for scheduling (now + 5 minutes, in Brasília time for input)
 const getMinDatetime = (): string => {
-  const now = new Date();
-  const minDate = addMinutes(now, 5);
-  return format(minDate, "yyyy-MM-dd'T'HH:mm");
+  const nowUtc = new Date();
+  // Convert current UTC time to Brasília, add 5 minutes
+  const nowBrasilia = addMinutes(nowUtc, -BRASILIA_OFFSET_HOURS * 60);
+  const minBrasilia = addMinutes(nowBrasilia, 5);
+  return format(minBrasilia, "yyyy-MM-dd'T'HH:mm");
 };
 
 const PublicationQueueTab = ({
