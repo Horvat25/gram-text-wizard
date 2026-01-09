@@ -692,8 +692,9 @@ export async function generateVideoFromSegments(
           try {
             const source = audioContext.createMediaElementSource(audioElement);
             source.connect(destination);
-            source.connect(audioContext.destination); // Also play through speakers for debugging
-            console.log("[VideoEncoder] Main audio connected to destination");
+            // ⚠️ NÃO conectar a audioContext.destination - isso faz o áudio tocar nos alto-falantes
+            // O áudio só deve estar no vídeo final, não reproduzido durante a renderização
+            console.log("[VideoEncoder] Main audio connected to video stream only (not speakers)");
           } catch (e) {
             console.warn("[VideoEncoder] Could not connect audio source:", e);
           }
@@ -732,8 +733,8 @@ export async function generateVideoFromSegments(
           try {
             const ctaSource = audioContext.createMediaElementSource(ctaAudioElement);
             ctaSource.connect(destination);
-            ctaSource.connect(audioContext.destination);
-            console.log("[VideoEncoder] CTA audio connected to destination");
+            // ⚠️ NÃO conectar a audioContext.destination - áudio só no vídeo
+            console.log("[VideoEncoder] CTA audio connected to video stream only (not speakers)");
           } catch (e) {
             console.warn("[VideoEncoder] Could not connect CTA audio source:", e);
           }

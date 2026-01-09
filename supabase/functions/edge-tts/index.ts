@@ -7,116 +7,172 @@ const corsHeaders = {
 };
 
 /**
- * Free TTS using Streamlabs Polly API (neural voices)
- * High quality voices, no API key required
+ * Free TTS using VoiceRSS API (neural voices, actually free!)
+ * Much better quality than Google Translate TTS
  */
 
 interface VoiceConfig {
   name: string;
-  pollyVoice: string;
+  voiceRSSVoice: string;
   lang: string;
   gender: string;
 }
 
-// Mapping to Amazon Polly neural voices via Streamlabs
+// VoiceRSS Brazilian Portuguese voices - natural neural quality
 const VOICES: Record<string, VoiceConfig> = {
-  // Brazilian Portuguese - Neural voices (matching Settings page options)
-  "camila": { name: "Camila", pollyVoice: "Camila", lang: "pt-BR", gender: "Female" },
-  "vitoria": { name: "Vitória", pollyVoice: "Vitoria", lang: "pt-BR", gender: "Female" },
-  "thiago": { name: "Thiago", pollyVoice: "Thiago", lang: "pt-BR", gender: "Male" },
-  "ricardo": { name: "Ricardo", pollyVoice: "Ricardo", lang: "pt-BR", gender: "Male" },
+  // Brazilian Portuguese - Female (natural, not robotic)
+  "camila": { name: "Camila", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
+  "vitoria": { name: "Vitória", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
+  "francisca": { name: "Francisca", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
+  // Brazilian Portuguese - Male
+  "thiago": { name: "Thiago", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Male" },
+  "ricardo": { name: "Ricardo", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Male" },
+  "antonio": { name: "Antonio", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Male" },
   // Portuguese Portugal
-  "fernanda": { name: "Fernanda", pollyVoice: "Ines", lang: "pt-PT", gender: "Female" },
-  // Aliases for backward compatibility
-  "antonio": { name: "Thiago", pollyVoice: "Thiago", lang: "pt-BR", gender: "Male" },
-  "francisca": { name: "Camila", pollyVoice: "Camila", lang: "pt-BR", gender: "Female" },
-  // English
-  "matthew": { name: "Matthew", pollyVoice: "Matthew", lang: "en-US", gender: "Male" },
-  "joanna": { name: "Joanna", pollyVoice: "Joanna", lang: "en-US", gender: "Female" },
-  "brian": { name: "Brian", pollyVoice: "Brian", lang: "en-GB", gender: "Male" },
+  "fernanda": { name: "Fernanda", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
+  // English voices
+  "matthew": { name: "Matthew", voiceRSSVoice: "John", lang: "en-us", gender: "Male" },
+  "joanna": { name: "Joanna", voiceRSSVoice: "Mary", lang: "en-us", gender: "Female" },
+  "brian": { name: "Brian", voiceRSSVoice: "John", lang: "en-gb", gender: "Male" },
 };
 
 const DEFAULT_VOICE = "camila";
 
+// VoiceRSS API Key (free tier - 350 requests/day)
+const VOICERSS_API_KEY = "f16d908cfc664ad7a5b13a89f4de84a4";
+
 /**
- * Generate speech using Streamlabs Polly API (free, high quality)
+ * Generate speech using VoiceRSS API (free, neural quality)
  */
-async function generatePollyTTS(text: string, voiceKey: string = DEFAULT_VOICE): Promise<Uint8Array> {
+async function generateVoiceRSSTTS(text: string, voiceKey: string = DEFAULT_VOICE): Promise<Uint8Array> {
   const voice = VOICES[voiceKey] || VOICES[DEFAULT_VOICE];
   
-  console.log(`[EdgeTTS] Using Polly voice: ${voice.pollyVoice}`);
+  console.log(`[EdgeTTS] Using VoiceRSS voice: ${voice.voiceRSSVoice} (${voice.lang})`);
   console.log(`[EdgeTTS] Text length: ${text.length} chars`);
   
-  // Streamlabs Polly API - free and high quality
-  const response = await fetch("https://streamlabs.com/polly/speak", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    },
-    body: JSON.stringify({
-      text: text,
-      voice: voice.pollyVoice,
-    }),
+  const params = new URLSearchParams({
+    key: VOICERSS_API_KEY,
+    src: text,
+    hl: voice.lang,
+    v: voice.voiceRSSVoice,
+    c: "MP3",
+    f: "44khz_16bit_stereo",
+    r: "0", // Normal speed
   });
 
+  const response = await fetch(`https://api.voicerss.org/?${params.toString()}`, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    },
+  });
+  
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[EdgeTTS] Polly API error: ${response.status} - ${errorText}`);
-    throw new Error(`Polly API error: ${response.status}`);
+    console.error(`[EdgeTTS] VoiceRSS error: ${response.status} - ${errorText}`);
+    throw new Error(`VoiceRSS error: ${response.status}`);
   }
 
-  const data = await response.json();
+  const contentType = response.headers.get("content-type") || "";
   
-  if (!data.speak_url) {
-    throw new Error("No audio URL in response");
+  // VoiceRSS returns text/plain on error
+  if (contentType.includes("text")) {
+    const errorText = await response.text();
+    console.error(`[EdgeTTS] VoiceRSS returned text error: ${errorText}`);
+    throw new Error(`VoiceRSS error: ${errorText}`);
   }
 
-  console.log(`[EdgeTTS] Got audio URL, downloading...`);
-  
-  // Download the audio file
-  const audioResponse = await fetch(data.speak_url);
-  
-  if (!audioResponse.ok) {
-    throw new Error(`Failed to download audio: ${audioResponse.status}`);
-  }
-
-  const audioBuffer = await audioResponse.arrayBuffer();
-  console.log(`[EdgeTTS] Downloaded ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+  const audioBuffer = await response.arrayBuffer();
+  console.log(`[EdgeTTS] VoiceRSS success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
   
   return new Uint8Array(audioBuffer);
 }
 
 /**
- * Fallback: Use VoiceRSS API (also free tier available)
+ * Fallback: ResponsiveVoice API (also free, decent quality)
  */
-async function generateVoiceRSSTTS(text: string, lang: string = "pt-br"): Promise<Uint8Array> {
-  console.log(`[EdgeTTS] Fallback to VoiceRSS`);
+async function generateResponsiveVoiceTTS(text: string, lang: string = "pt-BR"): Promise<Uint8Array> {
+  console.log(`[EdgeTTS] Fallback to ResponsiveVoice...`);
   
-  // VoiceRSS has a free tier - this is a demo key
   const params = new URLSearchParams({
-    key: "f16d908cfc664ad7a5b13a89f4de84a4", // Free demo key
-    src: text,
-    hl: lang,
-    v: "Luciana", // Brazilian Portuguese voice
-    c: "MP3",
-    f: "44khz_16bit_stereo",
+    text: text,
+    lang: "Brazilian Portuguese Female",
+    pitch: "0.5",
+    rate: "0.5",
+    vol: "1",
+    key: "qlsXP1Ow", // Public demo key
   });
 
-  const response = await fetch(`https://api.voicerss.org/?${params.toString()}`);
+  const url = `https://texttospeech.responsivevoice.org/v1/text:synthesize?${params.toString()}`;
+  
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    },
+  });
   
   if (!response.ok) {
-    throw new Error(`VoiceRSS error: ${response.status}`);
-  }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("text")) {
-    const errorText = await response.text();
-    throw new Error(`VoiceRSS error: ${errorText}`);
+    throw new Error(`ResponsiveVoice error: ${response.status}`);
   }
 
   const audioBuffer = await response.arrayBuffer();
+  console.log(`[EdgeTTS] ResponsiveVoice success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+  
   return new Uint8Array(audioBuffer);
+}
+
+/**
+ * Last resort: Google Translate TTS (more robotic but always works)
+ */
+async function generateGoogleTTS(text: string): Promise<Uint8Array> {
+  console.log(`[EdgeTTS] Last fallback: Google Translate TTS`);
+  
+  const chunks: Uint8Array[] = [];
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
+    if (trimmed.length === 0) continue;
+    
+    // Split long sentences
+    const maxLen = 180;
+    const parts = trimmed.length > maxLen 
+      ? trimmed.match(new RegExp(`.{1,${maxLen}}(\\s|$)`, 'g')) || [trimmed]
+      : [trimmed];
+    
+    for (const part of parts) {
+      const cleanPart = part.trim();
+      if (!cleanPart) continue;
+      
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanPart)}&tl=pt-BR&client=tw-ob`;
+      
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+      });
+      
+      if (response.ok) {
+        const buffer = await response.arrayBuffer();
+        chunks.push(new Uint8Array(buffer));
+      }
+    }
+  }
+  
+  if (chunks.length === 0) {
+    throw new Error("Google TTS failed to generate any audio");
+  }
+  
+  // Concatenate all chunks
+  const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
+  const audioData = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    audioData.set(chunk, offset);
+    offset += chunk.length;
+  }
+  
+  console.log(`[EdgeTTS] Google TTS success! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
+  return audioData;
 }
 
 serve(async (req) => {
@@ -125,7 +181,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice, rate } = await req.json();
+    const { text, voice } = await req.json();
 
     if (!text || text.trim().length === 0) {
       return new Response(
@@ -134,51 +190,34 @@ serve(async (req) => {
       );
     }
 
-    console.log(`[EdgeTTS] Request: ${text.substring(0, 80)}...`);
-    console.log(`[EdgeTTS] Voice: ${voice || DEFAULT_VOICE}`);
+    console.log(`[EdgeTTS] Request: "${text.substring(0, 80)}..."`);
+    console.log(`[EdgeTTS] Voice requested: ${voice || DEFAULT_VOICE}`);
 
     let audioData: Uint8Array;
+    let usedProvider = "unknown";
     
+    // Try VoiceRSS first (best quality)
     try {
-      // Try Streamlabs Polly first
-      audioData = await generatePollyTTS(text, voice || DEFAULT_VOICE);
-    } catch (pollyError) {
-      console.error(`[EdgeTTS] Polly failed:`, pollyError);
+      audioData = await generateVoiceRSSTTS(text, voice || DEFAULT_VOICE);
+      usedProvider = "VoiceRSS";
+    } catch (voiceRSSError) {
+      console.error(`[EdgeTTS] VoiceRSS failed:`, voiceRSSError);
       
-      // Fallback to Google Translate TTS
-      console.log(`[EdgeTTS] Falling back to Google TTS`);
-      const chunks: Uint8Array[] = [];
-      const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-      
-      for (const sentence of sentences) {
-        const trimmed = sentence.trim();
-        if (trimmed.length === 0) continue;
+      // Try ResponsiveVoice next
+      try {
+        audioData = await generateResponsiveVoiceTTS(text);
+        usedProvider = "ResponsiveVoice";
+      } catch (rvError) {
+        console.error(`[EdgeTTS] ResponsiveVoice failed:`, rvError);
         
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(trimmed)}&tl=pt-BR&client=tw-ob`;
-        
-        const response = await fetch(url, {
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-          },
-        });
-        
-        if (response.ok) {
-          const buffer = await response.arrayBuffer();
-          chunks.push(new Uint8Array(buffer));
+        // Last resort: Google TTS
+        try {
+          audioData = await generateGoogleTTS(text);
+          usedProvider = "Google";
+        } catch (googleError) {
+          console.error(`[EdgeTTS] Google TTS failed:`, googleError);
+          throw new Error("All TTS providers failed");
         }
-      }
-      
-      if (chunks.length === 0) {
-        throw new Error("All TTS methods failed");
-      }
-      
-      // Concatenate
-      const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
-      audioData = new Uint8Array(totalLength);
-      let offset = 0;
-      for (const chunk of chunks) {
-        audioData.set(chunk, offset);
-        offset += chunk.length;
       }
     }
     
@@ -188,13 +227,14 @@ serve(async (req) => {
     
     const base64Audio = base64Encode(new Uint8Array(audioData).buffer as ArrayBuffer);
     
-    console.log(`[EdgeTTS] Success! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
+    console.log(`[EdgeTTS] ✅ Success with ${usedProvider}! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
 
     return new Response(
       JSON.stringify({
         audioContent: base64Audio,
         format: "mp3",
         voice: voice || DEFAULT_VOICE,
+        provider: usedProvider,
         duration_estimate: Math.ceil(text.length / 14),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
