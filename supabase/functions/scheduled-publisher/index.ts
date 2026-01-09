@@ -16,15 +16,20 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    const now = new Date();
+    const nowIso = now.toISOString();
+    
+    // Log current time for debugging
     console.log("🕐 Verificando posts agendados...");
+    console.log(`⏰ Hora atual UTC: ${nowIso}`);
+    console.log(`⏰ Hora atual Brasília: ${new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString().replace('Z', ' BRT')}`);
 
     // Find posts that are scheduled and due for publishing
-    const now = new Date().toISOString();
     const { data: scheduledPosts, error: fetchError } = await supabase
       .from("posts")
       .select("*")
       .eq("status", "scheduled")
-      .lte("scheduled_for", now);
+      .lte("scheduled_for", nowIso);
 
     if (fetchError) {
       console.error("Erro ao buscar posts agendados:", fetchError);
