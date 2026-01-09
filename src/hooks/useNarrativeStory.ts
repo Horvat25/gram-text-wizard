@@ -290,9 +290,30 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     
-    // Helper to try TTS providers: Lovable TTS (Polly) → Edge TTS → Free TTS (Google)
+    // Helper to try TTS providers: Edge TTS (VoiceRSS) → Lovable TTS → Free TTS (Google)
     const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
-      // 🎯 Try Lovable TTS first (StreamElements/Amazon Polly - FREE and GOOD QUALITY!)
+      // 🎯 Try Edge TTS first (VoiceRSS - FREE and GOOD QUALITY!)
+      try {
+        console.log(`[TTS] Trying Edge TTS (VoiceRSS) with voice: ${preferredVoice}...`);
+        const edgeResult = await supabase.functions.invoke("edge-tts", {
+          body: { text, voice: preferredVoice },
+        });
+        
+        if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
+          const provider = edgeResult.data.provider || "VoiceRSS";
+          console.log(`[TTS] ✅ Edge TTS success! Provider: ${provider}`);
+          toast.success(`🎙️ Narração gerada (voz neural: ${provider})`);
+          return { 
+            url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
+            provider
+          };
+        }
+        console.log("[TTS] Edge TTS failed:", edgeResult.data?.error || edgeResult.error);
+      } catch (e) {
+        console.log("[TTS] Edge TTS error:", e);
+      }
+      
+      // 🔄 Fallback to Lovable TTS (StreamElements/Polly)
       try {
         console.log(`[TTS] Trying Lovable TTS (Polly) with voice: ${preferredVoice}...`);
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
@@ -312,25 +333,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.log("[TTS] Lovable TTS error:", e);
       }
       
-      // 🔄 Fallback to Edge TTS (Microsoft neural voices)
-      try {
-        console.log(`[TTS] Trying Edge TTS with voice: ${preferredVoice}...`);
-        const edgeResult = await supabase.functions.invoke("edge-tts", {
-          body: { text, voice: preferredVoice },
-        });
-        
-        if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          console.log("[TTS] ✅ Edge TTS success!");
-          toast.success("🎙️ Narração gerada (Microsoft Edge)");
-          return { 
-            url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider: "Edge"
-          };
-        }
-      } catch {
-        // Silent fail
-      }
-      
       // 🆓 Try Free TTS (Google Translate) as last resort
       try {
         console.log("[TTS] Trying Free TTS (Google Translate)...");
@@ -340,38 +342,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         
         if (!freeResult.error && freeResult.data?.audioContent && !freeResult.data?.error) {
           console.log("[TTS] ✅ Free TTS (Google) success!");
-          toast.success("🎙️ Narração gerada (Google TTS)");
+          toast.warning("🎙️ Narração gerada (Google TTS - qualidade básica)");
           return { 
             url: `data:audio/mp3;base64,${freeResult.data.audioContent}`,
             provider: "Google"
           };
-        }
-      } catch {
-        // Silent fail
-      }
-      
-      // Try paid APIs if user has credits configured (probably will fail but worth trying)
-      try {
-        const openaiResult = await supabase.functions.invoke("openai-tts", {
-          body: { text, voice: "onyx" },
-        });
-        
-        if (!openaiResult.error && openaiResult.data?.audioContent && !openaiResult.data?.error) {
-          console.log("[TTS] ✅ OpenAI TTS success!");
-          return { url: `data:audio/mp3;base64,${openaiResult.data.audioContent}`, provider: "OpenAI" };
-        }
-      } catch {
-        // Silent fail
-      }
-      
-      try {
-        const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
-          body: { text, language: "pt-BR" },
-        });
-        
-        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.error && !elevenResult.data?.fallback) {
-          console.log("[TTS] ✅ ElevenLabs TTS success!");
-          return { url: `data:audio/mp3;base64,${elevenResult.data.audioContent}`, provider: "ElevenLabs" };
         }
       } catch {
         // Silent fail
