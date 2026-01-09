@@ -25,8 +25,7 @@ import {
   RefreshCw,
   Globe,
 } from "lucide-react";
-import { format, parseISO, isPast, isToday, isTomorrow, addMinutes, differenceInMinutes } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
@@ -41,72 +40,134 @@ interface PublicationQueueTabProps {
   onUpdate: (id: string, updates: Partial<Post>) => Promise<boolean>;
 }
 
-// Brasília timezone offset (UTC-3)
-const BRASILIA_OFFSET_HOURS = 3; // Brasília is UTC-3, so we add 3 to go to UTC
+// Brasília timezone (fixed display regardless of the user's device timezone)
+const BRASILIA_TIMEZONE = "America/Sao_Paulo";
 
 // Convert datetime-local input (interpreted as Brasília time) to UTC ISO string
 const localToUTC = (localDatetime: string): string => {
   if (!localDatetime) return "";
+
   // datetime-local gives us a string like "2026-01-09T15:00"
-  // We interpret this as Brasília time (UTC-3)
-  // To convert to UTC, we add 3 hours
-  const [datePart, timePart] = localDatetime.split('T');
-  const [year, month, day] = datePart.split('-').map(Number);
-  const [hours, minutes] = timePart.split(':').map(Number);
-  
-  // Create date in UTC directly by adding the offset
-  const utcDate = new Date(Date.UTC(year, month - 1, day, hours + BRASILIA_OFFSET_HOURS, minutes, 0));
+  // We interpret this as Brasília time (America/Sao_Paulo)
+  // To convert to UTC, we add 3 hours (UTC-3 -> UTC)
+  const [datePart, timePart] = localDatetime.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hours + 3, minutes, 0));
   return utcDate.toISOString();
 };
 
-// Convert UTC ISO string from database to Brasília Date for display
-const utcToBrasilia = (utcDatetime: string): Date => {
-  const date = parseISO(utcDatetime);
-  // Subtract 3 hours from UTC to get Brasília time
-  return addMinutes(date, -BRASILIA_OFFSET_HOURS * 60);
+const getBrasiliaParts = (date: Date) => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: BRASILIA_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const pick = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+
+  return {
+    year: pick("year"),
+    month: pick("month"),
+    day: pick("day"),
+    hour: pick("hour"),
+    minute: pick("minute"),
+  };
 };
 
-// Format datetime for datetime-local input (shows Brasília time)
+const brasiliaDateKey = (date: Date) => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: BRASILIA_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const pick = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${pick("year")}-${pick("month")}-${pick("day")}`;
+};
+
+// Format datetime for datetime-local input (always shows Brasília time)
 const formatForInput = (utcDatetime: string): string => {
   if (!utcDatetime) return "";
-  const brasiliaDate = utcToBrasilia(utcDatetime);
-  return format(brasiliaDate, "yyyy-MM-dd'T'HH:mm");
+  const { year, month, day, hour, minute } = getBrasiliaParts(new Date(utcDatetime));
+  return `${year}-${month}-${day}T${hour}:${minute}`;
 };
 
-// Format datetime for display (Brasília time)
+// Format datetime for display (always shows Brasília time)
 const formatForDisplay = (utcDatetime: string, formatStr: string): string => {
   if (!utcDatetime) return "";
-  const brasiliaDate = utcToBrasilia(utcDatetime);
-  return format(brasiliaDate, formatStr, { locale: ptBR });
+
+  const date = new Date(utcDatetime);
+
+  if (formatStr === "HH:mm") {
+    return new Intl.DateTimeFormat("pt-BR", {
+      timeZone: BRASILIA_TIMEZONE,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(date);
+  }
+
+  if (formatStr === "dd/MM") {
+    const { day, month } = getBrasiliaParts(date);
+    return `${day}/${month}`;
+  }
+
+  // Supports "dd 'de' MMMM 'às' HH:mm" (used in the view dialog)
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: BRASILIA_TIMEZONE,
+    day: "2-digit",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const pick = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  const day = pick("day");
+  const month = pick("month");
+  const hour = pick("hour");
+  const minute = pick("minute");
+
+  return `${day} de ${month} às ${hour}:${minute}`;
 };
 
-// Get time remaining until publication (comparing UTC times)
+// Get time remaining until publication (comparing real instants)
 const getTimeRemaining = (utcDatetime: string): string => {
   const scheduledUtc = parseISO(utcDatetime);
   const nowUtc = new Date();
   const diff = differenceInMinutes(scheduledUtc, nowUtc);
-  
+
   if (diff < 0) return "Atrasado";
   if (diff < 60) return `Em ${diff} min`;
   if (diff < 1440) return `Em ${Math.floor(diff / 60)}h`;
   return `Em ${Math.floor(diff / 1440)} dias`;
 };
 
-// Get relative date label (in Brasília time for display)
+// Get relative date label (evaluated in Brasília timezone)
 const getDateLabel = (utcDatetime: string): string => {
-  const brasiliaDate = utcToBrasilia(utcDatetime);
-  if (isToday(brasiliaDate)) return "Hoje";
-  if (isTomorrow(brasiliaDate)) return "Amanhã";
-  return format(brasiliaDate, "dd/MM", { locale: ptBR });
+  const scheduledKey = brasiliaDateKey(new Date(utcDatetime));
+  const now = new Date();
+  const todayKey = brasiliaDateKey(now);
+  const tomorrowKey = brasiliaDateKey(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+
+  if (scheduledKey === todayKey) return "Hoje";
+  if (scheduledKey === tomorrowKey) return "Amanhã";
+
+  const { day, month } = getBrasiliaParts(new Date(utcDatetime));
+  return `${day}/${month}`;
 };
 
-// Get minimum datetime for scheduling (now + 5 minutes, in Brasília time for input)
+// Get minimum datetime for scheduling (now + 5 minutes, shown in Brasília time)
 const getMinDatetime = (): string => {
-  const nowUtc = new Date();
-  // Convert current UTC time to Brasília, add 5 minutes
-  const nowBrasilia = addMinutes(nowUtc, -BRASILIA_OFFSET_HOURS * 60);
-  const minBrasilia = addMinutes(nowBrasilia, 5);
-  return format(minBrasilia, "yyyy-MM-dd'T'HH:mm");
+  const minUtc = new Date(Date.now() + 5 * 60 * 1000);
+  return formatForInput(minUtc.toISOString());
 };
 
 const PublicationQueueTab = ({
@@ -147,12 +208,12 @@ const PublicationQueueTab = ({
     [queuedPosts]
   );
 
-  // Posts scheduled for today (using Brasília time)
+  // Posts scheduled for today (evaluated in Brasília timezone)
   const todayPosts = useMemo(() => {
+    const todayKey = brasiliaDateKey(new Date());
     return scheduledPosts.filter((p) => {
       if (!p.scheduled_for) return false;
-      const brasiliaDate = utcToBrasilia(p.scheduled_for);
-      return isToday(brasiliaDate);
+      return brasiliaDateKey(new Date(p.scheduled_for)) === todayKey;
     });
   }, [scheduledPosts]);
 
