@@ -44,8 +44,18 @@ interface Suggestion {
 const STORAGE_KEYS = {
   niche: 'suggestions_niche',
   suggestions: 'suggestions_data',
-  loading: 'suggestions_loading'
+  loading: 'suggestions_loading',
+  suggestionsCache: 'suggestions_cache'
 };
+
+// Cache duration: 1 hour in milliseconds
+const CACHE_DURATION = 60 * 60 * 1000;
+
+interface CachedSuggestions {
+  niche: string;
+  suggestions: Suggestion[];
+  timestamp: number;
+}
 
 interface ScheduledPost {
   suggestion: Suggestion;
@@ -106,29 +116,79 @@ export function SuggestionsTab() {
     }
   }, [suggestions]);
 
-  const fetchSuggestions = async () => {
+  // Check cache for suggestions
+  const getCachedSuggestions = (nicheKey: string): Suggestion[] | null => {
+    try {
+      const cached = localStorage.getItem(STORAGE_KEYS.suggestionsCache);
+      if (!cached) return null;
+      
+      const data: CachedSuggestions = JSON.parse(cached);
+      const isExpired = Date.now() - data.timestamp > CACHE_DURATION;
+      const isSameNiche = data.niche.toLowerCase() === nicheKey.toLowerCase();
+      
+      if (!isExpired && isSameNiche && data.suggestions?.length > 0) {
+        return data.suggestions;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Save suggestions to cache
+  const cacheSuggestions = (nicheKey: string, suggestionsList: Suggestion[]) => {
+    const cacheData: CachedSuggestions = {
+      niche: nicheKey,
+      suggestions: suggestionsList,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEYS.suggestionsCache, JSON.stringify(cacheData));
+  };
+
+  const fetchSuggestions = async (forceRefresh = false) => {
     if (!niche.trim()) {
       toast.error('Digite um nicho ou tema para buscar sugestões');
       return;
     }
 
+    const nicheKey = niche.trim();
+
+    // Check cache first (unless forcing refresh)
+    if (!forceRefresh) {
+      const cached = getCachedSuggestions(nicheKey);
+      if (cached) {
+        setSuggestions(cached);
+        toast.success(`${cached.length} sugestões carregadas do cache!`);
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-suggestions', {
-        body: { niche: niche.trim() }
+        body: { niche: nicheKey }
       });
 
       if (error) throw error;
 
       if (data?.suggestions) {
         setSuggestions(data.suggestions);
+        cacheSuggestions(nicheKey, data.suggestions);
         toast.success(`${data.suggestions.length} sugestões geradas!`);
       } else if (data?.error) {
-        toast.error(data.error);
+        if (data.error.includes('Créditos insuficientes')) {
+          toast.error('Créditos de IA esgotados. Adicione créditos em Configurações > Workspace > Usage.');
+        } else {
+          toast.error(data.error);
+        }
       }
     } catch (error: any) {
       console.error('Error fetching suggestions:', error);
-      toast.error('Erro ao gerar sugestões. Tente novamente.');
+      if (error.message?.includes('402')) {
+        toast.error('Créditos de IA esgotados. Adicione créditos em Configurações > Workspace > Usage.');
+      } else {
+        toast.error('Erro ao gerar sugestões. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -229,12 +289,12 @@ export function SuggestionsTab() {
                 placeholder="Digite seu nicho (ex: tecnologia, fitness, gastronomia, moda...)"
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions()}
+                onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions(false)}
                 className="pl-10 h-12 text-lg bg-background/50 border-primary/20 focus:border-primary"
               />
             </div>
             <Button 
-              onClick={fetchSuggestions} 
+              onClick={() => fetchSuggestions(false)} 
               disabled={loading || batchLoading !== null}
               size="lg"
               className="h-12 px-8 glow-sm"
@@ -349,7 +409,7 @@ export function SuggestionsTab() {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={fetchSuggestions}
+              onClick={() => fetchSuggestions(true)}
               className="border-primary/30"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
