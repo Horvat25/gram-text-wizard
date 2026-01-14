@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/tooltip";
 import { DollarSign, Sparkles, Video, Image as ImageIcon } from "lucide-react";
 
-export type MediaType = "image" | "video" | "reels" | "carousel" | "narrative";
-export type AIModel = "gemini" | "dalle3" | "minimax" | "narrative";
+export type MediaType = "image" | "reels" | "carousel" | "narrative";
+export type AIModel = "gemini" | "dalle3" | "narrative";
 
 interface ModelSelectorProps {
   mediaType: MediaType;
@@ -27,8 +27,7 @@ interface ModelSelectorProps {
 
 const MEDIA_TYPES = [
   { value: "image" as MediaType, label: "Imagem", icon: ImageIcon },
-  { value: "video" as MediaType, label: "Vídeo", icon: Video },
-  { value: "reels" as MediaType, label: "Reels Narrado", icon: Video, badge: "Novo" },
+  { value: "reels" as MediaType, label: "Reels/Vídeo", icon: Video, badge: "🎬" },
   { value: "carousel" as MediaType, label: "Carrossel", icon: ImageIcon },
 ];
 
@@ -49,27 +48,11 @@ const AI_MODELS = {
       costLevel: 3,
     },
   ],
-  video: [
-    {
-      value: "minimax" as AIModel,
-      label: "Minimax Video-01",
-      description: "Econômico via Replicate",
-      cost: "$",
-      costLevel: 1,
-    },
-  ],
   reels: [
     {
       value: "narrative" as AIModel,
-      label: "Pipeline Narrativo",
-      description: "Vídeo + Narração + Música (ElevenLabs)",
-      cost: "$",
-      costLevel: 1,
-    },
-    {
-      value: "minimax" as AIModel,
-      label: "Vídeo Simples",
-      description: "Apenas vídeo, sem áudio",
+      label: "Reels Cinematográfico",
+      description: "Imagem + Narração + Música (ElevenLabs)",
       cost: "$",
       costLevel: 1,
     },
@@ -204,11 +187,6 @@ const ModelSelector = ({
               {selectedModel === "gemini" && (
                 <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-600 border-green-600/30">
                   Gratuito
-                </Badge>
-              )}
-              {selectedModel === "minimax" && (
-                <Badge variant="outline" className="text-xs text-amber-600 border-amber-600/30">
-                  Geração em background
                 </Badge>
               )}
               {selectedModel === "narrative" && (
