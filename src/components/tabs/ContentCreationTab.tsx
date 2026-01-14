@@ -534,17 +534,11 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         }
         
         setIsGeneratingMedia(false);
-      } else if (mediaType === "video") {
-        // Regular video - use image as poster, reels should use NarrativeVideoGenerator
-        toast.error("Para vídeos, selecione o modo 'Reels Narrado' e use o gerador de stories cinematográficos.");
-        setIsGeneratingMedia(false);
-        return;
       } else if (mediaType === "reels") {
-        // Reels should use NarrativeVideoGenerator - redirect user
-        toast.error("Para Reels, use o gerador de Stories Cinematográficos abaixo. Selecione o modelo 'Narrativo'.");
+        // Reels should use NarrativeVideoGenerator
+        toast.info("Para Reels/Vídeo, use o gerador de Stories Cinematográficos abaixo.");
         setIsGeneratingMedia(false);
         return;
-        toast.info("Vídeo em geração. Você será notificado quando pronto.");
       }
     } catch (error: any) {
       console.error("Error generating media:", error);
@@ -617,7 +611,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         toast.error("Uma imagem é necessária para publicar no Instagram");
         return;
       }
-    } else if (mediaType === "video" || mediaType === "reels") {
+    } else if (mediaType === "reels") {
       if (!videoUrl) {
         toast.error("Um vídeo é necessário para publicar no Instagram");
         return;
@@ -702,8 +696,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
   const getMediaLabel = () => {
     switch (mediaType) {
       case "carousel": return "das Imagens do Carrossel";
-      case "video": return "do Vídeo";
-      case "reels": return "do Reels";
+      case "reels": return "do Reels/Vídeo";
       default: return "da Imagem";
     }
   };
@@ -714,12 +707,11 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
         ? `Gerando imagem ${carouselImages.length + 1}...` 
         : mediaType === "image" 
           ? "Gerando imagem..." 
-          : "Gerando vídeo...";
+          : "Gerando Reels...";
     }
     switch (mediaType) {
       case "carousel": return `Adicionar Imagem ao Carrossel (${carouselImages.length}/10)`;
-      case "video": return "Gerar Vídeo com IA";
-      case "reels": return "Gerar Reels com IA";
+      case "reels": return "Gerar Reels/Vídeo";
       default: return "Gerar Imagem com IA";
     }
   };
@@ -1114,9 +1106,9 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                     Usando Gemini Flash (gratuito)
                   </Badge>
                 )}
-                {selectedModel === "minimax" && (
-                  <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600">
-                    Usando Minimax via Replicate (geração em background)
+                {selectedModel === "narrative" && (
+                  <Badge variant="outline" className="text-xs border-purple-500/50 text-purple-600">
+                    Pipeline Cinematográfico com Narração
                   </Badge>
                 )}
 
@@ -1178,7 +1170,7 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
                     isSaving || 
                     (mediaType === "image" && !imageUrl) || 
                     (mediaType === "carousel" && carouselImages.length < 2) ||
-                    ((mediaType === "video" || mediaType === "reels") && !videoUrl)
+                    (mediaType === "reels" && !videoUrl)
                   }
                   className="w-full"
                   size="lg"
