@@ -41,7 +41,7 @@ Seja ESPECÍFICO com nomes, datas e eventos reais. Responda em português de for
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "user", content: searchPrompt }
         ],
