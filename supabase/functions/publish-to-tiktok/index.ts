@@ -274,9 +274,11 @@ serve(async (req) => {
     console.log('Video uploaded successfully, waiting for processing...');
 
     // Poll for publish status (TikTok processes the video asynchronously)
+    // For Sandbox apps, the status will be SEND_TO_USER_INBOX, not PUBLISH_COMPLETE
     let attempts = 0;
     const maxAttempts = 30; // 5 minutes max (10 second intervals)
     let publishStatus = null;
+    let finalStatus = '';
 
     while (attempts < maxAttempts) {
       await sleep(10000); // Wait 10 seconds between checks
@@ -294,35 +296,47 @@ serve(async (req) => {
       });
 
       const statusData = await statusResponse.json();
-      console.log(`TikTok status check ${attempts}:`, JSON.stringify(statusData));
+      const status = statusData.data?.status;
+      console.log(`TikTok status check ${attempts}: ${status}`, JSON.stringify(statusData));
 
-      if (statusData.data?.status === 'PUBLISH_COMPLETE') {
+      // For Sandbox apps, SEND_TO_USER_INBOX is the success state
+      // Video goes to user's TikTok drafts for manual publishing
+      if (status === 'PUBLISH_COMPLETE' || status === 'SEND_TO_USER_INBOX') {
         publishStatus = statusData.data;
+        finalStatus = status;
+        console.log(`✅ TikTok ${status === 'SEND_TO_USER_INBOX' ? 'sent to drafts (Sandbox mode)' : 'published'}`);
         break;
-      } else if (statusData.data?.status === 'FAILED') {
-        console.error('TikTok publish failed:', statusData);
+      } else if (status === 'FAILED') {
+        const failReason = statusData.data?.fail_reason || 'Unknown error';
+        console.error('❌ TikTok publish failed:', failReason, statusData);
         
         await supabase
           .from('posts')
           .update({ 
-            error_message: statusData.data.fail_reason || 'TikTok publish failed'
+            error_message: `TikTok: ${failReason}`
           })
           .eq('id', postId);
 
         return new Response(
           JSON.stringify({ 
-            error: statusData.data.fail_reason || 'TikTok publish failed' 
+            error: `TikTok falhou: ${failReason}`,
+            details: statusData.data
           }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
+      } else if (status === 'PROCESSING_UPLOAD' || status === 'PROCESSING_DOWNLOAD') {
+        console.log(`⏳ TikTok still processing: ${status}`);
+        // Continue polling
       }
-      // If still processing, continue polling
     }
 
     if (!publishStatus) {
-      console.error('TikTok publish timed out');
+      console.error('⏰ TikTok publish timed out after', attempts, 'attempts');
       return new Response(
-        JSON.stringify({ error: 'TikTok publish timed out - video may still be processing' }),
+        JSON.stringify({ 
+          error: 'TikTok timeout - o vídeo ainda pode estar processando. Verifique sua caixa de entrada no TikTok.',
+          timeout: true 
+        }),
         { status: 408, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -333,14 +347,20 @@ serve(async (req) => {
       ? currentPlatforms 
       : [...currentPlatforms, 'tiktok'];
 
+    // For Sandbox mode, video goes to drafts - this is expected behavior
+    const isSandboxMode = finalStatus === 'SEND_TO_USER_INBOX';
+    const tiktokPostId = publishStatus.publicaly_available_post_id?.[0] || publishId;
+
     const { error: updateError } = await supabase
       .from('posts')
       .update({
-        tiktok_post_id: publishStatus.publicaly_available_post_id?.[0] || publishId,
+        tiktok_post_id: tiktokPostId,
         status: 'published',
         published_at: new Date().toISOString(),
         platforms: updatedPlatforms,
-        error_message: null,
+        error_message: isSandboxMode 
+          ? 'Vídeo enviado para rascunhos do TikTok (modo Sandbox). Publique manualmente no app.' 
+          : null,
       })
       .eq('id', postId);
 
@@ -348,13 +368,21 @@ serve(async (req) => {
       console.error('Failed to update post:', updateError);
     }
 
-    console.log('Successfully published to TikTok:', publishStatus);
+    console.log('✅ Successfully sent to TikTok:', {
+      publishId,
+      tiktokPostId,
+      isSandboxMode,
+      finalStatus
+    });
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        tiktokPostId: publishStatus.publicaly_available_post_id?.[0] || publishId,
-        message: 'Post published to TikTok successfully'
+        tiktokPostId,
+        sandboxMode: isSandboxMode,
+        message: isSandboxMode 
+          ? 'Vídeo enviado para sua caixa de entrada do TikTok! Abra o app TikTok para publicar manualmente.'
+          : 'Post publicado no TikTok com sucesso!'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
