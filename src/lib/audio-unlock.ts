@@ -12,7 +12,9 @@ let isUnlocked = false;
  * Get or create the global AudioContext
  */
 export function getAudioContext(): AudioContext {
-  if (!globalAudioContext) {
+  // If a previous context was closed (can happen after hot reloads or manual cleanup),
+  // we must create a new one — a closed AudioContext cannot be resumed.
+  if (!globalAudioContext || globalAudioContext.state === "closed") {
     globalAudioContext = new AudioContext();
   }
   return globalAudioContext;

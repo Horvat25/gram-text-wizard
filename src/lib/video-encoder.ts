@@ -871,13 +871,25 @@ export async function generateVideoFromSegments(
       musicAudioElement.play().catch(console.warn);
     }
 
-    // Track time using performance.now() for accuracy
-    const startTime = performance.now();
+    // Track timeline time in a way that survives tab throttling/backgrounding.
+    // Using (performance.now() - startTime) can jump forward after the tab is
+    // backgrounded, which makes the encoder stop immediately and generates a
+    // ~1s CTA-only video.
+    let timelineTime = 0;
+    let lastNow = performance.now();
     let lastProgress = 0;
 
-    const animate = () => {
-      const elapsed = (performance.now() - startTime) / 1000;
-      
+    const animate = (now: number) => {
+      const rawDelta = (now - lastNow) / 1000;
+      lastNow = now;
+
+      // Cap delta to avoid big jumps after CPU stalls / background tab.
+      // This ensures the encoded video timeline advances smoothly.
+      const delta = Math.min(Math.max(rawDelta, 0), 0.1);
+      timelineTime += delta;
+
+      const elapsed = timelineTime;
+
       if (elapsed >= totalDuration) {
         console.log("[VideoEncoder] Animation complete, stopping recorder");
         if (audioElement) {
@@ -905,7 +917,7 @@ export async function generateVideoFromSegments(
 
       // Render current frame with watermark and CTA support
       renderFrame(
-        ctx, width, height, workingSegments, images, 
+        ctx, width, height, workingSegments, images,
         elapsed, totalDuration, ctaDuration,
         brandName, instagramHandle
       );
