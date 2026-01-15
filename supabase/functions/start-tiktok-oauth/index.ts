@@ -35,8 +35,11 @@ serve(async (req) => {
     const state = crypto.randomUUID();
 
     // TikTok OAuth authorization URL
-    // Scopes: user.info.basic (get user info), video.publish (post videos)
-    const scopes = 'user.info.basic,video.publish';
+    // Scopes for Sandbox/unaudited apps:
+    // - user.info.basic: get user profile info
+    // - video.upload: upload videos to inbox/drafts (required for Sandbox mode)
+    // Note: video.publish requires app audit and is for direct publishing
+    const scopes = 'user.info.basic,video.upload';
     
     const authUrl = new URL('https://www.tiktok.com/v2/auth/authorize/');
     authUrl.searchParams.set('client_key', clientKey);
