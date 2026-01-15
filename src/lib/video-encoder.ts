@@ -600,16 +600,27 @@ export async function generateVideoFromSegments(
     instagramHandle = "@neuralupdate",
   } = options;
 
-  const ctaDuration = 6; // 6 seconds for marketing CTA at end (was 4, increased for full narration)
+  const ctaDuration = 6; // 6 seconds for marketing CTA at end
 
   console.log("[VideoEncoder] Starting video generation with branding...");
   console.log(`[VideoEncoder] Segments: ${segments.length}, FPS: ${fps}`);
+  
+  // Validate segments have content and duration
+  const validSegments = segments.filter(s => s.imageUrl && s.duration > 0);
+  if (validSegments.length === 0) {
+    throw new Error("Nenhum segmento válido para gerar vídeo. Verifique se as imagens foram geradas.");
+  }
+  
+  // Use validated segments
+  const workingSegments = validSegments.length < segments.length 
+    ? validSegments 
+    : segments;
   console.log(`[VideoEncoder] Brand: ${brandName}, Handle: ${instagramHandle}`);
 
   // Pre-load all images
-  const imagePromises = segments.map(async (seg, index) => {
+  const imagePromises = workingSegments.map(async (seg, index) => {
     try {
-      console.log(`[VideoEncoder] Loading image ${index + 1}/${segments.length}`);
+      console.log(`[VideoEncoder] Loading image ${index + 1}/${workingSegments.length}`);
       return await loadImage(seg.imageUrl);
     } catch (error) {
       console.error(`Failed to load image for segment ${index}:`, error);
@@ -640,10 +651,13 @@ export async function generateVideoFromSegments(
   canvas.height = height;
   const ctx = canvas.getContext("2d")!;
 
-  // Calculate total duration (content + CTA)
-  const contentDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
+  // Calculate total duration (content + CTA) - ensure minimum duration
+  const contentDuration = workingSegments.reduce((sum, seg) => sum + seg.duration, 0);
+  if (contentDuration <= 0) {
+    throw new Error(`Duração do conteúdo inválida: ${contentDuration}s. Verifique se os segmentos têm duração definida.`);
+  }
   const totalDuration = contentDuration + ctaDuration;
-  console.log(`[VideoEncoder] Content: ${contentDuration}s, CTA: ${ctaDuration}s, Total: ${totalDuration}s`);
+  console.log(`[VideoEncoder] Content: ${contentDuration.toFixed(1)}s, CTA: ${ctaDuration}s, Total: ${totalDuration.toFixed(1)}s`);
 
   // Create video stream from canvas
   const stream = canvas.captureStream(fps);
@@ -875,9 +889,8 @@ export async function generateVideoFromSegments(
         if (musicAudioElement) {
           musicAudioElement.pause();
         }
-        if (audioContext) {
-          audioContext.close().catch(console.warn);
-        }
+        // ⚠️ NÃO fechar o AudioContext global - ele é reutilizado
+        // Apenas parar os elementos de áudio
         recorder.stop();
         return;
       }
@@ -892,7 +905,7 @@ export async function generateVideoFromSegments(
 
       // Render current frame with watermark and CTA support
       renderFrame(
-        ctx, width, height, segments, images, 
+        ctx, width, height, workingSegments, images, 
         elapsed, totalDuration, ctaDuration,
         brandName, instagramHandle
       );
