@@ -587,13 +587,45 @@ const PublicationQueueTab = ({
           </DialogHeader>
           {viewingPost && (
             <div className="space-y-4">
+              {/* Imagem */}
               {viewingPost.image_url && (
                 <img
                   src={viewingPost.image_url}
                   alt="Post"
-                  className="w-full rounded-lg"
+                  className="w-full rounded-lg object-cover max-h-[400px]"
                 />
               )}
+              
+              {/* Vídeo */}
+              {viewingPost.video_url && (
+                <video
+                  src={viewingPost.video_url}
+                  controls
+                  className="w-full rounded-lg max-h-[400px]"
+                />
+              )}
+              
+              {/* Carousel */}
+              {viewingPost.carousel_images && viewingPost.carousel_images.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {viewingPost.carousel_images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt={`Carousel ${i + 1}`}
+                      className="w-full rounded-lg object-cover aspect-square"
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {/* Sem mídia */}
+              {!viewingPost.image_url && !viewingPost.video_url && (!viewingPost.carousel_images || viewingPost.carousel_images.length === 0) && (
+                <div className="w-full h-48 rounded-lg bg-muted/50 flex items-center justify-center">
+                  <p className="text-muted-foreground text-sm">Sem mídia</p>
+                </div>
+              )}
+              
               <p className="text-sm whitespace-pre-wrap">{viewingPost.caption}</p>
               {viewingPost.hashtags && viewingPost.hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
