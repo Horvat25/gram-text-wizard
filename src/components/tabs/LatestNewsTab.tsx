@@ -310,6 +310,21 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
     }
   };
 
+  // Upload external image to Supabase Storage for Instagram compatibility
+  const uploadExternalImage = async (imageUrl: string): Promise<string> => {
+    toast.info('Preparando imagem para Instagram...');
+    
+    const { data, error } = await supabase.functions.invoke('upload-external-image', {
+      body: { imageUrl }
+    });
+
+    if (error || !data?.success) {
+      throw new Error(data?.error || error?.message || 'Falha ao processar imagem');
+    }
+
+    return data.publicUrl;
+  };
+
   // Publish now
   const publishNow = async () => {
     if (!selectedNews || !selectedImage) {
@@ -333,11 +348,29 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
         return;
       }
 
+      // Upload external image to Supabase Storage for Instagram compatibility
+      let finalImageUrl = selectedImage;
+      
+      // Check if it's an external URL (not already on Supabase)
+      const isExternalImage = !selectedImage.includes('supabase') && 
+                              !selectedImage.includes(import.meta.env.VITE_SUPABASE_URL || '');
+      
+      if (isExternalImage) {
+        try {
+          finalImageUrl = await uploadExternalImage(selectedImage);
+          toast.success('Imagem processada!');
+        } catch (uploadError: any) {
+          console.error('Image upload error:', uploadError);
+          // Try to proceed with original URL as fallback
+          toast.warning('Usando imagem original (pode falhar no Instagram)');
+        }
+      }
+
       // Create post
       const { data: post, error: insertError } = await supabase.from('posts').insert({
         caption: caption.trim(),
         hashtags,
-        image_url: selectedImage,
+        image_url: finalImageUrl,
         status: 'publishing',
         post_type: 'noticia',
         media_type: 'image',
@@ -347,11 +380,15 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       if (insertError) throw insertError;
 
       // Publish
-      const { error: publishError } = await supabase.functions.invoke('publish-post', {
+      const { data: publishData, error: publishError } = await supabase.functions.invoke('publish-post', {
         body: { postId: post.id }
       });
 
       if (publishError) throw publishError;
+      
+      if (publishData?.error) {
+        throw new Error(publishData.error);
+      }
       
       toast.success('Publicado no Instagram!');
       backToNewsList();
