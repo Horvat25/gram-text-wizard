@@ -332,48 +332,57 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
     };
   }
 
-  // Filter posts with REAL metrics (reach > 10 indicates synced from Instagram)
-  const postsWithRealMetrics = posts.filter((p: any) => p.reach && p.reach > 10);
-  
-  // Calculate totals from ALL posts
-  const totalLikes = posts.reduce((acc: number, p: any) => acc + (p.likes_count || 0), 0);
-  const totalComments = posts.reduce((acc: number, p: any) => acc + (p.comments_count || 0), 0);
-  const totalSaves = posts.reduce((acc: number, p: any) => acc + (p.saves_count || 0), 0);
-  const totalReach = posts.reduce((acc: number, p: any) => acc + (p.reach || 0), 0);
-  
-  const avgEngagement = totalReach > 0 
-    ? ((totalLikes + totalComments + totalSaves) / totalReach * 100).toFixed(2)
-    : 0;
+  // REAL metrics criteria:
+  // - Must have instagram_post_id (means it was actually published to Instagram)
+  // - Must have reach >= 10 (filters out missing/placeholder values)
+  const isRealMetricsPost = (p: any) => {
+    const hasIgId = !!p.instagram_post_id;
+    const reach = typeof p.reach === 'number' ? p.reach : 0;
+    return hasIgId && reach >= 10;
+  };
 
-  // Find top performing post
-  const sortedByEngagement = [...posts]
-    .filter((p: any) => p.reach && p.reach > 0)
+  const postsWithRealMetrics = posts.filter(isRealMetricsPost);
+  const ignoredPosts = posts.filter((p: any) => !isRealMetricsPost(p));
+
+  // Calculate totals ONLY from real metrics (never from simulated/placeholder)
+  const totalLikes = postsWithRealMetrics.reduce((acc: number, p: any) => acc + (p.likes_count || 0), 0);
+  const totalComments = postsWithRealMetrics.reduce((acc: number, p: any) => acc + (p.comments_count || 0), 0);
+  const totalSaves = postsWithRealMetrics.reduce((acc: number, p: any) => acc + (p.saves_count || 0), 0);
+  const totalReach = postsWithRealMetrics.reduce((acc: number, p: any) => acc + (p.reach || 0), 0);
+
+  const avgEngagement = totalReach > 0
+    ? ((totalLikes + totalComments + totalSaves) / totalReach * 100).toFixed(2)
+    : '0.00';
+
+  // Find top performing post ONLY among real-metrics posts
+  const sortedByEngagement = [...postsWithRealMetrics]
+    .filter((p: any) => (p.reach || 0) > 0)
     .sort((a: any, b: any) => {
-      const engA = (a.likes_count + a.comments_count + a.saves_count) / (a.reach || 1);
-      const engB = (b.likes_count + b.comments_count + b.saves_count) / (b.reach || 1);
+      const engA = ((a.likes_count || 0) + (a.comments_count || 0) + (a.saves_count || 0)) / (a.reach || 1);
+      const engB = ((b.likes_count || 0) + (b.comments_count || 0) + (b.saves_count || 0)) / (b.reach || 1);
       return engB - engA;
     });
-  
+
   const topPost = sortedByEngagement[0];
-  
   const hasRealMetrics = postsWithRealMetrics.length > 0;
-  
+
   return {
     success: true,
-    message: hasRealMetrics 
-      ? `📊 Performance real dos últimos ${days} dias (${postsWithRealMetrics.length} posts com métricas do Instagram)`
-      : `📊 Dados dos últimos ${days} dias (⚠️ Métricas ainda não sincronizadas com Instagram)`,
+    message: hasRealMetrics
+      ? `📊 Performance REAL dos últimos ${days} dias (${postsWithRealMetrics.length} posts com métricas do Instagram)`
+      : `📊 Ainda não há métricas REAIS sincronizadas (ignorado ${ignoredPosts.length} post(s) sem métricas reais)` ,
     data: {
-      total_posts: posts.length,
+      total_posts_published_in_period: posts.length,
       posts_with_real_metrics: postsWithRealMetrics.length,
+      ignored_posts_without_real_metrics: ignoredPosts.length,
       total_likes: totalLikes,
       total_comments: totalComments,
       total_saves: totalSaves,
       total_reach: totalReach,
       avg_engagement: `${avgEngagement}%`,
-      metrics_status: hasRealMetrics 
-        ? '✅ Métricas sincronizadas do Instagram' 
-        : '⚠️ Métricas não sincronizadas - conecte sua conta Instagram e sincronize',
+      metrics_status: hasRealMetrics
+        ? '✅ Métricas reais sincronizadas'
+        : '⚠️ Sem métricas reais: publique no Instagram e clique em Sincronizar do Instagram',
       top_post: topPost ? {
         id: topPost.id,
         caption: topPost.caption.slice(0, 80) + (topPost.caption.length > 80 ? '...' : ''),
@@ -381,8 +390,8 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
         comments: topPost.comments_count || 0,
         saves: topPost.saves_count || 0,
         reach: topPost.reach || 0,
-        engagement: topPost.reach > 0 
-          ? ((topPost.likes_count + topPost.comments_count + topPost.saves_count) / topPost.reach * 100).toFixed(2) + '%'
+        engagement: (topPost.reach || 0) > 0
+          ? (((topPost.likes_count || 0) + (topPost.comments_count || 0) + (topPost.saves_count || 0)) / topPost.reach * 100).toFixed(2) + '%'
           : '0%'
       } : null
     }
