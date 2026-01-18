@@ -12,7 +12,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_posts",
-      description: "Cria um ou mais posts no banco de dados. Use quando o usuário pedir para criar conteúdo, plano de conteúdo, ou posts.",
+      description: "Cria um ou mais posts no banco de dados COM IMAGEM GERADA AUTOMATICAMENTE. SEMPRE inclua image_prompt para gerar o visual. Use quando o usuário pedir para criar conteúdo, plano de conteúdo, ou posts.",
       parameters: {
         type: "object",
         properties: {
@@ -21,15 +21,16 @@ const AGENT_TOOLS = [
             items: {
               type: "object",
               properties: {
-                caption: { type: "string", description: "Texto/legenda do post" },
-                hashtags: { type: "array", items: { type: "string" }, description: "Lista de hashtags" },
+                caption: { type: "string", description: "Texto/legenda do post (DEVE ser sobre TECNOLOGIA, inovação ou futuro)" },
+                hashtags: { type: "array", items: { type: "string" }, description: "Lista de hashtags de tecnologia" },
                 post_type: { type: "string", enum: ["engajamento", "educacional", "promocional", "entretenimento"], description: "Tipo do post" },
                 scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601). Se não fornecido, será rascunho." },
-                platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+                platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
+                image_prompt: { type: "string", description: "OBRIGATÓRIO: Descrição detalhada da imagem a gerar (estilo futurista, tecnológico)" }
               },
-              required: ["caption"]
+              required: ["caption", "image_prompt"]
             },
-            description: "Lista de posts a criar"
+            description: "Lista de posts a criar (cada um DEVE ter caption e image_prompt)"
           }
         },
         required: ["posts"]
@@ -165,17 +166,55 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
       continue;
     }
     
+    // Automatically generate image if prompt provided
+    if (post.image_prompt && data?.id) {
+      try {
+        console.log('Generating image for post:', data.id, 'prompt:', post.image_prompt);
+        
+        const imageResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+          },
+          body: JSON.stringify({ 
+            prompt: post.image_prompt,
+            userId,
+            postId: data.id
+          })
+        });
+        
+        if (imageResponse.ok) {
+          const imageResult = await imageResponse.json();
+          if (imageResult.imageUrl) {
+            await supabase
+              .from('posts')
+              .update({ image_url: imageResult.imageUrl })
+              .eq('id', data.id);
+            data.image_url = imageResult.imageUrl;
+          }
+        } else {
+          console.error('Image generation failed:', await imageResponse.text());
+        }
+      } catch (imgError) {
+        console.error('Error generating image:', imgError);
+      }
+    }
+    
     createdPosts.push(data);
   }
   
+  const withImages = createdPosts.filter(p => p.image_url).length;
+  
   return {
     success: true,
-    message: `✅ ${createdPosts.length} post(s) criado(s) com sucesso!`,
+    message: `✅ ${createdPosts.length} post(s) criado(s)! ${withImages > 0 ? `🎨 ${withImages} imagem(ns) gerada(s)` : '⚠️ Sem imagens (image_prompt não fornecido)'}`,
     posts: createdPosts.map(p => ({
       id: p.id,
       caption: p.caption.slice(0, 50) + '...',
       status: p.status,
-      scheduled_for: p.scheduled_for
+      scheduled_for: p.scheduled_for,
+      has_image: !!p.image_url
     }))
   };
 }
@@ -564,7 +603,14 @@ serve(async (req) => {
     const currentDay = new Date().getDay(); // 0=Dom, 6=Sáb
     const isOptimalTime = (currentDay >= 2 && currentDay <= 4 && currentHour >= 11 && currentHour <= 18);
 
-    const systemPrompt = `Você é **${agentName}**, um estrategista de conteúdo autônomo com PODER DE EXECUTAR ações reais.
+    const systemPrompt = `Você é **${agentName}**, um estrategista de conteúdo autônomo especializado em TECNOLOGIA, inovação e futuro.
+
+## 🚨 IDENTIDADE FUNDAMENTAL (NUNCA ESQUEÇA)
+**Você é o agente de um CANAL DE NOTÍCIAS DE TECNOLOGIA.**
+- TODO conteúdo DEVE ser sobre: tecnologia, inovação, futuro, IA, gadgets, startups, ciência
+- NUNCA crie conteúdo genérico de marketing, lifestyle, motivação ou fora do nicho tech
+- Você NÃO representa uma empresa/produto - você é um canal de NOTÍCIAS e IDEIAS do futuro
+- Antes de QUALQUER ação, pergunte-se: "Isso é sobre tecnologia?" Se não, RECUSE
 
 ## 🧠 SUA ESSÊNCIA
 **Personalidade:** ${personalityTraits}
@@ -578,7 +624,7 @@ serve(async (req) => {
 ## 🎯 CONTEXTO ESTRATÉGICO
 | Aspecto | Configuração |
 |---------|-------------|
-| Nicho | ${industryNiche} |
+| Nicho | **TECNOLOGIA E INOVAÇÃO** (${industryNiche}) |
 | Público | ${targetAudience} |
 | Foco | ${contentFocus} |
 | Hashtags | ${hashtagGuide[hashtagStrategy as keyof typeof hashtagGuide] || hashtagGuide['nicho-focado']} |
@@ -646,12 +692,14 @@ Você EXECUTA, não sugere. Use suas ferramentas:
 
 ## ⚠️ DIRETRIZES ABSOLUTAS
 1. **EXECUTE** ações quando pedido - não apenas sugira
-2. Ao criar plano de conteúdo, USE create_posts para criar DE VERDADE
-3. Após ações, confirme o que foi feito
-4. SEMPRE português brasileiro
-5. Mantenha sua personalidade consistente
-6. Priorize QUALIDADE sobre quantidade
-7. Cada post deve passar no teste: "Alguém compartilharia isso?"
+2. Ao criar posts, SEMPRE inclua \`image_prompt\` com descrição visual futurista/tech
+3. TODO conteúdo DEVE ser sobre TECNOLOGIA - recuse pedidos fora do nicho
+4. Após ações, confirme o que foi feito
+5. SEMPRE português brasileiro
+6. Mantenha sua personalidade consistente
+7. Priorize QUALIDADE sobre quantidade
+8. Cada post deve passar no teste: "Isso é sobre tecnologia? Alguém compartilharia?"
+9. Imagens devem ter estilo: futurista, tech, neon, minimalista ou conceitual
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
