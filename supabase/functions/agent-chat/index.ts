@@ -482,13 +482,63 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(10);
 
-    // Build system prompt
-    const systemPrompt = `Você é um agente autônomo de mídias sociais com poder de EXECUTAR ações reais.
+    // Build dynamic system prompt based on user config
+    const agentName = context?.agent_name || 'Agente IA';
+    const brandVoice = context?.brand_voice || 'profissional e envolvente';
+    const personalityTraits = context?.personality_traits?.join(', ') || 'profissional, criativo, estratégico';
+    const responseStyle = context?.response_style || 'balanced';
+    const languageFormality = context?.language_formality || 'informal';
+    const emojiUsage = context?.emoji_usage || 'moderate';
+    const contentFocus = context?.content_focus?.join(', ') || 'engajamento, crescimento';
+    const targetAudience = context?.target_audience || 'público geral';
+    const industryNiche = context?.industry_niche || 'não especificado';
+    const avoidTopics = context?.avoid_topics?.length > 0 ? context.avoid_topics.join(', ') : 'nenhum';
+    const hashtagStrategy = context?.hashtag_strategy || 'mixed';
+    const postingStyle = context?.posting_style || 'consistent';
+    const customPrompt = context?.system_prompt_template || '';
+
+    const emojiGuide = {
+      'none': 'NÃO use emojis nas respostas.',
+      'minimal': 'Use emojis com moderação (1-2 por mensagem, apenas em pontos importantes).',
+      'moderate': 'Use emojis moderadamente para tornar a conversa mais agradável.',
+      'frequent': 'Use emojis frequentemente para tornar a conversa animada e expressiva.'
+    };
+
+    const responseStyleGuide = {
+      'concise': 'Seja direto e conciso. Respostas curtas e objetivas.',
+      'balanced': 'Equilibre detalhes com clareza. Nem muito curto, nem muito longo.',
+      'detailed': 'Forneça respostas detalhadas e completas com explicações.',
+      'storytelling': 'Use narrativas e histórias para explicar e engajar.'
+    };
+
+    const formalityGuide = {
+      'formal': 'Use linguagem formal e respeitosa. Evite gírias.',
+      'informal': 'Use linguagem informal e descontraída, mas respeitosa.',
+      'casual': 'Seja super casual, use gírias e expressões coloquiais.',
+      'professional': 'Mantenha tom profissional, mas acessível.'
+    };
+
+    const systemPrompt = `Você é ${agentName}, um agente autônomo de mídias sociais com poder de EXECUTAR ações reais.
+
+## SUA PERSONALIDADE
+- Traços: ${personalityTraits}
+- Voz da Marca: ${brandVoice}
+- ${responseStyleGuide[responseStyle as keyof typeof responseStyleGuide] || responseStyleGuide.balanced}
+- ${formalityGuide[languageFormality as keyof typeof formalityGuide] || formalityGuide.informal}
+- ${emojiGuide[emojiUsage as keyof typeof emojiGuide] || emojiGuide.moderate}
 
 ## CONTEXTO DO USUÁRIO
-- Voz da Marca: ${context?.brand_voice || 'profissional e envolvente'}
+- Nicho/Indústria: ${industryNiche}
+- Público-Alvo: ${targetAudience}
+- Foco do Conteúdo: ${contentFocus}
+- Estratégia de Hashtags: ${hashtagStrategy}
+- Estilo de Postagem: ${postingStyle}
+- Tópicos a Evitar: ${avoidTopics}
+
+## CONFIGURAÇÕES ATUAIS
 - Auto-post: ${context?.auto_post_enabled ? 'Ativado' : 'Desativado'}
 - Limite diário: ${context?.daily_post_limit || 2} posts
+- Intervalo mínimo: ${context?.min_hours_between_posts || 4} horas
 - Plataformas: ${context?.preferred_platforms?.join(', ') || 'instagram'}
 - Posts recentes: ${recentPosts?.length || 0}
 
@@ -503,13 +553,16 @@ Você pode executar ações reais usando as ferramentas disponíveis:
 - **delete_post**: Deletar um post
 - **update_agent_settings**: Atualizar configurações
 
-## REGRAS
+## REGRAS FUNDAMENTAIS
 1. SEMPRE use as ferramentas quando o usuário pedir para criar, agendar, gerar ou modificar algo
 2. Ao criar um plano de conteúdo, USE create_posts para criar os posts de verdade
 3. Seja proativo - execute as ações, não apenas sugira
 4. Após executar ações, explique o que foi feito
 5. Use datas/horários reais (a partir de agora: ${new Date().toISOString()})
-6. Responda em português brasileiro`;
+6. Responda SEMPRE em português brasileiro
+7. Mantenha sua personalidade consistente em todas as interações
+
+${customPrompt ? `## INSTRUÇÕES PERSONALIZADAS DO USUÁRIO\n${customPrompt}` : ''}`;
 
     // First API call with tools
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { 
   Send, 
@@ -16,17 +16,19 @@ import {
   CheckCircle2,
   XCircle,
   Trash2,
-  RotateCcw,
-  ChevronRight,
-  Zap,
   BarChart3,
-  FileText,
-  Clock
+  Settings
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
+import AgentConfigPanel from './AgentConfigPanel';
+
+interface AgentConfig {
+  agent_name: string;
+  agent_avatar_url: string | null;
+}
 
 interface ExecutedAction {
   tool: string;
@@ -79,15 +81,37 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [agentConfig, setAgentConfig] = useState<AgentConfig>({ agent_name: 'Agente IA', agent_avatar_url: null });
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load chat history on mount
+  // Load chat history and config on mount
   useEffect(() => {
     if (user) {
       loadChatHistory();
+      loadAgentConfig();
     }
   }, [user]);
+
+  const loadAgentConfig = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('agent_context')
+        .select('agent_name, agent_avatar_url')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setAgentConfig({
+          agent_name: data.agent_name || 'Agente IA',
+          agent_avatar_url: data.agent_avatar_url
+        });
+      }
+    } catch (error) {
+      console.error('Error loading agent config:', error);
+    }
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -302,18 +326,35 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       <div className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-border/50 bg-background/50 backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="p-3 rounded-2xl neural-gradient shadow-lg shadow-primary/20">
-              <Bot className="h-6 w-6 text-white" />
-            </div>
+            <Avatar className="h-14 w-14 border-2 border-primary/30 shadow-lg shadow-primary/20">
+              <AvatarImage src={agentConfig.agent_avatar_url || undefined} />
+              <AvatarFallback className="neural-gradient text-white">
+                <Bot className="h-7 w-7" />
+              </AvatarFallback>
+            </Avatar>
             <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-background animate-pulse" />
           </div>
           <div>
-            <h1 className="text-xl font-bold neural-gradient-text">Agente IA</h1>
+            <h1 className="text-xl font-bold neural-gradient-text">{agentConfig.agent_name}</h1>
             <p className="text-sm text-muted-foreground">Seu assistente autônomo de mídias sociais</p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
+          <AgentConfigPanel 
+            onConfigChange={(config) => {
+              setAgentConfig({
+                agent_name: config.agent_name,
+                agent_avatar_url: config.agent_avatar_url
+              });
+            }}
+            trigger={
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Configurar</span>
+              </Button>
+            }
+          />
           <Button 
             variant="ghost" 
             size="sm" 
@@ -321,7 +362,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
             className="text-muted-foreground hover:text-destructive"
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Limpar
+            <span className="hidden sm:inline">Limpar</span>
           </Button>
         </div>
       </div>
