@@ -27,7 +27,10 @@ import {
   X,
   ChevronLeft,
   Wand2,
-  Hash
+  Hash,
+  Flame,
+  Images,
+  LayoutGrid
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -49,6 +52,17 @@ const PREDEFINED_TOPICS = [
   { label: 'Física Quântica', query: 'física quântica descobertas recentes', icon: Atom },
   { label: 'Tecnologia', query: 'tecnologia inovação notícias', icon: Cpu },
   { label: 'Futurismo', query: 'futuro tecnologia previsões', icon: Rocket },
+];
+
+// Trending tech queries for "hot news" feature
+const TRENDING_QUERIES = [
+  'breaking tech news today',
+  'artificial intelligence breakthrough',
+  'OpenAI ChatGPT latest',
+  'Tesla Elon Musk news',
+  'Apple Google Microsoft announcement',
+  'quantum computing news',
+  'robotics humanoid news',
 ];
 
 // Brasília timezone offset (UTC-3)
@@ -82,12 +96,15 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
   // Post creation state
   const [selectedNews, setSelectedNews] = useState<NewsResult | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]); // For carousel
+  const [isCarouselMode, setIsCarouselMode] = useState(false);
   const [caption, setCaption] = useState('');
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [scheduledFor, setScheduledFor] = useState('');
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [loadingTrending, setLoadingTrending] = useState(false);
   
   const { accounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
@@ -143,6 +160,48 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
     }
   };
 
+  // Fetch trending tech news
+  const fetchTrendingNews = async () => {
+    setLoadingTrending(true);
+    setLoading(true);
+    
+    try {
+      // Use multiple trending queries to get varied results
+      const randomQueries = TRENDING_QUERIES.sort(() => Math.random() - 0.5).slice(0, 3);
+      const query = randomQueries.join(' OR ') + ' tecnologia inovação';
+      
+      const { data, error } = await supabase.functions.invoke('firecrawl-search', {
+        body: { 
+          query: 'breaking tech news AI robotics innovation',
+          limit: 15,
+          lang: 'pt-BR',
+          country: 'BR'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data.data) {
+        // Sort by number of images (more images = more visual content = trending)
+        const sorted = [...data.data].sort((a: NewsResult, b: NewsResult) => 
+          (b.images?.length || 0) - (a.images?.length || 0)
+        );
+        setNewsResults(sorted);
+        sessionStorage.setItem('latest_news_results', JSON.stringify(sorted));
+        sessionStorage.setItem('latest_news_query', 'trending');
+        toast.success(`🔥 ${sorted.length} notícias em alta encontradas!`);
+      } else {
+        toast.error(data?.error || 'Erro ao buscar trending');
+      }
+    } catch (error: any) {
+      console.error('Error fetching trending:', error);
+      toast.error('Erro ao buscar notícias em alta');
+    } finally {
+      setLoading(false);
+      setLoadingTrending(false);
+    }
+  };
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copiado!`);
@@ -157,20 +216,43 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
   };
 
   // Select news and go to creation mode
-  const selectNewsForPost = (news: NewsResult) => {
+  const selectNewsForPost = (news: NewsResult, asCarousel: boolean = false) => {
     setSelectedNews(news);
-    setSelectedImage(news.images?.[0] || null);
+    setIsCarouselMode(asCarousel);
+    
+    if (asCarousel && news.images && news.images.length >= 2) {
+      setSelectedImages(news.images.slice(0, 10)); // Select all for carousel
+      setSelectedImage(null);
+    } else {
+      setSelectedImage(news.images?.[0] || null);
+      setSelectedImages([]);
+    }
+    
     setCaption('');
     setHashtags([]);
+  };
+
+  // Toggle image selection for carousel
+  const toggleImageSelection = (img: string) => {
+    if (isCarouselMode) {
+      setSelectedImages(prev => 
+        prev.includes(img) 
+          ? prev.filter(i => i !== img)
+          : [...prev, img]
+      );
+    } else {
+      setSelectedImage(img);
+    }
   };
 
   // Go back to news list
   const backToNewsList = () => {
     setSelectedNews(null);
     setSelectedImage(null);
+    setSelectedImages([]);
+    setIsCarouselMode(false);
     setCaption('');
     setHashtags([]);
-    setScheduledFor('');
   };
 
   // Generate caption for selected news
@@ -202,8 +284,9 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
 
   // Save as draft
   const saveAsDraft = async () => {
-    if (!selectedNews || !selectedImage) {
-      toast.error('Selecione uma imagem da notícia');
+    const hasSelection = isCarouselMode ? selectedImages.length >= 2 : !!selectedImage;
+    if (!selectedNews || !hasSelection) {
+      toast.error(isCarouselMode ? 'Selecione pelo menos 2 imagens para o carrossel' : 'Selecione uma imagem da notícia');
       return;
     }
     if (!caption.trim()) {
@@ -216,10 +299,11 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       const postData: CreatePostData = {
         caption: caption.trim(),
         hashtags,
-        image_url: selectedImage,
+        image_url: isCarouselMode ? selectedImages[0] : selectedImage!,
+        carousel_images: isCarouselMode ? selectedImages : undefined,
         status: 'draft',
         post_type: 'noticia',
-        media_type: 'image',
+        media_type: isCarouselMode ? 'carousel' : 'image',
       };
 
       if (onPostCreated) {
@@ -227,7 +311,6 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
         toast.success('Rascunho salvo!');
         backToNewsList();
       } else {
-        // Fallback: save directly to Supabase
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           toast.error('Faça login para salvar');
@@ -253,8 +336,9 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
 
   // Schedule post
   const schedulePost = async () => {
-    if (!selectedNews || !selectedImage) {
-      toast.error('Selecione uma imagem da notícia');
+    const hasSelection = isCarouselMode ? selectedImages.length >= 2 : !!selectedImage;
+    if (!selectedNews || !hasSelection) {
+      toast.error(isCarouselMode ? 'Selecione pelo menos 2 imagens para o carrossel' : 'Selecione uma imagem da notícia');
       return;
     }
     if (!caption.trim()) {
@@ -275,11 +359,12 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       const postData: CreatePostData = {
         caption: caption.trim(),
         hashtags,
-        image_url: selectedImage,
+        image_url: isCarouselMode ? selectedImages[0] : selectedImage!,
+        carousel_images: isCarouselMode ? selectedImages : undefined,
         status: 'scheduled',
         scheduled_for: localToUTC(scheduledFor),
         post_type: 'noticia',
-        media_type: 'image',
+        media_type: isCarouselMode ? 'carousel' : 'image',
       };
 
       if (onPostCreated) {
@@ -331,8 +416,9 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
 
   // Publish now
   const publishNow = async () => {
-    if (!selectedNews || !selectedImage) {
-      toast.error('Selecione uma imagem da notícia');
+    const hasSelection = isCarouselMode ? selectedImages.length >= 2 : !!selectedImage;
+    if (!selectedNews || !hasSelection) {
+      toast.error(isCarouselMode ? 'Selecione pelo menos 2 imagens para o carrossel' : 'Selecione uma imagem da notícia');
       return;
     }
     if (!caption.trim()) {
@@ -352,42 +438,44 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
         return;
       }
 
-      // Upload external image to Supabase Storage for Instagram compatibility
-      let finalImageUrl = selectedImage;
-      let imageUploadFailed = false;
-      
-      // Check if it's an external URL (not already on Supabase)
-      const isExternalImage = !selectedImage.includes('supabase') && 
-                              !selectedImage.includes(import.meta.env.VITE_SUPABASE_URL || '');
-      
-      if (isExternalImage) {
-        try {
-          finalImageUrl = await uploadExternalImageWithWatermark(selectedImage);
-          toast.success('Imagem com marca d\'água pronta!');
-        } catch (uploadError: any) {
-          console.error('Image upload error:', uploadError);
-          imageUploadFailed = true;
-          
-          // Check if it's a blocking error
-          if (uploadError.message?.includes('403') || uploadError.message?.includes('bloqueando')) {
-            toast.error('O site está bloqueando o acesso à imagem. Tente outra imagem ou salve como rascunho.');
-            setIsPublishing(false);
-            return;
+      // For carousel, process all images; for single, process one
+      const imagesToProcess = isCarouselMode ? selectedImages : [selectedImage!];
+      const processedImages: string[] = [];
+
+      for (const img of imagesToProcess) {
+        const isExternalImage = !img.includes('supabase') && 
+                                !img.includes(import.meta.env.VITE_SUPABASE_URL || '');
+        
+        if (isExternalImage) {
+          try {
+            const processed = await uploadExternalImageWithWatermark(img);
+            processedImages.push(processed);
+          } catch (uploadError: any) {
+            console.error('Image upload error:', uploadError);
+            if (uploadError.message?.includes('403') || uploadError.message?.includes('bloqueando')) {
+              toast.error('O site está bloqueando o acesso a uma imagem. Tente outras imagens.');
+              setIsPublishing(false);
+              return;
+            }
+            // Fallback to original
+            processedImages.push(img);
           }
-          
-          // Try to proceed with original URL as fallback
-          toast.warning('Usando imagem original (pode falhar no Instagram)');
+        } else {
+          processedImages.push(img);
         }
       }
 
-      // Create post with 'draft' status first (valid status), then publish
+      toast.success('Imagens processadas!');
+
+      // Create post
       const { data: post, error: insertError } = await supabase.from('posts').insert({
         caption: caption.trim(),
         hashtags,
-        image_url: finalImageUrl,
-        status: 'draft', // Use valid status, publish-post will update to 'published'
+        image_url: processedImages[0],
+        carousel_images: isCarouselMode ? processedImages : null,
+        status: 'draft',
         post_type: 'noticia',
-        media_type: 'image',
+        media_type: isCarouselMode ? 'carousel' : 'image',
         user_id: user.id,
       }).select().single();
 
@@ -401,7 +489,6 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       if (publishError) throw publishError;
       
       if (publishData?.error) {
-        // Update post status to failed
         await supabase.from('posts').update({ 
           status: 'failed', 
           error_message: publishData.error 
@@ -409,7 +496,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
         throw new Error(publishData.error);
       }
       
-      toast.success('Publicado no Instagram!');
+      toast.success(isCarouselMode ? 'Carrossel publicado no Instagram!' : 'Publicado no Instagram!');
       backToNewsList();
     } catch (error: any) {
       console.error('Error publishing:', error);
@@ -440,14 +527,64 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
           {/* Left: Image selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="w-5 h-5" />
-                Imagem da Notícia
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isCarouselMode ? <Images className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
+                  {isCarouselMode ? 'Carrossel de Imagens' : 'Imagem da Notícia'}
+                </div>
+                {/* Toggle carousel mode */}
+                {selectedNews.images && selectedNews.images.length >= 2 && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setIsCarouselMode(!isCarouselMode);
+                      if (!isCarouselMode) {
+                        setSelectedImages(selectedNews.images?.slice(0, 10) || []);
+                        setSelectedImage(null);
+                      } else {
+                        setSelectedImage(selectedNews.images?.[0] || null);
+                        setSelectedImages([]);
+                      }
+                    }}
+                  >
+                    {isCarouselMode ? (
+                      <>
+                        <ImageIcon className="w-4 h-4 mr-1" />
+                        Imagem Única
+                      </>
+                    ) : (
+                      <>
+                        <LayoutGrid className="w-4 h-4 mr-1" />
+                        Carrossel
+                      </>
+                    )}
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Selected image preview */}
-              {selectedImage && (
+              {/* Carousel preview */}
+              {isCarouselMode && selectedImages.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">
+                    {selectedImages.length} imagens selecionadas
+                  </Label>
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {selectedImages.map((img, idx) => (
+                      <div key={idx} className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-primary">
+                        <img src={img} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
+                        <Badge className="absolute top-1 left-1 bg-primary text-[10px] px-1">
+                          {idx + 1}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Single image preview */}
+              {!isCarouselMode && selectedImage && (
                 <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-primary">
                   <img 
                     src={selectedImage} 
@@ -469,29 +606,47 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
               {selectedNews.images && selectedNews.images.length > 0 ? (
                 <div>
                   <Label className="text-sm text-muted-foreground mb-2 block">
-                    Imagens disponíveis ({selectedNews.images.length})
+                    {isCarouselMode 
+                      ? `Clique para selecionar/remover (${selectedImages.length}/${selectedNews.images.length})`
+                      : `Imagens disponíveis (${selectedNews.images.length})`
+                    }
                   </Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {selectedNews.images.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedImage(img)}
-                        className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedImage === img 
-                            ? 'border-primary ring-2 ring-primary/50' 
-                            : 'border-transparent hover:border-primary/50'
-                        }`}
-                      >
-                        <img 
-                          src={img} 
-                          alt={`Opção ${idx + 1}`} 
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-4 gap-2">
+                    {selectedNews.images.map((img, idx) => {
+                      const isSelected = isCarouselMode 
+                        ? selectedImages.includes(img) 
+                        : selectedImage === img;
+                      const selectionIndex = isCarouselMode ? selectedImages.indexOf(img) + 1 : 0;
+                      
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => toggleImageSelection(img)}
+                          className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                            isSelected 
+                              ? 'border-primary ring-2 ring-primary/50' 
+                              : 'border-transparent hover:border-primary/50'
+                          }`}
+                        >
+                          <img 
+                            src={img} 
+                            alt={`Opção ${idx + 1}`} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                          {isCarouselMode && isSelected && (
+                            <Badge className="absolute top-1 left-1 bg-primary text-[10px] px-1.5">
+                              {selectionIndex}
+                            </Badge>
+                          )}
+                          {!isCarouselMode && isSelected && (
+                            <Check className="absolute top-1 right-1 w-4 h-4 text-primary bg-background rounded-full p-0.5" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ) : (
@@ -687,6 +842,35 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       {/* Search */}
       <Card className="border-primary/20 bg-gradient-neural-soft overflow-hidden">
         <CardContent className="p-6">
+          {/* Trending Button */}
+          <div className="flex justify-center mb-4">
+            <Button 
+              onClick={fetchTrendingNews}
+              disabled={loading || loadingTrending}
+              size="lg"
+              variant="outline"
+              className="border-orange-500/50 text-orange-500 hover:bg-orange-500/10 hover:text-orange-400 h-14 px-8"
+            >
+              {loadingTrending ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Buscando trending...
+                </>
+              ) : (
+                <>
+                  <Flame className="w-5 h-5 mr-2" />
+                  🔥 Notícias em Alta (Tech)
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-sm text-muted-foreground">ou busque por tema</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -704,7 +888,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
               size="lg"
               className="h-12 px-8 glow-sm"
             >
-              {loading ? (
+              {loading && !loadingTrending ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Buscando...
