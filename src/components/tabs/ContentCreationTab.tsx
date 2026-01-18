@@ -87,7 +87,6 @@ const POST_TYPES = [
   { value: "storytelling", label: "Storytelling", description: "Conexão emocional" },
   { value: "viral", label: "Viral", description: "Máximo alcance" },
   { value: "vendas", label: "Vendas", description: "Conversão e ação" },
-  { value: "noticia", label: "Notícia", description: "Informativo atual" },
 ];
 
 interface ContentCreationTabProps {

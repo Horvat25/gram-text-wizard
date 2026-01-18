@@ -190,7 +190,7 @@ const Index = () => {
                 </TabsContent>
 
                 <TabsContent value="news" className="space-y-6">
-                  <LatestNewsTab />
+                  <LatestNewsTab onPostCreated={createPost} />
                 </TabsContent>
 
                 <TabsContent value="suggestions" className="space-y-6">
