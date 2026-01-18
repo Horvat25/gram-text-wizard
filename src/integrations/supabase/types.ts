@@ -14,6 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_context: {
+        Row: {
+          audience_preferences: string[] | null
+          auto_post_enabled: boolean | null
+          best_hashtags: string[] | null
+          best_posting_times: string[] | null
+          brand_voice: string | null
+          daily_post_limit: number | null
+          id: string
+          min_hours_between_posts: number | null
+          performance_history: number[] | null
+          preferred_platforms: string[] | null
+          success_patterns: string[] | null
+          top_topics: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          audience_preferences?: string[] | null
+          auto_post_enabled?: boolean | null
+          best_hashtags?: string[] | null
+          best_posting_times?: string[] | null
+          brand_voice?: string | null
+          daily_post_limit?: number | null
+          id?: string
+          min_hours_between_posts?: number | null
+          performance_history?: number[] | null
+          preferred_platforms?: string[] | null
+          success_patterns?: string[] | null
+          top_topics?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          audience_preferences?: string[] | null
+          auto_post_enabled?: boolean | null
+          best_hashtags?: string[] | null
+          best_posting_times?: string[] | null
+          brand_voice?: string | null
+          daily_post_limit?: number | null
+          id?: string
+          min_hours_between_posts?: number | null
+          performance_history?: number[] | null
+          preferred_platforms?: string[] | null
+          success_patterns?: string[] | null
+          top_topics?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      agent_decisions: {
+        Row: {
+          actual_engagement: number | null
+          content_plan: Json | null
+          created_at: string | null
+          decision: string
+          decision_reason: string | null
+          expected_engagement: number | null
+          hypothesis: string | null
+          hypothesis_confirmed: boolean | null
+          id: string
+          learning: string | null
+          metrics_snapshot: Json | null
+          post_id: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_engagement?: number | null
+          content_plan?: Json | null
+          created_at?: string | null
+          decision: string
+          decision_reason?: string | null
+          expected_engagement?: number | null
+          hypothesis?: string | null
+          hypothesis_confirmed?: boolean | null
+          id?: string
+          learning?: string | null
+          metrics_snapshot?: Json | null
+          post_id?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_engagement?: number | null
+          content_plan?: Json | null
+          created_at?: string | null
+          decision?: string
+          decision_reason?: string | null
+          expected_engagement?: number | null
+          hypothesis?: string | null
+          hypothesis_confirmed?: boolean | null
+          id?: string
+          learning?: string | null
+          metrics_snapshot?: Json | null
+          post_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_decisions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backups: {
         Row: {
           backup_type: string
