@@ -617,13 +617,9 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
                 size="icon"
                 onClick={toggleListening}
                 disabled={isLoading}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 ${isListening ? 'text-red-500 bg-red-500/10' : 'text-muted-foreground hover:text-primary'}`}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 ${isListening ? 'text-red-500 bg-red-500/10 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
               >
-                {isListening ? (
-                  <MicOff className="h-5 w-5" />
-                ) : (
-                  <Mic className="h-5 w-5" />
-                )}
+                <Mic className="h-5 w-5" />
               </Button>
             </div>
             <Button 
