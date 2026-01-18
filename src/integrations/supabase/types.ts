@@ -43,49 +43,88 @@ export type Database = {
       }
       agent_context: {
         Row: {
+          agent_avatar_url: string | null
+          agent_name: string | null
           audience_preferences: string[] | null
           auto_post_enabled: boolean | null
+          avoid_topics: string[] | null
           best_hashtags: string[] | null
           best_posting_times: string[] | null
           brand_voice: string | null
+          content_focus: string[] | null
           daily_post_limit: number | null
+          emoji_usage: string | null
+          hashtag_strategy: string | null
           id: string
+          industry_niche: string | null
+          language_formality: string | null
           min_hours_between_posts: number | null
           performance_history: number[] | null
+          personality_traits: string[] | null
+          posting_style: string | null
           preferred_platforms: string[] | null
+          response_style: string | null
           success_patterns: string[] | null
+          system_prompt_template: string | null
+          target_audience: string | null
           top_topics: string[] | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          agent_avatar_url?: string | null
+          agent_name?: string | null
           audience_preferences?: string[] | null
           auto_post_enabled?: boolean | null
+          avoid_topics?: string[] | null
           best_hashtags?: string[] | null
           best_posting_times?: string[] | null
           brand_voice?: string | null
+          content_focus?: string[] | null
           daily_post_limit?: number | null
+          emoji_usage?: string | null
+          hashtag_strategy?: string | null
           id?: string
+          industry_niche?: string | null
+          language_formality?: string | null
           min_hours_between_posts?: number | null
           performance_history?: number[] | null
+          personality_traits?: string[] | null
+          posting_style?: string | null
           preferred_platforms?: string[] | null
+          response_style?: string | null
           success_patterns?: string[] | null
+          system_prompt_template?: string | null
+          target_audience?: string | null
           top_topics?: string[] | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          agent_avatar_url?: string | null
+          agent_name?: string | null
           audience_preferences?: string[] | null
           auto_post_enabled?: boolean | null
+          avoid_topics?: string[] | null
           best_hashtags?: string[] | null
           best_posting_times?: string[] | null
           brand_voice?: string | null
+          content_focus?: string[] | null
           daily_post_limit?: number | null
+          emoji_usage?: string | null
+          hashtag_strategy?: string | null
           id?: string
+          industry_niche?: string | null
+          language_formality?: string | null
           min_hours_between_posts?: number | null
           performance_history?: number[] | null
+          personality_traits?: string[] | null
+          posting_style?: string | null
           preferred_platforms?: string[] | null
+          response_style?: string | null
           success_patterns?: string[] | null
+          system_prompt_template?: string | null
+          target_audience?: string | null
           top_topics?: string[] | null
           updated_at?: string | null
           user_id?: string
