@@ -83,6 +83,25 @@ const AGENT_TOOLS = [
   {
     type: "function",
     function: {
+      name: "get_detailed_analytics",
+      description: "Busca estatísticas DETALHADAS e REAIS do banco de dados. Use SEMPRE que o usuário perguntar 'quantos posts', 'quantos vídeos', 'quantas imagens', estatísticas de conteúdo, contagens, ou qualquer pergunta sobre números/dados do aplicativo.",
+      parameters: {
+        type: "object",
+        properties: {
+          query_type: { 
+            type: "string", 
+            enum: ["overview", "by_media_type", "by_status", "by_platform", "by_date_range", "recent_activity"],
+            description: "Tipo de consulta: overview (visão geral), by_media_type (por tipo: vídeo/imagem/reel), by_status (por status), by_platform (instagram/tiktok), by_date_range (por período), recent_activity (atividade recente)"
+          },
+          days: { type: "number", description: "Período em dias para filtrar (padrão: 30)" }
+        },
+        required: ["query_type"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "run_autonomous_agent",
       description: "Executa o agente autônomo para analisar e decidir se deve criar/publicar conteúdo. Use quando o usuário pedir para 'rodar o agente' ou 'executar ciclo'.",
       parameters: {
@@ -370,6 +389,211 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
   };
 }
 
+// NEW: Detailed analytics function that queries REAL data from database
+async function executeDetailedAnalytics(supabase: any, userId: string, args: any) {
+  const { query_type, days = 30 } = args;
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  // Fetch ALL posts for this user
+  const { data: allPosts, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao buscar dados: ${error.message}` };
+  }
+
+  if (!allPosts || allPosts.length === 0) {
+    return {
+      success: true,
+      message: `📊 Nenhum post encontrado no banco de dados.`,
+      data: { total: 0 }
+    };
+  }
+
+  // Calculate real statistics based on query type
+  switch (query_type) {
+    case 'overview': {
+      const total = allPosts.length;
+      const published = allPosts.filter((p: any) => p.status === 'published').length;
+      const scheduled = allPosts.filter((p: any) => p.status === 'scheduled').length;
+      const drafts = allPosts.filter((p: any) => p.status === 'draft').length;
+      const videos = allPosts.filter((p: any) => p.media_type === 'video' || p.video_url).length;
+      const images = allPosts.filter((p: any) => p.media_type === 'image' && p.image_url && !p.video_url).length;
+      const reels = allPosts.filter((p: any) => p.media_type === 'reel').length;
+      const carousels = allPosts.filter((p: any) => p.media_type === 'carousel' || (p.carousel_images && p.carousel_images.length > 0)).length;
+      const withMedia = allPosts.filter((p: any) => p.image_url || p.video_url || (p.carousel_images && p.carousel_images.length > 0)).length;
+      const withoutMedia = total - withMedia;
+
+      return {
+        success: true,
+        message: `📊 **VISÃO GERAL REAL DO BANCO DE DADOS**`,
+        data: {
+          total_posts: total,
+          por_status: {
+            publicados: published,
+            agendados: scheduled,
+            rascunhos: drafts
+          },
+          por_tipo_de_midia: {
+            videos: videos,
+            imagens: images,
+            reels: reels,
+            carroseis: carousels
+          },
+          midia: {
+            com_midia: withMedia,
+            sem_midia: withoutMedia
+          }
+        }
+      };
+    }
+
+    case 'by_media_type': {
+      const videos = allPosts.filter((p: any) => p.media_type === 'video' || p.video_url);
+      const images = allPosts.filter((p: any) => p.media_type === 'image' && p.image_url && !p.video_url);
+      const reels = allPosts.filter((p: any) => p.media_type === 'reel');
+      const carousels = allPosts.filter((p: any) => p.media_type === 'carousel' || (p.carousel_images && p.carousel_images.length > 0));
+
+      return {
+        success: true,
+        message: `🎬 **ANÁLISE POR TIPO DE MÍDIA**`,
+        data: {
+          videos: {
+            total: videos.length,
+            publicados: videos.filter((p: any) => p.status === 'published').length,
+            agendados: videos.filter((p: any) => p.status === 'scheduled').length
+          },
+          imagens: {
+            total: images.length,
+            publicados: images.filter((p: any) => p.status === 'published').length,
+            agendados: images.filter((p: any) => p.status === 'scheduled').length
+          },
+          reels: {
+            total: reels.length,
+            publicados: reels.filter((p: any) => p.status === 'published').length,
+            agendados: reels.filter((p: any) => p.status === 'scheduled').length
+          },
+          carroseis: {
+            total: carousels.length,
+            publicados: carousels.filter((p: any) => p.status === 'published').length,
+            agendados: carousels.filter((p: any) => p.status === 'scheduled').length
+          }
+        }
+      };
+    }
+
+    case 'by_status': {
+      const published = allPosts.filter((p: any) => p.status === 'published');
+      const scheduled = allPosts.filter((p: any) => p.status === 'scheduled');
+      const drafts = allPosts.filter((p: any) => p.status === 'draft');
+      const failed = allPosts.filter((p: any) => p.status === 'failed');
+
+      return {
+        success: true,
+        message: `📋 **ANÁLISE POR STATUS**`,
+        data: {
+          publicados: {
+            total: published.length,
+            ultimo: published.length > 0 ? new Date(published[0].published_at || published[0].created_at).toLocaleDateString('pt-BR') : null
+          },
+          agendados: {
+            total: scheduled.length,
+            proximos: scheduled.slice(0, 3).map((p: any) => ({
+              caption: p.caption.slice(0, 40) + '...',
+              data: p.scheduled_for ? new Date(p.scheduled_for).toLocaleString('pt-BR') : 'N/A'
+            }))
+          },
+          rascunhos: {
+            total: drafts.length
+          },
+          falhas: {
+            total: failed.length
+          }
+        }
+      };
+    }
+
+    case 'by_platform': {
+      const instagram = allPosts.filter((p: any) => !p.platforms || p.platforms.includes('instagram'));
+      const tiktok = allPosts.filter((p: any) => p.platforms && p.platforms.includes('tiktok'));
+
+      return {
+        success: true,
+        message: `📱 **ANÁLISE POR PLATAFORMA**`,
+        data: {
+          instagram: {
+            total: instagram.length,
+            publicados: instagram.filter((p: any) => p.status === 'published').length,
+            com_instagram_post_id: instagram.filter((p: any) => p.instagram_post_id).length
+          },
+          tiktok: {
+            total: tiktok.length,
+            publicados: tiktok.filter((p: any) => p.status === 'published').length,
+            com_tiktok_post_id: tiktok.filter((p: any) => p.tiktok_post_id).length
+          }
+        }
+      };
+    }
+
+    case 'by_date_range': {
+      const recentPosts = allPosts.filter((p: any) => new Date(p.created_at) >= since);
+      const today = new Date();
+      const last7Days = allPosts.filter((p: any) => {
+        const created = new Date(p.created_at);
+        const diff = (today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+        return diff <= 7;
+      });
+      const last30Days = allPosts.filter((p: any) => {
+        const created = new Date(p.created_at);
+        const diff = (today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+        return diff <= 30;
+      });
+
+      return {
+        success: true,
+        message: `📅 **ANÁLISE TEMPORAL (últimos ${days} dias)**`,
+        data: {
+          ultimos_7_dias: last7Days.length,
+          ultimos_30_dias: last30Days.length,
+          periodo_solicitado: {
+            dias: days,
+            posts: recentPosts.length
+          },
+          total_historico: allPosts.length
+        }
+      };
+    }
+
+    case 'recent_activity': {
+      const sortedPosts = [...allPosts].sort((a: any, b: any) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      const recent = sortedPosts.slice(0, 5);
+
+      return {
+        success: true,
+        message: `🕐 **ATIVIDADE RECENTE**`,
+        data: {
+          ultimos_5_posts: recent.map((p: any) => ({
+            id: p.id,
+            caption: p.caption.slice(0, 50) + '...',
+            tipo: p.media_type || 'image',
+            status: p.status,
+            criado_em: new Date(p.created_at).toLocaleString('pt-BR'),
+            tem_midia: !!(p.image_url || p.video_url)
+          }))
+        }
+      };
+    }
+
+    default:
+      return { success: false, message: `Tipo de consulta desconhecido: ${query_type}` };
+  }
+}
+
 async function executeRunAgent(supabase: any, userId: string) {
   const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/ai-agent-core`, {
     method: 'POST',
@@ -504,6 +728,8 @@ async function executeTool(supabase: any, userId: string, toolName: string, args
       return executeSchedulePost(supabase, userId, args);
     case 'get_performance_data':
       return executeGetPerformance(supabase, userId, args);
+    case 'get_detailed_analytics':
+      return executeDetailedAnalytics(supabase, userId, args);
     case 'run_autonomous_agent':
       return executeRunAgent(supabase, userId);
     case 'list_posts':
@@ -649,14 +875,19 @@ serve(async (req) => {
 Você EXECUTA, não sugere. Use suas ferramentas:
 | Ferramenta | Quando usar |
 |------------|-------------|
-| \`create_posts\` | Criar posts (rascunhos ou agendados) |
-| \`generate_image_for_post\` | Gerar visual AI para um post |
+| \`create_posts\` | Criar posts (SEMPRE com image_prompt!) |
+| \`generate_image_for_post\` | Gerar visual AI para um post existente |
 | \`schedule_post\` | Agendar post existente |
-| \`get_performance_data\` | Analisar métricas e performance |
+| \`get_detailed_analytics\` | **OBRIGATÓRIO** para perguntas sobre QUANTIDADES (quantos vídeos, posts, etc) |
+| \`get_performance_data\` | Analisar métricas de engajamento |
 | \`run_autonomous_agent\` | Executar ciclo autônomo completo |
-| \`list_posts\` | Ver posts existentes |
+| \`list_posts\` | Ver posts existentes com detalhes |
 | \`delete_post\` | Remover um post |
 | \`update_agent_settings\` | Mudar configurações |
+
+**REGRA CRÍTICA:** Quando o usuário perguntar "quantos", "qual o total", "quantas vezes", etc.:
+→ SEMPRE use \`get_detailed_analytics\` PRIMEIRO para buscar dados REAIS
+→ NUNCA invente números - se não souber, consulte o banco
 
 ## ⚡ FÓRMULA DE CONTEÚDO VIRAL
 
