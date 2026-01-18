@@ -6,6 +6,443 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Define available tools for the agent
+const AGENT_TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "create_posts",
+      description: "Cria um ou mais posts no banco de dados. Use quando o usuário pedir para criar conteúdo, plano de conteúdo, ou posts.",
+      parameters: {
+        type: "object",
+        properties: {
+          posts: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                caption: { type: "string", description: "Texto/legenda do post" },
+                hashtags: { type: "array", items: { type: "string" }, description: "Lista de hashtags" },
+                post_type: { type: "string", enum: ["engajamento", "educacional", "promocional", "entretenimento"], description: "Tipo do post" },
+                scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601). Se não fornecido, será rascunho." },
+                platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+              },
+              required: ["caption"]
+            },
+            description: "Lista de posts a criar"
+          }
+        },
+        required: ["posts"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "generate_image_for_post",
+      description: "Gera uma imagem AI para um post existente. Use quando o usuário pedir para gerar imagem/visual para um post.",
+      parameters: {
+        type: "object",
+        properties: {
+          post_id: { type: "string", description: "ID do post para adicionar a imagem" },
+          image_prompt: { type: "string", description: "Descrição detalhada da imagem a gerar" }
+        },
+        required: ["post_id", "image_prompt"]
+      }
+    }
+  },
+  {
+    type: "function", 
+    function: {
+      name: "schedule_post",
+      description: "Agenda um post existente para publicação. Use quando o usuário pedir para agendar um post.",
+      parameters: {
+        type: "object",
+        properties: {
+          post_id: { type: "string", description: "ID do post a agendar" },
+          scheduled_for: { type: "string", description: "Data/hora para publicar (ISO 8601)" }
+        },
+        required: ["post_id", "scheduled_for"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_performance_data",
+      description: "Busca dados de performance dos posts. Use quando o usuário pedir análise, métricas ou relatórios.",
+      parameters: {
+        type: "object",
+        properties: {
+          days: { type: "number", description: "Quantos dias de histórico buscar (padrão: 30)" }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "run_autonomous_agent",
+      description: "Executa o agente autônomo para analisar e decidir se deve criar/publicar conteúdo. Use quando o usuário pedir para 'rodar o agente' ou 'executar ciclo'.",
+      parameters: {
+        type: "object",
+        properties: {}
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_posts",
+      description: "Lista posts existentes. Use quando o usuário perguntar sobre posts, rascunhos ou agendados.",
+      parameters: {
+        type: "object",
+        properties: {
+          status: { type: "string", enum: ["draft", "scheduled", "published", "all"], description: "Filtrar por status" },
+          limit: { type: "number", description: "Quantidade máxima de posts (padrão: 10)" }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_post",
+      description: "Deleta um post. Use quando o usuário pedir para remover ou excluir um post.",
+      parameters: {
+        type: "object",
+        properties: {
+          post_id: { type: "string", description: "ID do post a deletar" }
+        },
+        required: ["post_id"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_agent_settings",
+      description: "Atualiza configurações do agente. Use quando o usuário quiser mudar preferências.",
+      parameters: {
+        type: "object",
+        properties: {
+          auto_post_enabled: { type: "boolean", description: "Ativar/desativar auto-post" },
+          daily_post_limit: { type: "number", description: "Limite diário de posts" },
+          min_hours_between_posts: { type: "number", description: "Intervalo mínimo entre posts (horas)" },
+          brand_voice: { type: "string", description: "Voz/tom da marca" },
+          preferred_platforms: { type: "array", items: { type: "string" }, description: "Plataformas preferidas" }
+        }
+      }
+    }
+  }
+];
+
+// Tool execution functions
+async function executeCreatePosts(supabase: any, userId: string, args: any) {
+  const { posts } = args;
+  const createdPosts = [];
+  
+  for (const post of posts) {
+    const postData = {
+      user_id: userId,
+      caption: post.caption,
+      hashtags: post.hashtags || [],
+      post_type: post.post_type || 'engajamento',
+      platforms: post.platforms || ['instagram'],
+      status: post.scheduled_for ? 'scheduled' : 'draft',
+      scheduled_for: post.scheduled_for || null,
+      media_type: 'image'
+    };
+    
+    const { data, error } = await supabase
+      .from('posts')
+      .insert(postData)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating post:', error);
+      continue;
+    }
+    
+    createdPosts.push(data);
+  }
+  
+  return {
+    success: true,
+    message: `✅ ${createdPosts.length} post(s) criado(s) com sucesso!`,
+    posts: createdPosts.map(p => ({
+      id: p.id,
+      caption: p.caption.slice(0, 50) + '...',
+      status: p.status,
+      scheduled_for: p.scheduled_for
+    }))
+  };
+}
+
+async function executeGenerateImage(supabase: any, userId: string, args: any) {
+  const { post_id, image_prompt } = args;
+  
+  // Call the generate-image function
+  const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+    },
+    body: JSON.stringify({ 
+      prompt: image_prompt,
+      userId,
+      postId: post_id
+    })
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    return { success: false, message: `❌ Erro ao gerar imagem: ${errorText}` };
+  }
+  
+  const result = await response.json();
+  
+  // Update the post with the image URL
+  if (result.imageUrl) {
+    await supabase
+      .from('posts')
+      .update({ image_url: result.imageUrl })
+      .eq('id', post_id)
+      .eq('user_id', userId);
+  }
+  
+  return {
+    success: true,
+    message: `🎨 Imagem gerada com sucesso!`,
+    imageUrl: result.imageUrl
+  };
+}
+
+async function executeSchedulePost(supabase: any, userId: string, args: any) {
+  const { post_id, scheduled_for } = args;
+  
+  const { data, error } = await supabase
+    .from('posts')
+    .update({ 
+      status: 'scheduled',
+      scheduled_for
+    })
+    .eq('id', post_id)
+    .eq('user_id', userId)
+    .select()
+    .single();
+  
+  if (error) {
+    return { success: false, message: `❌ Erro ao agendar: ${error.message}` };
+  }
+  
+  return {
+    success: true,
+    message: `📅 Post agendado para ${new Date(scheduled_for).toLocaleString('pt-BR')}`,
+    post: data
+  };
+}
+
+async function executeGetPerformance(supabase: any, userId: string, args: any) {
+  const days = args.days || 30;
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'published')
+    .gte('published_at', since.toISOString())
+    .order('published_at', { ascending: false });
+  
+  if (!posts || posts.length === 0) {
+    return {
+      success: true,
+      message: `📊 Nenhum post publicado nos últimos ${days} dias.`,
+      data: { posts: 0 }
+    };
+  }
+  
+  const totalLikes = posts.reduce((acc: number, p: any) => acc + (p.likes_count || 0), 0);
+  const totalComments = posts.reduce((acc: number, p: any) => acc + (p.comments_count || 0), 0);
+  const totalSaves = posts.reduce((acc: number, p: any) => acc + (p.saves_count || 0), 0);
+  const totalReach = posts.reduce((acc: number, p: any) => acc + (p.reach || 0), 0);
+  
+  const avgEngagement = totalReach > 0 
+    ? ((totalLikes + totalComments + totalSaves) / totalReach * 100).toFixed(2)
+    : 0;
+  
+  return {
+    success: true,
+    message: `📊 Performance dos últimos ${days} dias`,
+    data: {
+      total_posts: posts.length,
+      total_likes: totalLikes,
+      total_comments: totalComments,
+      total_saves: totalSaves,
+      total_reach: totalReach,
+      avg_engagement: `${avgEngagement}%`,
+      top_post: posts[0] ? {
+        caption: posts[0].caption.slice(0, 50) + '...',
+        likes: posts[0].likes_count,
+        engagement: posts[0].reach > 0 
+          ? ((posts[0].likes_count + posts[0].comments_count + posts[0].saves_count) / posts[0].reach * 100).toFixed(2) + '%'
+          : '0%'
+      } : null
+    }
+  };
+}
+
+async function executeRunAgent(supabase: any, userId: string) {
+  const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/ai-agent-core`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+    },
+    body: JSON.stringify({ userId })
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    return { success: false, message: `❌ Erro ao executar agente: ${errorText}` };
+  }
+  
+  const result = await response.json();
+  
+  return {
+    success: true,
+    message: `🤖 Agente executado!`,
+    result: {
+      decision: result.decision,
+      reason: result.decisionReason,
+      hypothesis: result.hypothesis,
+      post_created: result.postId ? true : false
+    }
+  };
+}
+
+async function executeListPosts(supabase: any, userId: string, args: any) {
+  const status = args.status || 'all';
+  const limit = args.limit || 10;
+  
+  let query = supabase
+    .from('posts')
+    .select('id, caption, status, scheduled_for, published_at, likes_count, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  
+  if (status !== 'all') {
+    query = query.eq('status', status);
+  }
+  
+  const { data: posts, error } = await query;
+  
+  if (error) {
+    return { success: false, message: `❌ Erro: ${error.message}` };
+  }
+  
+  return {
+    success: true,
+    message: `📋 ${posts.length} post(s) encontrado(s)`,
+    posts: posts.map((p: any) => ({
+      id: p.id,
+      caption: p.caption.slice(0, 60) + (p.caption.length > 60 ? '...' : ''),
+      status: p.status,
+      scheduled_for: p.scheduled_for,
+      likes: p.likes_count
+    }))
+  };
+}
+
+async function executeDeletePost(supabase: any, userId: string, args: any) {
+  const { post_id } = args;
+  
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', post_id)
+    .eq('user_id', userId);
+  
+  if (error) {
+    return { success: false, message: `❌ Erro ao deletar: ${error.message}` };
+  }
+  
+  return {
+    success: true,
+    message: `🗑️ Post deletado com sucesso!`
+  };
+}
+
+async function executeUpdateSettings(supabase: any, userId: string, args: any) {
+  // Check if context exists
+  const { data: existing } = await supabase
+    .from('agent_context')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+  
+  const updateData: any = {};
+  if (args.auto_post_enabled !== undefined) updateData.auto_post_enabled = args.auto_post_enabled;
+  if (args.daily_post_limit !== undefined) updateData.daily_post_limit = args.daily_post_limit;
+  if (args.min_hours_between_posts !== undefined) updateData.min_hours_between_posts = args.min_hours_between_posts;
+  if (args.brand_voice !== undefined) updateData.brand_voice = args.brand_voice;
+  if (args.preferred_platforms !== undefined) updateData.preferred_platforms = args.preferred_platforms;
+  
+  if (existing) {
+    const { error } = await supabase
+      .from('agent_context')
+      .update(updateData)
+      .eq('user_id', userId);
+    
+    if (error) {
+      return { success: false, message: `❌ Erro: ${error.message}` };
+    }
+  } else {
+    const { error } = await supabase
+      .from('agent_context')
+      .insert({ user_id: userId, ...updateData });
+    
+    if (error) {
+      return { success: false, message: `❌ Erro: ${error.message}` };
+    }
+  }
+  
+  return {
+    success: true,
+    message: `⚙️ Configurações atualizadas!`,
+    settings: updateData
+  };
+}
+
+// Execute a tool call
+async function executeTool(supabase: any, userId: string, toolName: string, args: any) {
+  switch (toolName) {
+    case 'create_posts':
+      return executeCreatePosts(supabase, userId, args);
+    case 'generate_image_for_post':
+      return executeGenerateImage(supabase, userId, args);
+    case 'schedule_post':
+      return executeSchedulePost(supabase, userId, args);
+    case 'get_performance_data':
+      return executeGetPerformance(supabase, userId, args);
+    case 'run_autonomous_agent':
+      return executeRunAgent(supabase, userId);
+    case 'list_posts':
+      return executeListPosts(supabase, userId, args);
+    case 'delete_post':
+      return executeDeletePost(supabase, userId, args);
+    case 'update_agent_settings':
+      return executeUpdateSettings(supabase, userId, args);
+    default:
+      return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -31,7 +468,7 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Buscar contexto do usuário
+    // Fetch context
     const { data: context } = await supabase
       .from('agent_context')
       .select('*')
@@ -42,79 +479,39 @@ serve(async (req) => {
       .from('posts')
       .select('*')
       .eq('user_id', userId)
-      .eq('status', 'published')
-      .order('published_at', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(10);
 
-    const { data: recentDecisions } = await supabase
-      .from('agent_decisions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(5);
+    // Build system prompt
+    const systemPrompt = `Você é um agente autônomo de mídias sociais com poder de EXECUTAR ações reais.
 
-    // Calcular engajamento médio
-    const avgEngagement = recentPosts && recentPosts.length > 0
-      ? recentPosts.reduce((acc: number, p: any) => {
-          const total = (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
-          const reach = p.reach || 1;
-          return acc + (total / reach * 100);
-        }, 0) / recentPosts.length
-      : 0;
+## CONTEXTO DO USUÁRIO
+- Voz da Marca: ${context?.brand_voice || 'profissional e envolvente'}
+- Auto-post: ${context?.auto_post_enabled ? 'Ativado' : 'Desativado'}
+- Limite diário: ${context?.daily_post_limit || 2} posts
+- Plataformas: ${context?.preferred_platforms?.join(', ') || 'instagram'}
+- Posts recentes: ${recentPosts?.length || 0}
 
-    // Construir contexto para o prompt
-    const contextSummary = context ? `
-## Configurações do Agente:
-- Voz da Marca: ${context.brand_voice || 'Não definida'}
-- Auto-post: ${context.auto_post_enabled ? 'Ativado' : 'Desativado'}
-- Limite diário: ${context.daily_post_limit || 3} posts
-- Intervalo mínimo: ${context.min_hours_between_posts || 4} horas
-- Plataformas: ${context.preferred_platforms?.join(', ') || 'Instagram'}
+## SUAS FERRAMENTAS
+Você pode executar ações reais usando as ferramentas disponíveis:
+- **create_posts**: Criar posts (rascunhos ou agendados)
+- **generate_image_for_post**: Gerar imagem AI para um post
+- **schedule_post**: Agendar um post existente
+- **get_performance_data**: Buscar métricas de performance
+- **run_autonomous_agent**: Executar ciclo do agente autônomo
+- **list_posts**: Listar posts existentes
+- **delete_post**: Deletar um post
+- **update_agent_settings**: Atualizar configurações
 
-## Aprendizados Acumulados:
-- Padrões de Sucesso: ${context.success_patterns?.slice(0, 3).join('; ') || 'Nenhum ainda'}
-- Melhores Horários: ${context.best_posting_times?.join(', ') || 'A definir'}
-- Melhores Hashtags: ${context.best_hashtags?.slice(0, 5).join(', ') || 'Nenhuma ainda'}
-- Tópicos Populares: ${context.top_topics?.slice(0, 5).join(', ') || 'Nenhum ainda'}
-` : 'Contexto do agente ainda não configurado.';
+## REGRAS
+1. SEMPRE use as ferramentas quando o usuário pedir para criar, agendar, gerar ou modificar algo
+2. Ao criar um plano de conteúdo, USE create_posts para criar os posts de verdade
+3. Seja proativo - execute as ações, não apenas sugira
+4. Após executar ações, explique o que foi feito
+5. Use datas/horários reais (a partir de agora: ${new Date().toISOString()})
+6. Responda em português brasileiro`;
 
-    const postsSummary = recentPosts && recentPosts.length > 0 ? `
-## Últimos 10 Posts Publicados:
-${recentPosts.map((p: any, i: number) => `${i + 1}. "${p.caption?.slice(0, 50)}..." - ${p.likes_count || 0} likes, ${p.comments_count || 0} comentários, ${p.saves_count || 0} salvos`).join('\n')}
-
-## Engajamento Médio: ${avgEngagement.toFixed(2)}%
-` : 'Nenhum post publicado ainda.';
-
-    const decisionsSummary = recentDecisions && recentDecisions.length > 0 ? `
-## Últimas 5 Decisões do Agente:
-${recentDecisions.map((d: any, i: number) => `${i + 1}. ${d.decision} - "${d.decision_reason?.slice(0, 80)}..."`).join('\n')}
-` : 'Nenhuma decisão registrada ainda.';
-
-    const systemPrompt = `Você é um agente estrategista de mídias sociais especializado em Instagram e TikTok. 
-Você ajuda o usuário a criar conteúdo viral, analisar métricas e desenvolver estratégias de crescimento.
-
-${contextSummary}
-
-${postsSummary}
-
-${decisionsSummary}
-
-## Suas Capacidades:
-1. **Análise de Métricas**: Avaliar performance de posts e identificar padrões
-2. **Planejamento de Conteúdo**: Sugerir ideias, horários e hashtags
-3. **Otimização**: Recomendar melhorias baseadas em dados
-4. **Tendências**: Identificar tópicos em alta
-5. **Estratégia**: Desenvolver planos de crescimento
-
-## Diretrizes:
-- Seja específico e baseado em dados quando disponíveis
-- Sugira ações concretas e executáveis
-- Use o contexto e histórico do usuário para personalizar respostas
-- Responda em português brasileiro
-- Seja proativo em sugerir melhorias
-- Quando solicitado um plano de conteúdo, forneça ideias específicas com horários, hashtags e formatos`;
-
-    // Chamar Lovable AI
+    // First API call with tools
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -126,7 +523,9 @@ ${decisionsSummary}
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages
-        ]
+        ],
+        tools: AGENT_TOOLS,
+        tool_choice: 'auto'
       })
     });
 
@@ -141,16 +540,75 @@ ${decisionsSummary}
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ 
-          error: 'Créditos esgotados. Adicione mais créditos ao workspace.' 
+          error: 'Créditos esgotados.' 
         }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
       }
       throw new Error(`API error: ${response.status}`);
     }
 
     const data = await response.json();
+    const choice = data.choices?.[0];
     
+    // Check if there are tool calls to execute
+    if (choice?.message?.tool_calls && choice.message.tool_calls.length > 0) {
+      const toolResults = [];
+      const executedActions = [];
+      
+      for (const toolCall of choice.message.tool_calls) {
+        const toolName = toolCall.function.name;
+        const toolArgs = JSON.parse(toolCall.function.arguments || '{}');
+        
+        console.log(`Executing tool: ${toolName}`, toolArgs);
+        
+        const result = await executeTool(supabase, userId, toolName, toolArgs);
+        toolResults.push({
+          tool_call_id: toolCall.id,
+          role: 'tool',
+          content: JSON.stringify(result)
+        });
+        executedActions.push({
+          tool: toolName,
+          ...result
+        });
+      }
+      
+      // Second API call with tool results to get final response
+      const finalResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-flash-preview',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages,
+            choice.message,
+            ...toolResults
+          ]
+        })
+      });
+      
+      if (!finalResponse.ok) {
+        // Return tool results even if final response fails
+        return new Response(JSON.stringify({
+          content: `Ações executadas:\n${executedActions.map(a => a.message).join('\n')}`,
+          actions: executedActions
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+      }
+      
+      const finalData = await finalResponse.json();
+      
+      return new Response(JSON.stringify({
+        content: finalData.choices?.[0]?.message?.content || 'Ações executadas com sucesso!',
+        actions: executedActions
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+    }
+    
+    // No tool calls, just return the response
     return new Response(JSON.stringify({
-      content: data.choices?.[0]?.message?.content || 'Erro ao processar resposta'
+      content: choice?.message?.content || 'Erro ao processar resposta'
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
 
   } catch (error) {

@@ -10,31 +10,39 @@ import {
   User, 
   Loader2,
   Sparkles,
-  Zap,
   TrendingUp,
   Calendar,
-  Target
+  Target,
+  CheckCircle2,
+  XCircle,
+  Zap
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
+
+interface ExecutedAction {
+  tool: string;
+  success: boolean;
+  message: string;
+  posts?: any[];
+  data?: any;
+}
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  action?: {
-    type: 'analyze' | 'suggest' | 'create' | 'schedule';
-    data?: any;
-  };
+  actions?: ExecutedAction[];
 }
 
 const QUICK_ACTIONS = [
   { icon: TrendingUp, label: 'Analisar performance', prompt: 'Analise minha performance recente e me dê insights' },
-  { icon: Sparkles, label: 'Gerar ideias', prompt: 'Sugira 5 ideias de posts para a próxima semana' },
-  { icon: Calendar, label: 'Planejar semana', prompt: 'Crie um plano de conteúdo para os próximos 7 dias' },
-  { icon: Target, label: 'Melhorar engajamento', prompt: 'O que posso fazer para melhorar meu engajamento?' },
+  { icon: Sparkles, label: 'Criar 5 posts', prompt: 'Crie 5 posts para a próxima semana e salve como rascunhos' },
+  { icon: Calendar, label: 'Planejar 7 dias', prompt: 'Crie um plano de conteúdo para os próximos 7 dias e salve todos os posts' },
+  { icon: Target, label: 'Rodar agente', prompt: 'Execute o agente autônomo agora' },
 ];
 
 export default function AgentChat() {
@@ -43,15 +51,20 @@ export default function AgentChat() {
     {
       id: '1',
       role: 'assistant',
-      content: `Olá! 👋 Sou seu agente autônomo de mídias sociais. 
+      content: `Olá! 👋 Sou seu agente autônomo de mídias sociais com poder de **EXECUTAR ações reais**.
 
-Posso ajudar você com:
-• **Análise de performance** - Entender o que está funcionando
-• **Geração de ideias** - Criar conteúdo estratégico
-• **Planejamento** - Organizar sua semana de posts
-• **Otimização** - Melhorar seus resultados
+🛠️ **O que eu posso FAZER por você:**
+• **Criar posts** - Gerar e salvar posts no banco de dados
+• **Gerar imagens** - Criar visuais com IA para seus posts
+• **Agendar publicações** - Definir datas para publicar
+• **Analisar métricas** - Buscar dados de performance
+• **Rodar o agente** - Executar ciclo autônomo completo
 
-O que gostaria de fazer hoje?`,
+💡 Basta me pedir e eu executo! Por exemplo:
+_"Crie 5 posts para a próxima semana"_
+_"Analise minha performance dos últimos 30 dias"_
+
+O que gostaria que eu faça?`,
       timestamp: new Date()
     }
   ]);
@@ -103,12 +116,14 @@ O que gostaria de fazer hoje?`,
       }
 
       const assistantContent = data.content || 'Desculpe, não consegui processar sua mensagem.';
+      const executedActions = data.actions || [];
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: assistantContent,
-        timestamp: new Date()
+        timestamp: new Date(),
+        actions: executedActions
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -173,33 +188,62 @@ O que gostaria de fazer hoje?`,
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    message.role === 'user' 
-                      ? 'bg-primary text-primary-foreground ml-auto' 
-                      : 'bg-muted'
-                  }`}>
-                    <div className="text-sm whitespace-pre-wrap prose prose-sm dark:prose-invert max-w-none">
-                      {message.content.split('\n').map((line, i) => {
-                        // Simple markdown parsing
-                        let formatted = line;
-                        // Bold
-                        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        // Lists
-                        if (formatted.startsWith('• ') || formatted.startsWith('- ')) {
-                          formatted = `<span class="flex gap-2"><span>•</span><span>${formatted.slice(2)}</span></span>`;
-                        }
-                        return (
-                          <span 
-                            key={i} 
-                            className="block"
-                            dangerouslySetInnerHTML={{ __html: formatted }}
-                          />
-                        );
-                      })}
+                  <div className={`max-w-[85%] space-y-2 ${message.role === 'user' ? 'ml-auto' : ''}`}>
+                    <div className={`rounded-2xl px-4 py-3 ${
+                      message.role === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted'
+                    }`}>
+                      <div className="text-sm whitespace-pre-wrap prose prose-sm dark:prose-invert max-w-none">
+                        {message.content.split('\n').map((line, i) => {
+                          let formatted = line;
+                          formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                          formatted = formatted.replace(/_(.*?)_/g, '<em>$1</em>');
+                          if (formatted.startsWith('• ') || formatted.startsWith('- ')) {
+                            formatted = `<span class="flex gap-2"><span>•</span><span>${formatted.slice(2)}</span></span>`;
+                          }
+                          return (
+                            <span 
+                              key={i} 
+                              className="block"
+                              dangerouslySetInnerHTML={{ __html: formatted }}
+                            />
+                          );
+                        })}
+                      </div>
+                      <span className="text-[10px] opacity-60 mt-1 block">
+                        {message.timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
-                    <span className="text-[10px] opacity-60 mt-1 block">
-                      {message.timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                    
+                    {/* Show executed actions */}
+                    {message.actions && message.actions.length > 0 && (
+                      <div className="space-y-1.5 pl-2">
+                        {message.actions.map((action, idx) => (
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className={`flex items-center gap-2 text-xs p-2 rounded-lg border ${
+                              action.success 
+                                ? 'bg-green-500/10 border-green-500/30 text-green-700 dark:text-green-400' 
+                                : 'bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-400'
+                            }`}
+                          >
+                            {action.success ? (
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                            ) : (
+                              <XCircle className="h-3.5 w-3.5 shrink-0" />
+                            )}
+                            <span className="flex-1">{action.message}</span>
+                            <Badge variant="outline" className="text-[10px] h-5">
+                              {action.tool.replace(/_/g, ' ')}
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
