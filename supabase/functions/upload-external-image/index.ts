@@ -6,6 +6,53 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Different user agents to try
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Googlebot-Image/1.0',
+];
+
+async function downloadImage(imageUrl: string): Promise<{ data: ArrayBuffer; contentType: string }> {
+  const url = new URL(imageUrl);
+  
+  for (const userAgent of USER_AGENTS) {
+    try {
+      console.log(`Trying download with user agent: ${userAgent.substring(0, 30)}...`);
+      
+      const response = await fetch(imageUrl, {
+        headers: {
+          'User-Agent': userAgent,
+          'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9,pt-BR;q=0.8',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Referer': url.origin,
+          'Origin': url.origin,
+          'Sec-Fetch-Dest': 'image',
+          'Sec-Fetch-Mode': 'no-cors',
+          'Sec-Fetch-Site': 'cross-site',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        }
+      });
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type') || 'image/jpeg';
+        const data = await response.arrayBuffer();
+        console.log(`Download successful! Size: ${data.byteLength} bytes`);
+        return { data, contentType };
+      }
+      
+      console.log(`Failed with status ${response.status}, trying next user agent...`);
+    } catch (err) {
+      console.log(`Error with user agent: ${err}`);
+    }
+  }
+  
+  throw new Error('Não foi possível baixar a imagem. O site pode estar bloqueando o acesso.');
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -20,22 +67,8 @@ serve(async (req) => {
 
     console.log("Downloading external image:", imageUrl);
 
-    // Download the image
-    const imageResponse = await fetch(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'image/*,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': new URL(imageUrl).origin,
-      }
-    });
-
-    if (!imageResponse.ok) {
-      throw new Error(`Falha ao baixar imagem: ${imageResponse.status} ${imageResponse.statusText}`);
-    }
-
-    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-    const imageData = await imageResponse.arrayBuffer();
+    // Try to download the image
+    const { data: imageData, contentType } = await downloadImage(imageUrl);
 
     console.log("Image downloaded, size:", imageData.byteLength, "type:", contentType);
 
