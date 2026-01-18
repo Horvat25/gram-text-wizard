@@ -311,12 +311,15 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
   };
 
   // Upload external image to Supabase Storage for Instagram compatibility
-  // Upload external image to Supabase Storage for Instagram compatibility
-  const uploadExternalImage = async (imageUrl: string): Promise<string> => {
-    toast.info('Preparando imagem para Instagram...');
+  // Upload external image with watermark to Supabase Storage
+  const uploadExternalImageWithWatermark = async (imageUrl: string): Promise<string> => {
+    toast.info('Adicionando marca d\'água Neural Update...');
     
-    const { data, error } = await supabase.functions.invoke('upload-external-image', {
-      body: { imageUrl }
+    const { data, error } = await supabase.functions.invoke('add-watermark', {
+      body: { 
+        imageUrl,
+        watermarkText: 'Neural Update'
+      }
     });
 
     if (error || !data?.success) {
@@ -359,8 +362,8 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       
       if (isExternalImage) {
         try {
-          finalImageUrl = await uploadExternalImage(selectedImage);
-          toast.success('Imagem processada!');
+          finalImageUrl = await uploadExternalImageWithWatermark(selectedImage);
+          toast.success('Imagem com marca d\'água pronta!');
         } catch (uploadError: any) {
           console.error('Image upload error:', uploadError);
           imageUploadFailed = true;
