@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -17,13 +17,15 @@ import {
   XCircle,
   Trash2,
   BarChart3,
-  Settings
+  Settings,
+  History
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
+import AgentExecutionHistory from './AgentExecutionHistory';
 
 interface AgentConfig {
   agent_name: string;
@@ -82,8 +84,31 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [agentConfig, setAgentConfig] = useState<AgentConfig>({ agent_name: 'Agente IA', agent_avatar_url: null });
+  const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Derive execution history from messages
+  const executionHistory = useMemo(() => {
+    return messages
+      .filter(m => m.role === 'user')
+      .map((userMsg, idx) => {
+        // Find the next assistant message
+        const userMsgIndex = messages.indexOf(userMsg);
+        const assistantMsg = messages.slice(userMsgIndex + 1).find(m => m.role === 'assistant');
+        
+        return {
+          id: userMsg.id,
+          timestamp: userMsg.timestamp,
+          userRequest: userMsg.content,
+          thinking: undefined, // Could be populated from agent response in future
+          actions: assistantMsg?.actions || [],
+          response: assistantMsg?.content || ''
+        };
+      })
+      .filter(e => e.actions.length > 0 || e.response) // Only show executions with activity
+      .reverse(); // Most recent first
+  }, [messages]);
 
   // Load chat history and config on mount
   useEffect(() => {
@@ -340,20 +365,37 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
           </div>
         </div>
         
-        <AgentConfigPanel 
-          onConfigChange={(config) => {
-            setAgentConfig({
-              agent_name: config.agent_name,
-              agent_avatar_url: config.agent_avatar_url
-            });
-          }}
-          onClearChat={clearHistory}
-          trigger={
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings className="h-4 w-4" />
-            </Button>
-          }
-        />
+        <div className="flex items-center gap-1">
+          {/* Execution History Button */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 relative"
+            onClick={() => setShowExecutionHistory(true)}
+          >
+            <History className="h-4 w-4" />
+            {executionHistory.length > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-[10px] text-primary-foreground rounded-full flex items-center justify-center">
+                {executionHistory.length > 9 ? '9+' : executionHistory.length}
+              </span>
+            )}
+          </Button>
+          
+          <AgentConfigPanel 
+            onConfigChange={(config) => {
+              setAgentConfig({
+                agent_name: config.agent_name,
+                agent_avatar_url: config.agent_avatar_url
+              });
+            }}
+            onClearChat={clearHistory}
+            trigger={
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Settings className="h-4 w-4" />
+              </Button>
+            }
+          />
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -509,6 +551,13 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
           </p>
         </div>
       </div>
+
+      {/* Execution History Panel */}
+      <AgentExecutionHistory
+        executions={executionHistory}
+        isOpen={showExecutionHistory}
+        onClose={() => setShowExecutionHistory(false)}
+      />
     </div>
   );
 }
