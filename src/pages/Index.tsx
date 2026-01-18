@@ -140,8 +140,6 @@ const Index = () => {
 
   return (
     <div className={cn("min-h-screen bg-background transition-colors duration-500", getPlatformBackground())}>
-      <Header />
-
       <AnimatePresence mode="wait">
         {!showDashboard ? (
           /* AGENT HERO VIEW - Main interface */
@@ -150,20 +148,22 @@ const Index = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, x: -50 }}
-            className="h-[calc(100vh-64px)] flex flex-col"
+            className="h-screen flex flex-col"
           >
-            {/* Toggle to Dashboard */}
-            <div className="flex justify-end px-4 py-2 border-b border-border/30">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDashboard(true)}
-                className="text-muted-foreground hover:text-primary gap-2"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">Abrir Dashboard</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            {/* Minimal Header - Just settings and user */}
+            <div className="flex items-center justify-end px-4 py-2 border-b border-border/30 bg-background/50 backdrop-blur-sm">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDashboard(true)}
+                  className="text-muted-foreground hover:text-primary gap-2"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span className="hidden sm:inline">Abrir Dashboard</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             {/* Agent Chat - Full Height */}
@@ -179,6 +179,7 @@ const Index = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
           >
+            <Header />
             <main className="container mx-auto px-4 py-6 space-y-6">
               {/* Back to Agent Button */}
               <div className="flex items-center justify-between">
