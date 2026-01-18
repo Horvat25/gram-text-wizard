@@ -54,15 +54,15 @@ const PREDEFINED_TOPICS = [
   { label: 'Futurismo', query: 'futuro tecnologia previsões', icon: Rocket },
 ];
 
-// Trending tech queries for "hot news" feature
+// Trending tech queries for "hot news" feature - Portuguese
 const TRENDING_QUERIES = [
-  'breaking tech news today',
-  'artificial intelligence breakthrough',
-  'OpenAI ChatGPT latest',
-  'Tesla Elon Musk news',
-  'Apple Google Microsoft announcement',
-  'quantum computing news',
-  'robotics humanoid news',
+  'últimas notícias tecnologia hoje',
+  'inteligência artificial novidades',
+  'OpenAI ChatGPT Brasil',
+  'Tesla Elon Musk notícias',
+  'Apple Google Microsoft anúncio',
+  'computação quântica descoberta',
+  'robótica humanoide novidades',
 ];
 
 // Brasília timezone offset (UTC-3)
@@ -172,7 +172,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       
       const { data, error } = await supabase.functions.invoke('firecrawl-search', {
         body: { 
-          query: 'breaking tech news AI robotics innovation',
+          query: 'notícias tecnologia inteligência artificial robótica inovação Brasil',
           limit: 15,
           lang: 'pt-BR',
           country: 'BR'
