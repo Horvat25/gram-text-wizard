@@ -322,49 +322,38 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background pointer-events-none" />
       
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-border/50 bg-background/50 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
+      {/* Compact Header */}
+      <div className="relative z-10 flex items-center justify-between px-4 py-2 border-b border-border/50 bg-background/50 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
           <div className="relative">
-            <Avatar className="h-14 w-14 border-2 border-primary/30 shadow-lg shadow-primary/20">
+            <Avatar className="h-9 w-9 border border-primary/30 shadow-md shadow-primary/10">
               <AvatarImage src={agentConfig.agent_avatar_url || undefined} />
               <AvatarFallback className="neural-gradient text-white">
-                <Bot className="h-7 w-7" />
+                <Bot className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
-            <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background" />
           </div>
           <div>
-            <h1 className="text-xl font-bold neural-gradient-text">{agentConfig.agent_name}</h1>
-            <p className="text-sm text-muted-foreground">Seu assistente autônomo de mídias sociais</p>
+            <h1 className="text-base font-semibold neural-gradient-text">{agentConfig.agent_name}</h1>
+            <p className="text-xs text-muted-foreground">Assistente autônomo</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <AgentConfigPanel 
-            onConfigChange={(config) => {
-              setAgentConfig({
-                agent_name: config.agent_name,
-                agent_avatar_url: config.agent_avatar_url
-              });
-            }}
-            trigger={
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Configurar</span>
-              </Button>
-            }
-          />
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={clearHistory}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            <span className="hidden sm:inline">Limpar</span>
-          </Button>
-        </div>
+        <AgentConfigPanel 
+          onConfigChange={(config) => {
+            setAgentConfig({
+              agent_name: config.agent_name,
+              agent_avatar_url: config.agent_avatar_url
+            });
+          }}
+          onClearChat={clearHistory}
+          trigger={
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Settings className="h-4 w-4" />
+            </Button>
+          }
+        />
       </div>
 
       {/* Messages Area */}

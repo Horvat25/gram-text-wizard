@@ -51,7 +51,8 @@ import {
   Briefcase,
   Loader2,
   Check,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -159,9 +160,10 @@ const CONTENT_FOCUS_OPTIONS = [
 interface AgentConfigPanelProps {
   trigger?: React.ReactNode;
   onConfigChange?: (config: AgentConfig) => void;
+  onClearChat?: () => void;
 }
 
-export default function AgentConfigPanel({ trigger, onConfigChange }: AgentConfigPanelProps) {
+export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat }: AgentConfigPanelProps) {
   const { user } = useAuth();
   const [config, setConfig] = useState<AgentConfig>(DEFAULT_CONFIG);
   const [isLoading, setIsLoading] = useState(true);
@@ -800,8 +802,8 @@ export default function AgentConfigPanel({ trigger, onConfigChange }: AgentConfi
           </ScrollArea>
         )}
 
-        {/* Save Button */}
-        <div className="shrink-0 pt-4 border-t mt-4">
+        {/* Action Buttons */}
+        <div className="shrink-0 pt-4 border-t mt-4 space-y-2">
           <Button 
             onClick={handleSave} 
             disabled={isSaving}
@@ -814,6 +816,20 @@ export default function AgentConfigPanel({ trigger, onConfigChange }: AgentConfi
             )}
             Salvar Configurações
           </Button>
+          
+          {onClearChat && (
+            <Button 
+              onClick={() => {
+                onClearChat();
+                setIsOpen(false);
+              }}
+              variant="outline"
+              className="w-full text-muted-foreground hover:text-destructive hover:border-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Limpar Histórico do Chat
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>
