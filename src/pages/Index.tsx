@@ -3,13 +3,14 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, CalendarDays, BarChart3, History, Lightbulb, Newspaper } from "lucide-react";
+import { Sparkles, CalendarDays, BarChart3, History, Lightbulb, Newspaper, Bot } from "lucide-react";
 import ContentCreationTab from "@/components/tabs/ContentCreationTab";
 import PublicationQueueTab from "@/components/tabs/PublicationQueueTab";
 import AnalyticsTab from "@/components/tabs/AnalyticsTab";
 import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
 import { SuggestionsTab } from "@/components/tabs/SuggestionsTab";
 import { LatestNewsTab } from "@/components/tabs/LatestNewsTab";
+import AgentTab from "@/components/tabs/AgentTab";
 import PlatformSelector, { Platform } from "@/components/PlatformSelector";
 import TikTokContentCreation from "@/components/TikTokContentCreation";
 import { usePosts } from "@/hooks/usePosts";
@@ -158,7 +159,7 @@ const Index = () => {
               transition={{ duration: 0.3 }}
             >
               <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+                <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
                   <TabsTrigger value="create" className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4" />
                     <span className="hidden sm:inline">Criação</span>
@@ -182,6 +183,10 @@ const Index = () => {
                   <TabsTrigger value="analytics" className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" />
                     <span className="hidden sm:inline">Analytics</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="agent" className="flex items-center gap-2">
+                    <Bot className="h-4 w-4" />
+                    <span className="hidden sm:inline">Agente</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -213,6 +218,10 @@ const Index = () => {
 
                 <TabsContent value="analytics" className="space-y-6">
                   <AnalyticsTab posts={posts} onRefresh={fetchPosts} />
+                </TabsContent>
+
+                <TabsContent value="agent" className="space-y-6">
+                  <AgentTab />
                 </TabsContent>
               </Tabs>
             </motion.div>

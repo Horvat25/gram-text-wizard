@@ -89,3 +89,9 @@ verify_jwt = false
 
 [functions.firecrawl-search]
 verify_jwt = false
+
+[functions.ai-agent-core]
+verify_jwt = false
+
+[functions.ai-agent-feedback]
+verify_jwt = false
