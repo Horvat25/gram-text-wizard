@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_chat_messages: {
+        Row: {
+          actions: Json | null
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          actions?: Json | null
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          actions?: Json | null
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       agent_context: {
         Row: {
           audience_preferences: string[] | null
