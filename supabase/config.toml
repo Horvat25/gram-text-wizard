@@ -95,3 +95,6 @@ verify_jwt = false
 
 [functions.ai-agent-feedback]
 verify_jwt = false
+
+[functions.agent-chat]
+verify_jwt = false

@@ -81,81 +81,28 @@ O que gostaria de fazer hoje?`,
     setIsLoading(true);
 
     try {
-      // Get agent context for additional info
-      const { data: context } = await supabase
-        .from('agent_context')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Build messages array for the API (exclude welcome message)
+      const chatMessages = messages
+        .filter(m => m.id !== '1')
+        .map(m => ({ role: m.role, content: m.content }));
+      
+      chatMessages.push({ role: 'user', content: content.trim() });
 
-      // Get recent posts for context
-      const { data: recentPosts } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('status', 'published')
-        .order('published_at', { ascending: false })
-        .limit(10);
-
-      // Get recent decisions
-      const { data: recentDecisions } = await supabase
-        .from('agent_decisions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      // Build context for AI
-      const avgEngagement = recentPosts && recentPosts.length > 0
-        ? recentPosts.reduce((acc, p) => {
-            const total = (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
-            const reach = p.reach || 1;
-            return acc + (total / reach * 100);
-          }, 0) / recentPosts.length
-        : 0;
-
-      const systemPrompt = `Você é um agente estrategista de mídias sociais especializado. Responda de forma clara, prática e acionável.
-
-CONTEXTO DO USUÁRIO:
-- Posts recentes: ${recentPosts?.length || 0}
-- Engajamento médio: ${avgEngagement.toFixed(2)}%
-- Formatos que mais funcionam: ${context?.top_topics?.join(', ') || 'ainda aprendendo'}
-- Melhores hashtags: ${context?.best_hashtags?.slice(0, 5).join(', ') || 'coletando dados'}
-- Padrões de sucesso: ${context?.success_patterns?.slice(0, 3).join('; ') || 'ainda aprendendo'}
-- Decisões recentes do agente: ${recentDecisions?.map(d => `${d.decision}: ${d.decision_reason}`).join('; ') || 'nenhuma'}
-
-REGRAS:
-- Seja específico com números e dados quando possível
-- Sugira ações concretas, não genéricas
-- Use emojis moderadamente para tornar a conversa agradável
-- Formate respostas longas com markdown (listas, negrito)
-- Se não souber algo específico, seja honesto`;
-
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages.filter(m => m.role !== 'assistant' || m.id !== '1').map(m => ({
-              role: m.role,
-              content: m.content
-            })),
-            { role: 'user', content: content.trim() }
-          ]
-        })
+      // Call the edge function
+      const { data, error } = await supabase.functions.invoke('agent-chat', {
+        body: { 
+          messages: chatMessages,
+          userId: user.id
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Erro na API');
+      if (error) throw error;
+
+      if (data.error) {
+        throw new Error(data.error);
       }
 
-      const data = await response.json();
-      const assistantContent = data.choices?.[0]?.message?.content || 'Desculpe, não consegui processar sua mensagem.';
+      const assistantContent = data.content || 'Desculpe, não consegui processar sua mensagem.';
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -167,10 +114,11 @@ REGRAS:
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '❌ Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+        content: `❌ ${errorMessage}`,
         timestamp: new Date()
       }]);
     } finally {
