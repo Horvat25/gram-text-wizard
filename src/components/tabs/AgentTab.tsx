@@ -1,120 +1,27 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Bot, 
   Play, 
   RefreshCw, 
-  Brain, 
-  TrendingUp, 
-  Clock, 
-  Target, 
-  Zap,
-  CheckCircle,
-  XCircle,
   Loader2,
+  MessageSquare,
+  BarChart3,
   Settings,
   History,
-  Lightbulb
+  Sparkles
 } from 'lucide-react';
-import { useAgentContext, AgentDecision } from '@/hooks/useAgentContext';
-import { format, formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useAgentContext } from '@/hooks/useAgentContext';
+import { motion } from 'framer-motion';
 
-function DecisionCard({ decision }: { decision: AgentDecision }) {
-  const getBadgeVariant = (d: string) => {
-    switch (d) {
-      case 'POST': return 'default';
-      case 'NO_POST': return 'secondary';
-      case 'WAIT': return 'outline';
-      default: return 'outline';
-    }
-  };
-
-  const getDecisionLabel = (d: string) => {
-    switch (d) {
-      case 'POST': return 'Postou';
-      case 'NO_POST': return 'Não Postou';
-      case 'WAIT': return 'Aguardou';
-      default: return d;
-    }
-  };
-
-  return (
-    <div className="p-4 border rounded-lg space-y-3 bg-card">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Badge variant={getBadgeVariant(decision.decision)}>
-            {getDecisionLabel(decision.decision)}
-          </Badge>
-          <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(decision.created_at), { 
-              addSuffix: true, 
-              locale: ptBR 
-            })}
-          </span>
-        </div>
-        {decision.hypothesis_confirmed !== null && (
-          decision.hypothesis_confirmed ? (
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          ) : (
-            <XCircle className="h-4 w-4 text-red-500" />
-          )
-        )}
-      </div>
-      
-      <p className="text-sm">{decision.decision_reason}</p>
-      
-      {decision.hypothesis && (
-        <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-          <strong>Hipótese:</strong> {decision.hypothesis}
-        </div>
-      )}
-      
-      {decision.content_plan && (
-        <div className="flex flex-wrap gap-1">
-          <Badge variant="outline" className="text-xs">
-            {decision.content_plan.format}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            {decision.content_plan.mediaType}
-          </Badge>
-          {decision.content_plan.platforms?.map((p: string) => (
-            <Badge key={p} variant="outline" className="text-xs">
-              {p}
-            </Badge>
-          ))}
-        </div>
-      )}
-      
-      {decision.expected_engagement && (
-        <div className="flex items-center gap-4 text-xs">
-          <span className="text-muted-foreground">
-            Esperado: {decision.expected_engagement.toFixed(1)}%
-          </span>
-          {decision.actual_engagement !== null && (
-            <span className={decision.hypothesis_confirmed ? 'text-green-600' : 'text-red-600'}>
-              Real: {decision.actual_engagement.toFixed(1)}%
-            </span>
-          )}
-        </div>
-      )}
-      
-      {decision.learning && (
-        <div className="text-xs bg-primary/10 p-2 rounded flex items-start gap-2">
-          <Lightbulb className="h-3 w-3 mt-0.5 text-primary shrink-0" />
-          <span>{decision.learning}</span>
-        </div>
-      )}
-    </div>
-  );
-}
+// Import agent components
+import AgentStatusCard from '@/components/agent/AgentStatusCard';
+import AgentStats from '@/components/agent/AgentStats';
+import AgentLearnings from '@/components/agent/AgentLearnings';
+import AgentDecisionHistory from '@/components/agent/AgentDecisionHistory';
+import AgentSettings from '@/components/agent/AgentSettings';
+import AgentChat from '@/components/agent/AgentChat';
 
 export default function AgentTab() {
   const { 
@@ -128,35 +35,37 @@ export default function AgentTab() {
     runFeedbackLoop 
   } = useAgentContext();
 
-  const [localSettings, setLocalSettings] = useState({
-    dailyLimit: context?.daily_post_limit || 2,
-    minHours: context?.min_hours_between_posts || 4
-  });
+  const [activeTab, setActiveTab] = useState('overview');
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando agente...</p>
+        </div>
       </div>
     );
   }
 
-  const accuracyRate = stats.hypothesesTotal > 0 
-    ? (stats.hypothesesConfirmed / stats.hypothesesTotal * 100).toFixed(0)
-    : 'N/A';
-
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Bot className="h-6 w-6 text-primary" />
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-2xl neural-gradient glow-sm">
+            <Bot className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Agente Autônomo</h2>
-            <p className="text-muted-foreground text-sm">
-              O cérebro que analisa, decide e aprende
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              <span className="neural-gradient-text">Agente Autônomo</span>
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              O cérebro que analisa, decide e aprende com cada post
             </p>
           </div>
         </div>
@@ -166,286 +75,143 @@ export default function AgentTab() {
             variant="outline" 
             onClick={runFeedbackLoop}
             disabled={isRunning}
+            className="gap-2"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Processar Feedback
+            <RefreshCw className={`h-4 w-4 ${isRunning ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Processar Feedback</span>
           </Button>
           <Button 
             onClick={runAgent}
             disabled={isRunning}
+            className="gap-2 neural-gradient border-0"
           >
             {isRunning ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Play className="h-4 w-4 mr-2" />
+              <Play className="h-4 w-4" />
             )}
-            Executar Agente
+            <span>Executar Agente</span>
           </Button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Brain className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-2xl font-bold">{stats.totalDecisions}</p>
-                <p className="text-xs text-muted-foreground">Decisões Tomadas</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Target className="h-5 w-5 text-green-500" />
-              <div>
-                <p className="text-2xl font-bold">{accuracyRate}%</p>
-                <p className="text-xs text-muted-foreground">Taxa de Acerto</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="h-5 w-5 text-blue-500" />
-              <div>
-                <p className="text-2xl font-bold">
-                  {stats.avgActualEngagement.toFixed(1)}%
-                </p>
-                <p className="text-xs text-muted-foreground">Eng. Médio Real</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Zap className="h-5 w-5 text-yellow-500" />
-              <div>
-                <p className="text-2xl font-bold">{stats.postsCreated}</p>
-                <p className="text-xs text-muted-foreground">Posts Criados</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Status Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <AgentStatusCard 
+          context={context}
+          isRunning={isRunning}
+          onToggleAutoPost={(enabled) => updateContext({ auto_post_enabled: enabled })}
+        />
+      </motion.div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Configurações
-            </CardTitle>
-            <CardDescription>
-              Controle o comportamento do agente
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Auto Post Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label htmlFor="auto-post">Publicação Automática</Label>
-                <p className="text-xs text-muted-foreground">
-                  Permitir que o agente publique automaticamente
-                </p>
-              </div>
-              <Switch
-                id="auto-post"
-                checked={context?.auto_post_enabled || false}
-                onCheckedChange={(checked) => updateContext({ auto_post_enabled: checked })}
-              />
-            </div>
-            
-            <Separator />
-            
-            {/* Daily Limit */}
-            <div className="space-y-2">
-              <Label htmlFor="daily-limit">Limite Diário de Posts</Label>
+      {/* Stats */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <AgentStats stats={stats} />
+      </motion.div>
+
+      {/* Tabs Navigation */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid bg-muted/50">
+          <TabsTrigger value="overview" className="gap-2">
+            <BarChart3 className="h-4 w-4" />
+            <span className="hidden sm:inline">Visão Geral</span>
+          </TabsTrigger>
+          <TabsTrigger value="chat" className="gap-2">
+            <MessageSquare className="h-4 w-4" />
+            <span className="hidden sm:inline">Chat</span>
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            <span className="hidden sm:inline">Histórico</span>
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="gap-2">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Config</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4 mt-4">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <AgentLearnings context={context} />
+            <AgentDecisionHistory decisions={decisions.slice(0, 5)} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="chat" className="mt-4">
+          <div className="max-w-3xl mx-auto">
+            <AgentChat />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="history" className="mt-4">
+          <AgentDecisionHistory decisions={decisions} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="mt-4">
+          <div className="max-w-xl">
+            <AgentSettings context={context} onUpdate={updateContext} />
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Capabilities Info */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 rounded-2xl p-6 border border-primary/10"
+      >
+        <div className="flex items-start gap-4">
+          <div className="p-2 rounded-xl bg-primary/10">
+            <Sparkles className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold mb-2">O que o Agente pode fazer?</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <Input
-                  id="daily-limit"
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={localSettings.dailyLimit}
-                  onChange={(e) => setLocalSettings(s => ({ ...s, dailyLimit: parseInt(e.target.value) || 2 }))}
-                  className="w-20"
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => updateContext({ daily_post_limit: localSettings.dailyLimit })}
-                >
-                  Salvar
-                </Button>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Analisar métricas (72h)
               </div>
-            </div>
-            
-            {/* Min Hours */}
-            <div className="space-y-2">
-              <Label htmlFor="min-hours">Intervalo Mínimo (horas)</Label>
               <div className="flex items-center gap-2">
-                <Input
-                  id="min-hours"
-                  type="number"
-                  min={1}
-                  max={24}
-                  value={localSettings.minHours}
-                  onChange={(e) => setLocalSettings(s => ({ ...s, minHours: parseInt(e.target.value) || 4 }))}
-                  className="w-20"
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => updateContext({ min_hours_between_posts: localSettings.minHours })}
-                >
-                  Salvar
-                </Button>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Buscar notícias atuais
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Gerar legendas e imagens
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Publicar automaticamente
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Decidir quando postar
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Aprender com resultados
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Validar hipóteses
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Adicionar watermark
               </div>
             </div>
-            
-            <Separator />
-            
-            {/* Platforms */}
-            <div className="space-y-2">
-              <Label>Plataformas Preferidas</Label>
-              <div className="flex gap-2">
-                <Button
-                  variant={context?.preferred_platforms?.includes('instagram') ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    const current = context?.preferred_platforms || [];
-                    const updated = current.includes('instagram')
-                      ? current.filter(p => p !== 'instagram')
-                      : [...current, 'instagram'];
-                    updateContext({ preferred_platforms: updated });
-                  }}
-                >
-                  Instagram
-                </Button>
-                <Button
-                  variant={context?.preferred_platforms?.includes('tiktok') ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    const current = context?.preferred_platforms || [];
-                    const updated = current.includes('tiktok')
-                      ? current.filter(p => p !== 'tiktok')
-                      : [...current, 'tiktok'];
-                    updateContext({ preferred_platforms: updated });
-                  }}
-                >
-                  TikTok
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Learnings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5" />
-              Aprendizados
-            </CardTitle>
-            <CardDescription>
-              O que o agente aprendeu até agora
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {context?.success_patterns && context.success_patterns.length > 0 ? (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Padrões de Sucesso</Label>
-                {context.success_patterns.map((pattern, i) => (
-                  <div key={i} className="text-sm p-2 bg-green-500/10 rounded flex items-start gap-2">
-                    <CheckCircle className="h-3 w-3 mt-1 text-green-500 shrink-0" />
-                    <span>{pattern}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                O agente ainda está coletando dados para aprender...
-              </p>
-            )}
-            
-            {context?.best_posting_times && context.best_posting_times.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  Melhores Horários
-                </Label>
-                <div className="flex flex-wrap gap-1">
-                  {context.best_posting_times.map((time, i) => (
-                    <Badge key={i} variant="outline">{time}</Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {context?.best_hashtags && context.best_hashtags.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Melhores Hashtags</Label>
-                <div className="flex flex-wrap gap-1">
-                  {context.best_hashtags.slice(0, 10).map((tag, i) => (
-                    <Badge key={i} variant="secondary">#{tag}</Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {context?.top_topics && context.top_topics.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Tópicos Fortes</Label>
-                <div className="flex flex-wrap gap-1">
-                  {context.top_topics.map((topic, i) => (
-                    <Badge key={i}>{topic}</Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Decision History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" />
-            Histórico de Decisões
-          </CardTitle>
-          <CardDescription>
-            As últimas {decisions.length} decisões do agente
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[400px] pr-4">
-            <div className="space-y-3">
-              {decisions.length > 0 ? (
-                decisions.map((decision) => (
-                  <DecisionCard key={decision.id} decision={decision} />
-                ))
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Bot className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhuma decisão registrada ainda.</p>
-                  <p className="text-sm">Execute o agente para começar!</p>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
