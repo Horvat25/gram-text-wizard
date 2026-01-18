@@ -270,7 +270,8 @@ function drawTextOverlay(
 
 /**
  * Draw watermark (Neural Update branding) - STATIC, no animations
- * Position: Top-right corner, fixed in all 4 images
+ * Position: Top-right corner, optimized for mobile viewing
+ * Size: Increased 50% for better visibility on small screens
  */
 function drawWatermark(
   ctx: CanvasRenderingContext2D,
@@ -278,43 +279,63 @@ function drawWatermark(
   height: number,
   brandName: string = "Neural Update"
 ) {
-  const fontSize = Math.floor(width * 0.028);
-  const padding = width * 0.03;
+  // MOBILE OPTIMIZED: Increased from 0.028 to 0.042 (50% larger)
+  const fontSize = Math.floor(width * 0.042);
+  const padding = width * 0.04;
   
   ctx.save();
   
   // Position: top-right corner (static)
-  ctx.font = `600 ${fontSize}px 'Inter', 'Segoe UI', sans-serif`;
+  ctx.font = `700 ${fontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   
   const text = `⚡ ${brandName}`;
   const metrics = ctx.measureText(text);
-  const pillPadding = fontSize * 0.5;
+  const pillPadding = fontSize * 0.6;
   const pillWidth = metrics.width + pillPadding * 2;
-  const pillHeight = fontSize + pillPadding * 1.2;
+  const pillHeight = fontSize + pillPadding * 1.4;
   const pillX = width - padding - pillWidth;
   const pillY = padding;
   
-  // Static gradient background (no glow animation)
+  // Add subtle shadow for depth
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 2;
+  
+  // Static gradient background with stronger colors
   const gradient = ctx.createLinearGradient(pillX, pillY, pillX + pillWidth, pillY + pillHeight);
-  gradient.addColorStop(0, "rgba(138, 43, 226, 0.9)");
-  gradient.addColorStop(1, "rgba(75, 0, 130, 0.9)");
+  gradient.addColorStop(0, "rgba(139, 92, 246, 0.95)");
+  gradient.addColorStop(1, "rgba(109, 40, 217, 0.95)");
   
   ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.roundRect(pillX, pillY, pillWidth, pillHeight, pillHeight / 2);
   ctx.fill();
   
-  // Draw text (static, no shadow animation)
+  // Add border for visibility
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  // Reset shadow for text
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  
+  // Draw text with slight shadow for readability
   ctx.fillStyle = "white";
-  ctx.fillText(text, width - padding - pillPadding, padding + pillPadding * 0.6);
+  ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+  ctx.shadowBlur = 3;
+  ctx.fillText(text, width - padding - pillPadding, padding + pillPadding * 0.7);
   
   ctx.restore();
 }
 
 /**
  * Draw marketing CTA frame (follow page)
+ * MOBILE OPTIMIZED: Larger text, cleaner layout, better readability
  */
 function drawMarketingCTA(
   ctx: CanvasRenderingContext2D,
@@ -323,58 +344,57 @@ function drawMarketingCTA(
   progress: number,
   instagramHandle: string = "@neuralupdate"
 ) {
-  // Animated gradient background
-  const gradientOffset = Math.sin(progress * Math.PI * 2) * 0.3;
+  // Clean dark gradient background (less distracting)
   const gradient = ctx.createRadialGradient(
     width / 2, height / 2, 0,
-    width / 2, height / 2, width
+    width / 2, height / 2, width * 0.8
   );
-  gradient.addColorStop(0, `hsl(${270 + gradientOffset * 30}, 70%, 15%)`);
-  gradient.addColorStop(0.5, `hsl(${280 + gradientOffset * 20}, 60%, 8%)`);
-  gradient.addColorStop(1, "rgb(5, 5, 15)");
+  gradient.addColorStop(0, "hsl(270, 60%, 12%)");
+  gradient.addColorStop(0.6, "hsl(270, 50%, 6%)");
+  gradient.addColorStop(1, "rgb(8, 8, 12)");
   
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
   
-  // Animated particles/stars
+  // Subtle animated particles (fewer, larger)
   ctx.save();
-  for (let i = 0; i < 30; i++) {
-    const x = ((Math.sin(i * 1.5 + progress * 3) + 1) / 2) * width;
-    const y = ((Math.cos(i * 2.3 + progress * 2) + 1) / 2) * height;
-    const size = 2 + Math.sin(progress * 5 + i) * 2;
-    const alpha = 0.3 + Math.sin(progress * 4 + i * 0.5) * 0.3;
+  for (let i = 0; i < 15; i++) {
+    const x = ((Math.sin(i * 2 + progress * 2) + 1) / 2) * width;
+    const y = ((Math.cos(i * 3 + progress * 1.5) + 1) / 2) * height;
+    const size = 3 + Math.sin(progress * 3 + i) * 2;
+    const alpha = 0.2 + Math.sin(progress * 2 + i * 0.5) * 0.15;
     
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(138, 43, 226, ${alpha})`;
+    ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
     ctx.fill();
   }
   ctx.restore();
   
-  // Main content
+  // Center Y position
   const centerY = height / 2;
   
-  // Animated icon (pulsing circle)
+  // MOBILE OPTIMIZED: Larger pulsing icon
   ctx.save();
-  const pulseScale = 1 + Math.sin(progress * Math.PI * 4) * 0.1;
-  const iconSize = width * 0.15 * pulseScale;
+  const pulseScale = 1 + Math.sin(progress * Math.PI * 3) * 0.08;
+  const iconSize = width * 0.18 * pulseScale;
   
   // Outer glow
   const glowGradient = ctx.createRadialGradient(
-    width / 2, centerY - height * 0.12, iconSize * 0.5,
-    width / 2, centerY - height * 0.12, iconSize * 1.5
+    width / 2, centerY - height * 0.15, iconSize * 0.5,
+    width / 2, centerY - height * 0.15, iconSize * 1.8
   );
-  glowGradient.addColorStop(0, "rgba(138, 43, 226, 0.6)");
-  glowGradient.addColorStop(1, "rgba(138, 43, 226, 0)");
+  glowGradient.addColorStop(0, "rgba(139, 92, 246, 0.5)");
+  glowGradient.addColorStop(1, "rgba(139, 92, 246, 0)");
   ctx.fillStyle = glowGradient;
   ctx.beginPath();
-  ctx.arc(width / 2, centerY - height * 0.12, iconSize * 1.5, 0, Math.PI * 2);
+  ctx.arc(width / 2, centerY - height * 0.15, iconSize * 1.8, 0, Math.PI * 2);
   ctx.fill();
   
   // Icon background
   const iconGradient = ctx.createLinearGradient(
-    width / 2 - iconSize, centerY - height * 0.12 - iconSize,
-    width / 2 + iconSize, centerY - height * 0.12 + iconSize
+    width / 2 - iconSize, centerY - height * 0.15 - iconSize,
+    width / 2 + iconSize, centerY - height * 0.15 + iconSize
   );
   iconGradient.addColorStop(0, "#8B5CF6");
   iconGradient.addColorStop(0.5, "#A855F7");
@@ -382,58 +402,58 @@ function drawMarketingCTA(
   
   ctx.fillStyle = iconGradient;
   ctx.beginPath();
-  ctx.arc(width / 2, centerY - height * 0.12, iconSize, 0, Math.PI * 2);
+  ctx.arc(width / 2, centerY - height * 0.15, iconSize, 0, Math.PI * 2);
   ctx.fill();
   
-  // Lightning bolt icon
+  // Lightning bolt icon (larger)
   ctx.fillStyle = "white";
-  ctx.font = `bold ${iconSize * 1.2}px Arial`;
+  ctx.font = `bold ${iconSize * 1.3}px Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("⚡", width / 2, centerY - height * 0.12);
+  ctx.fillText("⚡", width / 2, centerY - height * 0.15);
   ctx.restore();
   
-  // Brand name with animation
+  // MOBILE OPTIMIZED: Brand name - 30% larger
   ctx.save();
-  const titleFontSize = Math.floor(width * 0.09);
+  const titleFontSize = Math.floor(width * 0.12);
   ctx.font = `800 ${titleFontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   
   // Text gradient
   const textGradient = ctx.createLinearGradient(
-    width / 2 - width * 0.3, 0,
-    width / 2 + width * 0.3, 0
+    width / 2 - width * 0.35, 0,
+    width / 2 + width * 0.35, 0
   );
   textGradient.addColorStop(0, "#A855F7");
   textGradient.addColorStop(0.5, "#FFFFFF");
   textGradient.addColorStop(1, "#8B5CF6");
   
   ctx.fillStyle = textGradient;
-  ctx.shadowColor = "rgba(138, 43, 226, 0.8)";
-  ctx.shadowBlur = 20;
-  ctx.fillText("Neural Update", width / 2, centerY + height * 0.05);
+  ctx.shadowColor = "rgba(139, 92, 246, 0.6)";
+  ctx.shadowBlur = 25;
+  ctx.fillText("Neural Update", width / 2, centerY + height * 0.02);
   ctx.restore();
   
-  // Subtitle
+  // Subtitle - simplified for mobile
   ctx.save();
-  const subtitleFontSize = Math.floor(width * 0.04);
+  const subtitleFontSize = Math.floor(width * 0.045);
   ctx.font = `500 ${subtitleFontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-  ctx.fillText("Inteligência Artificial • Tecnologia • Inovação", width / 2, centerY + height * 0.12);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+  ctx.fillText("IA • Tecnologia • Futuro", width / 2, centerY + height * 0.1);
   ctx.restore();
   
-  // Follow CTA button with animation
+  // MOBILE OPTIMIZED: Follow CTA button - larger and more prominent
   ctx.save();
-  const buttonWidth = width * 0.6;
-  const buttonHeight = height * 0.08;
+  const buttonWidth = width * 0.7;
+  const buttonHeight = height * 0.09;
   const buttonX = (width - buttonWidth) / 2;
-  const buttonY = centerY + height * 0.2;
+  const buttonY = centerY + height * 0.18;
   
   // Button glow
-  ctx.shadowColor = "rgba(138, 43, 226, 0.6)";
-  ctx.shadowBlur = 25 + Math.sin(progress * Math.PI * 3) * 10;
+  ctx.shadowColor = "rgba(139, 92, 246, 0.7)";
+  ctx.shadowBlur = 30 + Math.sin(progress * Math.PI * 2) * 12;
   
   // Button gradient
   const buttonGradient = ctx.createLinearGradient(buttonX, buttonY, buttonX + buttonWidth, buttonY);
@@ -446,14 +466,14 @@ function drawMarketingCTA(
   ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
   ctx.fill();
   
-  // Button border glow
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+  // Button border
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
   ctx.lineWidth = 2;
   ctx.stroke();
   
-  // Button text
+  // Button text - larger
   ctx.shadowBlur = 0;
-  const buttonFontSize = Math.floor(width * 0.05);
+  const buttonFontSize = Math.floor(width * 0.06);
   ctx.font = `700 ${buttonFontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.fillStyle = "white";
   ctx.textAlign = "center";
@@ -461,24 +481,24 @@ function drawMarketingCTA(
   ctx.fillText("SEGUIR AGORA", width / 2, buttonY + buttonHeight / 2);
   ctx.restore();
   
-  // Instagram handle
+  // Instagram handle - larger and more visible
   ctx.save();
-  const handleFontSize = Math.floor(width * 0.055);
-  ctx.font = `600 ${handleFontSize}px 'Inter', 'Segoe UI', sans-serif`;
+  const handleFontSize = Math.floor(width * 0.07);
+  ctx.font = `700 ${handleFontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "center";
   ctx.fillStyle = "white";
   ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-  ctx.shadowBlur = 10;
-  ctx.fillText(instagramHandle, width / 2, centerY + height * 0.32);
+  ctx.shadowBlur = 8;
+  ctx.fillText(instagramHandle, width / 2, centerY + height * 0.31);
   ctx.restore();
   
-  // Bottom tagline
+  // Bottom tagline - simpler
   ctx.save();
-  const taglineFontSize = Math.floor(width * 0.035);
-  ctx.font = `400 ${taglineFontSize}px 'Inter', 'Segoe UI', sans-serif`;
+  const taglineFontSize = Math.floor(width * 0.04);
+  ctx.font = `500 ${taglineFontSize}px 'Inter', 'Segoe UI', sans-serif`;
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-  ctx.fillText("🚀 O futuro é agora", width / 2, height - height * 0.08);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+  ctx.fillText("O futuro é agora 🚀", width / 2, height - height * 0.06);
   ctx.restore();
 }
 
