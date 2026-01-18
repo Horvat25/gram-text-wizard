@@ -311,6 +311,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
   };
 
   // Upload external image to Supabase Storage for Instagram compatibility
+  // Upload external image to Supabase Storage for Instagram compatibility
   const uploadExternalImage = async (imageUrl: string): Promise<string> => {
     toast.info('Preparando imagem para Instagram...');
     
@@ -350,6 +351,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
 
       // Upload external image to Supabase Storage for Instagram compatibility
       let finalImageUrl = selectedImage;
+      let imageUploadFailed = false;
       
       // Check if it's an external URL (not already on Supabase)
       const isExternalImage = !selectedImage.includes('supabase') && 
@@ -361,17 +363,26 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
           toast.success('Imagem processada!');
         } catch (uploadError: any) {
           console.error('Image upload error:', uploadError);
+          imageUploadFailed = true;
+          
+          // Check if it's a blocking error
+          if (uploadError.message?.includes('403') || uploadError.message?.includes('bloqueando')) {
+            toast.error('O site está bloqueando o acesso à imagem. Tente outra imagem ou salve como rascunho.');
+            setIsPublishing(false);
+            return;
+          }
+          
           // Try to proceed with original URL as fallback
           toast.warning('Usando imagem original (pode falhar no Instagram)');
         }
       }
 
-      // Create post
+      // Create post with 'draft' status first (valid status), then publish
       const { data: post, error: insertError } = await supabase.from('posts').insert({
         caption: caption.trim(),
         hashtags,
         image_url: finalImageUrl,
-        status: 'publishing',
+        status: 'draft', // Use valid status, publish-post will update to 'published'
         post_type: 'noticia',
         media_type: 'image',
         user_id: user.id,
@@ -387,6 +398,11 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       if (publishError) throw publishError;
       
       if (publishData?.error) {
+        // Update post status to failed
+        await supabase.from('posts').update({ 
+          status: 'failed', 
+          error_message: publishData.error 
+        }).eq('id', post.id);
         throw new Error(publishData.error);
       }
       
