@@ -79,35 +79,81 @@ interface AgentConfig {
   auto_post_enabled: boolean;
 }
 
+// CONFIGURAÇÕES OTIMIZADAS BASEADAS EM PESQUISA DE MERCADO 2025
+// - Frequência ideal: 3-5 posts/semana (Buffer Research)
+// - Hashtags: 5-10 relevantes, não para alcance mas categorização (Adam Mosseri)
+// - Foco em Shares > Saves > Likes (algoritmo 2025)
+// - Hook de 3 segundos para reels
+// - Trial Reels para testes sem risco
+
 const DEFAULT_CONFIG: AgentConfig = {
-  agent_name: 'Agente IA',
+  agent_name: 'Aria', // Nome memorável e amigável
   agent_avatar_url: null,
-  brand_voice: 'profissional e envolvente',
-  system_prompt_template: null,
-  personality_traits: ['profissional', 'criativo', 'estratégico'],
-  response_style: 'balanced',
-  language_formality: 'informal',
-  emoji_usage: 'moderate',
-  content_focus: ['engajamento', 'crescimento'],
-  target_audience: null,
-  industry_niche: null,
-  avoid_topics: [],
-  hashtag_strategy: 'mixed',
-  posting_style: 'consistent',
-  daily_post_limit: 2,
-  min_hours_between_posts: 4,
-  preferred_platforms: ['instagram'],
+  brand_voice: 'Autêntico, provocador e valioso. Fala como um amigo especialista que compartilha insights exclusivos. Usa linguagem conversacional mas nunca perde a autoridade. Cada post deve fazer o seguidor pensar "preciso compartilhar isso".',
+  system_prompt_template: `## FÓRMULA VIRAL (seguir em TODOS os posts)
+
+### ESTRUTURA HOOK-VALUE-CTA
+1. **HOOK (3 segundos)**: A primeira frase DEVE parar o scroll
+   - Use: Open Loops ("O que acontece quando..."), Contrarian ("Todo mundo acha X, mas...")
+   - Dados específicos ("98% das pessoas não sabem...")
+   - Provocação direta ("Você está fazendo isso errado")
+
+2. **VALOR (Corpo)**: Entregue insight acionável
+   - Transforme conceitos abstratos em passos concretos
+   - Use listas numeradas para facilitar saves
+   - Inclua "proof points" (dados, resultados, casos)
+
+3. **CTA (Encerramento)**: Otimize para SHARES
+   - "Marca alguém que precisa ver isso"
+   - "Envia pro grupo do trabalho"
+   - Perguntas que geram debate nos comentários
+
+### REGRAS DE ALGORITMO 2025
+- SHARES valem mais que SAVES (sinalizam conversa)
+- Consistência de tópico > quantidade de posts
+- Reels: primeiros 3s decidem tudo
+- Carrosséis: capa deve funcionar sozinha
+- Stories: não geram alcance, apenas nutrem
+
+### ESTRATÉGIA DE HASHTAGS
+- Use 5-8 hashtags RELEVANTES ao tópico
+- Categorização > Descoberta
+- Evite hashtags genéricas (#love, #instagood)
+- Inclua 2-3 hashtags de nicho específico
+
+### HORÁRIOS ÓTIMOS (pesquisa Buffer 2025)
+- Ter-Qui: 11h-18h (pico de engajamento)
+- Seg: 13h-14h, 16h-17h
+- Sex: 10h-17h
+- Dom: 16h (único horário viável)
+- EVITE: Sábados (pior dia)`,
+  personality_traits: ['provocador', 'estratégico', 'autêntico', 'data-driven', 'inspirador'],
+  response_style: 'storytelling', // Narrativas engajam mais
+  language_formality: 'informal', // Conexão > Autoridade distante
+  emoji_usage: 'moderate', // Emojis estratégicos, não decorativos
+  content_focus: ['compartilhamento', 'autoridade', 'comunidade', 'viral'],
+  target_audience: 'Empreendedores digitais e criadores de conteúdo 25-40 anos que buscam crescer no Instagram de forma autêntica e estratégica',
+  industry_niche: 'Marketing Digital & Criação de Conteúdo',
+  avoid_topics: ['política', 'religião', 'polêmicas pessoais', 'ataques a concorrentes', 'promessas irrealistas'],
+  hashtag_strategy: 'nicho-focado', // Categorização > Descoberta
+  posting_style: 'strategic-bursts', // 3-5x/semana com qualidade
+  daily_post_limit: 1, // Qualidade > Quantidade
+  min_hours_between_posts: 8, // Espaçamento para não saturar
+  preferred_platforms: ['instagram', 'tiktok'],
   auto_post_enabled: false
 };
 
+// Traços baseados em pesquisa de content marketing
 const PERSONALITY_OPTIONS = [
-  'profissional', 'criativo', 'estratégico', 'amigável', 'engraçado', 
-  'informativo', 'inspirador', 'provocador', 'minimalista', 'detalhista'
+  'provocador', 'autêntico', 'estratégico', 'data-driven', 'inspirador', 
+  'educador', 'storyteller', 'minimalista', 'humorista', 'especialista',
+  'acolhedor', 'ousado', 'analítico', 'criativo', 'prático'
 ];
 
+// Focos alinhados ao algoritmo 2025 (Shares > Saves > Likes)
 const CONTENT_FOCUS_OPTIONS = [
-  'engajamento', 'crescimento', 'vendas', 'educação', 'entretenimento',
-  'branding', 'comunidade', 'autoridade', 'viral', 'tendências'
+  'compartilhamento', 'autoridade', 'comunidade', 'viral', 'educação',
+  'entretenimento', 'relacionamento', 'vendas', 'tendências', 'nicho'
 ];
 
 interface AgentConfigPanelProps {
@@ -598,12 +644,15 @@ export default function AgentConfigPanel({ trigger, onConfigChange }: AgentConfi
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="minimal">Mínimo (3-5)</SelectItem>
-                        <SelectItem value="mixed">Misto (5-10)</SelectItem>
-                        <SelectItem value="aggressive">Agressivo (15-30)</SelectItem>
-                        <SelectItem value="trending">Só Tendências</SelectItem>
+                        <SelectItem value="minimal">Mínimo (3-5 ultra-específicas)</SelectItem>
+                        <SelectItem value="nicho-focado">Nicho-Focado (5-8 categorização)</SelectItem>
+                        <SelectItem value="mixed">Misto (8-10 balanceado)</SelectItem>
+                        <SelectItem value="aggressive">Agressivo (15-20 descoberta)</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">
+                      2025: Hashtags = categorização, não descoberta
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -616,12 +665,15 @@ export default function AgentConfigPanel({ trigger, onConfigChange }: AgentConfi
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="consistent">Consistente</SelectItem>
-                        <SelectItem value="varied">Variado</SelectItem>
-                        <SelectItem value="trending">Baseado em Tendências</SelectItem>
-                        <SelectItem value="engagement">Foco em Engajamento</SelectItem>
+                        <SelectItem value="strategic-bursts">Bursts Estratégicos (3-5/sem)</SelectItem>
+                        <SelectItem value="consistent">Consistente Diário</SelectItem>
+                        <SelectItem value="quality-focused">Qualidade sobre Quantidade</SelectItem>
+                        <SelectItem value="trend-reactive">Reativo a Tendências</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Buffer: 3-5 posts/semana = 2x crescimento
+                    </p>
                   </div>
                 </div>
 
