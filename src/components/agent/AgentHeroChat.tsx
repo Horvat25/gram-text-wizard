@@ -1,4 +1,31 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+
+// Type definitions for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognitionInstance;
+    webkitSpeechRecognition: new () => SpeechRecognitionInstance;
+  }
+}
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -18,7 +45,9 @@ import {
   Trash2,
   BarChart3,
   Settings,
-  History
+  History,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -85,8 +114,57 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [agentConfig, setAgentConfig] = useState<AgentConfig>({ agent_name: 'Agente IA', agent_avatar_url: null });
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'pt-BR';
+
+        recognition.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+          setInput(transcript);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert('Reconhecimento de voz não suportado neste navegador');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      setInput('');
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   // Derive execution history from messages
   const executionHistory = useMemo(() => {
@@ -524,15 +602,30 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       <div className="relative z-10 p-6 border-t border-border/50 bg-background/80 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto">
           <div className="flex gap-3">
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Digite o que você quer que eu faça..."
-              className="min-h-[56px] max-h-[120px] resize-none bg-card/50 border-border/50 focus:border-primary/50 text-base"
-              disabled={isLoading}
-            />
+            <div className="flex-1 relative">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={isListening ? "🎙️ Ouvindo..." : "Digite ou clique no microfone para falar..."}
+                className={`min-h-[56px] max-h-[120px] resize-none bg-card/50 border-border/50 focus:border-primary/50 text-base pr-12 ${isListening ? 'border-red-500/50 animate-pulse' : ''}`}
+                disabled={isLoading}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleListening}
+                disabled={isLoading}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 ${isListening ? 'text-red-500 bg-red-500/10' : 'text-muted-foreground hover:text-primary'}`}
+              >
+                {isListening ? (
+                  <MicOff className="h-5 w-5" />
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
             <Button 
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || isLoading}
@@ -547,7 +640,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
             </Button>
           </div>
           <p className="text-[11px] text-muted-foreground mt-2 text-center">
-            Enter para enviar • Shift+Enter para nova linha
+            Enter para enviar • Shift+Enter para nova linha • 🎤 Clique no microfone para falar
           </p>
         </div>
       </div>
