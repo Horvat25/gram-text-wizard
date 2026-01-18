@@ -25,40 +25,56 @@ serve(async (req) => {
     console.log("Generating story script for:", topic);
     console.log("Segments:", segmentCount, "| Words per segment:", wordsPerSegment);
 
-    const systemPrompt = `Você é um roteirista de vídeos curtos virais para um canal de notícias de tecnologia e ideias do futuro.
-Crie conteúdo informativo e envolvente com COMEÇO, MEIO e FIM claros.
-Cada segmento deve ter uma cena visual distinta e impactante.
-Use linguagem conversacional em português brasileiro.
-NÃO mencione nomes de empresas, marcas ou sites fictícios.
-NÃO faça propaganda ou marketing.
-Seja informativo, direto e mantenha a atenção do espectador.`;
+    // VIRAL OPTIMIZATION: Prompts otimizados para ganchos que capturam atenção nos primeiros 3 segundos
+    const systemPrompt = `Você é um roteirista VIRAL de vídeos curtos para um canal de tecnologia e futuro.
+Seu ÚNICO objetivo é criar vídeos que PRENDAM a atenção nos PRIMEIROS 3 SEGUNDOS.
 
-    const userPrompt = `Crie um roteiro para um vídeo sobre: "${topic}"
+REGRAS DE OURO PARA VIRALIZAR:
+1. GANCHO IRRESISTÍVEL: Primeira frase DEVE criar curiosidade instantânea
+   - Use números específicos: "Em 2025, 90% dos empregos vão..."
+   - Faça afirmações ousadas: "Isso vai mudar TUDO que você sabe sobre..."
+   - Crie urgência: "A maioria das pessoas não percebeu, mas..."
+   - Use padrão interruptor: "Espera... você sabia que..."
+2. RITMO ACELERADO: Frases curtas, diretas, sem enrolação
+3. EMOÇÃO: Provoque espanto, curiosidade ou medo de perder algo
+4. VISUAL: Descreva cenas cinematográficas impactantes
 
-REGRAS IMPORTANTES:
-- Exatamente ${segmentCount} segmentos/cenas
-- Cada segmento deve ter ${wordsPerSegment}-${wordsPerSegment + 5} palavras para narração
-- Estilo: ${style || "informativo e envolvente"}
-- NUNCA mencione nomes de empresas, marcas ou URLs
-- Foque apenas no conteúdo educativo/informativo
+NÃO mencione marcas, empresas ou URLs.
+Use português brasileiro conversacional e envolvente.`;
 
-ESTRUTURA OBRIGATÓRIA:
-1. ABERTURA (gancho forte, pergunta ou fato impactante sobre o tema)
-2. DESENVOLVIMENTO (explicação principal, como funciona, benefícios)
-3. CONTEXTO (aplicações práticas, exemplos do mundo real)
-4. FECHAMENTO (reflexão sobre o futuro, conclusão inspiradora)
+    const userPrompt = `Crie um roteiro VIRAL sobre: "${topic}"
 
-Para cada segmento, forneça:
-- text: texto exato para narração (${wordsPerSegment} palavras)
-- imagePrompt: descrição detalhada da imagem em inglês, estilo cinematográfico
+⚡ REGRA CRÍTICA - PRIMEIRO SEGMENTO (GANCHO):
+A primeira frase DEVE usar uma dessas técnicas:
+- "Você NÃO vai acreditar no que..."
+- "Em [ano], [número]% das pessoas vão..."  
+- "Isso vai ACABAR com [algo comum]..."
+- "A verdade que ninguém te contou sobre..."
+- "Se você não souber isso agora, vai..."
+- Pergunta provocativa que cria suspense
 
-Responda APENAS com JSON válido no formato:
+ESPECIFICAÇÕES:
+- Exatamente ${segmentCount} segmentos
+- ${wordsPerSegment}-${wordsPerSegment + 5} palavras por segmento
+- Estilo: ${style || "impactante e provocativo"}
+
+ESTRUTURA VIRAL:
+1. GANCHO (0-3s): Frase que OBRIGA a pessoa a continuar assistindo
+2. REVELAÇÃO: Desenvolva a promessa do gancho com fatos surpreendentes
+3. PROVA: Exemplos concretos que validam a afirmação
+4. CONCLUSÃO: Feche com reflexão poderosa sobre o futuro
+
+Para cada segmento:
+- text: narração em português (${wordsPerSegment} palavras) - SEM enrolação!
+- imagePrompt: cena cinematográfica em inglês, dramática e visualmente impactante
+
+Responda APENAS com JSON:
 {
-  "title": "Título curto e impactante",
+  "title": "Título curto e provocativo",
   "segments": [
     {
-      "text": "Texto da narração aqui",
-      "imagePrompt": "Cinematic shot of..."
+      "text": "Texto da narração",
+      "imagePrompt": "Cinematic dramatic shot of..."
     }
   ]
 }`;
