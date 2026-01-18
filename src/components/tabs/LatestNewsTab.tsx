@@ -261,11 +261,20 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
 
     setIsGeneratingCaption(true);
     try {
+      // Extract source domain for crediting
+      const sourceDomain = getDomainFromUrl(selectedNews.url);
+      
       const { data, error } = await supabase.functions.invoke("generate-caption", {
         body: { 
           topic: `${selectedNews.title}. ${selectedNews.description || ''}`, 
           postType: 'noticia',
-          customInstructions: 'Esta é uma notícia baseada em fonte real. Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha credibilidade.'
+          sourceUrl: selectedNews.url,
+          sourceName: sourceDomain,
+          customInstructions: `Esta é uma notícia REAL. A fonte é: ${sourceDomain} (${selectedNews.url}). 
+OBRIGATÓRIO: Inclua a fonte no final da legenda no formato:
+📰 Fonte: ${sourceDomain}
+
+Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha credibilidade.`
         },
       });
 
@@ -273,7 +282,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
 
       setCaption(data.caption);
       setHashtags(data.hashtags);
-      toast.success('Legenda gerada!');
+      toast.success('Legenda gerada com fonte!');
     } catch (error: any) {
       console.error("Error generating caption:", error);
       toast.error(error.message || "Erro ao gerar legenda");

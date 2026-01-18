@@ -103,6 +103,7 @@ ESTRUTURA JORNALÍSTICA (MÁXIMO 3 PARÁGRAFOS):
 1. LEAD JORNALÍSTICO (1-2 linhas) - O quê? Quem? Quando? (o mais importante primeiro)
 2. CONTEXTO RÁPIDO (2-3 linhas) - Por que isso importa? Impacto?
 3. REFLEXÃO + ENGAJAMENTO (1-2 linhas) - Opinião ou pergunta para o público
+4. CRÉDITO DA FONTE (1 linha) - 📰 Fonte: [nome do site]
 
 ESTILO JORNALÍSTICO:
 - Tom INFORMATIVO e PROFISSIONAL
@@ -115,6 +116,7 @@ REGRAS OBRIGATÓRIAS:
 - MÁXIMO 500-700 caracteres
 - Seja FACTUAL - baseie-se na notícia fornecida
 - NÃO invente informações
+- SEMPRE inclua a fonte da notícia no final: 📰 Fonte: [site]
 - Mencione a relevância/impacto da notícia
 - 8 hashtags: 4 do tema + 2 de tecnologia + 2 de notícias (#Tecnologia #Inovação #News #Notícias)`,
   },
