@@ -250,22 +250,34 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
   const since = new Date();
   since.setDate(since.getDate() - days);
   
-  const { data: posts } = await supabase
+  const { data: posts, error } = await supabase
     .from('posts')
     .select('*')
     .eq('user_id', userId)
     .eq('status', 'published')
     .gte('published_at', since.toISOString())
     .order('published_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching posts:', error);
+    return {
+      success: false,
+      message: `❌ Erro ao buscar dados: ${error.message}`
+    };
+  }
   
   if (!posts || posts.length === 0) {
     return {
       success: true,
-      message: `📊 Nenhum post publicado nos últimos ${days} dias.`,
-      data: { posts: 0 }
+      message: `📊 Nenhum post publicado nos últimos ${days} dias no banco de dados.`,
+      data: { total_posts: 0 }
     };
   }
+
+  // Filter posts with REAL metrics (reach > 10 indicates synced from Instagram)
+  const postsWithRealMetrics = posts.filter((p: any) => p.reach && p.reach > 10);
   
+  // Calculate totals from ALL posts
   const totalLikes = posts.reduce((acc: number, p: any) => acc + (p.likes_count || 0), 0);
   const totalComments = posts.reduce((acc: number, p: any) => acc + (p.comments_count || 0), 0);
   const totalSaves = posts.reduce((acc: number, p: any) => acc + (p.saves_count || 0), 0);
@@ -274,22 +286,45 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
   const avgEngagement = totalReach > 0 
     ? ((totalLikes + totalComments + totalSaves) / totalReach * 100).toFixed(2)
     : 0;
+
+  // Find top performing post
+  const sortedByEngagement = [...posts]
+    .filter((p: any) => p.reach && p.reach > 0)
+    .sort((a: any, b: any) => {
+      const engA = (a.likes_count + a.comments_count + a.saves_count) / (a.reach || 1);
+      const engB = (b.likes_count + b.comments_count + b.saves_count) / (b.reach || 1);
+      return engB - engA;
+    });
+  
+  const topPost = sortedByEngagement[0];
+  
+  const hasRealMetrics = postsWithRealMetrics.length > 0;
   
   return {
     success: true,
-    message: `📊 Performance dos últimos ${days} dias`,
+    message: hasRealMetrics 
+      ? `📊 Performance real dos últimos ${days} dias (${postsWithRealMetrics.length} posts com métricas do Instagram)`
+      : `📊 Dados dos últimos ${days} dias (⚠️ Métricas ainda não sincronizadas com Instagram)`,
     data: {
       total_posts: posts.length,
+      posts_with_real_metrics: postsWithRealMetrics.length,
       total_likes: totalLikes,
       total_comments: totalComments,
       total_saves: totalSaves,
       total_reach: totalReach,
       avg_engagement: `${avgEngagement}%`,
-      top_post: posts[0] ? {
-        caption: posts[0].caption.slice(0, 50) + '...',
-        likes: posts[0].likes_count,
-        engagement: posts[0].reach > 0 
-          ? ((posts[0].likes_count + posts[0].comments_count + posts[0].saves_count) / posts[0].reach * 100).toFixed(2) + '%'
+      metrics_status: hasRealMetrics 
+        ? '✅ Métricas sincronizadas do Instagram' 
+        : '⚠️ Métricas não sincronizadas - conecte sua conta Instagram e sincronize',
+      top_post: topPost ? {
+        id: topPost.id,
+        caption: topPost.caption.slice(0, 80) + (topPost.caption.length > 80 ? '...' : ''),
+        likes: topPost.likes_count || 0,
+        comments: topPost.comments_count || 0,
+        saves: topPost.saves_count || 0,
+        reach: topPost.reach || 0,
+        engagement: topPost.reach > 0 
+          ? ((topPost.likes_count + topPost.comments_count + topPost.saves_count) / topPost.reach * 100).toFixed(2) + '%'
           : '0%'
       } : null
     }
