@@ -24,6 +24,7 @@ import {
   AlertCircle,
   RefreshCw,
   Globe,
+  Film,
 } from "lucide-react";
 import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
@@ -31,6 +32,7 @@ import { toast } from "sonner";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
+import AgentReelsRenderer from "@/components/agent/AgentReelsRenderer";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -181,9 +183,28 @@ const PublicationQueueTab = ({
   const [newScheduleDate, setNewScheduleDate] = useState("");
   const [viewingPost, setViewingPost] = useState<Post | null>(null);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
+  const [renderingPost, setRenderingPost] = useState<Post | null>(null);
   
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
+
+  // Check if a post needs video rendering (agent-created reels without video_url)
+  const needsVideoRendering = (post: Post) => {
+    const isReels = post.media_type === "reels" || post.media_type === "reel";
+    const hasNoVideo = !post.video_url;
+    const needsProcessing = post.overlay_metadata?.needs_processing === true;
+    return isReels && hasNoVideo && needsProcessing;
+  };
+
+  // Get script data from overlay_metadata for reels that need rendering
+  const getReelsScript = (post: Post) => {
+    if (!post.overlay_metadata?.script) return null;
+    return {
+      title: post.overlay_metadata.script.title || post.overlay_metadata.topic || "Reels",
+      segments: post.overlay_metadata.script.segments || [],
+      topic: post.overlay_metadata.topic || "",
+    };
+  };
 
   // Filter scheduled and draft posts
   const queuedPosts = useMemo(
@@ -284,15 +305,28 @@ const PublicationQueueTab = ({
 
   const PostCard = ({ post }: { post: Post }) => {
     const isOverdue = post.scheduled_for ? isPast(parseISO(post.scheduled_for)) : false;
+    const needsRendering = needsVideoRendering(post);
+    const isReels = post.media_type === "reels" || post.media_type === "reel";
     
     return (
-      <div className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${isOverdue ? 'border-destructive/50' : ''}`}>
+      <div className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${isOverdue ? 'border-destructive/50' : ''} ${needsRendering ? 'border-amber-500/50' : ''}`}>
         <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge className={getStatusColor(post.status, isOverdue)}>
               {isOverdue ? "Atrasado" : post.status === "scheduled" ? "Agendado" : "Rascunho"}
             </Badge>
-            {post.post_type && (
+            {isReels && (
+              <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-600 border-purple-500/30">
+                <Film className="h-3 w-3 mr-1" />
+                Reels
+              </Badge>
+            )}
+            {needsRendering && (
+              <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/30">
+                Aguardando renderização
+              </Badge>
+            )}
+            {post.post_type && !isReels && (
               <Badge variant="outline" className="text-xs capitalize">
                 {post.post_type}
               </Badge>
@@ -313,17 +347,48 @@ const PublicationQueueTab = ({
 
         <p className="text-sm mb-3 line-clamp-3">{post.caption}</p>
 
-        {post.image_url && (
+        {/* Show video if available */}
+        {post.video_url && (
           <div className="mb-3">
+            <video
+              src={post.video_url}
+              className="w-full h-32 object-cover rounded-md"
+              muted
+              playsInline
+            />
+          </div>
+        )}
+
+        {/* Show image thumbnail for reels waiting for rendering, or for image posts */}
+        {!post.video_url && post.image_url && (
+          <div className="mb-3 relative">
             <img
               src={post.image_url}
               alt="Preview"
               className="w-full h-32 object-cover rounded-md"
             />
+            {needsRendering && (
+              <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
+                <span className="text-white text-xs font-medium">Thumbnail - Vídeo não renderizado</span>
+              </div>
+            )}
           </div>
         )}
 
         <div className="flex gap-2 flex-wrap">
+          {/* Render Video button for agent-created reels */}
+          {needsRendering && (
+            <Button
+              size="sm"
+              variant="default"
+              className="bg-purple-600 hover:bg-purple-700"
+              onClick={() => setRenderingPost(post)}
+            >
+              <Film className="h-3 w-3 mr-1" />
+              Gerar Vídeo
+            </Button>
+          )}
+          
           <Button
             size="sm"
             variant="outline"
@@ -343,14 +408,17 @@ const PublicationQueueTab = ({
             <CalendarDays className="h-3 w-3 mr-1" />
             {post.status === "draft" ? "Agendar" : "Reagendar"}
           </Button>
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => handlePublishNow(post)}
-          >
-            <Send className="h-3 w-3 mr-1" />
-            Publicar
-          </Button>
+          {/* Only show Publish if not needing rendering */}
+          {!needsRendering && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => handlePublishNow(post)}
+            >
+              <Send className="h-3 w-3 mr-1" />
+              Publicar
+            </Button>
+          )}
           <Button
             size="sm"
             variant="destructive"
@@ -655,6 +723,25 @@ const PublicationQueueTab = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Reels Renderer Dialog */}
+      {renderingPost && getReelsScript(renderingPost) && (
+        <AgentReelsRenderer
+          postId={renderingPost.id}
+          topic={getReelsScript(renderingPost)!.topic}
+          script={{
+            title: getReelsScript(renderingPost)!.title,
+            segments: getReelsScript(renderingPost)!.segments,
+          }}
+          scheduledFor={renderingPost.scheduled_for}
+          autoPublish={false}
+          onComplete={() => {
+            setRenderingPost(null);
+            toast.success("Vídeo renderizado! Agora você pode publicar ou agendar.");
+          }}
+          onCancel={() => setRenderingPost(null)}
+        />
+      )}
     </div>
   );
 };

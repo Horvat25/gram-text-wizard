@@ -64,10 +64,30 @@ serve(async (req) => {
       console.log(`📝 Processando post ${post.id}: ${post.caption?.substring(0, 50)}...`);
 
       try {
-        const isVideo = post.media_type === "video" || post.media_type === "reels";
+        const isReels = post.media_type === "reels" || post.media_type === "reel";
+        const isVideo = post.media_type === "video" || isReels;
         const isCarousel = post.media_type === "carousel";
         const carouselImages = post.carousel_images as string[] || [];
         const mediaUrl = isVideo ? post.video_url : post.image_url;
+        
+        // Block Reels without video_url - they need to be rendered first
+        if (isReels && !post.video_url) {
+          console.log(`⚠️ Reels ${post.id} não tem video_url - precisa ser renderizado primeiro`);
+          await supabase
+            .from("posts")
+            .update({
+              status: "draft",
+              error_message: "Reels precisa ser renderizado antes de publicar. Acesse a Fila e clique em 'Gerar Vídeo'.",
+            })
+            .eq("id", post.id);
+          
+          results.push({
+            postId: post.id,
+            success: false,
+            error: "Reels sem vídeo renderizado - movido para rascunhos",
+          });
+          continue;
+        }
         
         const hasMedia = isCarousel ? carouselImages.length >= 2 : !!mediaUrl;
 
