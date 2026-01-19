@@ -40,6 +40,8 @@ interface AgentExecutionHistoryProps {
 
 const TOOL_LABELS: Record<string, { label: string; emoji: string }> = {
   'create_posts': { label: 'Criar Posts', emoji: '✍️' },
+  'create_narrated_video': { label: 'Criar Reels Narrado', emoji: '🎬' },
+  'create_carousel': { label: 'Criar Carrossel', emoji: '🎠' },
   'generate_image_for_post': { label: 'Gerar Imagem', emoji: '🎨' },
   'schedule_post': { label: 'Agendar Post', emoji: '📅' },
   'get_performance_data': { label: 'Buscar Analytics', emoji: '📊' },

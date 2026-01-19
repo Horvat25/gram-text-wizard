@@ -89,8 +89,14 @@ serve(async (req) => {
 
     console.log(`Publicando no Instagram para conta: ${account.username || instagramUserId}`);
 
-    const isVideo = post.media_type === "video" || post.media_type === "reels";
+    const isReels = post.media_type === "reels" || post.media_type === "reel";
+    const isVideo = post.media_type === "video" || isReels;
     const isCarousel = post.media_type === "carousel";
+
+    // Reels MUST have a video_url. Never fall back to image for Reels.
+    if (isReels && !post.video_url) {
+      throw new Error("Este Reels ainda não foi renderizado (video_url ausente). Gere o vídeo antes de publicar.");
+    }
     
     const caption = `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`;
     
