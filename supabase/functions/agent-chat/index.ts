@@ -12,7 +12,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_posts",
-      description: "Cria um ou mais posts no banco de dados COM IMAGEM GERADA AUTOMATICAMENTE. SEMPRE inclua image_prompt para gerar o visual. Use quando o usuário pedir para criar conteúdo, plano de conteúdo, ou posts.",
+      description: "⚠️ APENAS para posts com IMAGEM ESTÁTICA. NÃO use para vídeos, reels ou conteúdo narrado! Para VÍDEO/REELS use create_narrated_video. Para CARROSSEL use create_carousel.",
       parameters: {
         type: "object",
         properties: {
@@ -159,7 +159,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_narrated_video",
-      description: "Cria um vídeo narrado (Reel) com roteiro viral, imagens e narração. O vídeo será criado como RASCUNHO e precisa ser processado no app. Use quando o usuário pedir para criar vídeo, reels, ou conteúdo narrado.",
+      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração em áudio. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'conteúdo narrado', 'vídeo narrado', 'stories', 'shorts'. Este é o ÚNICO método para criar vídeos!",
       parameters: {
         type: "object",
         properties: {
@@ -1206,12 +1206,18 @@ serve(async (req) => {
 ## 🔧 FERRAMENTAS DISPONÍVEIS
 Você EXECUTA, não sugere. Use suas ferramentas:
 
+### ⚠️ REGRA CRÍTICA DE SELEÇÃO DE FERRAMENTA:
+Antes de criar conteúdo, ANALISE o pedido do usuário:
+- Mencionou "vídeo", "reels", "reel", "narrado", "shorts"? → **USE \`create_narrated_video\`**
+- Mencionou "carrossel", "slides", "múltiplas imagens"? → **USE \`create_carousel\`**  
+- Mencionou "imagem", "post", "foto" ou não especificou? → **USE \`create_posts\`**
+
 ### 📝 Criação de Conteúdo
-| Ferramenta | Quando usar |
+| Ferramenta | QUANDO USAR (OBRIGATÓRIO!) |
 |------------|-------------|
-| \`create_posts\` | Criar posts com IMAGEM (SEMPRE com image_prompt!) |
-| \`create_narrated_video\` | Criar VÍDEO NARRADO/REELS (roteiro viral + imagens + narração) |
-| \`create_carousel\` | Criar CARROSSEL com múltiplas imagens (2-10 slides) |
+| \`create_posts\` | ⚠️ APENAS para IMAGEM ESTÁTICA! NÃO use para vídeos! |
+| \`create_narrated_video\` | 🎬 **OBRIGATÓRIO** quando usuário pedir VÍDEO, REELS, REEL, NARRADO, SHORTS |
+| \`create_carousel\` | 🎠 Para CARROSSEL com múltiplas imagens (2-10 slides) |
 | \`generate_image_for_post\` | Gerar visual AI para um post existente |
 
 ### 📅 Gerenciamento
@@ -1233,10 +1239,14 @@ Você EXECUTA, não sugere. Use suas ferramentas:
 | \`run_autonomous_agent\` | Executar ciclo autônomo completo |
 | \`update_agent_settings\` | Mudar configurações |
 
-### 🎬 GUIA DE CONTEÚDO:
-- **Imagem única**: Use \`create_posts\` com image_prompt
-- **Vídeo/Reels narrado**: Use \`create_narrated_video\` com topic e caption
-- **Carrossel educativo**: Use \`create_carousel\` com slides (array de image_prompts)
+### 🎬 SELEÇÃO DE TIPO DE CONTEÚDO (LEIA COM ATENÇÃO!):
+1. **"criar um vídeo sobre X"** → \`create_narrated_video\` (topic=X)
+2. **"fazer um reels de Y"** → \`create_narrated_video\` (topic=Y)  
+3. **"criar post com imagem de Z"** → \`create_posts\` (image_prompt=Z)
+4. **"fazer carrossel de W"** → \`create_carousel\` (slides)
+
+**ERRO COMUM:** Usuário pede VÍDEO e você usa \`create_posts\`. ISSO ESTÁ ERRADO!
+- Para VÍDEO/REELS: SEMPRE use \`create_narrated_video\`
 
 ## ⏰ REGRAS DE AGENDAMENTO (CRÍTICO!)
 - **SEMPRE** envie datas/horários no formato ISO 8601: \`YYYY-MM-DDTHH:MM:SS\`
