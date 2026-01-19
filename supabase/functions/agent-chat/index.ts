@@ -157,22 +157,63 @@ const AGENT_TOOLS = [
   }
 ];
 
+// Helper function to convert Brasília time to UTC
+// The AI sends times as if they are in Brasília (UTC-3), so we need to convert to UTC for storage
+function convertBrasiliaToUTC(dateString: string): string {
+  if (!dateString) return dateString;
+  
+  // Parse the date string
+  const date = new Date(dateString);
+  
+  // Check if it's already a valid date
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date string:', dateString);
+    return dateString;
+  }
+  
+  // If the date string doesn't include timezone info (no Z or +/-), 
+  // treat it as Brasília time and add 3 hours to convert to UTC
+  const hasTimezone = dateString.includes('Z') || /[+-]\d{2}:\d{2}$/.test(dateString);
+  
+  if (!hasTimezone) {
+    // The date is in Brasília time (UTC-3), so we need to add 3 hours to get UTC
+    const utcDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    return utcDate.toISOString();
+  }
+  
+  return date.toISOString();
+}
+
+// Helper to format date for display in Brasília time
+function formatBrasiliaTime(isoString: string): string {
+  return new Date(isoString).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+}
+
 // Tool execution functions
 async function executeCreatePosts(supabase: any, userId: string, args: any) {
   const { posts } = args;
   const createdPosts = [];
   
   for (const post of posts) {
+    // Convert scheduled_for to UTC if provided
+    const scheduledForUTC = post.scheduled_for ? convertBrasiliaToUTC(post.scheduled_for) : null;
+    
     const postData = {
       user_id: userId,
       caption: post.caption,
       hashtags: post.hashtags || [],
       post_type: post.post_type || 'engajamento',
       platforms: post.platforms || ['instagram'],
-      status: post.scheduled_for ? 'scheduled' : 'draft',
-      scheduled_for: post.scheduled_for || null,
+      status: scheduledForUTC ? 'scheduled' : 'draft',
+      scheduled_for: scheduledForUTC,
       media_type: 'image'
     };
+    
+    console.log('Creating post with scheduled_for:', {
+      original: post.scheduled_for,
+      converted_to_utc: scheduledForUTC,
+      will_display_as: scheduledForUTC ? formatBrasiliaTime(scheduledForUTC) : null
+    });
     
     const { data, error } = await supabase
       .from('posts')
@@ -224,15 +265,22 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
   }
   
   const withImages = createdPosts.filter(p => p.image_url).length;
+  const scheduledPosts = createdPosts.filter(p => p.scheduled_for);
+  
+  // Format scheduled times for display
+  const scheduleInfo = scheduledPosts.length > 0 
+    ? `\n📅 Agendado(s) para: ${scheduledPosts.map(p => formatBrasiliaTime(p.scheduled_for)).join(', ')}`
+    : '';
   
   return {
     success: true,
-    message: `✅ ${createdPosts.length} post(s) criado(s)! ${withImages > 0 ? `🎨 ${withImages} imagem(ns) gerada(s)` : '⚠️ Sem imagens (image_prompt não fornecido)'}`,
+    message: `✅ ${createdPosts.length} post(s) criado(s)! ${withImages > 0 ? `🎨 ${withImages} imagem(ns) gerada(s)` : '⚠️ Sem imagens (image_prompt não fornecido)'}${scheduleInfo}`,
     posts: createdPosts.map(p => ({
       id: p.id,
       caption: p.caption.slice(0, 50) + '...',
       status: p.status,
       scheduled_for: p.scheduled_for,
+      scheduled_for_brasilia: p.scheduled_for ? formatBrasiliaTime(p.scheduled_for) : null,
       has_image: !!p.image_url
     }))
   };
@@ -281,11 +329,21 @@ async function executeGenerateImage(supabase: any, userId: string, args: any) {
 async function executeSchedulePost(supabase: any, userId: string, args: any) {
   const { post_id, scheduled_for } = args;
   
+  // Convert to UTC for storage
+  const scheduledForUTC = convertBrasiliaToUTC(scheduled_for);
+  
+  console.log('Scheduling post:', {
+    post_id,
+    original_time: scheduled_for,
+    converted_to_utc: scheduledForUTC,
+    will_display_as: formatBrasiliaTime(scheduledForUTC)
+  });
+  
   const { data, error } = await supabase
     .from('posts')
     .update({ 
       status: 'scheduled',
-      scheduled_for
+      scheduled_for: scheduledForUTC
     })
     .eq('id', post_id)
     .eq('user_id', userId)
@@ -298,8 +356,9 @@ async function executeSchedulePost(supabase: any, userId: string, args: any) {
   
   return {
     success: true,
-    message: `📅 Post agendado para ${new Date(scheduled_for).toLocaleString('pt-BR')}`,
-    post: data
+    message: `📅 Post agendado para ${formatBrasiliaTime(scheduledForUTC)} (horário de Brasília)`,
+    post: data,
+    scheduled_for_brasilia: formatBrasiliaTime(scheduledForUTC)
   };
 }
 
@@ -893,6 +952,15 @@ Você EXECUTA, não sugere. Use suas ferramentas:
 | \`list_posts\` | Ver posts existentes com detalhes |
 | \`delete_post\` | Remover um post |
 | \`update_agent_settings\` | Mudar configurações |
+
+## ⏰ REGRAS DE AGENDAMENTO (CRÍTICO!)
+- **SEMPRE** envie datas/horários no formato ISO 8601: \`YYYY-MM-DDTHH:MM:SS\`
+- **SEMPRE** considere o horário de BRASÍLIA (UTC-3) que o usuário menciona
+- Quando o usuário disser "às 14h" ou "às 2 da tarde", use \`14:00:00\`
+- Quando o usuário disser "amanhã às 10h", calcule a data correta e use \`10:00:00\`
+- **NÃO** adicione offset de timezone no formato - envie apenas a data/hora local
+- Exemplo: "agendar para amanhã 15:30" → \`2025-01-20T15:30:00\`
+- O sistema automaticamente converte para UTC para armazenamento
 
 **REGRA CRÍTICA:** Quando o usuário perguntar "quantos", "qual o total", "quantas vezes", etc.:
 → SEMPRE use \`get_detailed_analytics\` PRIMEIRO para buscar dados REAIS
