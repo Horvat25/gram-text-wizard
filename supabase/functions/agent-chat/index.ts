@@ -835,9 +835,9 @@ async function executeUpdateSettings(supabase: any, userId: string, args: any) {
 
 // Execute create_narrated_video - creates a video post with script for frontend processing
 async function executeCreateNarratedVideo(supabase: any, userId: string, args: any) {
-  const { topic, caption, hashtags, scheduled_for, platforms, style } = args;
+  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style } = args;
   
-  console.log('Creating narrated video for topic:', topic);
+  console.log('Creating narrated video for topic:', topic, '| publish_now:', publish_now);
   
   try {
     // Step 1: Generate the story script using AI
@@ -903,7 +903,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, args: a
       platforms: platforms || ['instagram', 'tiktok'],
       status: scheduledForUTC ? 'scheduled' : 'draft',
       scheduled_for: scheduledForUTC,
-      media_type: 'reel',
+      media_type: 'reels',
       image_url: thumbnailUrl, // Thumbnail for preview
       // Store script data in overlay_metadata for frontend processing
       overlay_metadata: {
@@ -912,7 +912,8 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, args: a
         topic: topic,
         style: style,
         needs_processing: true, // Flag for frontend to process
-        created_by_agent: true
+        created_by_agent: true,
+        publish_after_render: publish_now === true, // Flag to auto-publish after video is rendered
       }
     };
     
@@ -927,19 +928,33 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, args: a
       return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
     }
     
-    const scheduleInfo = scheduledForUTC 
-      ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
-      : '📝 Salvo como rascunho';
+    // Determine next step message
+    let nextStepMessage = '';
+    if (publish_now) {
+      nextStepMessage = '⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar e publicar automaticamente!';
+    } else if (scheduledForUTC) {
+      nextStepMessage = `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}\n⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels antes do horário agendado!`;
+    } else {
+      nextStepMessage = '📝 Salvo como rascunho\n⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels!';
+    }
     
     return {
       success: true,
-      message: `🎬 Vídeo narrado criado!\n\n📜 Título: "${script.title}"\n🎞️ ${script.segments?.length || 4} cenas\n${thumbnailUrl ? '🖼️ Thumbnail gerada' : '⚠️ Sem thumbnail'}\n${scheduleInfo}\n\n⚡ O vídeo está pronto para ser processado na aba "Criação de Conteúdo"!`,
+      message: `🎬 Vídeo narrado criado!\n\n📜 Título: "${script.title}"\n🎞️ ${script.segments?.length || 4} cenas cinematográficas\n${thumbnailUrl ? '🖼️ Thumbnail gerada' : ''}\n\n${nextStepMessage}`,
       post: {
         id: post.id,
         title: script.title,
         segments: script.segments?.length || 4,
         status: post.status,
-        has_thumbnail: !!thumbnailUrl
+        has_thumbnail: !!thumbnailUrl,
+        needs_rendering: true,
+        publish_after_render: publish_now === true,
+      },
+      // Special action for frontend to handle
+      requires_frontend_action: {
+        type: 'render_video',
+        post_id: post.id,
+        auto_publish: publish_now === true,
       }
     };
   } catch (error: any) {

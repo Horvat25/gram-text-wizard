@@ -24,6 +24,7 @@ export interface Post {
   reach: number | null;
   user_id: string | null;
   carousel_images: string[] | null;
+  overlay_metadata: any | null;
 }
 
 export interface CreatePostData {
