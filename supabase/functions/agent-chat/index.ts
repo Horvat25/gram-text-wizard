@@ -167,6 +167,7 @@ const AGENT_TOOLS = [
           caption: { type: "string", description: "Legenda do post para Instagram/TikTok" },
           hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
           scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
+          publish_now: { type: "boolean", description: "Se true, publicar assim que o vídeo estiver pronto (em vez de agendar)." },
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
           style: { type: "string", description: "Estilo do vídeo: impactante, educativo, provocativo, inspirador" }
         },
