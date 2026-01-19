@@ -154,6 +154,53 @@ const AGENT_TOOLS = [
         }
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_narrated_video",
+      description: "Cria um vídeo narrado (Reel) com roteiro viral, imagens e narração. O vídeo será criado como RASCUNHO e precisa ser processado no app. Use quando o usuário pedir para criar vídeo, reels, ou conteúdo narrado.",
+      parameters: {
+        type: "object",
+        properties: {
+          topic: { type: "string", description: "Tema do vídeo (DEVE ser sobre tecnologia, inovação, futuro, IA)" },
+          caption: { type: "string", description: "Legenda do post para Instagram/TikTok" },
+          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
+          style: { type: "string", description: "Estilo do vídeo: impactante, educativo, provocativo, inspirador" }
+        },
+        required: ["topic", "caption"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_carousel",
+      description: "Cria um carrossel com múltiplas imagens (2-10 slides). Cada slide terá uma imagem gerada. Use quando o usuário pedir carrossel, slides, ou múltiplas imagens.",
+      parameters: {
+        type: "object",
+        properties: {
+          caption: { type: "string", description: "Legenda principal do carrossel" },
+          slides: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                image_prompt: { type: "string", description: "Descrição da imagem para este slide (estilo futurista, tech)" }
+              },
+              required: ["image_prompt"]
+            },
+            description: "Lista de slides (2-10), cada um com image_prompt para gerar a imagem"
+          },
+          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: ["caption", "slides"]
+      }
+    }
   }
 ];
 
@@ -785,6 +832,219 @@ async function executeUpdateSettings(supabase: any, userId: string, args: any) {
   };
 }
 
+// Execute create_narrated_video - creates a video post with script for frontend processing
+async function executeCreateNarratedVideo(supabase: any, userId: string, args: any) {
+  const { topic, caption, hashtags, scheduled_for, platforms, style } = args;
+  
+  console.log('Creating narrated video for topic:', topic);
+  
+  try {
+    // Step 1: Generate the story script using AI
+    const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+      },
+      body: JSON.stringify({
+        topic,
+        segmentCount: 4,
+        wordsPerSegment: 12,
+        totalDuration: 20,
+        style: style || 'impactante e provocativo'
+      })
+    });
+    
+    if (!scriptResponse.ok) {
+      const errorText = await scriptResponse.text();
+      console.error('Script generation failed:', errorText);
+      return { success: false, message: `❌ Erro ao gerar roteiro: ${errorText}` };
+    }
+    
+    const script = await scriptResponse.json();
+    console.log('Script generated:', script.title, '- Segments:', script.segments?.length);
+    
+    // Step 2: Generate image for first segment as thumbnail
+    let thumbnailUrl = null;
+    if (script.segments && script.segments.length > 0) {
+      try {
+        const imageResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+          },
+          body: JSON.stringify({
+            prompt: `${script.segments[0].imagePrompt}. Cinematic style, high quality, 9:16 vertical aspect ratio for Instagram Reels.`,
+            format: 'portrait',
+            model: 'gemini'
+          })
+        });
+        
+        if (imageResponse.ok) {
+          const imageResult = await imageResponse.json();
+          thumbnailUrl = imageResult.imageUrl;
+          console.log('Thumbnail generated:', thumbnailUrl);
+        }
+      } catch (imgError) {
+        console.error('Thumbnail generation failed:', imgError);
+      }
+    }
+    
+    // Step 3: Create the post with video metadata
+    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    
+    const postData = {
+      user_id: userId,
+      caption: caption || `🎬 ${script.title}\n\n${topic}`,
+      hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
+      post_type: 'entretenimento',
+      platforms: platforms || ['instagram', 'tiktok'],
+      status: scheduledForUTC ? 'scheduled' : 'draft',
+      scheduled_for: scheduledForUTC,
+      media_type: 'reel',
+      image_url: thumbnailUrl, // Thumbnail for preview
+      // Store script data in overlay_metadata for frontend processing
+      overlay_metadata: {
+        type: 'narrated_video',
+        script: script,
+        topic: topic,
+        style: style,
+        needs_processing: true, // Flag for frontend to process
+        created_by_agent: true
+      }
+    };
+    
+    const { data: post, error } = await supabase
+      .from('posts')
+      .insert(postData)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating video post:', error);
+      return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
+    }
+    
+    const scheduleInfo = scheduledForUTC 
+      ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
+      : '📝 Salvo como rascunho';
+    
+    return {
+      success: true,
+      message: `🎬 Vídeo narrado criado!\n\n📜 Título: "${script.title}"\n🎞️ ${script.segments?.length || 4} cenas\n${thumbnailUrl ? '🖼️ Thumbnail gerada' : '⚠️ Sem thumbnail'}\n${scheduleInfo}\n\n⚡ O vídeo está pronto para ser processado na aba "Criação de Conteúdo"!`,
+      post: {
+        id: post.id,
+        title: script.title,
+        segments: script.segments?.length || 4,
+        status: post.status,
+        has_thumbnail: !!thumbnailUrl
+      }
+    };
+  } catch (error: any) {
+    console.error('Error in executeCreateNarratedVideo:', error);
+    return { success: false, message: `❌ Erro: ${error.message}` };
+  }
+}
+
+// Execute create_carousel - creates a carousel post with multiple images
+async function executeCreateCarousel(supabase: any, userId: string, args: any) {
+  const { caption, slides, hashtags, scheduled_for, platforms } = args;
+  
+  if (!slides || slides.length < 2) {
+    return { success: false, message: '❌ Carrossel precisa de pelo menos 2 slides!' };
+  }
+  
+  if (slides.length > 10) {
+    return { success: false, message: '❌ Carrossel pode ter no máximo 10 slides!' };
+  }
+  
+  console.log('Creating carousel with', slides.length, 'slides');
+  
+  const carouselImages: string[] = [];
+  let generatedCount = 0;
+  
+  // Generate images for each slide
+  for (let i = 0; i < slides.length; i++) {
+    const slide = slides[i];
+    try {
+      console.log(`Generating image ${i + 1}/${slides.length}:`, slide.image_prompt);
+      
+      const imageResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+        },
+        body: JSON.stringify({
+          prompt: `${slide.image_prompt}. High quality, professional, Instagram-ready, square 1:1 aspect ratio.`,
+          format: 'square',
+          model: 'gemini'
+        })
+      });
+      
+      if (imageResponse.ok) {
+        const imageResult = await imageResponse.json();
+        if (imageResult.imageUrl) {
+          carouselImages.push(imageResult.imageUrl);
+          generatedCount++;
+          console.log(`Image ${i + 1} generated successfully`);
+        }
+      } else {
+        console.error(`Failed to generate image ${i + 1}:`, await imageResponse.text());
+      }
+    } catch (imgError) {
+      console.error(`Error generating image ${i + 1}:`, imgError);
+    }
+  }
+  
+  if (carouselImages.length < 2) {
+    return { success: false, message: `❌ Não foi possível gerar imagens suficientes. Apenas ${carouselImages.length} de ${slides.length} foram geradas.` };
+  }
+  
+  // Create the carousel post
+  const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+  
+  const postData = {
+    user_id: userId,
+    caption,
+    hashtags: hashtags || ['#tecnologia', '#inovacao', '#carrossel'],
+    post_type: 'educacional',
+    platforms: platforms || ['instagram'],
+    status: scheduledForUTC ? 'scheduled' : 'draft',
+    scheduled_for: scheduledForUTC,
+    media_type: 'carousel',
+    image_url: carouselImages[0], // First image as main preview
+    carousel_images: carouselImages
+  };
+  
+  const { data: post, error } = await supabase
+    .from('posts')
+    .insert(postData)
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error creating carousel post:', error);
+    return { success: false, message: `❌ Erro ao criar carrossel: ${error.message}` };
+  }
+  
+  const scheduleInfo = scheduledForUTC 
+    ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
+    : '📝 Salvo como rascunho';
+  
+  return {
+    success: true,
+    message: `🎠 Carrossel criado com sucesso!\n\n🖼️ ${generatedCount}/${slides.length} imagens geradas\n${scheduleInfo}`,
+    post: {
+      id: post.id,
+      slides_count: carouselImages.length,
+      status: post.status,
+      scheduled_for_brasilia: scheduledForUTC ? formatBrasiliaTime(scheduledForUTC) : null
+    }
+  };
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, toolName: string, args: any) {
   switch (toolName) {
@@ -806,6 +1066,10 @@ async function executeTool(supabase: any, userId: string, toolName: string, args
       return executeDeletePost(supabase, userId, args);
     case 'update_agent_settings':
       return executeUpdateSettings(supabase, userId, args);
+    case 'create_narrated_video':
+      return executeCreateNarratedVideo(supabase, userId, args);
+    case 'create_carousel':
+      return executeCreateCarousel(supabase, userId, args);
     default:
       return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
   }
@@ -941,17 +1205,38 @@ serve(async (req) => {
 
 ## 🔧 FERRAMENTAS DISPONÍVEIS
 Você EXECUTA, não sugere. Use suas ferramentas:
+
+### 📝 Criação de Conteúdo
 | Ferramenta | Quando usar |
 |------------|-------------|
-| \`create_posts\` | Criar posts (SEMPRE com image_prompt!) |
+| \`create_posts\` | Criar posts com IMAGEM (SEMPRE com image_prompt!) |
+| \`create_narrated_video\` | Criar VÍDEO NARRADO/REELS (roteiro viral + imagens + narração) |
+| \`create_carousel\` | Criar CARROSSEL com múltiplas imagens (2-10 slides) |
 | \`generate_image_for_post\` | Gerar visual AI para um post existente |
+
+### 📅 Gerenciamento
+| Ferramenta | Quando usar |
+|------------|-------------|
 | \`schedule_post\` | Agendar post existente |
-| \`get_detailed_analytics\` | **OBRIGATÓRIO** para perguntas sobre QUANTIDADES (quantos vídeos, posts, etc) |
-| \`get_performance_data\` | Analisar métricas de engajamento |
-| \`run_autonomous_agent\` | Executar ciclo autônomo completo |
 | \`list_posts\` | Ver posts existentes com detalhes |
 | \`delete_post\` | Remover um post |
+
+### 📊 Analytics
+| Ferramenta | Quando usar |
+|------------|-------------|
+| \`get_detailed_analytics\` | **OBRIGATÓRIO** para perguntas sobre QUANTIDADES (quantos vídeos, posts, etc) |
+| \`get_performance_data\` | Analisar métricas de engajamento |
+
+### ⚙️ Sistema
+| Ferramenta | Quando usar |
+|------------|-------------|
+| \`run_autonomous_agent\` | Executar ciclo autônomo completo |
 | \`update_agent_settings\` | Mudar configurações |
+
+### 🎬 GUIA DE CONTEÚDO:
+- **Imagem única**: Use \`create_posts\` com image_prompt
+- **Vídeo/Reels narrado**: Use \`create_narrated_video\` com topic e caption
+- **Carrossel educativo**: Use \`create_carousel\` com slides (array de image_prompts)
 
 ## ⏰ REGRAS DE AGENDAMENTO (CRÍTICO!)
 - **SEMPRE** envie datas/horários no formato ISO 8601: \`YYYY-MM-DDTHH:MM:SS\`
