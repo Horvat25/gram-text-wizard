@@ -10,7 +10,8 @@ import {
   BarChart3,
   Settings,
   History,
-  Sparkles
+  Sparkles,
+  Calendar
 } from 'lucide-react';
 import { useAgentContext } from '@/hooks/useAgentContext';
 import { motion } from 'framer-motion';
@@ -22,6 +23,7 @@ import AgentLearnings from '@/components/agent/AgentLearnings';
 import AgentDecisionHistory from '@/components/agent/AgentDecisionHistory';
 import AgentSettings from '@/components/agent/AgentSettings';
 import AgentChat from '@/components/agent/AgentChat';
+import AgentRoutineScheduler from '@/components/agent/AgentRoutineScheduler';
 
 export default function AgentTab() {
   const { 
@@ -119,10 +121,14 @@ export default function AgentTab() {
 
       {/* Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid bg-muted/50">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid bg-muted/50">
           <TabsTrigger value="overview" className="gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Visão Geral</span>
+          </TabsTrigger>
+          <TabsTrigger value="routine" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Rotina</span>
           </TabsTrigger>
           <TabsTrigger value="chat" className="gap-2">
             <MessageSquare className="h-4 w-4" />
@@ -143,6 +149,15 @@ export default function AgentTab() {
             <AgentLearnings context={context} />
             <AgentDecisionHistory decisions={decisions.slice(0, 5)} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="routine" className="mt-4">
+          <AgentRoutineScheduler 
+            context={context}
+            onUpdate={updateContext}
+            onRunAgent={runAgent}
+            isRunning={isRunning}
+          />
         </TabsContent>
 
         <TabsContent value="chat" className="mt-4">
