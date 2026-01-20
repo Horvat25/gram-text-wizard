@@ -10,8 +10,7 @@ import {
   BarChart3,
   Settings,
   History,
-  Sparkles,
-  Calendar
+  Sparkles
 } from 'lucide-react';
 import { useAgentContext } from '@/hooks/useAgentContext';
 import { motion } from 'framer-motion';
@@ -21,9 +20,8 @@ import AgentStatusCard from '@/components/agent/AgentStatusCard';
 import AgentStats from '@/components/agent/AgentStats';
 import AgentLearnings from '@/components/agent/AgentLearnings';
 import AgentDecisionHistory from '@/components/agent/AgentDecisionHistory';
-import AgentConfigPanel from '@/components/agent/AgentConfigPanel';
 import AgentChat from '@/components/agent/AgentChat';
-import AgentRoutineScheduler from '@/components/agent/AgentRoutineScheduler';
+import AgentUnifiedSettings from '@/components/agent/AgentUnifiedSettings';
 
 export default function AgentTab() {
   const { 
@@ -119,16 +117,12 @@ export default function AgentTab() {
         <AgentStats stats={stats} />
       </motion.div>
 
-      {/* Tabs Navigation */}
+      {/* Tabs Navigation - Simplified to 4 */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid bg-muted/50">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid bg-muted/50">
           <TabsTrigger value="overview" className="gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Visão Geral</span>
-          </TabsTrigger>
-          <TabsTrigger value="routine" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Rotina</span>
           </TabsTrigger>
           <TabsTrigger value="chat" className="gap-2">
             <MessageSquare className="h-4 w-4" />
@@ -151,15 +145,6 @@ export default function AgentTab() {
           </div>
         </TabsContent>
 
-        <TabsContent value="routine" className="mt-4">
-          <AgentRoutineScheduler 
-            context={context}
-            onUpdate={updateContext}
-            onRunAgent={runAgent}
-            isRunning={isRunning}
-          />
-        </TabsContent>
-
         <TabsContent value="chat" className="mt-4">
           <div className="max-w-3xl mx-auto">
             <AgentChat />
@@ -171,10 +156,12 @@ export default function AgentTab() {
         </TabsContent>
 
         <TabsContent value="settings" className="mt-4">
-          <div className="max-w-xl mx-auto">
-            <AgentConfigPanel 
-              onConfigChange={() => {}}
-              onClearChat={() => {}}
+          <div className="max-w-2xl mx-auto">
+            <AgentUnifiedSettings 
+              context={context}
+              onUpdate={updateContext}
+              onRunAgent={runAgent}
+              isRunning={isRunning}
             />
           </div>
         </TabsContent>

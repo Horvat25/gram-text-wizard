@@ -18,6 +18,20 @@ export interface AgentContext {
   preferred_platforms: string[];
   daily_post_limit: number;
   min_hours_between_posts: number;
+  // Extended fields
+  agent_name: string | null;
+  agent_avatar_url: string | null;
+  personality_traits: string[] | null;
+  response_style: string | null;
+  language_formality: string | null;
+  emoji_usage: string | null;
+  content_focus: string[] | null;
+  target_audience: string | null;
+  industry_niche: string | null;
+  avoid_topics: string[] | null;
+  hashtag_strategy: string | null;
+  posting_style: string | null;
+  system_prompt_template: string | null;
 }
 
 export interface AgentDecision {
