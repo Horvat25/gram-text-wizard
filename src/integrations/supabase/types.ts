@@ -51,6 +51,10 @@ export type Database = {
           best_hashtags: string[] | null
           best_posting_times: string[] | null
           brand_voice: string | null
+          content_distribution_carousels: number | null
+          content_distribution_images: number | null
+          content_distribution_news: number | null
+          content_distribution_videos: number | null
           content_focus: string[] | null
           daily_post_limit: number | null
           emoji_usage: string | null
@@ -80,6 +84,10 @@ export type Database = {
           best_hashtags?: string[] | null
           best_posting_times?: string[] | null
           brand_voice?: string | null
+          content_distribution_carousels?: number | null
+          content_distribution_images?: number | null
+          content_distribution_news?: number | null
+          content_distribution_videos?: number | null
           content_focus?: string[] | null
           daily_post_limit?: number | null
           emoji_usage?: string | null
@@ -109,6 +117,10 @@ export type Database = {
           best_hashtags?: string[] | null
           best_posting_times?: string[] | null
           brand_voice?: string | null
+          content_distribution_carousels?: number | null
+          content_distribution_images?: number | null
+          content_distribution_news?: number | null
+          content_distribution_videos?: number | null
           content_focus?: string[] | null
           daily_post_limit?: number | null
           emoji_usage?: string | null
