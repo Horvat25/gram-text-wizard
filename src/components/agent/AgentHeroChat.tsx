@@ -53,7 +53,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
-import AgentUnifiedSettingsSheet from './AgentUnifiedSettingsSheet';
+import AgentConfigPanel from './AgentConfigPanel';
 import AgentExecutionHistory from './AgentExecutionHistory';
 
 interface AgentConfig {
@@ -459,7 +459,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
             )}
           </Button>
           
-          <AgentUnifiedSettingsSheet 
+          <AgentConfigPanel 
             onConfigChange={(config) => {
               setAgentConfig({
                 agent_name: config.agent_name,
