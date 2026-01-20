@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Globe,
   Film,
+  X,
 } from "lucide-react";
 import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
@@ -719,6 +720,16 @@ const PublicationQueueTab = ({
                   </p>
                 </div>
               )}
+              
+              {/* Botão de fechar para mobile */}
+              <Button 
+                onClick={() => setViewingPost(null)} 
+                className="w-full mt-4"
+                variant="outline"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Fechar
+              </Button>
             </div>
           )}
         </DialogContent>
