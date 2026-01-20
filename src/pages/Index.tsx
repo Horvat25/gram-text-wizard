@@ -14,7 +14,6 @@ import {
   Bot,
   ChevronLeft,
   ChevronRight,
-  Settings2,
   LayoutDashboard
 } from "lucide-react";
 import ContentCreationTab from "@/components/tabs/ContentCreationTab";
@@ -23,7 +22,7 @@ import AnalyticsTab from "@/components/tabs/AnalyticsTab";
 import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
 import { SuggestionsTab } from "@/components/tabs/SuggestionsTab";
 import { LatestNewsTab } from "@/components/tabs/LatestNewsTab";
-import AgentTab from "@/components/tabs/AgentTab";
+
 import AgentHeroChat from "@/components/agent/AgentHeroChat";
 import PlatformSelector, { Platform } from "@/components/PlatformSelector";
 import TikTokContentCreation from "@/components/TikTokContentCreation";
@@ -225,7 +224,7 @@ const Index = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-                      <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
+                      <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
                         <TabsTrigger value="create" className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4" />
                           <span className="hidden sm:inline">Criação</span>
@@ -249,10 +248,6 @@ const Index = () => {
                         <TabsTrigger value="analytics" className="flex items-center gap-2">
                           <BarChart3 className="h-4 w-4" />
                           <span className="hidden sm:inline">Analytics</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="agent-config" className="flex items-center gap-2">
-                          <Settings2 className="h-4 w-4" />
-                          <span className="hidden sm:inline">Config</span>
                         </TabsTrigger>
                       </TabsList>
 
@@ -284,10 +279,6 @@ const Index = () => {
 
                       <TabsContent value="analytics" className="space-y-6">
                         <AnalyticsTab posts={posts} onRefresh={fetchPosts} />
-                      </TabsContent>
-
-                      <TabsContent value="agent-config" className="space-y-6">
-                        <AgentTab />
                       </TabsContent>
                     </Tabs>
                   </motion.div>

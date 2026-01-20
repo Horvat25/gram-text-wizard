@@ -21,7 +21,7 @@ import AgentStatusCard from '@/components/agent/AgentStatusCard';
 import AgentStats from '@/components/agent/AgentStats';
 import AgentLearnings from '@/components/agent/AgentLearnings';
 import AgentDecisionHistory from '@/components/agent/AgentDecisionHistory';
-import AgentSettings from '@/components/agent/AgentSettings';
+import AgentConfigPanel from '@/components/agent/AgentConfigPanel';
 import AgentChat from '@/components/agent/AgentChat';
 import AgentRoutineScheduler from '@/components/agent/AgentRoutineScheduler';
 
@@ -171,8 +171,11 @@ export default function AgentTab() {
         </TabsContent>
 
         <TabsContent value="settings" className="mt-4">
-          <div className="max-w-xl">
-            <AgentSettings context={context} onUpdate={updateContext} />
+          <div className="max-w-xl mx-auto">
+            <AgentConfigPanel 
+              onConfigChange={() => {}}
+              onClearChat={() => {}}
+            />
           </div>
         </TabsContent>
       </Tabs>
