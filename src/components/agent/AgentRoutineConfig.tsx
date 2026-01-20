@@ -52,12 +52,12 @@ const CRON_FREQUENCIES = [
   { value: '24', label: '24 horas', short: '24h' },
 ];
 
-// Default distribution percentages (must sum to 100)
+// Default distribution (absolute numbers, not percentages)
 const DEFAULT_DISTRIBUTION: ContentDistribution = {
-  videos: 20,
-  carousels: 15,
-  news: 30,
-  images: 35
+  videos: 3,
+  carousels: 2,
+  news: 4,
+  images: 5
 };
 
 export default function AgentRoutineConfig({ 
@@ -77,15 +77,10 @@ export default function AgentRoutineConfig({
     min_hours_between_posts: context?.min_hours_between_posts || 4,
   });
 
-  // Calculate weekly goals based on daily limit and distribution
+  // Calculate weekly total and remaining points
   const weeklyTotal = localConfig.daily_post_limit * 7;
-  const calculatedGoals = {
-    totalPosts: weeklyTotal,
-    videos: Math.round(weeklyTotal * (distribution.videos / 100)),
-    carousels: Math.round(weeklyTotal * (distribution.carousels / 100)),
-    news: Math.round(weeklyTotal * (distribution.news / 100)),
-    images: Math.round(weeklyTotal * (distribution.images / 100)),
-  };
+  const assignedTotal = distribution.videos + distribution.carousels + distribution.news + distribution.images;
+  const remainingPoints = weeklyTotal - assignedTotal;
 
   // Sync with context
   useEffect(() => {
@@ -98,37 +93,9 @@ export default function AgentRoutineConfig({
     }
   }, [context]);
 
-  // Adjust distribution to maintain 100% total
-  const adjustDistribution = (type: keyof ContentDistribution, newValue: number) => {
-    const oldValue = distribution[type];
-    const diff = newValue - oldValue;
-    
-    // Get other types
-    const otherTypes = (Object.keys(distribution) as Array<keyof ContentDistribution>)
-      .filter(t => t !== type);
-    
-    // Distribute the difference among other types proportionally
-    const otherTotal = otherTypes.reduce((sum, t) => sum + distribution[t], 0);
-    
-    if (otherTotal === 0) return;
-    
-    const newDistribution = { ...distribution, [type]: newValue };
-    
-    otherTypes.forEach(t => {
-      const proportion = distribution[t] / otherTotal;
-      newDistribution[t] = Math.max(0, Math.round(distribution[t] - (diff * proportion)));
-    });
-    
-    // Ensure total is 100
-    const total = Object.values(newDistribution).reduce((a, b) => a + b, 0);
-    if (total !== 100) {
-      const largest = otherTypes.reduce((a, b) => 
-        newDistribution[a] > newDistribution[b] ? a : b
-      );
-      newDistribution[largest] += (100 - total);
-    }
-    
-    setDistribution(newDistribution);
+  // Update single content type independently
+  const updateDistribution = (type: keyof ContentDistribution, newValue: number) => {
+    setDistribution(prev => ({ ...prev, [type]: newValue }));
   };
 
   // Calculate countdown
@@ -314,7 +281,6 @@ export default function AgentRoutineConfig({
           </Collapsible>
 
           {/* Weekly Goals - Collapsible */}
-          {/* Weekly Goals - Collapsible */}
           <Collapsible open={showGoals} onOpenChange={setShowGoals}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" className="w-full justify-between">
@@ -322,54 +288,75 @@ export default function AgentRoutineConfig({
                   <Target className="h-4 w-4 text-green-500" />
                   Metas Semanais
                   <Badge variant="secondary" className="ml-2 text-xs">
-                    {calculatedGoals.totalPosts} posts/semana
+                    {assignedTotal}/{weeklyTotal} posts
                   </Badge>
                 </span>
                 {showGoals ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-3 space-y-4">
-              {/* Calculated Goals Display */}
+              {/* Remaining Points Alert */}
+              {remainingPoints !== 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-3 rounded-lg border flex items-center gap-2 ${
+                    remainingPoints > 0 
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300'
+                      : 'bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-300'
+                  }`}
+                >
+                  <Target className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    {remainingPoints > 0 
+                      ? `Você tem ${remainingPoints} ${remainingPoints === 1 ? 'ponto' : 'pontos'} para distribuir`
+                      : `Você está ${Math.abs(remainingPoints)} ${Math.abs(remainingPoints) === 1 ? 'ponto' : 'pontos'} acima do limite`
+                    }
+                  </span>
+                </motion.div>
+              )}
+
+              {/* Current Distribution Display */}
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="grid grid-cols-2 sm:grid-cols-5 gap-2"
               >
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-primary">{calculatedGoals.totalPosts}</div>
-                  <div className="text-xs text-muted-foreground">Total</div>
+                  <div className="text-2xl font-bold text-primary">{weeklyTotal}</div>
+                  <div className="text-xs text-muted-foreground">Meta</div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-pink-500">{calculatedGoals.videos}</div>
+                  <div className="text-2xl font-bold text-pink-500">{distribution.videos}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Video className="h-3 w-3" /> Vídeos
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-purple-500">{calculatedGoals.carousels}</div>
+                  <div className="text-2xl font-bold text-purple-500">{distribution.carousels}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Layers className="h-3 w-3" /> Carrosséis
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-blue-500">{calculatedGoals.news}</div>
+                  <div className="text-2xl font-bold text-blue-500">{distribution.news}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Newspaper className="h-3 w-3" /> Notícias
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-green-500">{calculatedGoals.images}</div>
+                  <div className="text-2xl font-bold text-green-500">{distribution.images}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Image className="h-3 w-3" /> Imagens
                   </div>
                 </div>
               </motion.div>
 
-              {/* Content Distribution Sliders */}
+              {/* Content Distribution Sliders - Independent */}
               <div className="p-4 rounded-lg bg-muted/30 border space-y-4">
                 <Label className="text-sm font-medium flex items-center gap-2">
-                  Distribuição de Conteúdo
-                  <span className="text-xs text-muted-foreground font-normal">(ajuste a prioridade)</span>
+                  Distribuir Pontos
+                  <span className="text-xs text-muted-foreground font-normal">(cada slider é independente)</span>
                 </Label>
                 
                 <div className="space-y-3">
@@ -379,14 +366,32 @@ export default function AgentRoutineConfig({
                       <span className="text-xs flex items-center gap-1.5">
                         <Video className="h-3 w-3 text-pink-500" /> Vídeos/Reels
                       </span>
-                      <span className="text-xs font-mono text-pink-500">{distribution.videos}%</span>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('videos', Math.max(0, distribution.videos - 1))}
+                        >
+                          -
+                        </Button>
+                        <span className="text-sm font-mono text-pink-500 w-6 text-center">{distribution.videos}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('videos', distribution.videos + 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
                     </div>
                     <Slider
                       value={[distribution.videos]}
-                      onValueChange={([v]) => adjustDistribution('videos', v)}
+                      onValueChange={([v]) => updateDistribution('videos', v)}
                       min={0}
-                      max={80}
-                      step={5}
+                      max={weeklyTotal}
+                      step={1}
                       className="[&_[role=slider]]:bg-pink-500"
                     />
                   </div>
@@ -397,14 +402,32 @@ export default function AgentRoutineConfig({
                       <span className="text-xs flex items-center gap-1.5">
                         <Layers className="h-3 w-3 text-purple-500" /> Carrosséis
                       </span>
-                      <span className="text-xs font-mono text-purple-500">{distribution.carousels}%</span>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('carousels', Math.max(0, distribution.carousels - 1))}
+                        >
+                          -
+                        </Button>
+                        <span className="text-sm font-mono text-purple-500 w-6 text-center">{distribution.carousels}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('carousels', distribution.carousels + 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
                     </div>
                     <Slider
                       value={[distribution.carousels]}
-                      onValueChange={([v]) => adjustDistribution('carousels', v)}
+                      onValueChange={([v]) => updateDistribution('carousels', v)}
                       min={0}
-                      max={80}
-                      step={5}
+                      max={weeklyTotal}
+                      step={1}
                       className="[&_[role=slider]]:bg-purple-500"
                     />
                   </div>
@@ -415,14 +438,32 @@ export default function AgentRoutineConfig({
                       <span className="text-xs flex items-center gap-1.5">
                         <Newspaper className="h-3 w-3 text-blue-500" /> Notícias
                       </span>
-                      <span className="text-xs font-mono text-blue-500">{distribution.news}%</span>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('news', Math.max(0, distribution.news - 1))}
+                        >
+                          -
+                        </Button>
+                        <span className="text-sm font-mono text-blue-500 w-6 text-center">{distribution.news}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('news', distribution.news + 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
                     </div>
                     <Slider
                       value={[distribution.news]}
-                      onValueChange={([v]) => adjustDistribution('news', v)}
+                      onValueChange={([v]) => updateDistribution('news', v)}
                       min={0}
-                      max={80}
-                      step={5}
+                      max={weeklyTotal}
+                      step={1}
                       className="[&_[role=slider]]:bg-blue-500"
                     />
                   </div>
@@ -433,21 +474,39 @@ export default function AgentRoutineConfig({
                       <span className="text-xs flex items-center gap-1.5">
                         <Image className="h-3 w-3 text-green-500" /> Imagens
                       </span>
-                      <span className="text-xs font-mono text-green-500">{distribution.images}%</span>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('images', Math.max(0, distribution.images - 1))}
+                        >
+                          -
+                        </Button>
+                        <span className="text-sm font-mono text-green-500 w-6 text-center">{distribution.images}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => updateDistribution('images', distribution.images + 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
                     </div>
                     <Slider
                       value={[distribution.images]}
-                      onValueChange={([v]) => adjustDistribution('images', v)}
+                      onValueChange={([v]) => updateDistribution('images', v)}
                       min={0}
-                      max={80}
-                      step={5}
+                      max={weeklyTotal}
+                      step={1}
                       className="[&_[role=slider]]:bg-green-500"
                     />
                   </div>
                 </div>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  Mova os sliders para priorizar tipos de conteúdo. O total sempre será 100%.
+                  Distribua os {weeklyTotal} posts semanais entre os tipos de conteúdo.
                 </p>
               </div>
             </CollapsibleContent>
