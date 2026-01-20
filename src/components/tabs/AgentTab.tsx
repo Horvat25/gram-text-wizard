@@ -6,11 +6,10 @@ import {
   Play, 
   RefreshCw, 
   Loader2,
-  MessageSquare,
-  BarChart3,
+  Calendar,
   Settings,
-  History,
-  Sparkles
+  FileText,
+  History
 } from 'lucide-react';
 import { useAgentContext } from '@/hooks/useAgentContext';
 import { motion } from 'framer-motion';
@@ -18,10 +17,10 @@ import { motion } from 'framer-motion';
 // Import agent components
 import AgentStatusCard from '@/components/agent/AgentStatusCard';
 import AgentStats from '@/components/agent/AgentStats';
-import AgentLearnings from '@/components/agent/AgentLearnings';
+import AgentRoutineConfig from '@/components/agent/AgentRoutineConfig';
+import AgentPersonalityConfig from '@/components/agent/AgentPersonalityConfig';
+import AgentReportsTab from '@/components/agent/AgentReportsTab';
 import AgentDecisionHistory from '@/components/agent/AgentDecisionHistory';
-import AgentChat from '@/components/agent/AgentChat';
-import AgentUnifiedSettings from '@/components/agent/AgentUnifiedSettings';
 
 export default function AgentTab() {
   const { 
@@ -35,7 +34,7 @@ export default function AgentTab() {
     runFeedbackLoop 
   } = useAgentContext();
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('routine');
 
   if (isLoading) {
     return (
@@ -65,7 +64,7 @@ export default function AgentTab() {
               <span className="neural-gradient-text">Agente Autônomo</span>
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base">
-              O cérebro que analisa, decide e aprende com cada post
+              Configure a rotina automática e personalidade do agente
             </p>
           </div>
         </div>
@@ -78,7 +77,7 @@ export default function AgentTab() {
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${isRunning ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Processar Feedback</span>
+            <span className="hidden sm:inline">Feedback Loop</span>
           </Button>
           <Button 
             onClick={runAgent}
@@ -90,7 +89,7 @@ export default function AgentTab() {
             ) : (
               <Play className="h-4 w-4" />
             )}
-            <span>Executar Agente</span>
+            <span>Executar</span>
           </Button>
         </div>
       </motion.div>
@@ -117,47 +116,31 @@ export default function AgentTab() {
         <AgentStats stats={stats} />
       </motion.div>
 
-      {/* Tabs Navigation - Simplified to 4 */}
+      {/* Tabs Navigation - 4 tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid bg-muted/50">
-          <TabsTrigger value="overview" className="gap-2">
-            <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Visão Geral</span>
+          <TabsTrigger value="routine" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Rotina</span>
           </TabsTrigger>
-          <TabsTrigger value="chat" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">Chat</span>
+          <TabsTrigger value="personality" className="gap-2">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Personalidade</span>
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="gap-2">
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Relatórios</span>
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2">
             <History className="h-4 w-4" />
-            <span className="hidden sm:inline">Histórico</span>
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2">
-            <Settings className="h-4 w-4" />
-            <span className="hidden sm:inline">Config</span>
+            <span className="hidden sm:inline">Decisões</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4 mt-4">
-          <div className="grid lg:grid-cols-2 gap-6">
-            <AgentLearnings context={context} />
-            <AgentDecisionHistory decisions={decisions.slice(0, 5)} />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="chat" className="mt-4">
-          <div className="max-w-3xl mx-auto">
-            <AgentChat />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="history" className="mt-4">
-          <AgentDecisionHistory decisions={decisions} />
-        </TabsContent>
-
-        <TabsContent value="settings" className="mt-4">
+        {/* ROUTINE TAB - Automation settings */}
+        <TabsContent value="routine" className="mt-4">
           <div className="max-w-2xl mx-auto">
-            <AgentUnifiedSettings 
+            <AgentRoutineConfig 
               context={context}
               onUpdate={updateContext}
               onRunAgent={runAgent}
@@ -165,58 +148,27 @@ export default function AgentTab() {
             />
           </div>
         </TabsContent>
-      </Tabs>
 
-      {/* Capabilities Info */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 rounded-2xl p-6 border border-primary/10"
-      >
-        <div className="flex items-start gap-4">
-          <div className="p-2 rounded-xl bg-primary/10">
-            <Sparkles className="h-5 w-5 text-primary" />
+        {/* PERSONALITY TAB - Agent identity */}
+        <TabsContent value="personality" className="mt-4">
+          <div className="max-w-2xl mx-auto">
+            <AgentPersonalityConfig 
+              context={context}
+              onUpdate={updateContext}
+            />
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold mb-2">O que o Agente pode fazer?</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Analisar métricas (72h)
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Buscar notícias atuais
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Gerar legendas e imagens
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Publicar automaticamente
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Decidir quando postar
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Aprender com resultados
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Validar hipóteses
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Adicionar watermark
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+        </TabsContent>
+
+        {/* REPORTS TAB - Execution reports from CRON */}
+        <TabsContent value="reports" className="mt-4">
+          <AgentReportsTab />
+        </TabsContent>
+
+        {/* HISTORY TAB - Decision history */}
+        <TabsContent value="history" className="mt-4">
+          <AgentDecisionHistory decisions={decisions} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
