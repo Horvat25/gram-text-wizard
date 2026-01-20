@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { 
   Calendar, 
   Play, 
@@ -20,7 +21,8 @@ import {
   Newspaper,
   Loader2,
   Clock,
-  Repeat
+  Repeat,
+  Layers
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, setHours, setMinutes, isBefore, differenceInMinutes } from 'date-fns';
@@ -33,8 +35,7 @@ interface AgentRoutineConfigProps {
   isRunning: boolean;
 }
 
-interface WeeklyGoals {
-  totalPosts: number;
+interface ContentDistribution {
   videos: number;
   carousels: number;
   news: number;
@@ -51,12 +52,12 @@ const CRON_FREQUENCIES = [
   { value: '24', label: '24 horas', short: '24h' },
 ];
 
-const DEFAULT_GOALS: WeeklyGoals = {
-  totalPosts: 14,
-  videos: 3,
-  carousels: 2,
-  news: 4,
-  images: 5
+// Default distribution percentages (must sum to 100)
+const DEFAULT_DISTRIBUTION: ContentDistribution = {
+  videos: 20,
+  carousels: 15,
+  news: 30,
+  images: 35
 };
 
 export default function AgentRoutineConfig({ 
@@ -67,7 +68,7 @@ export default function AgentRoutineConfig({
 }: AgentRoutineConfigProps) {
   const [cronFrequency, setCronFrequency] = useState('6');
   const [countdown, setCountdown] = useState<string>('');
-  const [goals, setGoals] = useState<WeeklyGoals>(DEFAULT_GOALS);
+  const [distribution, setDistribution] = useState<ContentDistribution>(DEFAULT_DISTRIBUTION);
   const [showGoals, setShowGoals] = useState(false);
   const [showLimits, setShowLimits] = useState(false);
   const [localConfig, setLocalConfig] = useState({
@@ -75,6 +76,16 @@ export default function AgentRoutineConfig({
     daily_post_limit: context?.daily_post_limit || 2,
     min_hours_between_posts: context?.min_hours_between_posts || 4,
   });
+
+  // Calculate weekly goals based on daily limit and distribution
+  const weeklyTotal = localConfig.daily_post_limit * 7;
+  const calculatedGoals = {
+    totalPosts: weeklyTotal,
+    videos: Math.round(weeklyTotal * (distribution.videos / 100)),
+    carousels: Math.round(weeklyTotal * (distribution.carousels / 100)),
+    news: Math.round(weeklyTotal * (distribution.news / 100)),
+    images: Math.round(weeklyTotal * (distribution.images / 100)),
+  };
 
   // Sync with context
   useEffect(() => {
@@ -86,6 +97,39 @@ export default function AgentRoutineConfig({
       });
     }
   }, [context]);
+
+  // Adjust distribution to maintain 100% total
+  const adjustDistribution = (type: keyof ContentDistribution, newValue: number) => {
+    const oldValue = distribution[type];
+    const diff = newValue - oldValue;
+    
+    // Get other types
+    const otherTypes = (Object.keys(distribution) as Array<keyof ContentDistribution>)
+      .filter(t => t !== type);
+    
+    // Distribute the difference among other types proportionally
+    const otherTotal = otherTypes.reduce((sum, t) => sum + distribution[t], 0);
+    
+    if (otherTotal === 0) return;
+    
+    const newDistribution = { ...distribution, [type]: newValue };
+    
+    otherTypes.forEach(t => {
+      const proportion = distribution[t] / otherTotal;
+      newDistribution[t] = Math.max(0, Math.round(distribution[t] - (diff * proportion)));
+    });
+    
+    // Ensure total is 100
+    const total = Object.values(newDistribution).reduce((a, b) => a + b, 0);
+    if (total !== 100) {
+      const largest = otherTypes.reduce((a, b) => 
+        newDistribution[a] > newDistribution[b] ? a : b
+      );
+      newDistribution[largest] += (100 - total);
+    }
+    
+    setDistribution(newDistribution);
+  };
 
   // Calculate countdown
   useEffect(() => {
@@ -270,49 +314,142 @@ export default function AgentRoutineConfig({
           </Collapsible>
 
           {/* Weekly Goals - Collapsible */}
+          {/* Weekly Goals - Collapsible */}
           <Collapsible open={showGoals} onOpenChange={setShowGoals}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" className="w-full justify-between">
                 <span className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-green-500" />
                   Metas Semanais
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    {calculatedGoals.totalPosts} posts/semana
+                  </Badge>
                 </span>
                 {showGoals ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3">
+            <CollapsibleContent className="pt-3 space-y-4">
+              {/* Calculated Goals Display */}
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="grid grid-cols-2 sm:grid-cols-5 gap-2"
               >
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-primary">{goals.totalPosts}</div>
+                  <div className="text-2xl font-bold text-primary">{calculatedGoals.totalPosts}</div>
                   <div className="text-xs text-muted-foreground">Total</div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-pink-500">{goals.videos}</div>
+                  <div className="text-2xl font-bold text-pink-500">{calculatedGoals.videos}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Video className="h-3 w-3" /> Vídeos
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-purple-500">{goals.carousels}</div>
-                  <div className="text-xs text-muted-foreground">Carrosséis</div>
+                  <div className="text-2xl font-bold text-purple-500">{calculatedGoals.carousels}</div>
+                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                    <Layers className="h-3 w-3" /> Carrosséis
+                  </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-blue-500">{goals.news}</div>
+                  <div className="text-2xl font-bold text-blue-500">{calculatedGoals.news}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Newspaper className="h-3 w-3" /> Notícias
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-green-500">{goals.images}</div>
+                  <div className="text-2xl font-bold text-green-500">{calculatedGoals.images}</div>
                   <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
                     <Image className="h-3 w-3" /> Imagens
                   </div>
                 </div>
               </motion.div>
+
+              {/* Content Distribution Sliders */}
+              <div className="p-4 rounded-lg bg-muted/30 border space-y-4">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  Distribuição de Conteúdo
+                  <span className="text-xs text-muted-foreground font-normal">(ajuste a prioridade)</span>
+                </Label>
+                
+                <div className="space-y-3">
+                  {/* Videos */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs flex items-center gap-1.5">
+                        <Video className="h-3 w-3 text-pink-500" /> Vídeos/Reels
+                      </span>
+                      <span className="text-xs font-mono text-pink-500">{distribution.videos}%</span>
+                    </div>
+                    <Slider
+                      value={[distribution.videos]}
+                      onValueChange={([v]) => adjustDistribution('videos', v)}
+                      min={0}
+                      max={80}
+                      step={5}
+                      className="[&_[role=slider]]:bg-pink-500"
+                    />
+                  </div>
+
+                  {/* Carousels */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs flex items-center gap-1.5">
+                        <Layers className="h-3 w-3 text-purple-500" /> Carrosséis
+                      </span>
+                      <span className="text-xs font-mono text-purple-500">{distribution.carousels}%</span>
+                    </div>
+                    <Slider
+                      value={[distribution.carousels]}
+                      onValueChange={([v]) => adjustDistribution('carousels', v)}
+                      min={0}
+                      max={80}
+                      step={5}
+                      className="[&_[role=slider]]:bg-purple-500"
+                    />
+                  </div>
+
+                  {/* News */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs flex items-center gap-1.5">
+                        <Newspaper className="h-3 w-3 text-blue-500" /> Notícias
+                      </span>
+                      <span className="text-xs font-mono text-blue-500">{distribution.news}%</span>
+                    </div>
+                    <Slider
+                      value={[distribution.news]}
+                      onValueChange={([v]) => adjustDistribution('news', v)}
+                      min={0}
+                      max={80}
+                      step={5}
+                      className="[&_[role=slider]]:bg-blue-500"
+                    />
+                  </div>
+
+                  {/* Images */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs flex items-center gap-1.5">
+                        <Image className="h-3 w-3 text-green-500" /> Imagens
+                      </span>
+                      <span className="text-xs font-mono text-green-500">{distribution.images}%</span>
+                    </div>
+                    <Slider
+                      value={[distribution.images]}
+                      onValueChange={([v]) => adjustDistribution('images', v)}
+                      min={0}
+                      max={80}
+                      step={5}
+                      className="[&_[role=slider]]:bg-green-500"
+                    />
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Mova os sliders para priorizar tipos de conteúdo. O total sempre será 100%.
+                </p>
+              </div>
             </CollapsibleContent>
           </Collapsible>
         </CardContent>
