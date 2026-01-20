@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
   Globe,
   Film,
   X,
+  ChevronUp,
 } from "lucide-react";
 import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
@@ -183,8 +184,19 @@ const PublicationQueueTab = ({
   const [reschedulePost, setReschedulePost] = useState<Post | null>(null);
   const [newScheduleDate, setNewScheduleDate] = useState("");
   const [viewingPost, setViewingPost] = useState<Post | null>(null);
+  const viewDialogRef = useRef<HTMLDivElement | null>(null);
+  const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
   const [renderingPost, setRenderingPost] = useState<Post | null>(null);
+
+  // When opening the preview, always start at the top so the close (X) is reachable on mobile.
+  useEffect(() => {
+    if (!viewingPost) return;
+    requestAnimationFrame(() => {
+      viewDialogRef.current?.scrollTo({ top: 0 });
+      setShowViewDialogScrollTop(false);
+    });
+  }, [viewingPost]);
   
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
@@ -649,10 +661,17 @@ const PublicationQueueTab = ({
       </Dialog>
 
       {/* View Post Dialog */}
-      <Dialog open={!!viewingPost} onOpenChange={() => setViewingPost(null)}>
-        <DialogContent className="max-w-lg">
+      <Dialog open={!!viewingPost} onOpenChange={(open) => !open && setViewingPost(null)}>
+        <DialogContent
+          ref={viewDialogRef}
+          className="max-w-lg max-h-[90dvh] overflow-y-auto overscroll-contain"
+          onScroll={(e) => setShowViewDialogScrollTop(e.currentTarget.scrollTop > 80)}
+        >
           <DialogHeader>
             <DialogTitle>Visualizar Post</DialogTitle>
+            <DialogDescription className="sr-only">
+              Pré-visualização do post (imagem, vídeo ou carousel).
+            </DialogDescription>
           </DialogHeader>
           {viewingPost && (
             <div className="space-y-4">
@@ -731,6 +750,20 @@ const PublicationQueueTab = ({
                 Fechar
               </Button>
             </div>
+          )}
+
+          {/* Botão flutuante para voltar ao topo (quando estiver scrollado) */}
+          {showViewDialogScrollTop && (
+            <Button
+              type="button"
+              size="icon"
+              variant="secondary"
+              className="fixed bottom-6 right-6 z-[60] rounded-full shadow-lg"
+              onClick={() => viewDialogRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
+            >
+              <ChevronUp className="h-4 w-4" />
+              <span className="sr-only">Voltar ao topo</span>
+            </Button>
           )}
         </DialogContent>
       </Dialog>
