@@ -68,7 +68,12 @@ export default function AgentRoutineConfig({
 }: AgentRoutineConfigProps) {
   const [cronFrequency, setCronFrequency] = useState('6');
   const [countdown, setCountdown] = useState<string>('');
-  const [distribution, setDistribution] = useState<ContentDistribution>(DEFAULT_DISTRIBUTION);
+  const [distribution, setDistribution] = useState<ContentDistribution>({
+    videos: context?.content_distribution_videos ?? 3,
+    carousels: context?.content_distribution_carousels ?? 2,
+    news: context?.content_distribution_news ?? 4,
+    images: context?.content_distribution_images ?? 5
+  });
   const [showGoals, setShowGoals] = useState(false);
   const [showLimits, setShowLimits] = useState(false);
   const [localConfig, setLocalConfig] = useState({
@@ -90,12 +95,27 @@ export default function AgentRoutineConfig({
         daily_post_limit: context.daily_post_limit || 2,
         min_hours_between_posts: context.min_hours_between_posts || 4,
       });
+      setDistribution({
+        videos: context.content_distribution_videos ?? 3,
+        carousels: context.content_distribution_carousels ?? 2,
+        news: context.content_distribution_news ?? 4,
+        images: context.content_distribution_images ?? 5
+      });
     }
   }, [context]);
 
-  // Update single content type independently
-  const updateDistribution = (type: keyof ContentDistribution, newValue: number) => {
-    setDistribution(prev => ({ ...prev, [type]: newValue }));
+  // Update single content type independently and save to DB
+  const updateDistribution = async (type: keyof ContentDistribution, newValue: number) => {
+    const newDistribution = { ...distribution, [type]: newValue };
+    setDistribution(newDistribution);
+    
+    // Save to database
+    await onUpdate({
+      content_distribution_videos: newDistribution.videos,
+      content_distribution_carousels: newDistribution.carousels,
+      content_distribution_news: newDistribution.news,
+      content_distribution_images: newDistribution.images
+    });
   };
 
   // Calculate countdown

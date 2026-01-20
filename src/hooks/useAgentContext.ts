@@ -32,6 +32,11 @@ export interface AgentContext {
   hashtag_strategy: string | null;
   posting_style: string | null;
   system_prompt_template: string | null;
+  // Content distribution
+  content_distribution_videos: number | null;
+  content_distribution_carousels: number | null;
+  content_distribution_news: number | null;
+  content_distribution_images: number | null;
 }
 
 export interface AgentDecision {
