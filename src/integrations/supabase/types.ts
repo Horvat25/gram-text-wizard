@@ -187,6 +187,68 @@ export type Database = {
           },
         ]
       }
+      agent_execution_reports: {
+        Row: {
+          content_plan: Json | null
+          created_at: string
+          decision: string | null
+          decision_reason: string | null
+          finished_at: string | null
+          hypothesis: string | null
+          id: string
+          learning: string | null
+          metrics_snapshot: Json | null
+          post_id: string | null
+          started_at: string
+          status: string
+          summary: string | null
+          trigger: string
+          user_id: string
+        }
+        Insert: {
+          content_plan?: Json | null
+          created_at?: string
+          decision?: string | null
+          decision_reason?: string | null
+          finished_at?: string | null
+          hypothesis?: string | null
+          id?: string
+          learning?: string | null
+          metrics_snapshot?: Json | null
+          post_id?: string | null
+          started_at?: string
+          status?: string
+          summary?: string | null
+          trigger?: string
+          user_id: string
+        }
+        Update: {
+          content_plan?: Json | null
+          created_at?: string
+          decision?: string | null
+          decision_reason?: string | null
+          finished_at?: string | null
+          hypothesis?: string | null
+          id?: string
+          learning?: string | null
+          metrics_snapshot?: Json | null
+          post_id?: string | null
+          started_at?: string
+          status?: string
+          summary?: string | null
+          trigger?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_execution_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backups: {
         Row: {
           backup_type: string

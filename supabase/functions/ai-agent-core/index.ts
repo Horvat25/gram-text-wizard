@@ -496,7 +496,7 @@ Deno.serve(async (req) => {
       const results = [];
       for (const ctx of activeContexts) {
         try {
-          const result = await processUser(supabase, ctx.user_id, lovableApiKey, supabaseUrl);
+          const result = await processUser(supabase, ctx.user_id, lovableApiKey, supabaseUrl, 'cron');
           results.push({ userId: ctx.user_id, ...result });
         } catch (e) {
           console.error(`[AGENT] Erro ao processar usuário ${ctx.user_id}:`, e);
@@ -541,53 +541,135 @@ async function processUser(
   supabase: any, 
   userId: string, 
   lovableApiKey: string,
-  supabaseUrl: string
+  supabaseUrl: string,
+  trigger: string = 'manual'
 ): Promise<any> {
   console.log(`[AGENT] Processando usuário: ${userId}`);
   
-  // ETAPA 1: Análise
-  const state = await analyzeCurrentState(supabase, userId);
+  // Create execution report record
+  const { data: reportRecord } = await supabase
+    .from('agent_execution_reports')
+    .insert({
+      user_id: userId,
+      trigger,
+      status: 'running',
+      started_at: new Date().toISOString()
+    })
+    .select()
+    .single();
   
-  // ETAPA 2: Decisão
-  const decision = await makeStrategicDecision(state, lovableApiKey);
+  const reportId = reportRecord?.id;
   
-  let post = null;
-  
-  // ETAPA 3 & 4: Execução (se decisão for POST)
-  if (decision.decision === 'POST' && decision.contentPlan) {
-    // Check if auto_post is enabled
-    if (state.context?.auto_post_enabled) {
-      post = await executeContentPlan(supabase, decision.contentPlan, userId, supabaseUrl);
-    } else {
-      console.log('[AGENT] auto_post desativado - post criado como rascunho');
-      // Create as draft only
-      const { data: draftPost } = await supabase
-        .from('posts')
-        .insert({
-          user_id: userId,
-          caption: `[SUGESTÃO DO AGENTE] Tema: ${decision.contentPlan.theme}`,
-          post_type: decision.contentPlan.format,
-          media_type: decision.contentPlan.mediaType || 'image',
-          platforms: decision.contentPlan.platforms || ['instagram'],
-          status: 'draft',
-          ai_model_used: 'gemini-2.5-flash'
-        })
-        .select()
-        .single();
-      
-      post = draftPost;
+  try {
+    // ETAPA 1: Análise
+    const state = await analyzeCurrentState(supabase, userId);
+    
+    // ETAPA 2: Decisão
+    const decision = await makeStrategicDecision(state, lovableApiKey);
+    
+    let post = null;
+    
+    // ETAPA 3 & 4: Execução (se decisão for POST)
+    if (decision.decision === 'POST' && decision.contentPlan) {
+      // Check if auto_post is enabled
+      if (state.context?.auto_post_enabled) {
+        post = await executeContentPlan(supabase, decision.contentPlan, userId, supabaseUrl);
+      } else {
+        console.log('[AGENT] auto_post desativado - post criado como rascunho');
+        // Create as draft only
+        const { data: draftPost } = await supabase
+          .from('posts')
+          .insert({
+            user_id: userId,
+            caption: `[SUGESTÃO DO AGENTE] Tema: ${decision.contentPlan.theme}`,
+            post_type: decision.contentPlan.format,
+            media_type: decision.contentPlan.mediaType || 'image',
+            platforms: decision.contentPlan.platforms || ['instagram'],
+            status: 'draft',
+            ai_model_used: 'gemini-2.5-flash'
+          })
+          .select()
+          .single();
+        
+        post = draftPost;
+      }
     }
+    
+    // ETAPA 5: Registro de decisão
+    await recordDecisionAndLearn(supabase, decision, state, post?.id || null, userId);
+    
+    // Generate friendly summary for the user
+    const summary = generateExecutionSummary(decision, state, post);
+    
+    // Update execution report with results
+    if (reportId) {
+      await supabase
+        .from('agent_execution_reports')
+        .update({
+          status: 'completed',
+          finished_at: new Date().toISOString(),
+          metrics_snapshot: {
+            avgEngagement: state.avgEngagement,
+            lastPostHours: state.lastPostHours,
+            postsToday: state.postsToday,
+            bestPerformingTypes: state.bestPerformingTypes,
+            saturatedTopics: state.saturatedTopics
+          },
+          decision: decision.decision,
+          decision_reason: decision.reason,
+          content_plan: decision.contentPlan || null,
+          post_id: post?.id || null,
+          summary,
+          hypothesis: decision.hypothesis || null
+        })
+        .eq('id', reportId);
+    }
+    
+    return {
+      decision: decision.decision,
+      reason: decision.reason,
+      hypothesis: decision.hypothesis,
+      expectedEngagement: decision.expectedEngagement,
+      postId: post?.id,
+      contentPlan: decision.contentPlan,
+      summary
+    };
+  } catch (error) {
+    // Update report with error status
+    if (reportId) {
+      await supabase
+        .from('agent_execution_reports')
+        .update({
+          status: 'failed',
+          finished_at: new Date().toISOString(),
+          summary: `Erro durante execução: ${String(error)}`
+        })
+        .eq('id', reportId);
+    }
+    throw error;
+  }
+}
+
+// Generate a friendly summary message for the execution
+function generateExecutionSummary(decision: AgentDecision, state: AgentState, post: any): string {
+  const agentName = state.context?.agent_name || 'Agente';
+  const now = new Date();
+  const hour = now.getHours();
+  
+  let greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  
+  if (decision.decision === 'POST' && post) {
+    const wasPublished = state.context?.auto_post_enabled;
+    if (wasPublished) {
+      return `${greeting}! 🚀 ${agentName} publicou um novo conteúdo sobre "${decision.contentPlan?.theme || 'tendências'}". O engajamento médio está em ${state.avgEngagement.toFixed(1)}% e decidi testar ${decision.hypothesis || 'um novo formato'}.`;
+    } else {
+      return `${greeting}! 📝 ${agentName} criou um rascunho sobre "${decision.contentPlan?.theme || 'tendências'}" para sua aprovação. Ative o modo automático para publicar sem intervenção.`;
+    }
+  } else if (decision.decision === 'NO_POST') {
+    return `${greeting}! 🧠 ${agentName} analisou o cenário e decidiu não postar agora. Motivo: ${decision.reason}. Próxima análise será feita em breve.`;
+  } else if (decision.decision === 'WAIT') {
+    return `${greeting}! ⏳ ${agentName} está aguardando o momento ideal. Último post foi há ${Math.round(state.lastPostHours)}h. ${decision.reason}`;
   }
   
-  // ETAPA 5: Registro
-  await recordDecisionAndLearn(supabase, decision, state, post?.id || null, userId);
-  
-  return {
-    decision: decision.decision,
-    reason: decision.reason,
-    hypothesis: decision.hypothesis,
-    expectedEngagement: decision.expectedEngagement,
-    postId: post?.id,
-    contentPlan: decision.contentPlan
-  };
+  return `${agentName} completou a análise. ${decision.reason}`;
 }
