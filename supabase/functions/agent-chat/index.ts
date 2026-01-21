@@ -202,6 +202,23 @@ const AGENT_TOOLS = [
         required: ["caption", "slides"]
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_news_post",
+      description: "📰 Cria post baseado em NOTÍCIA REAL da web. Busca automaticamente notícias recentes, usa a imagem do artigo original e inclui a fonte na legenda. Use SEMPRE que o usuário pedir post de notícia, news, ou atualidades.",
+      parameters: {
+        type: "object",
+        properties: {
+          topic: { type: "string", description: "Tema da notícia a buscar (ex: 'inteligência artificial', 'tecnologia', 'inovação')" },
+          caption_style: { type: "string", enum: ["informativo", "opinativo", "provocativo", "educacional"], description: "Estilo da legenda" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: ["topic"]
+      }
+    }
   }
 ];
 
@@ -1061,6 +1078,235 @@ async function executeCreateCarousel(supabase: any, userId: string, args: any) {
   };
 }
 
+// Execute create_news_post - fetches real news, uses article image, includes source
+async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
+  const { topic, caption_style, scheduled_for, platforms } = args;
+  
+  console.log('Creating news post for topic:', topic);
+  
+  try {
+    // Step 1: Search for recent news using Firecrawl
+    const searchResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/firecrawl-search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+      },
+      body: JSON.stringify({
+        query: `${topic} notícia recente`,
+        limit: 5,
+        lang: 'pt-BR',
+        country: 'BR'
+      })
+    });
+    
+    if (!searchResponse.ok) {
+      const errorText = await searchResponse.text();
+      console.error('News search failed:', errorText);
+      return { success: false, message: `❌ Erro ao buscar notícias: ${errorText}` };
+    }
+    
+    const searchResult = await searchResponse.json();
+    const newsArticles = searchResult.data || [];
+    
+    if (newsArticles.length === 0) {
+      return { success: false, message: `❌ Nenhuma notícia encontrada para "${topic}". Tente outro termo.` };
+    }
+    
+    // Find the first article with an image
+    let selectedArticle = null;
+    let selectedImage = null;
+    
+    for (const article of newsArticles) {
+      if (article.images && article.images.length > 0) {
+        selectedArticle = article;
+        selectedImage = article.images[0];
+        break;
+      }
+    }
+    
+    // If no article with image, use the first one and generate image
+    if (!selectedArticle) {
+      selectedArticle = newsArticles[0];
+    }
+    
+    console.log('Selected article:', selectedArticle.title);
+    console.log('Has image:', !!selectedImage);
+    
+    // Extract source domain
+    const sourceUrl = selectedArticle.url || '';
+    let sourceDomain = '';
+    try {
+      sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
+    } catch {
+      sourceDomain = 'fonte externa';
+    }
+    
+    // Step 2: Generate caption with source attribution
+    const captionResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-caption`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+      },
+      body: JSON.stringify({
+        topic: selectedArticle.title,
+        postType: 'noticia',
+        context: selectedArticle.description || selectedArticle.markdown?.slice(0, 500),
+        sourceUrl: sourceUrl,
+        sourceDomain: sourceDomain,
+        customInstructions: caption_style === 'provocativo' 
+          ? 'Seja provocativo e gere debate. Faça o leitor parar e pensar.'
+          : caption_style === 'opinativo'
+          ? 'Adicione uma perspectiva única. Qual é o ângulo que ninguém está vendo?'
+          : caption_style === 'educacional'
+          ? 'Explique o contexto e por que isso importa para criadores de conteúdo.'
+          : 'Seja informativo e direto. Entregue a notícia com clareza.'
+      })
+    });
+    
+    let caption = '';
+    let hashtags: string[] = [];
+    
+    if (captionResponse.ok) {
+      const captionResult = await captionResponse.json();
+      caption = captionResult.caption || '';
+      hashtags = captionResult.hashtags || [];
+    }
+    
+    // Fallback caption if generation failed
+    if (!caption) {
+      caption = `📰 ${selectedArticle.title}\n\n${selectedArticle.description || ''}\n\n🔗 Fonte: ${sourceDomain}\n${sourceUrl}`;
+      hashtags = ['#tecnologia', '#noticias', '#inovacao', '#ia', '#tech'];
+    }
+    
+    // Ensure source is in caption
+    if (!caption.includes('Fonte:') && !caption.includes('fonte:')) {
+      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+    }
+    
+    // Step 3: Process image (watermark + upload) or generate one
+    let imageUrl = null;
+    
+    if (selectedImage) {
+      console.log('Processing external image:', selectedImage);
+      
+      // Use add-watermark to process the external image
+      const watermarkResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/add-watermark`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+        },
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          watermarkText: 'Neural Update',
+          position: 'bottom-right'
+        })
+      });
+      
+      if (watermarkResponse.ok) {
+        const watermarkResult = await watermarkResponse.json();
+        imageUrl = watermarkResult.url || watermarkResult.imageUrl;
+        console.log('Image processed with watermark:', imageUrl);
+      } else {
+        console.error('Watermark failed, trying direct upload');
+        
+        // Try upload-external-image as fallback
+        const uploadResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/upload-external-image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+          },
+          body: JSON.stringify({
+            imageUrl: selectedImage
+          })
+        });
+        
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          imageUrl = uploadResult.url || uploadResult.imageUrl;
+        }
+      }
+    }
+    
+    // If no image could be processed, generate one
+    if (!imageUrl) {
+      console.log('No image available, generating one...');
+      
+      const imagePrompt = `News article illustration about: ${selectedArticle.title}. Professional news style, clean design, photo-realistic, modern journalism aesthetic. NO text overlays.`;
+      
+      const genResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+        },
+        body: JSON.stringify({
+          prompt: imagePrompt,
+          userId
+        })
+      });
+      
+      if (genResponse.ok) {
+        const genResult = await genResponse.json();
+        imageUrl = genResult.imageUrl;
+        console.log('Image generated:', imageUrl);
+      }
+    }
+    
+    // Step 4: Create the post
+    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    
+    const postData = {
+      user_id: userId,
+      caption,
+      hashtags,
+      post_type: 'noticia',
+      platforms: platforms || ['instagram'],
+      status: scheduledForUTC ? 'scheduled' : 'draft',
+      scheduled_for: scheduledForUTC,
+      media_type: 'image',
+      image_url: imageUrl
+    };
+    
+    const { data: post, error } = await supabase
+      .from('posts')
+      .insert(postData)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating news post:', error);
+      return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
+    }
+    
+    const scheduleInfo = scheduledForUTC 
+      ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
+      : '📝 Salvo como rascunho';
+    
+    return {
+      success: true,
+      message: `📰 Post de notícia criado com sucesso!\n\n📌 "${selectedArticle.title.slice(0, 50)}..."\n🔗 Fonte: ${sourceDomain}\n${imageUrl ? '🖼️ Imagem incluída' : '⚠️ Sem imagem'}\n${scheduleInfo}`,
+      post: {
+        id: post.id,
+        title: selectedArticle.title,
+        source: sourceDomain,
+        source_url: sourceUrl,
+        has_image: !!imageUrl,
+        status: post.status,
+        scheduled_for_brasilia: scheduledForUTC ? formatBrasiliaTime(scheduledForUTC) : null
+      }
+    };
+    
+  } catch (error: unknown) {
+    console.error('Error in executeCreateNewsPost:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return { success: false, message: `❌ Erro ao criar post de notícia: ${errorMessage}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, toolName: string, args: any) {
   switch (toolName) {
@@ -1086,6 +1332,8 @@ async function executeTool(supabase: any, userId: string, toolName: string, args
       return executeCreateNarratedVideo(supabase, userId, args);
     case 'create_carousel':
       return executeCreateCarousel(supabase, userId, args);
+    case 'create_news_post':
+      return executeCreateNewsPost(supabase, userId, args);
     default:
       return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
   }
