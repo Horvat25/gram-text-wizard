@@ -25,56 +25,60 @@ serve(async (req) => {
     console.log("Generating story script for:", topic);
     console.log("Segments:", segmentCount, "| Words per segment:", wordsPerSegment);
 
-    // VIRAL OPTIMIZATION: Prompts otimizados para ganchos que capturam atenção nos primeiros 3 segundos
-    const systemPrompt = `Você é um roteirista VIRAL de vídeos curtos para um canal de tecnologia e futuro.
-Seu ÚNICO objetivo é criar vídeos que PRENDAM a atenção nos PRIMEIROS 3 SEGUNDOS.
+    // NOVO POSICIONAMENTO: IA prática para criadores pequenos
+    const systemPrompt = `Você cria roteiros de Reels para o NeuralUpdate.
+POSICIONAMENTO: "IA prática para criadores pequenos que querem crescer sem virar escravos de conteúdo"
 
-REGRAS DE OURO PARA VIRALIZAR:
-1. GANCHO IRRESISTÍVEL: Primeira frase DEVE criar curiosidade instantânea
-   - Use números específicos: "Em 2025, 90% dos empregos vão..."
-   - Faça afirmações ousadas: "Isso vai mudar TUDO que você sabe sobre..."
-   - Crie urgência: "A maioria das pessoas não percebeu, mas..."
-   - Use padrão interruptor: "Espera... você sabia que..."
-2. RITMO ACELERADO: Frases curtas, diretas, sem enrolação
-3. EMOÇÃO: Provoque espanto, curiosidade ou medo de perder algo
-4. VISUAL: Descreva cenas cinematográficas impactantes
+PÚBLICO-ALVO:
+- Criadores com 1k-50k seguidores
+- Pessoas que postam todo dia e não crescem
+- Quem usa IA mas ainda se sente perdido
 
-NÃO mencione marcas, empresas ou URLs.
-Use português brasileiro conversacional e envolvente.`;
+ESTRUTURA OBRIGATÓRIA DE CADA VÍDEO:
+CENA 1 (0-2s): DOR DIRETA - Frase que faz a pessoa pensar "sou eu!"
+CENA 2 (3-6s): QUEBRA DE EXPECTATIVA - "O problema não é o que você pensa"
+CENA 3 (7-15s): MICRO-INSIGHT - 1 dica prática, 1 erro comum, 1 ajuste simples
+CENA 4: CTA - Direto, sem enrolação
 
-    const userPrompt = `Crie um roteiro VIRAL sobre: "${topic}"
+GANCHOS QUE FUNCIONAM (USE ESSES PADRÕES):
+- "Se você usa ChatGPT assim, ele está te atrapalhando."
+- "Criadores pequenos erram isso ao usar IA."
+- "Postar todo dia e continuar com poucos seguidores cansa, né?"
+- "A maioria usa IA pra parecer inteligente. Poucos usam pra crescer."
+- "Você tem [X] seguidores? Isso aqui é pra você."
 
-⚡ REGRA CRÍTICA - PRIMEIRO SEGMENTO (GANCHO):
-A primeira frase DEVE usar uma dessas técnicas:
-- "Você NÃO vai acreditar no que..."
-- "Em [ano], [número]% das pessoas vão..."  
-- "Isso vai ACABAR com [algo comum]..."
-- "A verdade que ninguém te contou sobre..."
-- "Se você não souber isso agora, vai..."
-- Pergunta provocativa que cria suspense
+REGRAS:
+- Frases CURTAS e DIRETAS (8-15 palavras máx)
+- ZERO textão ou poesia futurista
+- Tom de conversa com amigo que já tentou de tudo
+- Foco em RESULTADO PRÁTICO, não teoria
+
+Use português brasileiro conversacional.`;
+
+    const userPrompt = `Crie um roteiro sobre: "${topic}"
+
+ESTRUTURA EXATA:
+1. CENA 1 (0-2s) - DOR DIRETA: Frase que faz criadores pequenos pararem de rolar
+2. CENA 2 (3-6s) - QUEBRA: Revele que o problema não é o que eles pensam
+3. CENA 3 (7-15s) - INSIGHT PRÁTICO: Uma dica acionável, um erro comum, um ajuste simples
+4. CENA 4 - CTA: "Segue pra aprender a usar IA do jeito certo" ou similar
 
 ESPECIFICAÇÕES:
 - Exatamente ${segmentCount} segmentos
-- ${wordsPerSegment}-${wordsPerSegment + 5} palavras por segmento
-- Estilo: ${style || "impactante e provocativo"}
-
-ESTRUTURA VIRAL:
-1. GANCHO (0-3s): Frase que OBRIGA a pessoa a continuar assistindo
-2. REVELAÇÃO: Desenvolva a promessa do gancho com fatos surpreendentes
-3. PROVA: Exemplos concretos que validam a afirmação
-4. CONCLUSÃO: Feche com reflexão poderosa sobre o futuro
+- ${wordsPerSegment}-${wordsPerSegment + 5} palavras por segmento (frases CURTAS!)
+- Estilo: ${style || "direto, prático, empático"}
 
 Para cada segmento:
-- text: narração em português (${wordsPerSegment} palavras) - SEM enrolação!
-- imagePrompt: cena cinematográfica em inglês, dramática e visualmente impactante
+- text: narração em português (máx ${wordsPerSegment} palavras) - SEM enrolação!
+- imagePrompt: cena em inglês mostrando PESSOA REAL trabalhando, tela de celular, antes/depois, dados. NUNCA imagens abstratas/futuristas/neon genéricos.
 
 Responda APENAS com JSON:
 {
-  "title": "Título curto e provocativo",
+  "title": "Título curto focado no problema do criador",
   "segments": [
     {
       "text": "Texto da narração",
-      "imagePrompt": "Cinematic dramatic shot of..."
+      "imagePrompt": "Photo of content creator looking frustrated at phone showing low engagement metrics..."
     }
   ]
 }`;
