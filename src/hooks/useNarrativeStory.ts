@@ -565,7 +565,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, [setError]);
 
-  // Full pipeline
+  // Full pipeline - generates new script from topic
   const generateStory = useCallback(async (topic: string) => {
     abortRef.current = false;
     setIsGenerating(true);
@@ -602,10 +602,69 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(false);
   }, [generateScript, generateImages, generateAudio, generateVideo]);
 
+  // Render from existing script - uses pre-generated segments instead of generating new ones
+  const renderFromScript = useCallback(async (existingSegments: Array<{ text: string; imagePrompt: string }>, title?: string) => {
+    abortRef.current = false;
+    setIsGenerating(true);
+    setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
+
+    console.log('[renderFromScript] Using existing script with', existingSegments.length, 'segments');
+
+    // Build segments with timing from existing data
+    let currentTime = 0;
+    const segments: StorySegment[] = existingSegments.map((seg, index) => {
+      const segment: StorySegment = {
+        id: `seg-${index}`,
+        text: seg.text,
+        imagePrompt: seg.imagePrompt,
+        imageUrl: "",
+        duration: segmentDuration,
+        startTime: currentTime,
+      };
+      currentTime += segmentDuration;
+      return segment;
+    });
+
+    setState(prev => ({ 
+      ...prev, 
+      step: "script",
+      title: title || "Reels",
+      segments,
+      totalDuration: currentTime,
+      progress: 15,
+    }));
+    
+    toast.success(`Usando roteiro existente: ${segments.length} cenas`);
+
+    // Step 2: Images (generate from existing prompts)
+    const segmentsWithImages = await generateImages(segments);
+    if (!segmentsWithImages || abortRef.current) {
+      setIsGenerating(false);
+      return;
+    }
+
+    // Step 3: Audio (main + CTA)
+    const audioResult = await generateAudio(segmentsWithImages);
+    if (abortRef.current) {
+      setIsGenerating(false);
+      return;
+    }
+
+    // Step 4: Video
+    await generateVideo(
+      segmentsWithImages, 
+      audioResult?.narrationUrl || "", 
+      audioResult?.ctaNarrationUrl || "",
+      audioResult?.backgroundMusicUrl || ""
+    );
+    setIsGenerating(false);
+  }, [segmentDuration, generateImages, generateAudio, generateVideo]);
+
   return {
     state,
     isGenerating,
     generateStory,
+    renderFromScript,
     reset,
   };
 }
