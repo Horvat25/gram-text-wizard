@@ -63,6 +63,7 @@ export default function AgentReelsRenderer({
     state,
     isGenerating,
     generateStory,
+    renderFromScript,
     reset,
   } = useNarrativeStory({
     brandName: brandSettings.brandName || "NeuralUpdate",
@@ -120,10 +121,15 @@ export default function AgentReelsRenderer({
     unlockAudio();
     setIsStarted(true);
     
-    // The generateStory will use the topic to regenerate 
-    // But since we already have the script, we need a different approach
-    // For now, we'll use the topic which will regenerate similar content
-    await generateStory(topic);
+    // Use the pre-generated script segments instead of generating new ones
+    if (script.segments && script.segments.length > 0) {
+      console.log('[AgentReelsRenderer] Using existing script:', script.title, 'with', script.segments.length, 'segments');
+      await renderFromScript(script.segments, script.title);
+    } else {
+      // Fallback to generating from topic if no segments
+      console.log('[AgentReelsRenderer] No existing segments, generating from topic:', topic);
+      await generateStory(topic);
+    }
   };
 
   const handleClose = () => {
