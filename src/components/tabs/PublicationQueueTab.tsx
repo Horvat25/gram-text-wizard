@@ -771,6 +771,7 @@ const PublicationQueueTab = ({
       {/* Reels Renderer Dialog */}
       {renderingPost && getReelsScript(renderingPost) && (
         <AgentReelsRenderer
+          key={renderingPost.id}
           postId={renderingPost.id}
           topic={getReelsScript(renderingPost)!.topic}
           script={{
