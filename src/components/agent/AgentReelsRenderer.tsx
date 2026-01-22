@@ -117,18 +117,59 @@ export default function AgentReelsRenderer({
   };
 
   const handleStart = async () => {
+    if (isGenerating) return;
+
     // Unlock audio on user interaction
     unlockAudio();
     setIsStarted(true);
+
+    // Safety: always load the latest post data from the backend to avoid
+    // rendering/publishing duplicates due to stale UI state.
+    try {
+      const { data: latest, error: latestError } = await supabase
+        .from("posts")
+        .select("video_url, overlay_metadata")
+        .eq("id", postId)
+        .single();
+
+      if (latestError) throw latestError;
+
+      // If the post already has a rendered video, do NOT render again.
+      if (latest?.video_url) {
+        toast.info("Este Reels já está renderizado. Usando o vídeo existente.");
+        onComplete(latest.video_url);
+        setIsOpen(false);
+        return;
+      }
+
+      const metadata = (latest?.overlay_metadata as any) || null;
+      const dbScript = metadata?.script;
+      const dbSegments = dbScript?.segments;
+      const segmentsToUse = (Array.isArray(dbSegments) && dbSegments.length > 0)
+        ? dbSegments
+        : script.segments;
+
+      const titleToUse = dbScript?.title || script.title || topic;
+      const topicToUse = metadata?.topic || topic;
     
-    // Use the pre-generated script segments instead of generating new ones
-    if (script.segments && script.segments.length > 0) {
-      console.log('[AgentReelsRenderer] Using existing script:', script.title, 'with', script.segments.length, 'segments');
-      await renderFromScript(script.segments, script.title);
-    } else {
-      // Fallback to generating from topic if no segments
-      console.log('[AgentReelsRenderer] No existing segments, generating from topic:', topic);
-      await generateStory(topic);
+      // Use the pre-generated script segments (agent-created) instead of generating new ones
+      if (segmentsToUse && segmentsToUse.length > 0) {
+        console.log(
+          "[AgentReelsRenderer] Using existing script:",
+          titleToUse,
+          "with",
+          segmentsToUse.length,
+          "segments"
+        );
+        await renderFromScript(segmentsToUse, titleToUse);
+      } else {
+        // Fallback to generating from topic if no segments
+        console.log("[AgentReelsRenderer] No existing segments, generating from topic:", topicToUse);
+        await generateStory(topicToUse);
+      }
+    } catch (err: any) {
+      console.error("[AgentReelsRenderer] Failed to load latest post data:", err);
+      toast.error("Erro ao carregar dados do Reels. Tente novamente.");
     }
   };
 
