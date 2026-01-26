@@ -187,8 +187,12 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     setNarrativeScript(script);
   }, []);
 
-  // Load suggestion data from sessionStorage on mount
+  // Clear previous state and start fresh on mount
   useEffect(() => {
+    // Always start with a clean slate - remove any persisted state
+    localStorage.removeItem(CONTENT_CREATION_STATE_KEY);
+    
+    // Only load suggestion data if coming from Suggestions tab
     const suggestionData = sessionStorage.getItem('suggestionData');
     if (suggestionData) {
       try {
@@ -207,74 +211,6 @@ const ContentCreationTab = ({ onPostCreated }: ContentCreationTabProps) => {
     }
   }, []);
 
-  // Restore generator state if the tab "reloads" or the page recarrega
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(CONTENT_CREATION_STATE_KEY);
-      if (!saved) return;
-      const state = JSON.parse(saved);
-
-      if (state.topic) setTopic(state.topic);
-      if (state.postType) setPostType(state.postType);
-      if (state.generatedText) setGeneratedText(state.generatedText);
-      if (Array.isArray(state.hashtags)) setHashtags(state.hashtags);
-      if (state.imageUrl) setImageUrl(state.imageUrl);
-      if (state.videoUrl) setVideoUrl(state.videoUrl);
-      if (state.scheduledFor) setScheduledFor(state.scheduledFor);
-      if (state.imagePrompt) setImagePrompt(state.imagePrompt);
-      if (state.advancedPrompt) setAdvancedPrompt(state.advancedPrompt);
-      if (state.mediaType) setMediaType(state.mediaType);
-      if (state.selectedModel) setSelectedModel(state.selectedModel);
-      if (typeof state.videoProgress === 'number') setVideoProgress(state.videoProgress);
-      if (typeof state.showOverlayEditor === 'boolean') setShowOverlayEditor(state.showOverlayEditor);
-      if (state.overlay) setOverlay(state.overlay);
-      if (state.videoPredictionId) setVideoPredictionId(state.videoPredictionId);
-    } catch (e) {
-      console.error('Error restoring content creation state:', e);
-    }
-  }, []);
-
-  // Persist generator state on every relevant change (protege contra F5 / recarregadas)
-  useEffect(() => {
-    try {
-      const state = {
-        topic,
-        postType,
-        generatedText,
-        hashtags,
-        imageUrl,
-        videoUrl,
-        scheduledFor,
-        imagePrompt,
-        advancedPrompt,
-        mediaType,
-        selectedModel,
-        videoPredictionId,
-        videoProgress,
-        showOverlayEditor,
-        overlay,
-      };
-      localStorage.setItem(CONTENT_CREATION_STATE_KEY, JSON.stringify(state));
-    } catch (e) {
-      console.error('Error saving content creation state:', e);
-    }
-  }, [
-    topic,
-    postType,
-    generatedText,
-    hashtags,
-    imageUrl,
-    videoUrl,
-    scheduledFor,
-    imagePrompt,
-    advancedPrompt,
-    mediaType,
-    selectedModel,
-    videoPredictionId,
-    videoProgress,
-    showOverlayEditor,
-    overlay,
-  ]);
 
   // Poll for video status
   useEffect(() => {
