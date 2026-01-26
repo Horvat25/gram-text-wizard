@@ -73,10 +73,26 @@ O que gostaria que eu faça?`,
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
+  // Scroll to bottom on mount and when messages change
+  const scrollToBottom = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      }, 50);
     }
+  };
+
+  // Scroll on initial mount
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
+  // Scroll when messages change
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
 
   const sendMessage = async (content: string) => {
