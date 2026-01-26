@@ -216,12 +216,19 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
     }
   };
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom helper
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }, 100);
+  };
+
+  // Scroll to bottom on new messages and after loading history
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, isLoadingHistory]);
 
   const loadChatHistory = async () => {
     if (!user) return;
