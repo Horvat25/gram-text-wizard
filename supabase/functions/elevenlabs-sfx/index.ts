@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,7 @@ serve(async (req) => {
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
+      console.error("[ElevenLabs SFX] API Key not configured");
       throw new Error("ELEVENLABS_API_KEY não configurada");
     }
 
@@ -22,8 +24,9 @@ serve(async (req) => {
     const sfxPrompt = prompt || "subtle digital whoosh, futuristic transition sound, clean tech interface";
     const sfxDuration = duration || 2;
 
-    console.log("Generating SFX with prompt:", sfxPrompt);
-    console.log("Duration:", sfxDuration, "seconds");
+    console.log("[ElevenLabs SFX] Generating with prompt:", sfxPrompt);
+    console.log("[ElevenLabs SFX] Duration:", sfxDuration, "seconds");
+    console.log("[ElevenLabs SFX] API Key present:", !!ELEVENLABS_API_KEY);
 
     const response = await fetch("https://api.elevenlabs.io/v1/sound-generation", {
       method: "POST",
@@ -38,22 +41,37 @@ serve(async (req) => {
       }),
     });
 
+    console.log("[ElevenLabs SFX] Response status:", response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("ElevenLabs SFX error:", response.status, errorText);
+      console.error("[ElevenLabs SFX] Error response:", response.status, errorText);
+      
+      // Return graceful fallback for payment/quota issues
+      if (response.status === 402 || response.status === 401 || response.status === 403 || response.status === 429) {
+        console.log("[ElevenLabs SFX] Unavailable (requires paid plan or quota exceeded), returning fallback");
+        return new Response(
+          JSON.stringify({ 
+            audioContent: null,
+            error: "SFX generation requires ElevenLabs paid plan",
+            fallback: true,
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
       throw new Error(`ElevenLabs SFX error: ${response.status}`);
     }
 
     const audioBuffer = await response.arrayBuffer();
     
-    // Encode as base64 for JSON response
-    const base64Audio = btoa(
-      Array.from(new Uint8Array(audioBuffer))
-        .map(b => String.fromCharCode(b))
-        .join('')
-    );
+    // Use Deno's safe base64 encoder (prevents stack overflow with large buffers)
+    const base64Audio = base64Encode(audioBuffer);
 
-    console.log("SFX generated successfully, audio size:", audioBuffer.byteLength);
+    console.log("[ElevenLabs SFX] ✅ Generated successfully, audio size:", audioBuffer.byteLength, "bytes, base64 length:", base64Audio.length);
 
     return new Response(
       JSON.stringify({ 
@@ -66,7 +84,7 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error("Error in elevenlabs-sfx:", error);
+    console.error("[ElevenLabs SFX] Fatal error:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar efeito sonoro" }),
       {
