@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +10,6 @@ import { Slider } from '@/components/ui/slider';
 import { 
   Calendar, 
   Play, 
-  Timer, 
   Zap, 
   ChevronDown, 
   ChevronUp, 
@@ -21,11 +19,9 @@ import {
   Newspaper,
   Loader2,
   Clock,
-  Repeat,
   Layers
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { format, setHours, setMinutes, isBefore, differenceInMinutes } from 'date-fns';
 import { AgentContext } from '@/hooks/useAgentContext';
 
 interface AgentRoutineConfigProps {
@@ -42,15 +38,7 @@ interface ContentDistribution {
   images: number;
 }
 
-const CRON_FREQUENCIES = [
-  { value: '1', label: '1 hora', short: '1h' },
-  { value: '2', label: '2 horas', short: '2h' },
-  { value: '3', label: '3 horas', short: '3h' },
-  { value: '4', label: '4 horas', short: '4h' },
-  { value: '6', label: '6 horas', short: '6h' },
-  { value: '12', label: '12 horas', short: '12h' },
-  { value: '24', label: '24 horas', short: '24h' },
-];
+// Removed: CRON_FREQUENCIES - Agent now works towards goals, not fixed intervals
 
 // Default distribution (absolute numbers, not percentages)
 const DEFAULT_DISTRIBUTION: ContentDistribution = {
@@ -66,8 +54,7 @@ export default function AgentRoutineConfig({
   onRunAgent,
   isRunning 
 }: AgentRoutineConfigProps) {
-  const [cronFrequency, setCronFrequency] = useState('6');
-  const [countdown, setCountdown] = useState<string>('');
+  // Removed cronFrequency - agent works by goals now
   const [distribution, setDistribution] = useState<ContentDistribution>({
     videos: context?.content_distribution_videos ?? 3,
     carousels: context?.content_distribution_carousels ?? 2,
@@ -118,38 +105,7 @@ export default function AgentRoutineConfig({
     });
   };
 
-  // Calculate countdown
-  useEffect(() => {
-    const frequency = parseInt(cronFrequency);
-    
-    const updateCountdown = () => {
-      const now = new Date();
-      const currentHour = now.getHours();
-      const nextHour = Math.ceil((currentHour + 1) / frequency) * frequency;
-      const next = setMinutes(setHours(new Date(), nextHour >= 24 ? nextHour - 24 : nextHour), 0);
-      
-      if (isBefore(next, now)) {
-        next.setDate(next.getDate() + 1);
-      }
-
-      const diff = differenceInMinutes(next, now);
-      
-      if (diff <= 0) {
-        setCountdown('Executando...');
-      } else if (diff < 60) {
-        setCountdown(`${diff}min`);
-      } else {
-        const hours = Math.floor(diff / 60);
-        const mins = diff % 60;
-        setCountdown(`${hours}h${mins > 0 ? ` ${mins}m` : ''}`);
-      }
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 30000); // Update every 30s
-
-    return () => clearInterval(interval);
-  }, [cronFrequency]);
+  // Agent now works by daily goals, not fixed intervals
 
   const handleToggleAuto = async (enabled: boolean) => {
     setLocalConfig(c => ({ ...c, auto_post_enabled: enabled }));
@@ -180,8 +136,8 @@ export default function AgentRoutineConfig({
             </div>
             {localConfig.auto_post_enabled && (
               <Badge variant="outline" className="font-mono text-xs gap-1 border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-300">
-                <Timer className="h-3 w-3" />
-                {countdown || '...'}
+                <Target className="h-3 w-3" />
+                {localConfig.daily_post_limit}/dia
               </Badge>
             )}
           </div>
@@ -208,22 +164,13 @@ export default function AgentRoutineConfig({
             />
           </div>
 
-          {/* Frequency Selector */}
+          {/* Goal-based info */}
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border">
-            <Repeat className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">Executar a cada</span>
-            <Select value={cronFrequency} onValueChange={setCronFrequency}>
-              <SelectTrigger className="w-32 h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CRON_FREQUENCIES.map(freq => (
-                  <SelectItem key={freq.value} value={freq.value}>
-                    {freq.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Target className="h-4 w-4 text-primary" />
+            <span className="text-sm">
+              Meta diária: <strong>{localConfig.daily_post_limit} posts</strong> · 
+              Publicação automática direto nas redes
+            </span>
           </div>
 
           {/* Run Now Button */}
@@ -544,9 +491,9 @@ export default function AgentRoutineConfig({
             <div className="text-sm text-muted-foreground">
               <p className="font-medium text-foreground mb-1">Como funciona?</p>
               <p>
-                O agente executa automaticamente a cada <strong>{CRON_FREQUENCIES.find(f => f.value === cronFrequency)?.label}</strong>:
-                analisa métricas, busca notícias, cria conteúdo e publica. 
-                Cada execução gera um relatório na aba "Relatórios".
+                O agente trabalha de forma autônoma para cumprir suas metas diárias ({localConfig.daily_post_limit} posts/dia):
+                analisa o mercado, cria conteúdo e publica diretamente nas redes. 
+                Cada ação gera um relatório na aba "Relatórios".
               </p>
             </div>
           </div>
