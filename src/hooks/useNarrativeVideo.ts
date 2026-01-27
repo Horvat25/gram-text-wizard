@@ -8,6 +8,7 @@ export interface NarrativeContentState {
   script: string;
   imageUrl: string;
   narrationUrl: string;
+  backgroundMusicUrl: string;
   error: string | null;
 }
 
@@ -25,6 +26,7 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     script: "",
     imageUrl: "",
     narrationUrl: "",
+    backgroundMusicUrl: "",
     error: null,
   });
 
@@ -37,6 +39,7 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
       script: "",
       imageUrl: "",
       narrationUrl: "",
+      backgroundMusicUrl: "",
       error: null,
     });
     setIsGenerating(false);
@@ -100,9 +103,43 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     }
   }, [brandName, setError]);
 
-  // Step 3: Generate audio narration with multi-provider fallback chain
+  // Step 3a: Generate background music (optional, runs in parallel)
+  const generateBackgroundMusic = useCallback(async (): Promise<string> => {
+    try {
+      console.log("[Music] Generating background music...");
+      const { data, error } = await supabase.functions.invoke("elevenlabs-music", {
+        body: { 
+          prompt: "Ambient tech futuristic background music, subtle synth pads, modern, clean, minimal, 80bpm",
+          duration: 15 
+        },
+      });
+
+      if (error) {
+        console.warn("[Music] Edge function error:", error);
+        return "";
+      }
+
+      // Check for valid audio and no fallback flag
+      const audioContent = data?.audioContent;
+      const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
+      const hasFallbackFlag = data?.fallback === true;
+
+      if (isValidAudio && !hasFallbackFlag) {
+        console.log("[Music] ✅ Background music generated, size:", audioContent.length, "chars");
+        return `data:audio/mp3;base64,${audioContent}`;
+      }
+
+      console.log("[Music] No music available (paid plan required or quota exceeded)");
+      return "";
+    } catch (error) {
+      console.warn("[Music] Error generating background music:", error);
+      return "";
+    }
+  }, []);
+
+  // Step 3b: Generate audio narration with multi-provider fallback chain
   const generateAudio = useCallback(async (script: string) => {
-    setState(prev => ({ ...prev, step: "audio", progress: 80 }));
+    setState(prev => ({ ...prev, step: "audio", progress: 70 }));
     
     // Helper to try TTS providers in order
     const tryTTSProvider = async (provider: string, invokeBody: { text: string; voiceId?: string; voice?: string; language?: string }): Promise<{ url: string; provider: string } | null> => {
@@ -128,72 +165,86 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     };
     
     try {
-      let narrationResult: { url: string; provider: string } | null = null;
-      
-      // 1. Try ElevenLabs (Premium)
-      narrationResult = await tryTTSProvider("elevenlabs-tts", { 
-        text: script, 
-        voiceId: "camila", 
-        language: "pt-BR" 
-      });
-      
-      // 2. Fallback to Edge TTS (VoiceRSS)
-      if (!narrationResult) {
-        narrationResult = await tryTTSProvider("edge-tts", { 
-          text: script, 
-          voice: "camila" 
-        });
-      }
-      
-      // 3. Fallback to Lovable TTS (Polly)
-      if (!narrationResult) {
-        narrationResult = await tryTTSProvider("lovable-tts", { 
-          text: script, 
-          voice: "camila" 
-        });
-      }
-      
-      // 4. Fallback to Free TTS (Google)
-      if (!narrationResult) {
-        narrationResult = await tryTTSProvider("free-tts", { 
-          text: script, 
-          language: "pt-BR" 
-        });
-      }
+      // Generate narration AND background music in parallel
+      const [narrationResult, musicUrl] = await Promise.all([
+        // TTS fallback chain (sequential within)
+        (async () => {
+          // 1. Try ElevenLabs (Premium)
+          let result = await tryTTSProvider("elevenlabs-tts", { 
+            text: script, 
+            voiceId: "camila", 
+            language: "pt-BR" 
+          });
+          
+          // 2. Fallback to Edge TTS (VoiceRSS)
+          if (!result) {
+            result = await tryTTSProvider("edge-tts", { 
+              text: script, 
+              voice: "camila" 
+            });
+          }
+          
+          // 3. Fallback to Lovable TTS (Polly)
+          if (!result) {
+            result = await tryTTSProvider("lovable-tts", { 
+              text: script, 
+              voice: "camila" 
+            });
+          }
+          
+          // 4. Fallback to Free TTS (Google)
+          if (!result) {
+            result = await tryTTSProvider("free-tts", { 
+              text: script, 
+              language: "pt-BR" 
+            });
+          }
+          
+          return result;
+        })(),
+        // Background music (parallel)
+        generateBackgroundMusic()
+      ]);
+
+      setState(prev => ({ ...prev, progress: 90 }));
       
       if (narrationResult) {
-        toast.success(`🎙️ Narração gerada (${narrationResult.provider})`);
+        const hasMusic = musicUrl && musicUrl.length > 0;
+        toast.success(`🎙️ Narração gerada (${narrationResult.provider})${hasMusic ? ' + 🎵 Trilha sonora' : ''}`);
         setState(prev => ({ 
           ...prev, 
-          narrationUrl: narrationResult!.url, 
+          narrationUrl: narrationResult!.url,
+          backgroundMusicUrl: musicUrl,
           progress: 100,
           step: "complete",
         }));
-        return narrationResult.url;
+        return { narrationUrl: narrationResult.url, musicUrl };
       }
       
-      // All providers failed - complete without audio
+      // All TTS providers failed - complete without audio
       console.warn("[TTS] All providers failed, completing without audio");
       setState(prev => ({ 
         ...prev, 
         narrationUrl: "", 
+        backgroundMusicUrl: musicUrl,
         progress: 100,
         step: "complete",
       }));
       toast.warning("Conteúdo criado! (Narração indisponível no momento)");
-      return "";
+      return { narrationUrl: "", musicUrl };
     } catch (error: any) {
       console.warn("[TTS] Error in audio generation:", error);
       setState(prev => ({ 
         ...prev, 
         narrationUrl: "", 
+        backgroundMusicUrl: "",
         progress: 100,
         step: "complete",
       }));
       toast.warning("Conteúdo criado! (Narração indisponível)");
-      return "";
+      return { narrationUrl: "", musicUrl: "" };
     }
-  }, []);
+  }, [generateBackgroundMusic]);
 
   // Full pipeline (without video - much cheaper!)
   const generateNarrativeVideo = useCallback(async (
@@ -202,7 +253,7 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     customScript?: string
   ) => {
     setIsGenerating(true);
-    setState(prev => ({ ...prev, step: "idle", progress: 0, error: null }));
+    setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, backgroundMusicUrl: "" }));
 
     // Step 1: Script
     const script = await generateScript(topic, customScript);
@@ -212,9 +263,8 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     const imageUrl = await generateImage(imagePrompt);
     if (!imageUrl) return;
 
-    // Step 3: Audio (~$0.01)
-    const narrationUrl = await generateAudio(script);
-    if (!narrationUrl) return;
+    // Step 3: Audio + Music (in parallel)
+    await generateAudio(script);
 
     setIsGenerating(false);
   }, [generateScript, generateImage, generateAudio]);
@@ -226,6 +276,7 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     generateScript,
     generateImage,
     generateAudio,
+    generateBackgroundMusic,
     reset,
   };
 }

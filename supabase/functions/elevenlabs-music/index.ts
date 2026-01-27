@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,7 @@ serve(async (req) => {
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
+      console.error("[ElevenLabs Music] API Key not configured");
       throw new Error("ELEVENLABS_API_KEY não configurada");
     }
 
@@ -22,8 +24,9 @@ serve(async (req) => {
     const musicPrompt = prompt || "Ambient tech futuristic background music, subtle synth pads, modern, clean, minimal, 80bpm";
     const musicDuration = duration || 15;
 
-    console.log("Generating music with prompt:", musicPrompt);
-    console.log("Duration:", musicDuration, "seconds");
+    console.log("[ElevenLabs Music] Generating with prompt:", musicPrompt);
+    console.log("[ElevenLabs Music] Duration:", musicDuration, "seconds");
+    console.log("[ElevenLabs Music] API Key present:", !!ELEVENLABS_API_KEY);
 
     const response = await fetch("https://api.elevenlabs.io/v1/music", {
       method: "POST",
@@ -37,13 +40,15 @@ serve(async (req) => {
       }),
     });
 
+    console.log("[ElevenLabs Music] Response status:", response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("ElevenLabs Music error:", response.status, errorText);
+      console.error("[ElevenLabs Music] Error response:", response.status, errorText);
       
       // Return graceful fallback for payment/quota issues (music is optional)
       if (response.status === 402 || response.status === 401 || response.status === 403 || response.status === 429) {
-        console.log("ElevenLabs Music unavailable (requires paid plan), returning empty");
+        console.log("[ElevenLabs Music] Unavailable (requires paid plan or quota exceeded), returning fallback");
         return new Response(
           JSON.stringify({ 
             audioContent: null,
@@ -62,14 +67,10 @@ serve(async (req) => {
 
     const audioBuffer = await response.arrayBuffer();
     
-    // Encode as base64 for JSON response
-    const base64Audio = btoa(
-      Array.from(new Uint8Array(audioBuffer))
-        .map(b => String.fromCharCode(b))
-        .join('')
-    );
+    // Use Deno's safe base64 encoder (prevents stack overflow with large buffers)
+    const base64Audio = base64Encode(audioBuffer);
 
-    console.log("Music generated successfully, audio size:", audioBuffer.byteLength);
+    console.log("[ElevenLabs Music] ✅ Generated successfully, audio size:", audioBuffer.byteLength, "bytes, base64 length:", base64Audio.length);
 
     return new Response(
       JSON.stringify({ 
@@ -82,7 +83,7 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error("Error in elevenlabs-music:", error);
+    console.error("[ElevenLabs Music] Fatal error:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar música" }),
       {
