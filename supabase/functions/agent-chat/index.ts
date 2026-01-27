@@ -259,9 +259,22 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
   const { posts } = args;
   const createdPosts = [];
   
+  // Check if user has auto_post_enabled
+  const { data: agentContext } = await supabase
+    .from('agent_context')
+    .select('auto_post_enabled')
+    .eq('user_id', userId)
+    .maybeSingle();
+  
+  const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
+  console.log('[CREATE_POSTS] Auto post enabled:', autoPostEnabled);
+  
   for (const post of posts) {
     // Convert scheduled_for to UTC if provided
     const scheduledForUTC = post.scheduled_for ? convertBrasiliaToUTC(post.scheduled_for) : null;
+    
+    // If auto_post_enabled and no schedule, set status to 'pending' for immediate publishing
+    const status = scheduledForUTC ? 'scheduled' : (autoPostEnabled ? 'pending' : 'draft');
     
     const postData = {
       user_id: userId,
@@ -269,7 +282,7 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
       hashtags: post.hashtags || [],
       post_type: post.post_type || 'engajamento',
       platforms: post.platforms || ['instagram'],
-      status: scheduledForUTC ? 'scheduled' : 'draft',
+      status,
       scheduled_for: scheduledForUTC,
       media_type: 'image'
     };
@@ -277,7 +290,9 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
     console.log('Creating post with scheduled_for:', {
       original: post.scheduled_for,
       converted_to_utc: scheduledForUTC,
-      will_display_as: scheduledForUTC ? formatBrasiliaTime(scheduledForUTC) : null
+      will_display_as: scheduledForUTC ? formatBrasiliaTime(scheduledForUTC) : null,
+      status,
+      auto_publish: autoPostEnabled && !scheduledForUTC
     });
     
     const { data, error } = await supabase
@@ -317,6 +332,50 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
               .update({ image_url: imageResult.imageUrl })
               .eq('id', data.id);
             data.image_url = imageResult.imageUrl;
+            
+            // If auto_post_enabled and not scheduled, publish immediately after image is ready
+            if (autoPostEnabled && !scheduledForUTC && imageResult.imageUrl) {
+              console.log('[AUTO_PUBLISH] Publishing post immediately:', data.id);
+              
+              for (const platform of (post.platforms || ['instagram'])) {
+                try {
+                  if (platform === 'instagram') {
+                    const publishResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/publish-post`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+                      },
+                      body: JSON.stringify({ postId: data.id })
+                    });
+                    
+                    if (publishResponse.ok) {
+                      console.log('[AUTO_PUBLISH] Published to Instagram successfully!');
+                      data.status = 'published';
+                    } else {
+                      console.error('[AUTO_PUBLISH] Failed to publish to Instagram:', await publishResponse.text());
+                    }
+                  } else if (platform === 'tiktok') {
+                    const publishResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/publish-to-tiktok`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+                      },
+                      body: JSON.stringify({ postId: data.id })
+                    });
+                    
+                    if (publishResponse.ok) {
+                      console.log('[AUTO_PUBLISH] Published to TikTok successfully!');
+                    } else {
+                      console.error('[AUTO_PUBLISH] Failed to publish to TikTok');
+                    }
+                  }
+                } catch (pubError) {
+                  console.error(`[AUTO_PUBLISH] Error publishing to ${platform}:`, pubError);
+                }
+              }
+            }
           }
         } else {
           console.error('Image generation failed:', await imageResponse.text());
@@ -331,22 +390,28 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
   
   const withImages = createdPosts.filter(p => p.image_url).length;
   const scheduledPosts = createdPosts.filter(p => p.scheduled_for);
+  const publishedPosts = createdPosts.filter(p => p.status === 'published');
   
   // Format scheduled times for display
   const scheduleInfo = scheduledPosts.length > 0 
     ? `\n📅 Agendado(s) para: ${scheduledPosts.map(p => formatBrasiliaTime(p.scheduled_for)).join(', ')}`
     : '';
   
+  const publishInfo = publishedPosts.length > 0
+    ? `\n🚀 ${publishedPosts.length} post(s) publicado(s) automaticamente!`
+    : '';
+  
   return {
     success: true,
-    message: `✅ ${createdPosts.length} post(s) criado(s)! ${withImages > 0 ? `🎨 ${withImages} imagem(ns) gerada(s)` : '⚠️ Sem imagens (image_prompt não fornecido)'}${scheduleInfo}`,
+    message: `✅ ${createdPosts.length} post(s) criado(s)! ${withImages > 0 ? `🎨 ${withImages} imagem(ns) gerada(s)` : '⚠️ Sem imagens (image_prompt não fornecido)'}${publishInfo}${scheduleInfo}`,
     posts: createdPosts.map(p => ({
       id: p.id,
       caption: p.caption.slice(0, 50) + '...',
       status: p.status,
       scheduled_for: p.scheduled_for,
       scheduled_for_brasilia: p.scheduled_for ? formatBrasiliaTime(p.scheduled_for) : null,
-      has_image: !!p.image_url
+      has_image: !!p.image_url,
+      published: p.status === 'published'
     }))
   };
 }
