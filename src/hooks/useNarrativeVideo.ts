@@ -100,51 +100,90 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     }
   }, [brandName, setError]);
 
-  // Step 3: Generate audio narration (try ElevenLabs first, then OpenAI as fallback)
+  // Step 3: Generate audio narration with multi-provider fallback chain
   const generateAudio = useCallback(async (script: string) => {
     setState(prev => ({ ...prev, step: "audio", progress: 80 }));
     
+    // Helper to try TTS providers in order
+    const tryTTSProvider = async (provider: string, invokeBody: { text: string; voiceId?: string; voice?: string; language?: string }): Promise<{ url: string; provider: string } | null> => {
+      try {
+        console.log(`[TTS] Trying ${provider}...`);
+        const result = await supabase.functions.invoke(provider, { body: invokeBody });
+        
+        // Check for valid audio - must have audioContent as non-empty string and no fallback flag
+        const audioContent = result.data?.audioContent;
+        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
+        const hasFallbackFlag = result.data?.fallback === true;
+        
+        if (!result.error && isValidAudio && !hasFallbackFlag) {
+          console.log(`[TTS] ✅ ${provider} success! Audio size: ${audioContent.length} chars`);
+          return { url: `data:audio/mp3;base64,${audioContent}`, provider };
+        }
+        
+        console.log(`[TTS] ${provider} failed:`, result.data?.error || result.error || 'Invalid audio');
+      } catch (e) {
+        console.error(`[TTS] ${provider} error:`, e);
+      }
+      return null;
+    };
+    
     try {
-      // Try ElevenLabs first (already configured)
-      let narrationResult = await supabase.functions.invoke("elevenlabs-tts", {
-        body: { text: script, language: "pt-BR" },
+      let narrationResult: { url: string; provider: string } | null = null;
+      
+      // 1. Try ElevenLabs (Premium)
+      narrationResult = await tryTTSProvider("elevenlabs-tts", { 
+        text: script, 
+        voiceId: "camila", 
+        language: "pt-BR" 
       });
-
-      // If ElevenLabs fails, try OpenAI
-      if (narrationResult.error) {
-        console.log("ElevenLabs failed, trying OpenAI TTS...");
-        narrationResult = await supabase.functions.invoke("openai-tts", {
-          body: { text: script, voice: "onyx" },
+      
+      // 2. Fallback to Edge TTS (VoiceRSS)
+      if (!narrationResult) {
+        narrationResult = await tryTTSProvider("edge-tts", { 
+          text: script, 
+          voice: "camila" 
         });
       }
-
-      if (narrationResult.error) {
-        // If both fail, complete without audio
-        console.warn("TTS failed, completing without audio:", narrationResult.error);
+      
+      // 3. Fallback to Lovable TTS (Polly)
+      if (!narrationResult) {
+        narrationResult = await tryTTSProvider("lovable-tts", { 
+          text: script, 
+          voice: "camila" 
+        });
+      }
+      
+      // 4. Fallback to Free TTS (Google)
+      if (!narrationResult) {
+        narrationResult = await tryTTSProvider("free-tts", { 
+          text: script, 
+          language: "pt-BR" 
+        });
+      }
+      
+      if (narrationResult) {
+        toast.success(`🎙️ Narração gerada (${narrationResult.provider})`);
         setState(prev => ({ 
           ...prev, 
-          narrationUrl: "", 
+          narrationUrl: narrationResult!.url, 
           progress: 100,
           step: "complete",
         }));
-        toast.warning("Conteúdo criado! (Narração indisponível no momento)");
-        return "";
+        return narrationResult.url;
       }
-
-      const narrationUrl = `data:audio/mp3;base64,${narrationResult.data.audioContent}`;
-
+      
+      // All providers failed - complete without audio
+      console.warn("[TTS] All providers failed, completing without audio");
       setState(prev => ({ 
         ...prev, 
-        narrationUrl, 
+        narrationUrl: "", 
         progress: 100,
         step: "complete",
       }));
-      
-      toast.success("Conteúdo completo com narração!");
-      return narrationUrl;
+      toast.warning("Conteúdo criado! (Narração indisponível no momento)");
+      return "";
     } catch (error: any) {
-      // Complete without audio on error
-      console.warn("TTS error, completing without audio:", error);
+      console.warn("[TTS] Error in audio generation:", error);
       setState(prev => ({ 
         ...prev, 
         narrationUrl: "", 

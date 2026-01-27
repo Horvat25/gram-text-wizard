@@ -23,7 +23,7 @@ import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
 import { SuggestionsTab } from "@/components/tabs/SuggestionsTab";
 import { LatestNewsTab } from "@/components/tabs/LatestNewsTab";
 
-import AgentHeroChat from "@/components/agent/AgentHeroChat";
+import AgentTab from "@/components/tabs/AgentTab";
 import PlatformSelector, { Platform } from "@/components/PlatformSelector";
 import TikTokContentCreation from "@/components/TikTokContentCreation";
 import { usePosts } from "@/hooks/usePosts";
@@ -165,9 +165,9 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Agent Chat - Full Height */}
-            <div className="flex-1 overflow-hidden">
-              <AgentHeroChat onNavigate={handleNavigateFromAgent} />
+            {/* Agent Tab - Full Height with Chat + Respostas tabs */}
+            <div className="flex-1 overflow-hidden p-4">
+              <AgentTab />
             </div>
           </motion.div>
         ) : (
