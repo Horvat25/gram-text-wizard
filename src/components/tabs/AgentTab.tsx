@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageCircle, FileText } from 'lucide-react';
-import { motion } from 'framer-motion';
 import AgentHeroChat from '@/components/agent/AgentHeroChat';
 import AgentReportsTab from '@/components/agent/AgentReportsTab';
 
@@ -10,40 +9,26 @@ export default function AgentTab() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Compact Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:inline-grid bg-muted/50 shrink-0">
-          <TabsTrigger value="chat" className="gap-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+        <TabsList className="grid w-full grid-cols-2 shrink-0 h-9">
+          <TabsTrigger value="chat" className="gap-1.5 text-sm">
             <MessageCircle className="h-4 w-4" />
-            <span>Chat</span>
+            Chat
           </TabsTrigger>
-          <TabsTrigger value="respostas" className="gap-2">
+          <TabsTrigger value="respostas" className="gap-1.5 text-sm">
             <FileText className="h-4 w-4" />
-            <span>Respostas</span>
+            Respostas
           </TabsTrigger>
         </TabsList>
 
-        {/* CHAT TAB - User talks to agent */}
-        <TabsContent value="chat" className="flex-1 mt-4 overflow-hidden">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="h-full"
-          >
+        <TabsContent value="chat" className="flex-1 mt-2 overflow-hidden data-[state=active]:flex data-[state=active]:flex-col">
+          <div className="h-full">
             <AgentHeroChat />
-          </motion.div>
+          </div>
         </TabsContent>
 
-        {/* RESPOSTAS TAB - Agent reports and automatic messages */}
-        <TabsContent value="respostas" className="flex-1 mt-4 overflow-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <AgentReportsTab />
-          </motion.div>
+        <TabsContent value="respostas" className="flex-1 mt-2 overflow-auto">
+          <AgentReportsTab />
         </TabsContent>
       </Tabs>
     </div>

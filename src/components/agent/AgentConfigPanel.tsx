@@ -19,7 +19,6 @@ import {
   Settings, 
   Calendar,
   Bot,
-  FileText,
   Loader2,
   Trash2
 } from 'lucide-react';
@@ -27,10 +26,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
-// Import the new modular components
+// Import the modular components
 import AgentRoutineConfig from './AgentRoutineConfig';
 import AgentPersonalityConfig from './AgentPersonalityConfig';
-import AgentReportsTab from './AgentReportsTab';
 import { AgentContext } from '@/hooks/useAgentContext';
 
 interface AgentConfigPanelProps {
@@ -173,18 +171,14 @@ export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat 
         ) : (
           <ScrollArea className="flex-1 px-6">
             <Tabs defaultValue="routine" className="pb-6">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
                 <TabsTrigger value="routine" className="gap-1 text-xs">
                   <Calendar className="h-3 w-3" />
-                  <span className="hidden sm:inline">Rotina</span>
+                  Rotina
                 </TabsTrigger>
                 <TabsTrigger value="personality" className="gap-1 text-xs">
                   <Bot className="h-3 w-3" />
-                  <span className="hidden sm:inline">Persona</span>
-                </TabsTrigger>
-                <TabsTrigger value="reports" className="gap-1 text-xs">
-                  <FileText className="h-3 w-3" />
-                  <span className="hidden sm:inline">Relatórios</span>
+                  Persona
                 </TabsTrigger>
               </TabsList>
 
@@ -202,10 +196,6 @@ export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat 
                   context={context}
                   onUpdate={handleUpdate}
                 />
-              </TabsContent>
-
-              <TabsContent value="reports" className="mt-0">
-                <AgentReportsTab />
               </TabsContent>
             </Tabs>
 
