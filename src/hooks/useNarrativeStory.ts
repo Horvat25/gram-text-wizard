@@ -298,22 +298,43 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
       // 🎯 Try ElevenLabs TTS first (PREMIUM QUALITY!)
       try {
-        console.log(`[TTS] Trying ElevenLabs TTS with voice: ${preferredVoice}...`);
+        console.log(`[TTS] 🎯 Trying ElevenLabs TTS with voice: ${preferredVoice}...`);
         const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
           body: { text, voiceId: preferredVoice, language: "pt-BR" },
         });
         
-        if (!elevenResult.error && elevenResult.data?.audioContent && !elevenResult.data?.fallback) {
-          console.log(`[TTS] ✅ ElevenLabs TTS success!`);
+        console.log("[TTS] ElevenLabs response:", JSON.stringify({
+          hasError: !!elevenResult.error,
+          hasData: !!elevenResult.data,
+          hasAudioContent: !!elevenResult.data?.audioContent,
+          fallbackFlag: elevenResult.data?.fallback,
+          errorMsg: elevenResult.data?.error || elevenResult.error?.message,
+        }));
+        
+        // Check for valid audio - audioContent must exist and be non-empty string
+        const audioContent = elevenResult.data?.audioContent;
+        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
+        const hasFallbackFlag = elevenResult.data?.fallback === true;
+        
+        if (!elevenResult.error && isValidAudio && !hasFallbackFlag) {
+          console.log(`[TTS] ✅ ElevenLabs TTS success! Audio size: ${audioContent.length} chars`);
           toast.success(`🎙️ Narração premium gerada (ElevenLabs)`);
           return { 
-            url: `data:audio/mp3;base64,${elevenResult.data.audioContent}`,
+            url: `data:audio/mp3;base64,${audioContent}`,
             provider: "ElevenLabs"
           };
         }
-        console.log("[TTS] ElevenLabs TTS failed:", elevenResult.data?.error || elevenResult.error);
+        
+        // Log specific failure reason
+        if (hasFallbackFlag) {
+          console.log("[TTS] ⚠️ ElevenLabs returned fallback flag - API blocked/rate-limited");
+        } else if (!isValidAudio) {
+          console.log("[TTS] ⚠️ ElevenLabs returned invalid/empty audio content");
+        } else {
+          console.log("[TTS] ⚠️ ElevenLabs failed:", elevenResult.data?.error || elevenResult.error);
+        }
       } catch (e) {
-        console.log("[TTS] ElevenLabs TTS error:", e);
+        console.error("[TTS] ❌ ElevenLabs TTS error:", e);
       }
       
       // 🔄 Fallback to Edge TTS (VoiceRSS)
