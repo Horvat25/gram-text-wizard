@@ -55,7 +55,7 @@ Retorne APENAS o texto da narração, nada mais.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite", // Most economical model
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Crie um roteiro de narração sobre: "${topic}"` },
