@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getRandomTrack, preloadTrack } from "@/lib/background-music";
 
 export interface NarrativeContentState {
   step: "idle" | "script" | "image" | "audio" | "complete" | "error";
@@ -103,36 +104,23 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     }
   }, [brandName, setError]);
 
-  // Step 3a: Generate background music (optional, runs in parallel)
+  // Step 3a: Generate background music using royalty-free tracks
   const generateBackgroundMusic = useCallback(async (): Promise<string> => {
     try {
-      console.log("[Music] Generating background music...");
-      const { data, error } = await supabase.functions.invoke("elevenlabs-music", {
-        body: { 
-          prompt: "Ambient tech futuristic background music, subtle synth pads, modern, clean, minimal, 80bpm",
-          duration: 15 
-        },
-      });
-
-      if (error) {
-        console.warn("[Music] Edge function error:", error);
-        return "";
-      }
-
-      // Check for valid audio and no fallback flag
-      const audioContent = data?.audioContent;
-      const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-      const hasFallbackFlag = data?.fallback === true;
-
-      if (isValidAudio && !hasFallbackFlag) {
-        console.log("[Music] ✅ Background music generated, size:", audioContent.length, "chars");
-        return `data:audio/mp3;base64,${audioContent}`;
-      }
-
-      console.log("[Music] No music available (paid plan required or quota exceeded)");
-      return "";
+      console.log("[Music] Loading royalty-free background music...");
+      
+      // Get a random ambient/tech track from our library
+      const track = getRandomTrack();
+      console.log("[Music] Selected track:", track.name, "-", track.mood);
+      
+      // Preload the track as data URL for reliable playback
+      const musicUrl = await preloadTrack(track);
+      
+      console.log("[Music] ✅ Background music ready:", track.name);
+      return musicUrl;
     } catch (error) {
-      console.warn("[Music] Error generating background music:", error);
+      console.warn("[Music] Error loading background music:", error);
+      // Music is optional - video continues without it
       return "";
     }
   }, []);
