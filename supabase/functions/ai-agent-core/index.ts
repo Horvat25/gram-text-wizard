@@ -75,7 +75,7 @@ async function sendChatMessage(supabase: any, userId: string, message: string): 
 // Generate conversational status update
 function getConversationalUpdate(
   agentName: string, 
-  action: 'analyzing' | 'deciding' | 'creating' | 'created' | 'waiting' | 'completed' | 'error',
+  action: 'analyzing' | 'deciding' | 'creating' | 'created' | 'waiting' | 'completed' | 'error' | 'insights',
   details?: any
 ): string {
   const hour = new Date().getHours();
@@ -98,7 +98,7 @@ function getConversationalUpdate(
       `🚀 Gerando ${details?.type || 'post'} - vai ficar bom!`
     ],
     created: [
-      `✅ Pronto! Criei um ${details?.type || 'post'} sobre "${details?.theme || 'tendências'}". ${details?.needsRender ? 'Precisa só renderizar o vídeo quando puder! 🎬' : ''}`,
+      `✅ Pronto! Criei um ${details?.type || 'post'} sobre "${details?.theme || 'tendências'}". ${details?.needsRender ? 'Precisa só renderizar o vídeo quando puder! 🎬' : details?.published ? 'Publicado! 🚀' : ''}`,
       `🎉 Feito! Novo ${details?.type || 'conteúdo'} criado. ${details?.status === 'published' ? 'Já foi publicado!' : details?.status === 'scheduled' ? 'Agendado!' : 'Está nos rascunhos.'}`,
       `👍 Concluído! ${details?.type || 'Post'} sobre "${details?.theme || 'tech'}" ${details?.status === 'published' ? 'no ar!' : 'pronto pra revisão.'}`
     ],
@@ -106,6 +106,11 @@ function getConversationalUpdate(
       `⏳ Ainda não é hora de postar. ${details?.reason || 'Vou aguardar o momento ideal.'}`,
       `🕐 Esperando um pouco... ${details?.reason || 'O timing é importante!'}`,
       `😊 Tudo tranquilo por enquanto. ${details?.reason || 'Próxima análise em breve!'}`
+    ],
+    insights: [
+      `📈 **Análise de Performance:**\n${details?.insights || 'Coletando dados...'}`,
+      `🎯 **Insights do Período:**\n${details?.insights || 'Analisando métricas...'}`,
+      `💡 **Descobertas:**\n${details?.insights || 'Processando informações...'}`
     ],
     completed: [
       `${greeting}! 📈 Resumo: já temos ${details?.weeklyProgress || 0} posts esta semana (meta: ${details?.weeklyGoals || 0}). Engajamento médio: ${details?.avgEngagement || '0'}%.`,
@@ -127,14 +132,20 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   
   const now = new Date();
   const hours72Ago = new Date(now.getTime() - 72 * 60 * 60 * 1000);
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
-  // Get start of current week (Sunday)
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay());
+  // Get today start in Brasilia timezone (UTC-3)
+  const brasiliaOffset = -3 * 60 * 60 * 1000;
+  const todayBrasilia = new Date(now.getTime() + brasiliaOffset);
+  todayBrasilia.setHours(0, 0, 0, 0);
+  const todayStartUTC = new Date(todayBrasilia.getTime() - brasiliaOffset);
+  
+  // Get start of current week (Sunday) in Brasilia
+  const weekStart = new Date(todayBrasilia);
+  weekStart.setDate(todayBrasilia.getDate() - todayBrasilia.getDay());
   weekStart.setHours(0, 0, 0, 0);
+  const weekStartUTC = new Date(weekStart.getTime() - brasiliaOffset);
   
-  // Busca posts das últimas 72h
+  // Busca posts das últimas 72h (publicados para métricas)
   const { data: posts72h, error: postsError } = await supabase
     .from('posts')
     .select('*')
@@ -149,13 +160,23 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   
   const recentPosts = posts72h || [];
   
+  // *** FIX: Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário ***
+  const { data: todayPosts } = await supabase
+    .from('posts')
+    .select('id, status')
+    .eq('user_id', userId)
+    .gte('created_at', todayStartUTC.toISOString());
+  
+  const postsCreatedToday = (todayPosts || []).length;
+  console.log(`[AGENT] Posts criados HOJE: ${postsCreatedToday} (draft+scheduled+published)`);
+  
   // Busca posts desta semana para tracking de distribuição
   const { data: weekPosts } = await supabase
     .from('posts')
     .select('media_type, post_type, status')
     .eq('user_id', userId)
     .in('status', ['published', 'scheduled', 'draft'])
-    .gte('created_at', weekStart.toISOString());
+    .gte('created_at', weekStartUTC.toISOString());
   
   const postsThisWeek = weekPosts || [];
   
@@ -188,17 +209,22 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
     ? engagements.reduce((a: number, b: number) => a + b, 0) / engagements.length 
     : 0;
   
-  // Horas desde último post
-  const lastPost = recentPosts[0];
-  const lastPostTime = lastPost ? new Date(lastPost.published_at) : null;
+  // Horas desde último post (considerar criado, não só publicado)
+  const { data: lastCreatedPost } = await supabase
+    .from('posts')
+    .select('created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  
+  const lastPostTime = lastCreatedPost ? new Date(lastCreatedPost.created_at) : null;
   const lastPostHours = lastPostTime 
     ? (now.getTime() - lastPostTime.getTime()) / (1000 * 60 * 60) 
     : 999;
   
-  // Posts hoje
-  const postsToday = recentPosts.filter((p: any) => 
-    new Date(p.published_at) >= todayStart
-  ).length;
+  // Posts hoje - usar o valor já calculado (postsCreatedToday) que conta TODOS os posts criados hoje
+  const postsToday = postsCreatedToday;
   
   // Formatos vencedores (top 3 por engajamento)
   const postsByType = recentPosts.reduce((acc: any, post: any) => {
@@ -291,8 +317,8 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
 async function makeStrategicDecision(state: AgentState, lovableApiKey: string): Promise<AgentDecision> {
   console.log('[AGENT] Etapa 2: Tomando decisão estratégica...');
   
-  const dailyLimit = state.context?.daily_post_limit || 2;
-  const minHoursBetween = state.context?.min_hours_between_posts || 4;
+  const dailyLimit = state.context?.daily_post_limit || 5;
+  const minHoursBetween = state.context?.min_hours_between_posts || 2;
   const preferredPlatforms = state.context?.preferred_platforms || ['instagram'];
   const bestTimes = state.context?.best_posting_times || ['10:00', '14:00', '19:00'];
   const successPatterns = state.context?.success_patterns || [];
@@ -304,17 +330,20 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
                         state.weeklyProgress.news + state.weeklyProgress.images;
   
   console.log(`[AGENT] Meta semanal: ${totalProgress}/${totalGoals} posts`);
+  console.log(`[AGENT] Limite diário: ${state.postsToday}/${dailyLimit} posts CRIADOS hoje`);
   console.log(`[AGENT] Próximo tipo de conteúdo: ${state.nextContentType || 'meta completa'}`);
   
-  // Pre-check: Reject immediately if basic conditions aren't met
+  // *** MUDANÇA: Limite diário - se atingiu, parar por hoje ***
   if (state.postsToday >= dailyLimit) {
-    console.log('[AGENT] Limite diário atingido - decisão local');
+    console.log('[AGENT] Limite diário atingido - PARAR por hoje');
     return {
       decision: 'NO_POST',
-      reason: `Limite diário de ${dailyLimit} posts já foi atingido (${state.postsToday} posts hoje).`
+      reason: `🎯 Meta diária alcançada! ${state.postsToday}/${dailyLimit} posts criados hoje. Voltarei amanhã para continuar.`,
+      hypothesis: 'Respeitar limites diários melhora a qualidade e evita spam.'
     };
   }
   
+  // Tempo mínimo entre posts
   if (state.lastPostHours < minHoursBetween) {
     console.log('[AGENT] Tempo mínimo não atingido - decisão local');
     return {
@@ -329,7 +358,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     console.log('[AGENT] Meta semanal completa!');
     return {
       decision: 'NO_POST',
-      reason: `Meta semanal de ${totalGoals} posts alcançada! 🎉 Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}`
+      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}`
     };
   }
   
@@ -433,11 +462,13 @@ async function executeContentPlan(
   supabase: any, 
   plan: ContentPlan, 
   userId: string,
-  supabaseUrl: string
+  supabaseUrl: string,
+  autoPublish: boolean = false
 ): Promise<any> {
   console.log('[AGENT] Etapa 3-4: Executando plano de conteúdo...');
   console.log('[AGENT] Plano:', JSON.stringify(plan, null, 2));
   console.log('[AGENT] Tipo de conteúdo:', plan.contentType);
+  console.log('[AGENT] Auto-publish:', autoPublish);
   
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const headers = {
@@ -448,14 +479,14 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video':
-      return createVideoContent(supabase, plan, userId, supabaseUrl, headers);
+      return createVideoContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
     case 'carousel':
-      return createCarouselContent(supabase, plan, userId, supabaseUrl, headers);
+      return createCarouselContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
     case 'news':
-      return createNewsContent(supabase, plan, userId, supabaseUrl, headers);
+      return createNewsContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
     case 'image':
     default:
-      return createImageContent(supabase, plan, userId, supabaseUrl, headers);
+      return createImageContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
   }
 }
 
@@ -465,7 +496,8 @@ async function createVideoContent(
   plan: ContentPlan,
   userId: string,
   supabaseUrl: string,
-  headers: any
+  headers: any,
+  autoPublish: boolean = false
 ): Promise<any> {
   console.log('[AGENT] Criando vídeo/reels:', plan.theme);
   
@@ -529,6 +561,7 @@ async function createVideoContent(
   }
   
   // Create post with video metadata (needs_processing for frontend render)
+  // Videos always stay as draft because they need client-side rendering
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     caption,
@@ -536,7 +569,7 @@ async function createVideoContent(
     post_type: 'entretenimento',
     media_type: 'reels',
     platforms: plan.platforms || ['instagram'],
-    status: 'draft',
+    status: 'draft', // Videos ALWAYS draft - need frontend render
     image_url: thumbnailUrl,
     overlay_metadata: {
       type: 'narrated_video',
@@ -544,7 +577,7 @@ async function createVideoContent(
       topic: plan.theme,
       needs_processing: true,
       created_by_agent: true,
-      publish_after_render: true
+      publish_after_render: autoPublish // Publish after frontend renders
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
@@ -560,7 +593,8 @@ async function createCarouselContent(
   plan: ContentPlan,
   userId: string,
   supabaseUrl: string,
-  headers: any
+  headers: any,
+  autoPublish: boolean = false
 ): Promise<any> {
   console.log('[AGENT] Criando carrossel:', plan.theme);
   
@@ -613,7 +647,8 @@ async function createCarouselContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Create carousel post
+  // Create carousel post - can publish directly if has enough images and autoPublish
+  const canPublish = autoPublish && carouselImages.length >= 2;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     caption,
@@ -621,7 +656,8 @@ async function createCarouselContent(
     post_type: 'educacional',
     media_type: 'carousel',
     platforms: plan.platforms || ['instagram'],
-    status: carouselImages.length >= 2 ? 'draft' : 'failed',
+    status: carouselImages.length >= 2 ? (canPublish ? 'scheduled' : 'draft') : 'failed',
+    scheduled_for: canPublish ? new Date().toISOString() : null, // Immediate schedule for publish
     image_url: carouselImages[0] || null,
     carousel_images: carouselImages,
     ai_model_used: 'gemini-2.5-flash'
@@ -638,7 +674,8 @@ async function createNewsContent(
   plan: ContentPlan,
   userId: string,
   supabaseUrl: string,
-  headers: any
+  headers: any,
+  autoPublish: boolean = false
 ): Promise<any> {
   console.log('[AGENT] Criando post de notícia:', plan.theme);
   
@@ -751,7 +788,8 @@ async function createNewsContent(
     caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
   }
   
-  // Create post
+  // Create post - publish directly if autoPublish and has image
+  const canPublish = autoPublish && imageUrl;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     caption,
@@ -759,7 +797,8 @@ async function createNewsContent(
     post_type: 'noticia',
     media_type: 'image',
     platforms: plan.platforms || ['instagram'],
-    status: 'draft',
+    status: canPublish ? 'scheduled' : 'draft',
+    scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: imageUrl,
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
@@ -775,7 +814,8 @@ async function createImageContent(
   plan: ContentPlan,
   userId: string,
   supabaseUrl: string,
-  headers: any
+  headers: any,
+  autoPublish: boolean = false
 ): Promise<any> {
   console.log('[AGENT] Criando post de imagem:', plan.theme);
   
@@ -816,7 +856,8 @@ async function createImageContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Create post
+  // Create post - publish directly if autoPublish and has image
+  const canPublish = autoPublish && imageUrl;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     caption,
@@ -824,7 +865,8 @@ async function createImageContent(
     post_type: plan.format,
     media_type: 'image',
     platforms: plan.platforms || ['instagram'],
-    status: 'draft',
+    status: canPublish ? 'scheduled' : 'draft',
+    scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: imageUrl,
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
@@ -884,6 +926,108 @@ async function recordDecisionAndLearn(
       .eq('user_id', userId);
     
     console.log('[AGENT] Contexto atualizado com novo padrão de sucesso');
+  }
+}
+
+// NOVA FUNÇÃO: Gerar análise e insights quando não posta
+async function generateInsightsAndAnalysis(
+  supabase: any,
+  userId: string,
+  state: AgentState,
+  lovableApiKey: string,
+  supabaseUrl: string
+): Promise<string | null> {
+  console.log('[AGENT] Gerando análise e insights...');
+  
+  try {
+    // 1. Buscar notícias recentes sobre IA para pesquisa
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${serviceRoleKey}`
+    };
+    
+    let aiNews: string[] = [];
+    try {
+      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          query: 'inteligência artificial novidades tecnologia 2025',
+          limit: 5,
+          lang: 'pt-BR'
+        })
+      });
+      
+      if (searchResponse.ok) {
+        const searchResult = await searchResponse.json();
+        aiNews = (searchResult.data || []).slice(0, 3).map((a: any) => a.title || a.url).filter(Boolean);
+      }
+    } catch (e) {
+      console.log('[AGENT] Erro ao buscar notícias:', e);
+    }
+    
+    // 2. Preparar dados de performance
+    const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
+                          state.weeklyProgress.news + state.weeklyProgress.images;
+    const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
+                       state.weeklyGoals.news + state.weeklyGoals.images;
+    
+    // 3. Gerar análise com IA
+    const analysisPrompt = `Você é um analista de conteúdo digital. Analise os dados e gere insights curtos e acionáveis.
+
+DADOS DE PERFORMANCE:
+- Engajamento médio: ${state.avgEngagement.toFixed(2)}%
+- Posts criados hoje: ${state.postsToday}
+- Progresso semanal: ${totalProgress}/${totalGoals} posts
+- Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
+- Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
+- Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}
+- Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
+- Tipos que performam melhor: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
+- Temas recentes: ${state.saturatedTopics.join(', ') || 'variados'}
+
+${aiNews.length > 0 ? `TENDÊNCIAS EM IA (notícias recentes):
+${aiNews.map((n, i) => `${i + 1}. ${n}`).join('\n')}` : ''}
+
+Gere uma análise CURTA (máximo 3 parágrafos) com:
+1. 📊 Status atual (1 frase)
+2. 💡 1-2 insights práticos sobre o que melhorar
+3. 🎯 1 sugestão de conteúdo baseada nas tendências
+
+Seja direto e conversacional. Use emojis com moderação.`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [
+          { role: 'system', content: 'Você é um analista de marketing digital especializado em crescimento orgânico.' },
+          { role: 'user', content: analysisPrompt }
+        ]
+      })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      const insights = result.choices?.[0]?.message?.content;
+      if (insights) {
+        console.log('[AGENT] Insights gerados com sucesso');
+        return insights;
+      }
+    } else if (response.status === 402 || response.status === 429) {
+      console.log('[AGENT] Sem créditos para gerar insights, pulando...');
+      return null;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('[AGENT] Erro ao gerar insights:', error);
+    return null;
   }
 }
 
@@ -1035,28 +1179,11 @@ async function processUser(
         theme: decision.contentPlan.theme
       }));
       
-      // Check if auto_post is enabled
-      if (state.context?.auto_post_enabled) {
-        post = await executeContentPlan(supabase, decision.contentPlan, userId, supabaseUrl);
-      } else {
-        console.log('[AGENT] auto_post desativado - post criado como rascunho');
-        // Create as draft only
-        const { data: draftPost } = await supabase
-          .from('posts')
-          .insert({
-            user_id: userId,
-            caption: `[SUGESTÃO DO AGENTE] Tema: ${decision.contentPlan.theme}`,
-            post_type: decision.contentPlan.format,
-            media_type: decision.contentPlan.mediaType || 'image',
-            platforms: decision.contentPlan.platforms || ['instagram'],
-            status: 'draft',
-            ai_model_used: 'gemini-2.5-flash'
-          })
-          .select()
-          .single();
-        
-        post = draftPost;
-      }
+      // Check if auto_post is enabled - pass to executeContentPlan
+      const autoPublish = state.context?.auto_post_enabled || false;
+      post = await executeContentPlan(supabase, decision.contentPlan, userId, supabaseUrl, autoPublish);
+      
+      console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
       
       // Send completion message
       const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
@@ -1072,6 +1199,14 @@ async function processUser(
       await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'waiting', {
         reason: decision.reason
       }));
+      
+      // *** NOVO: Gerar análise e insights quando não posta ***
+      const insights = await generateInsightsAndAnalysis(supabase, userId, state, lovableApiKey, supabaseUrl);
+      if (insights) {
+        await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'insights', {
+          insights
+        }));
+      }
     }
     
     // ETAPA 5: Registro de decisão
