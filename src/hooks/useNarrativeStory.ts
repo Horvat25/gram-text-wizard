@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
 import { initFFmpeg, convertWebMToMP4 } from "@/lib/video-converter";
 import { estimateSpeechDuration } from "@/lib/browser-tts";
+import { getRandomTrack, preloadTrack } from "@/lib/background-music";
+
 export interface StorySegment {
   id: string;
   text: string;
@@ -400,31 +402,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return null;
     };
     
-    // Generate background music based on topic/theme
-    const generateBackgroundMusic = async (topic: string): Promise<string> => {
+    // Generate background music using royalty-free tracks (no API needed!)
+    const generateBackgroundMusic = async (): Promise<string> => {
       try {
-        console.log("[Music] Generating background music for theme:", topic);
+        console.log("[Music] Loading royalty-free background music...");
         
-        // Estimate total duration for music
-        const estimatedDuration = segments.length * 5 + 6; // segments + CTA duration
+        // Get a random ambient/tech track from our built-in library
+        const track = getRandomTrack();
+        console.log("[Music] Selected track:", track.name, "-", track.mood);
         
-        const musicResult = await supabase.functions.invoke("elevenlabs-music", {
-          body: { 
-            prompt: `Ambient tech futuristic background music, modern, inspiring, subtle synth pads, for video about ${topic}. Clean, minimal, 80bpm.`,
-            duration: Math.min(estimatedDuration, 30), // ElevenLabs max is 30s
-          },
-        });
+        // Preload the track as data URL for reliable playback
+        const musicUrl = await preloadTrack(track);
         
-        if (!musicResult.error && musicResult.data?.audioContent) {
-          console.log("[Music] ✅ Background music generated!");
-          toast.success("🎵 Trilha sonora gerada!");
-          return `data:audio/mp3;base64,${musicResult.data.audioContent}`;
-        }
-        console.log("[Music] Failed to generate music:", musicResult.data?.error || musicResult.error);
+        console.log("[Music] ✅ Background music ready:", track.name);
+        toast.success(`🎵 Trilha: ${track.name}`);
+        return musicUrl;
       } catch (e) {
-        console.log("[Music] Music generation error:", e);
+        console.warn("[Music] Error loading background music:", e);
+        return "";
       }
-      return "";
     };
     
     try {
@@ -441,10 +437,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         ctaNarrationUrl = ctaResult?.url || "";
       }
       
-      // Generate background music (in parallel with duration detection)
+      // Generate background music (in parallel with duration detection) - uses royalty-free tracks
       const [audioDuration, musicUrl] = await Promise.all([
         narrationUrl ? getAudioDuration(narrationUrl) : Promise.resolve(0),
-        generateBackgroundMusic(segments[0]?.text || "technology"),
+        generateBackgroundMusic(),
       ]);
       
       backgroundMusicUrl = musicUrl;
