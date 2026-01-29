@@ -891,27 +891,21 @@ export async function generateVideoFromSegments(
       musicAudioElement.play().catch(console.warn);
     }
 
-    // Track timeline time in a way that survives tab throttling/backgrounding.
-    // Using (performance.now() - startTime) can jump forward after the tab is
-    // backgrounded, which makes the encoder stop immediately and generates a
-    // ~1s CTA-only video.
-    let timelineTime = 0;
-    let lastNow = performance.now();
+    // Track timeline using performance.now() directly.
+    // We use a START time and calculate elapsed from that.
+    // The key insight: we want the VIDEO to be exactly totalDuration seconds.
+    // If the browser throttles the tab, the animation will "jump" but the video
+    // will still end at the correct total duration based on real wall-clock time.
+    const startTime = performance.now();
     let lastProgress = 0;
 
     const animate = (now: number) => {
-      const rawDelta = (now - lastNow) / 1000;
-      lastNow = now;
+      // Calculate elapsed time from start (wall-clock time)
+      const elapsed = (now - startTime) / 1000;
 
-      // Cap delta to avoid big jumps after CPU stalls / background tab.
-      // This ensures the encoded video timeline advances smoothly.
-      const delta = Math.min(Math.max(rawDelta, 0), 0.1);
-      timelineTime += delta;
-
-      const elapsed = timelineTime;
-
+      // If we've reached total duration, stop recording
       if (elapsed >= totalDuration) {
-        console.log("[VideoEncoder] Animation complete, stopping recorder");
+        console.log("[VideoEncoder] Animation complete, stopping recorder. Final elapsed:", elapsed.toFixed(2), "s");
         if (audioElement) {
           audioElement.pause();
         }
@@ -922,7 +916,6 @@ export async function generateVideoFromSegments(
           musicAudioElement.pause();
         }
         // ⚠️ NÃO fechar o AudioContext global - ele é reutilizado
-        // Apenas parar os elementos de áudio
         recorder.stop();
         return;
       }
@@ -930,7 +923,7 @@ export async function generateVideoFromSegments(
       // Start CTA audio when entering CTA phase
       if (elapsed >= contentDuration && !ctaAudioStarted && ctaAudioElement) {
         ctaAudioStarted = true;
-        console.log("[VideoEncoder] Starting CTA audio");
+        console.log("[VideoEncoder] Starting CTA audio at", elapsed.toFixed(2), "s");
         ctaAudioElement.currentTime = 0;
         ctaAudioElement.play().catch(console.warn);
       }
@@ -951,7 +944,7 @@ export async function generateVideoFromSegments(
       requestAnimationFrame(animate);
     };
 
-    console.log("[VideoEncoder] Starting animation loop");
+    console.log("[VideoEncoder] Starting animation loop, target duration:", totalDuration.toFixed(2), "s");
     requestAnimationFrame(animate);
   });
 }
