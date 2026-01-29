@@ -155,33 +155,48 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     try {
       // Generate narration AND background music in parallel
       const [narrationResult, musicUrl] = await Promise.all([
-        // TTS fallback chain (sequential within)
+        // TTS chain: ElevenLabs é OBRIGATÓRIO para conteúdo principal
+        // Google/Free TTS só para CTAs curtos (ex: "siga-nos")
         (async () => {
-          // 1. Try ElevenLabs (Premium)
+          // 1. SEMPRE tentar ElevenLabs primeiro para conteúdo (voz premium)
+          console.log("[TTS] 🎙️ Usando ElevenLabs para narração principal...");
           let result = await tryTTSProvider("elevenlabs-tts", { 
             text: script, 
             voiceId: "camila", 
             language: "pt-BR" 
           });
           
-          // 2. Fallback to Edge TTS (VoiceRSS)
+          // 2. Se ElevenLabs falhar, tentar OpenAI TTS (alta qualidade)
           if (!result) {
+            console.log("[TTS] ElevenLabs indisponível, tentando OpenAI TTS...");
+            result = await tryTTSProvider("openai-tts", { 
+              text: script, 
+              voice: "nova" 
+            });
+          }
+          
+          // 3. Fallback para Edge TTS (qualidade média-alta)
+          if (!result) {
+            console.log("[TTS] OpenAI indisponível, tentando Edge TTS...");
             result = await tryTTSProvider("edge-tts", { 
               text: script, 
               voice: "camila" 
             });
           }
           
-          // 3. Fallback to Lovable TTS (Polly)
+          // 4. Fallback para Lovable TTS (Polly - qualidade média)
           if (!result) {
+            console.log("[TTS] Edge TTS indisponível, tentando Lovable TTS...");
             result = await tryTTSProvider("lovable-tts", { 
               text: script, 
               voice: "camila" 
             });
           }
           
-          // 4. Fallback to Free TTS (Google)
+          // 5. Último recurso: Free TTS (Google) - apenas se tudo mais falhar
+          // Nota: Google TTS deve ser reservado para CTAs curtos como "siga-nos"
           if (!result) {
+            console.warn("[TTS] ⚠️ Todos os provedores premium falharam, usando Google TTS como último recurso");
             result = await tryTTSProvider("free-tts", { 
               text: script, 
               language: "pt-BR" 
