@@ -1144,13 +1144,14 @@ async function executeCreateCarousel(supabase: any, userId: string, args: any) {
 }
 
 // Execute create_news_post - fetches real news, uses article image, includes source
+// Matches the behavior of LatestNewsTab: select best image, generate caption as "reporter"
 async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
   const { topic, caption_style, scheduled_for, platforms } = args;
   
-  console.log('Creating news post for topic:', topic);
+  console.log('[NEWS_POST] Creating news post for topic:', topic);
   
   try {
-    // Step 1: Search for recent news using Firecrawl
+    // Step 1: Search for recent news using Firecrawl (same as LatestNewsTab)
     const searchResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/firecrawl-search`, {
       method: 'POST',
       headers: {
@@ -1158,8 +1159,8 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
         'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
       },
       body: JSON.stringify({
-        query: `${topic} notícia recente`,
-        limit: 5,
+        query: `${topic} notícia recente tecnologia`,
+        limit: 10, // Get more results to find best images
         lang: 'pt-BR',
         country: 'BR'
       })
@@ -1167,7 +1168,7 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
     
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
-      console.error('News search failed:', errorText);
+      console.error('[NEWS_POST] News search failed:', errorText);
       return { success: false, message: `❌ Erro ao buscar notícias: ${errorText}` };
     }
     
@@ -1178,27 +1179,38 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
       return { success: false, message: `❌ Nenhuma notícia encontrada para "${topic}". Tente outro termo.` };
     }
     
-    // Find the first article with an image
-    let selectedArticle = null;
+    console.log(`[NEWS_POST] Found ${newsArticles.length} articles`);
+    
+    // Score articles by image quality (more images = likely better visual content)
+    // This matches LatestNewsTab behavior of prioritizing articles with images
+    // Sort by image count to find best visual article
+    const articlesWithImages = newsArticles
+      .filter((a: any) => a.images && a.images.length > 0)
+      .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
+    
+    let selectedArticle = articlesWithImages[0] || newsArticles[0];
+    
+    // Select the best image from the article (first one is usually og:image which is best)
+    // Filter out icons, logos, tiny images
     let selectedImage = null;
-    
-    for (const article of newsArticles) {
-      if (article.images && article.images.length > 0) {
-        selectedArticle = article;
-        selectedImage = article.images[0];
-        break;
-      }
+    if (selectedArticle.images && selectedArticle.images.length > 0) {
+      // Filter for quality images (not icons/logos)
+      const qualityImages = selectedArticle.images.filter((img: string) => 
+        img && 
+        !img.includes('icon') && 
+        !img.includes('logo') && 
+        !img.includes('avatar') &&
+        !img.includes('1x1') &&
+        !img.includes('pixel') &&
+        !img.includes('favicon')
+      );
+      selectedImage = qualityImages[0] || selectedArticle.images[0];
     }
     
-    // If no article with image, use the first one and generate image
-    if (!selectedArticle) {
-      selectedArticle = newsArticles[0];
-    }
+    console.log('[NEWS_POST] Selected article:', selectedArticle.title);
+    console.log('[NEWS_POST] Selected image:', selectedImage ? 'yes' : 'no');
     
-    console.log('Selected article:', selectedArticle.title);
-    console.log('Has image:', !!selectedImage);
-    
-    // Extract source domain
+    // Extract source domain (same as LatestNewsTab getDomainFromUrl)
     const sourceUrl = selectedArticle.url || '';
     let sourceDomain = '';
     try {
@@ -1207,7 +1219,8 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
       sourceDomain = 'fonte externa';
     }
     
-    // Step 2: Generate caption with source attribution
+    // Step 2: Generate caption with source attribution (matching LatestNewsTab's "reporter" style)
+    // The generate-caption function has a 'noticia' postType that uses "Digital Journalist" persona
     const captionResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-caption`, {
       method: 'POST',
       headers: {
@@ -1215,18 +1228,22 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
         'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
       },
       body: JSON.stringify({
-        topic: selectedArticle.title,
-        postType: 'noticia',
-        context: selectedArticle.description || selectedArticle.markdown?.slice(0, 500),
+        topic: `${selectedArticle.title}. ${selectedArticle.description || ''}`,
+        postType: 'noticia', // This triggers the "Digital Journalist" persona
         sourceUrl: sourceUrl,
-        sourceDomain: sourceDomain,
-        customInstructions: caption_style === 'provocativo' 
-          ? 'Seja provocativo e gere debate. Faça o leitor parar e pensar.'
-          : caption_style === 'opinativo'
-          ? 'Adicione uma perspectiva única. Qual é o ângulo que ninguém está vendo?'
-          : caption_style === 'educacional'
-          ? 'Explique o contexto e por que isso importa para criadores de conteúdo.'
-          : 'Seja informativo e direto. Entregue a notícia com clareza.'
+        sourceName: sourceDomain,
+        customInstructions: `Esta é uma notícia REAL. A fonte é: ${sourceDomain} (${sourceUrl}). 
+OBRIGATÓRIO: Inclua a fonte no final da legenda no formato:
+📰 Fonte: ${sourceDomain}
+
+Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha credibilidade.
+${caption_style === 'provocativo' 
+  ? 'Seja provocativo e gere debate. Faça o leitor parar e pensar.'
+  : caption_style === 'opinativo'
+  ? 'Adicione uma perspectiva única. Qual é o ângulo que ninguém está vendo?'
+  : caption_style === 'educacional'
+  ? 'Explique o contexto e por que isso importa para criadores de conteúdo.'
+  : 'Seja informativo e direto. Entregue a notícia com clareza.'}`
       })
     });
     
@@ -1237,26 +1254,27 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
       const captionResult = await captionResponse.json();
       caption = captionResult.caption || '';
       hashtags = captionResult.hashtags || [];
+      console.log('[NEWS_POST] Caption generated, length:', caption.length);
     }
     
     // Fallback caption if generation failed
     if (!caption) {
-      caption = `📰 ${selectedArticle.title}\n\n${selectedArticle.description || ''}\n\n🔗 Fonte: ${sourceDomain}\n${sourceUrl}`;
+      caption = `📰 ${selectedArticle.title}\n\n${selectedArticle.description || ''}\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
       hashtags = ['#tecnologia', '#noticias', '#inovacao', '#ia', '#tech'];
     }
     
-    // Ensure source is in caption
-    if (!caption.includes('Fonte:') && !caption.includes('fonte:')) {
-      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+    // Ensure source URL is in caption (matching LatestNewsTab behavior)
+    if (!caption.includes(sourceUrl) && !caption.includes('🔗')) {
+      caption += `\n\n🔗 ${sourceUrl}`;
     }
     
-    // Step 3: Process image (watermark + upload) or generate one
+    // Step 3: Process image with watermark (same as LatestNewsTab uploadExternalImageWithWatermark)
     let imageUrl = null;
     
     if (selectedImage) {
-      console.log('Processing external image:', selectedImage);
+      console.log('[NEWS_POST] Processing external image:', selectedImage);
       
-      // Use add-watermark to process the external image
+      // Use add-watermark to process the external image (matches LatestNewsTab)
       const watermarkResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/add-watermark`, {
         method: 'POST',
         headers: {
@@ -1265,17 +1283,17 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
         },
         body: JSON.stringify({
           imageUrl: selectedImage,
-          watermarkText: 'Neural Update',
-          position: 'bottom-right'
+          watermarkText: 'Neural Update'
         })
       });
       
       if (watermarkResponse.ok) {
         const watermarkResult = await watermarkResponse.json();
-        imageUrl = watermarkResult.url || watermarkResult.imageUrl;
-        console.log('Image processed with watermark:', imageUrl);
+        // The add-watermark function returns 'publicUrl' (fixed!)
+        imageUrl = watermarkResult.publicUrl || watermarkResult.url || watermarkResult.imageUrl;
+        console.log('[NEWS_POST] Image processed with watermark:', imageUrl);
       } else {
-        console.error('Watermark failed, trying direct upload');
+        console.error('[NEWS_POST] Watermark failed, trying direct upload');
         
         // Try upload-external-image as fallback
         const uploadResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/upload-external-image`, {
@@ -1291,7 +1309,8 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
         
         if (uploadResponse.ok) {
           const uploadResult = await uploadResponse.json();
-          imageUrl = uploadResult.url || uploadResult.imageUrl;
+          imageUrl = uploadResult.publicUrl || uploadResult.url || uploadResult.imageUrl;
+          console.log('[NEWS_POST] Image uploaded without watermark:', imageUrl);
         }
       }
     }
