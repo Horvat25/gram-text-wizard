@@ -156,6 +156,24 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   const bestTimes = state.context?.best_posting_times || ['10:00', '14:00', '19:00'];
   const successPatterns = state.context?.success_patterns || [];
   
+  // Pre-check: Reject immediately if basic conditions aren't met
+  if (state.postsToday >= dailyLimit) {
+    console.log('[AGENT] Limite diário atingido - decisão local');
+    return {
+      decision: 'NO_POST',
+      reason: `Limite diário de ${dailyLimit} posts já foi atingido (${state.postsToday} posts hoje).`
+    };
+  }
+  
+  if (state.lastPostHours < minHoursBetween) {
+    console.log('[AGENT] Tempo mínimo não atingido - decisão local');
+    return {
+      decision: 'WAIT',
+      reason: `Tempo insuficiente desde o último post (${state.lastPostHours.toFixed(1)}h). Mínimo: ${minHoursBetween}h.`,
+      hypothesis: 'Respeitar intervalos melhora o alcance de cada post.'
+    };
+  }
+  
   const systemPrompt = `Você é um agente estrategista de mídias sociais autônomo. Sua função é decidir se vale a pena postar agora e, se sim, planejar o conteúdo ideal.
 
 REGRAS OBRIGATÓRIAS:
@@ -185,46 +203,83 @@ FORMATOS DISPONÍVEIS:
 
 Analise os dados e tome uma decisão. Seja disciplinado - NÃO poste se as condições não forem ideais.`;
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${lovableApiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: 'Analise os dados e decida a próxima ação. Responda em JSON com os campos: decision (POST/NO_POST/WAIT), reason, contentPlan (se POST), hypothesis, expectedEngagement.' }
-      ],
-      response_format: { type: 'json_object' }
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('[AGENT] Erro na API:', errorText);
-    throw new Error(`Erro na API de decisão: ${response.status}`);
-  }
-
-  const result = await response.json();
-  const content = result.choices?.[0]?.message?.content;
+  // Try with primary model first, fallback to cheaper model
+  const models = ['google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'];
   
-  if (!content) {
-    throw new Error('Resposta vazia da API');
-  }
+  for (const model of models) {
+    try {
+      console.log(`[AGENT] Tentando decisão com modelo: ${model}`);
+      
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: 'Analise os dados e decida a próxima ação. Responda em JSON com os campos: decision (POST/NO_POST/WAIT), reason, contentPlan (se POST), hypothesis, expectedEngagement.' }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
 
-  try {
-    const decision = JSON.parse(content);
-    console.log('[AGENT] Decisão tomada:', decision.decision, '-', decision.reason);
-    return decision;
-  } catch (e) {
-    console.error('[AGENT] Erro ao parsear decisão:', content);
-    return {
-      decision: 'WAIT',
-      reason: 'Erro ao processar decisão da IA'
-    };
+      if (response.status === 402) {
+        console.error(`[AGENT] Erro 402 (créditos insuficientes) com modelo ${model}`);
+        if (model === models[models.length - 1]) {
+          // Last model failed, throw specific error
+          throw new Error('CREDITS_EXHAUSTED: Créditos da Lovable AI esgotados. Adicione mais créditos em Settings > Workspace > Usage.');
+        }
+        continue; // Try next model
+      }
+      
+      if (response.status === 429) {
+        console.error(`[AGENT] Erro 429 (rate limit) com modelo ${model}`);
+        throw new Error('RATE_LIMITED: Limite de requisições atingido. Tente novamente em alguns minutos.');
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[AGENT] Erro ${response.status} na API:`, errorText);
+        if (model === models[models.length - 1]) {
+          throw new Error(`Erro na API de decisão: ${response.status}`);
+        }
+        continue;
+      }
+
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Resposta vazia da API');
+      }
+
+      try {
+        const decision = JSON.parse(content);
+        console.log('[AGENT] Decisão tomada:', decision.decision, '-', decision.reason);
+        return decision;
+      } catch (e) {
+        console.error('[AGENT] Erro ao parsear decisão:', content);
+        return {
+          decision: 'WAIT',
+          reason: 'Erro ao processar decisão da IA'
+        };
+      }
+    } catch (error) {
+      if (model === models[models.length - 1]) {
+        throw error;
+      }
+      console.warn(`[AGENT] Falha com ${model}, tentando próximo...`);
+    }
   }
+  
+  // Fallback if all models fail
+  return {
+    decision: 'WAIT',
+    reason: 'Todos os modelos de IA falharam. Aguardando próximo ciclo.'
+  };
 }
 
 // ETAPA 3 & 4: PLANEJAMENTO E EXECUÇÃO
@@ -635,6 +690,18 @@ async function processUser(
       summary
     };
   } catch (error) {
+    const errorStr = String(error);
+    let userFriendlySummary = `Erro durante execução: ${errorStr}`;
+    
+    // Provide user-friendly error messages
+    if (errorStr.includes('CREDITS_EXHAUSTED')) {
+      userFriendlySummary = '⚠️ Créditos da IA esgotados. Adicione mais créditos no painel do Lovable (Settings > Workspace > Usage) para continuar usando o agente autônomo.';
+    } else if (errorStr.includes('RATE_LIMITED')) {
+      userFriendlySummary = '⏳ Limite de requisições atingido. O agente tentará novamente no próximo ciclo (em 6 horas).';
+    } else if (errorStr.includes('402')) {
+      userFriendlySummary = '⚠️ Créditos insuficientes para executar o agente. Recarregue seus créditos em Settings > Workspace > Usage.';
+    }
+    
     // Update report with error status
     if (reportId) {
       await supabase
@@ -642,7 +709,7 @@ async function processUser(
         .update({
           status: 'failed',
           finished_at: new Date().toISOString(),
-          summary: `Erro durante execução: ${String(error)}`
+          summary: userFriendlySummary
         })
         .eq('id', reportId);
     }
