@@ -5,15 +5,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Content distribution types
+type ContentType = 'video' | 'carousel' | 'news' | 'image';
+
+interface ContentDistribution {
+  videos: number;
+  carousels: number;
+  news: number;
+  images: number;
+}
+
 interface ContentPlan {
   theme: string;
   format: 'noticia' | 'educacional' | 'engajamento' | 'storytelling' | 'viral' | 'vendas';
-  mediaType: 'image' | 'carousel' | 'video';
+  mediaType: 'image' | 'carousel' | 'video' | 'reels';
   cta: string;
   tone: string;
   objective: 'alcance' | 'engajamento' | 'conversao';
   platforms: ('instagram' | 'tiktok')[];
   scheduledFor?: string;
+  contentType?: ContentType; // Which slot this fills
 }
 
 interface AgentDecision {
@@ -28,10 +39,15 @@ interface AgentState {
   avgEngagement: number;
   lastPostHours: number;
   postsToday: number;
+  postsThisWeek: number;
   bestPerformingTypes: string[];
   saturatedTopics: string[];
   context: any;
   recentPosts: any[];
+  // Content distribution tracking
+  weeklyGoals: ContentDistribution;
+  weeklyProgress: ContentDistribution;
+  nextContentType: ContentType | null;
 }
 
 // Calculate engagement rate
@@ -49,6 +65,11 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   const hours72Ago = new Date(now.getTime() - 72 * 60 * 60 * 1000);
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
+  // Get start of current week (Sunday)
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+  
   // Busca posts das últimas 72h
   const { data: posts72h, error: postsError } = await supabase
     .from('posts')
@@ -64,6 +85,16 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   
   const recentPosts = posts72h || [];
   
+  // Busca posts desta semana para tracking de distribuição
+  const { data: weekPosts } = await supabase
+    .from('posts')
+    .select('media_type, post_type, status')
+    .eq('user_id', userId)
+    .in('status', ['published', 'scheduled', 'draft'])
+    .gte('created_at', weekStart.toISOString());
+  
+  const postsThisWeek = weekPosts || [];
+  
   // Carrega contexto do agente
   const { data: context, error: contextError } = await supabase
     .from('agent_context')
@@ -78,7 +109,7 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   // Se não existe contexto, cria um
   if (!context) {
     console.log('[AGENT] Criando contexto inicial...');
-    const { data: newContext } = await supabase
+    await supabase
       .from('agent_context')
       .insert({ user_id: userId })
       .select()
@@ -127,22 +158,68 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
     .map((p: any) => p.post_type)
     .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i);
   
+  // ===== CONTENT DISTRIBUTION TRACKING =====
+  // Weekly goals from context settings
+  const weeklyGoals: ContentDistribution = {
+    videos: context.content_distribution_videos || 3,
+    carousels: context.content_distribution_carousels || 2,
+    news: context.content_distribution_news || 4,
+    images: context.content_distribution_images || 5
+  };
+  
+  // Count progress this week by media type
+  const weeklyProgress: ContentDistribution = {
+    videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
+    carousels: postsThisWeek.filter((p: any) => p.media_type === 'carousel').length,
+    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia').length,
+    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia').length
+  };
+  
+  // Determine next content type based on which has most remaining quota (proportional)
+  const getRemaining = (type: ContentType): number => {
+    const goal = weeklyGoals[type === 'video' ? 'videos' : type === 'carousel' ? 'carousels' : type === 'news' ? 'news' : 'images'];
+    const progress = weeklyProgress[type === 'video' ? 'videos' : type === 'carousel' ? 'carousels' : type === 'news' ? 'news' : 'images'];
+    return Math.max(0, goal - progress);
+  };
+  
+  const remainingByType = [
+    { type: 'video' as ContentType, remaining: getRemaining('video'), priority: 4 },     // Higher priority
+    { type: 'carousel' as ContentType, remaining: getRemaining('carousel'), priority: 3 },
+    { type: 'news' as ContentType, remaining: getRemaining('news'), priority: 2 },
+    { type: 'image' as ContentType, remaining: getRemaining('image'), priority: 1 }
+  ].filter(t => t.remaining > 0)
+   .sort((a, b) => {
+     // Sort by remaining (descending) then by priority (descending)
+     if (b.remaining !== a.remaining) return b.remaining - a.remaining;
+     return b.priority - a.priority;
+   });
+  
+  const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  
   console.log('[AGENT] Estado analisado:', {
     avgEngagement: avgEngagement.toFixed(2) + '%',
     lastPostHours: Math.round(lastPostHours) + 'h',
     postsToday,
+    postsThisWeek: postsThisWeek.length,
     bestPerformingTypes,
-    saturatedTopics: recentThemes
+    saturatedTopics: recentThemes,
+    weeklyGoals,
+    weeklyProgress,
+    nextContentType
   });
   
   return {
     avgEngagement,
     lastPostHours,
     postsToday,
+    postsThisWeek: postsThisWeek.length,
     bestPerformingTypes,
     saturatedTopics: recentThemes,
     context,
-    recentPosts
+    recentPosts,
+    weeklyGoals,
+    weeklyProgress,
+    nextContentType
   };
 }
 
@@ -155,6 +232,15 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   const preferredPlatforms = state.context?.preferred_platforms || ['instagram'];
   const bestTimes = state.context?.best_posting_times || ['10:00', '14:00', '19:00'];
   const successPatterns = state.context?.success_patterns || [];
+  
+  // Check if weekly goals are met
+  const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
+                     state.weeklyGoals.news + state.weeklyGoals.images;
+  const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
+                        state.weeklyProgress.news + state.weeklyProgress.images;
+  
+  console.log(`[AGENT] Meta semanal: ${totalProgress}/${totalGoals} posts`);
+  console.log(`[AGENT] Próximo tipo de conteúdo: ${state.nextContentType || 'meta completa'}`);
   
   // Pre-check: Reject immediately if basic conditions aren't met
   if (state.postsToday >= dailyLimit) {
@@ -174,111 +260,107 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     };
   }
   
-  const systemPrompt = `Você é um agente estrategista de mídias sociais autônomo. Sua função é decidir se vale a pena postar agora e, se sim, planejar o conteúdo ideal.
-
-REGRAS OBRIGATÓRIAS:
-- NÃO poste se já foram feitos ${dailyLimit} posts hoje (atual: ${state.postsToday})
-- Espere pelo menos ${minHoursBetween}h entre posts (última postagem há ${state.lastPostHours.toFixed(1)}h)
-- Se engajamento médio < 3%, sugira testar formato diferente
-- Se engajamento médio > 8%, mantenha o padrão vencedor
-- Evite temas saturados (já usados nas últimas 24h): ${state.saturatedTopics.join(', ') || 'nenhum'}
-
-DADOS ATUAIS:
-- Engajamento médio 72h: ${state.avgEngagement.toFixed(2)}%
-- Horas desde último post: ${state.lastPostHours.toFixed(1)}h
-- Posts hoje: ${state.postsToday}
-- Limite diário: ${dailyLimit}
-- Formatos vencedores: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
-- Melhores horários: ${bestTimes.join(', ')}
-- Plataformas: ${preferredPlatforms.join(', ')}
-- Padrões de sucesso anteriores: ${successPatterns.slice(0, 3).join('; ') || 'ainda aprendendo'}
-
-FORMATOS DISPONÍVEIS:
-- noticia: Conteúdo baseado em notícias atuais
-- educacional: Dicas, tutoriais, how-to
-- engajamento: Perguntas, enquetes, debates
-- storytelling: Histórias pessoais ou de marca
-- viral: Trends, memes, conteúdo compartilhável
-- vendas: Promoções, CTAs diretos
-
-Analise os dados e tome uma decisão. Seja disciplinado - NÃO poste se as condições não forem ideais.`;
-
-  // Try with primary model first, fallback to cheaper model
-  const models = ['google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'];
-  
-  for (const model of models) {
-    try {
-      console.log(`[AGENT] Tentando decisão com modelo: ${model}`);
-      
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${lovableApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: 'Analise os dados e decida a próxima ação. Responda em JSON com os campos: decision (POST/NO_POST/WAIT), reason, contentPlan (se POST), hypothesis, expectedEngagement.' }
-          ],
-          response_format: { type: 'json_object' }
-        })
-      });
-
-      if (response.status === 402) {
-        console.error(`[AGENT] Erro 402 (créditos insuficientes) com modelo ${model}`);
-        if (model === models[models.length - 1]) {
-          // Last model failed, throw specific error
-          throw new Error('CREDITS_EXHAUSTED: Créditos da Lovable AI esgotados. Adicione mais créditos em Settings > Workspace > Usage.');
-        }
-        continue; // Try next model
-      }
-      
-      if (response.status === 429) {
-        console.error(`[AGENT] Erro 429 (rate limit) com modelo ${model}`);
-        throw new Error('RATE_LIMITED: Limite de requisições atingido. Tente novamente em alguns minutos.');
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[AGENT] Erro ${response.status} na API:`, errorText);
-        if (model === models[models.length - 1]) {
-          throw new Error(`Erro na API de decisão: ${response.status}`);
-        }
-        continue;
-      }
-
-      const result = await response.json();
-      const content = result.choices?.[0]?.message?.content;
-      
-      if (!content) {
-        throw new Error('Resposta vazia da API');
-      }
-
-      try {
-        const decision = JSON.parse(content);
-        console.log('[AGENT] Decisão tomada:', decision.decision, '-', decision.reason);
-        return decision;
-      } catch (e) {
-        console.error('[AGENT] Erro ao parsear decisão:', content);
-        return {
-          decision: 'WAIT',
-          reason: 'Erro ao processar decisão da IA'
-        };
-      }
-    } catch (error) {
-      if (model === models[models.length - 1]) {
-        throw error;
-      }
-      console.warn(`[AGENT] Falha com ${model}, tentando próximo...`);
-    }
+  // Check if weekly goals are complete
+  if (!state.nextContentType) {
+    console.log('[AGENT] Meta semanal completa!');
+    return {
+      decision: 'NO_POST',
+      reason: `Meta semanal de ${totalGoals} posts alcançada! 🎉 Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}`
+    };
   }
   
-  // Fallback if all models fail
+  // Determine content type and format based on distribution
+  const contentTypeMap: Record<ContentType, { mediaType: string; format: string; theme: string }> = {
+    'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
+    'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
+    'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
+    'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' }
+  };
+  
+  const selectedType = contentTypeMap[state.nextContentType];
+  
+  console.log(`[AGENT] Tipo selecionado: ${state.nextContentType} -> ${selectedType.format} (${selectedType.mediaType})`);
+  
+  // Build content plan based on selected type
+  const contentPlan: ContentPlan = {
+    theme: selectedType.theme,
+    format: selectedType.format as any,
+    mediaType: selectedType.mediaType as any,
+    cta: 'Comente sua opinião!',
+    tone: 'profissional e envolvente',
+    objective: 'engajamento',
+    platforms: preferredPlatforms,
+    contentType: state.nextContentType
+  };
+  
+  // Use AI to refine the theme based on trends
+  const systemPrompt = `Você é um especialista em conteúdo tech. 
+O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType.format}).
+
+PROGRESSO SEMANAL:
+- Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
+- Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
+- Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
+- Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
+
+CONTEXTO:
+- Engajamento médio: ${state.avgEngagement.toFixed(2)}%
+- Formatos vencedores: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
+- Evitar temas: ${state.saturatedTopics.join(', ') || 'nenhum'}
+
+Sugira um tema ESPECÍFICO e atual para o ${state.nextContentType}.
+Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
+
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite', // Use lite for speed
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Crie um tema para ${state.nextContentType}. JSON only.` }
+        ],
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content;
+      if (content) {
+        try {
+          const themeData = JSON.parse(content);
+          contentPlan.theme = themeData.theme || contentPlan.theme;
+          contentPlan.cta = themeData.cta || contentPlan.cta;
+          contentPlan.tone = themeData.tone || contentPlan.tone;
+          console.log('[AGENT] Tema refinado pela IA:', contentPlan.theme);
+        } catch {
+          console.log('[AGENT] Usando tema padrão');
+        }
+      }
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro ao refinar tema, usando padrão:', e);
+  }
+
+  // Return decision with content plan (no need for another AI call - we already decided based on distribution)
+  const remainingForType = {
+    'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
+    'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
+    'news': state.weeklyGoals.news - state.weeklyProgress.news,
+    'image': state.weeklyGoals.images - state.weeklyProgress.images
+  };
+  
   return {
-    decision: 'WAIT',
-    reason: 'Todos os modelos de IA falharam. Aguardando próximo ciclo.'
+    decision: 'POST',
+    reason: `Criando ${state.nextContentType} (${remainingForType[state.nextContentType]} restante na meta semanal). Tema: "${contentPlan.theme}"`,
+    contentPlan,
+    hypothesis: `${state.nextContentType} sobre "${contentPlan.theme}" deve gerar engajamento`,
+    expectedEngagement: state.avgEngagement > 0 ? state.avgEngagement * 1.1 : 5
   };
 }
 
@@ -291,163 +373,400 @@ async function executeContentPlan(
 ): Promise<any> {
   console.log('[AGENT] Etapa 3-4: Executando plano de conteúdo...');
   console.log('[AGENT] Plano:', JSON.stringify(plan, null, 2));
+  console.log('[AGENT] Tipo de conteúdo:', plan.contentType);
   
-  let newsData: any = null;
-  let imageUrl: string | null = null;
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${serviceRoleKey}`
+  };
   
-  // 1. Buscar notícias se formato for notícia
-  if (plan.format === 'noticia') {
-    console.log('[AGENT] Buscando notícias para tema:', plan.theme);
-    try {
-      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `${plan.theme} notícias Brasil`,
-          limit: 5,
-          lang: 'pt-BR',
-          country: 'BR'
-        })
-      });
-      
-      if (searchResponse.ok) {
-        const searchData = await searchResponse.json();
-        newsData = searchData?.results?.[0];
-        if (newsData?.image) {
-          imageUrl = newsData.image;
-          console.log('[AGENT] Imagem de notícia encontrada:', imageUrl);
-        }
-      }
-    } catch (e) {
-      console.error('[AGENT] Erro ao buscar notícias:', e);
-    }
+  // Route to appropriate content creation based on contentType
+  switch (plan.contentType) {
+    case 'video':
+      return createVideoContent(supabase, plan, userId, supabaseUrl, headers);
+    case 'carousel':
+      return createCarouselContent(supabase, plan, userId, supabaseUrl, headers);
+    case 'news':
+      return createNewsContent(supabase, plan, userId, supabaseUrl, headers);
+    case 'image':
+    default:
+      return createImageContent(supabase, plan, userId, supabaseUrl, headers);
   }
+}
+
+// Create VIDEO content (reels/narrated video)
+async function createVideoContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  supabaseUrl: string,
+  headers: any
+): Promise<any> {
+  console.log('[AGENT] Criando vídeo/reels:', plan.theme);
   
-  // 2. Gerar legenda
-  console.log('[AGENT] Gerando legenda...');
-  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+  // Generate script for video
+  const scriptResponse = await fetch(`${supabaseUrl}/functions/v1/generate-story-script`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
-      topic: newsData?.title || plan.theme,
-      postType: plan.format,
-      customInstructions: `Tom: ${plan.tone || 'profissional'}. CTA: ${plan.cta || 'Comente sua opinião!'}`
+      topic: plan.theme,
+      segmentCount: 4,
+      wordsPerSegment: 12,
+      totalDuration: 20,
+      style: plan.tone || 'impactante'
     })
   });
   
-  let caption = plan.theme;
-  let hashtags: string[] = [];
+  let script = null;
+  let thumbnailUrl = null;
+  
+  if (scriptResponse.ok) {
+    script = await scriptResponse.json();
+    console.log('[AGENT] Script gerado:', script.title);
+    
+    // Generate thumbnail from first segment
+    if (script.segments?.[0]?.imagePrompt) {
+      const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          prompt: `${script.segments[0].imagePrompt}. Cinematic, vertical 9:16 aspect ratio.`,
+          format: 'portrait',
+          model: 'gemini'
+        })
+      });
+      
+      if (imgResponse.ok) {
+        const imgData = await imgResponse.json();
+        thumbnailUrl = imgData.imageUrl;
+      }
+    }
+  }
+  
+  // Generate caption
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: script?.title || plan.theme,
+      postType: 'entretenimento',
+      customInstructions: `Este é um REELS/vídeo curto. ${plan.cta}`
+    })
+  });
+  
+  let caption = `🎬 ${script?.title || plan.theme}`;
+  let hashtags: string[] = ['#tecnologia', '#reels', '#viral', '#ia'];
   
   if (captionResponse.ok) {
     const captionData = await captionResponse.json();
     caption = captionData.caption || caption;
-    hashtags = captionData.hashtags || [];
-    console.log('[AGENT] Legenda gerada com', caption.length, 'caracteres');
-  } else {
-    console.error('[AGENT] Erro ao gerar legenda');
+    hashtags = captionData.hashtags || hashtags;
   }
   
-  // 3. Gerar imagem se não tiver da notícia
-  if (!imageUrl) {
-    console.log('[AGENT] Gerando imagem com IA...');
-    const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+  // Create post with video metadata (needs_processing for frontend render)
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    caption,
+    hashtags,
+    post_type: 'entretenimento',
+    media_type: 'reels',
+    platforms: plan.platforms || ['instagram'],
+    status: 'draft',
+    image_url: thumbnailUrl,
+    overlay_metadata: {
+      type: 'narrated_video',
+      script,
+      topic: plan.theme,
+      needs_processing: true,
+      created_by_agent: true,
+      publish_after_render: true
+    },
+    ai_model_used: 'gemini-2.5-flash'
+  }).select().single();
+  
+  if (error) throw error;
+  console.log('[AGENT] Vídeo criado (aguardando render):', post.id);
+  return post;
+}
+
+// Create CAROUSEL content
+async function createCarouselContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  supabaseUrl: string,
+  headers: any
+): Promise<any> {
+  console.log('[AGENT] Criando carrossel:', plan.theme);
+  
+  // Generate 4 images for carousel
+  const slidePrompts = [
+    `Slide 1: Introdução visual para ${plan.theme}. Clean, modern, tech aesthetic.`,
+    `Slide 2: Dados ou estatísticas sobre ${plan.theme}. Infographic style.`,
+    `Slide 3: Benefícios ou aplicações de ${plan.theme}. Professional design.`,
+    `Slide 4: Conclusão ou CTA sobre ${plan.theme}. Impactful, memorable.`
+  ];
+  
+  const carouselImages: string[] = [];
+  
+  for (const prompt of slidePrompts) {
+    const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
-        prompt: `Imagem profissional para post de mídia social sobre: ${plan.theme}`,
-        format: 'square'
+        prompt,
+        format: 'square',
+        model: 'gemini'
       })
     });
     
-    if (imageResponse.ok) {
-      const imageData = await imageResponse.json();
-      imageUrl = imageData.url;
-      console.log('[AGENT] Imagem gerada:', imageUrl);
-    } else {
-      console.error('[AGENT] Erro ao gerar imagem');
-    }
-  } else {
-    // Adicionar watermark na imagem de notícia
-    console.log('[AGENT] Adicionando watermark...');
-    try {
-      const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl })
-      });
-      
-      if (watermarkResponse.ok) {
-        const watermarkData = await watermarkResponse.json();
-        imageUrl = watermarkData.url || imageUrl;
+    if (imgResponse.ok) {
+      const imgData = await imgResponse.json();
+      if (imgData.imageUrl) {
+        carouselImages.push(imgData.imageUrl);
       }
-    } catch (e) {
-      console.error('[AGENT] Erro ao adicionar watermark:', e);
     }
   }
   
-  // 4. Criar post no banco
-  console.log('[AGENT] Salvando post no banco...');
-  const { data: post, error: postError } = await supabase
-    .from('posts')
-    .insert({
-      user_id: userId,
-      caption,
-      hashtags,
-      image_url: imageUrl,
-      post_type: plan.format,
-      media_type: plan.mediaType || 'image',
-      platforms: plan.platforms || ['instagram'],
-      status: plan.scheduledFor ? 'scheduled' : 'draft',
-      scheduled_for: plan.scheduledFor || null,
-      ai_model_used: 'gemini-2.5-flash'
+  // Generate caption
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: plan.theme,
+      postType: 'educacional',
+      customInstructions: `Este é um CARROSSEL com ${carouselImages.length} slides. ${plan.cta}`
     })
-    .select()
-    .single();
+  });
   
-  if (postError) {
-    console.error('[AGENT] Erro ao salvar post:', postError);
-    throw new Error('Falha ao salvar post no banco');
+  let caption = `📚 ${plan.theme}`;
+  let hashtags: string[] = ['#carrossel', '#tecnologia', '#dicas', '#educacional'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
   }
   
-  console.log('[AGENT] Post criado:', post.id);
+  // Create carousel post
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    caption,
+    hashtags,
+    post_type: 'educacional',
+    media_type: 'carousel',
+    platforms: plan.platforms || ['instagram'],
+    status: carouselImages.length >= 2 ? 'draft' : 'failed',
+    image_url: carouselImages[0] || null,
+    carousel_images: carouselImages,
+    ai_model_used: 'gemini-2.5-flash'
+  }).select().single();
   
-  // 5. Publicar se auto_post_enabled e não agendado
-  if (!plan.scheduledFor) {
-    for (const platform of (plan.platforms || ['instagram'])) {
-      console.log(`[AGENT] Publicando no ${platform}...`);
-      
+  if (error) throw error;
+  console.log('[AGENT] Carrossel criado:', post.id, 'slides:', carouselImages.length);
+  return post;
+}
+
+// Create NEWS content (using Firecrawl)
+async function createNewsContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  supabaseUrl: string,
+  headers: any
+): Promise<any> {
+  console.log('[AGENT] Criando post de notícia:', plan.theme);
+  
+  // Search for news using Firecrawl
+  const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      query: `${plan.theme} notícia recente tecnologia`,
+      limit: 10,
+      lang: 'pt-BR',
+      country: 'BR'
+    })
+  });
+  
+  let selectedArticle = null;
+  let selectedImage = null;
+  let sourceDomain = '';
+  let sourceUrl = '';
+  
+  if (searchResponse.ok) {
+    const searchResult = await searchResponse.json();
+    const articles = searchResult.data || [];
+    
+    // Find article with best images
+    const withImages = articles.filter((a: any) => a.images?.length > 0)
+      .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
+    
+    selectedArticle = withImages[0] || articles[0];
+    
+    if (selectedArticle) {
+      sourceUrl = selectedArticle.url || '';
       try {
-        if (platform === 'instagram') {
-          const publishResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ postId: post.id })
-          });
-          
-          if (publishResponse.ok) {
-            console.log('[AGENT] Publicado no Instagram com sucesso!');
-          } else {
-            console.error('[AGENT] Erro ao publicar no Instagram');
-          }
-        } else if (platform === 'tiktok') {
-          const publishResponse = await fetch(`${supabaseUrl}/functions/v1/publish-to-tiktok`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ postId: post.id })
-          });
-          
-          if (publishResponse.ok) {
-            console.log('[AGENT] Publicado no TikTok com sucesso!');
-          } else {
-            console.error('[AGENT] Erro ao publicar no TikTok');
-          }
-        }
-      } catch (e) {
-        console.error(`[AGENT] Erro ao publicar no ${platform}:`, e);
+        sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
+      } catch { sourceDomain = 'fonte'; }
+      
+      // Select best image (filter icons/logos)
+      if (selectedArticle.images?.length > 0) {
+        const qualityImages = selectedArticle.images.filter((img: string) =>
+          img && !img.includes('icon') && !img.includes('logo') && 
+          !img.includes('avatar') && !img.includes('favicon')
+        );
+        selectedImage = qualityImages[0] || selectedArticle.images[0];
       }
     }
   }
   
+  console.log('[AGENT] Artigo selecionado:', selectedArticle?.title || 'nenhum');
+  
+  // Process image with watermark
+  let imageUrl = null;
+  if (selectedImage) {
+    const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        imageUrl: selectedImage,
+        watermarkText: 'Neural Update'
+      })
+    });
+    
+    if (watermarkResponse.ok) {
+      const wmResult = await watermarkResponse.json();
+      imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+    }
+  }
+  
+  // Generate image if no article image
+  if (!imageUrl) {
+    const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        prompt: `News illustration: ${selectedArticle?.title || plan.theme}. Professional journalism style.`,
+        format: 'square',
+        model: 'gemini'
+      })
+    });
+    
+    if (imgResponse.ok) {
+      const imgData = await imgResponse.json();
+      imageUrl = imgData.imageUrl;
+    }
+  }
+  
+  // Generate caption with source attribution
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: `${selectedArticle?.title || plan.theme}. ${selectedArticle?.description || ''}`,
+      postType: 'noticia',
+      sourceUrl: sourceUrl,
+      sourceName: sourceDomain,
+      customInstructions: `Esta é uma notícia REAL. OBRIGATÓRIO incluir fonte: 📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`
+    })
+  });
+  
+  let caption = `📰 ${selectedArticle?.title || plan.theme}`;
+  let hashtags: string[] = ['#tecnologia', '#noticias', '#ia', '#tech'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
+  }
+  
+  // Ensure source is in caption
+  if (!caption.includes(sourceUrl) && sourceUrl) {
+    caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+  }
+  
+  // Create post
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    caption,
+    hashtags,
+    post_type: 'noticia',
+    media_type: 'image',
+    platforms: plan.platforms || ['instagram'],
+    status: 'draft',
+    image_url: imageUrl,
+    ai_model_used: 'gemini-2.5-flash'
+  }).select().single();
+  
+  if (error) throw error;
+  console.log('[AGENT] Post de notícia criado:', post.id);
+  return post;
+}
+
+// Create IMAGE content (simple static post)
+async function createImageContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  supabaseUrl: string,
+  headers: any
+): Promise<any> {
+  console.log('[AGENT] Criando post de imagem:', plan.theme);
+  
+  // Generate image
+  const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      prompt: `Professional social media post about: ${plan.theme}. Modern, tech aesthetic, engaging.`,
+      format: 'square',
+      model: 'gemini'
+    })
+  });
+  
+  let imageUrl = null;
+  if (imgResponse.ok) {
+    const imgData = await imgResponse.json();
+    imageUrl = imgData.imageUrl;
+  }
+  
+  // Generate caption
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: plan.theme,
+      postType: plan.format,
+      customInstructions: `Tom: ${plan.tone}. CTA: ${plan.cta}`
+    })
+  });
+  
+  let caption = plan.theme;
+  let hashtags: string[] = ['#tecnologia', '#ia', '#futuro', '#inovacao'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
+  }
+  
+  // Create post
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    caption,
+    hashtags,
+    post_type: plan.format,
+    media_type: 'image',
+    platforms: plan.platforms || ['instagram'],
+    status: 'draft',
+    image_url: imageUrl,
+    ai_model_used: 'gemini-2.5-flash'
+  }).select().single();
+  
+  if (error) throw error;
+  console.log('[AGENT] Post de imagem criado:', post.id);
   return post;
 }
 
