@@ -57,6 +57,70 @@ function calculateEngagement(post: any): number {
   return (total / reach) * 100;
 }
 
+// Send conversational chat message to user
+async function sendChatMessage(supabase: any, userId: string, message: string): Promise<void> {
+  try {
+    await supabase.from('agent_chat_messages').insert({
+      user_id: userId,
+      role: 'assistant',
+      content: message,
+      actions: null
+    });
+    console.log('[AGENT] Chat message sent:', message.substring(0, 50) + '...');
+  } catch (error) {
+    console.error('[AGENT] Failed to send chat message:', error);
+  }
+}
+
+// Generate conversational status update
+function getConversationalUpdate(
+  agentName: string, 
+  action: 'analyzing' | 'deciding' | 'creating' | 'created' | 'waiting' | 'completed' | 'error',
+  details?: any
+): string {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  
+  const messages: Record<string, string[]> = {
+    analyzing: [
+      `🔍 Dando uma olhada no cenário... vamos ver como andam as coisas por aqui.`,
+      `📊 Analisando as métricas e tendências do momento...`,
+      `🧠 Hora de entender o que está funcionando melhor!`
+    ],
+    deciding: [
+      `🤔 Hmm, deixa eu pensar no melhor tipo de conteúdo pra agora...`,
+      `💭 Avaliando qual formato vai funcionar melhor nesse horário...`,
+      `⚡ Decidindo a estratégia: ${details?.nextType || 'conteúdo'} parece promissor!`
+    ],
+    creating: [
+      `✍️ Mãos à obra! Criando um ${details?.type || 'conteúdo'} sobre "${details?.theme || 'tendências'}"...`,
+      `🎨 Produzindo conteúdo fresquinho sobre ${details?.theme || 'tecnologia'}...`,
+      `🚀 Gerando ${details?.type || 'post'} - vai ficar bom!`
+    ],
+    created: [
+      `✅ Pronto! Criei um ${details?.type || 'post'} sobre "${details?.theme || 'tendências'}". ${details?.needsRender ? 'Precisa só renderizar o vídeo quando puder! 🎬' : ''}`,
+      `🎉 Feito! Novo ${details?.type || 'conteúdo'} criado. ${details?.status === 'published' ? 'Já foi publicado!' : details?.status === 'scheduled' ? 'Agendado!' : 'Está nos rascunhos.'}`,
+      `👍 Concluído! ${details?.type || 'Post'} sobre "${details?.theme || 'tech'}" ${details?.status === 'published' ? 'no ar!' : 'pronto pra revisão.'}`
+    ],
+    waiting: [
+      `⏳ Ainda não é hora de postar. ${details?.reason || 'Vou aguardar o momento ideal.'}`,
+      `🕐 Esperando um pouco... ${details?.reason || 'O timing é importante!'}`,
+      `😊 Tudo tranquilo por enquanto. ${details?.reason || 'Próxima análise em breve!'}`
+    ],
+    completed: [
+      `${greeting}! 📈 Resumo: já temos ${details?.weeklyProgress || 0} posts esta semana (meta: ${details?.weeklyGoals || 0}). Engajamento médio: ${details?.avgEngagement || '0'}%.`,
+      `Ciclo completo! 📊 Progresso semanal: ${details?.weeklyProgress || 0}/${details?.weeklyGoals || 0} posts. Tudo rodando bem!`
+    ],
+    error: [
+      `⚠️ Ops, tive um probleminha: ${details?.error || 'erro desconhecido'}. Vou tentar de novo no próximo ciclo!`,
+      `😅 Algo deu errado: ${details?.error || 'falha temporária'}. Não se preocupe, vou resolver!`
+    ]
+  };
+  
+  const variants = messages[action] || messages.completed;
+  return variants[Math.floor(Math.random() * variants.length)];
+}
+
 // ETAPA 1: LEITURA DO MUNDO
 async function analyzeCurrentState(supabase: any, userId: string): Promise<AgentState> {
   console.log('[AGENT] Etapa 1: Analisando estado atual...');
@@ -920,6 +984,14 @@ async function processUser(
 ): Promise<any> {
   console.log(`[AGENT] Processando usuário: ${userId}`);
   
+  // Get agent name for conversational messages
+  const { data: contextData } = await supabase
+    .from('agent_context')
+    .select('agent_name')
+    .eq('user_id', userId)
+    .maybeSingle();
+  const agentName = contextData?.agent_name || 'Agente';
+  
   // Create execution report record
   const { data: reportRecord } = await supabase
     .from('agent_execution_reports')
@@ -935,8 +1007,16 @@ async function processUser(
   const reportId = reportRecord?.id;
   
   try {
+    // Send initial chat message (conversational style)
+    await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'analyzing'));
+    
     // ETAPA 1: Análise
     const state = await analyzeCurrentState(supabase, userId);
+    
+    // Send decision update
+    await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'deciding', {
+      nextType: state.nextContentType
+    }));
     
     // ETAPA 2: Decisão
     const decision = await makeStrategicDecision(state, lovableApiKey);
@@ -945,6 +1025,16 @@ async function processUser(
     
     // ETAPA 3 & 4: Execução (se decisão for POST)
     if (decision.decision === 'POST' && decision.contentPlan) {
+      // Send creating message
+      const mediaTypeName = decision.contentPlan.mediaType === 'reels' ? 'Reels' : 
+                            decision.contentPlan.mediaType === 'carousel' ? 'Carrossel' :
+                            decision.contentPlan.mediaType === 'video' ? 'Vídeo' : 'Post';
+      
+      await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'creating', {
+        type: mediaTypeName,
+        theme: decision.contentPlan.theme
+      }));
+      
       // Check if auto_post is enabled
       if (state.context?.auto_post_enabled) {
         post = await executeContentPlan(supabase, decision.contentPlan, userId, supabaseUrl);
@@ -967,6 +1057,21 @@ async function processUser(
         
         post = draftPost;
       }
+      
+      // Send completion message
+      const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
+      await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'created', {
+        type: mediaTypeName,
+        theme: decision.contentPlan.theme,
+        status: post?.status,
+        needsRender: isReels && !post?.video_url
+      }));
+      
+    } else if (decision.decision === 'NO_POST' || decision.decision === 'WAIT') {
+      // Send waiting message
+      await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'waiting', {
+        reason: decision.reason
+      }));
     }
     
     // ETAPA 5: Registro de decisão
@@ -974,6 +1079,18 @@ async function processUser(
     
     // Generate friendly summary for the user
     const summary = generateExecutionSummary(decision, state, post);
+    
+    // Send final summary with stats
+    const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
+                       state.weeklyGoals.news + state.weeklyGoals.images;
+    const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
+                          state.weeklyProgress.news + state.weeklyProgress.images;
+    
+    await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'completed', {
+      weeklyProgress: totalProgress,
+      weeklyGoals: totalGoals,
+      avgEngagement: state.avgEngagement.toFixed(1)
+    }));
     
     // Update execution report with results
     if (reportId) {
@@ -1016,10 +1133,15 @@ async function processUser(
     if (errorStr.includes('CREDITS_EXHAUSTED')) {
       userFriendlySummary = '⚠️ Créditos da IA esgotados. Adicione mais créditos no painel do Lovable (Settings > Workspace > Usage) para continuar usando o agente autônomo.';
     } else if (errorStr.includes('RATE_LIMITED')) {
-      userFriendlySummary = '⏳ Limite de requisições atingido. O agente tentará novamente no próximo ciclo (em 6 horas).';
+      userFriendlySummary = '⏳ Limite de requisições atingido. O agente tentará novamente no próximo ciclo.';
     } else if (errorStr.includes('402')) {
       userFriendlySummary = '⚠️ Créditos insuficientes para executar o agente. Recarregue seus créditos em Settings > Workspace > Usage.';
     }
+    
+    // Send error message via chat
+    await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'error', {
+      error: userFriendlySummary
+    }));
     
     // Update report with error status
     if (reportId) {
