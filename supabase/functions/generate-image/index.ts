@@ -7,13 +7,107 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Pollinations.ai - 100% FREE, no API key needed, uses FLUX model
+async function generateWithPollinations(prompt: string, format: string): Promise<{ imageBytes: Uint8Array; contentType: string }> {
+  const width = format === "portrait" ? 768 : 1024;
+  const height = format === "portrait" ? 1024 : 1024;
+  
+  const encodedPrompt = encodeURIComponent(prompt);
+  const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=flux&nologo=true&enhance=true`;
+  
+  console.log("Gerando imagem com Pollinations.ai (GRÁTIS)...");
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`Pollinations error: ${response.status}`);
+  }
+  
+  const arrayBuffer = await response.arrayBuffer();
+  const imageBytes = new Uint8Array(arrayBuffer);
+  const contentType = response.headers.get("content-type") || "image/jpeg";
+  
+  console.log("Imagem Pollinations gerada com sucesso!");
+  return { imageBytes, contentType };
+}
+
+// Gemini fallback (uses Lovable AI credits)
+async function generateWithGemini(prompt: string, format: string, LOVABLE_API_KEY: string): Promise<{ base64ImageUrl: string }> {
+  console.log("Fallback: Gerando imagem com Gemini...");
+  
+  const maxAttempts = 3;
+  let base64ImageUrl: string | undefined;
+  let lastError = "";
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    console.log(`Tentativa ${attempt}/${maxAttempts} de gerar imagem com Gemini...`);
+    
+    try {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-image-preview",
+          messages: [{ role: "user", content: prompt }],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Tentativa ${attempt} - Erro na API Lovable:`, response.status, errorText);
+        
+        if (response.status === 429) {
+          lastError = "Rate limit exceeded";
+          const waitTime = Math.pow(2, attempt) * 1000;
+          await new Promise(r => setTimeout(r, waitTime));
+          continue;
+        }
+        if (response.status === 402) {
+          throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
+        }
+        
+        lastError = `API error: ${response.status}`;
+        await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
+
+      const data = await response.json();
+      base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url 
+        || data.choices?.[0]?.message?.content?.images?.[0]?.url
+        || data.images?.[0]?.url;
+
+      if (base64ImageUrl && base64ImageUrl.startsWith('data:image/')) {
+        console.log(`Tentativa ${attempt} - Imagem Gemini gerada!`);
+        break;
+      } else {
+        lastError = "Unexpected response format";
+        await new Promise(r => setTimeout(r, 1000 * attempt));
+      }
+    } catch (fetchError: any) {
+      console.error(`Tentativa ${attempt} - Erro:`, fetchError);
+      lastError = fetchError.message || "Connection error";
+      await new Promise(r => setTimeout(r, 1500));
+    }
+  }
+
+  if (!base64ImageUrl) {
+    throw new Error(`Gemini failed after ${maxAttempts} attempts: ${lastError}`);
+  }
+
+  return { base64ImageUrl };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt, format = "square", customStyle, model = "gemini", brandName, brandLogoUrl } = await req.json();
+    const { prompt, format = "square", customStyle, model = "pollinations", brandName } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       throw new Error("Prompt é obrigatório");
@@ -23,42 +117,74 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Build optimized prompt
+    const brandingName = brandName || "NeuralUpdate";
+    const styleInstructions = customStyle 
+      ? `${customStyle}. Professional quality, vibrant colors.` 
+      : `Professional, high quality, vibrant colors, balanced composition. Modern tech aesthetic.`;
+    
+    const optimizedPrompt = `${prompt}. ${styleInstructions}. Ultra high resolution, suitable for Instagram, no text or words in the image.`;
+
     let imageUrl: string;
     let modelUsed: string;
     let costEstimate: number;
 
-    // Neural Update branding default
-    const brandingName = brandName || "NeuralUpdate";
-    const brandingInstructions = `
-IMPORTANTE - Marca d'água obrigatória:
-- Adicione o texto "${brandingName}" discretamente no canto inferior direito da imagem
-- Use fonte moderna e clean (estilo tech/minimal)
-- Cor: branco com leve transparência ou gradiente roxo/ciano
-- Tamanho pequeno mas legível
+    // Try Pollinations first (FREE!) unless explicitly requesting other models
+    if (model === "pollinations" || model === "gemini" || model === "auto") {
+      try {
+        const { imageBytes, contentType } = await generateWithPollinations(optimizedPrompt, format);
+        
+        // Upload to storage
+        const timestamp = Date.now();
+        const randomId = crypto.randomUUID().split("-")[0];
+        const extension = contentType.includes("png") ? "png" : "jpg";
+        const fileName = `generated/${timestamp}-${randomId}.${extension}`;
 
-Estilo Neural Update: 
-- Estética futurista/tech com tons de roxo (#8B5CF6), azul elétrico (#06B6D4) e gradientes neon
-- Visual clean e minimalista com elementos de IA/tecnologia
-- Bordas ou elementos sutis que remetem a circuitos/redes neurais
-- Paleta: roxo, ciano, dark slate
-- Aspecto profissional e inovador`;
+        const { error: uploadError } = await supabase.storage
+          .from("post-images")
+          .upload(fileName, imageBytes, {
+            contentType,
+            upsert: false,
+          });
 
-    // Build style instructions
-    const styleInstructions = customStyle 
-      ? `${customStyle}. ${brandingInstructions}` 
-      : `${brandingInstructions}. Profissional, alta qualidade, cores vibrantes, composição equilibrada.`;
+        if (uploadError) {
+          throw new Error(`Upload error: ${uploadError.message}`);
+        }
 
-    // Determine size based on format
-    const size = format === "portrait" ? "1024x1792" : "1024x1024";
+        const { data: publicUrlData } = supabase.storage
+          .from("post-images")
+          .getPublicUrl(fileName);
 
-    // Try DALL-E 3 first if selected
+        imageUrl = publicUrlData.publicUrl;
+        modelUsed = "pollinations/flux";
+        costEstimate = 0; // FREE!
+
+        console.log("✅ Imagem salva (GRÁTIS):", imageUrl);
+
+        return new Response(
+          JSON.stringify({
+            imageUrl,
+            format,
+            modelUsed,
+            costEstimate,
+            supportsText: false,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      } catch (pollinationsError) {
+        console.warn("Pollinations falhou, tentando Gemini como fallback:", pollinationsError);
+      }
+    }
+
+    // DALL-E 3 (if explicitly requested and API key exists)
     if (model === "dalle3") {
       const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
       
       if (OPENAI_API_KEY) {
         console.log("Gerando imagem com DALL-E 3...");
-        
-        const optimizedPrompt = `${prompt}. ${styleInstructions}. High quality, suitable for Instagram, no text or words in the image.`;
+        const size = format === "portrait" ? "1024x1792" : "1024x1024";
 
         try {
           const dalleResponse = await fetch("https://api.openai.com/v1/images/generations", {
@@ -78,8 +204,6 @@ Estilo Neural Update:
           });
 
           if (!dalleResponse.ok) {
-            const errorData = await dalleResponse.text();
-            console.error("DALL-E 3 error:", dalleResponse.status, errorData);
             throw new Error(`DALL-E 3 error: ${dalleResponse.status}`);
           }
 
@@ -87,10 +211,9 @@ Estilo Neural Update:
           const base64Image = dalleData.data?.[0]?.b64_json;
 
           if (!base64Image) {
-            throw new Error("DALL-E 3 não retornou imagem");
+            throw new Error("DALL-E 3 no image returned");
           }
 
-          // Upload to storage
           const imageBytes = decode(base64Image);
           const timestamp = Date.now();
           const randomId = crypto.randomUUID().split("-")[0];
@@ -104,7 +227,7 @@ Estilo Neural Update:
             });
 
           if (uploadError) {
-            throw new Error(`Erro ao salvar imagem: ${uploadError.message}`);
+            throw new Error(`Upload error: ${uploadError.message}`);
           }
 
           const { data: publicUrlData } = supabase.storage
@@ -113,7 +236,7 @@ Estilo Neural Update:
 
           imageUrl = publicUrlData.publicUrl;
           modelUsed = "openai/dall-e-3";
-          costEstimate = 0.08; // ~$0.08 per HD image
+          costEstimate = 0.08;
 
           console.log("Imagem DALL-E 3 salva:", imageUrl);
 
@@ -130,110 +253,22 @@ Estilo Neural Update:
             }
           );
         } catch (dalleError) {
-          console.error("Fallback para Gemini devido a erro DALL-E:", dalleError);
+          console.error("DALL-E 3 failed:", dalleError);
         }
-      } else {
-        console.log("OPENAI_API_KEY não configurada, usando Gemini como fallback");
       }
     }
 
-    // Fallback to Gemini
+    // Gemini fallback
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("Nenhuma API de imagem configurada");
+      throw new Error("No image generation API available");
     }
 
-    console.log("Gerando imagem com Gemini...");
-
-    const optimizedPrompt = `${prompt}
-
-Estilo: ${styleInstructions}
-Formato: ${format === "portrait" ? "Vertical (4:5 ratio)" : "Quadrado (1:1 ratio)"}.
-Qualidade: Ultra alta resolução, adequado para Instagram feed.
-Sem texto: Não incluir textos ou palavras na imagem.`;
-
-    // Try up to 3 times for image generation with exponential backoff
-    let base64ImageUrl: string | undefined;
-    let lastError: string = "";
-    const maxAttempts = 3;
-    
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      console.log(`Tentativa ${attempt}/${maxAttempts} de gerar imagem com Gemini...`);
-      
-      try {
-        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash-image-preview",
-            messages: [
-              {
-                role: "user",
-                content: optimizedPrompt,
-              },
-            ],
-            modalities: ["image", "text"],
-          }),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`Tentativa ${attempt} - Erro na API Lovable:`, response.status, errorText);
-          
-          if (response.status === 429) {
-            lastError = "Limite de requisições excedido. Aguarde alguns minutos.";
-            // Exponential backoff: 2s, 4s, 8s
-            const waitTime = Math.pow(2, attempt) * 1000;
-            console.log(`Rate limited, waiting ${waitTime}ms before retry...`);
-            await new Promise(r => setTimeout(r, waitTime));
-            continue;
-          }
-          if (response.status === 402) {
-            throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
-          }
-          
-          lastError = `Erro na API: ${response.status}`;
-          await new Promise(r => setTimeout(r, 1500));
-          continue;
-        }
-
-        const data = await response.json();
-        console.log(`Tentativa ${attempt} - Resposta recebida, verificando estrutura...`);
-        
-        // Check multiple possible locations for the image
-        base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url 
-          || data.choices?.[0]?.message?.content?.images?.[0]?.url
-          || data.images?.[0]?.url;
-
-        if (base64ImageUrl && base64ImageUrl.startsWith('data:image/')) {
-          console.log(`Tentativa ${attempt} - Imagem gerada com sucesso!`);
-          break;
-        } else {
-          lastError = "API não retornou imagem no formato esperado";
-          console.warn(`Tentativa ${attempt} - Estrutura de resposta inesperada:`, 
-            JSON.stringify(data.choices?.[0]?.message).substring(0, 300));
-          // Wait before retry with increasing delay
-          await new Promise(r => setTimeout(r, 1000 * attempt));
-        }
-      } catch (fetchError: any) {
-        console.error(`Tentativa ${attempt} - Erro de fetch:`, fetchError);
-        lastError = fetchError.message || "Erro de conexão";
-        await new Promise(r => setTimeout(r, 1500));
-      }
-    }
-
-    if (!base64ImageUrl) {
-      throw new Error(`Imagem não foi gerada após ${maxAttempts} tentativas: ${lastError}`);
-    }
-
-    console.log("Imagem Gemini gerada, fazendo upload para Storage...");
+    const { base64ImageUrl } = await generateWithGemini(optimizedPrompt, format, LOVABLE_API_KEY);
 
     const base64Match = base64ImageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
     if (!base64Match) {
-      throw new Error("Formato de imagem inválido");
+      throw new Error("Invalid image format");
     }
 
     const imageType = base64Match[1];
@@ -252,7 +287,7 @@ Sem texto: Não incluir textos ou palavras na imagem.`;
       });
 
     if (uploadError) {
-      throw new Error(`Erro ao salvar imagem: ${uploadError.message}`);
+      throw new Error(`Upload error: ${uploadError.message}`);
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -261,7 +296,7 @@ Sem texto: Não incluir textos ou palavras na imagem.`;
 
     imageUrl = publicUrlData.publicUrl;
     modelUsed = "google/gemini-flash";
-    costEstimate = 0;
+    costEstimate = 0.02;
 
     console.log("Imagem Gemini salva:", imageUrl);
 
