@@ -16,16 +16,21 @@ serve(async (req) => {
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
+      console.error("[ElevenLabs TTS] ❌ API Key not configured");
       throw new Error("ELEVENLABS_API_KEY não configurada");
     }
+
+    // Log API key format (first 8 chars only for security)
+    const keyPreview = ELEVENLABS_API_KEY.substring(0, 8) + "...";
+    console.log("[ElevenLabs TTS] API Key format:", keyPreview, "length:", ELEVENLABS_API_KEY.length);
 
     if (!text) {
       throw new Error("Texto é obrigatório");
     }
 
-    console.log("Generating TTS for text:", text.substring(0, 100) + "...");
-    console.log("Voice ID/Name requested:", voiceId || "default");
-    console.log("Language:", language || "pt-BR");
+    console.log("[ElevenLabs TTS] Generating for text:", text.substring(0, 100) + "...");
+    console.log("[ElevenLabs TTS] Voice ID/Name requested:", voiceId || "default");
+    console.log("[ElevenLabs TTS] Language:", language || "pt-BR");
 
     // Map voice names to ElevenLabs voice IDs
     const voiceIdMap: Record<string, string> = {
@@ -89,31 +94,34 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("ElevenLabs TTS error:", response.status, errorText);
+      console.error("[ElevenLabs TTS] ❌ API Error:", response.status, errorText);
       
-      // Return 200 with fallback flag so client can properly detect and use next provider
-      // Using 200 instead of 503 because supabase.functions.invoke treats non-2xx as errors
-      if (response.status === 401 || response.status === 403 || response.status === 429) {
-        console.log("ElevenLabs blocked/rate-limited, signaling client to use fallback");
-        return new Response(
-          JSON.stringify({ 
-            error: "ElevenLabs unavailable",
-            code: "ELEVENLABS_BLOCKED",
-            fallback: true,
-            audioContent: null, // Explicit null so client knows no audio
-          }),
-          {
-            status: 200, // Return 200 so client can read the fallback flag
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
+      // Parse error for more details
+      let errorDetails = "";
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetails = errorJson?.detail?.message || errorJson?.message || errorText;
+      } catch {
+        errorDetails = errorText;
       }
       
-      // For other errors, also signal fallback
-      console.log("ElevenLabs error, signaling client to use fallback");
+      // Specific error messages for debugging
+      if (response.status === 401) {
+        console.error("[ElevenLabs TTS] ❌ 401 Unauthorized - API Key inválida ou expirada");
+        console.error("[ElevenLabs TTS] Detalhes:", errorDetails);
+      } else if (response.status === 403) {
+        console.error("[ElevenLabs TTS] ❌ 403 Forbidden - Sem permissão para TTS (verifique scopes da API Key)");
+      } else if (response.status === 429) {
+        console.error("[ElevenLabs TTS] ❌ 429 Rate Limited - Quota esgotada");
+      }
+      
+      // Return 200 with fallback flag so client can properly detect and use next provider
       return new Response(
         JSON.stringify({ 
-          error: `ElevenLabs error: ${response.status}`,
+          error: `ElevenLabs: ${errorDetails || response.status}`,
+          code: response.status === 401 ? "INVALID_API_KEY" : 
+                response.status === 403 ? "NO_TTS_PERMISSION" :
+                response.status === 429 ? "QUOTA_EXCEEDED" : "ELEVENLABS_ERROR",
           fallback: true,
           audioContent: null,
         }),
@@ -129,7 +137,7 @@ serve(async (req) => {
     // Use Deno's base64 encoder (safer for large buffers)
     const base64Audio = base64Encode(audioBuffer);
 
-    console.log("ElevenLabs TTS generated successfully, audio size:", audioBuffer.byteLength, "base64 length:", base64Audio.length);
+    console.log("[ElevenLabs TTS] ✅ Success! Audio size:", audioBuffer.byteLength, "bytes, base64:", base64Audio.length, "chars");
 
     return new Response(
       JSON.stringify({ 
