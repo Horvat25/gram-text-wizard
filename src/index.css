@@ -142,4 +142,32 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* TikTok Theme */
+  .tiktok-gradient {
+    background: linear-gradient(135deg, #25F4EE, #FE2C55);
+  }
+  
+  .tiktok-glow {
+    box-shadow: 0 0 15px rgba(37, 244, 238, 0.4),
+                0 0 30px rgba(254, 44, 85, 0.2);
+  }
+  
+  .tiktok-border {
+    border-color: #25F4EE;
+  }
+
+  /* Instagram Theme */
+  .instagram-gradient {
+    background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF);
+  }
+  
+  .instagram-glow {
+    box-shadow: 0 0 15px rgba(221, 42, 123, 0.4),
+                0 0 30px rgba(129, 52, 175, 0.2);
+  }
+  
+  .instagram-border {
+    border-color: #DD2A7B;
+  }
 }
