@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import type { AgentPlatform } from '@/components/tabs/AgentTab';
 
 // Type definitions for Web Speech API
 interface SpeechRecognitionEvent extends Event {
@@ -47,7 +48,11 @@ import {
   Settings,
   History,
   Mic,
-  MicOff
+  MicOff,
+  Instagram,
+  Video,
+  Image as ImageIcon,
+  Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -55,6 +60,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
 import AgentExecutionHistory from './AgentExecutionHistory';
+import { cn } from '@/lib/utils';
+
+// TikTok Icon Component
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="currentColor" 
+    className={className}
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+  </svg>
+);
 
 interface AgentConfig {
   agent_name: string;
@@ -79,34 +96,56 @@ interface Message {
 
 interface AgentHeroChatProps {
   onNavigate?: (tab: string) => void;
+  platform: AgentPlatform;
 }
 
-const QUICK_ACTIONS = [
-  { icon: Sparkles, label: 'Criar 5 posts', prompt: 'Crie 5 posts criativos para a próxima semana e salve como rascunhos', color: 'from-pink-500 to-rose-500' },
-  { icon: Calendar, label: 'Plano de 7 dias', prompt: 'Crie um plano de conteúdo completo para os próximos 7 dias e salve todos os posts', color: 'from-violet-500 to-purple-500' },
-  { icon: BarChart3, label: 'Ver Analytics', prompt: 'Analise minha performance dos últimos 30 dias e me mostre os insights', color: 'from-cyan-500 to-blue-500' },
-  { icon: Target, label: 'Rodar Agente', prompt: 'Execute o agente autônomo agora e me diga o que ele decidiu', color: 'from-emerald-500 to-green-500' },
+// Platform-specific quick actions
+const TIKTOK_ACTIONS = [
+  { icon: Video, label: 'Criar Reels', prompt: 'Crie um vídeo viral sobre IA para TikTok', color: 'from-[#25F4EE] to-[#FE2C55]' },
+  { icon: TrendingUp, label: 'Tendências', prompt: 'Quais são as tendências do TikTok hoje?', color: 'from-[#FE2C55] to-[#FF0050]' },
+  { icon: Target, label: 'Rodar Agente', prompt: 'Execute o agente focado em TikTok', color: 'from-[#25F4EE] to-cyan-500' },
+  { icon: Zap, label: 'Viral Tips', prompt: 'Me dê dicas para viralizar no TikTok', color: 'from-purple-500 to-[#FE2C55]' },
 ];
 
-const WELCOME_MESSAGE = `# 👋 Olá! Eu sou seu Agente de Mídias Sociais
+const INSTAGRAM_ACTIONS = [
+  { icon: Sparkles, label: 'Criar 5 posts', prompt: 'Crie 5 posts criativos para Instagram e salve como rascunhos', color: 'from-pink-500 to-rose-500' },
+  { icon: ImageIcon, label: 'Carrossel', prompt: 'Crie um carrossel educativo para Instagram', color: 'from-violet-500 to-purple-500' },
+  { icon: BarChart3, label: 'Ver Analytics', prompt: 'Analise minha performance dos últimos 30 dias no Instagram', color: 'from-cyan-500 to-blue-500' },
+  { icon: Calendar, label: 'Plano 7 dias', prompt: 'Crie um plano de conteúdo para os próximos 7 dias no Instagram', color: 'from-emerald-500 to-green-500' },
+];
 
-Sou uma **IA autônoma** com poder de executar ações reais no seu app.
+const TIKTOK_WELCOME = `# 🎵 Olá! Sou seu Agente TikTok
 
-## 🛠️ O que posso fazer por você:
-• **Criar posts** → Gero e salvo no banco de dados
-• **Gerar imagens** → Crio visuais com IA
-• **Agendar publicações** → Defino datas para publicar
-• **Analisar métricas** → Busco dados de performance
-• **Navegar no app** → Mostro seções específicas
+Sou especializado em criar **conteúdo viral** para o TikTok.
 
-## 💡 Exemplos de comandos:
-_"Crie um plano de conteúdo para 7 dias"_
+## 🚀 O que posso fazer:
+• **Criar vídeos** → Com trends e música
+• **Analisar tendências** → O que está bombando
+• **Gerar roteiros** → Scripts virais
+• **Enviar para Inbox** → Direto pros seus rascunhos
+
+## 💡 Dica:
+_"Crie um vídeo sobre IA com uma trend atual"_
+
+**O que você quer criar hoje?**`;
+
+const INSTAGRAM_WELCOME = `# 📸 Olá! Sou seu Agente Instagram
+
+Sou uma **IA autônoma** focada no seu crescimento no Instagram.
+
+## 🛠️ O que posso fazer:
+• **Criar posts** → Imagens, carrosséis, reels
+• **Agendar publicações** → Horários otimizados
+• **Analisar métricas** → Insights de performance
+• **Auto-publicar** → Postar automaticamente
+
+## 💡 Exemplos:
+_"Crie 5 posts para a próxima semana"_
 _"Mostre meus analytics dos últimos 30 dias"_
-_"Liste meus posts agendados"_
 
 **O que você gostaria que eu faça?**`;
 
-export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
+export default function AgentHeroChat({ onNavigate, platform }: AgentHeroChatProps) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -118,6 +157,12 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  // Get platform-specific content
+  const quickActions = platform === 'tiktok' ? TIKTOK_ACTIONS : INSTAGRAM_ACTIONS;
+  const welcomeMessage = platform === 'tiktok' ? TIKTOK_WELCOME : INSTAGRAM_WELCOME;
+  const platformName = platform === 'tiktok' ? 'TikTok' : 'Instagram';
+  const platformBadge = platform === 'tiktok' ? 'Drafts/Inbox' : 'Auto-post';
 
   // Initialize speech recognition
   useEffect(() => {
@@ -188,13 +233,13 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       .reverse(); // Most recent first
   }, [messages]);
 
-  // Load chat history and config on mount
+  // Load chat history and config on mount or platform change
   useEffect(() => {
     if (user) {
       loadChatHistory();
       loadAgentConfig();
     }
-  }, [user]);
+  }, [user, platform]);
 
   const loadAgentConfig = async () => {
     if (!user) return;
@@ -233,6 +278,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const loadChatHistory = async () => {
     if (!user) return;
     
+    setIsLoadingHistory(true);
     try {
       const { data, error } = await supabase
         .from('agent_chat_messages')
@@ -256,7 +302,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
         setMessages([{
           id: 'welcome',
           role: 'assistant',
-          content: WELCOME_MESSAGE,
+          content: welcomeMessage,
           timestamp: new Date()
         }]);
       }
@@ -265,7 +311,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       setMessages([{
         id: 'welcome',
         role: 'assistant',
-        content: WELCOME_MESSAGE,
+        content: welcomeMessage,
         timestamp: new Date()
       }]);
     } finally {
@@ -304,7 +350,7 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       setMessages([{
         id: 'welcome',
         role: 'assistant',
-        content: WELCOME_MESSAGE,
+        content: welcomeMessage,
         timestamp: new Date()
       }]);
     } catch (error) {
@@ -338,7 +384,8 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       const { data, error } = await supabase.functions.invoke('agent-chat', {
         body: { 
           messages: chatMessages,
-          userId: user.id
+          userId: user.id,
+          platform // Pass platform to backend
         }
       });
 
@@ -425,28 +472,70 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Background Image */}
+      {/* Background with platform theme */}
       <div 
-        className="absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none"
+        className={cn(
+          "absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none",
+          platform === 'tiktok' && "opacity-5"
+        )}
         style={{ backgroundImage: `url(${agentHeroBg})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background pointer-events-none" />
+      <div className={cn(
+        "absolute inset-0 pointer-events-none",
+        platform === 'tiktok' 
+          ? "bg-gradient-to-b from-black/50 via-background/95 to-background"
+          : "bg-gradient-to-b from-background/80 via-background/95 to-background"
+      )} />
       
-      {/* Compact Header */}
-      <div className="relative z-10 flex items-center justify-between px-4 py-2 border-b border-border/50 bg-background/50 backdrop-blur-sm">
+      {/* Compact Header with Platform Theme */}
+      <div className={cn(
+        "relative z-10 flex items-center justify-between px-4 py-2 border-b backdrop-blur-sm",
+        platform === 'tiktok'
+          ? "border-[#25F4EE]/30 bg-black/30"
+          : "border-pink-500/30 bg-pink-500/5"
+      )}>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Avatar className="h-9 w-9 border border-primary/30 shadow-md shadow-primary/10">
+            <Avatar className={cn(
+              "h-9 w-9 border shadow-md",
+              platform === 'tiktok'
+                ? "border-[#25F4EE]/50 shadow-[#25F4EE]/20"
+                : "border-pink-500/50 shadow-pink-500/20"
+            )}>
               <AvatarImage src={agentConfig.agent_avatar_url || undefined} />
-              <AvatarFallback className="neural-gradient text-white">
-                <Bot className="h-4 w-4" />
+              <AvatarFallback className={cn(
+                "text-white",
+                platform === 'tiktok' ? "tiktok-gradient" : "instagram-gradient"
+              )}>
+                {platform === 'tiktok' ? (
+                  <TikTokIcon className="h-4 w-4" />
+                ) : (
+                  <Instagram className="h-4 w-4" />
+                )}
               </AvatarFallback>
             </Avatar>
-            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background" />
+            <span className={cn(
+              "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background",
+              platform === 'tiktok' ? "bg-[#25F4EE]" : "bg-green-500"
+            )} />
           </div>
           <div>
-            <h1 className="text-base font-semibold neural-gradient-text">{agentConfig.agent_name}</h1>
-            <p className="text-xs text-muted-foreground">Assistente autônomo</p>
+            <h1 className={cn(
+              "text-base font-semibold",
+              platform === 'tiktok' 
+                ? "bg-gradient-to-r from-[#25F4EE] to-[#FE2C55] bg-clip-text text-transparent"
+                : "bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] bg-clip-text text-transparent"
+            )}>
+              Agente {platformName}
+            </h1>
+            <Badge variant="outline" className={cn(
+              "text-[10px] px-1.5 py-0",
+              platform === 'tiktok'
+                ? "border-[#25F4EE]/30 text-[#25F4EE]"
+                : "border-pink-500/30 text-pink-500"
+            )}>
+              {platformBadge}
+            </Badge>
           </div>
         </div>
         
@@ -460,7 +549,10 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
           >
             <History className="h-4 w-4" />
             {executionHistory.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-[10px] text-primary-foreground rounded-full flex items-center justify-center">
+              <span className={cn(
+                "absolute -top-0.5 -right-0.5 w-4 h-4 text-[10px] text-white rounded-full flex items-center justify-center",
+                platform === 'tiktok' ? "bg-[#FE2C55]" : "bg-pink-500"
+              )}>
                 {executionHistory.length > 9 ? '9+' : executionHistory.length}
               </span>
             )}
@@ -495,10 +587,21 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
                 exit={{ opacity: 0 }}
                 className={`flex gap-4 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
-                <Avatar className={`h-10 w-10 shrink-0 ${message.role === 'assistant' ? 'neural-gradient shadow-lg shadow-primary/20' : 'bg-secondary'}`}>
+                <Avatar className={cn(
+                  "h-10 w-10 shrink-0 shadow-lg",
+                  message.role === 'assistant' 
+                    ? platform === 'tiktok'
+                      ? "tiktok-gradient shadow-[#25F4EE]/20"
+                      : "instagram-gradient shadow-pink-500/20"
+                    : "bg-secondary"
+                )}>
                   <AvatarFallback className="bg-transparent">
                     {message.role === 'assistant' ? (
-                      <Bot className="h-5 w-5 text-white" />
+                      platform === 'tiktok' ? (
+                        <TikTokIcon className="h-5 w-5 text-white" />
+                      ) : (
+                        <Instagram className="h-5 w-5 text-white" />
+                      )
                     ) : (
                       <User className="h-5 w-5" />
                     )}
@@ -506,11 +609,14 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
                 </Avatar>
                 
                 <div className={`max-w-[85%] space-y-2 ${message.role === 'user' ? 'ml-auto' : ''}`}>
-                  <div className={`rounded-2xl px-5 py-4 ${
+                  <div className={cn(
+                    "rounded-2xl px-5 py-4",
                     message.role === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-card/80 backdrop-blur-sm border border-border/50 shadow-sm'
-                  }`}>
+                      ? platform === 'tiktok'
+                        ? "tiktok-gradient text-white"
+                        : "instagram-gradient text-white"
+                      : "bg-card/80 backdrop-blur-sm border border-border/50 shadow-sm"
+                  )}>
                     <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
                       {renderMarkdown(message.content)}
                     </div>
@@ -558,17 +664,35 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
               animate={{ opacity: 1 }}
               className="flex gap-4"
             >
-              <Avatar className="h-10 w-10 neural-gradient shadow-lg shadow-primary/20">
+              <Avatar className={cn(
+                "h-10 w-10 shadow-lg",
+                platform === 'tiktok'
+                  ? "tiktok-gradient shadow-[#25F4EE]/20"
+                  : "instagram-gradient shadow-pink-500/20"
+              )}>
                 <AvatarFallback className="bg-transparent">
-                  <Bot className="h-5 w-5 text-white" />
+                  {platform === 'tiktok' ? (
+                    <TikTokIcon className="h-5 w-5 text-white" />
+                  ) : (
+                    <Instagram className="h-5 w-5 text-white" />
+                  )}
                 </AvatarFallback>
               </Avatar>
               <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl px-5 py-4">
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className={cn(
+                      "w-2 h-2 rounded-full animate-bounce",
+                      platform === 'tiktok' ? "bg-[#25F4EE]" : "bg-pink-500"
+                    )} style={{ animationDelay: '0ms' }} />
+                    <span className={cn(
+                      "w-2 h-2 rounded-full animate-bounce",
+                      platform === 'tiktok' ? "bg-[#FE2C55]" : "bg-purple-500"
+                    )} style={{ animationDelay: '150ms' }} />
+                    <span className={cn(
+                      "w-2 h-2 rounded-full animate-bounce",
+                      platform === 'tiktok' ? "bg-[#25F4EE]" : "bg-orange-500"
+                    )} style={{ animationDelay: '300ms' }} />
                   </div>
                   <span>Processando sua solicitação...</span>
                 </div>
@@ -584,18 +708,28 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
           <div className="max-w-4xl mx-auto">
             <p className="text-xs text-muted-foreground mb-3">⚡ Ações rápidas:</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {QUICK_ACTIONS.map((action, i) => (
+              {quickActions.map((action, i) => (
                 <Button
                   key={i}
                   variant="outline"
-                  className={`h-auto py-3 px-4 flex flex-col items-start gap-1.5 text-left hover:border-primary/50 transition-all group`}
+                  className={cn(
+                    "h-auto py-3 px-4 flex flex-col items-start gap-1.5 text-left transition-all group",
+                    platform === 'tiktok'
+                      ? "hover:border-[#25F4EE]/50"
+                      : "hover:border-pink-500/50"
+                  )}
                   onClick={() => sendMessage(action.prompt)}
                   disabled={isLoading}
                 >
                   <div className={`p-1.5 rounded-lg bg-gradient-to-br ${action.color} text-white`}>
                     <action.icon className="h-3.5 w-3.5" />
                   </div>
-                  <span className="text-xs font-medium group-hover:text-primary transition-colors">
+                  <span className={cn(
+                    "text-xs font-medium transition-colors",
+                    platform === 'tiktok'
+                      ? "group-hover:text-[#25F4EE]"
+                      : "group-hover:text-pink-500"
+                  )}>
                     {action.label}
                   </span>
                 </Button>
@@ -606,7 +740,12 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       )}
 
       {/* Input Area */}
-      <div className="relative z-10 p-6 border-t border-border/50 bg-background/80 backdrop-blur-sm">
+      <div className={cn(
+        "relative z-10 p-6 border-t backdrop-blur-sm",
+        platform === 'tiktok'
+          ? "border-[#25F4EE]/20 bg-black/20"
+          : "border-pink-500/20 bg-pink-500/5"
+      )}>
         <div className="max-w-4xl mx-auto">
           <div className="flex gap-3">
             <div className="flex-1 relative">
@@ -615,8 +754,14 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isListening ? "🎙️ Ouvindo..." : "Digite ou clique no microfone para falar..."}
-                className={`min-h-[56px] max-h-[120px] resize-none bg-card/50 border-border/50 focus:border-primary/50 text-base pr-12 ${isListening ? 'border-red-500/50 animate-pulse' : ''}`}
+                placeholder={isListening ? "🎙️ Ouvindo..." : `Fale com o Agente ${platformName}...`}
+                className={cn(
+                  "min-h-[56px] max-h-[120px] resize-none bg-card/50 text-base pr-12",
+                  isListening && "animate-pulse",
+                  platform === 'tiktok'
+                    ? "border-[#25F4EE]/30 focus:border-[#25F4EE]/50"
+                    : "border-pink-500/30 focus:border-pink-500/50"
+                )}
                 disabled={isLoading}
               />
               <Button
@@ -624,7 +769,12 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
                 size="icon"
                 onClick={toggleListening}
                 disabled={isLoading}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 ${isListening ? 'text-red-500 bg-red-500/10 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
+                className={cn(
+                  "absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9",
+                  isListening 
+                    ? "text-red-500 bg-red-500/10 animate-pulse"
+                    : "text-muted-foreground hover:text-primary"
+                )}
               >
                 <Mic className="h-5 w-5" />
               </Button>
@@ -633,7 +783,12 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || isLoading}
               size="lg"
-              className="shrink-0 neural-gradient border-0 shadow-lg shadow-primary/20 px-6"
+              className={cn(
+                "shrink-0 border-0 shadow-lg px-6",
+                platform === 'tiktok'
+                  ? "tiktok-gradient tiktok-glow"
+                  : "instagram-gradient instagram-glow"
+              )}
             >
               {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
