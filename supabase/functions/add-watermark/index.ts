@@ -40,10 +40,11 @@ async function downloadImage(imageUrl: string): Promise<{ data: ArrayBuffer; con
   throw new Error('Não foi possível baixar a imagem.');
 }
 
-// Create watermarked image using Lovable AI image generation
-async function createWatermarkedImage(
+// Create image with watermark AND headline overlay using Lovable AI
+async function createNewsImage(
   originalImageUrl: string,
-  watermarkText: string = "Neural Update"
+  watermarkText: string = "Neural Update",
+  headlineText?: string
 ): Promise<ArrayBuffer> {
   const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
   
@@ -51,8 +52,30 @@ async function createWatermarkedImage(
     throw new Error("LOVABLE_API_KEY não configurada");
   }
 
-  // Use AI to add watermark overlay to the image
-  const prompt = `Take this exact image and add a small, elegant watermark text "${watermarkText}" in the bottom right corner. The watermark should be semi-transparent white text with a subtle dark shadow, positioned in the lower right area. Keep the original image exactly as is, only add the watermark overlay. The watermark should be visible but not distracting.`;
+  // Build the prompt based on whether we have headline text
+  let prompt = "";
+  
+  if (headlineText && headlineText.length > 0) {
+    // Style inspired by @davision.eth - bold yellow text at bottom
+    // Create a professional news-style image with the headline
+    prompt = `Take this image and add a PROFESSIONAL NEWS OVERLAY:
+1. Add a semi-transparent dark gradient at the bottom 40% of the image (from transparent at top to 80% black at bottom)
+2. Add this headline text in BOLD, UPPERCASE, YELLOW (#FFD700) letters at the bottom: "${headlineText.toUpperCase()}"
+   - Text should be large and highly readable
+   - Text should be centered horizontally
+   - Text should wrap to multiple lines if needed
+   - Add a subtle text shadow for readability
+3. Below the headline, add a small "ARRASTE PARA MAIS" text in orange/red color
+4. Add a small, elegant watermark "${watermarkText}" in the top right corner (semi-transparent white)
+
+The style should look like a professional tech news Instagram post, similar to @davision.eth style.
+Keep the original image exactly as is, only add the text overlays.`;
+  } else {
+    // Just add watermark
+    prompt = `Take this exact image and add a small, elegant watermark text "${watermarkText}" in the bottom right corner. The watermark should be semi-transparent white text with a subtle dark shadow, positioned in the lower right area. Keep the original image exactly as is, only add the watermark overlay. The watermark should be visible but not distracting.`;
+  }
+
+  console.log("[add-watermark] Using Lovable AI with prompt:", prompt.substring(0, 100) + "...");
 
   const response = await fetch("https://api.lovable.dev/v1/images/edit", {
     method: "POST",
@@ -79,13 +102,13 @@ async function createWatermarkedImage(
     throw new Error("Resposta inválida da API de imagem");
   }
 
-  // Download the watermarked image
-  const watermarkedResponse = await fetch(result.url);
-  if (!watermarkedResponse.ok) {
-    throw new Error("Erro ao baixar imagem com marca d'água");
+  // Download the processed image
+  const processedResponse = await fetch(result.url);
+  if (!processedResponse.ok) {
+    throw new Error("Erro ao baixar imagem processada");
   }
 
-  return await watermarkedResponse.arrayBuffer();
+  return await processedResponse.arrayBuffer();
 }
 
 serve(async (req) => {
@@ -94,13 +117,15 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, watermarkText = "Neural Update" } = await req.json();
+    const { imageUrl, watermarkText = "Neural Update", headlineText } = await req.json();
 
     if (!imageUrl) {
       throw new Error("imageUrl é obrigatório");
     }
 
-    console.log("Processing image with watermark:", imageUrl);
+    console.log("Processing image:", imageUrl);
+    console.log("Watermark:", watermarkText);
+    console.log("Headline:", headlineText ? headlineText.substring(0, 50) + "..." : "none");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -108,14 +133,16 @@ serve(async (req) => {
 
     let finalImageData: ArrayBuffer;
     let contentType = 'image/jpeg';
+    let hasOverlay = false;
 
     try {
-      // Try to add watermark using AI
-      console.log("Adding watermark via AI...");
-      finalImageData = await createWatermarkedImage(imageUrl, watermarkText);
-      console.log("Watermark added successfully");
-    } catch (watermarkError: any) {
-      console.error("Watermark failed, downloading original:", watermarkError.message);
+      // Try to add watermark/headline using AI
+      console.log("Adding watermark/headline via AI...");
+      finalImageData = await createNewsImage(imageUrl, watermarkText, headlineText);
+      hasOverlay = true;
+      console.log("Overlay added successfully");
+    } catch (overlayError: any) {
+      console.error("Overlay failed, downloading original:", overlayError.message);
       
       // Fallback: just download and use original image
       const { data, contentType: ct } = await downloadImage(imageUrl);
@@ -124,7 +151,7 @@ serve(async (req) => {
     }
 
     // Generate unique filename
-    const filename = `news-watermarked-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+    const filename = `news-${headlineText ? 'headline-' : 'watermarked-'}${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
 
     // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
@@ -152,6 +179,7 @@ serve(async (req) => {
         publicUrl,
         originalUrl: imageUrl,
         hasWatermark: true,
+        hasHeadline: hasOverlay && !!headlineText,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

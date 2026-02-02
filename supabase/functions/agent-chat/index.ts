@@ -1274,7 +1274,7 @@ ${caption_style === 'provocativo'
     if (selectedImage) {
       console.log('[NEWS_POST] Processing external image:', selectedImage);
       
-      // Use add-watermark to process the external image (matches LatestNewsTab)
+      // Use add-watermark to process the external image WITH HEADLINE (like @davision.eth style)
       const watermarkResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/add-watermark`, {
         method: 'POST',
         headers: {
@@ -1283,7 +1283,8 @@ ${caption_style === 'provocativo'
         },
         body: JSON.stringify({
           imageUrl: selectedImage,
-          watermarkText: 'Neural Update'
+          watermarkText: 'Neural Update',
+          headlineText: selectedArticle.title // Add headline overlay on image!
         })
       });
       
