@@ -3,9 +3,13 @@
  * Creates real MP4-compatible video files from images and audio
  * Uses H.264 codec where available for Instagram compatibility
  * BRANDING: Neural Update watermark + marketing CTA at end
+ * 
+ * FIX: Uses fix-webm-duration to properly set duration metadata
+ * Without this fix, WebM videos downloaded to mobile show as 0 seconds
  */
 
 import { ensureAudioReady, getAudioContext } from "./audio-unlock";
+import fixWebmDuration from "fix-webm-duration";
 
 interface VideoSegment {
   imageUrl: string;
@@ -864,9 +868,24 @@ export async function generateVideoFromSegments(
     recorder.onstop = async () => {
       clearTimeout(maxTimeout);
       console.log(`[VideoEncoder] Recording stopped, chunks: ${chunks.length}`);
-      const blob = new Blob(chunks, { type: mimeType });
-      console.log(`[VideoEncoder] Final blob size: ${(blob.size / 1024 / 1024).toFixed(2)} MB, type: ${blob.type}`);
-      resolve(blob);
+      const rawBlob = new Blob(chunks, { type: mimeType });
+      console.log(`[VideoEncoder] Raw blob size: ${(rawBlob.size / 1024 / 1024).toFixed(2)} MB, type: ${rawBlob.type}`);
+      
+      // FIX: Apply duration fix for WebM videos
+      // MediaRecorder doesn't write duration metadata, causing "0 seconds" issue on mobile
+      let finalBlob = rawBlob;
+      if (!isMP4) {
+        try {
+          console.log(`[VideoEncoder] Fixing WebM duration metadata (${totalDuration.toFixed(1)}s)...`);
+          finalBlob = await fixWebmDuration(rawBlob, totalDuration * 1000, { logger: false });
+          console.log(`[VideoEncoder] Duration metadata fixed! Final size: ${(finalBlob.size / 1024 / 1024).toFixed(2)} MB`);
+        } catch (fixError) {
+          console.warn("[VideoEncoder] Could not fix duration metadata:", fixError);
+          // Continue with raw blob if fix fails
+        }
+      }
+      
+      resolve(finalBlob);
     };
 
     recorder.onerror = (e) => {
