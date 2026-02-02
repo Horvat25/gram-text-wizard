@@ -16,7 +16,7 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
-  Instagram
+  Sparkles
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,18 +24,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import type { AgentPlatform } from '@/components/tabs/AgentTab';
-
-// TikTok Icon Component
-const TikTokIcon = ({ className }: { className?: string }) => (
-  <svg 
-    viewBox="0 0 24 24" 
-    fill="currentColor" 
-    className={className}
-  >
-    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
-  </svg>
-);
 
 interface ExecutionReport {
   id: string;
@@ -58,10 +46,9 @@ interface ReportCardProps {
   report: ExecutionReport;
   isExpanded: boolean;
   onToggle: () => void;
-  platform: AgentPlatform;
 }
 
-function ReportCard({ report, isExpanded, onToggle, platform }: ReportCardProps) {
+function ReportCard({ report, isExpanded, onToggle }: ReportCardProps) {
   const getDecisionColor = (decision: string | null) => {
     switch (decision) {
       case 'POST':
@@ -97,22 +84,12 @@ function ReportCard({ report, isExpanded, onToggle, platform }: ReportCardProps)
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "border rounded-xl overflow-hidden transition-colors",
-        platform === 'tiktok'
-          ? "border-[#25F4EE]/20 hover:border-[#25F4EE]/40"
-          : "border-pink-500/20 hover:border-pink-500/40"
-      )}
+      className="border rounded-xl overflow-hidden transition-colors border-primary/20 hover:border-primary/40"
     >
       {/* Header - Always visible */}
       <button
         onClick={onToggle}
-        className={cn(
-          "w-full p-4 flex items-center justify-between transition-colors",
-          platform === 'tiktok'
-            ? "bg-black/20 hover:bg-black/30"
-            : "bg-pink-500/5 hover:bg-pink-500/10"
-        )}
+        className="w-full p-4 flex items-center justify-between transition-colors bg-primary/5 hover:bg-primary/10"
       >
         <div className="flex items-center gap-3">
           {getDecisionIcon(report.decision)}
@@ -154,23 +131,11 @@ function ReportCard({ report, isExpanded, onToggle, platform }: ReportCardProps)
             <div className="p-4 space-y-4 bg-muted/10">
               {/* Summary/Message from Agent */}
               {report.summary && (
-                <div className={cn(
-                  "p-3 rounded-lg border",
-                  platform === 'tiktok'
-                    ? "bg-[#25F4EE]/5 border-[#25F4EE]/20"
-                    : "bg-pink-500/5 border-pink-500/20"
-                )}>
+                <div className="p-3 rounded-lg border bg-primary/5 border-primary/20">
                   <div className="flex items-start gap-2">
-                    {platform === 'tiktok' ? (
-                      <TikTokIcon className="h-4 w-4 mt-0.5 text-[#25F4EE]" />
-                    ) : (
-                      <Instagram className="h-4 w-4 mt-0.5 text-pink-500" />
-                    )}
+                    <Sparkles className="h-4 w-4 mt-0.5 text-primary" />
                     <div>
-                      <p className={cn(
-                        "text-xs font-medium mb-1",
-                        platform === 'tiktok' ? "text-[#25F4EE]" : "text-pink-500"
-                      )}>
+                      <p className="text-xs font-medium mb-1 text-primary">
                         Mensagem do Agente
                       </p>
                       <p className="text-sm">{report.summary}</p>
@@ -267,17 +232,11 @@ function ReportCard({ report, isExpanded, onToggle, platform }: ReportCardProps)
   );
 }
 
-interface AgentReportsTabProps {
-  platform: AgentPlatform;
-}
-
-export default function AgentReportsTab({ platform }: AgentReportsTabProps) {
+export default function AgentReportsTab() {
   const { user } = useAuth();
   const [reports, setReports] = useState<ExecutionReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const platformName = platform === 'tiktok' ? 'TikTok' : 'Instagram';
 
   const fetchReports = async () => {
     if (!user) return;
@@ -307,45 +266,28 @@ export default function AgentReportsTab({ platform }: AgentReportsTabProps) {
 
   useEffect(() => {
     fetchReports();
-  }, [user, platform]);
+  }, [user]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className={cn(
-          "h-8 w-8 animate-spin",
-          platform === 'tiktok' ? "text-[#25F4EE]" : "text-pink-500"
-        )} />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <Card className={cn(
-      "border",
-      platform === 'tiktok'
-        ? "border-[#25F4EE]/20 bg-black/10"
-        : "border-pink-500/20 bg-pink-500/5"
-    )}>
+    <Card className="border border-primary/20 bg-gradient-to-br from-primary/5 to-violet-500/5">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={cn(
-              "p-2 rounded-xl",
-              platform === 'tiktok'
-                ? "bg-[#25F4EE]/10"
-                : "bg-pink-500/10"
-            )}>
-              {platform === 'tiktok' ? (
-                <TikTokIcon className="h-5 w-5 text-[#25F4EE]" />
-              ) : (
-                <Instagram className="h-5 w-5 text-pink-500" />
-              )}
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Bot className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg">Relatórios {platformName}</CardTitle>
+              <CardTitle className="text-lg">Relatórios do Agente</CardTitle>
               <CardDescription>
-                O que o agente fez em cada execução
+                Histórico de execuções e decisões
               </CardDescription>
             </div>
           </div>
@@ -353,12 +295,7 @@ export default function AgentReportsTab({ platform }: AgentReportsTabProps) {
             variant="outline" 
             size="sm" 
             onClick={fetchReports}
-            className={cn(
-              "gap-1",
-              platform === 'tiktok'
-                ? "border-[#25F4EE]/30 hover:border-[#25F4EE]/50"
-                : "border-pink-500/30 hover:border-pink-500/50"
-            )}
+            className="gap-1 border-primary/30 hover:border-primary/50"
           >
             <RefreshCw className="h-3 w-3" />
             Atualizar
@@ -377,20 +314,13 @@ export default function AgentReportsTab({ platform }: AgentReportsTabProps) {
                   onToggle={() => setExpandedId(
                     expandedId === report.id ? null : report.id
                   )}
-                  platform={platform}
                 />
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-center">
-              <div className={cn(
-                "p-4 rounded-full mb-4",
-                platform === 'tiktok' ? "bg-[#25F4EE]/10" : "bg-pink-500/10"
-              )}>
-                <Clock className={cn(
-                  "h-10 w-10",
-                  platform === 'tiktok' ? "text-[#25F4EE]" : "text-pink-500"
-                )} />
+              <div className="p-4 rounded-full mb-4 bg-primary/10">
+                <Clock className="h-10 w-10 text-primary" />
               </div>
               <p className="text-muted-foreground font-medium">Nenhuma execução registrada</p>
               <p className="text-sm text-muted-foreground mt-1">
