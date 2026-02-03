@@ -54,6 +54,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
 import AgentExecutionHistory from './AgentExecutionHistory';
+import AutoVideoRenderer from './AutoVideoRenderer';
 import { cn } from '@/lib/utils';
 import { usePendingVideos } from '@/hooks/usePendingVideos';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -485,38 +486,13 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
         </div>
       </div>
 
-      {/* Pending Videos Notification */}
-      {pendingCount > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative z-10 mx-4 mt-2 p-3 rounded-xl border bg-amber-500/10 border-amber-500/30"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-amber-500/20">
-                <Video className="h-4 w-4 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                  🎬 {pendingCount} vídeo{pendingCount > 1 ? 's' : ''} aguardando renderização
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Criados pelo agente • Precisa renderizar no navegador
-                </p>
-              </div>
-            </div>
-            <Button 
-              size="sm" 
-              className="gap-1.5 bg-amber-500 hover:bg-amber-600 text-white"
-              onClick={() => onNavigate?.('queue')}
-            >
-              <Play className="h-3.5 w-3.5" />
-              Renderizar
-            </Button>
-          </div>
-        </motion.div>
-      )}
+      {/* Auto Video Renderer - replaces simple pending notification */}
+      <AutoVideoRenderer 
+        enabled={true} 
+        onComplete={(postId, videoUrl) => {
+          console.log('Video rendered:', postId, videoUrl);
+        }} 
+      />
 
       {/* Notification Permission Request */}
       {notifSupported && notifPermission === 'default' && (
