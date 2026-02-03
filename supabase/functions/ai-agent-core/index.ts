@@ -265,24 +265,37 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
     images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia').length
   };
   
-  // Determine next content type based on which has most remaining quota (proportional)
-  const getRemaining = (type: ContentType): number => {
-    const goal = weeklyGoals[type === 'video' ? 'videos' : type === 'carousel' ? 'carousels' : type === 'news' ? 'news' : 'images'];
-    const progress = weeklyProgress[type === 'video' ? 'videos' : type === 'carousel' ? 'carousels' : type === 'news' ? 'news' : 'images'];
-    return Math.max(0, goal - progress);
+  // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
+  // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
+  const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
+    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images' } as const;
+    const key = keyMap[type];
+    const goal = weeklyGoals[key] || 1;
+    const progress = weeklyProgress[key] || 0;
+    const remaining = Math.max(0, goal - progress);
+    const percentage = goal > 0 ? (progress / goal) * 100 : 100;
+    return { remaining, percentage, goal };
   };
   
-  const remainingByType = [
-    { type: 'video' as ContentType, remaining: getRemaining('video'), priority: 4 },     // Higher priority
-    { type: 'carousel' as ContentType, remaining: getRemaining('carousel'), priority: 3 },
-    { type: 'news' as ContentType, remaining: getRemaining('news'), priority: 2 },
-    { type: 'image' as ContentType, remaining: getRemaining('image'), priority: 1 }
-  ].filter(t => t.remaining > 0)
-   .sort((a, b) => {
-     // Sort by remaining (descending) then by priority (descending)
-     if (b.remaining !== a.remaining) return b.remaining - a.remaining;
-     return b.priority - a.priority;
-   });
+  const typeStats = [
+    { type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 },
+    { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
+    { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
+    { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 }
+  ].filter(t => t.remaining > 0);
+  
+  // Sort by completion percentage (ascending - lower % first for diversity)
+  // Then by priority (descending) as tiebreaker
+  const remainingByType = typeStats.sort((a, b) => {
+    // Primary sort: completion percentage ascending (0% before 50% before 100%)
+    if (a.percentage !== b.percentage) return a.percentage - b.percentage;
+    // Secondary sort: priority descending (video before carousel before news before image)
+    return b.priority - a.priority;
+  });
+  
+  console.log('[AGENT] Content distribution analysis:', remainingByType.map(t => 
+    `${t.type}: ${Math.round(t.percentage)}% (${t.goal - t.remaining}/${t.goal})`
+  ).join(', '));
   
   const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
   

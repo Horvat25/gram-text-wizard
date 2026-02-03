@@ -44,7 +44,9 @@ import {
   History,
   Mic,
   Video,
-  Newspaper
+  Newspaper,
+  Bell,
+  Play
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -53,6 +55,8 @@ import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
 import AgentExecutionHistory from './AgentExecutionHistory';
 import { cn } from '@/lib/utils';
+import { usePendingVideos } from '@/hooks/usePendingVideos';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface AgentConfig {
   agent_name: string;
@@ -116,6 +120,10 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  
+  // Pending videos and notifications
+  const { pendingVideos, count: pendingCount } = usePendingVideos();
+  const { isSupported: notifSupported, permission: notifPermission, requestPermission } = usePushNotifications();
 
   // Initialize speech recognition
   useEffect(() => {
@@ -476,6 +484,71 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
           />
         </div>
       </div>
+
+      {/* Pending Videos Notification */}
+      {pendingCount > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-10 mx-4 mt-2 p-3 rounded-xl border bg-amber-500/10 border-amber-500/30"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-amber-500/20">
+                <Video className="h-4 w-4 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                  🎬 {pendingCount} vídeo{pendingCount > 1 ? 's' : ''} aguardando renderização
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Criados pelo agente • Precisa renderizar no navegador
+                </p>
+              </div>
+            </div>
+            <Button 
+              size="sm" 
+              className="gap-1.5 bg-amber-500 hover:bg-amber-600 text-white"
+              onClick={() => onNavigate?.('queue')}
+            >
+              <Play className="h-3.5 w-3.5" />
+              Renderizar
+            </Button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Notification Permission Request */}
+      {notifSupported && notifPermission === 'default' && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-10 mx-4 mt-2 p-3 rounded-xl border bg-primary/5 border-primary/20"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <Bell className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Ativar Notificações</p>
+                <p className="text-xs text-muted-foreground">
+                  Receba avisos quando o agente criar conteúdo
+                </p>
+              </div>
+            </div>
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="gap-1.5"
+              onClick={requestPermission}
+            >
+              <Bell className="h-3.5 w-3.5" />
+              Ativar
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Messages Area */}
       <ScrollArea className="flex-1 relative z-10" ref={scrollRef}>
