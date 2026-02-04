@@ -27,6 +27,7 @@ serve(async (req) => {
 
     const BRAND = (brandName && String(brandName).trim()) || "Neural Update";
     const STYLE = (style && String(style).trim()) || "informativo, inteligente, direto e sem hype";
+    const currentYear = new Date().getFullYear(); // Always use current year (2025+)
 
     // Helpers
     const normalize = (s: string) =>
@@ -141,17 +142,22 @@ serve(async (req) => {
       return parsed;
     };
 
-    // System prompt: strategy + constraints, but topic-driven
+    // System prompt: strategy + constraints, topic-driven, with CURRENT YEAR context
     const systemPrompt = `Você é um estrategista de conteúdo digital do perfil ${BRAND}.
+
+DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
 
 OBJETIVO:
 - Criar roteiros curtos para Reels/Stories com crescimento orgânico, autoridade e engajamento real.
 - Conteúdo informativo e inteligente (IA aplicada ao dia a dia, tecnologia, ferramentas, tendências, notícias explicadas de forma simples).
+- SEMPRE mencionar contexto atual (${currentYear}) quando relevante.
 
 REGRAS CRÍTICAS:
-- O roteiro DEVE ser sobre o TEMA fornecido pelo usuário. Não troque o assunto para “crescimento no Instagram”, “criadores pequenos”, etc.
+- O roteiro DEVE ser sobre o TEMA fornecido pelo usuário. Não troque o assunto para "crescimento no Instagram", "criadores pequenos", etc.
+- NUNCA mencionar anos passados como 2023 ou 2024 - estamos em ${currentYear}!
 - Nada de conteúdo genérico/repetitivo. Sem promessas milagrosas. Sem hype vazio.
 - Linguagem clara, direta e interessante.
+- TUDO em PORTUGUÊS BRASILEIRO (incluindo os textos e imagePrompt).
 
 ESTRUTURA (4 CENAS):
 1) GANCHO (0-2s): frase curta e específica do tema.
@@ -161,8 +167,8 @@ ESTRUTURA (4 CENAS):
 
 FORMATO:
 - Frases curtas (8–16 palavras por segmento).
-- Português brasileiro.
-- Para cada cena, crie um imagePrompt em INGLÊS com visual REALISTA e relacionado ao tema (evite neon/futurista genérico/abstrato).`;
+- Português brasileiro sem erros ortográficos.
+- Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema (evite neon/futurista genérico/abstrato).`;
 
     const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
 "${topic}"
@@ -171,15 +177,17 @@ ESPECIFICAÇÕES:
 - Exatamente ${segmentCount} segmentos.
 - ${wordsPerSegment}-${wordsPerSegment + 5} palavras por segmento.
 - Estilo: ${STYLE}.
+- Estamos em ${currentYear} - NÃO mencione anos anteriores!
 
 IMPORTANTE:
 - Inclua termos específicos do tema no texto (não responda com um roteiro genérico).
+- Todos os textos e imagePrompts devem estar em PORTUGUÊS BRASILEIRO.
 
 Responda APENAS com JSON no formato:
 {
   "title": "Título curto e específico do tema",
   "segments": [
-    { "text": "...", "imagePrompt": "..." }
+    { "text": "texto em português...", "imagePrompt": "descrição da imagem em português..." }
   ]
 }`;
 
@@ -194,7 +202,11 @@ Responda APENAS com JSON no formato:
 Reescreva um NOVO roteiro seguindo a mesma estrutura, mas agora OBRIGATORIAMENTE sobre:
 "${topic}"
 
-Exija que pelo menos 2 cenas contenham palavras do tema.
+LEMBRE-SE:
+- Estamos em ${currentYear}, não mencione anos passados.
+- Tudo em PORTUGUÊS BRASILEIRO.
+- Exija que pelo menos 2 cenas contenham palavras do tema.
+
 Responda APENAS com JSON no mesmo formato.`;
 
       parsed = await callModel(systemPrompt, retryUserPrompt);
