@@ -30,6 +30,7 @@ import { usePosts } from "@/hooks/usePosts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { VideoRenderingProvider } from "@/contexts/VideoRenderingContext";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,6 +139,7 @@ const Index = () => {
   };
 
   return (
+    <VideoRenderingProvider>
     <div className={cn("min-h-screen bg-background transition-colors duration-500", getPlatformBackground())}>
       <AnimatePresence mode="wait">
         {!showDashboard ? (
@@ -287,6 +289,7 @@ const Index = () => {
         )}
       </AnimatePresence>
     </div>
+    </VideoRenderingProvider>
   );
 };
 
