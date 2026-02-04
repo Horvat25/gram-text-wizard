@@ -611,12 +611,12 @@ async function createCarouselContent(
 ): Promise<any> {
   console.log('[AGENT] Criando carrossel:', plan.theme);
   
-  // Generate 4 images for carousel
+  // Generate 4 images for carousel - ALL IN PORTUGUESE
   const slidePrompts = [
-    `Slide 1: Introdução visual para ${plan.theme}. Clean, modern, tech aesthetic.`,
-    `Slide 2: Dados ou estatísticas sobre ${plan.theme}. Infographic style.`,
-    `Slide 3: Benefícios ou aplicações de ${plan.theme}. Professional design.`,
-    `Slide 4: Conclusão ou CTA sobre ${plan.theme}. Impactful, memorable.`
+    `Slide 1: Introdução visual sobre ${plan.theme}. Design moderno, tecnológico, profissional. Alta qualidade para Instagram. Ano 2025.`,
+    `Slide 2: Dados ou estatísticas sobre ${plan.theme}. Estilo infográfico, clean, profissional. Cores vibrantes.`,
+    `Slide 3: Benefícios ou aplicações de ${plan.theme}. Design inovador, futurista mas realista.`,
+    `Slide 4: Conclusão e chamada para ação sobre ${plan.theme}. Impactante, memorável, profissional.`
   ];
   
   const carouselImages: string[] = [];
@@ -738,7 +738,7 @@ async function createNewsContent(
   
   console.log('[AGENT] Artigo selecionado:', selectedArticle?.title || 'nenhum');
   
-  // Process image with watermark
+  // Process image with watermark AND headline overlay (like @davision.eth style)
   let imageUrl = null;
   if (selectedImage) {
     const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
@@ -746,7 +746,8 @@ async function createNewsContent(
       headers,
       body: JSON.stringify({
         imageUrl: selectedImage,
-        watermarkText: 'Neural Update'
+        watermarkText: 'Neural Update',
+        headlineText: selectedArticle?.title || plan.theme // ADD HEADLINE TO IMAGE!
       })
     });
     
@@ -756,13 +757,13 @@ async function createNewsContent(
     }
   }
   
-  // Generate image if no article image
+  // Generate image if no article image - PORTUGUESE PROMPT
   if (!imageUrl) {
     const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        prompt: `News illustration: ${selectedArticle?.title || plan.theme}. Professional journalism style.`,
+        prompt: `Ilustração de notícia sobre: ${selectedArticle?.title || plan.theme}. Estilo jornalístico profissional, cores realistas. Qualidade para Instagram 2025. Sem texto na imagem.`,
         format: 'square',
         model: 'gemini'
       })
@@ -796,9 +797,14 @@ async function createNewsContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Ensure source is in caption
-  if (!caption.includes(sourceUrl) && sourceUrl) {
-    caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+  // ALWAYS ensure source is in caption for news posts
+  const hasSourceInCaption = caption.includes('Fonte:') || caption.includes('🔗');
+  if (!hasSourceInCaption && selectedArticle) {
+    if (sourceUrl) {
+      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+    } else if (sourceDomain && sourceDomain !== 'fonte') {
+      caption += `\n\n📰 Fonte: ${sourceDomain}`;
+    }
   }
   
   // Create post - publish directly if autoPublish and has image
@@ -832,12 +838,12 @@ async function createImageContent(
 ): Promise<any> {
   console.log('[AGENT] Criando post de imagem:', plan.theme);
   
-  // Generate image
+  // Generate image with PORTUGUESE prompt
   const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      prompt: `Professional social media post about: ${plan.theme}. Modern, tech aesthetic, engaging.`,
+      prompt: `Post profissional para redes sociais sobre: ${plan.theme}. Design moderno, estético tecnológico, cores vibrantes. Qualidade profissional para Instagram 2025. Sem texto na imagem.`,
       format: 'square',
       model: 'gemini'
     })

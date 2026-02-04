@@ -143,8 +143,18 @@ serve(async (req) => {
 
     console.log(`Gerando caption tipo: ${selectedType.name} para tópico: ${topic}`);
 
-    // Build system prompt with custom instructions if provided
+    const currentYear = new Date().getFullYear(); // Always use current year (2025+)
+
+    // Build system prompt with custom instructions and year context
     let systemPrompt = selectedType.systemPrompt;
+    
+    // Add year context to prevent outdated references
+    systemPrompt += `\n\nCONTEXTO TEMPORAL OBRIGATÓRIO:
+- Data atual: ${new Date().toLocaleDateString('pt-BR')} (Ano ${currentYear})
+- NUNCA mencione anos passados (2023, 2024) como se fossem atuais
+- Sempre use referências temporais corretas para ${currentYear}
+- Português brasileiro PERFEITO (sem erros ortográficos)`;
+    
     if (customInstructions) {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;
     }
@@ -172,7 +182,9 @@ REGRAS OBRIGATÓRIAS:
 - Use 2-3 emojis estratégicos
 - Use CAPS para ênfase quando necessário
 - Hashtags separadas por linha em branco no final
-- Tom: brasileiro, natural, direto`,
+- Tom: brasileiro, natural, direto
+- PORTUGUÊS BRASILEIRO CORRETO (sem erros ortográficos!)
+- Estamos em ${currentYear} - NÃO mencione anos passados como atuais`,
           },
         ],
       }),
