@@ -35,6 +35,7 @@ import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import AgentReelsRenderer from "@/components/agent/AgentReelsRenderer";
+import AutoVideoRenderingPanel from "@/components/queue/AutoVideoRenderingPanel";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -446,6 +447,9 @@ const PublicationQueueTab = ({
 
   return (
     <div className="space-y-6">
+      {/* Auto Video Rendering Panel */}
+      <AutoVideoRenderingPanel />
+
       {/* Connected Account Info */}
       {!loadingAccounts && (
         hasConnectedAccount ? (

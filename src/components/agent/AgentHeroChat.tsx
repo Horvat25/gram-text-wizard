@@ -44,9 +44,7 @@ import {
   History,
   Mic,
   Video,
-  Newspaper,
-  Bell,
-  Play
+  Newspaper
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -54,10 +52,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
 import AgentExecutionHistory from './AgentExecutionHistory';
-import AutoVideoRenderer from './AutoVideoRenderer';
 import { cn } from '@/lib/utils';
-import { usePendingVideos } from '@/hooks/usePendingVideos';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface AgentConfig {
   agent_name: string;
@@ -121,10 +116,6 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-  
-  // Pending videos and notifications
-  const { pendingVideos, count: pendingCount } = usePendingVideos();
-  const { isSupported: notifSupported, permission: notifPermission, requestPermission } = usePushNotifications();
 
   // Initialize speech recognition
   useEffect(() => {
@@ -485,46 +476,6 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
           />
         </div>
       </div>
-
-      {/* Auto Video Renderer - replaces simple pending notification */}
-      <AutoVideoRenderer 
-        enabled={true} 
-        onComplete={(postId, videoUrl) => {
-          console.log('Video rendered:', postId, videoUrl);
-        }} 
-      />
-
-      {/* Notification Permission Request */}
-      {notifSupported && notifPermission === 'default' && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative z-10 mx-4 mt-2 p-3 rounded-xl border bg-primary/5 border-primary/20"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-primary/10">
-                <Bell className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Ativar Notificações</p>
-                <p className="text-xs text-muted-foreground">
-                  Receba avisos quando o agente criar conteúdo
-                </p>
-              </div>
-            </div>
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="gap-1.5"
-              onClick={requestPermission}
-            >
-              <Bell className="h-3.5 w-3.5" />
-              Ativar
-            </Button>
-          </div>
-        </motion.div>
-      )}
 
       {/* Messages Area */}
       <ScrollArea className="flex-1 relative z-10" ref={scrollRef}>
