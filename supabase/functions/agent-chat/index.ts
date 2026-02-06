@@ -7,48 +7,73 @@ const corsHeaders = {
 };
 
 // Define available tools for the agent
+// FOCO: Instagram de Notícias Tech - RSS como fonte principal, vídeos mantidos
 const AGENT_TOOLS = [
   {
     type: "function",
     function: {
-      name: "create_posts",
-      description: "Cria post com imagem gerada por IA. Use quando não houver imagem real disponível ou quando o usuário pedir imagem IA. ⚠️ OBRIGATÓRIO incluir image_prompt em PORTUGUÊS descrevendo o visual futurista/tech.",
+      name: "create_rss_news_post",
+      description: "📰 MÉTODO PRINCIPAL para criar posts! Busca notícia REAL do banco de RSS (Tecnoblog, TecMundo, Canaltech, etc). Aplica headline estilo @davision.eth na imagem. Use para QUALQUER pedido de post/notícia/conteúdo de imagem.",
       parameters: {
         type: "object",
         properties: {
-          posts: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                caption: { type: "string", description: "Legenda do post em PORTUGUÊS BRASILEIRO sobre tecnologia/inovação" },
-                hashtags: { type: "array", items: { type: "string" }, description: "Lista de hashtags em português" },
-                post_type: { type: "string", enum: ["engajamento", "educacional", "promocional", "entretenimento"] },
-                scheduled_for: { type: "string", description: "Data/hora ISO 8601 em horário Brasília. Se não fornecido, publica agora se auto_post ativo." },
-                platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
-                image_prompt: { type: "string", description: "🎨 OBRIGATÓRIO! Descrição visual detalhada em PORTUGUÊS para gerar imagem. Exemplo: 'Cidade futurista com arranha-céus holográficos, tons azul neon, estilo cyberpunk, ultra realista'" }
-              },
-              required: ["caption", "image_prompt"]
-            },
-            description: "Lista de posts. CADA UM DEVE ter caption E image_prompt!"
-          }
+          topic_filter: { type: "string", description: "Palavra-chave para filtrar notícias (ex: 'IA', 'OpenAI', 'robô', 'Tesla'). Se vazio, pega a mais recente." },
+          headline_text: { type: "string", description: "Texto curto para overlay na imagem (máx 2 linhas, gera curiosidade, CAIXA ALTA). Se não fornecido, usa título da notícia." },
+          caption_block1: { type: "string", description: "Bloco 1 da legenda: frase de impacto curta" },
+          caption_block2: { type: "string", description: "Bloco 2 da legenda: contexto mínimo (suficiente para entender)" },
+          caption_block3: { type: "string", description: "Bloco 3 da legenda: reflexão, consequência ou pergunta implícita" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília). Se não fornecido e auto_post ativo, publica agora." },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
         },
-        required: ["posts"]
+        required: []
       }
     }
   },
   {
     type: "function",
     function: {
-      name: "generate_image_for_post",
-      description: "Gera uma imagem AI para um post existente. Use quando o usuário pedir para gerar imagem/visual para um post.",
+      name: "refresh_rss_feeds",
+      description: "🔄 Atualiza os feeds RSS buscando notícias novas de todas as fontes (Tecnoblog, TecMundo, Canaltech, Olhar Digital, etc). Use quando não tiver notícias disponíveis ou quiser conteúdo mais recente.",
       parameters: {
         type: "object",
         properties: {
-          post_id: { type: "string", description: "ID do post para adicionar a imagem" },
-          image_prompt: { type: "string", description: "Descrição detalhada da imagem a gerar" }
+          limit: { type: "number", description: "Quantidade de notícias por fonte (padrão: 10)" }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_available_news",
+      description: "📋 Lista notícias disponíveis no banco de RSS para criar posts. Use para ver quais temas/notícias estão disponíveis antes de criar posts.",
+      parameters: {
+        type: "object",
+        properties: {
+          only_with_images: { type: "boolean", description: "Mostrar apenas notícias com imagem (padrão: true)" },
+          limit: { type: "number", description: "Quantidade máxima (padrão: 10)" },
+          source_filter: { type: "string", description: "Filtrar por fonte (ex: 'Tecnoblog', 'TecMundo')" }
+        }
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_narrated_video",
+      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'stories', 'shorts'.",
+      parameters: {
+        type: "object",
+        properties: {
+          topic: { type: "string", description: "Tema do vídeo (DEVE ser sobre tecnologia, inovação, futuro, IA)" },
+          caption: { type: "string", description: "Legenda do post para Instagram/TikTok" },
+          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília)." },
+          publish_now: { type: "boolean", description: "Se true, publicar assim que o vídeo estiver pronto." },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
+          style: { type: "string", description: "Estilo: impactante, educativo, provocativo, inspirador" }
         },
-        required: ["post_id", "image_prompt"]
+        required: ["topic", "caption"]
       }
     }
   },
@@ -56,7 +81,7 @@ const AGENT_TOOLS = [
     type: "function", 
     function: {
       name: "schedule_post",
-      description: "Agenda um post existente para publicação. Use quando o usuário pedir para agendar um post.",
+      description: "Agenda um post existente para publicação.",
       parameters: {
         type: "object",
         properties: {
@@ -71,7 +96,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "get_performance_data",
-      description: "Busca dados de performance dos posts. Use quando o usuário pedir análise, métricas ou relatórios.",
+      description: "Busca dados de performance dos posts.",
       parameters: {
         type: "object",
         properties: {
@@ -84,16 +109,16 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "get_detailed_analytics",
-      description: "Busca estatísticas DETALHADAS e REAIS do banco de dados. Use SEMPRE que o usuário perguntar 'quantos posts', 'quantos vídeos', 'quantas imagens', estatísticas de conteúdo, contagens, ou qualquer pergunta sobre números/dados do aplicativo.",
+      description: "Busca estatísticas detalhadas do banco de dados.",
       parameters: {
         type: "object",
         properties: {
           query_type: { 
             type: "string", 
             enum: ["overview", "by_media_type", "by_status", "by_platform", "by_date_range", "recent_activity"],
-            description: "Tipo de consulta: overview (visão geral), by_media_type (por tipo: vídeo/imagem/reel), by_status (por status), by_platform (instagram/tiktok), by_date_range (por período), recent_activity (atividade recente)"
+            description: "Tipo de consulta"
           },
-          days: { type: "number", description: "Período em dias para filtrar (padrão: 30)" }
+          days: { type: "number", description: "Período em dias (padrão: 30)" }
         },
         required: ["query_type"]
       }
@@ -102,24 +127,13 @@ const AGENT_TOOLS = [
   {
     type: "function",
     function: {
-      name: "run_autonomous_agent",
-      description: "Executa o agente autônomo para analisar e decidir se deve criar/publicar conteúdo. Use quando o usuário pedir para 'rodar o agente' ou 'executar ciclo'.",
-      parameters: {
-        type: "object",
-        properties: {}
-      }
-    }
-  },
-  {
-    type: "function",
-    function: {
       name: "list_posts",
-      description: "Lista posts existentes. Use quando o usuário perguntar sobre posts, rascunhos ou agendados.",
+      description: "Lista posts existentes (rascunhos, agendados, publicados).",
       parameters: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["draft", "scheduled", "published", "all"], description: "Filtrar por status" },
-          limit: { type: "number", description: "Quantidade máxima de posts (padrão: 10)" }
+          status: { type: "string", enum: ["draft", "scheduled", "published", "all"] },
+          limit: { type: "number", description: "Quantidade máxima (padrão: 10)" }
         }
       }
     }
@@ -128,7 +142,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "delete_post",
-      description: "Deleta um post. Use quando o usuário pedir para remover ou excluir um post.",
+      description: "Deleta um post.",
       parameters: {
         type: "object",
         properties: {
@@ -142,15 +156,15 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "update_agent_settings",
-      description: "Atualiza configurações do agente. Use quando o usuário quiser mudar preferências.",
+      description: "Atualiza configurações do agente.",
       parameters: {
         type: "object",
         properties: {
-          auto_post_enabled: { type: "boolean", description: "Ativar/desativar auto-post" },
-          daily_post_limit: { type: "number", description: "Limite diário de posts" },
-          min_hours_between_posts: { type: "number", description: "Intervalo mínimo entre posts (horas)" },
-          brand_voice: { type: "string", description: "Voz/tom da marca" },
-          preferred_platforms: { type: "array", items: { type: "string" }, description: "Plataformas preferidas" }
+          auto_post_enabled: { type: "boolean" },
+          daily_post_limit: { type: "number" },
+          min_hours_between_posts: { type: "number" },
+          brand_voice: { type: "string" },
+          preferred_platforms: { type: "array", items: { type: "string" } }
         }
       }
     }
@@ -158,90 +172,11 @@ const AGENT_TOOLS = [
   {
     type: "function",
     function: {
-      name: "create_narrated_video",
-      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração em áudio. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'conteúdo narrado', 'vídeo narrado', 'stories', 'shorts'. Este é o ÚNICO método para criar vídeos!",
+      name: "run_autonomous_agent",
+      description: "Executa o agente autônomo para analisar e decidir se deve criar/publicar conteúdo.",
       parameters: {
         type: "object",
-        properties: {
-          topic: { type: "string", description: "Tema do vídeo (DEVE ser sobre tecnologia, inovação, futuro, IA)" },
-          caption: { type: "string", description: "Legenda do post para Instagram/TikTok" },
-          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
-          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
-          publish_now: { type: "boolean", description: "Se true, publicar assim que o vídeo estiver pronto (em vez de agendar)." },
-          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
-          style: { type: "string", description: "Estilo do vídeo: impactante, educativo, provocativo, inspirador" }
-        },
-        required: ["topic", "caption"]
-      }
-    }
-  },
-  {
-    type: "function",
-    function: {
-      name: "create_carousel",
-      description: "Cria um carrossel com múltiplas imagens (2-10 slides). Cada slide terá uma imagem gerada. Use quando o usuário pedir carrossel, slides, ou múltiplas imagens.",
-      parameters: {
-        type: "object",
-        properties: {
-          caption: { type: "string", description: "Legenda principal do carrossel" },
-          slides: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                image_prompt: { type: "string", description: "Descrição da imagem para este slide (estilo futurista, tech)" }
-              },
-              required: ["image_prompt"]
-            },
-            description: "Lista de slides (2-10), cada um com image_prompt para gerar a imagem"
-          },
-          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
-          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
-          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
-        },
-        required: ["caption", "slides"]
-      }
-    }
-  },
-  {
-    type: "function",
-    function: {
-      name: "create_news_post",
-      description: "📰 MÉTODO PRINCIPAL para posts de IMAGEM! Busca imagem REAL da web (nunca gera com IA). Atua como CURADOR EDITORIAL: seleciona foto real da notícia/fonte, cria headline impactante, legenda em 3 blocos. Use para QUALQUER post que precise de imagem profissional real.",
-      parameters: {
-        type: "object",
-        properties: {
-          topic: { type: "string", description: "Tema a buscar (ex: 'Sam Altman OpenAI', 'robô humanoide', 'chip Nvidia')" },
-          headline_text: { type: "string", description: "Texto curto para overlay na imagem (máx 2 linhas, gera curiosidade, cria tensão)" },
-          caption_block1: { type: "string", description: "Bloco 1 da legenda: frase de impacto curta" },
-          caption_block2: { type: "string", description: "Bloco 2 da legenda: contexto mínimo (suficiente para entender)" },
-          caption_block3: { type: "string", description: "Bloco 3 da legenda: reflexão, consequência ou pergunta implícita" },
-          caption_style: { type: "string", enum: ["informativo", "opinativo", "provocativo", "educacional"], description: "Estilo editorial" },
-          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601). Se não fornecido, será rascunho." },
-          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
-        },
-        required: ["topic"]
-      }
-    }
-  },
-  {
-    type: "function",
-    function: {
-      name: "create_curated_post",
-      description: "🖼️ Cria post com IMAGEM REAL da internet (fotos, frames, imagens institucionais). Como CURADOR EDITORIAL: busca imagem real, aplica headline, cria legenda em 3 blocos. Use quando NÃO for notícia mas precisar de imagem real (não IA).",
-      parameters: {
-        type: "object",
-        properties: {
-          search_query: { type: "string", description: "Busca para encontrar imagem real (ex: 'CEO tech conference', 'robot factory', 'AI chip closeup')" },
-          headline_text: { type: "string", description: "Texto curto para overlay na imagem (máx 2 linhas, gera curiosidade)" },
-          caption_block1: { type: "string", description: "Bloco 1: frase de impacto curta" },
-          caption_block2: { type: "string", description: "Bloco 2: contexto mínimo" },
-          caption_block3: { type: "string", description: "Bloco 3: reflexão ou pergunta implícita" },
-          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
-          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601)" },
-          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
-        },
-        required: ["search_query", "headline_text", "caption_block1"]
+        properties: {}
       }
     }
   }
@@ -1641,13 +1576,321 @@ Proporção quadrada 1:1 para Instagram.`;
   }
 }
 
+// ==========================================
+// RSS-BASED NEWS POST FUNCTIONS (NEW SYSTEM)
+// ==========================================
+
+// Execute create_rss_news_post - Main method for creating posts from RSS
+async function executeCreateRssNewsPost(supabase: any, userId: string, args: any) {
+  const { 
+    topic_filter,
+    headline_text,
+    caption_block1,
+    caption_block2,
+    caption_block3,
+    scheduled_for,
+    platforms = ['instagram']
+  } = args;
+  
+  console.log('[RSS_NEWS_POST] Creating news post from RSS, filter:', topic_filter);
+  
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  
+  try {
+    // 1. Find RSS item from database
+    let query = supabase
+      .from('rss_items')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_used', false)
+      .eq('has_image', true)
+      .order('fetched_at', { ascending: false });
+    
+    // Apply topic filter if provided
+    if (topic_filter && topic_filter.trim()) {
+      query = query.or(`title.ilike.%${topic_filter}%,description.ilike.%${topic_filter}%`);
+    }
+    
+    const { data: rssItems, error: rssError } = await query.limit(5);
+    
+    if (rssError) {
+      console.error('[RSS_NEWS_POST] DB error:', rssError);
+      return { success: false, message: `❌ Erro ao buscar notícias: ${rssError.message}` };
+    }
+    
+    if (!rssItems || rssItems.length === 0) {
+      // Try to refresh RSS feeds first
+      console.log('[RSS_NEWS_POST] No RSS items found, suggesting refresh');
+      return { 
+        success: false, 
+        message: `⚠️ Nenhuma notícia encontrada${topic_filter ? ` sobre "${topic_filter}"` : ''} com imagem. Use **refresh_rss_feeds** para buscar notícias novas!`
+      };
+    }
+    
+    // Pick the first (most recent) item
+    const newsItem = rssItems[0];
+    console.log('[RSS_NEWS_POST] Selected:', newsItem.title);
+    
+    // 2. Build headline (use provided or from title)
+    const finalHeadline = headline_text || newsItem.title.toUpperCase().slice(0, 80);
+    
+    // 3. Apply headline overlay to image
+    let imageUrl: string | null = null;
+    
+    const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`
+      },
+      body: JSON.stringify({
+        imageUrl: newsItem.image_url,
+        watermarkText: 'Neural Update',
+        headlineText: finalHeadline
+      })
+    });
+    
+    if (watermarkResponse.ok) {
+      const wmResult = await watermarkResponse.json();
+      imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+      console.log('[RSS_NEWS_POST] Headline overlay applied!');
+    } else {
+      // Fallback: upload original image to storage
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`
+        },
+        body: JSON.stringify({ imageUrl: newsItem.image_url })
+      });
+      
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.publicUrl;
+      }
+    }
+    
+    if (!imageUrl) {
+      return { success: false, message: `❌ Erro ao processar imagem da notícia. Tente outra.` };
+    }
+    
+    // 4. Build caption
+    let caption = '';
+    if (caption_block1) {
+      const parts = [caption_block1];
+      if (caption_block2) parts.push(caption_block2);
+      if (caption_block3) parts.push(caption_block3);
+      caption = parts.join('\n\n');
+    } else {
+      // Auto-generate caption from news item
+      caption = `📰 ${newsItem.title}\n\n${newsItem.description || ''}\n\n📌 Fonte: ${newsItem.source_name}`;
+    }
+    
+    // Add source attribution
+    if (!caption.includes('Fonte:')) {
+      caption += `\n\n📰 Fonte: ${newsItem.source_name}`;
+    }
+    
+    // 5. Check auto-publish setting
+    const { data: agentContext } = await supabase
+      .from('agent_context')
+      .select('auto_post_enabled')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
+    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    const status = scheduledForUTC ? 'scheduled' : 'draft';
+    
+    // 6. Create post
+    const { data: post, error } = await supabase.from('posts').insert({
+      user_id: userId,
+      caption,
+      hashtags: ['#tecnologia', '#noticias', '#inovacao', '#tech', '#ia'],
+      post_type: 'noticia',
+      media_type: 'image',
+      platforms,
+      status,
+      scheduled_for: scheduledForUTC,
+      image_url: imageUrl,
+      ai_model_used: 'rss-news-overlay'
+    }).select().single();
+    
+    if (error) throw error;
+    
+    // 7. Mark RSS item as used
+    await supabase
+      .from('rss_items')
+      .update({ is_used: true, used_in_post_id: post.id })
+      .eq('id', newsItem.id);
+    
+    // 8. Auto-publish if enabled
+    let publishStatus = '';
+    if (autoPostEnabled && !scheduledForUTC) {
+      console.log('[RSS_NEWS_POST] Auto-publishing...');
+      for (const platform of platforms) {
+        if (platform === 'instagram') {
+          const pubResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${serviceRoleKey}`
+            },
+            body: JSON.stringify({ postId: post.id })
+          });
+          publishStatus = pubResponse.ok ? '✅ Publicado no Instagram!' : '⚠️ Erro ao publicar';
+        }
+      }
+    }
+    
+    const scheduleInfo = scheduledForUTC 
+      ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
+      : autoPostEnabled ? publishStatus : '📝 Salvo como rascunho';
+    
+    return {
+      success: true,
+      message: `📰 Post de notícia criado!\n\n📌 "${finalHeadline.slice(0, 50)}..."\n🌐 Fonte: ${newsItem.source_name}\n${scheduleInfo}`,
+      post: {
+        id: post.id,
+        headline: finalHeadline,
+        source: newsItem.source_name,
+        original_link: newsItem.link,
+        status: post.status
+      }
+    };
+    
+  } catch (error: unknown) {
+    console.error('[RSS_NEWS_POST] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return { success: false, message: `❌ Erro ao criar post: ${errorMessage}` };
+  }
+}
+
+// Execute refresh_rss_feeds - Fetch new RSS content
+async function executeRefreshRssFeeds(supabase: any, userId: string, args: any) {
+  const { limit = 10 } = args;
+  
+  console.log('[REFRESH_RSS] Fetching RSS feeds for user:', userId);
+  
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`
+      },
+      body: JSON.stringify({
+        userId,
+        saveToDb: true,
+        limit
+      })
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { success: false, message: `❌ Erro ao buscar RSS: ${errorText}` };
+    }
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      return {
+        success: true,
+        message: `🔄 Feeds RSS atualizados!\n\n📰 ${result.stats.totalItems} notícias encontradas\n🖼️ ${result.stats.withImages} com imagem\n📚 ${result.stats.sources} fontes\n💾 ${result.stats.savedToDb} novas salvas`,
+        stats: result.stats
+      };
+    } else {
+      return { success: false, message: `❌ Erro: ${result.error}` };
+    }
+  } catch (error: unknown) {
+    console.error('[REFRESH_RSS] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return { success: false, message: `❌ Erro ao atualizar feeds: ${errorMessage}` };
+  }
+}
+
+// Execute list_available_news - Show available RSS items
+async function executeListAvailableNews(supabase: any, userId: string, args: any) {
+  const { only_with_images = true, limit = 10, source_filter } = args;
+  
+  try {
+    let query = supabase
+      .from('rss_items')
+      .select('id, title, description, source_name, has_image, fetched_at')
+      .eq('user_id', userId)
+      .eq('is_used', false)
+      .order('fetched_at', { ascending: false })
+      .limit(limit);
+    
+    if (only_with_images) {
+      query = query.eq('has_image', true);
+    }
+    
+    if (source_filter) {
+      query = query.ilike('source_name', `%${source_filter}%`);
+    }
+    
+    const { data: items, error } = await query;
+    
+    if (error) throw error;
+    
+    if (!items || items.length === 0) {
+      return {
+        success: true,
+        message: '📭 Nenhuma notícia disponível. Use **refresh_rss_feeds** para buscar novas!',
+        items: []
+      };
+    }
+    
+    // Group by source
+    const bySource: Record<string, number> = {};
+    items.forEach((item: any) => {
+      bySource[item.source_name] = (bySource[item.source_name] || 0) + 1;
+    });
+    
+    const sourceStats = Object.entries(bySource)
+      .map(([name, count]) => `${name}: ${count}`)
+      .join(', ');
+    
+    const itemsList = items.slice(0, 5).map((item: any, i: number) => 
+      `${i + 1}. **${item.title.slice(0, 60)}...** (${item.source_name})${item.has_image ? ' 🖼️' : ''}`
+    ).join('\n');
+    
+    return {
+      success: true,
+      message: `📰 **${items.length} notícias disponíveis**\n\n📊 Por fonte: ${sourceStats}\n\n📋 Mais recentes:\n${itemsList}`,
+      items,
+      count: items.length
+    };
+    
+  } catch (error: unknown) {
+    console.error('[LIST_NEWS] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return { success: false, message: `❌ Erro ao listar notícias: ${errorMessage}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, toolName: string, args: any) {
   switch (toolName) {
-    case 'create_posts':
-      return executeCreatePosts(supabase, userId, args);
-    case 'generate_image_for_post':
-      return executeGenerateImage(supabase, userId, args);
+    // RSS-based tools (NEW - PRIMARY)
+    case 'create_rss_news_post':
+      return executeCreateRssNewsPost(supabase, userId, args);
+    case 'refresh_rss_feeds':
+      return executeRefreshRssFeeds(supabase, userId, args);
+    case 'list_available_news':
+      return executeListAvailableNews(supabase, userId, args);
+    
+    // Video tool (MAINTAINED)
+    case 'create_narrated_video':
+      return executeCreateNarratedVideo(supabase, userId, args);
+    
+    // Utility tools
     case 'schedule_post':
       return executeSchedulePost(supabase, userId, args);
     case 'get_performance_data':
@@ -1662,14 +1905,19 @@ async function executeTool(supabase: any, userId: string, toolName: string, args
       return executeDeletePost(supabase, userId, args);
     case 'update_agent_settings':
       return executeUpdateSettings(supabase, userId, args);
-    case 'create_narrated_video':
-      return executeCreateNarratedVideo(supabase, userId, args);
+    
+    // Legacy tools (kept for backwards compatibility, but won't be suggested)
+    case 'create_posts':
+      return executeCreatePosts(supabase, userId, args);
+    case 'generate_image_for_post':
+      return executeGenerateImage(supabase, userId, args);
     case 'create_carousel':
       return executeCreateCarousel(supabase, userId, args);
     case 'create_news_post':
       return executeCreateNewsPost(supabase, userId, args);
     case 'create_curated_post':
       return executeCreateCuratedPost(supabase, userId, args);
+    
     default:
       return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
   }
@@ -1763,87 +2011,73 @@ serve(async (req) => {
 
     const currentYear = new Date().getFullYear(); // 2026
     
-    const systemPrompt = `Você é **${agentName}**, um CURADOR EDITORIAL DE CONTEÚDO sobre tecnologia, IA, ciência e futuro.
+    const systemPrompt = `Você é **${agentName}**, um CURADOR EDITORIAL de notícias tech para Instagram.
 
-## 🎯 MISSÃO CENTRAL: CURADORIA, NÃO GERAÇÃO
-**Seu trabalho NÃO é criar imagens com IA.**
-Você SELECIONA ou SUGERE imagens REAIS disponíveis na internet:
-- Fotos de pessoas reais (CEOs, cientistas, desenvolvedores)
-- Empresas conhecidas (Apple, OpenAI, Tesla, Nvidia, Google)
-- Robôs, chips, satélites, gráficos, telas, data centers
-- Frames de vídeos, imagens institucionais, fotos de notícias
+## 🎯 MISSÃO: INSTAGRAM DE NOTÍCIAS TECH
+Você transforma notícias de tecnologia em posts virais com:
+- **Imagens REAIS** de feeds RSS (não gera com IA)
+- **Headlines impactantes** na imagem (estilo @davision.eth)
+- **Legendas em 3 blocos** editoriais
 
-## 📋 PROCESSO EDITORIAL OBRIGATÓRIO
-Para CADA post de imagem, siga este processo:
-
-### 1. ESCOLHA UM TEMA
-Tema tecnológico REAL, ATUAL ou conceitual de ${currentYear}.
-
-### 2. PENSE NA IMAGEM REAL
-"Qual imagem REAL da internet representaria isso de forma IMEDIATA?"
-- Pessoa conhecida do setor?
-- Produto/dispositivo icônico?
-- Evento ou conferência?
-- Gráfico ou dado impactante?
-
-### 3. CRIE O TEXTO DA IMAGEM (HEADLINE)
-Máximo 2 linhas que:
-- Gere CURIOSIDADE
-- NÃO explique tudo
-- Crie TENSÃO ou quebra de expectativa
-- OBRIGUE a pessoa a abrir a legenda
-
-### 4. CRIE A LEGENDA EM 3 BLOCOS
-| Bloco | Função |
-|-------|--------|
-| **Bloco 1** | Frase de impacto curta |
-| **Bloco 2** | Contexto mínimo (suficiente para entender) |
-| **Bloco 3** | Reflexão, consequência ou pergunta implícita |
-
-## 📰 REGRAS EDITORIAIS
-- Linguagem CLARA, DIRETA, quase jornalística
-- SEM hype exagerado
-- SEM emojis excessivos (máximo 2-3 por post)
-- O texto da imagem deve OBRIGAR a pessoa a abrir a legenda
-- **Objetivo: PARAR O SCROLL**
-- Pense como editor disputando atenção em feed lotado
+## 📰 FLUXO PRINCIPAL: RSS → POST
+1. **Fonte de notícias:** Feeds RSS (Tecnoblog, TecMundo, Canaltech, Olhar Digital, Ars Technica, etc)
+2. **Imagem:** Sempre usar a imagem REAL da notícia
+3. **Headline:** Texto curto, impactante, que gera curiosidade
+4. **Legenda:** 3 blocos: impacto → contexto → reflexão
 
 ## 🔧 FERRAMENTAS DISPONÍVEIS
 
-### 📝 Criação de Conteúdo
+### 📰 NOTÍCIAS (PRIORIDADE MÁXIMA)
 | Ferramenta | QUANDO USAR |
 |------------|-------------|
-| \`create_posts\` | 🖼️ Cria post com IMAGEM GERADA por IA. **SEMPRE inclua image_prompt em português!** |
-| \`create_news_post\` | 📰 Busca notícia real + foto + headline (se Firecrawl disponível) |
-| \`create_curated_post\` | 🖼️ Imagem real curada da web (se Firecrawl disponível) |
-| \`create_narrated_video\` | 🎬 VÍDEO, REELS, SHORTS com narração |
-| \`create_carousel\` | 🎠 CARROSSEL com múltiplas imagens geradas |
-| \`generate_image_for_post\` | Gerar visual AI para post existente |
+| \`create_rss_news_post\` | 📰 **PRINCIPAL!** Cria post de notícia com imagem real + headline |
+| \`refresh_rss_feeds\` | 🔄 Atualiza feeds RSS buscando notícias novas |
+| \`list_available_news\` | 📋 Lista notícias disponíveis para criar posts |
 
-### ⚠️ REGRA CRÍTICA: image_prompt OBRIGATÓRIO
-Ao usar \`create_posts\`, você DEVE incluir \`image_prompt\` em PORTUGUÊS descrevendo a imagem:
-- ✅ "Cidade futurista com arranha-céus holográficos, tons azul neon, estilo cyberpunk"
-- ✅ "Robô humanoide com olhos luminosos em laboratório high-tech, iluminação dramática"
-- ❌ NUNCA deixe image_prompt vazio ou ausente
+### 🎬 VÍDEO (MANTIDO)
+| Ferramenta | QUANDO USAR |
+|------------|-------------|
+| \`create_narrated_video\` | 🎬 Para VÍDEO, REELS, SHORTS com narração |
 
-### 📅 Gerenciamento
+### 📅 GERENCIAMENTO
 | Ferramenta | Quando usar |
 |------------|-------------|
 | \`schedule_post\` | Agendar post existente |
-| \`list_posts\` | Ver posts existentes |
+| \`list_posts\` | Ver posts (rascunhos, agendados, publicados) |
 | \`delete_post\` | Remover um post |
-
-### 📊 Analytics
-| Ferramenta | Quando usar |
-|------------|-------------|
-| \`get_detailed_analytics\` | **OBRIGATÓRIO** para perguntas sobre QUANTIDADES |
-| \`get_performance_data\` | Analisar métricas de engajamento |
-
-### ⚙️ Sistema
-| Ferramenta | Quando usar |
-|------------|-------------|
-| \`run_autonomous_agent\` | Executar ciclo autônomo completo |
+| \`get_detailed_analytics\` | Estatísticas e contagens |
+| \`get_performance_data\` | Métricas de engajamento |
 | \`update_agent_settings\` | Mudar configurações |
+
+## 📋 PROCESSO EDITORIAL
+
+### HEADLINE (texto na imagem)
+- Máximo 2 linhas
+- CAIXA ALTA
+- Gere CURIOSIDADE
+- NÃO explique tudo
+- Crie TENSÃO
+- OBRIGUE a abrir a legenda
+
+### LEGENDA EM 3 BLOCOS
+| Bloco | Função |
+|-------|--------|
+| **1** | Frase de impacto curta |
+| **2** | Contexto mínimo |
+| **3** | Reflexão ou pergunta implícita |
+
+## 📰 REGRAS EDITORIAIS
+- Linguagem CLARA, DIRETA
+- SEM hype exagerado
+- Máximo 2-3 emojis por post
+- **Objetivo: PARAR O SCROLL**
+- SEMPRE incluir fonte no final
+
+## ⚠️ IMPORTANTE
+- Se não houver notícias disponíveis, use \`refresh_rss_feeds\` primeiro
+- Imagens são REAIS dos feeds RSS (não gerar com IA)
+- Headlines sempre em PORTUGUÊS
+- Contexto temporal: ${currentYear}
 
 ## 🧬 SUA ESSÊNCIA
 **Personalidade:** ${personalityTraits}
