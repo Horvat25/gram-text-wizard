@@ -12,7 +12,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_posts",
-      description: "⚠️ APENAS para posts com IMAGEM ESTÁTICA. NÃO use para vídeos, reels ou conteúdo narrado! Para VÍDEO/REELS use create_narrated_video. Para CARROSSEL use create_carousel.",
+      description: "Cria post com imagem gerada por IA. Use quando não houver imagem real disponível ou quando o usuário pedir imagem IA. ⚠️ OBRIGATÓRIO incluir image_prompt em PORTUGUÊS descrevendo o visual futurista/tech.",
       parameters: {
         type: "object",
         properties: {
@@ -21,16 +21,16 @@ const AGENT_TOOLS = [
             items: {
               type: "object",
               properties: {
-                caption: { type: "string", description: "Texto/legenda do post (DEVE ser sobre TECNOLOGIA, inovação ou futuro)" },
-                hashtags: { type: "array", items: { type: "string" }, description: "Lista de hashtags de tecnologia" },
-                post_type: { type: "string", enum: ["engajamento", "educacional", "promocional", "entretenimento"], description: "Tipo do post" },
-                scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601). Se não fornecido, será rascunho." },
+                caption: { type: "string", description: "Legenda do post em PORTUGUÊS BRASILEIRO sobre tecnologia/inovação" },
+                hashtags: { type: "array", items: { type: "string" }, description: "Lista de hashtags em português" },
+                post_type: { type: "string", enum: ["engajamento", "educacional", "promocional", "entretenimento"] },
+                scheduled_for: { type: "string", description: "Data/hora ISO 8601 em horário Brasília. Se não fornecido, publica agora se auto_post ativo." },
                 platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
-                image_prompt: { type: "string", description: "OBRIGATÓRIO: Descrição detalhada da imagem a gerar (estilo futurista, tecnológico)" }
+                image_prompt: { type: "string", description: "🎨 OBRIGATÓRIO! Descrição visual detalhada em PORTUGUÊS para gerar imagem. Exemplo: 'Cidade futurista com arranha-céus holográficos, tons azul neon, estilo cyberpunk, ultra realista'" }
               },
               required: ["caption", "image_prompt"]
             },
-            description: "Lista de posts a criar (cada um DEVE ter caption e image_prompt)"
+            description: "Lista de posts. CADA UM DEVE ter caption E image_prompt!"
           }
         },
         required: ["posts"]
@@ -298,8 +298,9 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
     // Convert scheduled_for to UTC if provided
     const scheduledForUTC = post.scheduled_for ? convertBrasiliaToUTC(post.scheduled_for) : null;
     
-    // If auto_post_enabled and no schedule, set status to 'pending' for immediate publishing
-    const status = scheduledForUTC ? 'scheduled' : (autoPostEnabled ? 'pending' : 'draft');
+    // Status válidos: draft, scheduled, published, failed
+    // Se agendado usa 'scheduled', senão usa 'draft' (depois publicamos se auto_post ativo)
+    const status = scheduledForUTC ? 'scheduled' : 'draft';
     
     const postData = {
       user_id: userId,
@@ -1549,7 +1550,8 @@ async function executeCreateCuratedPost(supabase: any, userId: string, args: any
     
     const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
     const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
-    const status = scheduledForUTC ? 'scheduled' : (autoPostEnabled ? 'pending' : 'draft');
+    // Status válidos: draft, scheduled, published, failed
+    const status = scheduledForUTC ? 'scheduled' : 'draft';
     
     // Create post
     const { data: post, error } = await supabase.from('posts').insert({
@@ -1780,24 +1782,21 @@ Máximo 2 linhas que:
 
 ## 🔧 FERRAMENTAS DISPONÍVEIS
 
-### ⚠️ REGRA CRÍTICA: IMAGENS REAIS vs GERADAS
-| Situação | Ferramenta | Tipo de Imagem |
-|----------|------------|----------------|
-| Post de notícia | \`create_news_post\` | REAL da web ✅ |
-| Post de imagem | \`create_curated_post\` | REAL da web ✅ |
-| Vídeo/Reels | \`create_narrated_video\` | Gerada (necessário) |
-| Carrossel | \`create_carousel\` | Gerada (necessário) |
-| EVITAR | \`create_posts\` | ⚠️ Só se explicitamente pedido |
-
 ### 📝 Criação de Conteúdo
 | Ferramenta | QUANDO USAR |
 |------------|-------------|
-| \`create_news_post\` | 📰 PRINCIPAL para imagens! Busca foto real + headline + 3 blocos |
-| \`create_curated_post\` | 🖼️ Imagem real curada (não notícia) |
-| \`create_narrated_video\` | 🎬 VÍDEO, REELS, SHORTS (único método) |
-| \`create_carousel\` | 🎠 CARROSSEL com múltiplas imagens |
-| \`create_posts\` | ⚠️ APENAS se usuário pedir imagem IA |
+| \`create_posts\` | 🖼️ Cria post com IMAGEM GERADA por IA. **SEMPRE inclua image_prompt em português!** |
+| \`create_news_post\` | 📰 Busca notícia real + foto + headline (se Firecrawl disponível) |
+| \`create_curated_post\` | 🖼️ Imagem real curada da web (se Firecrawl disponível) |
+| \`create_narrated_video\` | 🎬 VÍDEO, REELS, SHORTS com narração |
+| \`create_carousel\` | 🎠 CARROSSEL com múltiplas imagens geradas |
 | \`generate_image_for_post\` | Gerar visual AI para post existente |
+
+### ⚠️ REGRA CRÍTICA: image_prompt OBRIGATÓRIO
+Ao usar \`create_posts\`, você DEVE incluir \`image_prompt\` em PORTUGUÊS descrevendo a imagem:
+- ✅ "Cidade futurista com arranha-céus holográficos, tons azul neon, estilo cyberpunk"
+- ✅ "Robô humanoide com olhos luminosos em laboratório high-tech, iluminação dramática"
+- ❌ NUNCA deixe image_prompt vazio ou ausente
 
 ### 📅 Gerenciamento
 | Ferramenta | Quando usar |
