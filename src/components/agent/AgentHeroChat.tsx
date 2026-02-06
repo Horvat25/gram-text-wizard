@@ -213,16 +213,29 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   };
 
   const scrollToBottom = () => {
+    // ScrollArea uses a viewport element inside, not the ref directly
     setTimeout(() => {
       if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          viewport.scrollTop = viewport.scrollHeight;
+        }
       }
     }, 100);
   };
 
+  // Scroll to bottom on mount, when messages change, and when history finishes loading
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoadingHistory]);
+  }, [messages]);
+  
+  // Additional scroll on mount and after history loads
+  useEffect(() => {
+    if (!isLoadingHistory) {
+      // Use longer delay after history loads to ensure DOM is ready
+      setTimeout(scrollToBottom, 200);
+    }
+  }, [isLoadingHistory]);
 
   const loadChatHistory = async () => {
     if (!user) return;
