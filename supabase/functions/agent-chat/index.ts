@@ -18,10 +18,11 @@ const AGENT_TOOLS = [
         type: "object",
         properties: {
           topic_filter: { type: "string", description: "Palavra-chave para filtrar notícias (ex: 'IA', 'OpenAI', 'robô', 'Tesla'). Se vazio, pega a mais recente." },
-          headline_text: { type: "string", description: "Texto curto para overlay na imagem (máx 2 linhas, gera curiosidade, CAIXA ALTA). Se não fornecido, usa título da notícia." },
-          caption_block1: { type: "string", description: "Bloco 1 da legenda: frase de impacto curta" },
-          caption_block2: { type: "string", description: "Bloco 2 da legenda: contexto mínimo (suficiente para entender)" },
-          caption_block3: { type: "string", description: "Bloco 3 da legenda: reflexão, consequência ou pergunta implícita" },
+          headline_text: { type: "string", description: "Headline com TENSÃO IMPLÍCITA (máx 2 linhas, CAIXA ALTA). NÃO explique tudo. Gere conflito. Ex: 'SAM ALTMAN SABIA DISSO HÁ 2 ANOS. AGORA É TARDE DEMAIS.'" },
+          caption_block1: { type: "string", description: "Bloco 1: COMPLEMENTA a headline (não repete!). Frase que segura a atenção após a headline puxar." },
+          caption_block2: { type: "string", description: "Bloco 2: contexto mínimo (suficiente para entender)" },
+          caption_block3: { type: "string", description: "Bloco 3: reflexão, consequência ou pergunta implícita" },
+          theme_tags: { type: "array", items: { type: "string" }, description: "Tags internas invisíveis para analytics (ex: ['IA', 'Big Tech', 'Segurança', 'Futuro do Trabalho']). Não aparece no post." },
           scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília). Se não fornecido e auto_post ativo, publica agora." },
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
         },
@@ -181,6 +182,15 @@ const AGENT_TOOLS = [
     }
   }
 ];
+
+// Generate pseudo-random human delay in minutes (2-8 min)
+// Makes posts feel more natural, avoiding bot detection patterns
+function generateHumanDelay(): number {
+  // Base delay 2-5 min + random extra 0-3 min
+  const baseDelay = 2 + Math.floor(Math.random() * 3); // 2-4
+  const extraDelay = Math.random() * 3; // 0-3
+  return Math.round((baseDelay + extraDelay) * 10) / 10; // Round to 1 decimal
+}
 
 // Helper function to convert Brasília time to UTC
 // The AI sends times as if they are in Brasília (UTC-3), so we need to convert to UTC for storage
@@ -1581,6 +1591,7 @@ Proporção quadrada 1:1 para Instagram.`;
 // ==========================================
 
 // Execute create_rss_news_post - Main method for creating posts from RSS
+// Now with theme_tags for invisible analytics and human delay for natural publishing
 async function executeCreateRssNewsPost(supabase: any, userId: string, args: any) {
   const { 
     topic_filter,
@@ -1588,11 +1599,12 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
     caption_block1,
     caption_block2,
     caption_block3,
+    theme_tags = [], // Invisible tags for analytics (e.g., ['IA', 'Big Tech', 'Segurança'])
     scheduled_for,
     platforms = ['instagram']
   } = args;
   
-  console.log('[RSS_NEWS_POST] Creating news post from RSS, filter:', topic_filter);
+  console.log('[RSS_NEWS_POST] Creating news post from RSS, filter:', topic_filter, 'theme_tags:', theme_tags);
   
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -1704,7 +1716,15 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
     const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
     const status = scheduledForUTC ? 'scheduled' : 'draft';
     
-    // 6. Create post
+    // 6. Create post with theme_tags in overlay_metadata for invisible analytics
+    const overlayMetadata = {
+      type: 'rss_news_post',
+      theme_tags: theme_tags, // Invisible tags for future analytics
+      source_rss_id: newsItem.id,
+      headline_applied: finalHeadline,
+      created_by_agent: true
+    };
+    
     const { data: post, error } = await supabase.from('posts').insert({
       user_id: userId,
       caption,
@@ -1715,7 +1735,8 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
       status,
       scheduled_for: scheduledForUTC,
       image_url: imageUrl,
-      ai_model_used: 'rss-news-overlay'
+      ai_model_used: 'rss-news-overlay',
+      overlay_metadata: overlayMetadata // Store theme_tags here for analytics
     }).select().single();
     
     if (error) throw error;
@@ -1726,10 +1747,23 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
       .update({ is_used: true, used_in_post_id: post.id })
       .eq('id', newsItem.id);
     
-    // 8. Auto-publish if enabled
+    // 8. Auto-publish with HUMAN DELAY if enabled
+    // Delay makes feed feel natural, avoiding bot detection patterns
     let publishStatus = '';
+    let humanDelayMinutes = 0;
+    
     if (autoPostEnabled && !scheduledForUTC) {
-      console.log('[RSS_NEWS_POST] Auto-publishing...');
+      // Generate pseudo-random delay (2-8 min)
+      humanDelayMinutes = generateHumanDelay();
+      const delayMs = Math.round(humanDelayMinutes * 60 * 1000);
+      
+      console.log(`[RSS_NEWS_POST] Human delay: ${humanDelayMinutes} min before publishing...`);
+      
+      // Wait for the delay before publishing (simulates human behavior)
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      
+      console.log('[RSS_NEWS_POST] Delay complete. Auto-publishing now...');
+      
       for (const platform of platforms) {
         if (platform === 'instagram') {
           const pubResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
@@ -1747,16 +1781,22 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
     
     const scheduleInfo = scheduledForUTC 
       ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
-      : autoPostEnabled ? publishStatus : '📝 Salvo como rascunho';
+      : autoPostEnabled 
+        ? `${publishStatus}${humanDelayMinutes > 0 ? ` (delay humano: ${humanDelayMinutes.toFixed(1)} min)` : ''}`
+        : '📝 Salvo como rascunho';
+    
+    // Include theme_tags in response for transparency
+    const themeTagsInfo = theme_tags.length > 0 ? `\n🏷️ Tags: ${theme_tags.join(', ')}` : '';
     
     return {
       success: true,
-      message: `📰 Post de notícia criado!\n\n📌 "${finalHeadline.slice(0, 50)}..."\n🌐 Fonte: ${newsItem.source_name}\n${scheduleInfo}`,
+      message: `📰 Post de notícia criado!\n\n📌 "${finalHeadline.slice(0, 50)}..."\n🌐 Fonte: ${newsItem.source_name}${themeTagsInfo}\n${scheduleInfo}`,
       post: {
         id: post.id,
         headline: finalHeadline,
         source: newsItem.source_name,
         original_link: newsItem.link,
+        theme_tags: theme_tags,
         status: post.status
       }
     };
@@ -2051,20 +2091,26 @@ Você transforma notícias de tecnologia em posts virais com:
 
 ## 📋 PROCESSO EDITORIAL
 
-### HEADLINE (texto na imagem)
-- Máximo 2 linhas
-- CAIXA ALTA
-- Gere CURIOSIDADE
-- NÃO explique tudo
-- Crie TENSÃO
-- OBRIGUE a abrir a legenda
+### HEADLINE (texto na imagem) — TENSÃO OBRIGATÓRIA
+- Máximo 2 linhas, CAIXA ALTA
+- **CONFLITO IMPLÍCITO:** O leitor precisa sentir que algo está acontecendo
+- **NÃO EXPLIQUE:** A headline PUXA, a legenda SEGURA
+- **FÓRMULA:** [Consequência dramática] + [Gancho misterioso]
+- ❌ RUIM: "OpenAI lança nova versão do GPT-5"
+- ✅ BOM: "SAM ALTMAN SABIA DISSO HÁ 2 ANOS. AGORA É TARDE DEMAIS."
+- ✅ BOM: "ESSE CHIP CUSTA US$40.000. E VOCÊ VAI QUERER UM."
 
-### LEGENDA EM 3 BLOCOS
-| Bloco | Função |
-|-------|--------|
-| **1** | Frase de impacto curta |
-| **2** | Contexto mínimo |
-| **3** | Reflexão ou pergunta implícita |
+### LEGENDA EM 3 BLOCOS — A PRIMEIRA LINHA NÃO REPETE A HEADLINE
+| Bloco | Função | Regra |
+|-------|--------|-------|
+| **1** | COMPLEMENTA a headline | NÃO repita! A headline puxa, o bloco 1 SEGURA |
+| **2** | Contexto mínimo | Suficiente para entender, nunca demais |
+| **3** | Reflexão/pergunta | Deixe o leitor pensando, não conclua demais |
+
+### 🏷️ TAGS INVISÍVEIS (theme_tags)
+- SEMPRE envie 2-4 tags internas para analytics
+- Categorias válidas: IA, Big Tech, Segurança, Hardware, Futuro do Trabalho, Startups, Inovação, Privacidade
+- Não aparecem no post, são para rastreamento interno
 
 ## 📰 REGRAS EDITORIAIS
 - Linguagem CLARA, DIRETA
