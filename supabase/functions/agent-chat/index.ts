@@ -1170,7 +1170,7 @@ async function executeCreateCarousel(supabase: any, userId: string, args: any) {
 }
 
 // Execute create_news_post - fetches real news, uses article image, includes source
-// Now supports editorial format: headline overlay + 3-block caption
+// With AI fallback when Firecrawl is unavailable
 async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
   const { 
     topic, 
@@ -1185,261 +1185,237 @@ async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
   
   console.log('[NEWS_POST] Creating news post for topic:', topic);
   
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  
   try {
-    // Step 1: Search for recent news using Firecrawl (same as LatestNewsTab)
-    const searchResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/firecrawl-search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-      },
-      body: JSON.stringify({
-        query: `${topic} notícia recente tecnologia`,
-        limit: 10, // Get more results to find best images
-        lang: 'pt-BR',
-        country: 'BR'
-      })
-    });
+    let selectedArticle: any = null;
+    let selectedImage: string | null = null;
+    let sourceDomain = 'IA';
+    let sourceUrl = '';
+    let usedAiFallback = false;
     
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error('[NEWS_POST] News search failed:', errorText);
-      return { success: false, message: `❌ Erro ao buscar notícias: ${errorText}` };
-    }
-    
-    const searchResult = await searchResponse.json();
-    const newsArticles = searchResult.data || [];
-    
-    if (newsArticles.length === 0) {
-      return { success: false, message: `❌ Nenhuma notícia encontrada para "${topic}". Tente outro termo.` };
-    }
-    
-    console.log(`[NEWS_POST] Found ${newsArticles.length} articles`);
-    
-    // Score articles by image quality (more images = likely better visual content)
-    // This matches LatestNewsTab behavior of prioritizing articles with images
-    // Sort by image count to find best visual article
-    const articlesWithImages = newsArticles
-      .filter((a: any) => a.images && a.images.length > 0)
-      .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
-    
-    let selectedArticle = articlesWithImages[0] || newsArticles[0];
-    
-    // Select the best image from the article (first one is usually og:image which is best)
-    // Filter out icons, logos, tiny images
-    let selectedImage = null;
-    if (selectedArticle.images && selectedArticle.images.length > 0) {
-      // Filter for quality images (not icons/logos)
-      const qualityImages = selectedArticle.images.filter((img: string) => 
-        img && 
-        !img.includes('icon') && 
-        !img.includes('logo') && 
-        !img.includes('avatar') &&
-        !img.includes('1x1') &&
-        !img.includes('pixel') &&
-        !img.includes('favicon')
-      );
-      selectedImage = qualityImages[0] || selectedArticle.images[0];
-    }
-    
-    console.log('[NEWS_POST] Selected article:', selectedArticle.title);
-    console.log('[NEWS_POST] Selected image:', selectedImage ? 'yes' : 'no');
-    
-    // Extract source domain (same as LatestNewsTab getDomainFromUrl)
-    const sourceUrl = selectedArticle.url || '';
-    let sourceDomain = '';
+    // Try to fetch real news with Firecrawl
     try {
-      sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
-    } catch {
-      sourceDomain = 'fonte externa';
+      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`
+        },
+        body: JSON.stringify({
+          query: `${topic} notícia recente tecnologia`,
+          limit: 10,
+          lang: 'pt-BR',
+          country: 'BR'
+        })
+      });
+      
+      if (searchResponse.ok) {
+        const searchResult = await searchResponse.json();
+        const newsArticles = searchResult.data || [];
+        
+        if (newsArticles.length > 0) {
+          // Find article with quality images
+          const articlesWithImages = newsArticles
+            .filter((a: any) => a.images && a.images.length > 0)
+            .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
+          
+          selectedArticle = articlesWithImages[0] || newsArticles[0];
+          
+          if (selectedArticle.images?.length > 0) {
+            const qualityImages = selectedArticle.images.filter((img: string) => 
+              img && !img.includes('icon') && !img.includes('logo') && 
+              !img.includes('avatar') && !img.includes('1x1') && !img.includes('favicon')
+            );
+            selectedImage = qualityImages[0] || selectedArticle.images[0];
+          }
+          
+          sourceUrl = selectedArticle.url || '';
+          try {
+            sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
+          } catch { sourceDomain = 'fonte externa'; }
+          
+          console.log('[NEWS_POST] Found real article:', selectedArticle.title);
+        }
+      }
+    } catch (searchError) {
+      console.log('[NEWS_POST] Firecrawl unavailable, using AI fallback');
     }
     
-    // Step 2: Generate caption with source attribution (matching LatestNewsTab's "reporter" style)
-    // The generate-caption function has a 'noticia' postType that uses "Digital Journalist" persona
-    const captionResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-caption`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-      },
-      body: JSON.stringify({
-        topic: `${selectedArticle.title}. ${selectedArticle.description || ''}`,
-        postType: 'noticia', // This triggers the "Digital Journalist" persona
-        sourceUrl: sourceUrl,
-        sourceName: sourceDomain,
-        customInstructions: `Esta é uma notícia REAL. A fonte é: ${sourceDomain} (${sourceUrl}). 
-OBRIGATÓRIO: Inclua a fonte no final da legenda no formato:
-📰 Fonte: ${sourceDomain}
-
-Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha credibilidade.
-${caption_style === 'provocativo' 
-  ? 'Seja provocativo e gere debate. Faça o leitor parar e pensar.'
-  : caption_style === 'opinativo'
-  ? 'Adicione uma perspectiva única. Qual é o ângulo que ninguém está vendo?'
-  : caption_style === 'educacional'
-  ? 'Explique o contexto e por que isso importa para criadores de conteúdo.'
-  : 'Seja informativo e direto. Entregue a notícia com clareza.'}`
-      })
-    });
+    // FALLBACK: If Firecrawl failed, create content with AI
+    if (!selectedArticle) {
+      console.log('[NEWS_POST] Using AI fallback for topic:', topic);
+      usedAiFallback = true;
+      
+      // Generate image with AI
+      const currentYear = new Date().getFullYear();
+      const imagePrompt = `Fotografia profissional de alta qualidade relacionada a: ${topic}.
+Estilo: jornalístico, editorial, moderno, ${currentYear}.
+Iluminação cinematográfica, cores vibrantes, foco definido.
+IMPORTANTE: Não adicione texto na imagem. Imagem limpa para overlay posterior.
+Proporção quadrada 1:1 para Instagram.`;
+      
+      const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`
+        },
+        body: JSON.stringify({
+          prompt: imagePrompt,
+          format: 'square',
+          model: 'gemini'
+        })
+      });
+      
+      if (imageResponse.ok) {
+        const imageResult = await imageResponse.json();
+        selectedImage = imageResult.imageUrl;
+        console.log('[NEWS_POST] AI image generated');
+      }
+      
+      sourceDomain = 'Conteúdo IA';
+    }
     
+    // Build caption
     let caption = '';
     let hashtags: string[] = [];
     
-    // If 3-block format is provided by the agent, use it
     if (caption_block1) {
+      // 3-block format from agent
       const captionParts = [caption_block1];
       if (caption_block2) captionParts.push(caption_block2);
       if (caption_block3) captionParts.push(caption_block3);
       caption = captionParts.join('\n\n');
-      hashtags = ['#tecnologia', '#inovação', '#ia', '#notícias', '#futuro'];
-      console.log('[NEWS_POST] Using 3-block editorial format');
-    } else if (captionResponse.ok) {
-      // Fallback to AI-generated caption
-      const captionResult = await captionResponse.json();
-      caption = captionResult.caption || '';
-      hashtags = captionResult.hashtags || [];
-      console.log('[NEWS_POST] Caption generated, length:', caption.length);
-    }
-    
-    // Fallback caption if generation failed and no blocks provided
-    if (!caption) {
+      hashtags = ['#tecnologia', '#inovação', '#ia', '#futuro'];
+    } else if (selectedArticle) {
+      // Generate from article
       caption = `📰 ${selectedArticle.title}\n\n${selectedArticle.description || ''}\n\n📰 Fonte: ${sourceDomain}`;
-      hashtags = ['#tecnologia', '#noticias', '#inovacao', '#ia', '#tech'];
+      hashtags = ['#tecnologia', '#noticias', '#inovacao', '#ia'];
+    } else {
+      // Fallback caption
+      caption = `🚀 ${topic}\n\nConteúdo sobre ${topic} - as últimas novidades do mundo tech.\n\n#tecnologia #inovação`;
+      hashtags = ['#tecnologia', '#inovação', '#futuro', '#ia'];
     }
     
-    // Ensure source attribution is in caption
-    if (!caption.includes('Fonte:')) {
-      caption += `\n\n📰 Fonte: ${sourceDomain}`;
-    }
+    // Use headline text for image overlay
+    const headlineForImage = headline_text || (selectedArticle?.title?.slice(0, 80)) || topic.toUpperCase();
     
-    // Step 3: Process image with watermark (same as LatestNewsTab uploadExternalImageWithWatermark)
-    let imageUrl = null;
-    
-    // Use custom headline if provided, otherwise use article title
-    const headlineForImage = headline_text || selectedArticle.title;
-    
+    // Apply headline overlay to image
+    let imageUrl: string | null = null;
     if (selectedImage) {
-      console.log('[NEWS_POST] Processing external image:', selectedImage);
+      console.log('[NEWS_POST] Applying headline overlay...');
       
-      // Use add-watermark to process the external image WITH HEADLINE (like @davision.eth style)
-      const watermarkResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/add-watermark`, {
+      const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+          'Authorization': `Bearer ${serviceRoleKey}`
         },
         body: JSON.stringify({
           imageUrl: selectedImage,
           watermarkText: 'Neural Update',
-          headlineText: headlineForImage // Custom headline or article title
+          headlineText: headlineForImage
         })
       });
       
       if (watermarkResponse.ok) {
-        const watermarkResult = await watermarkResponse.json();
-        // The add-watermark function returns 'publicUrl' (fixed!)
-        imageUrl = watermarkResult.publicUrl || watermarkResult.url || watermarkResult.imageUrl;
-        console.log('[NEWS_POST] Image processed with watermark:', imageUrl);
+        const wmResult = await watermarkResponse.json();
+        imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+        console.log('[NEWS_POST] Headline overlay applied!');
       } else {
-        console.error('[NEWS_POST] Watermark failed, trying direct upload');
-        
-        // Try upload-external-image as fallback
-        const uploadResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/upload-external-image`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-          },
-          body: JSON.stringify({
-            imageUrl: selectedImage
-          })
-        });
-        
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          imageUrl = uploadResult.publicUrl || uploadResult.url || uploadResult.imageUrl;
-          console.log('[NEWS_POST] Image uploaded without watermark:', imageUrl);
-        }
+        // Use original image without overlay
+        imageUrl = selectedImage;
+        console.log('[NEWS_POST] Overlay failed, using original image');
       }
     }
     
-    // If no image could be processed, generate one
     if (!imageUrl) {
-      console.log('No image available, generating one...');
-      
-      const imagePrompt = `News article illustration about: ${selectedArticle.title}. Professional news style, clean design, photo-realistic, modern journalism aesthetic. NO text overlays.`;
-      
-      const genResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-        },
-        body: JSON.stringify({
-          prompt: imagePrompt,
-          userId
-        })
-      });
-      
-      if (genResponse.ok) {
-        const genResult = await genResponse.json();
-        imageUrl = genResult.imageUrl;
-        console.log('Image generated:', imageUrl);
-      }
+      return { success: false, message: `❌ Não consegui gerar imagem para "${topic}". Tente outro tema.` };
     }
     
-    // Step 4: Create the post
-    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    // Check auto-publish
+    const { data: agentContext } = await supabase
+      .from('agent_context')
+      .select('auto_post_enabled')
+      .eq('user_id', userId)
+      .maybeSingle();
     
-    const postData = {
+    const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
+    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    const status = scheduledForUTC ? 'scheduled' : 'draft';
+    
+    // Create post
+    const { data: post, error } = await supabase.from('posts').insert({
       user_id: userId,
       caption,
       hashtags,
       post_type: 'noticia',
       platforms: platforms || ['instagram'],
-      status: scheduledForUTC ? 'scheduled' : 'draft',
+      status,
       scheduled_for: scheduledForUTC,
       media_type: 'image',
-      image_url: imageUrl
-    };
+      image_url: imageUrl,
+      ai_model_used: usedAiFallback ? 'gemini-editorial' : 'curated-news'
+    }).select().single();
     
-    const { data: post, error } = await supabase
-      .from('posts')
-      .insert(postData)
-      .select()
-      .single();
+    if (error) throw error;
     
-    if (error) {
-      console.error('Error creating news post:', error);
-      return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
+    // Auto-publish if enabled
+    let publishStatus = '';
+    if (autoPostEnabled && !scheduledForUTC && imageUrl) {
+      console.log('[NEWS_POST] Auto-publishing...');
+      for (const platform of (platforms || ['instagram'])) {
+        try {
+          if (platform === 'instagram') {
+            const pubResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serviceRoleKey}`
+              },
+              body: JSON.stringify({ postId: post.id })
+            });
+            if (pubResponse.ok) {
+              publishStatus = '✅ Publicado no Instagram!';
+            } else {
+              publishStatus = '⚠️ Erro ao publicar';
+            }
+          }
+        } catch (pubError) {
+          console.error('[NEWS_POST] Publish error:', pubError);
+        }
+      }
     }
     
     const scheduleInfo = scheduledForUTC 
       ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
-      : '📝 Salvo como rascunho';
+      : autoPostEnabled ? publishStatus : '📝 Salvo como rascunho';
+    
+    const imageSource = usedAiFallback ? '🤖 Imagem IA + Headline' : `🌐 Imagem real: ${sourceDomain}`;
     
     return {
       success: true,
-      message: `📰 Post de notícia criado com sucesso!\n\n📌 "${selectedArticle.title.slice(0, 50)}..."\n🔗 Fonte: ${sourceDomain}\n${imageUrl ? '🖼️ Imagem incluída' : '⚠️ Sem imagem'}\n${scheduleInfo}`,
+      message: `📰 Post editorial criado!\n\n📌 Headline: "${headlineForImage.slice(0, 50)}..."\n${imageSource}\n${scheduleInfo}`,
       post: {
         id: post.id,
-        title: selectedArticle.title,
+        headline: headlineForImage,
         source: sourceDomain,
-        source_url: sourceUrl,
-        has_image: !!imageUrl,
+        has_image: true,
         status: post.status,
-        scheduled_for_brasilia: scheduledForUTC ? formatBrasiliaTime(scheduledForUTC) : null
+        used_ai_fallback: usedAiFallback
       }
     };
     
   } catch (error: unknown) {
     console.error('Error in executeCreateNewsPost:', error);
     const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-    return { success: false, message: `❌ Erro ao criar post de notícia: ${errorMessage}` };
+    return { success: false, message: `❌ Erro ao criar post: ${errorMessage}` };
   }
 }
 
-// Execute create curated post (with real web image, not AI generated)
+// Execute create curated post (with real web image, or AI fallback with headline overlay)
 async function executeCreateCuratedPost(supabase: any, userId: string, args: any) {
   const { 
     search_query, 
@@ -1452,64 +1428,102 @@ async function executeCreateCuratedPost(supabase: any, userId: string, args: any
     platforms = ['instagram']
   } = args;
   
-  console.log('[CREATE_CURATED_POST] Searching for real image:', search_query);
+  console.log('[CREATE_CURATED_POST] Creating editorial post for:', search_query);
   
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    // Search for real images using Firecrawl
-    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${serviceRoleKey}`
-      },
-      body: JSON.stringify({
-        query: `${search_query} foto imagem`,
-        limit: 10,
-        lang: 'pt-BR',
-        country: 'BR'
-      })
-    });
+    let selectedImage: string | null = null;
+    let sourceInfo = 'IA';
+    let usedAiFallback = false;
     
-    let selectedImage = null;
-    let sourceInfo = '';
-    
-    if (searchResponse.ok) {
-      const searchResult = await searchResponse.json();
-      const articles = searchResult.data || [];
+    // Try to find real image using Firecrawl
+    try {
+      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`
+        },
+        body: JSON.stringify({
+          query: `${search_query} foto imagem`,
+          limit: 10,
+          lang: 'pt-BR',
+          country: 'BR'
+        })
+      });
       
-      // Find article with quality images
-      for (const article of articles) {
-        if (article.images?.length > 0) {
-          const qualityImages = article.images.filter((img: string) =>
-            img && !img.includes('icon') && !img.includes('logo') && 
-            !img.includes('avatar') && !img.includes('favicon') &&
-            (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp'))
-          );
-          if (qualityImages.length > 0) {
-            selectedImage = qualityImages[0];
-            try {
-              sourceInfo = new URL(article.url).hostname.replace('www.', '');
-            } catch { sourceInfo = 'web'; }
-            break;
+      if (searchResponse.ok) {
+        const searchResult = await searchResponse.json();
+        const articles = searchResult.data || [];
+        
+        // Find article with quality images
+        for (const article of articles) {
+          if (article.images?.length > 0) {
+            const qualityImages = article.images.filter((img: string) =>
+              img && !img.includes('icon') && !img.includes('logo') && 
+              !img.includes('avatar') && !img.includes('favicon') &&
+              (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp'))
+            );
+            if (qualityImages.length > 0) {
+              selectedImage = qualityImages[0];
+              try {
+                sourceInfo = new URL(article.url).hostname.replace('www.', '');
+              } catch { sourceInfo = 'web'; }
+              break;
+            }
           }
         }
+      }
+    } catch (searchError) {
+      console.log('[CREATE_CURATED_POST] Firecrawl failed, using AI fallback');
+    }
+    
+    // FALLBACK: If no real image found, generate with AI
+    if (!selectedImage) {
+      console.log('[CREATE_CURATED_POST] No real image found, generating with AI...');
+      usedAiFallback = true;
+      
+      // Generate contextual image based on search query
+      const currentYear = new Date().getFullYear();
+      const imagePrompt = `Fotografia profissional de alta qualidade relacionada a: ${search_query}. 
+Estilo: jornalístico, editorial, moderno, ${currentYear}. 
+Iluminação cinematográfica, cores vibrantes, foco definido.
+IMPORTANTE: Não adicione texto na imagem. Imagem limpa para overlay posterior.
+Proporção quadrada 1:1 para Instagram.`;
+      
+      const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${serviceRoleKey}`
+        },
+        body: JSON.stringify({
+          prompt: imagePrompt,
+          format: 'square',
+          model: 'gemini'
+        })
+      });
+      
+      if (imageResponse.ok) {
+        const imageResult = await imageResponse.json();
+        selectedImage = imageResult.imageUrl;
+        sourceInfo = 'Gerada por IA';
       }
     }
     
     if (!selectedImage) {
       return {
         success: false,
-        message: `❌ Não encontrei imagem real para "${search_query}". Tente outro termo de busca.`
+        message: `❌ Não consegui encontrar ou gerar imagem para "${search_query}". Tente outro tema.`
       };
     }
     
-    console.log('[CREATE_CURATED_POST] Found image:', selectedImage);
+    console.log('[CREATE_CURATED_POST] Image ready:', usedAiFallback ? 'AI generated' : 'Real web image');
     
-    // Process image with watermark and headline
-    let imageUrl = null;
+    // Process image with watermark and headline (Portuguese style @davision.eth)
+    let imageUrl: string | null = null;
     const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
       method: 'POST',
       headers: {
@@ -1526,6 +1540,11 @@ async function executeCreateCuratedPost(supabase: any, userId: string, args: any
     if (watermarkResponse.ok) {
       const wmResult = await watermarkResponse.json();
       imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+      console.log('[CREATE_CURATED_POST] Headline overlay applied successfully');
+    } else {
+      // Fallback: use original image without overlay
+      imageUrl = selectedImage;
+      console.log('[CREATE_CURATED_POST] Watermark failed, using original image');
     }
     
     if (!imageUrl) {
@@ -1550,7 +1569,6 @@ async function executeCreateCuratedPost(supabase: any, userId: string, args: any
     
     const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
     const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
-    // Status válidos: draft, scheduled, published, failed
     const status = scheduledForUTC ? 'scheduled' : 'draft';
     
     // Create post
@@ -1564,18 +1582,19 @@ async function executeCreateCuratedPost(supabase: any, userId: string, args: any
       status,
       scheduled_for: scheduledForUTC,
       image_url: imageUrl,
-      ai_model_used: 'curated-web-image'
+      ai_model_used: usedAiFallback ? 'gemini-with-overlay' : 'curated-web-image'
     }).select().single();
     
     if (error) throw error;
     
     // Auto-publish if enabled
+    let publishStatus = '';
     if (autoPostEnabled && !scheduledForUTC && imageUrl) {
       console.log('[CREATE_CURATED_POST] Auto-publishing...');
       for (const platform of platforms) {
         try {
           if (platform === 'instagram') {
-            await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
+            const pubResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -1583,26 +1602,35 @@ async function executeCreateCuratedPost(supabase: any, userId: string, args: any
               },
               body: JSON.stringify({ postId: post.id })
             });
+            if (pubResponse.ok) {
+              publishStatus = '✅ Publicado no Instagram!';
+            } else {
+              publishStatus = '⚠️ Erro ao publicar';
+            }
           }
         } catch (pubError) {
           console.error(`[CREATE_CURATED_POST] Error publishing:`, pubError);
+          publishStatus = '⚠️ Erro ao publicar';
         }
       }
     }
     
     const scheduleInfo = scheduledForUTC 
       ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
-      : autoPostEnabled ? '🚀 Publicando...' : '📝 Salvo como rascunho';
+      : autoPostEnabled ? publishStatus : '📝 Salvo como rascunho';
+    
+    const imageSource = usedAiFallback ? '🤖 Imagem IA + Headline' : `🌐 Imagem real: ${sourceInfo}`;
     
     return {
       success: true,
-      message: `🖼️ Post curado criado!\n\n📌 Headline: "${headline_text}"\n🌐 Fonte: ${sourceInfo}\n${scheduleInfo}`,
+      message: `🖼️ Post editorial criado!\n\n📌 Headline: "${headline_text}"\n${imageSource}\n${scheduleInfo}`,
       post: {
         id: post.id,
         headline: headline_text,
         source: sourceInfo,
         has_image: true,
-        status: post.status
+        status: post.status,
+        used_ai_fallback: usedAiFallback
       }
     };
     
