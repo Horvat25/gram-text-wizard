@@ -207,16 +207,41 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_news_post",
-      description: "📰 Cria post baseado em NOTÍCIA REAL da web. Busca automaticamente notícias recentes, usa a imagem do artigo original e inclui a fonte na legenda. Use SEMPRE que o usuário pedir post de notícia, news, ou atualidades.",
+      description: "📰 MÉTODO PRINCIPAL para posts de IMAGEM! Busca imagem REAL da web (nunca gera com IA). Atua como CURADOR EDITORIAL: seleciona foto real da notícia/fonte, cria headline impactante, legenda em 3 blocos. Use para QUALQUER post que precise de imagem profissional real.",
       parameters: {
         type: "object",
         properties: {
-          topic: { type: "string", description: "Tema da notícia a buscar (ex: 'inteligência artificial', 'tecnologia', 'inovação')" },
-          caption_style: { type: "string", enum: ["informativo", "opinativo", "provocativo", "educacional"], description: "Estilo da legenda" },
-          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário de Brasília). Se não fornecido, será rascunho." },
+          topic: { type: "string", description: "Tema a buscar (ex: 'Sam Altman OpenAI', 'robô humanoide', 'chip Nvidia')" },
+          headline_text: { type: "string", description: "Texto curto para overlay na imagem (máx 2 linhas, gera curiosidade, cria tensão)" },
+          caption_block1: { type: "string", description: "Bloco 1 da legenda: frase de impacto curta" },
+          caption_block2: { type: "string", description: "Bloco 2 da legenda: contexto mínimo (suficiente para entender)" },
+          caption_block3: { type: "string", description: "Bloco 3 da legenda: reflexão, consequência ou pergunta implícita" },
+          caption_style: { type: "string", enum: ["informativo", "opinativo", "provocativo", "educacional"], description: "Estilo editorial" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601). Se não fornecido, será rascunho." },
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
         },
         required: ["topic"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_curated_post",
+      description: "🖼️ Cria post com IMAGEM REAL da internet (fotos, frames, imagens institucionais). Como CURADOR EDITORIAL: busca imagem real, aplica headline, cria legenda em 3 blocos. Use quando NÃO for notícia mas precisar de imagem real (não IA).",
+      parameters: {
+        type: "object",
+        properties: {
+          search_query: { type: "string", description: "Busca para encontrar imagem real (ex: 'CEO tech conference', 'robot factory', 'AI chip closeup')" },
+          headline_text: { type: "string", description: "Texto curto para overlay na imagem (máx 2 linhas, gera curiosidade)" },
+          caption_block1: { type: "string", description: "Bloco 1: frase de impacto curta" },
+          caption_block2: { type: "string", description: "Bloco 2: contexto mínimo" },
+          caption_block3: { type: "string", description: "Bloco 3: reflexão ou pergunta implícita" },
+          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags relevantes" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601)" },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: ["search_query", "headline_text", "caption_block1"]
       }
     }
   }
@@ -1144,9 +1169,18 @@ async function executeCreateCarousel(supabase: any, userId: string, args: any) {
 }
 
 // Execute create_news_post - fetches real news, uses article image, includes source
-// Matches the behavior of LatestNewsTab: select best image, generate caption as "reporter"
+// Now supports editorial format: headline overlay + 3-block caption
 async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
-  const { topic, caption_style, scheduled_for, platforms } = args;
+  const { 
+    topic, 
+    headline_text,
+    caption_block1,
+    caption_block2,
+    caption_block3,
+    caption_style, 
+    scheduled_for, 
+    platforms 
+  } = args;
   
   console.log('[NEWS_POST] Creating news post for topic:', topic);
   
@@ -1250,26 +1284,38 @@ ${caption_style === 'provocativo'
     let caption = '';
     let hashtags: string[] = [];
     
-    if (captionResponse.ok) {
+    // If 3-block format is provided by the agent, use it
+    if (caption_block1) {
+      const captionParts = [caption_block1];
+      if (caption_block2) captionParts.push(caption_block2);
+      if (caption_block3) captionParts.push(caption_block3);
+      caption = captionParts.join('\n\n');
+      hashtags = ['#tecnologia', '#inovação', '#ia', '#notícias', '#futuro'];
+      console.log('[NEWS_POST] Using 3-block editorial format');
+    } else if (captionResponse.ok) {
+      // Fallback to AI-generated caption
       const captionResult = await captionResponse.json();
       caption = captionResult.caption || '';
       hashtags = captionResult.hashtags || [];
       console.log('[NEWS_POST] Caption generated, length:', caption.length);
     }
     
-    // Fallback caption if generation failed
+    // Fallback caption if generation failed and no blocks provided
     if (!caption) {
-      caption = `📰 ${selectedArticle.title}\n\n${selectedArticle.description || ''}\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+      caption = `📰 ${selectedArticle.title}\n\n${selectedArticle.description || ''}\n\n📰 Fonte: ${sourceDomain}`;
       hashtags = ['#tecnologia', '#noticias', '#inovacao', '#ia', '#tech'];
     }
     
-    // Ensure source URL is in caption (matching LatestNewsTab behavior)
-    if (!caption.includes(sourceUrl) && !caption.includes('🔗')) {
-      caption += `\n\n🔗 ${sourceUrl}`;
+    // Ensure source attribution is in caption
+    if (!caption.includes('Fonte:')) {
+      caption += `\n\n📰 Fonte: ${sourceDomain}`;
     }
     
     // Step 3: Process image with watermark (same as LatestNewsTab uploadExternalImageWithWatermark)
     let imageUrl = null;
+    
+    // Use custom headline if provided, otherwise use article title
+    const headlineForImage = headline_text || selectedArticle.title;
     
     if (selectedImage) {
       console.log('[NEWS_POST] Processing external image:', selectedImage);
@@ -1284,7 +1330,7 @@ ${caption_style === 'provocativo'
         body: JSON.stringify({
           imageUrl: selectedImage,
           watermarkText: 'Neural Update',
-          headlineText: selectedArticle.title // Add headline overlay on image!
+          headlineText: headlineForImage // Custom headline or article title
         })
       });
       
@@ -1392,6 +1438,179 @@ ${caption_style === 'provocativo'
   }
 }
 
+// Execute create curated post (with real web image, not AI generated)
+async function executeCreateCuratedPost(supabase: any, userId: string, args: any) {
+  const { 
+    search_query, 
+    headline_text, 
+    caption_block1, 
+    caption_block2 = '', 
+    caption_block3 = '',
+    hashtags = [],
+    scheduled_for,
+    platforms = ['instagram']
+  } = args;
+  
+  console.log('[CREATE_CURATED_POST] Searching for real image:', search_query);
+  
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Search for real images using Firecrawl
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`
+      },
+      body: JSON.stringify({
+        query: `${search_query} foto imagem`,
+        limit: 10,
+        lang: 'pt-BR',
+        country: 'BR'
+      })
+    });
+    
+    let selectedImage = null;
+    let sourceInfo = '';
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      const articles = searchResult.data || [];
+      
+      // Find article with quality images
+      for (const article of articles) {
+        if (article.images?.length > 0) {
+          const qualityImages = article.images.filter((img: string) =>
+            img && !img.includes('icon') && !img.includes('logo') && 
+            !img.includes('avatar') && !img.includes('favicon') &&
+            (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp'))
+          );
+          if (qualityImages.length > 0) {
+            selectedImage = qualityImages[0];
+            try {
+              sourceInfo = new URL(article.url).hostname.replace('www.', '');
+            } catch { sourceInfo = 'web'; }
+            break;
+          }
+        }
+      }
+    }
+    
+    if (!selectedImage) {
+      return {
+        success: false,
+        message: `❌ Não encontrei imagem real para "${search_query}". Tente outro termo de busca.`
+      };
+    }
+    
+    console.log('[CREATE_CURATED_POST] Found image:', selectedImage);
+    
+    // Process image with watermark and headline
+    let imageUrl = null;
+    const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`
+      },
+      body: JSON.stringify({
+        imageUrl: selectedImage,
+        watermarkText: 'Neural Update',
+        headlineText: headline_text
+      })
+    });
+    
+    if (watermarkResponse.ok) {
+      const wmResult = await watermarkResponse.json();
+      imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+    }
+    
+    if (!imageUrl) {
+      return {
+        success: false,
+        message: `❌ Erro ao processar imagem. Tente novamente.`
+      };
+    }
+    
+    // Build caption in 3 blocks format
+    const captionParts = [caption_block1];
+    if (caption_block2) captionParts.push(caption_block2);
+    if (caption_block3) captionParts.push(caption_block3);
+    const caption = captionParts.join('\n\n');
+    
+    // Check auto-publish setting
+    const { data: agentContext } = await supabase
+      .from('agent_context')
+      .select('auto_post_enabled')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
+    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    const status = scheduledForUTC ? 'scheduled' : (autoPostEnabled ? 'pending' : 'draft');
+    
+    // Create post
+    const { data: post, error } = await supabase.from('posts').insert({
+      user_id: userId,
+      caption,
+      hashtags: hashtags.length > 0 ? hashtags : ['#tecnologia', '#inovação', '#futuro', '#ia'],
+      post_type: 'engajamento',
+      media_type: 'image',
+      platforms,
+      status,
+      scheduled_for: scheduledForUTC,
+      image_url: imageUrl,
+      ai_model_used: 'curated-web-image'
+    }).select().single();
+    
+    if (error) throw error;
+    
+    // Auto-publish if enabled
+    if (autoPostEnabled && !scheduledForUTC && imageUrl) {
+      console.log('[CREATE_CURATED_POST] Auto-publishing...');
+      for (const platform of platforms) {
+        try {
+          if (platform === 'instagram') {
+            await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serviceRoleKey}`
+              },
+              body: JSON.stringify({ postId: post.id })
+            });
+          }
+        } catch (pubError) {
+          console.error(`[CREATE_CURATED_POST] Error publishing:`, pubError);
+        }
+      }
+    }
+    
+    const scheduleInfo = scheduledForUTC 
+      ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
+      : autoPostEnabled ? '🚀 Publicando...' : '📝 Salvo como rascunho';
+    
+    return {
+      success: true,
+      message: `🖼️ Post curado criado!\n\n📌 Headline: "${headline_text}"\n🌐 Fonte: ${sourceInfo}\n${scheduleInfo}`,
+      post: {
+        id: post.id,
+        headline: headline_text,
+        source: sourceInfo,
+        has_image: true,
+        status: post.status
+      }
+    };
+    
+  } catch (error: unknown) {
+    console.error('Error in executeCreateCuratedPost:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return { success: false, message: `❌ Erro ao criar post curado: ${errorMessage}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, toolName: string, args: any) {
   switch (toolName) {
@@ -1419,6 +1638,8 @@ async function executeTool(supabase: any, userId: string, toolName: string, args
       return executeCreateCarousel(supabase, userId, args);
     case 'create_news_post':
       return executeCreateNewsPost(supabase, userId, args);
+    case 'create_curated_post':
+      return executeCreateCuratedPost(supabase, userId, args);
     default:
       return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
   }
@@ -1510,93 +1731,72 @@ serve(async (req) => {
     const currentDay = new Date().getDay(); // 0=Dom, 6=Sáb
     const isOptimalTime = (currentDay >= 2 && currentDay <= 4 && currentHour >= 11 && currentHour <= 18);
 
-    const systemPrompt = `Você é **${agentName}**, um ESTRATEGISTA DE CONTEÚDO DIGITAL focado em crescimento orgânico, autoridade e engajamento REAL — não apenas visualizações vazias.
+    const currentYear = new Date().getFullYear(); // 2026
+    
+    const systemPrompt = `Você é **${agentName}**, um CURADOR EDITORIAL DE CONTEÚDO sobre tecnologia, IA, ciência e futuro.
 
-## 🎯 MISSÃO CENTRAL
-Criar conteúdo INFORMATIVO, INTELIGENTE e ATUAL que gere:
-1. **ENGAJAMENTO** (comentários, salvamentos, compartilhamentos)
-2. **AUTORIDADE** (conteúdo que faz o perfil parecer confiável e inteligente)
-3. **SEGUIDORES QUALIFICADOS** (não curiosos passageiros)
+## 🎯 MISSÃO CENTRAL: CURADORIA, NÃO GERAÇÃO
+**Seu trabalho NÃO é criar imagens com IA.**
+Você SELECIONA ou SUGERE imagens REAIS disponíveis na internet:
+- Fotos de pessoas reais (CEOs, cientistas, desenvolvedores)
+- Empresas conhecidas (Apple, OpenAI, Tesla, Nvidia, Google)
+- Robôs, chips, satélites, gráficos, telas, data centers
+- Frames de vídeos, imagens institucionais, fotos de notícias
 
-## 📌 PILARES DE CONTEÚDO (FOQUE NELES!)
-- **Inteligência Artificial aplicada ao dia a dia** - como IA resolve problemas reais
-- **Tecnologia, plataformas, ferramentas e tendências** - o que importa de verdade
-- **Notícias relevantes explicadas de forma simples** - contexto, não só manchete
-- **Ideias práticas, insights e provocações** - faça o público PENSAR
-- **Marketing digital de forma educativa** - ensine, não venda
+## 📋 PROCESSO EDITORIAL OBRIGATÓRIO
+Para CADA post de imagem, siga este processo:
 
-## 🚫 O QUE VOCÊ NUNCA FAZ
-- Conteúdo GENÉRICO, RASO ou REPETITIVO
-- Agir como robô de automação
-- Exageros vazios e promessas milagrosas
-- Wallpapers futuristas genéricos sem propósito
-- Textões motivacionais ou poesia abstrata
-- Propaganda óbvia (quando falar de plataformas, apresente VALOR REAL, casos de uso práticos)
+### 1. ESCOLHA UM TEMA
+Tema tecnológico REAL, ATUAL ou conceitual de ${currentYear}.
 
-## 🧠 MENTALIDADE DE CRIADOR HUMANO
-**Você pensa como um criador humano que quer GERAR VALOR antes de vender.**
+### 2. PENSE NA IMAGEM REAL
+"Qual imagem REAL da internet representaria isso de forma IMEDIATA?"
+- Pessoa conhecida do setor?
+- Produto/dispositivo icônico?
+- Evento ou conferência?
+- Gráfico ou dado impactante?
 
-Antes de criar QUALQUER post, pergunte-se:
-- "Isso faria alguém CURTIR, SALVAR ou COMENTAR?"
-- "Traz CONTEXTO ou só hype?"
-- "Um seguidor compartilharia isso com um amigo?"
+### 3. CRIE O TEXTO DA IMAGEM (HEADLINE)
+Máximo 2 linhas que:
+- Gere CURIOSIDADE
+- NÃO explique tudo
+- Crie TENSÃO ou quebra de expectativa
+- OBRIGUE a pessoa a abrir a legenda
 
-## 🧬 SUA ESSÊNCIA
-**Personalidade:** ${personalityTraits}
-**Voz:** ${brandVoice}
+### 4. CRIE A LEGENDA EM 3 BLOCOS
+| Bloco | Função |
+|-------|--------|
+| **Bloco 1** | Frase de impacto curta |
+| **Bloco 2** | Contexto mínimo (suficiente para entender) |
+| **Bloco 3** | Reflexão, consequência ou pergunta implícita |
 
-**Seu tom:**
-- ${responseStyleGuide[responseStyle as keyof typeof responseStyleGuide] || responseStyleGuide.storytelling}
-- ${formalityGuide[languageFormality as keyof typeof formalityGuide] || formalityGuide.informal}
-- ${emojiGuide[emojiUsage as keyof typeof emojiGuide] || emojiGuide.moderate}
-
-## 🎯 CONTEXTO ESTRATÉGICO
-| Aspecto | Configuração |
-|---------|-------------|
-| Nicho | **${industryNiche}** |
-| Público | ${targetAudience} |
-| Foco | ${contentFocus} |
-| Hashtags | ${hashtagGuide[hashtagStrategy as keyof typeof hashtagGuide] || hashtagGuide['nicho-focado']} |
-| Ritmo | ${postingStyle} (${context?.daily_post_limit || 1} posts/dia, mín ${context?.min_hours_between_posts || 8}h entre posts) |
-| Evitar | ${avoidTopics} |
-
-## 📊 INTELIGÊNCIA DE ALGORITMO 2025
-**HIERARQUIA DE MÉTRICAS (em ordem de peso):**
-1. 🔄 **SHARES** - "Isso é importante pra outras pessoas" (MÁXIMO PESO)
-2. 💾 **SAVES** - "Vou usar isso depois" (alto peso)
-3. 💬 **COMMENTS** - Sinalizam conversa (médio peso)
-4. ❤️ **LIKES** - Aprovação passiva (baixo peso)
-
-**REGRAS DE OURO:**
-- Primeiros 3 segundos decidem TUDO
-- Consistência de tópico > quantidade de posts
-- ${isOptimalTime ? '✅ AGORA é horário ótimo para postar!' : '⚠️ Horário atual NÃO é ideal. Melhores: Ter-Qui 11h-18h'}
-- Sábados = pior dia (evitar agendamentos)
-
-## 🔄 ADAPTAÇÃO AUTOMÁTICA
-**Se perceber queda de engajamento:**
-- Varie formatos (imagem → vídeo → carrossel)
-- Teste novos temas dentro dos pilares
-- Mude abordagens (educativo → provocativo → prático)
-- Analise o que funcionou antes com \`get_detailed_analytics\`
+## 📰 REGRAS EDITORIAIS
+- Linguagem CLARA, DIRETA, quase jornalística
+- SEM hype exagerado
+- SEM emojis excessivos (máximo 2-3 por post)
+- O texto da imagem deve OBRIGAR a pessoa a abrir a legenda
+- **Objetivo: PARAR O SCROLL**
+- Pense como editor disputando atenção em feed lotado
 
 ## 🔧 FERRAMENTAS DISPONÍVEIS
-Você EXECUTA, não sugere. Use suas ferramentas:
 
-### ⚠️ REGRA CRÍTICA DE SELEÇÃO DE FERRAMENTA:
-Antes de criar conteúdo, ANALISE o pedido do usuário:
-- Mencionou "vídeo", "reels", "reel", "narrado", "shorts"? → **USE \`create_narrated_video\`**
-- Mencionou "carrossel", "slides", "múltiplas imagens"? → **USE \`create_carousel\`**  
-- Mencionou "notícia", "news", "atualidades"? → **USE \`create_news_post\`**
-- Mencionou "imagem", "post", "foto" ou não especificou? → **USE \`create_posts\`**
+### ⚠️ REGRA CRÍTICA: IMAGENS REAIS vs GERADAS
+| Situação | Ferramenta | Tipo de Imagem |
+|----------|------------|----------------|
+| Post de notícia | \`create_news_post\` | REAL da web ✅ |
+| Post de imagem | \`create_curated_post\` | REAL da web ✅ |
+| Vídeo/Reels | \`create_narrated_video\` | Gerada (necessário) |
+| Carrossel | \`create_carousel\` | Gerada (necessário) |
+| EVITAR | \`create_posts\` | ⚠️ Só se explicitamente pedido |
 
 ### 📝 Criação de Conteúdo
 | Ferramenta | QUANDO USAR |
 |------------|-------------|
-| \`create_posts\` | ⚠️ APENAS para IMAGEM ESTÁTICA |
-| \`create_narrated_video\` | 🎬 VÍDEO, REELS, REEL, NARRADO, SHORTS |
+| \`create_news_post\` | 📰 PRINCIPAL para imagens! Busca foto real + headline + 3 blocos |
+| \`create_curated_post\` | 🖼️ Imagem real curada (não notícia) |
+| \`create_narrated_video\` | 🎬 VÍDEO, REELS, SHORTS (único método) |
 | \`create_carousel\` | 🎠 CARROSSEL com múltiplas imagens |
-| \`create_news_post\` | 📰 Posts baseados em NOTÍCIAS com fonte |
+| \`create_posts\` | ⚠️ APENAS se usuário pedir imagem IA |
 | \`generate_image_for_post\` | Gerar visual AI para post existente |
 
 ### 📅 Gerenciamento
@@ -1618,48 +1818,63 @@ Antes de criar conteúdo, ANALISE o pedido do usuário:
 | \`run_autonomous_agent\` | Executar ciclo autônomo completo |
 | \`update_agent_settings\` | Mudar configurações |
 
+## 🧬 SUA ESSÊNCIA
+**Personalidade:** ${personalityTraits}
+**Voz:** ${brandVoice}
+**Tom:** ${responseStyleGuide[responseStyle as keyof typeof responseStyleGuide] || responseStyleGuide.storytelling}
+**Formalidade:** ${formalityGuide[languageFormality as keyof typeof formalityGuide] || formalityGuide.informal}
+**Emojis:** ${emojiGuide[emojiUsage as keyof typeof emojiGuide] || emojiGuide.minimal}
+
+## 🎯 CONTEXTO ESTRATÉGICO
+| Aspecto | Configuração |
+|---------|-------------|
+| Ano atual | **${currentYear}** |
+| Nicho | **${industryNiche}** |
+| Público | ${targetAudience} |
+| Foco | ${contentFocus} |
+| Hashtags | ${hashtagGuide[hashtagStrategy as keyof typeof hashtagGuide] || hashtagGuide['nicho-focado']} |
+| Ritmo | ${postingStyle} (${context?.daily_post_limit || 1} posts/dia) |
+| Evitar | ${avoidTopics} |
+
+## 📊 HIERARQUIA DE MÉTRICAS ${currentYear}
+1. 🔄 **SHARES** - Máximo peso
+2. 💾 **SAVES** - Alto peso  
+3. 💬 **COMMENTS** - Médio peso
+4. ❤️ **LIKES** - Baixo peso
+
+**Primeiros 3 segundos decidem TUDO.**
+
+## 💡 EXEMPLOS DE HEADLINES QUE PARAM O SCROLL
+
+### ❌ RUIM (explica demais):
+"OpenAI lança nova versão do GPT-5 com mais capacidades"
+
+### ✅ BOM (gera tensão):
+"Sam Altman sabia disso há 2 anos. Agora é tarde demais."
+
+### ❌ RUIM (genérico):
+"A inteligência artificial está mudando o mundo"
+
+### ✅ BOM (específico + tensão):
+"Esse chip custa US$40.000. E você VAI querer um."
+
 ## ⏰ REGRAS DE AGENDAMENTO
 - **SEMPRE** use formato ISO 8601: \`YYYY-MM-DDTHH:MM:SS\`
-- Considere horário de BRASÍLIA (UTC-3)
-- Exemplo: "agendar para amanhã 15:30" → \`2025-01-24T15:30:00\`
-
-## ⚡ ESTRUTURA DE REELS VENCEDORA
-
-### FORMATO FIXO PARA CADA VÍDEO:
-\`\`\`
-CENA 1 (0-2s): DOR DIRETA
-→ "Postar todo dia e não crescer cansa, né?"
-
-CENA 2 (3-6s): QUEBRA DE EXPECTATIVA
-→ "O problema não é a quantidade. É o conteúdo."
-
-CENA 3 (7-15s): MICRO-INSIGHT
-→ 1 dica prática OU 1 erro comum OU 1 ajuste simples
-
-CENA 4: CTA CURTO
-→ "Segue pra aprender a usar IA do jeito certo."
-\`\`\`
-
-### GANCHOS PRONTOS:
-- "Se você usa ChatGPT assim, ele está te atrapalhando."
-- "A maioria usa IA pra parecer inteligente. Poucos usam pra crescer."
-- "Criadores pequenos erram isso ao usar IA."
-- "Cansei de ver criador fazendo isso errado."
+- Horário de BRASÍLIA (UTC-3)
+- ${isOptimalTime ? '✅ AGORA é horário ótimo!' : '⚠️ Melhores horários: Ter-Qui 11h-18h'}
 
 ## 📋 STATUS ATUAL
 - Auto-post: ${context?.auto_post_enabled ? '🟢 Ativado' : '🔴 Desativado'}
 - Plataformas: ${context?.preferred_platforms?.join(', ') || 'instagram'}
 - Posts recentes: ${recentPosts?.length || 0}
-- Data/hora atual: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
+- Data/hora: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })} (${currentYear})
 
 ## ⚠️ DIRETRIZES ABSOLUTAS
-1. **EXECUTE** ações quando pedido - não apenas sugira
-2. Linguagem CLARA, DIRETA e INTERESSANTE
-3. Traga CONTEXTO, não só hype
-4. SEMPRE português brasileiro conversacional
-5. Imagens: pessoas reais, telas, antes/depois, dados
-6. NUNCA imagens genéricas futuristas/neon/abstratas
-7. Teste mental: "Isso é conteúdo de VALOR ou só ruído?"
+1. **EXECUTE** ações - não apenas sugira
+2. **CURADORIA** de imagens reais > geração IA
+3. **PORTUGUÊS BRASILEIRO** sempre
+4. **NUNCA** mencione anos passados (2024, 2025)
+5. **TESTE MENTAL**: "Isso para o scroll?"
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
