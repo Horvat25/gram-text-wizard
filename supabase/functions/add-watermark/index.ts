@@ -45,7 +45,7 @@ async function createNewsImage(
   originalImageUrl: string,
   watermarkText: string = "Neural Update",
   headlineText?: string
-): Promise<ArrayBuffer> {
+): Promise<{ data: Uint8Array; contentType: string }> {
   const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
   
   if (!lovableApiKey) {
@@ -53,40 +53,63 @@ async function createNewsImage(
   }
 
   // Build the prompt based on whether we have headline text
+  // CRITICAL: All prompts MUST be in Portuguese and follow @davision.eth style
   let prompt = "";
   
   if (headlineText && headlineText.length > 0) {
     // Style inspired by @davision.eth - bold yellow text at bottom
-    // Create a professional news-style image with the headline
-    prompt = `Take this image and add a PROFESSIONAL NEWS OVERLAY:
-1. Add a semi-transparent dark gradient at the bottom 40% of the image (from transparent at top to 80% black at bottom)
-2. Add this headline text in BOLD, UPPERCASE, YELLOW (#FFD700) letters at the bottom: "${headlineText.toUpperCase()}"
-   - Text should be large and highly readable
-   - Text should be centered horizontally
-   - Text should wrap to multiple lines if needed
-   - Add a subtle text shadow for readability
-3. Below the headline, add a small "ARRASTE PARA MAIS" text in orange/red color
-4. Add a small, elegant watermark "${watermarkText}" in the top right corner (semi-transparent white)
+    // Headlines must be in PORTUGUESE ONLY
+    const upperHeadline = headlineText.toUpperCase();
+    
+    prompt = `Edite esta imagem adicionando um OVERLAY PROFISSIONAL estilo notícia viral do Instagram:
 
-The style should look like a professional tech news Instagram post, similar to @davision.eth style.
-Keep the original image exactly as is, only add the text overlays.`;
+1. GRADIENTE ESCURO: Adicione um gradiente semi-transparente escuro nos 40% inferiores da imagem (de transparente no topo a 85% preto na base)
+
+2. HEADLINE PRINCIPAL: Adicione este texto em CAIXA ALTA, NEGRITO, cor AMARELO DOURADO (#FFD700) na parte inferior:
+   "${upperHeadline}"
+   - Fonte grande, altamente legível, estilo impactante
+   - Centralizado horizontalmente
+   - Quebra de linha se necessário (máximo 2 linhas)
+   - Sombra sutil para contraste
+
+3. CALL TO ACTION: Abaixo do headline, adicione "ARRASTE PARA MAIS" em laranja/vermelho (#FF6B35), menor
+
+4. MARCA D'ÁGUA: Pequena marca "${watermarkText}" no canto superior direito (branco semi-transparente)
+
+IMPORTANTE:
+- Mantenha a imagem original EXATAMENTE como está
+- APENAS adicione os overlays de texto
+- Estilo: notícia tech profissional, similar a @davision.eth
+- Todo texto DEVE estar em PORTUGUÊS`;
   } else {
-    // Just add watermark
-    prompt = `Take this exact image and add a small, elegant watermark text "${watermarkText}" in the bottom right corner. The watermark should be semi-transparent white text with a subtle dark shadow, positioned in the lower right area. Keep the original image exactly as is, only add the watermark overlay. The watermark should be visible but not distracting.`;
+    // Just add watermark - also in Portuguese
+    prompt = `Mantenha esta imagem EXATAMENTE como está e adicione apenas uma pequena marca d'água elegante "${watermarkText}" no canto inferior direito. A marca deve ser branca semi-transparente com sombra sutil. Discreta mas visível.`;
   }
 
-  console.log("[add-watermark] Using Lovable AI with prompt:", prompt.substring(0, 100) + "...");
+  console.log("[add-watermark] Using Lovable AI (Gemini Image) with prompt:", prompt.substring(0, 100) + "...");
 
-  const response = await fetch("https://api.lovable.dev/v1/images/edit", {
+  // Use Lovable AI Gateway with Gemini image model for editing
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${lovableApiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      image_paths: [originalImageUrl],
-      prompt: prompt,
-      aspect_ratio: "1:1",
+      model: "google/gemini-2.5-flash-image",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { 
+              type: "image_url", 
+              image_url: { url: originalImageUrl } 
+            }
+          ]
+        }
+      ],
+      modalities: ["image", "text"]
     }),
   });
 
@@ -96,19 +119,31 @@ Keep the original image exactly as is, only add the text overlays.`;
     throw new Error(`Erro ao processar imagem: ${response.status}`);
   }
 
-  const result = await response.json();
+  const data = await response.json();
   
-  if (!result.url) {
+  // Extract base64 image from response
+  const base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+  
+  if (!base64ImageUrl || !base64ImageUrl.startsWith('data:image/')) {
+    console.error("No image in response:", JSON.stringify(data).substring(0, 300));
     throw new Error("Resposta inválida da API de imagem");
   }
 
-  // Download the processed image
-  const processedResponse = await fetch(result.url);
-  if (!processedResponse.ok) {
-    throw new Error("Erro ao baixar imagem processada");
+  // Convert base64 to bytes
+  const base64Match = base64ImageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+  if (!base64Match) {
+    throw new Error("Formato de imagem inválido");
   }
-
-  return await processedResponse.arrayBuffer();
+  
+  const imageType = base64Match[1];
+  const base64Data = base64Match[2];
+  const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+  const imageBytes = decode(base64Data);
+  
+  const contentType = `image/${imageType === 'jpg' ? 'jpeg' : imageType}`;
+  console.log("[add-watermark] Image processed, size:", imageBytes.length, "type:", contentType);
+  
+  return { data: imageBytes, contentType };
 }
 
 serve(async (req) => {
@@ -131,16 +166,18 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    let finalImageData: ArrayBuffer;
-    let contentType = 'image/jpeg';
+    let finalImageData: Uint8Array | ArrayBuffer;
+    let contentType = 'image/png';
     let hasOverlay = false;
 
     try {
       // Try to add watermark/headline using AI
       console.log("Adding watermark/headline via AI...");
-      finalImageData = await createNewsImage(imageUrl, watermarkText, headlineText);
+      const result = await createNewsImage(imageUrl, watermarkText, headlineText);
+      finalImageData = result.data;
+      contentType = result.contentType;
       hasOverlay = true;
-      console.log("Overlay added successfully");
+      console.log("Overlay added successfully, contentType:", contentType);
     } catch (overlayError: any) {
       console.error("Overlay failed, downloading original:", overlayError.message);
       
