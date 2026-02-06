@@ -5,6 +5,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useNarrativeStory } from '@/hooks/useNarrativeStory';
 import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { unlockAudio } from '@/lib/audio-unlock';
+import { initFFmpeg } from '@/lib/video-converter';
 import { toast } from 'sonner';
 
 interface PendingVideo {
@@ -139,10 +140,18 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   useEffect(() => {
     fetchPendingVideos();
     
+    // OPTIMIZATION: Pre-load FFmpeg when pending videos exist
+    // This loads the 31MB core in background while user browses
+    if (pendingVideos.length > 0) {
+      initFFmpeg().catch(err => {
+        console.log('[VideoRendering] FFmpeg pre-load deferred:', err.message);
+      });
+    }
+    
     // Poll every 30 seconds
     const interval = setInterval(fetchPendingVideos, 30000);
     return () => clearInterval(interval);
-  }, [fetchPendingVideos]);
+  }, [fetchPendingVideos, pendingVideos.length]);
 
   // Handle video completion
   useEffect(() => {
