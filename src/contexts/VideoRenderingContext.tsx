@@ -97,20 +97,21 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     preferredVoice: 'camila'
   });
 
-  // Fetch pending videos
+  // Fetch pending videos (both draft AND scheduled that need rendering)
   const fetchPendingVideos = useCallback(async () => {
     if (!user) return;
 
     setIsLoading(true);
     try {
+      // Fetch both draft and scheduled videos that need rendering
       const { data, error } = await supabase
         .from('posts')
         .select('id, caption, created_at, image_url, scheduled_for, overlay_metadata')
         .eq('user_id', user.id)
-        .eq('status', 'draft')
+        .in('status', ['draft', 'scheduled']) // Include both statuses
         .eq('media_type', 'reels')
         .is('video_url', null)
-        .order('created_at', { ascending: false })
+        .order('scheduled_for', { ascending: true, nullsFirst: false }) // Prioritize by schedule
         .limit(20);
 
       if (error) throw error;
@@ -123,6 +124,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
                metadata.needs_processing === true;
       }) as PendingVideo[];
 
+      console.log(`[VideoRendering] Found ${pending.length} pending videos (draft + scheduled)`);
       setPendingVideos(pending);
       
       // Update render queue if not currently rendering
