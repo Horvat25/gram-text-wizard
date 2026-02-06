@@ -151,9 +151,10 @@ serve(async (req) => {
     // Add year context to prevent outdated references
     systemPrompt += `\n\nCONTEXTO TEMPORAL OBRIGATÓRIO:
 - Data atual: ${new Date().toLocaleDateString('pt-BR')} (Ano ${currentYear})
-- NUNCA mencione anos passados (2023, 2024) como se fossem atuais
+- NUNCA mencione anos passados (2023, 2024, 2025) como se fossem atuais
 - Sempre use referências temporais corretas para ${currentYear}
-- Português brasileiro PERFEITO (sem erros ortográficos)`;
+- Português brasileiro PERFEITO (sem erros ortográficos)
+- NÃO use termos em inglês - tudo deve ser em português brasileiro`;
     
     if (customInstructions) {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;

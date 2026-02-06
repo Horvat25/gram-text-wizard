@@ -534,13 +534,14 @@ async function createVideoContent(
     script = await scriptResponse.json();
     console.log('[AGENT] Script gerado:', script.title);
     
-    // Generate thumbnail from first segment
+    // Generate thumbnail from first segment - PORTUGUESE PROMPT
+    const currentYear = new Date().getFullYear(); // 2026
     if (script.segments?.[0]?.imagePrompt) {
       const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          prompt: `${script.segments[0].imagePrompt}. Cinematic, vertical 9:16 aspect ratio.`,
+          prompt: `${script.segments[0].imagePrompt}. Cinematográfico, proporção vertical 9:16. Ano ${currentYear}. Todo texto em PORTUGUÊS.`,
           format: 'portrait',
           model: 'gemini'
         })
@@ -612,11 +613,12 @@ async function createCarouselContent(
   console.log('[AGENT] Criando carrossel:', plan.theme);
   
   // Generate 4 images for carousel - ALL IN PORTUGUESE
+  const currentYear = new Date().getFullYear(); // 2026
   const slidePrompts = [
-    `Slide 1: Introdução visual sobre ${plan.theme}. Design moderno, tecnológico, profissional. Alta qualidade para Instagram. Ano 2025.`,
-    `Slide 2: Dados ou estatísticas sobre ${plan.theme}. Estilo infográfico, clean, profissional. Cores vibrantes.`,
-    `Slide 3: Benefícios ou aplicações de ${plan.theme}. Design inovador, futurista mas realista.`,
-    `Slide 4: Conclusão e chamada para ação sobre ${plan.theme}. Impactante, memorável, profissional.`
+    `Slide 1: Introdução visual sobre ${plan.theme}. Design moderno, tecnológico, profissional. Alta qualidade para Instagram. Ano ${currentYear}. Todo texto em PORTUGUÊS BRASILEIRO.`,
+    `Slide 2: Dados ou estatísticas sobre ${plan.theme}. Estilo infográfico, clean, profissional. Cores vibrantes. Ano ${currentYear}. Texto em português.`,
+    `Slide 3: Benefícios ou aplicações de ${plan.theme}. Design inovador, futurista mas realista. Ano ${currentYear}. Português brasileiro.`,
+    `Slide 4: Conclusão e chamada para ação sobre ${plan.theme}. Impactante, memorável, profissional. Ano ${currentYear}. PORTUGUÊS.`
   ];
   
   const carouselImages: string[] = [];
@@ -758,12 +760,13 @@ async function createNewsContent(
   }
   
   // Generate image if no article image - PORTUGUESE PROMPT
+  const newsYear = new Date().getFullYear(); // 2026
   if (!imageUrl) {
     const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        prompt: `Ilustração de notícia sobre: ${selectedArticle?.title || plan.theme}. Estilo jornalístico profissional, cores realistas. Qualidade para Instagram 2025. Sem texto na imagem.`,
+        prompt: `Ilustração de notícia sobre: ${selectedArticle?.title || plan.theme}. Estilo jornalístico profissional, cores realistas. Qualidade para Instagram ${newsYear}. Sem texto na imagem. Se houver texto, deve ser em PORTUGUÊS BRASILEIRO.`,
         format: 'square',
         model: 'gemini'
       })
@@ -839,11 +842,12 @@ async function createImageContent(
   console.log('[AGENT] Criando post de imagem:', plan.theme);
   
   // Generate image with PORTUGUESE prompt
+  const imageYear = new Date().getFullYear(); // 2026
   const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      prompt: `Post profissional para redes sociais sobre: ${plan.theme}. Design moderno, estético tecnológico, cores vibrantes. Qualidade profissional para Instagram 2025. Sem texto na imagem.`,
+      prompt: `Post profissional para redes sociais sobre: ${plan.theme}. Design moderno, estético tecnológico, cores vibrantes. Qualidade profissional para Instagram ${imageYear}. Sem texto na imagem ou se houver texto, deve ser em PORTUGUÊS BRASILEIRO. Contexto: ano ${imageYear}.`,
       format: 'square',
       model: 'gemini'
     })
