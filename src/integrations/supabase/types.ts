@@ -480,6 +480,65 @@ export type Database = {
         }
         Relationships: []
       }
+      rss_items: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          fetched_at: string | null
+          has_image: boolean | null
+          id: string
+          image_url: string | null
+          is_used: boolean | null
+          link: string
+          published_at: string | null
+          source_name: string
+          source_url: string
+          title: string
+          used_in_post_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          fetched_at?: string | null
+          has_image?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_used?: boolean | null
+          link: string
+          published_at?: string | null
+          source_name: string
+          source_url: string
+          title: string
+          used_in_post_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          fetched_at?: string | null
+          has_image?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_used?: boolean | null
+          link?: string
+          published_at?: string | null
+          source_name?: string
+          source_url?: string
+          title?: string
+          used_in_post_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rss_items_used_in_post_id_fkey"
+            columns: ["used_in_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       settings: {
         Row: {
           brand_logo_url: string | null
