@@ -228,12 +228,74 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     
     setCurrentVideoId(nextVideo.id);
     
-    const script = nextVideo.overlay_metadata?.script;
+    let script = nextVideo.overlay_metadata?.script;
+    
+    // If no script, try to generate one from the topic
     if (!script?.segments?.length) {
-      console.error('No script segments for video:', nextVideo.id);
-      setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
-      setTimeout(processNextVideo, 100);
-      return;
+      const topic = nextVideo.overlay_metadata?.topic;
+      
+      if (!topic) {
+        console.error('No script or topic for video:', nextVideo.id);
+        toast.error(`Vídeo sem script ou tema: pulando...`);
+        setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
+        setTimeout(processNextVideo, 100);
+        return;
+      }
+      
+      // Generate script on-the-fly
+      toast.info(`Gerando script para: ${topic.substring(0, 50)}...`);
+      console.log('[VideoRendering] Generating script for video without one:', nextVideo.id);
+      
+      try {
+        const { data: scriptData, error: scriptError } = await supabase.functions.invoke('generate-story-script', {
+          body: {
+            topic,
+            segmentCount: 4,
+            wordsPerSegment: 12,
+            totalDuration: 20,
+            style: 'informativo, envolvente, com começo-meio-fim',
+            brandName: brandSettings.brandName || 'Neural Update'
+          }
+        });
+        
+        if (scriptError || !scriptData?.segments?.length) {
+          console.error('Failed to generate script:', scriptError || 'No segments');
+          toast.error(`Erro ao gerar script: pulando vídeo`);
+          setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
+          setTimeout(processNextVideo, 100);
+          return;
+        }
+        
+        // Update the post with the generated script
+        await supabase
+          .from('posts')
+          .update({
+            overlay_metadata: {
+              ...nextVideo.overlay_metadata,
+              script: {
+                title: scriptData.title,
+                segments: scriptData.segments,
+                segmentCount: scriptData.segmentCount,
+                totalDuration: scriptData.totalDuration
+              }
+            }
+          })
+          .eq('id', nextVideo.id);
+        
+        script = {
+          title: scriptData.title,
+          segments: scriptData.segments
+        };
+        
+        console.log('[VideoRendering] Script generated successfully:', script.title);
+        
+      } catch (err) {
+        console.error('Error generating script:', err);
+        toast.error(`Erro ao gerar script: pulando vídeo`);
+        setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
+        setTimeout(processNextVideo, 100);
+        return;
+      }
     }
     
     try {
@@ -243,7 +305,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
       setTimeout(processNextVideo, 100);
     }
-  }, [completedCount, renderFromScript, notifyAgentAction, fetchPendingVideos]);
+  }, [completedCount, renderFromScript, notifyAgentAction, fetchPendingVideos, brandSettings.brandName]);
 
   const startRendering = useCallback(() => {
     unlockAudio();
