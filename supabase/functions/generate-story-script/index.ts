@@ -160,6 +160,26 @@ REGRAS CRÍTICAS:
 - TUDO em PORTUGUÊS BRASILEIRO (incluindo os textos e imagePrompt).
 - NÃO USE INGLÊS EM NENHUMA PARTE DO ROTEIRO OU imagePrompt!
 
+📝 ORTOGRAFIA - REGRAS OBRIGATÓRIAS:
+- Revise CADA palavra antes de finalizar. ZERO erros ortográficos são aceitáveis.
+- Use acentuação correta: "você", "também", "através", "é", "está", "já", "até".
+- Palavras comumente erradas que devem estar CORRETAS:
+  * "Inteligência" (não "Inteligencia")
+  * "Tecnologia" (não "Tecnolojia") 
+  * "através" (não "atraves")
+  * "você" (não "voce")
+  * "diagnóstico" (não "diagnostico")
+  * "automático" (não "automatico")
+  * "revolução" (não "revolucao")
+  * "atenção" (não "atencao")
+  * "decisão" (não "decisao")
+  * "saúde" (não "saude")
+  * "Médico" (não "Medico")
+  * "análise" (não "analise")
+  * "possível" (não "possivel")
+  * "próximo" (não "proximo")
+- PROIBIDO usar termos em inglês como "AI", "Generative AI", "Robotics", "Computing" - use equivalentes em português!
+
 ESTRUTURA (4 CENAS):
 1) GANCHO (0-2s): frase curta e específica do tema.
 2) CONTEXTO (3-6s): explique o que é / por que importa, sem jargão.
@@ -168,10 +188,9 @@ ESTRUTURA (4 CENAS):
 
 FORMATO:
 - Frases curtas (8–16 palavras por segmento).
-- Português brasileiro perfeito, sem erros ortográficos.
+- Português brasileiro PERFEITO, sem NENHUM erro ortográfico ou de acentuação.
 - Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema.
-- imagePrompt DEVE conter: "Ano ${currentYear}. Texto em português brasileiro."
-- PROIBIDO usar termos em inglês como "AI", "Generative AI", "Robotics", "Computing" - use equivalentes em português!`;
+- imagePrompt DEVE conter: "Ano ${currentYear}. Texto em português brasileiro."`;
 
     const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
 "${topic}"
@@ -182,15 +201,20 @@ ESPECIFICAÇÕES:
 - Estilo: ${STYLE}.
 - Estamos em ${currentYear} - NÃO mencione anos anteriores!
 
+⚠️ REVISÃO ORTOGRÁFICA OBRIGATÓRIA:
+- Antes de responder, REVISE todos os textos para garantir ortografia correta em PT-BR.
+- Verifique acentos: ã, é, ê, í, ó, ô, ú, ç.
+- Se o tema estiver em inglês, TRADUZA para português brasileiro.
+
 IMPORTANTE:
 - Inclua termos específicos do tema no texto (não responda com um roteiro genérico).
-- Todos os textos e imagePrompts devem estar em PORTUGUÊS BRASILEIRO.
+- Todos os textos e imagePrompts devem estar em PORTUGUÊS BRASILEIRO CORRETO.
 
 Responda APENAS com JSON no formato:
 {
-  "title": "Título curto e específico do tema",
+  "title": "Título curto e específico do tema EM PORTUGUÊS",
   "segments": [
-    { "text": "texto em português...", "imagePrompt": "descrição da imagem em português..." }
+    { "text": "texto em português com ortografia perfeita...", "imagePrompt": "descrição da imagem em português..." }
   ]
 }`;
 
@@ -207,8 +231,10 @@ Reescreva um NOVO roteiro seguindo a mesma estrutura, mas agora OBRIGATORIAMENTE
 
 LEMBRE-SE:
 - Estamos em ${currentYear}, não mencione anos passados.
-- Tudo em PORTUGUÊS BRASILEIRO.
+- Tudo em PORTUGUÊS BRASILEIRO com ortografia PERFEITA.
 - Exija que pelo menos 2 cenas contenham palavras do tema.
+- Se o tema estiver em inglês, TRADUZA para português.
+- REVISE acentos: ã, é, ê, í, ó, ô, ú, ç antes de responder.
 
 Responda APENAS com JSON no mesmo formato.`;
 
