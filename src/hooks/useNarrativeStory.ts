@@ -132,19 +132,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, [segmentCount, segmentDuration, setError]);
 
-  // Step 2: Generate images for each segment (with retry and better error handling)
+  // Step 2: Generate images for each segment (OPTIMIZED: parallel batches of 3)
   const generateImages = useCallback(async (segments: StorySegment[]) => {
     setState(prev => ({ ...prev, step: "images", progress: 20 }));
     
     const updatedSegments = [...segments];
     const progressPerImage = 50 / segments.length;
     
-    // Generate images in parallel batches of 2 (to avoid rate limits)
-    for (let i = 0; i < segments.length; i += 2) {
+    // OPTIMIZED: Generate images in parallel batches of 3 (was 2)
+    const batchSize = 3;
+    for (let i = 0; i < segments.length; i += batchSize) {
       if (abortRef.current) return null;
       
-      const batch = segments.slice(i, i + 2);
-      console.log(`Generating batch ${Math.floor(i/2) + 1}: segments ${i + 1} to ${i + batch.length}`);
+      const batch = segments.slice(i, i + batchSize);
+      console.log(`[IMAGES] Generating batch ${Math.floor(i/batchSize) + 1}: segments ${i + 1} to ${i + batch.length}`);
       
       const results = await Promise.all(
         batch.map(async (segment, batchIndex) => {
@@ -204,16 +205,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
       });
 
-      // Update state to show progress
       setState(prev => ({ 
         ...prev, 
         segments: [...updatedSegments],
         progress: Math.min(20 + (i + batch.length) * progressPerImage, 70),
       }));
       
-      // Small delay between batches to avoid rate limits
-      if (i + 2 < segments.length) {
-        await new Promise(r => setTimeout(r, 1500));
+      // OPTIMIZED: Reduced delay between batches (was 1500ms)
+      if (i + batchSize < segments.length) {
+        await new Promise(r => setTimeout(r, 800));
       }
     }
 
