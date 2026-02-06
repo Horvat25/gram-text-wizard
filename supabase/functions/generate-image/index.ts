@@ -12,8 +12,18 @@ const corsHeaders = {
 async function generateWithGemini(prompt: string, format: string, LOVABLE_API_KEY: string): Promise<{ base64ImageUrl: string }> {
   console.log("Gerando imagem com Gemini 2.5 Flash Image...");
   
-  const aspectRatio = format === "portrait" ? "9:16 vertical" : format === "landscape" ? "16:9 horizontal" : "1:1 square";
-  const enhancedPrompt = `${prompt}. High quality, ${aspectRatio} aspect ratio, professional photography style, vibrant colors, Instagram-ready. Ultra high resolution.`;
+  const currentYear = new Date().getFullYear(); // 2026
+  const aspectRatio = format === "portrait" ? "9:16 vertical" : format === "landscape" ? "16:9 horizontal" : "1:1 quadrado";
+  
+  // CRITICAL: Force Portuguese output and current year context
+  const enhancedPrompt = `${prompt}. 
+INSTRUÇÕES OBRIGATÓRIAS:
+- Todo texto visível na imagem DEVE ser em PORTUGUÊS BRASILEIRO
+- Contexto: ano ${currentYear}
+- Qualidade profissional, estilo fotográfico, cores vibrantes
+- Proporção: ${aspectRatio}
+- Pronto para Instagram, ultra alta resolução
+- NÃO use texto em inglês na imagem`;
   
   const maxAttempts = 3;
   let base64ImageUrl: string | undefined;
@@ -137,12 +147,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Build optimized prompt
+    // Build optimized prompt - PORTUGUESE ONLY
+    const currentYear = new Date().getFullYear(); // 2026
     const styleInstructions = customStyle 
-      ? `${customStyle}. Professional quality, vibrant colors.` 
-      : `Professional, high quality, vibrant colors, balanced composition. Modern aesthetic.`;
+      ? `${customStyle}. Qualidade profissional, cores vibrantes.` 
+      : `Profissional, alta qualidade, cores vibrantes, composição equilibrada. Estética moderna.`;
     
-    const optimizedPrompt = `${prompt}. ${styleInstructions}. No text or words in the image unless specifically requested.`;
+    const optimizedPrompt = `${prompt}. ${styleInstructions}. Contexto: ano ${currentYear}. Todo texto na imagem deve ser em PORTUGUÊS BRASILEIRO. Não use inglês.`;
 
     let imageUrl: string;
     let modelUsed: string;

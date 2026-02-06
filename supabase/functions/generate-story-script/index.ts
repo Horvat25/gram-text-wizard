@@ -154,10 +154,11 @@ OBJETIVO:
 
 REGRAS CRÍTICAS:
 - O roteiro DEVE ser sobre o TEMA fornecido pelo usuário. Não troque o assunto para "crescimento no Instagram", "criadores pequenos", etc.
-- NUNCA mencionar anos passados como 2023 ou 2024 - estamos em ${currentYear}!
+- NUNCA mencionar anos passados como 2023, 2024 ou 2025 - estamos em ${currentYear}!
 - Nada de conteúdo genérico/repetitivo. Sem promessas milagrosas. Sem hype vazio.
 - Linguagem clara, direta e interessante.
 - TUDO em PORTUGUÊS BRASILEIRO (incluindo os textos e imagePrompt).
+- NÃO USE INGLÊS EM NENHUMA PARTE DO ROTEIRO OU imagePrompt!
 
 ESTRUTURA (4 CENAS):
 1) GANCHO (0-2s): frase curta e específica do tema.
@@ -167,8 +168,10 @@ ESTRUTURA (4 CENAS):
 
 FORMATO:
 - Frases curtas (8–16 palavras por segmento).
-- Português brasileiro sem erros ortográficos.
-- Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema (evite neon/futurista genérico/abstrato).`;
+- Português brasileiro perfeito, sem erros ortográficos.
+- Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema.
+- imagePrompt DEVE conter: "Ano ${currentYear}. Texto em português brasileiro."
+- PROIBIDO usar termos em inglês como "AI", "Generative AI", "Robotics", "Computing" - use equivalentes em português!`;
 
     const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
 "${topic}"
