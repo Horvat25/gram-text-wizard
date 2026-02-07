@@ -127,8 +127,9 @@ function getConversationalUpdate(
 }
 
 // ETAPA 1: LEITURA DO MUNDO
-async function analyzeCurrentState(supabase: any, userId: string): Promise<AgentState> {
+async function analyzeCurrentState(supabase: any, userId: string, workspaceId: string): Promise<AgentState> {
   console.log('[AGENT] Etapa 1: Analisando estado atual...');
+  console.log('[AGENT] workspaceId:', workspaceId, 'userId:', userId);
   
   const now = new Date();
   const hours72Ago = new Date(now.getTime() - 72 * 60 * 60 * 1000);
@@ -145,11 +146,11 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   weekStart.setHours(0, 0, 0, 0);
   const weekStartUTC = new Date(weekStart.getTime() - brasiliaOffset);
   
-  // Busca posts das últimas 72h (publicados para métricas)
+  // Busca posts das últimas 72h (publicados para métricas) - USAR WORKSPACE_ID
   const { data: posts72h, error: postsError } = await supabase
     .from('posts')
     .select('*')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .eq('status', 'published')
     .gte('published_at', hours72Ago.toISOString())
     .order('published_at', { ascending: false });
@@ -160,11 +161,11 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   
   const recentPosts = posts72h || [];
   
-  // *** FIX: Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário ***
+  // Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário
   const { data: todayPosts } = await supabase
     .from('posts')
     .select('id, status')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .gte('created_at', todayStartUTC.toISOString());
   
   const postsCreatedToday = (todayPosts || []).length;
@@ -174,33 +175,33 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   const { data: weekPosts } = await supabase
     .from('posts')
     .select('media_type, post_type, status')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .in('status', ['published', 'scheduled', 'draft'])
     .gte('created_at', weekStartUTC.toISOString());
   
   const postsThisWeek = weekPosts || [];
   
-  // Carrega contexto do agente
+  // Carrega contexto do agente - USAR WORKSPACE_ID
   const { data: context, error: contextError } = await supabase
     .from('agent_context')
     .select('*')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .maybeSingle();
   
   if (contextError) {
     console.error('[AGENT] Erro ao buscar contexto:', contextError);
   }
   
-  // Se não existe contexto, cria um
+  // Se não existe contexto, cria um com workspace_id
   if (!context) {
-    console.log('[AGENT] Criando contexto inicial...');
+    console.log('[AGENT] Criando contexto inicial para workspace:', workspaceId);
     await supabase
       .from('agent_context')
-      .insert({ user_id: userId })
+      .insert({ user_id: userId, workspace_id: workspaceId })
       .select()
       .single();
     
-    return analyzeCurrentState(supabase, userId);
+    return analyzeCurrentState(supabase, userId, workspaceId);
   }
   
   // Calcular métricas
@@ -213,7 +214,7 @@ async function analyzeCurrentState(supabase: any, userId: string): Promise<Agent
   const { data: lastCreatedPost } = await supabase
     .from('posts')
     .select('created_at')
-    .eq('user_id', userId)
+    .eq('workspace_id', context.workspace_id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -475,6 +476,7 @@ async function executeContentPlan(
   supabase: any, 
   plan: ContentPlan, 
   userId: string,
+  workspaceId: string,
   supabaseUrl: string,
   autoPublish: boolean = false
 ): Promise<any> {
@@ -482,6 +484,7 @@ async function executeContentPlan(
   console.log('[AGENT] Plano:', JSON.stringify(plan, null, 2));
   console.log('[AGENT] Tipo de conteúdo:', plan.contentType);
   console.log('[AGENT] Auto-publish:', autoPublish);
+  console.log('[AGENT] workspaceId:', workspaceId);
   
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const headers = {
@@ -492,14 +495,14 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video':
-      return createVideoContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
+      return createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'carousel':
-      return createCarouselContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
+      return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'news':
-      return createNewsContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
+      return createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'image':
     default:
-      return createImageContent(supabase, plan, userId, supabaseUrl, headers, autoPublish);
+      return createImageContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
   }
 }
 
@@ -508,6 +511,7 @@ async function createVideoContent(
   supabase: any,
   plan: ContentPlan,
   userId: string,
+  workspaceId: string,
   supabaseUrl: string,
   headers: any,
   autoPublish: boolean = false
@@ -578,7 +582,7 @@ async function createVideoContent(
   // Videos always stay as draft because they need client-side rendering
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
-    caption,
+    workspace_id: workspaceId,
     hashtags,
     post_type: 'entretenimento',
     media_type: 'reels',
@@ -606,6 +610,7 @@ async function createCarouselContent(
   supabase: any,
   plan: ContentPlan,
   userId: string,
+  workspaceId: string,
   supabaseUrl: string,
   headers: any,
   autoPublish: boolean = false
@@ -666,6 +671,7 @@ async function createCarouselContent(
   const canPublish = autoPublish && carouselImages.length >= 2;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
+    workspace_id: workspaceId,
     caption,
     hashtags,
     post_type: 'educacional',
@@ -688,6 +694,7 @@ async function createNewsContent(
   supabase: any,
   plan: ContentPlan,
   userId: string,
+  workspaceId: string,
   supabaseUrl: string,
   headers: any,
   autoPublish: boolean = false
@@ -814,6 +821,7 @@ async function createNewsContent(
   const canPublish = autoPublish && imageUrl;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
+    workspace_id: workspaceId,
     caption,
     hashtags,
     post_type: 'noticia',
@@ -835,6 +843,7 @@ async function createImageContent(
   supabase: any,
   plan: ContentPlan,
   userId: string,
+  workspaceId: string,
   supabaseUrl: string,
   headers: any,
   autoPublish: boolean = false
@@ -883,6 +892,7 @@ async function createImageContent(
   const canPublish = autoPublish && imageUrl;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
+    workspace_id: workspaceId,
     caption,
     hashtags,
     post_type: plan.format,
@@ -905,13 +915,15 @@ async function recordDecisionAndLearn(
   decision: AgentDecision,
   state: AgentState,
   postId: string | null,
-  userId: string
+  userId: string,
+  workspaceId: string
 ): Promise<void> {
   console.log('[AGENT] Etapa 5: Registrando decisão e aprendizados...');
   
-  // Salvar decisão
+  // Salvar decisão - incluir workspace_id
   const { error: decisionError } = await supabase.from('agent_decisions').insert({
     user_id: userId,
+    workspace_id: workspaceId,
     metrics_snapshot: {
       avgEngagement: state.avgEngagement,
       lastPostHours: state.lastPostHours,
@@ -933,7 +945,7 @@ async function recordDecisionAndLearn(
     console.log('[AGENT] Decisão registrada com sucesso');
   }
   
-  // Atualizar contexto do agente se houve sucesso
+  // Atualizar contexto do agente se houve sucesso - usar workspace_id
   if (decision.decision === 'POST' && state.avgEngagement > 5) {
     const newPatterns = [...(state.context.success_patterns || [])];
     if (decision.reason && !newPatterns.includes(decision.reason)) {
@@ -946,7 +958,7 @@ async function recordDecisionAndLearn(
         success_patterns: newPatterns.slice(-10), // Keep last 10
         updated_at: new Date().toISOString()
       })
-      .eq('user_id', userId);
+      .eq('workspace_id', workspaceId);
     
     console.log('[AGENT] Contexto atualizado com novo padrão de sucesso');
   }
@@ -1189,8 +1201,8 @@ async function processWorkspace(
     // Send initial chat message (conversational style)
     await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'analyzing'));
     
-    // ETAPA 1: Análise
-    const state = await analyzeCurrentState(supabase, userId);
+    // ETAPA 1: Análise - passar workspaceId para buscar dados corretos
+    const state = await analyzeCurrentState(supabase, userId, workspaceId);
     
     // Send decision update
     await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'deciding', {
@@ -1216,7 +1228,7 @@ async function processWorkspace(
       
       // Check if auto_post is enabled - pass to executeContentPlan
       const autoPublish = state.context?.auto_post_enabled || false;
-      post = await executeContentPlan(supabase, decision.contentPlan, userId, supabaseUrl, autoPublish);
+      post = await executeContentPlan(supabase, decision.contentPlan, userId, workspaceId, supabaseUrl, autoPublish);
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
       
@@ -1244,8 +1256,8 @@ async function processWorkspace(
       }
     }
     
-    // ETAPA 5: Registro de decisão
-    await recordDecisionAndLearn(supabase, decision, state, post?.id || null, userId);
+    // ETAPA 5: Registro de decisão - passar workspaceId
+    await recordDecisionAndLearn(supabase, decision, state, post?.id || null, userId, workspaceId);
     
     // Generate friendly summary for the user
     const summary = generateExecutionSummary(decision, state, post);
