@@ -125,96 +125,77 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     }
   }, []);
 
-  // Step 3b: Generate audio narration with multi-provider fallback chain
+  // Step 3b: Generate audio - ÚNICA TENTATIVA (sem fallback)
   const generateAudio = useCallback(async (script: string) => {
     setState(prev => ({ ...prev, step: "audio", progress: 70 }));
     
-    // Helper to try TTS providers in order
-    const tryTTSProvider = async (provider: string, invokeBody: { text: string; voiceId?: string; voice?: string; language?: string }): Promise<{ url: string; provider: string } | null> => {
-      try {
-        console.log(`[TTS] Trying ${provider}...`);
-        const result = await supabase.functions.invoke(provider, { body: invokeBody });
-        
-        // Check for valid audio - must have audioContent as non-empty string and no fallback flag
-        const audioContent = result.data?.audioContent;
-        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-        const hasFallbackFlag = result.data?.fallback === true;
-        
-        if (!result.error && isValidAudio && !hasFallbackFlag) {
-          console.log(`[TTS] ✅ ${provider} success! Audio size: ${audioContent.length} chars`);
-          return { url: `data:audio/mp3;base64,${audioContent}`, provider };
-        }
-        
-        console.log(`[TTS] ${provider} failed:`, result.data?.error || result.error || 'Invalid audio');
-      } catch (e) {
-        console.error(`[TTS] ${provider} error:`, e);
-      }
-      return null;
-    };
-    
     try {
-      // Generate narration AND background music in parallel
-      // 100% FREE pipeline: Bark → Edge TTS → Lovable TTS → Free TTS
-      const [narrationResult, musicUrl] = await Promise.all([
+      // Gerar narração E trilha sonora em paralelo
+      const [ttsResult, musicUrl] = await Promise.all([
+        // TTS - ÚNICA TENTATIVA (conforme prompt definitivo)
         (async () => {
-          // 1. Try Bark TTS first (Hugging Face - FREE neural voice)
-          console.log("[TTS] 🎙️ Tentando Bark TTS (Hugging Face)...");
-          let result = await tryTTSProvider("huggingface-bark-tts", { 
-            text: script, 
-            voice: "camila", 
-            language: "pt-BR" 
-          });
+          console.log("[TTS] 🎙️ Iniciando narração...");
           
-          // 2. Fallback para Edge TTS (VoiceRSS - FREE)
-          if (!result) {
-            console.log("[TTS] Bark indisponível, tentando Edge TTS...");
-            result = await tryTTSProvider("edge-tts", { 
-              text: script, 
-              voice: "camila" 
+          try {
+            const result = await supabase.functions.invoke("huggingface-bark-tts", { 
+              body: { 
+                text: script, 
+                language: "pt-BR" 
+              } 
             });
+            
+            // Verificar status
+            if (result.data?.tts_status === "success" && result.data?.audioContent) {
+              const format = result.data.format || "mp3";
+              console.log(`[TTS] ✅ Sucesso! Modelo: ${result.data.model}, Size: ${result.data.size_kb}KB`);
+              return { 
+                url: `data:audio/${format};base64,${result.data.audioContent}`, 
+                status: "success",
+                model: result.data.model 
+              };
+            }
+            
+            // Falha explícita
+            console.log("[TTS] ❌ Falhou:", result.data?.error || "sem áudio");
+            return { url: "", status: "failed", model: null };
+            
+          } catch (e: any) {
+            console.error("[TTS] ❌ Erro:", e.message);
+            return { url: "", status: "failed", model: null };
           }
-          
-          // 3. Fallback para Lovable TTS (Polly - FREE)
-          if (!result) {
-            console.log("[TTS] Edge TTS indisponível, tentando Lovable TTS...");
-            result = await tryTTSProvider("lovable-tts", { 
-              text: script, 
-              voice: "camila" 
-            });
-          }
-          
-          // 4. Último recurso: Free TTS (Google - FREE)
-          if (!result) {
-            console.warn("[TTS] ⚠️ Todos os provedores falharam, usando Google TTS como último recurso");
-            result = await tryTTSProvider("free-tts", { 
-              text: script, 
-              language: "pt-BR" 
-            });
-          }
-          
-          return result;
         })(),
-        // Background music (parallel) - uses MusicGen or royalty-free tracks
+        // Trilha sonora (paralelo)
         generateBackgroundMusic()
       ]);
 
       setState(prev => ({ ...prev, progress: 90 }));
       
-      if (narrationResult) {
-        const hasMusic = musicUrl && musicUrl.length > 0;
-        toast.success(`🎙️ Narração gerada (${narrationResult.provider})${hasMusic ? ' + 🎵 Trilha sonora' : ''}`);
-        setState(prev => ({ 
-          ...prev, 
-          narrationUrl: narrationResult!.url,
-          backgroundMusicUrl: musicUrl,
-          progress: 100,
-          step: "complete",
-        }));
-        return { narrationUrl: narrationResult.url, musicUrl };
+      const hasVoice = ttsResult.status === "success" && ttsResult.url;
+      const hasMusic = musicUrl && musicUrl.length > 0;
+      
+      if (hasVoice) {
+        toast.success(`🎙️ Narração gerada${hasMusic ? ' + 🎵 Trilha' : ''}`);
+      } else {
+        console.log("[TTS] → Seguir sem voz (apenas trilha)");
+        toast.info(`🎵 Vídeo com trilha sonora${hasMusic ? '' : ' (sem áudio)'}`);
       }
       
-      // All TTS providers failed - complete without audio
-      console.warn("[TTS] All providers failed, completing without audio");
+      setState(prev => ({ 
+        ...prev, 
+        narrationUrl: ttsResult.url,
+        backgroundMusicUrl: musicUrl,
+        progress: 100,
+        step: "complete",
+      }));
+      
+      return { narrationUrl: ttsResult.url, musicUrl };
+      
+    } catch (error: any) {
+      console.warn("[TTS] Erro geral:", error);
+      
+      // Mesmo com erro, tenta trilha sonora
+      const musicUrl = await generateBackgroundMusic().catch(() => "");
+      
       setState(prev => ({ 
         ...prev, 
         narrationUrl: "", 
@@ -222,19 +203,9 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
         progress: 100,
         step: "complete",
       }));
-      toast.warning("Conteúdo criado! (Narração indisponível no momento)");
+      
+      toast.info("🎵 Vídeo apenas com trilha sonora");
       return { narrationUrl: "", musicUrl };
-    } catch (error: any) {
-      console.warn("[TTS] Error in audio generation:", error);
-      setState(prev => ({ 
-        ...prev, 
-        narrationUrl: "", 
-        backgroundMusicUrl: "",
-        progress: 100,
-        step: "complete",
-      }));
-      toast.warning("Conteúdo criado! (Narração indisponível)");
-      return { narrationUrl: "", musicUrl: "" };
     }
   }, [generateBackgroundMusic]);
 
