@@ -507,8 +507,21 @@ function drawMarketingCTA(
 }
 
 /**
- * Render a single frame to the canvas
+ * Transition types for professional video editing
+ */
+type TransitionType = 'crossfade' | 'slide' | 'zoom' | 'none';
+
+/**
+ * Get transition duration in seconds (20% of segment duration, max 0.8s)
+ */
+function getTransitionDuration(segmentDuration: number): number {
+  return Math.min(segmentDuration * 0.2, 0.8);
+}
+
+/**
+ * Render a single frame to the canvas with professional transitions
  * Uses split image layout: top image + center text + bottom image
+ * Supports crossfade transitions between segments
  */
 function renderFrame(
   ctx: CanvasRenderingContext2D,
@@ -531,29 +544,55 @@ function renderFrame(
     return;
   }
   
-  // Find current segment
+  // Find current segment and calculate transition state
   let elapsed = 0;
   let segmentIndex = 0;
   let segmentProgress = 0;
+  let timeIntoSegment = 0;
   
   for (let i = 0; i < segments.length; i++) {
     if (currentTime < elapsed + segments[i].duration) {
       segmentIndex = i;
-      segmentProgress = (currentTime - elapsed) / segments[i].duration;
+      timeIntoSegment = currentTime - elapsed;
+      segmentProgress = timeIntoSegment / segments[i].duration;
       break;
     }
     elapsed += segments[i].duration;
   }
 
   const segment = segments[segmentIndex];
-  const img = images[segmentIndex];
-
+  const currentImg = images[segmentIndex];
+  const segmentDuration = segment.duration;
+  const transitionDuration = getTransitionDuration(segmentDuration);
+  
+  // Calculate if we're in a transition zone
+  const isEnteringTransition = timeIntoSegment < transitionDuration && segmentIndex > 0;
+  const isExitingTransition = timeIntoSegment > (segmentDuration - transitionDuration) && segmentIndex < segments.length - 1;
+  
   // Clear canvas with dark background for center area
   ctx.fillStyle = "#0a0a0f";
   ctx.fillRect(0, 0, width, height);
+  
+  // Determine transition type based on segment index for variety
+  const transitionTypes: TransitionType[] = ['crossfade', 'slide', 'zoom', 'crossfade'];
+  const transitionType = transitionTypes[segmentIndex % transitionTypes.length];
 
-  // Draw split images (top and bottom) with Ken Burns effect
-  drawSplitImages(ctx, img, width, height, segmentProgress, segmentIndex);
+  if (isEnteringTransition && segmentIndex > 0) {
+    // Entering from previous segment - blend with previous image
+    const prevImg = images[segmentIndex - 1];
+    const transitionProgress = timeIntoSegment / transitionDuration; // 0 to 1
+    
+    drawTransition(ctx, prevImg, currentImg, width, height, transitionProgress, transitionType, segmentIndex - 1, segmentIndex);
+  } else if (isExitingTransition && segmentIndex < segments.length - 1) {
+    // Exiting to next segment - blend with next image
+    const nextImg = images[segmentIndex + 1];
+    const transitionProgress = (timeIntoSegment - (segmentDuration - transitionDuration)) / transitionDuration; // 0 to 1
+    
+    drawTransition(ctx, currentImg, nextImg, width, height, transitionProgress, transitionType, segmentIndex, segmentIndex + 1);
+  } else {
+    // Normal segment - just show current image with Ken Burns
+    drawSplitImages(ctx, currentImg, width, height, segmentProgress, segmentIndex);
+  }
 
   // Draw watermark
   drawWatermark(ctx, width, height, brandName);
@@ -562,6 +601,144 @@ function renderFrame(
   if (segment.text) {
     drawTextOverlay(ctx, segment.text, width, height);
   }
+}
+
+/**
+ * Draw a transition between two images
+ * Supports multiple transition types for professional look
+ */
+function drawTransition(
+  ctx: CanvasRenderingContext2D,
+  fromImg: HTMLImageElement,
+  toImg: HTMLImageElement,
+  width: number,
+  height: number,
+  progress: number, // 0 = fully "from", 1 = fully "to"
+  type: TransitionType,
+  fromIndex: number,
+  toIndex: number
+): void {
+  // Ease the progress for smoother transitions
+  const easedProgress = easeInOutCubic(progress);
+  
+  switch (type) {
+    case 'crossfade':
+      // Simple crossfade - most common and professional
+      drawCrossfadeTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
+      break;
+      
+    case 'slide':
+      // Slide from right to left
+      drawSlideTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
+      break;
+      
+    case 'zoom':
+      // Zoom out from current, zoom in to next
+      drawZoomTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
+      break;
+      
+    default:
+      // Fallback to simple crossfade
+      drawCrossfadeTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
+  }
+}
+
+/**
+ * Easing function for smooth transitions
+ */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/**
+ * Crossfade transition - blend two images with alpha
+ */
+function drawCrossfadeTransition(
+  ctx: CanvasRenderingContext2D,
+  fromImg: HTMLImageElement,
+  toImg: HTMLImageElement,
+  width: number,
+  height: number,
+  progress: number,
+  fromIndex: number,
+  toIndex: number
+): void {
+  // Draw "from" image at decreasing opacity
+  ctx.save();
+  ctx.globalAlpha = 1 - progress;
+  drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
+  ctx.restore();
+  
+  // Draw "to" image at increasing opacity
+  ctx.save();
+  ctx.globalAlpha = progress;
+  drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
+  ctx.restore();
+}
+
+/**
+ * Slide transition - new image slides in from right
+ */
+function drawSlideTransition(
+  ctx: CanvasRenderingContext2D,
+  fromImg: HTMLImageElement,
+  toImg: HTMLImageElement,
+  width: number,
+  height: number,
+  progress: number,
+  fromIndex: number,
+  toIndex: number
+): void {
+  const offset = width * (1 - progress);
+  
+  // Draw "from" image sliding left
+  ctx.save();
+  ctx.translate(-width * progress, 0);
+  drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
+  ctx.restore();
+  
+  // Draw "to" image sliding in from right
+  ctx.save();
+  ctx.translate(offset, 0);
+  drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
+  ctx.restore();
+}
+
+/**
+ * Zoom transition - zoom out from current, zoom in to next
+ */
+function drawZoomTransition(
+  ctx: CanvasRenderingContext2D,
+  fromImg: HTMLImageElement,
+  toImg: HTMLImageElement,
+  width: number,
+  height: number,
+  progress: number,
+  fromIndex: number,
+  toIndex: number
+): void {
+  const centerX = width / 2;
+  const centerY = height / 2;
+  
+  // Draw "from" image zooming out with fade
+  ctx.save();
+  ctx.globalAlpha = 1 - progress;
+  const fromScale = 1 + progress * 0.15; // Zoom out slightly
+  ctx.translate(centerX, centerY);
+  ctx.scale(fromScale, fromScale);
+  ctx.translate(-centerX, -centerY);
+  drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
+  ctx.restore();
+  
+  // Draw "to" image zooming in with fade
+  ctx.save();
+  ctx.globalAlpha = progress;
+  const toScale = 0.85 + progress * 0.15; // Start zoomed out, end at 1
+  ctx.translate(centerX, centerY);
+  ctx.scale(toScale, toScale);
+  ctx.translate(-centerX, -centerY);
+  drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
+  ctx.restore();
 }
 
 /**
@@ -628,6 +805,12 @@ export async function generateVideoFromSegments(
 
   console.log("[VideoEncoder] Starting video generation with branding...");
   console.log(`[VideoEncoder] Segments: ${segments.length}, FPS: ${fps}`);
+  console.log("[VideoEncoder] Segment details:", segments.map((s, i) => ({
+    index: i,
+    duration: s.duration,
+    hasImage: !!s.imageUrl,
+    textPreview: s.text?.substring(0, 30) + "..."
+  })));
   
   // Validate segments have content and duration
   const validSegments = segments.filter(s => s.imageUrl && s.duration > 0);
@@ -635,11 +818,16 @@ export async function generateVideoFromSegments(
     throw new Error("Nenhum segmento válido para gerar vídeo. Verifique se as imagens foram geradas.");
   }
   
+  if (validSegments.length !== segments.length) {
+    console.warn(`[VideoEncoder] ${segments.length - validSegments.length} segments filtered out (missing image or zero duration)`);
+  }
+  
   // Use validated segments
   const workingSegments = validSegments.length < segments.length 
     ? validSegments 
     : segments;
   console.log(`[VideoEncoder] Brand: ${brandName}, Handle: ${instagramHandle}`);
+  console.log(`[VideoEncoder] Working with ${workingSegments.length} valid segments`);
 
   // Pre-load all images
   const imagePromises = workingSegments.map(async (seg, index) => {
