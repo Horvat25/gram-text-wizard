@@ -168,29 +168,25 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     
     try {
       const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
-      const shouldPublish = currentVideo?.overlay_metadata?.publish_after_render;
+      const videoTitle = currentVideo?.overlay_metadata?.script?.title || 'Vídeo';
       
-      // Update post with video URL
+      // ALWAYS save as draft without scheduling - user will schedule manually
+      // This prevents duplicate/overlapping posts
       await supabase
         .from('posts')
         .update({
           video_url: videoUrl,
           overlay_metadata: null,
-          status: shouldPublish ? 'scheduled' : 'draft',
-          scheduled_for: shouldPublish ? new Date().toISOString() : null
+          status: 'draft',
+          scheduled_for: null // Clear any existing schedule
         })
         .eq('id', videoId);
 
-      // Auto-publish if flagged
-      if (shouldPublish) {
-        const { error: publishError } = await supabase.functions.invoke('publish-post', {
-          body: { postId: videoId }
-        });
-        
-        if (!publishError) {
-          notifyPostPublished('Instagram');
-        }
-      }
+      // Show success toast with reminder to schedule
+      toast.success(`✅ "${videoTitle}" renderizado!`, {
+        description: 'Agende manualmente quando quiser publicar.',
+        duration: 5000
+      });
 
       setCompletedCount(prev => prev + 1);
       
