@@ -7,33 +7,34 @@ const corsHeaders = {
 };
 
 /**
- * Text-to-Speech using Bark (Suno) via Hugging Face Inference API
+ * Text-to-Speech using multiple Hugging Face models with intelligent fallback
  * 
- * Bark is a multilingual TTS model that produces natural, human-like speech.
- * Free tier: ~1000 requests/month (can have queue delays)
- * 
- * Best practices for Bark:
- * - Short sentences (2-3 per segment)
- * - Clear, direct language
- * - Portuguese (pt-BR) supported natively
+ * Priority:
+ * 1. Parler-TTS Mini (Natural, expressive - works best!)
+ * 2. Microsoft SpeechT5 (Good quality, multilingual)
+ * 3. ESPnet VITS (Fast, decent quality)
+ * 4. Fallback flag for client to use browser TTS
  */
 
-// Updated to new Hugging Face router endpoint (api-inference is deprecated)
-const HF_API_URL = "https://router.huggingface.co/hf-inference/models/suno/bark";
-const HF_BARK_SMALL_URL = "https://router.huggingface.co/hf-inference/models/suno/bark-small";
+// Hugging Face Inference API v2 endpoints
+const HF_ENDPOINTS = {
+  parler: "https://router.huggingface.co/hf-inference/models/parler-tts/parler-tts-mini-multilingual-v1.1",
+  speechT5: "https://router.huggingface.co/hf-inference/models/microsoft/speecht5_tts",
+  vits: "https://router.huggingface.co/hf-inference/models/facebook/mms-tts-por",
+  // Alternative endpoints
+  parlerLarge: "https://router.huggingface.co/hf-inference/models/parler-tts/parler-tts-large-v1",
+  espnet: "https://router.huggingface.co/hf-inference/models/espnet/kan-bayashi_ljspeech_vits",
+};
 
-// Bark voice presets for Portuguese
-const VOICE_PRESETS: Record<string, string> = {
-  // Portuguese speakers (neutral news-style)
-  "camila": "v2/pt_speaker_1",  // Female, neutral
-  "vitoria": "v2/pt_speaker_2", // Female, warm
-  "ricardo": "v2/pt_speaker_3", // Male, authoritative
-  "thiago": "v2/pt_speaker_4",  // Male, neutral
-  // English fallbacks
-  "brian": "v2/en_speaker_0",
-  "joanna": "v2/en_speaker_1",
-  // Default
-  "default": "v2/pt_speaker_1",
+// Voice descriptions for Parler-TTS (natural language)
+const PARLER_VOICES: Record<string, string> = {
+  "camila": "A female speaker with a warm, professional voice delivers the news in Brazilian Portuguese with clear enunciation and moderate pace.",
+  "vitoria": "A young female speaker with an enthusiastic, engaging voice speaks in Brazilian Portuguese with energy and warmth.",
+  "francisca": "A mature female speaker with a calm, authoritative voice narrates in Portuguese with clarity and confidence.",
+  "antonio": "A male speaker with a deep, professional voice delivers news in Brazilian Portuguese with authority and clarity.",
+  "ricardo": "A young male speaker with an energetic, modern voice speaks in Portuguese with enthusiasm.",
+  "thiago": "A male speaker with a friendly, conversational tone narrates in Brazilian Portuguese naturally.",
+  "default": "A professional speaker with a clear, warm voice delivers content in Brazilian Portuguese with good pacing.",
 };
 
 interface BarkRequest {
@@ -69,33 +70,55 @@ serve(async (req) => {
       );
     }
 
-    // Get voice preset
     const voiceKey = voice?.toLowerCase() || "default";
-    const voicePreset = VOICE_PRESETS[voiceKey] || VOICE_PRESETS["default"];
+    const voiceDescription = PARLER_VOICES[voiceKey] || PARLER_VOICES["default"];
     
-    console.log(`[Bark TTS] Voice: ${voiceKey} -> Preset: ${voicePreset}`);
+    console.log(`[Bark TTS] Voice: ${voiceKey}`);
     console.log(`[Bark TTS] Text length: ${text.length} chars`);
     console.log(`[Bark TTS] Text preview: "${text.substring(0, 100)}..."`);
 
-    // Prepare text for Bark (optimize for news narration)
-    // Bark works best with shorter segments and clear punctuation
-    const optimizedText = optimizeTextForBark(text);
+    // Optimize text for TTS
+    const optimizedText = optimizeTextForTTS(text);
     console.log(`[Bark TTS] Optimized text length: ${optimizedText.length} chars`);
 
-    // Try Bark full model first, then bark-small as fallback
     let audioBuffer: ArrayBuffer | null = null;
-    let usedModel = "bark";
+    let usedModel = "unknown";
     
+    // Try Parler-TTS first (best quality for narration)
     try {
-      audioBuffer = await callBarkAPI(HF_API_KEY, HF_API_URL, optimizedText, voicePreset);
+      console.log("[Bark TTS] Trying Parler-TTS Mini Multilingual...");
+      audioBuffer = await callParlerTTS(HF_API_KEY, optimizedText, voiceDescription);
+      usedModel = "parler-tts";
     } catch (e: any) {
-      console.warn(`[Bark TTS] Full model failed: ${e.message}, trying bark-small...`);
+      console.warn(`[Bark TTS] Parler failed: ${e.message}`);
+      
+      // Try Microsoft SpeechT5
       try {
-        audioBuffer = await callBarkAPI(HF_API_KEY, HF_BARK_SMALL_URL, optimizedText, voicePreset);
-        usedModel = "bark-small";
+        console.log("[Bark TTS] Trying Microsoft SpeechT5...");
+        audioBuffer = await callSpeechT5(HF_API_KEY, optimizedText);
+        usedModel = "speecht5";
       } catch (e2: any) {
-        console.error(`[Bark TTS] Both models failed:`, e2);
-        throw e2;
+        console.warn(`[Bark TTS] SpeechT5 failed: ${e2.message}`);
+        
+        // Try Facebook MMS-TTS
+        try {
+          console.log("[Bark TTS] Trying Facebook MMS-TTS...");
+          audioBuffer = await callMMSTTS(HF_API_KEY, optimizedText);
+          usedModel = "mms-tts";
+        } catch (e3: any) {
+          console.warn(`[Bark TTS] MMS-TTS failed: ${e3.message}`);
+          
+          // Return fallback flag
+          console.log("[Bark TTS] All models failed, returning fallback");
+          return new Response(
+            JSON.stringify({ 
+              error: "Todos os modelos TTS falharam",
+              fallback: true,
+              isLoading: false,
+            }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
 
@@ -109,7 +132,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         audioContent: base64Audio,
-        format: "wav", // Bark outputs WAV
+        format: "wav",
         voice: voiceKey,
         model: usedModel,
         duration_estimate: Math.ceil(text.length / 12),
@@ -119,14 +142,11 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("[Bark TTS] Error:", error);
     
-    // Check if it's a queue/loading error (common with free tier)
-    const isLoading = error.message?.includes("loading") || error.message?.includes("queue");
-    
     return new Response(
       JSON.stringify({ 
         error: error.message || "Erro ao gerar narração",
         fallback: true,
-        isLoading,
+        isLoading: false,
       }),
       { 
         status: 200, // Return 200 so client can fallback gracefully
@@ -137,37 +157,28 @@ serve(async (req) => {
 });
 
 /**
- * Optimize text for Bark TTS
- * - Short sentences
- * - Clear punctuation
- * - Remove special characters that confuse the model
+ * Optimize text for TTS
  */
-function optimizeTextForBark(text: string): string {
+function optimizeTextForTTS(text: string): string {
   return text
-    // Normalize whitespace
     .replace(/\s+/g, ' ')
-    // Ensure proper sentence endings
     .replace(/([.!?])\s*/g, '$1 ')
-    // Remove multiple punctuation
     .replace(/[.!?]{2,}/g, '.')
-    // Remove emojis and special chars
     .replace(/[\u{1F600}-\u{1F6FF}]/gu, '')
     .replace(/[""'']/g, '"')
-    // Add pauses after commas for better rhythm
     .replace(/,\s*/g, ', ')
     .trim();
 }
 
 /**
- * Call Hugging Face Bark API
+ * Call Parler-TTS API (Natural language voice descriptions)
  */
-async function callBarkAPI(
+async function callParlerTTS(
   apiKey: string, 
-  apiUrl: string, 
   text: string, 
-  voicePreset: string
+  voiceDescription: string
 ): Promise<ArrayBuffer> {
-  const response = await fetch(apiUrl, {
+  const response = await fetch(HF_ENDPOINTS.parler, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
@@ -176,35 +187,84 @@ async function callBarkAPI(
     body: JSON.stringify({
       inputs: text,
       parameters: {
-        voice_preset: voicePreset,
+        description: voiceDescription,
       },
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[Bark TTS] API Error: ${response.status} - ${errorText}`);
-    
-    // Check for common Hugging Face errors
-    if (response.status === 503) {
-      throw new Error("Model is loading, please retry in a few seconds");
-    }
-    if (response.status === 429) {
-      throw new Error("Rate limit exceeded, please retry later");
-    }
-    
-    throw new Error(`Bark API error: ${response.status}`);
+    console.error(`[Bark TTS] Parler error: ${response.status} - ${errorText}`);
+    throw new Error(`Parler error: ${response.status}`);
   }
 
   const contentType = response.headers.get("content-type") || "";
-  
-  // Check if response is JSON (error) instead of audio
   if (contentType.includes("application/json")) {
-    const jsonResponse = await response.json();
-    if (jsonResponse.error) {
-      throw new Error(jsonResponse.error);
-    }
-    throw new Error("Unexpected JSON response from Bark API");
+    const json = await response.json();
+    if (json.error) throw new Error(json.error);
+    throw new Error("Unexpected JSON response");
+  }
+
+  return await response.arrayBuffer();
+}
+
+/**
+ * Call Microsoft SpeechT5 API
+ */
+async function callSpeechT5(apiKey: string, text: string): Promise<ArrayBuffer> {
+  const response = await fetch(HF_ENDPOINTS.speechT5, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      inputs: text,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[Bark TTS] SpeechT5 error: ${response.status} - ${errorText}`);
+    throw new Error(`SpeechT5 error: ${response.status}`);
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    const json = await response.json();
+    if (json.error) throw new Error(json.error);
+    throw new Error("Unexpected JSON response");
+  }
+
+  return await response.arrayBuffer();
+}
+
+/**
+ * Call Facebook MMS-TTS API (Portuguese)
+ */
+async function callMMSTTS(apiKey: string, text: string): Promise<ArrayBuffer> {
+  const response = await fetch(HF_ENDPOINTS.vits, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      inputs: text,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[Bark TTS] MMS-TTS error: ${response.status} - ${errorText}`);
+    throw new Error(`MMS-TTS error: ${response.status}`);
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    const json = await response.json();
+    if (json.error) throw new Error(json.error);
+    throw new Error("Unexpected JSON response");
   }
 
   return await response.arrayBuffer();
