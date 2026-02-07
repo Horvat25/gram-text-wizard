@@ -225,15 +225,15 @@ function formatBrasiliaTime(isoString: string): string {
 }
 
 // Tool execution functions
-async function executeCreatePosts(supabase: any, userId: string, args: any) {
+async function executeCreatePosts(supabase: any, userId: string, workspaceId: string, args: any) {
   const { posts } = args;
   const createdPosts = [];
   
-  // Check if user has auto_post_enabled
+  // Check if workspace has auto_post_enabled
   const { data: agentContext } = await supabase
     .from('agent_context')
     .select('auto_post_enabled')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .maybeSingle();
   
   const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
@@ -249,6 +249,7 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
     
     const postData = {
       user_id: userId,
+      workspace_id: workspaceId,
       caption: post.caption,
       hashtags: post.hashtags || [],
       post_type: post.post_type || 'engajamento',
@@ -387,7 +388,7 @@ async function executeCreatePosts(supabase: any, userId: string, args: any) {
   };
 }
 
-async function executeGenerateImage(supabase: any, userId: string, args: any) {
+async function executeGenerateImage(supabase: any, userId: string, workspaceId: string, args: any) {
   const { post_id, image_prompt } = args;
   
   // Call the generate-image function
@@ -417,7 +418,7 @@ async function executeGenerateImage(supabase: any, userId: string, args: any) {
       .from('posts')
       .update({ image_url: result.imageUrl })
       .eq('id', post_id)
-      .eq('user_id', userId);
+      .eq('workspace_id', workspaceId);
   }
   
   return {
@@ -427,7 +428,7 @@ async function executeGenerateImage(supabase: any, userId: string, args: any) {
   };
 }
 
-async function executeSchedulePost(supabase: any, userId: string, args: any) {
+async function executeSchedulePost(supabase: any, userId: string, workspaceId: string, args: any) {
   const { post_id, scheduled_for } = args;
   
   // Convert to UTC for storage
@@ -447,7 +448,7 @@ async function executeSchedulePost(supabase: any, userId: string, args: any) {
       scheduled_for: scheduledForUTC
     })
     .eq('id', post_id)
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .select()
     .single();
   
@@ -463,7 +464,7 @@ async function executeSchedulePost(supabase: any, userId: string, args: any) {
   };
 }
 
-async function executeGetPerformance(supabase: any, userId: string, args: any) {
+async function executeGetPerformance(supabase: any, userId: string, workspaceId: string, args: any) {
   const days = args.days || 30;
   const since = new Date();
   since.setDate(since.getDate() - days);
@@ -471,7 +472,7 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
   const { data: posts, error } = await supabase
     .from('posts')
     .select('*')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .eq('status', 'published')
     .gte('published_at', since.toISOString())
     .order('published_at', { ascending: false });
@@ -559,16 +560,16 @@ async function executeGetPerformance(supabase: any, userId: string, args: any) {
 }
 
 // NEW: Detailed analytics function that queries REAL data from database
-async function executeDetailedAnalytics(supabase: any, userId: string, args: any) {
+async function executeDetailedAnalytics(supabase: any, userId: string, workspaceId: string, args: any) {
   const { query_type, days = 30 } = args;
   const since = new Date();
   since.setDate(since.getDate() - days);
 
-  // Fetch ALL posts for this user
+  // Fetch ALL posts for this workspace
   const { data: allPosts, error } = await supabase
     .from('posts')
     .select('*')
-    .eq('user_id', userId);
+    .eq('workspace_id', workspaceId);
 
   if (error) {
     return { success: false, message: `❌ Erro ao buscar dados: ${error.message}` };
@@ -763,14 +764,14 @@ async function executeDetailedAnalytics(supabase: any, userId: string, args: any
   }
 }
 
-async function executeRunAgent(supabase: any, userId: string) {
+async function executeRunAgent(supabase: any, userId: string, workspaceId: string) {
   const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/ai-agent-core`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
     },
-    body: JSON.stringify({ userId })
+    body: JSON.stringify({ userId, workspaceId })
   });
   
   if (!response.ok) {
@@ -792,14 +793,14 @@ async function executeRunAgent(supabase: any, userId: string) {
   };
 }
 
-async function executeListPosts(supabase: any, userId: string, args: any) {
+async function executeListPosts(supabase: any, userId: string, workspaceId: string, args: any) {
   const status = args.status || 'all';
   const limit = args.limit || 10;
   
   let query = supabase
     .from('posts')
     .select('id, caption, status, scheduled_for, published_at, likes_count, created_at')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .order('created_at', { ascending: false })
     .limit(limit);
   
@@ -826,14 +827,14 @@ async function executeListPosts(supabase: any, userId: string, args: any) {
   };
 }
 
-async function executeDeletePost(supabase: any, userId: string, args: any) {
+async function executeDeletePost(supabase: any, userId: string, workspaceId: string, args: any) {
   const { post_id } = args;
   
   const { error } = await supabase
     .from('posts')
     .delete()
     .eq('id', post_id)
-    .eq('user_id', userId);
+    .eq('workspace_id', workspaceId);
   
   if (error) {
     return { success: false, message: `❌ Erro ao deletar: ${error.message}` };
@@ -845,12 +846,12 @@ async function executeDeletePost(supabase: any, userId: string, args: any) {
   };
 }
 
-async function executeUpdateSettings(supabase: any, userId: string, args: any) {
+async function executeUpdateSettings(supabase: any, userId: string, workspaceId: string, args: any) {
   // Check if context exists
   const { data: existing } = await supabase
     .from('agent_context')
     .select('id')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .maybeSingle();
   
   const updateData: any = {};
@@ -864,7 +865,7 @@ async function executeUpdateSettings(supabase: any, userId: string, args: any) {
     const { error } = await supabase
       .from('agent_context')
       .update(updateData)
-      .eq('user_id', userId);
+      .eq('workspace_id', workspaceId);
     
     if (error) {
       return { success: false, message: `❌ Erro: ${error.message}` };
@@ -887,10 +888,10 @@ async function executeUpdateSettings(supabase: any, userId: string, args: any) {
 }
 
 // Execute create_narrated_video - creates a video post with script for frontend processing
-async function executeCreateNarratedVideo(supabase: any, userId: string, args: any) {
+async function executeCreateNarratedVideo(supabase: any, userId: string, workspaceId: string, args: any) {
   const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style } = args;
   
-  console.log('Creating narrated video for topic:', topic, '| publish_now:', publish_now);
+  console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
   
   try {
     // Step 1: Generate the story script using AI
@@ -950,6 +951,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, args: a
     
     const postData = {
       user_id: userId,
+      workspace_id: workspaceId,
       caption: caption || `🎬 ${script.title}\n\n${topic}`,
       hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
       post_type: 'entretenimento',
@@ -1017,7 +1019,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, args: a
 }
 
 // Execute create_carousel - creates a carousel post with multiple images
-async function executeCreateCarousel(supabase: any, userId: string, args: any) {
+async function executeCreateCarousel(supabase: any, userId: string, workspaceId: string, args: any) {
   const { caption, slides, hashtags, scheduled_for, platforms } = args;
   
   if (!slides || slides.length < 2) {
@@ -1116,7 +1118,7 @@ async function executeCreateCarousel(supabase: any, userId: string, args: any) {
 
 // Execute create_news_post - fetches real news, uses article image, includes source
 // With AI fallback when Firecrawl is unavailable
-async function executeCreateNewsPost(supabase: any, userId: string, args: any) {
+async function executeCreateNewsPost(supabase: any, userId: string, workspaceId: string, args: any) {
   const { 
     topic, 
     headline_text,
@@ -1361,7 +1363,7 @@ Proporção quadrada 1:1 para Instagram.`;
 }
 
 // Execute create curated post (with real web image, or AI fallback with headline overlay)
-async function executeCreateCuratedPost(supabase: any, userId: string, args: any) {
+async function executeCreateCuratedPost(supabase: any, userId: string, workspaceId: string, args: any) {
   const { 
     search_query, 
     headline_text, 
@@ -1592,7 +1594,7 @@ Proporção quadrada 1:1 para Instagram.`;
 
 // Execute create_rss_news_post - Main method for creating posts from RSS
 // Now with theme_tags for invisible analytics and human delay for natural publishing
-async function executeCreateRssNewsPost(supabase: any, userId: string, args: any) {
+async function executeCreateRssNewsPost(supabase: any, userId: string, workspaceId: string, args: any) {
   const { 
     topic_filter,
     headline_text,
@@ -1614,7 +1616,7 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
     let query = supabase
       .from('rss_items')
       .select('*')
-      .eq('user_id', userId)
+      .eq('workspace_id', workspaceId)
       .eq('is_used', false)
       .eq('has_image', true)
       .order('fetched_at', { ascending: false });
@@ -1727,6 +1729,7 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
     
     const { data: post, error } = await supabase.from('posts').insert({
       user_id: userId,
+      workspace_id: workspaceId,
       caption,
       hashtags: ['#tecnologia', '#noticias', '#inovacao', '#tech', '#ia'],
       post_type: 'noticia',
@@ -1809,10 +1812,10 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, args: any
 }
 
 // Execute refresh_rss_feeds - Fetch new RSS content
-async function executeRefreshRssFeeds(supabase: any, userId: string, args: any) {
+async function executeRefreshRssFeeds(supabase: any, userId: string, workspaceId: string, args: any) {
   const { limit = 10 } = args;
   
-  console.log('[REFRESH_RSS] Fetching RSS feeds for user:', userId);
+  console.log('[REFRESH_RSS] Fetching RSS feeds for workspace:', workspaceId);
   
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -1826,6 +1829,7 @@ async function executeRefreshRssFeeds(supabase: any, userId: string, args: any) 
       },
       body: JSON.stringify({
         userId,
+        workspaceId,
         saveToDb: true,
         limit
       })
@@ -1855,14 +1859,14 @@ async function executeRefreshRssFeeds(supabase: any, userId: string, args: any) 
 }
 
 // Execute list_available_news - Show available RSS items
-async function executeListAvailableNews(supabase: any, userId: string, args: any) {
+async function executeListAvailableNews(supabase: any, userId: string, workspaceId: string, args: any) {
   const { only_with_images = true, limit = 10, source_filter } = args;
   
   try {
     let query = supabase
       .from('rss_items')
       .select('id, title, description, source_name, has_image, fetched_at')
-      .eq('user_id', userId)
+      .eq('workspace_id', workspaceId)
       .eq('is_used', false)
       .order('fetched_at', { ascending: false })
       .limit(limit);
@@ -1916,47 +1920,47 @@ async function executeListAvailableNews(supabase: any, userId: string, args: any
 }
 
 // Execute a tool call
-async function executeTool(supabase: any, userId: string, toolName: string, args: any) {
+async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
     // RSS-based tools (NEW - PRIMARY)
     case 'create_rss_news_post':
-      return executeCreateRssNewsPost(supabase, userId, args);
+      return executeCreateRssNewsPost(supabase, userId, workspaceId, args);
     case 'refresh_rss_feeds':
-      return executeRefreshRssFeeds(supabase, userId, args);
+      return executeRefreshRssFeeds(supabase, userId, workspaceId, args);
     case 'list_available_news':
-      return executeListAvailableNews(supabase, userId, args);
+      return executeListAvailableNews(supabase, userId, workspaceId, args);
     
     // Video tool (MAINTAINED)
     case 'create_narrated_video':
-      return executeCreateNarratedVideo(supabase, userId, args);
+      return executeCreateNarratedVideo(supabase, userId, workspaceId, args);
     
     // Utility tools
     case 'schedule_post':
-      return executeSchedulePost(supabase, userId, args);
+      return executeSchedulePost(supabase, userId, workspaceId, args);
     case 'get_performance_data':
-      return executeGetPerformance(supabase, userId, args);
+      return executeGetPerformance(supabase, userId, workspaceId, args);
     case 'get_detailed_analytics':
-      return executeDetailedAnalytics(supabase, userId, args);
+      return executeDetailedAnalytics(supabase, userId, workspaceId, args);
     case 'run_autonomous_agent':
-      return executeRunAgent(supabase, userId);
+      return executeRunAgent(supabase, userId, workspaceId);
     case 'list_posts':
-      return executeListPosts(supabase, userId, args);
+      return executeListPosts(supabase, userId, workspaceId, args);
     case 'delete_post':
-      return executeDeletePost(supabase, userId, args);
+      return executeDeletePost(supabase, userId, workspaceId, args);
     case 'update_agent_settings':
-      return executeUpdateSettings(supabase, userId, args);
+      return executeUpdateSettings(supabase, userId, workspaceId, args);
     
     // Legacy tools (kept for backwards compatibility, but won't be suggested)
     case 'create_posts':
-      return executeCreatePosts(supabase, userId, args);
+      return executeCreatePosts(supabase, userId, workspaceId, args);
     case 'generate_image_for_post':
-      return executeGenerateImage(supabase, userId, args);
+      return executeGenerateImage(supabase, userId, workspaceId, args);
     case 'create_carousel':
-      return executeCreateCarousel(supabase, userId, args);
+      return executeCreateCarousel(supabase, userId, workspaceId, args);
     case 'create_news_post':
-      return executeCreateNewsPost(supabase, userId, args);
+      return executeCreateNewsPost(supabase, userId, workspaceId, args);
     case 'create_curated_post':
-      return executeCreateCuratedPost(supabase, userId, args);
+      return executeCreateCuratedPost(supabase, userId, workspaceId, args);
     
     default:
       return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
@@ -1969,10 +1973,17 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, userId } = await req.json();
+    const { messages, userId, workspaceId } = await req.json();
     
     if (!userId) {
       return new Response(JSON.stringify({ error: 'userId is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    if (!workspaceId) {
+      return new Response(JSON.stringify({ error: 'workspaceId is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -1988,11 +1999,11 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch context
+    // Fetch context using workspaceId
     const { data: context } = await supabase
       .from('agent_context')
       .select('*')
-      .eq('user_id', userId)
+      .eq('workspace_id', workspaceId)
       .maybeSingle();
 
     const { data: recentPosts } = await supabase
@@ -2234,7 +2245,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
         
         console.log(`Executing tool: ${toolName}`, toolArgs);
         
-        const result = await executeTool(supabase, userId, toolName, toolArgs);
+        const result = await executeTool(supabase, userId, workspaceId, toolName, toolArgs);
         toolResults.push({
           tool_call_id: toolCall.id,
           role: 'tool',
