@@ -18,8 +18,9 @@ const corsHeaders = {
  * - Portuguese (pt-BR) supported natively
  */
 
-const HF_API_URL = "https://api-inference.huggingface.co/models/suno/bark";
-const HF_BARK_SMALL_URL = "https://api-inference.huggingface.co/models/suno/bark-small";
+// Updated to new Hugging Face router endpoint (api-inference is deprecated)
+const HF_API_URL = "https://router.huggingface.co/hf-inference/models/suno/bark";
+const HF_BARK_SMALL_URL = "https://router.huggingface.co/hf-inference/models/suno/bark-small";
 
 // Bark voice presets for Portuguese
 const VOICE_PRESETS: Record<string, string> = {

@@ -298,11 +298,36 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     // Helper to try TTS providers: Edge TTS (Microsoft Neural) → Lovable TTS → Free TTS
     // 100% FREE and high-quality neural voices!
+    // REORDERED: Bark FIRST for testing, then Edge TTS, then others
     const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
-      // 🎯 Try Edge TTS FIRST (Microsoft Azure Neural Voices - BEST quality, FREE!)
-      // Same voices used by Microsoft Edge browser - very natural and professional
+      // 🎯 Try Bark TTS FIRST (Hugging Face - neural voices, testing priority)
       try {
-        console.log(`[TTS] 🎯 Trying Edge TTS (Microsoft Neural) with voice: ${preferredVoice}...`);
+        console.log(`[TTS] 🎯 Trying Bark TTS FIRST (Hugging Face) with voice: ${preferredVoice}...`);
+        const barkResult = await supabase.functions.invoke("huggingface-bark-tts", {
+          body: { text, voice: preferredVoice, language: "pt-BR" },
+        });
+        
+        const audioContent = barkResult.data?.audioContent;
+        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
+        const hasFallbackFlag = barkResult.data?.fallback === true;
+        
+        if (!barkResult.error && isValidAudio && !hasFallbackFlag) {
+          const format = barkResult.data?.format || "wav";
+          console.log(`[TTS] ✅ Bark TTS success! Audio size: ${audioContent.length} chars`);
+          toast.success(`🎙️ Narração neural gerada (Bark/Suno)`);
+          return { 
+            url: `data:audio/${format};base64,${audioContent}`,
+            provider: "Bark"
+          };
+        }
+        console.log("[TTS] ⚠️ Bark failed:", barkResult.data?.error || "model loading or rate-limited");
+      } catch (e) {
+        console.error("[TTS] ❌ Bark TTS error:", e);
+      }
+      
+      // 🔄 Fallback 1: Edge TTS (Microsoft Azure Neural Voices - also FREE!)
+      try {
+        console.log(`[TTS] Trying Edge TTS (Microsoft Neural) with voice: ${preferredVoice}...`);
         const edgeResult = await supabase.functions.invoke("edge-tts", {
           body: { text, voice: preferredVoice },
         });
@@ -329,7 +354,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.error("[TTS] ❌ Edge TTS error:", e);
       }
       
-      // 🔄 Fallback to Lovable TTS (StreamElements/Polly - also high quality)
+      // 🔄 Fallback 2: Lovable TTS (StreamElements/Polly - also high quality)
       try {
         console.log(`[TTS] Trying Lovable TTS (Polly) with voice: ${preferredVoice}...`);
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
@@ -347,31 +372,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.log("[TTS] ⚠️ Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
       } catch (e) {
         console.log("[TTS] Lovable TTS error:", e);
-      }
-      
-      // 🔄 Try Bark TTS (Hugging Face - neural but often has queue delays)
-      try {
-        console.log(`[TTS] Trying Bark TTS (Hugging Face) with voice: ${preferredVoice}...`);
-        const barkResult = await supabase.functions.invoke("huggingface-bark-tts", {
-          body: { text, voice: preferredVoice, language: "pt-BR" },
-        });
-        
-        const audioContent = barkResult.data?.audioContent;
-        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-        const hasFallbackFlag = barkResult.data?.fallback === true;
-        
-        if (!barkResult.error && isValidAudio && !hasFallbackFlag) {
-          const format = barkResult.data?.format || "wav";
-          console.log(`[TTS] ✅ Bark TTS success! Audio size: ${audioContent.length} chars`);
-          toast.success(`🎙️ Narração neural gerada (Bark/Suno)`);
-          return { 
-            url: `data:audio/${format};base64,${audioContent}`,
-            provider: "Bark"
-          };
-        }
-        console.log("[TTS] ⚠️ Bark failed (model loading or rate-limited)");
-      } catch (e) {
-        console.log("[TTS] Bark TTS error:", e);
       }
       
       // 🆓 Last resort: Free TTS (Google Translate - robotic but always works)

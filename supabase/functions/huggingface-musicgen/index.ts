@@ -18,8 +18,9 @@ const corsHeaders = {
  * - Analysis: neutral, professional, ambient
  */
 
-const HF_API_URL = "https://api-inference.huggingface.co/models/facebook/musicgen-small";
-const HF_MUSICGEN_MEDIUM_URL = "https://api-inference.huggingface.co/models/facebook/musicgen-medium";
+// Updated to new Hugging Face router endpoint (api-inference is deprecated)
+const HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/musicgen-small";
+const HF_MUSICGEN_MEDIUM_URL = "https://router.huggingface.co/hf-inference/models/facebook/musicgen-medium";
 
 // Prompt templates for different content types
 const MOOD_PROMPTS: Record<string, string> = {
