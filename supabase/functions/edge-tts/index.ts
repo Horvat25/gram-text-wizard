@@ -7,121 +7,150 @@ const corsHeaders = {
 };
 
 /**
- * Free TTS using VoiceRSS API (neural voices, actually free!)
- * Much better quality than Google Translate TTS
+ * Free TTS using Microsoft Azure Edge Neural Voices
+ * These are the SAME voices used by Microsoft Edge browser - high quality, natural sounding!
+ * 
+ * Free alternatives with neural quality:
+ * 1. Microsoft Edge TTS (via edge-tts Python library API proxy)
+ * 2. StreamElements (uses Amazon Polly under the hood)
+ * 3. Google Translate TTS (last resort)
  */
 
 interface VoiceConfig {
   name: string;
-  voiceRSSVoice: string;
+  msVoice: string;  // Microsoft Edge voice name
+  pollyVoice: string; // Amazon Polly voice for StreamElements fallback
   lang: string;
-  gender: string;
 }
 
-// VoiceRSS Brazilian Portuguese voices - natural neural quality
+// Microsoft Edge TTS voices - Brazilian Portuguese (EXCELLENT quality!)
 const VOICES: Record<string, VoiceConfig> = {
-  // Brazilian Portuguese - Female (natural, not robotic)
-  "camila": { name: "Camila", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
-  "vitoria": { name: "Vitória", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
-  "francisca": { name: "Francisca", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
+  // Brazilian Portuguese - Female (most natural)
+  "camila": { name: "Camila", msVoice: "pt-BR-FranciscaNeural", pollyVoice: "Camila", lang: "pt-BR" },
+  "francisca": { name: "Francisca", msVoice: "pt-BR-FranciscaNeural", pollyVoice: "Camila", lang: "pt-BR" },
+  "vitoria": { name: "Vitória", msVoice: "pt-BR-FranciscaNeural", pollyVoice: "Vitoria", lang: "pt-BR" },
+  "leticia": { name: "Letícia", msVoice: "pt-BR-LeticiaNeural", pollyVoice: "Camila", lang: "pt-BR" },
+  "manuela": { name: "Manuela", msVoice: "pt-BR-ManuelaNeural", pollyVoice: "Camila", lang: "pt-BR" },
+  "yara": { name: "Yara", msVoice: "pt-BR-YaraNeural", pollyVoice: "Camila", lang: "pt-BR" },
+  "elza": { name: "Elza", msVoice: "pt-BR-ElzaNeural", pollyVoice: "Camila", lang: "pt-BR" },
+  "brenda": { name: "Brenda", msVoice: "pt-BR-BrendaNeural", pollyVoice: "Camila", lang: "pt-BR" },
   // Brazilian Portuguese - Male
-  "thiago": { name: "Thiago", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Male" },
-  "ricardo": { name: "Ricardo", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Male" },
-  "antonio": { name: "Antonio", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Male" },
-  // Portuguese Portugal
-  "fernanda": { name: "Fernanda", voiceRSSVoice: "Luciana", lang: "pt-br", gender: "Female" },
-  // English voices
-  "matthew": { name: "Matthew", voiceRSSVoice: "John", lang: "en-us", gender: "Male" },
-  "joanna": { name: "Joanna", voiceRSSVoice: "Mary", lang: "en-us", gender: "Female" },
-  "brian": { name: "Brian", voiceRSSVoice: "John", lang: "en-gb", gender: "Male" },
+  "antonio": { name: "Antonio", msVoice: "pt-BR-AntonioNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  "ricardo": { name: "Ricardo", msVoice: "pt-BR-AntonioNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  "thiago": { name: "Thiago", msVoice: "pt-BR-AntonioNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  "fábio": { name: "Fábio", msVoice: "pt-BR-FabioNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  "humberto": { name: "Humberto", msVoice: "pt-BR-HumbertoNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  "julio": { name: "Julio", msVoice: "pt-BR-JulioNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  "nicolau": { name: "Nicolau", msVoice: "pt-BR-NicolauNeural", pollyVoice: "Ricardo", lang: "pt-BR" },
+  // English
+  "matthew": { name: "Matthew", msVoice: "en-US-GuyNeural", pollyVoice: "Matthew", lang: "en-US" },
+  "joanna": { name: "Joanna", msVoice: "en-US-JennyNeural", pollyVoice: "Joanna", lang: "en-US" },
 };
 
 const DEFAULT_VOICE = "camila";
 
-// VoiceRSS API Key (free tier - 350 requests/day)
-const VOICERSS_API_KEY = "f16d908cfc664ad7a5b13a89f4de84a4";
-
 /**
- * Generate speech using VoiceRSS API (free, neural quality)
+ * Get Microsoft Edge TTS authorization token
+ * This is the same method Edge browser uses!
  */
-async function generateVoiceRSSTTS(text: string, voiceKey: string = DEFAULT_VOICE): Promise<Uint8Array> {
-  const voice = VOICES[voiceKey] || VOICES[DEFAULT_VOICE];
-  
-  console.log(`[EdgeTTS] Using VoiceRSS voice: ${voice.voiceRSSVoice} (${voice.lang})`);
-  console.log(`[EdgeTTS] Text length: ${text.length} chars`);
-  
-  const params = new URLSearchParams({
-    key: VOICERSS_API_KEY,
-    src: text,
-    hl: voice.lang,
-    v: voice.voiceRSSVoice,
-    c: "MP3",
-    f: "44khz_16bit_stereo",
-    r: "0", // Normal speed
-  });
+async function getEdgeToken(): Promise<{ token: string; region: string }> {
+  const response = await fetch(
+    "https://dev.microsofttranslator.com/apps/endpoint?api-version=1.0",
+    {
+      headers: {
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+      },
+    }
+  );
 
-  const response = await fetch(`https://api.voicerss.org/?${params.toString()}`, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    },
-  });
-  
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[EdgeTTS] VoiceRSS error: ${response.status} - ${errorText}`);
-    throw new Error(`VoiceRSS error: ${response.status}`);
+    throw new Error(`Failed to get Edge token: ${response.status}`);
   }
 
-  const contentType = response.headers.get("content-type") || "";
+  const data = await response.json();
+  return {
+    token: data.t || data.accessToken,
+    region: data.r || "eastus",
+  };
+}
+
+/**
+ * Generate speech using Microsoft Edge TTS (real neural voices, FREE!)
+ */
+async function generateMicrosoftEdgeTTS(text: string, voiceKey: string): Promise<Uint8Array> {
+  const voice = VOICES[voiceKey] || VOICES[DEFAULT_VOICE];
+  console.log(`[EdgeTTS] Using Microsoft voice: ${voice.msVoice}`);
   
-  // VoiceRSS returns text/plain on error
-  if (contentType.includes("text")) {
+  // Get auth token
+  const { token, region } = await getEdgeToken();
+  
+  // Build SSML for natural speech
+  const ssml = `
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${voice.lang}">
+      <voice name="${voice.msVoice}">
+        <prosody rate="0%" pitch="0%">
+          ${escapeXml(text)}
+        </prosody>
+      </voice>
+    </speak>
+  `.trim();
+
+  const ttsUrl = `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`;
+  
+  const response = await fetch(ttsUrl, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/ssml+xml",
+      "X-Microsoft-OutputFormat": "audio-24khz-96kbitrate-mono-mp3",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    },
+    body: ssml,
+  });
+
+  if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[EdgeTTS] VoiceRSS returned text error: ${errorText}`);
-    throw new Error(`VoiceRSS error: ${errorText}`);
+    console.error(`[EdgeTTS] Microsoft TTS error: ${response.status} - ${errorText}`);
+    throw new Error(`Microsoft TTS error: ${response.status}`);
   }
 
   const audioBuffer = await response.arrayBuffer();
-  console.log(`[EdgeTTS] VoiceRSS success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+  console.log(`[EdgeTTS] ✅ Microsoft Edge TTS success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
   
   return new Uint8Array(audioBuffer);
 }
 
 /**
- * Fallback: ResponsiveVoice API (also free, decent quality)
+ * Fallback: StreamElements TTS (uses Amazon Polly - also high quality neural voices)
  */
-async function generateResponsiveVoiceTTS(text: string, lang: string = "pt-BR"): Promise<Uint8Array> {
-  console.log(`[EdgeTTS] Fallback to ResponsiveVoice...`);
+async function generateStreamElementsTTS(text: string, voiceKey: string): Promise<Uint8Array> {
+  const voice = VOICES[voiceKey] || VOICES[DEFAULT_VOICE];
+  console.log(`[EdgeTTS] Fallback to StreamElements Polly voice: ${voice.pollyVoice}`);
   
-  const params = new URLSearchParams({
-    text: text,
-    lang: "Brazilian Portuguese Female",
-    pitch: "0.5",
-    rate: "0.5",
-    vol: "1",
-    key: "qlsXP1Ow", // Public demo key
-  });
-
-  const url = `https://texttospeech.responsivevoice.org/v1/text:synthesize?${params.toString()}`;
+  const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice.pollyVoice}&text=${encodeURIComponent(text)}`;
   
   const response = await fetch(url, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "Accept": "audio/mpeg",
     },
   });
   
   if (!response.ok) {
-    throw new Error(`ResponsiveVoice error: ${response.status}`);
+    const errorText = await response.text();
+    console.error(`[EdgeTTS] StreamElements error: ${response.status} - ${errorText}`);
+    throw new Error(`StreamElements error: ${response.status}`);
   }
 
   const audioBuffer = await response.arrayBuffer();
-  console.log(`[EdgeTTS] ResponsiveVoice success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+  console.log(`[EdgeTTS] ✅ StreamElements Polly success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
   
   return new Uint8Array(audioBuffer);
 }
 
 /**
- * Last resort: Google Translate TTS (more robotic but always works)
+ * Last resort: Google Translate TTS (robotic but always works)
  */
 async function generateGoogleTTS(text: string): Promise<Uint8Array> {
   console.log(`[EdgeTTS] Last fallback: Google Translate TTS`);
@@ -155,6 +184,9 @@ async function generateGoogleTTS(text: string): Promise<Uint8Array> {
         const buffer = await response.arrayBuffer();
         chunks.push(new Uint8Array(buffer));
       }
+      
+      // Small delay to avoid rate limiting
+      await new Promise(r => setTimeout(r, 100));
     }
   }
   
@@ -175,6 +207,15 @@ async function generateGoogleTTS(text: string): Promise<Uint8Array> {
   return audioData;
 }
 
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -190,32 +231,34 @@ serve(async (req) => {
       );
     }
 
+    const voiceKey = (voice || DEFAULT_VOICE).toLowerCase();
     console.log(`[EdgeTTS] Request: "${text.substring(0, 80)}..."`);
-    console.log(`[EdgeTTS] Voice requested: ${voice || DEFAULT_VOICE}`);
+    console.log(`[EdgeTTS] Voice requested: ${voiceKey}`);
+    console.log(`[EdgeTTS] Text length: ${text.length} chars`);
 
     let audioData: Uint8Array;
     let usedProvider = "unknown";
     
-    // Try VoiceRSS first (best quality)
+    // Try Microsoft Edge TTS first (BEST quality - same as Edge browser)
     try {
-      audioData = await generateVoiceRSSTTS(text, voice || DEFAULT_VOICE);
-      usedProvider = "VoiceRSS";
-    } catch (voiceRSSError) {
-      console.error(`[EdgeTTS] VoiceRSS failed:`, voiceRSSError);
+      audioData = await generateMicrosoftEdgeTTS(text, voiceKey);
+      usedProvider = "Microsoft Edge Neural";
+    } catch (msError: any) {
+      console.error(`[EdgeTTS] Microsoft Edge TTS failed: ${msError.message}`);
       
-      // Try ResponsiveVoice next
+      // Try StreamElements (Amazon Polly) next
       try {
-        audioData = await generateResponsiveVoiceTTS(text);
-        usedProvider = "ResponsiveVoice";
-      } catch (rvError) {
-        console.error(`[EdgeTTS] ResponsiveVoice failed:`, rvError);
+        audioData = await generateStreamElementsTTS(text, voiceKey);
+        usedProvider = "Amazon Polly";
+      } catch (seError: any) {
+        console.error(`[EdgeTTS] StreamElements failed: ${seError.message}`);
         
         // Last resort: Google TTS
         try {
           audioData = await generateGoogleTTS(text);
           usedProvider = "Google";
-        } catch (googleError) {
-          console.error(`[EdgeTTS] Google TTS failed:`, googleError);
+        } catch (googleError: any) {
+          console.error(`[EdgeTTS] All providers failed!`);
           throw new Error("All TTS providers failed");
         }
       }
@@ -225,7 +268,7 @@ serve(async (req) => {
       throw new Error("No audio data generated");
     }
     
-    const base64Audio = base64Encode(new Uint8Array(audioData).buffer as ArrayBuffer);
+    const base64Audio = base64Encode(audioData);
     
     console.log(`[EdgeTTS] ✅ Success with ${usedProvider}! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
 
@@ -233,7 +276,7 @@ serve(async (req) => {
       JSON.stringify({
         audioContent: base64Audio,
         format: "mp3",
-        voice: voice || DEFAULT_VOICE,
+        voice: voiceKey,
         provider: usedProvider,
         duration_estimate: Math.ceil(text.length / 14),
       }),

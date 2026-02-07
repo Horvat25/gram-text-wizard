@@ -190,7 +190,19 @@ FORMATO:
 - Frases curtas (8–16 palavras por segmento).
 - Português brasileiro PERFEITO, sem NENHUM erro ortográfico ou de acentuação.
 - Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema.
-- imagePrompt DEVE conter: "Ano ${currentYear}. Texto em português brasileiro."`;
+
+⚠️ REGRAS CRÍTICAS PARA imagePrompt - LEIA COM ATENÇÃO:
+1. NÃO PEÇA TEXTO NA IMAGEM! Evite frases como "com texto", "escrito", "legenda", "título", "palavras", etc.
+2. Descreva APENAS elementos visuais: objetos, pessoas, cores, cenários, iluminação, composição.
+3. Use estilo cinematográfico: "iluminação dramática", "ângulo baixo", "close-up", "perspectiva aérea".
+4. NUNCA mencione ano, data ou texto a ser renderizado na imagem.
+5. Foco em ATMOSFERA e EMOÇÃO, não em informação textual.
+
+Exemplo de imagePrompt CORRETO:
+✅ "Close-up de um robô humanoide com olhos luminosos azuis, cenário de arena de batalha com luzes dramáticas e fumaça, estilo cinematográfico"
+
+Exemplo de imagePrompt ERRADO:
+❌ "Imagem com texto 'IA 2026', robô segurando placa escrito tecnologia" - NUNCA FAÇA ISSO!`;
 
     const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
 "${topic}"
