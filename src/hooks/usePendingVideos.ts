@@ -32,12 +32,13 @@ export function usePendingVideos() {
 
     setIsLoading(true);
     try {
-      // Query for draft reels that have overlay_metadata with needs_processing = true
+      // Query for draft AND scheduled reels that have overlay_metadata with needs_processing = true
+      // This ensures the queue shows ALL videos that need rendering, not just drafts
       const { data, error } = await supabase
         .from('posts')
         .select('id, caption, created_at, image_url, overlay_metadata')
         .eq('workspace_id', currentWorkspace.id)
-        .eq('status', 'draft')
+        .in('status', ['draft', 'scheduled']) // Include both statuses
         .eq('media_type', 'reels')
         .is('video_url', null)
         .order('created_at', { ascending: false })

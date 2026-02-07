@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useNarrativeStory } from '@/hooks/useNarrativeStory';
 import { useBrandSettings } from '@/hooks/useBrandSettings';
@@ -60,6 +61,7 @@ interface VideoRenderingProviderProps {
 
 export function VideoRenderingProvider({ children }: VideoRenderingProviderProps) {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const { notifyPostPublished, notifyAgentAction } = usePushNotifications();
   const { settings: brandSettings } = useBrandSettings();
   
@@ -98,16 +100,22 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   });
 
   // Fetch pending videos (both draft AND scheduled that need rendering)
+  // IMPORTANT: Filter by workspace_id to avoid mixing videos from different workspaces
   const fetchPendingVideos = useCallback(async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) {
+      setPendingVideos([]);
+      setRenderQueue([]);
+      return;
+    }
 
     setIsLoading(true);
     try {
       // Fetch both draft and scheduled videos that need rendering
+      // Use workspace_id for proper isolation between workspaces
       const { data, error } = await supabase
         .from('posts')
         .select('id, caption, created_at, image_url, scheduled_for, overlay_metadata')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .in('status', ['draft', 'scheduled']) // Include both statuses
         .eq('media_type', 'reels')
         .is('video_url', null)
@@ -124,7 +132,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
                metadata.needs_processing === true;
       }) as PendingVideo[];
 
-      console.log(`[VideoRendering] Found ${pending.length} pending videos (draft + scheduled)`);
+      console.log(`[VideoRendering] Found ${pending.length} pending videos for workspace ${currentWorkspace.id}`);
       setPendingVideos(pending);
       
       // Update render queue if not currently rendering
@@ -136,7 +144,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, currentWorkspace]);
 
   // Initial fetch and polling
   useEffect(() => {
