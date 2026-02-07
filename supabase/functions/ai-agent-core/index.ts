@@ -98,9 +98,12 @@ function getConversationalUpdate(
       `🚀 Gerando ${details?.type || 'post'} - vai ficar bom!`
     ],
     created: [
-      `✅ Pronto! Criei um ${details?.type || 'post'} sobre "${details?.theme || 'tendências'}". ${details?.needsRender ? 'Precisa só renderizar o vídeo quando puder! 🎬' : details?.published ? 'Publicado! 🚀' : ''}`,
-      `🎉 Feito! Novo ${details?.type || 'conteúdo'} criado. ${details?.status === 'published' ? 'Já foi publicado!' : details?.status === 'scheduled' ? 'Agendado!' : 'Está nos rascunhos.'}`,
-      `👍 Concluído! ${details?.type || 'Post'} sobre "${details?.theme || 'tech'}" ${details?.status === 'published' ? 'no ar!' : 'pronto pra revisão.'}`
+      details?.needsRender 
+        ? `🎬 Roteiro do Reels "${details?.theme || 'tendências'}" criado! Vá na aba "Fila" para renderizar o vídeo antes de publicar.`
+        : `✅ Pronto! Criei um ${details?.type || 'post'} sobre "${details?.theme || 'tendências'}". ${details?.status === 'published' ? 'Publicado! 🚀' : details?.status === 'scheduled' ? 'Agendado! ⏰' : 'Salvo como rascunho.'}`,
+      details?.needsRender
+        ? `📝 Script do vídeo sobre "${details?.theme || 'tech'}" está pronto! O vídeo precisa ser renderizado na aba "Fila" antes de publicar.`
+        : `🎉 Feito! Novo ${details?.type || 'conteúdo'} criado. ${details?.status === 'published' ? 'Já foi publicado!' : details?.status === 'scheduled' ? 'Agendado!' : 'Está nos rascunhos.'}`
     ],
     waiting: [
       `⏳ Ainda não é hora de postar. ${details?.reason || 'Vou aguardar o momento ideal.'}`,
