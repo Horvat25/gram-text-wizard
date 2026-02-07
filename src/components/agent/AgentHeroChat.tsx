@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
@@ -106,6 +107,7 @@ _"Mostre meus analytics dos últimos 30 dias"_
 
 export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -186,19 +188,19 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   }, [messages]);
 
   useEffect(() => {
-    if (user) {
+    if (user && currentWorkspace) {
       loadChatHistory();
       loadAgentConfig();
     }
-  }, [user]);
+  }, [user, currentWorkspace]);
 
   const loadAgentConfig = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
     try {
       const { data } = await supabase
         .from('agent_context')
         .select('agent_name, agent_avatar_url')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .maybeSingle();
       
       if (data) {
@@ -238,14 +240,14 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   }, [isLoadingHistory]);
 
   const loadChatHistory = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
     
     setIsLoadingHistory(true);
     try {
       const { data, error } = await supabase
         .from('agent_chat_messages')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .order('created_at', { ascending: true })
         .limit(50);
 
@@ -281,13 +283,14 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   };
 
   const saveMessage = async (message: Message) => {
-    if (!user || message.id === 'welcome') return;
+    if (!user || !currentWorkspace || message.id === 'welcome') return;
     
     try {
       const { error } = await supabase
         .from('agent_chat_messages')
         .insert({
           user_id: user.id,
+          workspace_id: currentWorkspace.id,
           role: message.role,
           content: message.content,
           actions: message.actions ? JSON.parse(JSON.stringify(message.actions)) : null
@@ -300,13 +303,13 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   };
 
   const clearHistory = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
     
     try {
       await supabase
         .from('agent_chat_messages')
         .delete()
-        .eq('user_id', user.id);
+        .eq('workspace_id', currentWorkspace.id);
       
       setMessages([{
         id: 'welcome',
@@ -345,7 +348,8 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
       const { data, error } = await supabase.functions.invoke('agent-chat', {
         body: { 
           messages: chatMessages,
-          userId: user.id
+          userId: user.id,
+          workspaceId: currentWorkspace?.id
         }
       });
 
