@@ -1973,7 +1973,8 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, userId, workspaceId } = await req.json();
+    const body = await req.json();
+    const { messages, userId, workspaceId } = body;
     
     if (!userId) {
       return new Response(JSON.stringify({ error: 'userId is required' }), {
@@ -1984,6 +1985,28 @@ serve(async (req) => {
     
     if (!workspaceId) {
       return new Response(JSON.stringify({ error: 'workspaceId is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Validate messages is an array
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(JSON.stringify({ error: 'messages must be a non-empty array' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // Ensure messages are properly formatted
+    const validMessages = messages.filter(m => 
+      m && typeof m === 'object' && 
+      typeof m.role === 'string' && 
+      typeof m.content === 'string'
+    );
+    
+    if (validMessages.length === 0) {
+      return new Response(JSON.stringify({ error: 'No valid messages provided' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -2207,7 +2230,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
         model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: systemPrompt },
-          ...messages
+          ...validMessages
         ],
         tools: AGENT_TOOLS,
         tool_choice: 'auto'
