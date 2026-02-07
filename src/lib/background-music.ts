@@ -1,6 +1,7 @@
 /**
  * Royalty-free background music tracks for video generation
- * These are ambient/tech tracks suitable for Instagram Reels and TikTok
+ * High-quality ambient/tech tracks for Instagram Reels and TikTok
+ * All tracks are CC0 or Creative Commons licensed for commercial use
  */
 
 export interface BackgroundTrack {
@@ -12,49 +13,76 @@ export interface BackgroundTrack {
   mood: string;
 }
 
-// Free royalty-free music from multiple sources (all free for commercial use)
-// Updated February 2026 with working CDN links
+// Free Music Archive - CC0 licensed tracks + additional sources
 export const BACKGROUND_TRACKS: BackgroundTrack[] = [
+  // Chad Crouch - Electronic/Ambient
   {
-    id: "ambient-tech-1",
-    name: "Ambient Corporate",
-    // Free Music Archive - CC0 licensed
+    id: "shipping-lanes",
+    name: "Shipping Lanes",
     url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
     duration: 189,
     genre: "ambient",
     mood: "futuristic",
   },
   {
-    id: "ambient-tech-2", 
-    name: "Inspiring Piano",
-    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/relax/Dee_Yan-Key_-_05_-_morning_dew.mp3",
-    duration: 180,
-    genre: "cinematic",
-    mood: "inspiring",
-  },
-  {
-    id: "ambient-tech-3",
-    name: "Electronic Future",
+    id: "algorithms",
+    name: "Algorithms",
     url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Algorithms.mp3",
     duration: 167,
     genre: "electronic",
     mood: "professional",
   },
   {
-    id: "ambient-tech-4",
-    name: "Chill Atmospheric",
+    id: "nightowl",
+    name: "Night Owl",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Nightowl.mp3",
+    duration: 223,
+    genre: "electronic",
+    mood: "motivational",
+  },
+  
+  // Dee Yan-Key - Relaxing/Ambient
+  {
+    id: "morning-dew",
+    name: "Morning Dew",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/relax/Dee_Yan-Key_-_05_-_morning_dew.mp3",
+    duration: 180,
+    genre: "cinematic",
+    mood: "inspiring",
+  },
+  {
+    id: "floating",
+    name: "Floating",
     url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/relax/Dee_Yan-Key_-_02_-_floating.mp3",
     duration: 195,
     genre: "ambient",
     mood: "chill",
   },
+
+  // Additional high-energy tracks
   {
-    id: "ambient-tech-5",
-    name: "Tech News Background",
-    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Nightowl.mp3",
-    duration: 223,
+    id: "tech-news-1",
+    name: "Digital Innovation",
+    url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=electronic-future-beats-117997.mp3",
+    duration: 147,
     genre: "electronic",
-    mood: "motivational",
+    mood: "energetic",
+  },
+  {
+    id: "tech-news-2",
+    name: "Cyber World",
+    url: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b0939c8.mp3?filename=cyberpunk-2099-10701.mp3",
+    duration: 120,
+    genre: "cyberpunk",
+    mood: "futuristic",
+  },
+  {
+    id: "ambient-tech-3",
+    name: "Corporate Innovation",
+    url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=inspiring-cinematic-ambient-116199.mp3",
+    duration: 195,
+    genre: "cinematic",
+    mood: "inspiring",
   },
 ];
 
@@ -70,11 +98,54 @@ export function getRandomTrack(): BackgroundTrack {
  * Get a track by mood preference
  */
 export function getTrackByMood(mood: string): BackgroundTrack {
-  const track = BACKGROUND_TRACKS.find(t => 
-    t.mood.toLowerCase().includes(mood.toLowerCase()) ||
-    t.genre.toLowerCase().includes(mood.toLowerCase())
+  const normalizedMood = mood.toLowerCase();
+  
+  // Try to match by mood
+  let track = BACKGROUND_TRACKS.find(t => 
+    t.mood.toLowerCase().includes(normalizedMood)
   );
+  
+  // Try to match by genre
+  if (!track) {
+    track = BACKGROUND_TRACKS.find(t => 
+      t.genre.toLowerCase().includes(normalizedMood)
+    );
+  }
+  
+  // Mood-based selection
+  if (!track) {
+    if (normalizedMood.includes("tech") || normalizedMood.includes("news")) {
+      track = BACKGROUND_TRACKS.find(t => t.mood === "futuristic" || t.mood === "professional");
+    } else if (normalizedMood.includes("breaking") || normalizedMood.includes("urgent")) {
+      track = BACKGROUND_TRACKS.find(t => t.mood === "energetic");
+    } else if (normalizedMood.includes("inspire") || normalizedMood.includes("positive")) {
+      track = BACKGROUND_TRACKS.find(t => t.mood === "inspiring");
+    }
+  }
+  
   return track || getRandomTrack();
+}
+
+/**
+ * Get track by topic content
+ */
+export function getTrackForTopic(topic: string): BackgroundTrack {
+  const lowerTopic = topic.toLowerCase();
+  
+  if (lowerTopic.includes("breaking") || lowerTopic.includes("urgente") || lowerTopic.includes("alerta")) {
+    return getTrackByMood("energetic");
+  }
+  if (lowerTopic.includes("futuro") || lowerTopic.includes("tecnologia") || lowerTopic.includes("ia") || lowerTopic.includes("ai")) {
+    return getTrackByMood("futuristic");
+  }
+  if (lowerTopic.includes("análise") || lowerTopic.includes("entenda") || lowerTopic.includes("como")) {
+    return getTrackByMood("professional");
+  }
+  if (lowerTopic.includes("sucesso") || lowerTopic.includes("incrível") || lowerTopic.includes("novidade")) {
+    return getTrackByMood("inspiring");
+  }
+  
+  return getRandomTrack();
 }
 
 /**
@@ -95,7 +166,25 @@ export async function preloadTrack(track: BackgroundTrack): Promise<string> {
     console.log(`[Music] ✅ Track preloaded: ${track.name} (${Math.round(blob.size / 1024)}KB)`);
     return dataUrl;
   } catch (error) {
-    console.error(`[Music] Failed to preload track:`, error);
+    console.error(`[Music] Failed to preload ${track.name}:`, error);
+    
+    // Try fallback track
+    const fallbackTrack = BACKGROUND_TRACKS.find(t => t.id !== track.id);
+    if (fallbackTrack) {
+      console.log(`[Music] Trying fallback: ${fallbackTrack.name}`);
+      try {
+        const response = await fetch(fallbackTrack.url);
+        if (response.ok) {
+          const blob = await response.blob();
+          const dataUrl = await blobToDataUrl(blob);
+          console.log(`[Music] ✅ Fallback loaded: ${fallbackTrack.name}`);
+          return dataUrl;
+        }
+      } catch (e) {
+        console.error(`[Music] Fallback also failed:`, e);
+      }
+    }
+    
     throw error;
   }
 }
