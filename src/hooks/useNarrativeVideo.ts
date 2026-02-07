@@ -154,37 +154,27 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     
     try {
       // Generate narration AND background music in parallel
+      // 100% FREE pipeline: Bark → Edge TTS → Lovable TTS → Free TTS
       const [narrationResult, musicUrl] = await Promise.all([
-        // TTS chain: ElevenLabs é OBRIGATÓRIO para conteúdo principal
-        // Google/Free TTS só para CTAs curtos (ex: "siga-nos")
         (async () => {
-          // 1. SEMPRE tentar ElevenLabs primeiro para conteúdo (voz premium)
-          console.log("[TTS] 🎙️ Usando ElevenLabs para narração principal...");
-          let result = await tryTTSProvider("elevenlabs-tts", { 
+          // 1. Try Bark TTS first (Hugging Face - FREE neural voice)
+          console.log("[TTS] 🎙️ Tentando Bark TTS (Hugging Face)...");
+          let result = await tryTTSProvider("huggingface-bark-tts", { 
             text: script, 
-            voiceId: "camila", 
+            voice: "camila", 
             language: "pt-BR" 
           });
           
-          // 2. Se ElevenLabs falhar, tentar OpenAI TTS (alta qualidade)
+          // 2. Fallback para Edge TTS (VoiceRSS - FREE)
           if (!result) {
-            console.log("[TTS] ElevenLabs indisponível, tentando OpenAI TTS...");
-            result = await tryTTSProvider("openai-tts", { 
-              text: script, 
-              voice: "nova" 
-            });
-          }
-          
-          // 3. Fallback para Edge TTS (qualidade média-alta)
-          if (!result) {
-            console.log("[TTS] OpenAI indisponível, tentando Edge TTS...");
+            console.log("[TTS] Bark indisponível, tentando Edge TTS...");
             result = await tryTTSProvider("edge-tts", { 
               text: script, 
               voice: "camila" 
             });
           }
           
-          // 4. Fallback para Lovable TTS (Polly - qualidade média)
+          // 3. Fallback para Lovable TTS (Polly - FREE)
           if (!result) {
             console.log("[TTS] Edge TTS indisponível, tentando Lovable TTS...");
             result = await tryTTSProvider("lovable-tts", { 
@@ -193,10 +183,9 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
             });
           }
           
-          // 5. Último recurso: Free TTS (Google) - apenas se tudo mais falhar
-          // Nota: Google TTS deve ser reservado para CTAs curtos como "siga-nos"
+          // 4. Último recurso: Free TTS (Google - FREE)
           if (!result) {
-            console.warn("[TTS] ⚠️ Todos os provedores premium falharam, usando Google TTS como último recurso");
+            console.warn("[TTS] ⚠️ Todos os provedores falharam, usando Google TTS como último recurso");
             result = await tryTTSProvider("free-tts", { 
               text: script, 
               language: "pt-BR" 
@@ -205,7 +194,7 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
           
           return result;
         })(),
-        // Background music (parallel)
+        // Background music (parallel) - uses MusicGen or royalty-free tracks
         generateBackgroundMusic()
       ]);
 

@@ -52,9 +52,9 @@ const AI_MODELS = {
     {
       value: "narrative" as AIModel,
       label: "Reels Cinematográfico",
-      description: "Imagem + Narração + Música (ElevenLabs)",
-      cost: "$",
-      costLevel: 1,
+      description: "Imagem + Narração + Música (Bark/MusicGen)",
+      cost: "FREE",
+      costLevel: 0,
     },
   ],
   carousel: [

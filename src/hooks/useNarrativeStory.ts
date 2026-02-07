@@ -276,7 +276,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio - try ElevenLabs first, then fallback
+  // Step 3: Generate narration audio - 100% FREE pipeline: Bark → Edge TTS → Lovable TTS → Free TTS
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "" };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -296,50 +296,52 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let ctaNarrationUrl = "";
     let backgroundMusicUrl = "";
     
-    // Helper to try TTS providers: ElevenLabs → Edge TTS → Lovable TTS → Free TTS
+    // Helper to try TTS providers: Bark (HuggingFace) → Edge TTS → Lovable TTS → Free TTS
+    // 100% FREE and open-source pipeline!
     const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
-      // 🎯 Try ElevenLabs TTS first (PREMIUM QUALITY!)
+      // 🎯 Try Bark TTS first (Hugging Face - FREE, high quality neural voice)
       try {
-        console.log(`[TTS] 🎯 Trying ElevenLabs TTS with voice: ${preferredVoice}...`);
-        const elevenResult = await supabase.functions.invoke("elevenlabs-tts", {
-          body: { text, voiceId: preferredVoice, language: "pt-BR" },
+        console.log(`[TTS] 🎯 Trying Bark TTS (Hugging Face) with voice: ${preferredVoice}...`);
+        const barkResult = await supabase.functions.invoke("huggingface-bark-tts", {
+          body: { text, voice: preferredVoice, language: "pt-BR" },
         });
         
-        console.log("[TTS] ElevenLabs response:", JSON.stringify({
-          hasError: !!elevenResult.error,
-          hasData: !!elevenResult.data,
-          hasAudioContent: !!elevenResult.data?.audioContent,
-          fallbackFlag: elevenResult.data?.fallback,
-          errorMsg: elevenResult.data?.error || elevenResult.error?.message,
+        console.log("[TTS] Bark response:", JSON.stringify({
+          hasError: !!barkResult.error,
+          hasData: !!barkResult.data,
+          hasAudioContent: !!barkResult.data?.audioContent,
+          fallbackFlag: barkResult.data?.fallback,
+          errorMsg: barkResult.data?.error || barkResult.error?.message,
         }));
         
-        // Check for valid audio - audioContent must exist and be non-empty string
-        const audioContent = elevenResult.data?.audioContent;
+        // Check for valid audio
+        const audioContent = barkResult.data?.audioContent;
         const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-        const hasFallbackFlag = elevenResult.data?.fallback === true;
+        const hasFallbackFlag = barkResult.data?.fallback === true;
         
-        if (!elevenResult.error && isValidAudio && !hasFallbackFlag) {
-          console.log(`[TTS] ✅ ElevenLabs TTS success! Audio size: ${audioContent.length} chars`);
-          toast.success(`🎙️ Narração premium gerada (ElevenLabs)`);
+        if (!barkResult.error && isValidAudio && !hasFallbackFlag) {
+          const format = barkResult.data?.format || "wav";
+          console.log(`[TTS] ✅ Bark TTS success! Audio size: ${audioContent.length} chars`);
+          toast.success(`🎙️ Narração neural gerada (Bark/Suno)`);
           return { 
-            url: `data:audio/mp3;base64,${audioContent}`,
-            provider: "ElevenLabs"
+            url: `data:audio/${format};base64,${audioContent}`,
+            provider: "Bark"
           };
         }
         
         // Log specific failure reason
         if (hasFallbackFlag) {
-          console.log("[TTS] ⚠️ ElevenLabs returned fallback flag - API blocked/rate-limited");
+          console.log("[TTS] ⚠️ Bark returned fallback flag - model loading or rate-limited");
         } else if (!isValidAudio) {
-          console.log("[TTS] ⚠️ ElevenLabs returned invalid/empty audio content");
+          console.log("[TTS] ⚠️ Bark returned invalid/empty audio content");
         } else {
-          console.log("[TTS] ⚠️ ElevenLabs failed:", elevenResult.data?.error || elevenResult.error);
+          console.log("[TTS] ⚠️ Bark failed:", barkResult.data?.error || barkResult.error);
         }
       } catch (e) {
-        console.error("[TTS] ❌ ElevenLabs TTS error:", e);
+        console.error("[TTS] ❌ Bark TTS error:", e);
       }
       
-      // 🔄 Fallback to Edge TTS (VoiceRSS)
+      // 🔄 Fallback to Edge TTS (VoiceRSS - FREE)
       try {
         console.log(`[TTS] Trying Edge TTS (VoiceRSS) with voice: ${preferredVoice}...`);
         const edgeResult = await supabase.functions.invoke("edge-tts", {
@@ -360,7 +362,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.log("[TTS] Edge TTS error:", e);
       }
       
-      // 🔄 Fallback to Lovable TTS (StreamElements/Polly)
+      // 🔄 Fallback to Lovable TTS (StreamElements/Polly - FREE)
       try {
         console.log(`[TTS] Trying Lovable TTS (Polly) with voice: ${preferredVoice}...`);
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
@@ -380,7 +382,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.log("[TTS] Lovable TTS error:", e);
       }
       
-      // 🆓 Try Free TTS (Google Translate) as last resort
+      // 🆓 Try Free TTS (Google Translate - FREE) as last resort
       try {
         console.log("[TTS] Trying Free TTS (Google Translate)...");
         const freeResult = await supabase.functions.invoke("free-tts", {
@@ -402,18 +404,38 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return null;
     };
     
-    // Generate background music using royalty-free tracks (no API needed!)
-    const generateBackgroundMusic = async (): Promise<string> => {
+    // Generate background music - try MusicGen (HuggingFace) first, then fallback to royalty-free tracks
+    const generateBackgroundMusic = async (mood?: string): Promise<string> => {
+      // 🎵 Try MusicGen first (Hugging Face - FREE AI-generated music)
+      try {
+        console.log("[Music] 🎵 Trying MusicGen (Hugging Face)...");
+        const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
+          body: { mood: mood || "technology", duration: 15 },
+        });
+        
+        const audioContent = musicResult.data?.audioContent;
+        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
+        const hasFallbackFlag = musicResult.data?.fallback === true;
+        
+        if (!musicResult.error && isValidAudio && !hasFallbackFlag) {
+          const format = musicResult.data?.format || "wav";
+          console.log("[Music] ✅ MusicGen success! Generated AI music");
+          toast.success(`🎵 Trilha AI gerada (MusicGen)`);
+          return `data:audio/${format};base64,${audioContent}`;
+        }
+        
+        console.log("[Music] MusicGen failed or loading:", musicResult.data?.error || "Using fallback");
+      } catch (e) {
+        console.warn("[Music] MusicGen error:", e);
+      }
+      
+      // 🎵 Fallback to royalty-free tracks from library
       try {
         console.log("[Music] Loading royalty-free background music...");
-        
-        // Get a random ambient/tech track from our built-in library
         const track = getRandomTrack();
         console.log("[Music] Selected track:", track.name, "-", track.mood);
         
-        // Preload the track as data URL for reliable playback
         const musicUrl = await preloadTrack(track);
-        
         console.log("[Music] ✅ Background music ready:", track.name);
         toast.success(`🎵 Trilha: ${track.name}`);
         return musicUrl;
