@@ -583,6 +583,7 @@ async function createVideoContent(
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
+    caption, // ← CRITICAL: Include caption field
     hashtags,
     post_type: 'entretenimento',
     media_type: 'reels',
@@ -1154,10 +1155,11 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
     
-  } catch (error) {
+  } catch (error: any) {
+    const errorMessage = error?.message || error?.code || JSON.stringify(error) || String(error);
     console.error('[AGENT] Erro fatal:', error);
     return new Response(
-      JSON.stringify({ error: String(error) }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
