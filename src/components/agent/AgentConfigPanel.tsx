@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { toast } from 'sonner';
 
 // Import the modular components
@@ -39,26 +40,27 @@ interface AgentConfigPanelProps {
 
 export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat }: AgentConfigPanelProps) {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const [context, setContext] = useState<AgentContext | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    if (user && isOpen) {
+    if (user && currentWorkspace && isOpen) {
       loadContext();
     }
-  }, [user, isOpen]);
+  }, [user, currentWorkspace, isOpen]);
 
   const loadContext = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
     setIsLoading(true);
     
     try {
       const { data, error } = await supabase
         .from('agent_context')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .maybeSingle();
 
       if (error) throw error;
@@ -74,24 +76,24 @@ export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat 
   };
 
   const handleUpdate = async (updates: Partial<AgentContext>) => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
 
     try {
       const { data: existing } = await supabase
         .from('agent_context')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .maybeSingle();
 
       if (existing) {
         await supabase
           .from('agent_context')
           .update({ ...updates, updated_at: new Date().toISOString() })
-          .eq('user_id', user.id);
+          .eq('workspace_id', currentWorkspace.id);
       } else {
         await supabase
           .from('agent_context')
-          .insert({ user_id: user.id, ...updates });
+          .insert({ user_id: user.id, workspace_id: currentWorkspace.id, ...updates });
       }
 
       // Update local state
@@ -108,12 +110,19 @@ export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat 
   };
 
   const handleRunAgent = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) {
+      toast.error('Selecione um workspace primeiro');
+      return;
+    }
     setIsRunning(true);
     
     try {
       const { data, error } = await supabase.functions.invoke('ai-agent-core', {
-        body: { userId: user.id, trigger: 'manual' }
+        body: { 
+          userId: user.id, 
+          workspaceId: currentWorkspace.id,
+          trigger: 'manual' 
+        }
       });
 
       if (error) throw error;
@@ -128,13 +137,13 @@ export default function AgentConfigPanel({ trigger, onConfigChange, onClearChat 
   };
 
   const handleClearChat = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
 
     try {
       await supabase
         .from('agent_chat_messages')
         .delete()
-        .eq('user_id', user.id);
+        .eq('workspace_id', currentWorkspace.id);
       
       toast.success('Histórico do chat limpo!');
       onClearChat?.();
