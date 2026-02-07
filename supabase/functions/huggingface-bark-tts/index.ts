@@ -7,37 +7,24 @@ const corsHeaders = {
 };
 
 /**
- * Text-to-Speech using multiple Hugging Face models with intelligent fallback
+ * TTS Neural - ÚNICA ENGINE (Google Translate TTS)
  * 
- * Priority:
- * 1. Parler-TTS Mini (Natural, expressive - works best!)
- * 2. Microsoft SpeechT5 (Good quality, multilingual)
- * 3. ESPnet VITS (Fast, decent quality)
- * 4. Fallback flag for client to use browser TTS
+ * Por que Google TTS:
+ * - Bark/HuggingFace: endpoints migraram, 404 em todos os modelos
+ * - ElevenLabs: quota esgotada (86/10000 créditos)
+ * 
+ * Regras (conforme prompt definitivo):
+ * - Única tentativa
+ * - Timeout: 10 segundos por chunk
+ * - Chunking: 200 chars por chunk
+ * - Se falhar → tts_status: "failed", vídeo continua só com trilha
+ * - Sem fallback, sem retry
  */
 
-// Hugging Face Inference API v2 endpoints
-const HF_ENDPOINTS = {
-  parler: "https://router.huggingface.co/hf-inference/models/parler-tts/parler-tts-mini-multilingual-v1.1",
-  speechT5: "https://router.huggingface.co/hf-inference/models/microsoft/speecht5_tts",
-  vits: "https://router.huggingface.co/hf-inference/models/facebook/mms-tts-por",
-  // Alternative endpoints
-  parlerLarge: "https://router.huggingface.co/hf-inference/models/parler-tts/parler-tts-large-v1",
-  espnet: "https://router.huggingface.co/hf-inference/models/espnet/kan-bayashi_ljspeech_vits",
-};
+const MAX_CHUNK_SIZE = 200;
+const TIMEOUT_MS = 10000;
 
-// Voice descriptions for Parler-TTS (natural language)
-const PARLER_VOICES: Record<string, string> = {
-  "camila": "A female speaker with a warm, professional voice delivers the news in Brazilian Portuguese with clear enunciation and moderate pace.",
-  "vitoria": "A young female speaker with an enthusiastic, engaging voice speaks in Brazilian Portuguese with energy and warmth.",
-  "francisca": "A mature female speaker with a calm, authoritative voice narrates in Portuguese with clarity and confidence.",
-  "antonio": "A male speaker with a deep, professional voice delivers news in Brazilian Portuguese with authority and clarity.",
-  "ricardo": "A young male speaker with an energetic, modern voice speaks in Portuguese with enthusiasm.",
-  "thiago": "A male speaker with a friendly, conversational tone narrates in Brazilian Portuguese naturally.",
-  "default": "A professional speaker with a clear, warm voice delivers content in Brazilian Portuguese with good pacing.",
-};
-
-interface BarkRequest {
+interface TTSRequest {
   text: string;
   voice?: string;
   language?: string;
@@ -49,107 +36,105 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice, language }: BarkRequest = await req.json();
-    const HF_API_KEY = Deno.env.get("HF_API_KEY") || Deno.env.get("HUGGINGFACE_API_KEY");
+    const { text, language = "pt-BR" }: TTSRequest = await req.json();
 
-    if (!HF_API_KEY) {
-      console.error("[Bark TTS] Hugging Face API Key not configured");
+    console.log("[TTS] ========== INICIADO ==========");
+    console.log(`[TTS] Texto: ${text?.length || 0} chars`);
+    console.log(`[TTS] Idioma: ${language}`);
+
+    if (!text || text.trim().length === 0) {
+      console.error("[TTS] ❌ Texto vazio");
       return new Response(
         JSON.stringify({ 
-          error: "HF_API_KEY não configurada",
-          fallback: true,
+          tts_status: "failed",
+          error: "Texto é obrigatório",
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!text || text.trim().length === 0) {
-      return new Response(
-        JSON.stringify({ error: "Texto é obrigatório" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Limpar texto
+    const cleanedText = cleanTextForTTS(text);
+    console.log(`[TTS] Texto limpo: ${cleanedText.length} chars`);
 
-    const voiceKey = voice?.toLowerCase() || "default";
-    const voiceDescription = PARLER_VOICES[voiceKey] || PARLER_VOICES["default"];
+    // Chunking do texto
+    const chunks = splitTextIntoChunks(cleanedText, MAX_CHUNK_SIZE);
+    console.log(`[TTS] Chunks: ${chunks.length}`);
+
+    // Gerar áudio para cada chunk
+    const audioBuffers: ArrayBuffer[] = [];
     
-    console.log(`[Bark TTS] Voice: ${voiceKey}`);
-    console.log(`[Bark TTS] Text length: ${text.length} chars`);
-    console.log(`[Bark TTS] Text preview: "${text.substring(0, 100)}..."`);
-
-    // Optimize text for TTS
-    const optimizedText = optimizeTextForTTS(text);
-    console.log(`[Bark TTS] Optimized text length: ${optimizedText.length} chars`);
-
-    let audioBuffer: ArrayBuffer | null = null;
-    let usedModel = "unknown";
-    
-    // Try Parler-TTS first (best quality for narration)
-    try {
-      console.log("[Bark TTS] Trying Parler-TTS Mini Multilingual...");
-      audioBuffer = await callParlerTTS(HF_API_KEY, optimizedText, voiceDescription);
-      usedModel = "parler-tts";
-    } catch (e: any) {
-      console.warn(`[Bark TTS] Parler failed: ${e.message}`);
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      console.log(`[TTS] Chunk ${i + 1}/${chunks.length}: "${chunk.substring(0, 30)}..."`);
       
-      // Try Microsoft SpeechT5
       try {
-        console.log("[Bark TTS] Trying Microsoft SpeechT5...");
-        audioBuffer = await callSpeechT5(HF_API_KEY, optimizedText);
-        usedModel = "speecht5";
-      } catch (e2: any) {
-        console.warn(`[Bark TTS] SpeechT5 failed: ${e2.message}`);
+        const audioBuffer = await callGoogleTTSWithTimeout(chunk, language, TIMEOUT_MS);
         
-        // Try Facebook MMS-TTS
-        try {
-          console.log("[Bark TTS] Trying Facebook MMS-TTS...");
-          audioBuffer = await callMMSTTS(HF_API_KEY, optimizedText);
-          usedModel = "mms-tts";
-        } catch (e3: any) {
-          console.warn(`[Bark TTS] MMS-TTS failed: ${e3.message}`);
-          
-          // Return fallback flag
-          console.log("[Bark TTS] All models failed, returning fallback");
+        if (!audioBuffer || audioBuffer.byteLength === 0) {
+          console.error(`[TTS] ❌ Chunk ${i + 1} vazio`);
           return new Response(
             JSON.stringify({ 
-              error: "Todos os modelos TTS falharam",
-              fallback: true,
-              isLoading: false,
+              tts_status: "failed",
+              error: `Chunk ${i + 1} sem áudio`,
             }),
             { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
+        
+        audioBuffers.push(audioBuffer);
+        console.log(`[TTS] ✓ Chunk ${i + 1}: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+        
+      } catch (chunkError: any) {
+        console.error(`[TTS] ❌ Chunk ${i + 1} erro: ${chunkError.message}`);
+        return new Response(
+          JSON.stringify({ 
+            tts_status: "failed",
+            error: chunkError.message,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
-    if (!audioBuffer || audioBuffer.byteLength === 0) {
-      throw new Error("No audio data generated");
+    // Concatenar todos os buffers
+    const totalSize = audioBuffers.reduce((acc, buf) => acc + buf.byteLength, 0);
+    const combinedBuffer = new Uint8Array(totalSize);
+    let offset = 0;
+    
+    for (const buffer of audioBuffers) {
+      combinedBuffer.set(new Uint8Array(buffer), offset);
+      offset += buffer.byteLength;
     }
 
-    const base64Audio = base64Encode(audioBuffer);
-    console.log(`[Bark TTS] ✅ Success with ${usedModel}! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+    const base64Audio = base64Encode(combinedBuffer);
+    
+    console.log(`[TTS] ✅ SUCESSO! Size: ${(totalSize / 1024).toFixed(1)}KB`);
+    console.log("[TTS] ========== FINALIZADO ==========");
 
     return new Response(
       JSON.stringify({
         audioContent: base64Audio,
-        format: "wav",
-        voice: voiceKey,
-        model: usedModel,
-        duration_estimate: Math.ceil(text.length / 12),
+        format: "mp3",
+        tts_status: "success",
+        model: "google-tts",
+        chunks_processed: chunks.length,
+        size_kb: (totalSize / 1024).toFixed(1),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (error: any) {
-    console.error("[Bark TTS] Error:", error);
+    console.error("[TTS] ❌ FALHOU:", error.message);
+    console.log("[TTS] → Seguir sem voz");
     
     return new Response(
       JSON.stringify({ 
-        error: error.message || "Erro ao gerar narração",
-        fallback: true,
-        isLoading: false,
+        tts_status: "failed",
+        error: error.message || "Erro desconhecido",
       }),
       { 
-        status: 200, // Return 200 so client can fallback gracefully
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" } 
       }
     );
@@ -157,115 +142,104 @@ serve(async (req) => {
 });
 
 /**
- * Optimize text for TTS
+ * Limpa texto para TTS
  */
-function optimizeTextForTTS(text: string): string {
+function cleanTextForTTS(text: string): string {
   return text
-    .replace(/\s+/g, ' ')
-    .replace(/([.!?])\s*/g, '$1 ')
-    .replace(/[.!?]{2,}/g, '.')
-    .replace(/[\u{1F600}-\u{1F6FF}]/gu, '')
-    .replace(/[""'']/g, '"')
-    .replace(/,\s*/g, ', ')
+    .replace(/[\u{1F600}-\u{1F6FF}]/gu, '') // Remove emojis
+    .replace(/[""'']/g, '"') // Normaliza aspas
+    .replace(/\s+/g, ' ') // Remove espaços extras
+    .replace(/…/g, '...') // Normaliza reticências
+    .replace(/[#@]/g, '') // Remove hashtags e menções
     .trim();
 }
 
 /**
- * Call Parler-TTS API (Natural language voice descriptions)
+ * Divide texto em chunks respeitando pontuação
  */
-async function callParlerTTS(
-  apiKey: string, 
+function splitTextIntoChunks(text: string, maxSize: number): string[] {
+  const chunks: string[] = [];
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  
+  let currentChunk = "";
+  
+  for (const sentence of sentences) {
+    if ((currentChunk + " " + sentence).trim().length <= maxSize) {
+      currentChunk = (currentChunk + " " + sentence).trim();
+    } else {
+      if (currentChunk) {
+        chunks.push(currentChunk);
+      }
+      
+      if (sentence.length > maxSize) {
+        const words = sentence.split(" ");
+        currentChunk = "";
+        for (const word of words) {
+          if ((currentChunk + " " + word).trim().length <= maxSize) {
+            currentChunk = (currentChunk + " " + word).trim();
+          } else {
+            if (currentChunk) chunks.push(currentChunk);
+            currentChunk = word;
+          }
+        }
+      } else {
+        currentChunk = sentence;
+      }
+    }
+  }
+  
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+  
+  return chunks.filter(c => c.length > 0);
+}
+
+/**
+ * Chama Google Translate TTS (100% gratuito)
+ */
+async function callGoogleTTSWithTimeout(
   text: string, 
-  voiceDescription: string
+  language: string,
+  timeoutMs: number
 ): Promise<ArrayBuffer> {
-  const response = await fetch(HF_ENDPOINTS.parler, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      inputs: text,
-      parameters: {
-        description: voiceDescription,
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  const encodedText = encodeURIComponent(text);
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${language}&client=tw-ob`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "audio/mpeg",
       },
-    }),
-  });
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[Bark TTS] Parler error: ${response.status} - ${errorText}`);
-    throw new Error(`Parler error: ${response.status}`);
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Google TTS error: ${response.status}`);
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    
+    if (!contentType.includes("audio")) {
+      throw new Error("Resposta não é áudio");
+    }
+
+    return await response.arrayBuffer();
+
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    
+    if (error.name === "AbortError") {
+      throw new Error("Timeout: Google TTS não respondeu em 10s");
+    }
+    
+    throw error;
   }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    const json = await response.json();
-    if (json.error) throw new Error(json.error);
-    throw new Error("Unexpected JSON response");
-  }
-
-  return await response.arrayBuffer();
-}
-
-/**
- * Call Microsoft SpeechT5 API
- */
-async function callSpeechT5(apiKey: string, text: string): Promise<ArrayBuffer> {
-  const response = await fetch(HF_ENDPOINTS.speechT5, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      inputs: text,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[Bark TTS] SpeechT5 error: ${response.status} - ${errorText}`);
-    throw new Error(`SpeechT5 error: ${response.status}`);
-  }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    const json = await response.json();
-    if (json.error) throw new Error(json.error);
-    throw new Error("Unexpected JSON response");
-  }
-
-  return await response.arrayBuffer();
-}
-
-/**
- * Call Facebook MMS-TTS API (Portuguese)
- */
-async function callMMSTTS(apiKey: string, text: string): Promise<ArrayBuffer> {
-  const response = await fetch(HF_ENDPOINTS.vits, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      inputs: text,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[Bark TTS] MMS-TTS error: ${response.status} - ${errorText}`);
-    throw new Error(`MMS-TTS error: ${response.status}`);
-  }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    const json = await response.json();
-    if (json.error) throw new Error(json.error);
-    throw new Error("Unexpected JSON response");
-  }
-
-  return await response.arrayBuffer();
 }
