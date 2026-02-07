@@ -24,6 +24,7 @@ interface PendingVideo {
     topic: string;
     needs_processing: boolean;
     publish_after_render?: boolean;
+    created_by_agent?: boolean;
   };
 }
 
@@ -337,7 +338,40 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     }
   }, [isGenerating, processNextVideo]);
 
-  const progress = renderQueue.length > 0 
+  // AUTO-START: Automatically start rendering when agent creates a video
+  // Only trigger when new videos appear and we're not already rendering
+  const prevPendingCountRef = useRef(pendingVideos.length);
+  useEffect(() => {
+    const newCount = pendingVideos.length;
+    const wasEmpty = prevPendingCountRef.current === 0;
+    const hasNewVideos = newCount > 0;
+    
+    // If we went from 0 to >0 pending videos and not rendering, auto-start
+    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !isPausedRef.current) {
+      console.log('[VideoRendering] Auto-starting render for new agent-created video(s)');
+      
+      // Check if any video was created by the agent
+      const agentCreatedVideo = pendingVideos.find(v => 
+        v.overlay_metadata?.created_by_agent === true
+      );
+      
+      if (agentCreatedVideo) {
+        // Small delay to ensure UI is ready
+        setTimeout(() => {
+          unlockAudio();
+          toast.info('🎬 Iniciando renderização automática do vídeo...');
+          setIsRendering(true);
+          setIsPaused(false);
+          setCompletedCount(0);
+          setTimeout(processNextVideo, 100);
+        }, 2000);
+      }
+    }
+    
+    prevPendingCountRef.current = newCount;
+  }, [pendingVideos, processNextVideo]);
+
+  const progress = renderQueue.length > 0
     ? Math.round((completedCount / (completedCount + renderQueue.length)) * 100)
     : 100;
 
