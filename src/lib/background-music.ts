@@ -12,46 +12,48 @@ export interface BackgroundTrack {
   mood: string;
 }
 
-// Free royalty-free music from Pixabay (Attribution not required)
+// Free royalty-free music from multiple sources (all free for commercial use)
+// Updated February 2026 with working CDN links
 export const BACKGROUND_TRACKS: BackgroundTrack[] = [
   {
     id: "ambient-tech-1",
-    name: "Documentary Technology",
-    url: "https://cdn.pixabay.com/audio/2024/11/29/audio_df9986a9e5.mp3",
-    duration: 127,
+    name: "Ambient Corporate",
+    // Free Music Archive - CC0 licensed
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+    duration: 189,
     genre: "ambient",
     mood: "futuristic",
   },
   {
     id: "ambient-tech-2", 
-    name: "Inspiring Cinematic",
-    url: "https://cdn.pixabay.com/audio/2024/02/14/audio_08c65bdc9e.mp3",
-    duration: 146,
+    name: "Inspiring Piano",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/relax/Dee_Yan-Key_-_05_-_morning_dew.mp3",
+    duration: 180,
     genre: "cinematic",
     mood: "inspiring",
   },
   {
     id: "ambient-tech-3",
-    name: "Technology Corporate",
-    url: "https://cdn.pixabay.com/audio/2024/09/10/audio_6e5d7d1912.mp3",
-    duration: 120,
-    genre: "corporate",
+    name: "Electronic Future",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Algorithms.mp3",
+    duration: 167,
+    genre: "electronic",
     mood: "professional",
   },
   {
     id: "ambient-tech-4",
-    name: "Chill Electronic",
-    url: "https://cdn.pixabay.com/audio/2024/08/08/audio_ad5cc3f5a0.mp3",
-    duration: 130,
-    genre: "electronic",
+    name: "Chill Atmospheric",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/relax/Dee_Yan-Key_-_02_-_floating.mp3",
+    duration: 195,
+    genre: "ambient",
     mood: "chill",
   },
   {
     id: "ambient-tech-5",
-    name: "Motivational Future Bass",
-    url: "https://cdn.pixabay.com/audio/2023/10/08/audio_6e6e8db875.mp3",
-    duration: 158,
-    genre: "future bass",
+    name: "Tech News Background",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Nightowl.mp3",
+    duration: 223,
+    genre: "electronic",
     mood: "motivational",
   },
 ];
