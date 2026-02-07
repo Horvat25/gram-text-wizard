@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useWorkspace } from "./useWorkspace";
 
 export interface Post {
   id: string;
@@ -23,6 +24,7 @@ export interface Post {
   saves_count: number | null;
   reach: number | null;
   user_id: string | null;
+  workspace_id: string | null;
   carousel_images: string[] | null;
   overlay_metadata: any | null;
 }
@@ -43,11 +45,18 @@ export interface CreatePostData {
 }
 
 export const usePosts = () => {
+  const { currentWorkspace } = useWorkspace();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async () => {
+    if (!currentWorkspace) {
+      setPosts([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
@@ -60,6 +69,7 @@ export const usePosts = () => {
       const { data, error: fetchError } = await supabase
         .from("posts")
         .select("*")
+        .eq("workspace_id", currentWorkspace.id)
         .order("created_at", { ascending: false });
 
       if (fetchError) throw fetchError;
@@ -70,9 +80,14 @@ export const usePosts = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentWorkspace]);
 
   const createPost = async (postData: CreatePostData): Promise<Post | null> => {
+    if (!currentWorkspace) {
+      toast.error("Selecione um workspace primeiro");
+      return null;
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -96,6 +111,7 @@ export const usePosts = () => {
           carousel_images: postData.carousel_images || null,
           platforms: postData.platforms || ['instagram'],
           user_id: user.id,
+          workspace_id: currentWorkspace.id,
         } as any)
         .select()
         .single();
@@ -188,13 +204,20 @@ export const usePosts = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  // Subscribe to realtime changes
+  // Subscribe to realtime changes for current workspace
   useEffect(() => {
+    if (!currentWorkspace) return;
+
     const channel = supabase
-      .channel("posts-changes")
+      .channel(`posts-changes-${currentWorkspace.id}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "posts" },
+        { 
+          event: "*", 
+          schema: "public", 
+          table: "posts",
+          filter: `workspace_id=eq.${currentWorkspace.id}`
+        },
         (payload) => {
           console.log("Realtime update:", payload);
           fetchPosts();
@@ -205,7 +228,7 @@ export const usePosts = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchPosts]);
+  }, [fetchPosts, currentWorkspace]);
 
   return {
     posts,

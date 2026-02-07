@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useWorkspace } from './useWorkspace';
 
 export interface InstagramAccount {
   id: string;
@@ -12,9 +13,11 @@ export interface InstagramAccount {
   expires_at: string | null;
   connected_at: string | null;
   updated_at: string | null;
+  workspace_id: string | null;
 }
 
 export function useInstagramAccounts() {
+  const { currentWorkspace } = useWorkspace();
   const [accounts, setAccounts] = useState<InstagramAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +25,12 @@ export function useInstagramAccounts() {
   const { toast } = useToast();
 
   const fetchAccounts = useCallback(async (isRetry = false) => {
+    if (!currentWorkspace) {
+      setAccounts([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -29,6 +38,7 @@ export function useInstagramAccounts() {
       const { data, error } = await supabase
         .from('instagram_accounts')
         .select('*')
+        .eq('workspace_id', currentWorkspace.id)
         .order('connected_at', { ascending: false });
 
       if (error) throw error;
@@ -59,7 +69,7 @@ export function useInstagramAccounts() {
     } finally {
       setLoading(false);
     }
-  }, [retryCount, toast]);
+  }, [currentWorkspace, retryCount, toast]);
 
   const disconnectAccount = async (accountId: string) => {
     try {
@@ -108,7 +118,7 @@ export function useInstagramAccounts() {
 
   useEffect(() => {
     fetchAccounts();
-  }, []);
+  }, [fetchAccounts]);
 
   return {
     accounts,

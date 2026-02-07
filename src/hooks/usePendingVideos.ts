@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useWorkspace } from './useWorkspace';
 
 interface PendingVideo {
   id: string;
@@ -19,11 +20,15 @@ interface PendingVideo {
 
 export function usePendingVideos() {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const [pendingVideos, setPendingVideos] = useState<PendingVideo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchPendingVideos = useCallback(async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) {
+      setPendingVideos([]);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -31,7 +36,7 @@ export function usePendingVideos() {
       const { data, error } = await supabase
         .from('posts')
         .select('id, caption, created_at, image_url, overlay_metadata')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .eq('status', 'draft')
         .eq('media_type', 'reels')
         .is('video_url', null)
@@ -55,7 +60,7 @@ export function usePendingVideos() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, currentWorkspace]);
 
   useEffect(() => {
     fetchPendingVideos();
