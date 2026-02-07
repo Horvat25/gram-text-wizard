@@ -276,7 +276,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio - 100% FREE pipeline: Bark → Edge TTS → Lovable TTS → Free TTS
+  // Step 3: Generate narration audio - 100% FREE pipeline: Edge TTS (Microsoft Neural) → Lovable TTS → Free TTS
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "" };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -296,73 +296,40 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let ctaNarrationUrl = "";
     let backgroundMusicUrl = "";
     
-    // Helper to try TTS providers: Bark (HuggingFace) → Edge TTS → Lovable TTS → Free TTS
-    // 100% FREE and open-source pipeline!
+    // Helper to try TTS providers: Edge TTS (Microsoft Neural) → Lovable TTS → Free TTS
+    // 100% FREE and high-quality neural voices!
     const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
-      // 🎯 Try Bark TTS first (Hugging Face - FREE, high quality neural voice)
+      // 🎯 Try Edge TTS FIRST (Microsoft Azure Neural Voices - BEST quality, FREE!)
+      // Same voices used by Microsoft Edge browser - very natural and professional
       try {
-        console.log(`[TTS] 🎯 Trying Bark TTS (Hugging Face) with voice: ${preferredVoice}...`);
-        const barkResult = await supabase.functions.invoke("huggingface-bark-tts", {
-          body: { text, voice: preferredVoice, language: "pt-BR" },
-        });
-        
-        console.log("[TTS] Bark response:", JSON.stringify({
-          hasError: !!barkResult.error,
-          hasData: !!barkResult.data,
-          hasAudioContent: !!barkResult.data?.audioContent,
-          fallbackFlag: barkResult.data?.fallback,
-          errorMsg: barkResult.data?.error || barkResult.error?.message,
-        }));
-        
-        // Check for valid audio
-        const audioContent = barkResult.data?.audioContent;
-        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-        const hasFallbackFlag = barkResult.data?.fallback === true;
-        
-        if (!barkResult.error && isValidAudio && !hasFallbackFlag) {
-          const format = barkResult.data?.format || "wav";
-          console.log(`[TTS] ✅ Bark TTS success! Audio size: ${audioContent.length} chars`);
-          toast.success(`🎙️ Narração neural gerada (Bark/Suno)`);
-          return { 
-            url: `data:audio/${format};base64,${audioContent}`,
-            provider: "Bark"
-          };
-        }
-        
-        // Log specific failure reason
-        if (hasFallbackFlag) {
-          console.log("[TTS] ⚠️ Bark returned fallback flag - model loading or rate-limited");
-        } else if (!isValidAudio) {
-          console.log("[TTS] ⚠️ Bark returned invalid/empty audio content");
-        } else {
-          console.log("[TTS] ⚠️ Bark failed:", barkResult.data?.error || barkResult.error);
-        }
-      } catch (e) {
-        console.error("[TTS] ❌ Bark TTS error:", e);
-      }
-      
-      // 🔄 Fallback to Edge TTS (VoiceRSS - FREE)
-      try {
-        console.log(`[TTS] Trying Edge TTS (VoiceRSS) with voice: ${preferredVoice}...`);
+        console.log(`[TTS] 🎯 Trying Edge TTS (Microsoft Neural) with voice: ${preferredVoice}...`);
         const edgeResult = await supabase.functions.invoke("edge-tts", {
           body: { text, voice: preferredVoice },
         });
         
+        console.log("[TTS] Edge TTS response:", JSON.stringify({
+          hasError: !!edgeResult.error,
+          hasData: !!edgeResult.data,
+          hasAudioContent: !!edgeResult.data?.audioContent,
+          provider: edgeResult.data?.provider,
+          errorMsg: edgeResult.data?.error || edgeResult.error?.message,
+        }));
+        
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          const provider = edgeResult.data.provider || "VoiceRSS";
+          const provider = edgeResult.data.provider || "Microsoft Neural";
           console.log(`[TTS] ✅ Edge TTS success! Provider: ${provider}`);
-          toast.success(`🎙️ Narração gerada (voz neural: ${provider})`);
+          toast.success(`🎙️ Narração neural gerada (${provider})`);
           return { 
             url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
             provider
           };
         }
-        console.log("[TTS] Edge TTS failed:", edgeResult.data?.error || edgeResult.error);
+        console.log("[TTS] ⚠️ Edge TTS failed:", edgeResult.data?.error || edgeResult.error);
       } catch (e) {
-        console.log("[TTS] Edge TTS error:", e);
+        console.error("[TTS] ❌ Edge TTS error:", e);
       }
       
-      // 🔄 Fallback to Lovable TTS (StreamElements/Polly - FREE)
+      // 🔄 Fallback to Lovable TTS (StreamElements/Polly - also high quality)
       try {
         console.log(`[TTS] Trying Lovable TTS (Polly) with voice: ${preferredVoice}...`);
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
@@ -377,12 +344,37 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
             provider: "Polly"
           };
         }
-        console.log("[TTS] Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
+        console.log("[TTS] ⚠️ Lovable TTS failed:", lovableResult.data?.error || lovableResult.error);
       } catch (e) {
         console.log("[TTS] Lovable TTS error:", e);
       }
       
-      // 🆓 Try Free TTS (Google Translate - FREE) as last resort
+      // 🔄 Try Bark TTS (Hugging Face - neural but often has queue delays)
+      try {
+        console.log(`[TTS] Trying Bark TTS (Hugging Face) with voice: ${preferredVoice}...`);
+        const barkResult = await supabase.functions.invoke("huggingface-bark-tts", {
+          body: { text, voice: preferredVoice, language: "pt-BR" },
+        });
+        
+        const audioContent = barkResult.data?.audioContent;
+        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
+        const hasFallbackFlag = barkResult.data?.fallback === true;
+        
+        if (!barkResult.error && isValidAudio && !hasFallbackFlag) {
+          const format = barkResult.data?.format || "wav";
+          console.log(`[TTS] ✅ Bark TTS success! Audio size: ${audioContent.length} chars`);
+          toast.success(`🎙️ Narração neural gerada (Bark/Suno)`);
+          return { 
+            url: `data:audio/${format};base64,${audioContent}`,
+            provider: "Bark"
+          };
+        }
+        console.log("[TTS] ⚠️ Bark failed (model loading or rate-limited)");
+      } catch (e) {
+        console.log("[TTS] Bark TTS error:", e);
+      }
+      
+      // 🆓 Last resort: Free TTS (Google Translate - robotic but always works)
       try {
         console.log("[TTS] Trying Free TTS (Google Translate)...");
         const freeResult = await supabase.functions.invoke("free-tts", {
