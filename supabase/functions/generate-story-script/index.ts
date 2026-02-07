@@ -190,19 +190,19 @@ FORMATO:
 - Frases curtas (8–16 palavras por segmento).
 - Português brasileiro PERFEITO, sem NENHUM erro ortográfico ou de acentuação.
 - Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema.
+- O imagePrompt PODE incluir textos/títulos se fizer sentido para o conteúdo, MAS com ortografia PERFEITA.
 
-⚠️ REGRAS CRÍTICAS PARA imagePrompt - LEIA COM ATENÇÃO:
-1. NÃO PEÇA TEXTO NA IMAGEM! Evite frases como "com texto", "escrito", "legenda", "título", "palavras", etc.
-2. Descreva APENAS elementos visuais: objetos, pessoas, cores, cenários, iluminação, composição.
-3. Use estilo cinematográfico: "iluminação dramática", "ângulo baixo", "close-up", "perspectiva aérea".
-4. NUNCA mencione ano, data ou texto a ser renderizado na imagem.
-5. Foco em ATMOSFERA e EMOÇÃO, não em informação textual.
+⚠️ REGRAS PARA imagePrompt:
+1. Use estilo cinematográfico: "iluminação dramática", "ângulo baixo", "close-up", "perspectiva aérea".
+2. Se incluir texto no imagePrompt, garanta que está 100% correto ortograficamente.
+3. Foco em ATMOSFERA e EMOÇÃO.
+4. Textos curtos funcionam melhor (máximo 3-4 palavras por texto na imagem).
 
-Exemplo de imagePrompt CORRETO:
-✅ "Close-up de um robô humanoide com olhos luminosos azuis, cenário de arena de batalha com luzes dramáticas e fumaça, estilo cinematográfico"
+Exemplo de imagePrompt com texto:
+✅ "Robô humanoide em arena futurista com texto 'Revolução Robótica' em neon azul, iluminação dramática"
 
-Exemplo de imagePrompt ERRADO:
-❌ "Imagem com texto 'IA 2026', robô segurando placa escrito tecnologia" - NUNCA FAÇA ISSO!`;
+Exemplo de imagePrompt sem texto:
+✅ "Close-up de mãos robóticas em movimento, cenário industrial com faíscas, estilo cinematográfico"`;
 
     const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
 "${topic}"
@@ -230,6 +230,55 @@ Responda APENAS com JSON no formato:
   ]
 }`;
 
+    // Spelling correction function - validates and fixes Portuguese spelling
+    const correctSpelling = async (script: any): Promise<any> => {
+      const spellingPrompt = `Você é um revisor ortográfico rigoroso de português brasileiro.
+
+TAREFA: Revise o JSON abaixo e corrija TODOS os erros ortográficos, de acentuação e gramática.
+
+REGRAS:
+- Corrija acentos faltando: você, através, é, está, já, até, revolução, atenção, decisão
+- Corrija palavras em inglês para português: AI→IA, Robotics→Robótica, Computing→Computação
+- NÃO altere o significado ou estrutura do conteúdo
+- NÃO adicione nem remova segmentos
+- Retorne APENAS o JSON corrigido, sem explicações
+
+JSON para revisar:
+${JSON.stringify(script, null, 2)}`;
+
+      try {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-lite",
+            messages: [
+              { role: "user", content: spellingPrompt },
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          console.warn("[spelling-check] Failed, using original:", response.status);
+          return script;
+        }
+
+        const data = await response.json();
+        let content = data.choices?.[0]?.message?.content || "";
+        content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+        const corrected = JSON.parse(content);
+        console.log("[spelling-check] Corrections applied successfully");
+        return corrected;
+      } catch (e) {
+        console.warn("[spelling-check] Error, using original:", e);
+        return script;
+      }
+    };
+
     // Try once, then retry if the model ignored the topic
     let parsed = await callModel(systemPrompt, userPrompt);
 
@@ -252,6 +301,10 @@ Responda APENAS com JSON no mesmo formato.`;
 
       parsed = await callModel(systemPrompt, retryUserPrompt);
     }
+
+    // Apply spelling correction as final step
+    console.log("[generate-story-script] Running spelling check...");
+    parsed = await correctSpelling(parsed);
 
     console.log("[generate-story-script] Generated title:", parsed.title);
     console.log("[generate-story-script] Segments count:", parsed.segments.length);
