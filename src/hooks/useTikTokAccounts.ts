@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useWorkspace } from "./useWorkspace";
 
 export interface TikTokAccount {
   id: string;
@@ -14,14 +15,22 @@ export interface TikTokAccount {
   expires_at: string | null;
   connected_at: string | null;
   updated_at: string | null;
+  workspace_id: string | null;
 }
 
 export const useTikTokAccounts = () => {
+  const { currentWorkspace } = useWorkspace();
   const [accounts, setAccounts] = useState<TikTokAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAccounts = useCallback(async () => {
+    if (!currentWorkspace) {
+      setAccounts([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -36,6 +45,7 @@ export const useTikTokAccounts = () => {
       const { data, error: fetchError } = await supabase
         .from("tiktok_accounts")
         .select("*")
+        .eq("workspace_id", currentWorkspace.id)
         .order("connected_at", { ascending: false });
 
       if (fetchError) {
@@ -51,7 +61,7 @@ export const useTikTokAccounts = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentWorkspace]);
 
   const disconnectAccount = async (accountId: string): Promise<boolean> => {
     try {

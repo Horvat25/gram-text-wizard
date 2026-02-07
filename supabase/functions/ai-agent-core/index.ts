@@ -1071,29 +1071,32 @@ Deno.serve(async (req) => {
     
     // Parse request body
     let userId: string | null = null;
+    let workspaceId: string | null = null;
     let trigger = 'manual';
     
     try {
       const body = await req.json();
       userId = body.userId;
+      workspaceId = body.workspaceId;
       trigger = body.trigger || 'manual';
     } catch {
       // No body or invalid JSON
     }
     
-    // If triggered by cron, process all users with auto_post_enabled
+    // If triggered by cron, process all workspaces with auto_post_enabled
     if (trigger === 'cron' && !userId) {
-      console.log('[AGENT] Trigger: CRON - Processando todos os usuários ativos...');
+      console.log('[AGENT] Trigger: CRON - Processando todos os workspaces ativos...');
       
       const { data: activeContexts } = await supabase
         .from('agent_context')
-        .select('user_id')
-        .eq('auto_post_enabled', true);
+        .select('user_id, workspace_id')
+        .eq('auto_post_enabled', true)
+        .not('workspace_id', 'is', null);
       
       if (!activeContexts || activeContexts.length === 0) {
-        console.log('[AGENT] Nenhum usuário com auto_post ativo');
+        console.log('[AGENT] Nenhum workspace com auto_post ativo');
         return new Response(
-          JSON.stringify({ success: true, message: 'Nenhum usuário ativo' }),
+          JSON.stringify({ success: true, message: 'Nenhum workspace ativo' }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -1101,11 +1104,11 @@ Deno.serve(async (req) => {
       const results = [];
       for (const ctx of activeContexts) {
         try {
-          const result = await processUser(supabase, ctx.user_id, lovableApiKey, supabaseUrl, 'cron');
-          results.push({ userId: ctx.user_id, ...result });
+          const result = await processWorkspace(supabase, ctx.user_id, ctx.workspace_id, lovableApiKey, supabaseUrl, 'cron');
+          results.push({ workspaceId: ctx.workspace_id, userId: ctx.user_id, ...result });
         } catch (e) {
-          console.error(`[AGENT] Erro ao processar usuário ${ctx.user_id}:`, e);
-          results.push({ userId: ctx.user_id, error: String(e) });
+          console.error(`[AGENT] Erro ao processar workspace ${ctx.workspace_id}:`, e);
+          results.push({ workspaceId: ctx.workspace_id, userId: ctx.user_id, error: String(e) });
         }
       }
       
@@ -1116,7 +1119,7 @@ Deno.serve(async (req) => {
       );
     }
     
-    // Single user processing
+    // Single workspace processing - require workspaceId
     if (!userId) {
       return new Response(
         JSON.stringify({ error: 'userId é obrigatório para trigger manual' }),
@@ -1124,7 +1127,14 @@ Deno.serve(async (req) => {
       );
     }
     
-    const result = await processUser(supabase, userId, lovableApiKey, supabaseUrl);
+    if (!workspaceId) {
+      return new Response(
+        JSON.stringify({ error: 'workspaceId é obrigatório para trigger manual' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger);
     
     console.log('[AGENT] ===== CICLO FINALIZADO =====');
     return new Response(
@@ -1141,21 +1151,22 @@ Deno.serve(async (req) => {
   }
 });
 
-// Process a single user
-async function processUser(
+// Process a single workspace
+async function processWorkspace(
   supabase: any, 
   userId: string, 
+  workspaceId: string,
   lovableApiKey: string,
   supabaseUrl: string,
   trigger: string = 'manual'
 ): Promise<any> {
-  console.log(`[AGENT] Processando usuário: ${userId}`);
+  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId})`);
   
   // Get agent name for conversational messages
   const { data: contextData } = await supabase
     .from('agent_context')
     .select('agent_name')
-    .eq('user_id', userId)
+    .eq('workspace_id', workspaceId)
     .maybeSingle();
   const agentName = contextData?.agent_name || 'Agente';
   
@@ -1164,6 +1175,7 @@ async function processUser(
     .from('agent_execution_reports')
     .insert({
       user_id: userId,
+      workspace_id: workspaceId,
       trigger,
       status: 'running',
       started_at: new Date().toISOString()

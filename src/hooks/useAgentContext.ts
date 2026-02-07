@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useWorkspace } from './useWorkspace';
 import { toast } from 'sonner';
 
 export interface AgentContext {
@@ -18,6 +19,7 @@ export interface AgentContext {
   preferred_platforms: string[];
   daily_post_limit: number;
   min_hours_between_posts: number;
+  workspace_id: string | null;
   // Extended fields
   agent_name: string | null;
   agent_avatar_url: string | null;
@@ -53,32 +55,40 @@ export interface AgentDecision {
   actual_engagement: number | null;
   hypothesis_confirmed: boolean | null;
   learning: string | null;
+  workspace_id: string | null;
 }
 
 export function useAgentContext() {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const [context, setContext] = useState<AgentContext | null>(null);
   const [decisions, setDecisions] = useState<AgentDecision[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
 
   const fetchContext = useCallback(async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) {
+      setContext(null);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
         .from('agent_context')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .maybeSingle();
 
       if (error) throw error;
 
       if (!data) {
-        // Create initial context
+        // Create initial context for this workspace
         const { data: newContext, error: createError } = await supabase
           .from('agent_context')
-          .insert({ user_id: user.id })
+          .insert({ 
+            user_id: user.id,
+            workspace_id: currentWorkspace.id
+          })
           .select()
           .single();
 
@@ -90,16 +100,19 @@ export function useAgentContext() {
     } catch (error) {
       console.error('Error fetching agent context:', error);
     }
-  }, [user]);
+  }, [user, currentWorkspace]);
 
   const fetchDecisions = useCallback(async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) {
+      setDecisions([]);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
         .from('agent_decisions')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -108,7 +121,7 @@ export function useAgentContext() {
     } catch (error) {
       console.error('Error fetching agent decisions:', error);
     }
-  }, [user]);
+  }, [user, currentWorkspace]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -123,7 +136,7 @@ export function useAgentContext() {
   }, [user, fetchContext, fetchDecisions]);
 
   const updateContext = async (updates: Partial<AgentContext>) => {
-    if (!user || !context) return;
+    if (!user || !context || !currentWorkspace) return;
 
     try {
       const { error } = await supabase
@@ -132,7 +145,7 @@ export function useAgentContext() {
           ...updates,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', user.id);
+        .eq('workspace_id', currentWorkspace.id);
 
       if (error) throw error;
 
@@ -145,12 +158,16 @@ export function useAgentContext() {
   };
 
   const runAgent = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
 
     setIsRunning(true);
     try {
       const { data, error } = await supabase.functions.invoke('ai-agent-core', {
-        body: { userId: user.id, trigger: 'manual' }
+        body: { 
+          userId: user.id, 
+          workspaceId: currentWorkspace.id,
+          trigger: 'manual' 
+        }
       });
 
       if (error) throw error;
@@ -170,11 +187,15 @@ export function useAgentContext() {
   };
 
   const runFeedbackLoop = async () => {
-    if (!user) return;
+    if (!user || !currentWorkspace) return;
 
     try {
       const { data, error } = await supabase.functions.invoke('ai-agent-feedback', {
-        body: { userId: user.id, processAll: true }
+        body: { 
+          userId: user.id, 
+          workspaceId: currentWorkspace.id,
+          processAll: true 
+        }
       });
 
       if (error) throw error;

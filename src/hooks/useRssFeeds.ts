@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useWorkspace } from './useWorkspace';
 import { toast } from 'sonner';
 
 export interface RssItem {
@@ -42,6 +43,7 @@ export const DEFAULT_FEEDS: RssFeed[] = [
 
 export function useRssFeeds() {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const [items, setItems] = useState<RssItem[]>([]);
   const [stats, setStats] = useState<RssStats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -49,8 +51,8 @@ export function useRssFeeds() {
 
   // Buscar feeds RSS e salvar no banco
   const fetchFeeds = useCallback(async (feeds?: RssFeed[], limit = 10) => {
-    if (!user?.id) {
-      toast.error('Faça login para buscar notícias');
+    if (!user?.id || !currentWorkspace) {
+      toast.error('Faça login e selecione um workspace para buscar notícias');
       return null;
     }
 
@@ -61,6 +63,7 @@ export function useRssFeeds() {
       const { data, error: fnError } = await supabase.functions.invoke('fetch-rss', {
         body: {
           userId: user.id,
+          workspaceId: currentWorkspace.id,
           feeds: feeds || DEFAULT_FEEDS,
           saveToDb: true,
           limit,
@@ -98,18 +101,18 @@ export function useRssFeeds() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, currentWorkspace]);
 
   // Carregar itens salvos do banco
   const loadSavedItems = useCallback(async (onlyWithImages = false, onlyUnused = true) => {
-    if (!user?.id) return null;
+    if (!user?.id || !currentWorkspace) return null;
 
     setLoading(true);
     try {
       let query = supabase
         .from('rss_items')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .order('fetched_at', { ascending: false })
         .limit(50);
 
@@ -146,11 +149,11 @@ export function useRssFeeds() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, currentWorkspace]);
 
   // Marcar item como usado (vinculado a um post)
   const markAsUsed = useCallback(async (itemId: string, postId: string) => {
-    if (!user?.id) return false;
+    if (!user?.id || !currentWorkspace) return false;
 
     try {
       const { error: updateError } = await supabase
@@ -160,7 +163,7 @@ export function useRssFeeds() {
           used_in_post_id: postId,
         })
         .eq('id', itemId)
-        .eq('user_id', user.id);
+        .eq('workspace_id', currentWorkspace.id);
 
       if (updateError) throw updateError;
 
@@ -174,11 +177,11 @@ export function useRssFeeds() {
       console.error('Error marking RSS item as used:', err);
       return false;
     }
-  }, [user?.id]);
+  }, [user?.id, currentWorkspace]);
 
   // Deletar itens antigos (limpeza)
   const cleanupOldItems = useCallback(async (daysOld = 7) => {
-    if (!user?.id) return 0;
+    if (!user?.id || !currentWorkspace) return 0;
 
     try {
       const cutoffDate = new Date();
@@ -187,7 +190,7 @@ export function useRssFeeds() {
       const { data, error: deleteError } = await supabase
         .from('rss_items')
         .delete()
-        .eq('user_id', user.id)
+        .eq('workspace_id', currentWorkspace.id)
         .eq('is_used', false)
         .lt('fetched_at', cutoffDate.toISOString())
         .select('id');
@@ -203,7 +206,7 @@ export function useRssFeeds() {
       console.error('Error cleaning up RSS items:', err);
       return 0;
     }
-  }, [user?.id]);
+  }, [user?.id, currentWorkspace]);
 
   return {
     items,

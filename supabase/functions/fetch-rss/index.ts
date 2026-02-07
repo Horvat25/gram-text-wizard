@@ -190,7 +190,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userId, feeds, saveToDb = true, limit = 10 } = await req.json();
+    const { userId, workspaceId, feeds, saveToDb = true, limit = 10 } = await req.json();
     
     if (!userId) {
       return new Response(
@@ -198,9 +198,16 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    if (!workspaceId) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'workspaceId é obrigatório' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const feedsToFetch = feeds && feeds.length > 0 ? feeds : DEFAULT_FEEDS;
-    console.log(`[RSS] Fetching ${feedsToFetch.length} feeds for user ${userId}`);
+    console.log(`[RSS] Fetching ${feedsToFetch.length} feeds for workspace ${workspaceId}`);
     
     const allItems: RssItem[] = [];
     const errors: string[] = [];
@@ -264,6 +271,7 @@ serve(async (req) => {
             .from('rss_items')
             .upsert({
               user_id: userId,
+              workspace_id: workspaceId,
               source_name: item.sourceName,
               source_url: item.sourceUrl,
               title: item.title,
