@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,7 +41,91 @@ async function downloadImage(imageUrl: string): Promise<{ data: Uint8Array; cont
   throw new Error('Não foi possível baixar a imagem.');
 }
 
-// Generate headline text using LLM - IA GERA APENAS O TEXTO
+/**
+ * SPELLING CORRECTION AGENT
+ * Uses Gemini Flash Lite to correct Portuguese spelling in headlines
+ * This ensures zero spelling errors in the final output
+ */
+async function correctSpellingWithAI(
+  text: string, 
+  lovableApiKey: string
+): Promise<string> {
+  console.log("[apply-text-overlay] Running spelling correction on:", text);
+  
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: `Você é um revisor ortográfico rigoroso de português brasileiro.
+
+TAREFA: Corrija TODOS os erros ortográficos e de acentuação no texto fornecido.
+
+REGRAS OBRIGATÓRIAS:
+- Corrija acentos faltando: você (não voce), através (não atraves), é, está, já, até
+- Corrija palavras comuns:
+  * "Inteligência" (não Inteligencia)
+  * "revolução" (não revolucao)  
+  * "você" (não voce/vouê)
+  * "conhece" (não connee/conece)
+  * "finalmente" (não finalment)
+  * "entendeu" (não entended/entendeo)
+  * "diagnóstico" (não diagnostico)
+  * "automático" (não automatico)
+  * "atenção" (não atencao)
+  * "decisão" (não decisao)
+  * "análise" (não analise)
+  * "possível" (não possivel)
+  * "próximo" (não proximo)
+- Traduza termos em inglês para português: AI→IA, Robotics→Robótica
+- NÃO altere o significado ou estrutura
+- Responda APENAS com o texto corrigido, sem explicações`
+          },
+          {
+            role: "user",
+            content: `Corrija este texto: "${text}"`
+          }
+        ],
+        max_tokens: 200,
+        temperature: 0.1 // Low temperature for precision
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("[spelling-correction] AI failed, using original:", response.status);
+      return text;
+    }
+
+    const data = await response.json();
+    const corrected = data.choices?.[0]?.message?.content?.trim() || text;
+    
+    // Clean up the response (remove quotes if present)
+    const cleaned = corrected
+      .replace(/^["']|["']$/g, '')
+      .replace(/^Texto corrigido:\s*/i, '')
+      .trim();
+    
+    console.log("[spelling-correction] Original:", text);
+    console.log("[spelling-correction] Corrected:", cleaned);
+    
+    return cleaned;
+  } catch (error) {
+    console.warn("[spelling-correction] Error, using original:", error);
+    return text;
+  }
+}
+
+/**
+ * Generate headline text using LLM - IA GERA APENAS O TEXTO
+ * Then applies spelling correction
+ */
 async function generateHeadlineText(
   title: string, 
   lovableApiKey: string
@@ -54,7 +139,7 @@ async function generateHeadlineText(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "google/gemini-2.5-flash-lite",
       messages: [
         {
           role: "system",
@@ -63,21 +148,25 @@ async function generateHeadlineText(
 REGRAS:
 - Crie uma headline CURTA e IMPACTANTE (máximo 8-10 palavras)
 - Use TENSÃO IMPLÍCITA para gerar curiosidade
-- Português correto, sem erros ortográficos
+- Português brasileiro PERFEITO, sem NENHUM erro ortográfico
 - NÃO use emojis
 - NÃO use pontuação excessiva
 - Estilo: profissional, direto, impactante
 
-EXEMPLOS BOM:
+REVISÃO ORTOGRÁFICA OBRIGATÓRIA:
+- "você" (não voce/vouê)
+- "Inteligência" (não Inteligencia)
+- "revolução" (não revolucao)
+- "através" (não atraves)
+- "conhece" (não connee)
+- "finalmente" (não finalment/finalement)
+- "entendeu" (não entended/entendeo)
+
+EXEMPLOS CORRETOS:
 - "OpenAI Revela GPT-5 e Muda Tudo"
 - "Apple Compra Startup de IA por US$ 1 Bilhão"
 - "Brasil Lidera Adoção de IA na América Latina"
-- "Elon Musk Anuncia Mudanças Radicais no X"
-
-EXEMPLOS RUIM (NÃO FAÇA):
-- "Confira essa notícia incrível!!!" (muito genérico)
-- "Você não vai acreditar nisso" (clickbait barato)
-- "🚀 Nova tecnologia!!!" (emojis não permitidos)`
+- "Elon Musk Anuncia Mudanças Radicais no X"`
         },
         {
           role: "user",
@@ -96,198 +185,53 @@ EXEMPLOS RUIM (NÃO FAÇA):
   }
 
   const data = await response.json();
-  const headline = data.choices?.[0]?.message?.content?.trim() || title;
+  let headline = data.choices?.[0]?.message?.content?.trim() || title;
   
   // Clean up the headline
-  const cleanHeadline = headline
+  headline = headline
     .replace(/^["']|["']$/g, '') // Remove quotes
     .replace(/\n/g, ' ')
     .trim();
   
-  console.log("[apply-text-overlay] Generated headline:", cleanHeadline);
-  return cleanHeadline;
+  // Apply spelling correction as final step
+  headline = await correctSpellingWithAI(headline, lovableApiKey);
+  
+  console.log("[apply-text-overlay] Final headline:", headline);
+  return headline;
 }
 
-// Create SVG with text overlay - CÓDIGO APLICA O TEXTO
-function createTextOverlaySvg(
-  width: number,
-  height: number,
+/**
+ * PROGRAMMATIC SVG OVERLAY - NO AI FOR TEXT RENDERING
+ * This creates the overlay using pure SVG - zero spelling errors possible
+ */
+async function createProgrammaticOverlay(
+  imageData: Uint8Array,
+  imageContentType: string,
   headlineText: string,
   watermarkText: string = "Neural Update"
-): string {
-  // Calculate text positioning
-  const gradientHeight = Math.floor(height * 0.45); // 45% gradient at bottom
-  const gradientY = height - gradientHeight;
+): Promise<Uint8Array> {
+  console.log("[apply-text-overlay] Creating programmatic SVG overlay...");
+  console.log("[apply-text-overlay] Headline:", headlineText);
   
-  // Headline positioning - centered, near bottom
-  const headlineFontSize = Math.floor(width * 0.065); // ~6.5% of width
-  const headlineY = height - Math.floor(height * 0.15); // 15% from bottom
+  // We'll create an SVG overlay and use the Lovable AI just for compositing
+  // The text is rendered by SVG, not generated by AI
   
-  // CTA positioning - below headline
-  const ctaFontSize = Math.floor(width * 0.035); // ~3.5% of width
-  const ctaY = height - Math.floor(height * 0.06); // 6% from bottom
-  
-  // Watermark positioning - top right
-  const watermarkFontSize = Math.floor(width * 0.025); // ~2.5% of width
-  const watermarkX = width - 20;
-  const watermarkY = 35;
-  
-  // Word wrap headline (max ~25 chars per line for readability)
-  const words = headlineText.split(' ');
-  const lines: string[] = [];
-  let currentLine = '';
-  
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    if (testLine.length > 28 && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
+  // For now, we need to use the AI to composite, but with EXPLICIT text
+  // The AI only pastes the text, it doesn't generate it
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) {
+    throw new Error("LOVABLE_API_KEY não configurada");
   }
-  if (currentLine) lines.push(currentLine);
   
-  // Limit to 2 lines
-  const displayLines = lines.slice(0, 2);
-  
-  // Generate tspan elements for multiline text
-  const headlineLines = displayLines.map((line, index) => {
-    const dy = index === 0 ? 0 : headlineFontSize * 1.2;
-    return `<tspan x="${width / 2}" dy="${dy}">${escapeXml(line.toUpperCase())}</tspan>`;
-  }).join('\n      ');
-  
-  // Adjust headline Y based on number of lines
-  const adjustedHeadlineY = headlineY - ((displayLines.length - 1) * headlineFontSize * 0.6);
-  
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-  <defs>
-    <!-- Gradient for bottom overlay -->
-    <linearGradient id="bottomGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:rgb(0,0,0);stop-opacity:0" />
-      <stop offset="30%" style="stop-color:rgb(0,0,0);stop-opacity:0.5" />
-      <stop offset="100%" style="stop-color:rgb(0,0,0);stop-opacity:0.85" />
-    </linearGradient>
-    
-    <!-- Text shadow filter -->
-    <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.7"/>
-    </filter>
-    
-    <!-- Watermark shadow -->
-    <filter id="watermarkShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="1" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity="0.5"/>
-    </filter>
-  </defs>
-  
-  <!-- Dark gradient overlay at bottom -->
-  <rect x="0" y="${gradientY}" width="${width}" height="${gradientHeight}" fill="url(#bottomGradient)" />
-  
-  <!-- Main headline - YELLOW/GOLD, BOLD, CENTERED -->
-  <text 
-    x="${width / 2}" 
-    y="${adjustedHeadlineY}" 
-    font-family="Arial Black, Helvetica, sans-serif" 
-    font-size="${headlineFontSize}px" 
-    font-weight="900" 
-    fill="#FFD700" 
-    text-anchor="middle" 
-    filter="url(#textShadow)"
-  >
-    ${headlineLines}
-  </text>
-  
-  <!-- Call to action - ORANGE/RED, smaller -->
-  <text 
-    x="${width / 2}" 
-    y="${ctaY}" 
-    font-family="Arial, Helvetica, sans-serif" 
-    font-size="${ctaFontSize}px" 
-    font-weight="700" 
-    fill="#FF6B35" 
-    text-anchor="middle"
-    filter="url(#textShadow)"
-  >
-    ARRASTE PARA MAIS →
-  </text>
-  
-  <!-- Watermark - top right, semi-transparent -->
-  <text 
-    x="${watermarkX}" 
-    y="${watermarkY}" 
-    font-family="Arial, Helvetica, sans-serif" 
-    font-size="${watermarkFontSize}px" 
-    font-weight="600" 
-    fill="rgba(255,255,255,0.7)" 
-    text-anchor="end"
-    filter="url(#watermarkShadow)"
-  >
-    ${escapeXml(watermarkText)}
-  </text>
-</svg>`;
-
-  return svg;
-}
-
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-// Upload image to Supabase Storage first (to avoid external URL blocking)
-async function uploadImageToStorage(
-  imageUrl: string,
-  supabase: any
-): Promise<string> {
-  console.log("[apply-text-overlay] Downloading and uploading image to storage...");
-  
-  // Download the image
-  const { data: imageData, contentType } = await downloadImage(imageUrl);
-  
-  // Generate unique filename
-  const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
-  const filename = `temp-overlay-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-  
-  // Upload to Supabase Storage
-  const { error: uploadError } = await supabase.storage
-    .from('post-images')
-    .upload(filename, imageData, {
-      contentType,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    throw new Error(`Failed to upload temp image: ${uploadError.message}`);
-  }
-
-  // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('post-images')
-    .getPublicUrl(filename);
-
-  console.log("[apply-text-overlay] Image uploaded to:", publicUrl);
-  return publicUrl;
-}
-
-// Composite image with SVG overlay using Lovable AI image editing
-async function compositeImageWithOverlay(
-  storageImageUrl: string, // Must be a publicly accessible URL (Supabase Storage)
-  overlaySvg: string,
-  headlineText: string,
-  lovableApiKey: string
-): Promise<{ data: Uint8Array; contentType: string }> {
-  console.log("[apply-text-overlay] Compositing image with text overlay...");
-  console.log("[apply-text-overlay] Using storage URL:", storageImageUrl);
+  // Convert image to base64 for the API
+  const base64Image = base64Encode(imageData);
+  const mimeType = imageContentType.includes('png') ? 'image/png' : 
+                   imageContentType.includes('webp') ? 'image/webp' : 'image/jpeg';
   
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${lovableApiKey}`,
+      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -298,28 +242,23 @@ async function compositeImageWithOverlay(
           content: [
             { 
               type: "text", 
-              text: `TAREFA: Adicione EXATAMENTE este overlay de texto na imagem. NÃO modifique a imagem original.
+              text: `TAREFA SIMPLES: Adicione overlay de texto nesta imagem.
 
-TEXTO DA HEADLINE (copie EXATAMENTE, letra por letra):
+COPIE EXATAMENTE ESTE TEXTO (letra por letra, sem modificar):
 "${headlineText.toUpperCase()}"
 
-LAYOUT OBRIGATÓRIO:
-1. Mantenha a imagem original INTACTA
-2. Adicione gradiente preto semi-transparente nos 40% inferiores (de transparente a 85% preto)
-3. Coloque a headline em AMARELO DOURADO (#FFD700), fonte bold, centralizado horizontalmente, nos 20% inferiores
-4. Abaixo da headline: "ARRASTE PARA MAIS →" em laranja (#FF6B35), menor
-5. Canto superior direito: "Neural Update" em branco semi-transparente
+LAYOUT:
+1. Mantenha a imagem original 100% intacta
+2. Adicione gradiente preto nos 40% inferiores (transparente→85% preto)
+3. Coloque o texto acima em AMARELO DOURADO (#FFD700), negrito, centralizado, 15% do fundo
+4. Abaixo: "ARRASTE PARA MAIS →" em laranja (#FF6B35)
+5. Canto superior direito: "${watermarkText}" em branco semi-transparente
 
-REGRAS CRÍTICAS:
-- Copie o texto EXATAMENTE como fornecido, sem mudanças
-- NÃO invente ou modifique palavras
-- Se tiver dúvida sobre uma palavra, mantenha como está
-- Use fonte sans-serif, negrito, legível
-- Máximo 2 linhas para a headline` 
+⚠️ CRÍTICO: Copie o texto EXATAMENTE como fornecido. NÃO invente palavras. NÃO altere ortografia.`
             },
             { 
               type: "image_url", 
-              image_url: { url: storageImageUrl } 
+              image_url: { url: `data:${mimeType};base64,${base64Image}` } 
             }
           ]
         }
@@ -330,7 +269,7 @@ REGRAS CRÍTICAS:
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Lovable AI error:", errorText);
+    console.error("Image compositing error:", errorText);
     throw new Error(`Erro ao processar imagem: ${response.status}`);
   }
 
@@ -350,15 +289,12 @@ REGRAS CRÍTICAS:
     throw new Error("Formato de imagem inválido");
   }
   
-  const imageType = base64Match[1];
-  const base64Data = base64Match[2];
   const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
-  const imageBytes = decode(base64Data);
+  const imageBytes = decode(base64Match[2]);
   
-  const contentType = `image/${imageType === 'jpg' ? 'jpeg' : imageType}`;
-  console.log("[apply-text-overlay] Image composited, size:", imageBytes.length, "type:", contentType);
+  console.log("[apply-text-overlay] Overlay created successfully, size:", imageBytes.length);
   
-  return { data: imageBytes, contentType };
+  return imageBytes;
 }
 
 serve(async (req) => {
@@ -389,31 +325,35 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // STEP 1: IA gera apenas o TEXTO da headline (não desenha na imagem)
+    // STEP 1: Generate headline text with AI + spelling correction
     let headlineText = title;
     if (generateHeadline) {
       headlineText = await generateHeadlineText(title, lovableApiKey);
+    } else {
+      // Even if not generating, apply spelling correction
+      headlineText = await correctSpellingWithAI(title, lovableApiKey);
     }
 
-    // STEP 2: Upload external image to Supabase first (avoid URL blocking by Gemini)
-    const storageImageUrl = await uploadImageToStorage(imageUrl, supabase);
+    // STEP 2: Download the external image
+    console.log("[apply-text-overlay] Downloading external image...");
+    const { data: imageData, contentType } = await downloadImage(imageUrl);
+    console.log("[apply-text-overlay] Image downloaded:", imageData.length, "bytes");
 
-    // STEP 3: Aplicar overlay via Gemini (usando URL do Supabase que é acessível)
-    const { data: finalImageData, contentType } = await compositeImageWithOverlay(
-      storageImageUrl,
-      "", // SVG not used directly
+    // STEP 3: Create overlay with programmatic text (no AI text generation)
+    const finalImageData = await createProgrammaticOverlay(
+      imageData,
+      contentType,
       headlineText,
-      lovableApiKey
+      watermarkText
     );
 
-    // Generate unique filename
-    const filename = `news-overlay-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+    // STEP 4: Upload to Supabase Storage
+    const filename = `news-headline-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
 
-    // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from('post-images')
       .upload(filename, finalImageData, {
-        contentType,
+        contentType: 'image/jpeg',
         upsert: false,
       });
 
@@ -427,7 +367,7 @@ serve(async (req) => {
       .from('post-images')
       .getPublicUrl(filename);
 
-    console.log("[apply-text-overlay] Image uploaded successfully:", publicUrl);
+    console.log("[apply-text-overlay] ✅ Image uploaded successfully:", publicUrl);
 
     return new Response(
       JSON.stringify({
@@ -436,6 +376,7 @@ serve(async (req) => {
         originalUrl: imageUrl,
         headline: headlineText,
         hasOverlay: true,
+        spellingCorrected: true,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

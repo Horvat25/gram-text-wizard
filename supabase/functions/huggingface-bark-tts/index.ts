@@ -7,22 +7,20 @@ const corsHeaders = {
 };
 
 /**
- * TTS Neural - ÚNICA ENGINE (Google Translate TTS)
+ * Neural TTS for Technology Content
  * 
- * Por que Google TTS:
- * - Bark/HuggingFace: endpoints migraram, 404 em todos os modelos
- * - ElevenLabs: quota esgotada (86/10000 créditos)
+ * Uses Microsoft Edge TTS for high-quality neural voices
+ * Fallback to Google TTS if Edge fails
  * 
- * Regras (conforme prompt definitivo):
- * - Única tentativa
- * - Timeout: 10 segundos por chunk
- * - Chunking: 200 chars por chunk
- * - Se falhar → tts_status: "failed", vídeo continua só com trilha
- * - Sem fallback, sem retry
+ * Tech Voice Options:
+ * - pt-BR-AntonioNeural: Male, professional, authoritative (RECOMMENDED)
+ * - pt-BR-FranciscaNeural: Female, warm, engaging
+ * - pt-BR-ThalitaNeural: Female, young, dynamic
+ * - pt-BR-GiovannaNeural: Female, news anchor style
  */
 
 const MAX_CHUNK_SIZE = 200;
-const TIMEOUT_MS = 10000;
+const TIMEOUT_MS = 15000;
 
 interface TTSRequest {
   text: string;
@@ -30,20 +28,37 @@ interface TTSRequest {
   language?: string;
 }
 
+// Microsoft Edge TTS voices for technology content
+const EDGE_VOICES: Record<string, string> = {
+  // Male voices - professional tech
+  "antonio": "pt-BR-AntonioNeural",
+  "tech_male": "pt-BR-AntonioNeural",
+  "professional": "pt-BR-AntonioNeural",
+  
+  // Female voices
+  "francisca": "pt-BR-FranciscaNeural", 
+  "thalita": "pt-BR-ThalitaNeural",
+  "giovanna": "pt-BR-GiovannaNeural",
+  "tech_female": "pt-BR-FranciscaNeural",
+  
+  // Default
+  "default": "pt-BR-AntonioNeural", // Tech-focused male voice
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { text, language = "pt-BR" }: TTSRequest = await req.json();
+    const { text, voice = "tech_male", language = "pt-BR" }: TTSRequest = await req.json();
 
-    console.log("[TTS] ========== INICIADO ==========");
-    console.log(`[TTS] Texto: ${text?.length || 0} chars`);
-    console.log(`[TTS] Idioma: ${language}`);
+    console.log("[TTS-Neural] ========== INICIADO ==========");
+    console.log(`[TTS-Neural] Texto: ${text?.length || 0} chars`);
+    console.log(`[TTS-Neural] Voz: ${voice}`);
 
     if (!text || text.trim().length === 0) {
-      console.error("[TTS] ❌ Texto vazio");
+      console.error("[TTS-Neural] ❌ Texto vazio");
       return new Response(
         JSON.stringify({ 
           tts_status: "failed",
@@ -53,80 +68,72 @@ serve(async (req) => {
       );
     }
 
-    // Limpar texto
+    // Clean text for TTS
     const cleanedText = cleanTextForTTS(text);
-    console.log(`[TTS] Texto limpo: ${cleanedText.length} chars`);
+    console.log(`[TTS-Neural] Texto limpo: ${cleanedText.length} chars`);
 
-    // Chunking do texto
-    const chunks = splitTextIntoChunks(cleanedText, MAX_CHUNK_SIZE);
-    console.log(`[TTS] Chunks: ${chunks.length}`);
-
-    // Gerar áudio para cada chunk
-    const audioBuffers: ArrayBuffer[] = [];
+    // Try Microsoft Edge TTS first (neural, high quality)
+    let audioData: Uint8Array | null = null;
+    let usedProvider = "unknown";
     
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      console.log(`[TTS] Chunk ${i + 1}/${chunks.length}: "${chunk.substring(0, 30)}..."`);
+    const edgeVoice = EDGE_VOICES[voice.toLowerCase()] || EDGE_VOICES["default"];
+    
+    try {
+      console.log(`[TTS-Neural] Tentando Edge TTS com voz: ${edgeVoice}`);
+      audioData = await generateEdgeTTS(cleanedText, edgeVoice, TIMEOUT_MS);
+      usedProvider = "Microsoft Edge Neural";
+      console.log(`[TTS-Neural] ✅ Edge TTS sucesso! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
+    } catch (edgeError: any) {
+      console.warn(`[TTS-Neural] Edge TTS falhou: ${edgeError.message}`);
       
+      // Fallback to Google TTS
       try {
-        const audioBuffer = await callGoogleTTSWithTimeout(chunk, language, TIMEOUT_MS);
-        
-        if (!audioBuffer || audioBuffer.byteLength === 0) {
-          console.error(`[TTS] ❌ Chunk ${i + 1} vazio`);
-          return new Response(
-            JSON.stringify({ 
-              tts_status: "failed",
-              error: `Chunk ${i + 1} sem áudio`,
-            }),
-            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        
-        audioBuffers.push(audioBuffer);
-        console.log(`[TTS] ✓ Chunk ${i + 1}: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
-        
-      } catch (chunkError: any) {
-        console.error(`[TTS] ❌ Chunk ${i + 1} erro: ${chunkError.message}`);
+        console.log(`[TTS-Neural] Fallback para Google TTS...`);
+        audioData = await generateGoogleTTS(cleanedText, language, TIMEOUT_MS);
+        usedProvider = "Google TTS";
+        console.log(`[TTS-Neural] ✅ Google TTS sucesso! Size: ${(audioData.length / 1024).toFixed(1)}KB`);
+      } catch (googleError: any) {
+        console.error(`[TTS-Neural] ❌ Google TTS também falhou: ${googleError.message}`);
         return new Response(
           JSON.stringify({ 
             tts_status: "failed",
-            error: chunkError.message,
+            error: "Todos os provedores TTS falharam",
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     }
 
-    // Concatenar todos os buffers
-    const totalSize = audioBuffers.reduce((acc, buf) => acc + buf.byteLength, 0);
-    const combinedBuffer = new Uint8Array(totalSize);
-    let offset = 0;
-    
-    for (const buffer of audioBuffers) {
-      combinedBuffer.set(new Uint8Array(buffer), offset);
-      offset += buffer.byteLength;
+    if (!audioData || audioData.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          tts_status: "failed",
+          error: "Nenhum áudio gerado",
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    const base64Audio = base64Encode(combinedBuffer);
+    const base64Audio = base64Encode(audioData);
     
-    console.log(`[TTS] ✅ SUCESSO! Size: ${(totalSize / 1024).toFixed(1)}KB`);
-    console.log("[TTS] ========== FINALIZADO ==========");
+    console.log(`[TTS-Neural] ✅ SUCESSO! Provider: ${usedProvider}, Size: ${(audioData.length / 1024).toFixed(1)}KB`);
+    console.log("[TTS-Neural] ========== FINALIZADO ==========");
 
     return new Response(
       JSON.stringify({
         audioContent: base64Audio,
         format: "mp3",
         tts_status: "success",
-        model: "google-tts",
-        chunks_processed: chunks.length,
-        size_kb: (totalSize / 1024).toFixed(1),
+        model: usedProvider,
+        voice: edgeVoice,
+        size_kb: (audioData.length / 1024).toFixed(1),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error: any) {
-    console.error("[TTS] ❌ FALHOU:", error.message);
-    console.log("[TTS] → Seguir sem voz");
+    console.error("[TTS-Neural] ❌ FALHOU:", error.message);
+    console.log("[TTS-Neural] → Seguir sem voz");
     
     return new Response(
       JSON.stringify({ 
@@ -142,20 +149,20 @@ serve(async (req) => {
 });
 
 /**
- * Limpa texto para TTS
+ * Clean text for TTS
  */
 function cleanTextForTTS(text: string): string {
   return text
     .replace(/[\u{1F600}-\u{1F6FF}]/gu, '') // Remove emojis
-    .replace(/[""'']/g, '"') // Normaliza aspas
-    .replace(/\s+/g, ' ') // Remove espaços extras
-    .replace(/…/g, '...') // Normaliza reticências
-    .replace(/[#@]/g, '') // Remove hashtags e menções
+    .replace(/[""'']/g, '"') // Normalize quotes
+    .replace(/\s+/g, ' ') // Remove extra spaces
+    .replace(/…/g, '...') // Normalize ellipsis
+    .replace(/[#@]/g, '') // Remove hashtags and mentions
     .trim();
 }
 
 /**
- * Divide texto em chunks respeitando pontuação
+ * Split text into chunks respecting punctuation
  */
 function splitTextIntoChunks(text: string, maxSize: number): string[] {
   const chunks: string[] = [];
@@ -196,50 +203,143 @@ function splitTextIntoChunks(text: string, maxSize: number): string[] {
 }
 
 /**
- * Chama Google Translate TTS (100% gratuito)
+ * Microsoft Edge TTS (high quality neural voices)
  */
-async function callGoogleTTSWithTimeout(
+async function generateEdgeTTS(
+  text: string, 
+  voice: string,
+  timeoutMs: number
+): Promise<Uint8Array> {
+  const chunks = splitTextIntoChunks(text, MAX_CHUNK_SIZE);
+  const audioBuffers: Uint8Array[] = [];
+  
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`[Edge TTS] Chunk ${i + 1}/${chunks.length}: "${chunk.substring(0, 30)}..."`);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
+    try {
+      // Use a public Edge TTS endpoint
+      const url = `https://api.tts.quest/v1/speak?text=${encodeURIComponent(chunk)}&voice=${encodeURIComponent(voice)}`;
+      
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`Edge TTS error: ${response.status}`);
+      }
+      
+      const buffer = await response.arrayBuffer();
+      audioBuffers.push(new Uint8Array(buffer));
+      
+      // Small delay between chunks
+      if (i < chunks.length - 1) {
+        await new Promise(r => setTimeout(r, 100));
+      }
+      
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === "AbortError") {
+        throw new Error("Edge TTS timeout");
+      }
+      throw error;
+    }
+  }
+  
+  // Concatenate all buffers
+  const totalSize = audioBuffers.reduce((acc, buf) => acc + buf.length, 0);
+  const combinedBuffer = new Uint8Array(totalSize);
+  let offset = 0;
+  
+  for (const buffer of audioBuffers) {
+    combinedBuffer.set(buffer, offset);
+    offset += buffer.length;
+  }
+  
+  return combinedBuffer;
+}
+
+/**
+ * Google Translate TTS (fallback)
+ */
+async function generateGoogleTTS(
   text: string, 
   language: string,
   timeoutMs: number
-): Promise<ArrayBuffer> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  const encodedText = encodeURIComponent(text);
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${language}&client=tw-ob`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "audio/mpeg",
-      },
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`Google TTS error: ${response.status}`);
-    }
-
-    const contentType = response.headers.get("content-type") || "";
+): Promise<Uint8Array> {
+  const chunks = splitTextIntoChunks(text, MAX_CHUNK_SIZE);
+  const audioBuffers: Uint8Array[] = [];
+  
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`[Google TTS] Chunk ${i + 1}/${chunks.length}: "${chunk.substring(0, 30)}..."`);
     
-    if (!contentType.includes("audio")) {
-      throw new Error("Resposta não é áudio");
-    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    return await response.arrayBuffer();
+    const encodedText = encodeURIComponent(chunk);
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${language}&client=tw-ob`;
 
-  } catch (error: any) {
-    clearTimeout(timeoutId);
-    
-    if (error.name === "AbortError") {
-      throw new Error("Timeout: Google TTS não respondeu em 10s");
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Accept": "audio/mpeg",
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Google TTS error: ${response.status}`);
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      
+      if (!contentType.includes("audio")) {
+        throw new Error("Response is not audio");
+      }
+
+      const buffer = await response.arrayBuffer();
+      audioBuffers.push(new Uint8Array(buffer));
+      
+      // Small delay between chunks
+      if (i < chunks.length - 1) {
+        await new Promise(r => setTimeout(r, 150));
+      }
+
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === "AbortError") {
+        throw new Error("Google TTS timeout");
+      }
+      
+      throw error;
     }
-    
-    throw error;
   }
+  
+  // Concatenate all buffers
+  const totalSize = audioBuffers.reduce((acc, buf) => acc + buf.length, 0);
+  const combinedBuffer = new Uint8Array(totalSize);
+  let offset = 0;
+  
+  for (const buffer of audioBuffers) {
+    combinedBuffer.set(buffer, offset);
+    offset += buffer.length;
+  }
+  
+  return combinedBuffer;
 }
