@@ -152,7 +152,14 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, format = "square", customStyle, model = "auto", brandName } = await req.json();
+    const { 
+      prompt, 
+      format = "square", 
+      customStyle, 
+      model = "auto", 
+      brandName,
+      applyWatermark = true // Default: sempre aplicar watermark
+    } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       throw new Error("Prompt é obrigatório");
@@ -201,13 +208,46 @@ serve(async (req) => {
             .from("post-images")
             .getPublicUrl(fileName);
 
+          imageUrl = publicUrlData.publicUrl;
+          modelUsed = "openai/dall-e-3";
+          costEstimate = 0.08;
+          
+          // Apply watermark if requested
+          if (applyWatermark && imageUrl) {
+            console.log("[generate-image] Applying watermark to DALL-E image...");
+            try {
+              const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${supabaseKey}`,
+                },
+                body: JSON.stringify({
+                  imageUrl: imageUrl,
+                  watermarkText: "Neural Update"
+                }),
+              });
+              
+              if (watermarkResponse.ok) {
+                const watermarkResult = await watermarkResponse.json();
+                if (watermarkResult.publicUrl) {
+                  imageUrl = watermarkResult.publicUrl;
+                  console.log("[generate-image] ✅ Watermark applied to DALL-E image");
+                }
+              }
+            } catch (e) {
+              console.warn("[generate-image] Watermark failed, using original:", e);
+            }
+          }
+
           return new Response(
             JSON.stringify({
-              imageUrl: publicUrlData.publicUrl,
+              imageUrl,
               format,
-              modelUsed: "openai/dall-e-3",
-              costEstimate: 0.08,
+              modelUsed,
+              costEstimate,
               supportsText: true,
+              hasWatermark: applyWatermark,
             }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
@@ -257,7 +297,37 @@ serve(async (req) => {
     modelUsed = "google/gemini-2.5-flash-image";
     costEstimate = 0.02; // ~R$0.10 per image
 
-    console.log("✅ Imagem Gemini salva:", imageUrl);
+    console.log("✅ Imagem Gemini gerada:", imageUrl);
+
+    // Apply watermark "Neural Update" to ALL generated images
+    if (applyWatermark && imageUrl) {
+      console.log("[generate-image] Applying Neural Update watermark...");
+      try {
+        const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            imageUrl: imageUrl,
+            watermarkText: "Neural Update"
+          }),
+        });
+        
+        if (watermarkResponse.ok) {
+          const watermarkResult = await watermarkResponse.json();
+          if (watermarkResult.publicUrl) {
+            imageUrl = watermarkResult.publicUrl;
+            console.log("[generate-image] ✅ Neural Update watermark applied!");
+          }
+        } else {
+          console.warn("[generate-image] Watermark service returned error, using original image");
+        }
+      } catch (watermarkError) {
+        console.warn("[generate-image] Watermark failed, using original:", watermarkError);
+      }
+    }
 
     return new Response(
       JSON.stringify({
@@ -266,6 +336,7 @@ serve(async (req) => {
         modelUsed,
         costEstimate,
         supportsText: false,
+        hasWatermark: applyWatermark,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
