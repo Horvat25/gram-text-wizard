@@ -693,7 +693,8 @@ async function createCarouselContent(
   return post;
 }
 
-// Create NEWS content (using Firecrawl)
+// Create NEWS content (using Firecrawl + real images + code-applied text overlay)
+// FLUXO: 1) Buscar notícia real 2) Pegar imagem real do site 3) LLM gera texto da headline 4) Código aplica overlay
 async function createNewsContent(
   supabase: any,
   plan: ContentPlan,
@@ -703,9 +704,9 @@ async function createNewsContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando post de notícia:', plan.theme);
+  console.log('[AGENT] Criando post de notícia (imagem real + overlay por código):', plan.theme);
   
-  // Search for news using Firecrawl
+  // STEP 1: Search for news using Firecrawl
   const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
     method: 'POST',
     headers,
@@ -726,7 +727,7 @@ async function createNewsContent(
     const searchResult = await searchResponse.json();
     const articles = searchResult.data || [];
     
-    // Find article with best images
+    // Find article with best images (prioritize og:image which comes first in images array)
     const withImages = articles.filter((a: any) => a.images?.length > 0)
       .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
     
@@ -738,58 +739,78 @@ async function createNewsContent(
         sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
       } catch { sourceDomain = 'fonte'; }
       
-      // Select best image (filter icons/logos)
+      // STEP 2: Select REAL image from site (og:image, twitter:image, or main article image)
+      // Filter out icons, logos, favicons - we want editorial/news photos
       if (selectedArticle.images?.length > 0) {
         const qualityImages = selectedArticle.images.filter((img: string) =>
-          img && !img.includes('icon') && !img.includes('logo') && 
-          !img.includes('avatar') && !img.includes('favicon')
+          img && 
+          !img.includes('icon') && 
+          !img.includes('logo') && 
+          !img.includes('avatar') && 
+          !img.includes('favicon') &&
+          !img.includes('1x1') &&
+          !img.includes('pixel') &&
+          (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp') || img.includes('image'))
         );
+        // First image is usually og:image (best quality for sharing)
         selectedImage = qualityImages[0] || selectedArticle.images[0];
       }
     }
   }
   
   console.log('[AGENT] Artigo selecionado:', selectedArticle?.title || 'nenhum');
+  console.log('[AGENT] Imagem real encontrada:', selectedImage ? 'sim' : 'não');
   
-  // Process image with watermark AND headline overlay (like @davision.eth style)
+  // STEP 3 & 4: Apply text overlay via CODE (not AI image generation)
+  // The apply-text-overlay function:
+  // - Downloads the real image
+  // - LLM generates ONLY the headline TEXT (string)
+  // - Code applies the text as overlay (fixed font, color, layout)
   let imageUrl = null;
-  if (selectedImage) {
-    const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+  if (selectedImage && selectedArticle?.title) {
+    console.log('[AGENT] Aplicando overlay de texto via código...');
+    const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
         imageUrl: selectedImage,
+        title: selectedArticle.title,  // LLM will generate headline from this
         watermarkText: 'Neural Update',
-        headlineText: selectedArticle?.title || plan.theme // ADD HEADLINE TO IMAGE!
+        generateHeadline: true  // LLM generates text, code applies it
       })
     });
     
-    if (watermarkResponse.ok) {
-      const wmResult = await watermarkResponse.json();
-      imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+    if (overlayResponse.ok) {
+      const overlayResult = await overlayResponse.json();
+      imageUrl = overlayResult.publicUrl;
+      console.log('[AGENT] Overlay aplicado com sucesso, headline:', overlayResult.headline);
+    } else {
+      console.error('[AGENT] Erro ao aplicar overlay:', await overlayResponse.text());
     }
   }
   
-  // Generate image if no article image - NO TEXT IN IMAGE
-  const newsYear = new Date().getFullYear(); // 2026
-  if (!imageUrl) {
-    const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+  // Fallback: If overlay failed, just upload the original image without text
+  if (!imageUrl && selectedImage) {
+    console.log('[AGENT] Fallback: usando imagem original sem overlay');
+    const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        prompt: `Ilustração fotorrealista representando o conceito de: ${selectedArticle?.title || plan.theme}. Estilo jornalístico profissional, cores realistas. Qualidade para Instagram ${newsYear}. REGRA ABSOLUTA: NÃO INCLUA NENHUM TEXTO, PALAVRA, LETRA OU NÚMERO NA IMAGEM. Apenas elementos visuais. A notícia será explicada na legenda, a imagem deve ser puramente visual.`,
-        format: 'square',
-        model: 'gemini'
-      })
+      body: JSON.stringify({ imageUrl: selectedImage })
     });
     
-    if (imgResponse.ok) {
-      const imgData = await imgResponse.json();
-      imageUrl = imgData.imageUrl;
+    if (uploadResponse.ok) {
+      const uploadResult = await uploadResponse.json();
+      imageUrl = uploadResult.publicUrl;
     }
   }
   
-  // Generate caption with source attribution
+  // DO NOT generate AI image for news - only use real images
+  // If no real image found, post will be text-only (draft status)
+  if (!imageUrl) {
+    console.log('[AGENT] AVISO: Nenhuma imagem real encontrada. Post será salvo como draft.');
+  }
+  
+  // Generate caption with source attribution (3-block editorial structure)
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
@@ -798,7 +819,16 @@ async function createNewsContent(
       postType: 'noticia',
       sourceUrl: sourceUrl,
       sourceName: sourceDomain,
-      customInstructions: `Esta é uma notícia REAL. OBRIGATÓRIO incluir fonte: 📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`
+      customInstructions: `Esta é uma notícia REAL com imagem real do site. 
+      
+Estrutura OBRIGATÓRIA da legenda (3 blocos):
+1. HOOK DE IMPACTO - Uma frase curta e impactante (sem emoji no início)
+2. CONTEXTO MÍNIMO - 1-2 frases explicando o essencial
+3. REFLEXÃO/PERGUNTA - Engajamento com o leitor
+
+OBRIGATÓRIO ao final:
+📰 Fonte: ${sourceDomain}
+🔗 ${sourceUrl}`
     })
   });
   
@@ -821,7 +851,7 @@ async function createNewsContent(
     }
   }
   
-  // Create post - publish directly if autoPublish and has image
+  // Create post - publish directly if autoPublish and has real image
   const canPublish = autoPublish && imageUrl;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
@@ -831,14 +861,22 @@ async function createNewsContent(
     post_type: 'noticia',
     media_type: 'image',
     platforms: plan.platforms || ['instagram'],
-    status: canPublish ? 'scheduled' : 'draft',
+    status: imageUrl ? (canPublish ? 'scheduled' : 'draft') : 'draft', // No image = draft
     scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: imageUrl,
-    ai_model_used: 'gemini-2.5-flash'
+    overlay_metadata: {
+      type: 'news_overlay',
+      source_url: sourceUrl,
+      source_domain: sourceDomain,
+      original_title: selectedArticle?.title,
+      used_real_image: !!selectedImage,
+      text_applied_by_code: true // Flag indicating text was applied programmatically
+    },
+    ai_model_used: 'gemini-2.5-flash' // For headline generation only
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Post de notícia criado:', post.id);
+  console.log('[AGENT] Post de notícia criado:', post.id, 'com imagem real:', !!imageUrl);
   return post;
 }
 
