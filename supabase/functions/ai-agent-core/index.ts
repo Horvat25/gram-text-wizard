@@ -509,7 +509,8 @@ async function executeContentPlan(
   }
 }
 
-// Create VIDEO content (reels/narrated video) - NOW WITH SERVER-SIDE RENDERING
+// Create VIDEO content (reels/slideshow) - EXTERNAL RENDER ARCHITECTURE
+// Lovable apenas ORQUESTRA - renderização é feita por serviço externo FFmpeg
 async function createVideoContent(
   supabase: any,
   plan: ContentPlan,
@@ -519,60 +520,85 @@ async function createVideoContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando vídeo/reels:', plan.theme);
+  console.log('[AGENT] Criando vídeo/reels (arquitetura externa):', plan.theme);
   
-  // Generate script for video
-  const scriptResponse = await fetch(`${supabaseUrl}/functions/v1/generate-story-script`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      topic: plan.theme,
-      segmentCount: 4,
-      wordsPerSegment: 12,
-      totalDuration: 20,
-      style: plan.tone || 'impactante'
-    })
-  });
+  // STEP 1: Buscar imagens existentes ou gerar novas
+  // Prioridade: imagens reais > imagens geradas por IA
+  const images: string[] = [];
+  const currentYear = new Date().getFullYear();
   
-  let script = null;
-  let thumbnailUrl = null;
-  
-  if (scriptResponse.ok) {
-    script = await scriptResponse.json();
-    console.log('[AGENT] Script gerado:', script.title);
+  // Tentar buscar imagens da web primeiro (Firecrawl)
+  console.log('[AGENT] Buscando imagens para vídeo...');
+  try {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        topic: plan.theme,
+        preferRealImages: true
+      })
+    });
     
-    // Generate thumbnail from first segment - PORTUGUESE PROMPT
-    const currentYear = new Date().getFullYear();
-    if (script.segments?.[0]?.imagePrompt) {
-      const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          prompt: `${script.segments[0].imagePrompt}. Cinematográfico, proporção vertical 9:16. Ano ${currentYear}. Todo texto em PORTUGUÊS.`,
-          format: 'portrait',
-          model: 'gemini'
-        })
-      });
-      
-      if (imgResponse.ok) {
-        const imgData = await imgResponse.json();
-        thumbnailUrl = imgData.imageUrl;
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      if (searchResult.images && searchResult.images.length > 0) {
+        images.push(...searchResult.images.slice(0, 4));
+        console.log(`[AGENT] Encontradas ${images.length} imagens da web`);
+      }
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro ao buscar imagens:', e);
+  }
+  
+  // Se não encontrou imagens suficientes, gerar com IA
+  if (images.length < 4) {
+    console.log('[AGENT] Gerando imagens adicionais com IA...');
+    const prompts = [
+      `Cena 1: ${plan.theme}. Cinematográfico, vertical 9:16, ultra HD. Ano ${currentYear}. SEM TEXTO.`,
+      `Cena 2: Impacto de ${plan.theme} na sociedade. Futurista, vibrante. SEM TEXTO.`,
+      `Cena 3: Benefícios de ${plan.theme}. Visual impactante, moderno. SEM TEXTO.`,
+      `Cena 4: O futuro com ${plan.theme}. Inspirador, profissional. SEM TEXTO.`
+    ];
+    
+    for (let i = images.length; i < 4; i++) {
+      try {
+        const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            prompt: prompts[i] || prompts[0],
+            format: 'portrait',
+            model: 'gemini',
+            applyWatermark: true
+          })
+        });
+        
+        if (imgResponse.ok) {
+          const imgData = await imgResponse.json();
+          if (imgData.imageUrl) {
+            images.push(imgData.imageUrl);
+          }
+        }
+      } catch (e) {
+        console.log(`[AGENT] Erro ao gerar imagem ${i}:`, e);
       }
     }
   }
   
-  // Generate caption
+  console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
+  
+  // STEP 2: Gerar caption
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      topic: script?.title || plan.theme,
+      topic: plan.theme,
       postType: 'entretenimento',
       customInstructions: `Este é um REELS/vídeo curto. ${plan.cta}`
     })
   });
   
-  let caption = `🎬 ${script?.title || plan.theme}`;
+  let caption = `🎬 ${plan.theme}`;
   let hashtags: string[] = ['#tecnologia', '#reels', '#viral', '#ia'];
   
   if (captionResponse.ok) {
@@ -581,7 +607,7 @@ async function createVideoContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Create post first (needed for server-side render)
+  // STEP 3: Criar post (status draft, sem video_url ainda)
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
@@ -590,12 +616,16 @@ async function createVideoContent(
     post_type: 'entretenimento',
     media_type: 'reels',
     platforms: plan.platforms || ['instagram'],
-    status: 'draft', // Will be updated to 'scheduled' after server render
-    image_url: thumbnailUrl,
+    status: 'draft',
+    image_url: images[0] || null, // Thumbnail
+    carousel_images: images, // Todas as imagens para o slideshow
     overlay_metadata: {
-      type: 'narrated_video',
-      script,
-      topic: plan.theme,
+      type: 'external_render_slideshow',
+      images,
+      duration_per_image: 3,
+      resolution: '1080x1920',
+      platform: 'instagram_reels',
+      transition: 'fade',
       needs_processing: true,
       created_by_agent: true,
       publish_after_render: autoPublish
@@ -604,44 +634,69 @@ async function createVideoContent(
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Vídeo criado:', post.id);
+  console.log('[AGENT] Post de vídeo criado:', post.id);
   
-  // *** NEW: Trigger server-side rendering if autoPublish is enabled ***
-  if (autoPublish && script) {
-    console.log('[AGENT] Iniciando renderização server-side para publicação automática...');
+  // STEP 4: Tentar renderização externa (se RENDER_SERVICE_URL configurado)
+  if (images.length >= 2) {
+    console.log('[AGENT] Solicitando renderização externa...');
     
     try {
-      const renderResponse = await fetch(`${supabaseUrl}/functions/v1/render-video-server`, {
+      const renderResponse = await fetch(`${supabaseUrl}/functions/v1/request-video-render`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          postId: post.id,
-          script,
-          workspaceId,
-          userId
+          images,
+          duration_per_image: 3,
+          resolution: '1080x1920',
+          platform: 'instagram_reels',
+          transition: 'fade',
+          post_id: post.id,
+          workspace_id: workspaceId
         })
       });
       
-      if (renderResponse.ok) {
-        const renderResult = await renderResponse.json();
-        console.log('[AGENT] Renderização iniciada:', renderResult.status);
+      const renderResult = await renderResponse.json();
+      
+      if (renderResult.success && renderResult.video_url) {
+        // Sucesso! Vídeo renderizado externamente
+        console.log('[AGENT] ✅ Vídeo renderizado externamente:', renderResult.video_url);
         
-        // If server rendered successfully, update post status
-        if (renderResult.status === 'completed' && renderResult.videoUrl) {
-          await supabase.from('posts').update({
-            video_url: renderResult.videoUrl,
-            status: 'scheduled',
-            scheduled_for: new Date().toISOString()
-          }).eq('id', post.id);
-          console.log('[AGENT] Vídeo renderizado e agendado para publicação!');
-        }
+        await supabase.from('posts').update({
+          video_url: renderResult.video_url,
+          status: autoPublish ? 'scheduled' : 'draft',
+          scheduled_for: autoPublish ? new Date().toISOString() : null,
+          overlay_metadata: {
+            ...post.overlay_metadata,
+            needs_processing: false,
+            render_source: 'external',
+            rendered_at: new Date().toISOString()
+          }
+        }).eq('id', post.id);
+        
       } else {
-        console.log('[AGENT] Renderização server-side não disponível, vídeo requer render manual');
+        // Serviço externo não disponível ou falhou
+        console.log('[AGENT] Renderização externa não disponível:', renderResult.error || 'sem resposta');
+        console.log('[AGENT] Vídeo salvo como rascunho - aguardando configuração do serviço de renderização');
+        
+        // Atualizar post com mensagem informativa
+        await supabase.from('posts').update({
+          error_message: 'Aguardando serviço de renderização externo (RENDER_SERVICE_URL)',
+          overlay_metadata: {
+            ...post.overlay_metadata,
+            needs_processing: true,
+            render_status: 'pending_external_service'
+          }
+        }).eq('id', post.id);
       }
-    } catch (renderError) {
-      console.log('[AGENT] Erro na renderização server-side:', renderError);
-      // Video stays as draft - user can render manually
+    } catch (renderError: any) {
+      console.log('[AGENT] Erro ao solicitar renderização:', renderError.message);
     }
+  } else {
+    console.log('[AGENT] Imagens insuficientes para vídeo:', images.length);
+    await supabase.from('posts').update({
+      status: 'draft',
+      error_message: 'Imagens insuficientes para gerar slideshow (mínimo: 2)'
+    }).eq('id', post.id);
   }
   
   return post;
