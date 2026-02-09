@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 import { 
   Newspaper, 
   TrendingUp, 
@@ -31,9 +31,8 @@ import {
   Hash,
   Flame,
   Images,
-  LayoutGrid,
-  Settings2,
-  ChevronDown
+  LayoutGrid
+
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -110,7 +109,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
   const [isPublishing, setIsPublishing] = useState(false);
   const [loadingTrending, setLoadingTrending] = useState(false);
   const [customFeeds, setCustomFeeds] = useState<CustomFeed[]>(DEFAULT_TECH_FEEDS);
-  const [showFeedsSettings, setShowFeedsSettings] = useState(false);
+  
   
   const { accounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
@@ -931,24 +930,8 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
         </p>
       </div>
 
-      {/* Custom Feeds Settings - Collapsible */}
-      <Collapsible open={showFeedsSettings} onOpenChange={setShowFeedsSettings}>
-        <CollapsibleTrigger asChild>
-          <Button 
-            variant="outline" 
-            className="w-full justify-between border-dashed border-primary/30 hover:bg-primary/5"
-          >
-            <div className="flex items-center gap-2">
-              <Settings2 className="w-4 h-4" />
-              <span>Gerenciar Sites de Notícias ({customFeeds.length} fontes)</span>
-            </div>
-            <ChevronDown className={`w-4 h-4 transition-transform ${showFeedsSettings ? 'rotate-180' : ''}`} />
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4">
-          <CustomFeedsManager onFeedsChange={setCustomFeeds} />
-        </CollapsibleContent>
-      </Collapsible>
+      {/* Custom Feeds Manager - Always Visible */}
+      <CustomFeedsManager onFeedsChange={setCustomFeeds} />
 
       {/* Search */}
       <Card className="border-primary/20 bg-gradient-neural-soft overflow-hidden">
