@@ -47,84 +47,116 @@ Deno.serve(async (req) => {
     // STRATEGY 1: Use Lovable AI to generate individual images for each segment
     // Then combine with audio using a simple slideshow approach
     
-    const segments: ScriptSegment[] = script.segments || [];
-    const renderedSegments: { imageUrl: string; audioUrl?: string; duration: number }[] = [];
+  const segments: ScriptSegment[] = script.segments || [];
+  const renderedSegments: { imageUrl: string; audioUrl?: string; duration: number }[] = [];
+  
+  // Generate images for each segment - PRIORITY: REAL IMAGES FROM WEB
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i];
+    let imageUrl = segment.imageUrl;
     
-    // Generate images for each segment that doesn't have one
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      let imageUrl = segment.imageUrl;
+    // STEP 1: Search for REAL images from the web (ALWAYS TRY FIRST)
+    if (!imageUrl && segment.imagePrompt) {
+      console.log(`[RENDER-SERVER] Segmento ${i + 1}: buscando imagem REAL da web...`);
       
-      // If no image, search for real images first
-      if (!imageUrl && segment.imagePrompt) {
-        console.log(`[RENDER-SERVER] Segmento ${i + 1}: buscando imagem real...`);
-        
-        try {
-          // Search for real images via Firecrawl
-          const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${serviceRoleKey}`,
-            },
-            body: JSON.stringify({
-              query: segment.imagePrompt,
-              limit: 3,
-            }),
-          });
+      try {
+        // Search for real images via search-images-for-video
+        const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${serviceRoleKey}`,
+          },
+          body: JSON.stringify({
+            query: segment.imagePrompt,
+            limit: 5,
+          }),
+        });
 
-          if (searchResponse.ok) {
-            const searchResult = await searchResponse.json();
-            if (searchResult.images && searchResult.images.length > 0) {
-              // Upload external image to storage
-              const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${serviceRoleKey}`,
-                },
-                body: JSON.stringify({ imageUrl: searchResult.images[0] }),
-              });
+        if (searchResponse.ok) {
+          const searchResult = await searchResponse.json();
+          if (searchResult.images && searchResult.images.length > 0) {
+            // Try each image until one works
+            for (const candidateImage of searchResult.images) {
+              try {
+                // Apply watermark via add-watermark function
+                const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${serviceRoleKey}`,
+                  },
+                  body: JSON.stringify({ 
+                    imageUrl: candidateImage,
+                    watermarkText: "Neural Update"
+                  }),
+                });
 
-              if (uploadResponse.ok) {
-                const uploadResult = await uploadResponse.json();
-                imageUrl = uploadResult.publicUrl;
-                console.log(`[RENDER-SERVER] Segmento ${i + 1}: imagem real encontrada`);
+                if (watermarkResponse.ok) {
+                  const watermarkResult = await watermarkResponse.json();
+                  imageUrl = watermarkResult.publicUrl;
+                  console.log(`[RENDER-SERVER] Segmento ${i + 1}: imagem REAL + watermark ✅`);
+                  break;
+                }
+              } catch (e) {
+                console.log(`[RENDER-SERVER] Falha ao processar imagem, tentando próxima...`);
               }
             }
           }
-        } catch (e) {
-          console.log(`[RENDER-SERVER] Erro na busca de imagem:`, e);
         }
+      } catch (e) {
+        console.log(`[RENDER-SERVER] Erro na busca de imagem:`, e);
       }
+    }
 
-      // Fallback: Generate image with AI if no real image found
-      if (!imageUrl && segment.imagePrompt && lovableApiKey) {
-        console.log(`[RENDER-SERVER] Segmento ${i + 1}: gerando imagem com IA (fallback)...`);
-        
-        try {
-          const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${serviceRoleKey}`,
-            },
-            body: JSON.stringify({
-              prompt: `${segment.imagePrompt}. Cinematográfico, vertical 9:16, ultra HD. NENHUM TEXTO.`,
-              format: "portrait",
-              model: "gemini",
-            }),
-          });
+    // STEP 2: FALLBACK - Generate image with AI ONLY if no real image found
+    if (!imageUrl && segment.imagePrompt && lovableApiKey) {
+      console.log(`[RENDER-SERVER] Segmento ${i + 1}: FALLBACK - gerando com IA (sem imagem real)...`);
+      
+      try {
+        const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${serviceRoleKey}`,
+          },
+          body: JSON.stringify({
+            prompt: `${segment.imagePrompt}. Cinematográfico, vertical 9:16, ultra HD. NENHUM TEXTO.`,
+            format: "portrait",
+            model: "gemini",
+          }),
+        });
 
-          if (imgResponse.ok) {
-            const imgData = await imgResponse.json();
-            imageUrl = imgData.imageUrl;
-            console.log(`[RENDER-SERVER] Segmento ${i + 1}: imagem IA gerada`);
+        if (imgResponse.ok) {
+          const imgData = await imgResponse.json();
+          
+          // Apply watermark to AI-generated image too
+          if (imgData.imageUrl) {
+            const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${serviceRoleKey}`,
+              },
+              body: JSON.stringify({ 
+                imageUrl: imgData.imageUrl,
+                watermarkText: "Neural Update"
+              }),
+            });
+
+            if (watermarkResponse.ok) {
+              const watermarkResult = await watermarkResponse.json();
+              imageUrl = watermarkResult.publicUrl;
+              console.log(`[RENDER-SERVER] Segmento ${i + 1}: imagem IA + watermark ✅`);
+            } else {
+              imageUrl = imgData.imageUrl; // Use without watermark as last resort
+            }
           }
-        } catch (e) {
-          console.log(`[RENDER-SERVER] Erro ao gerar imagem:`, e);
         }
+      } catch (e) {
+        console.log(`[RENDER-SERVER] Erro ao gerar imagem IA:`, e);
       }
+    }
 
       // Generate audio narration for segment
       let audioUrl: string | undefined;

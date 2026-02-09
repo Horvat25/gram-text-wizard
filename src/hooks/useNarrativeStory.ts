@@ -192,7 +192,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.warn('[IMAGES] Web search failed, falling back to AI:', e);
     }
     
-    // STEP 2: Fill remaining segments with AI-generated images (fallback)
+    // STEP 2: Fill remaining segments with AI-generated images (fallback) + WATERMARK
     const segmentsNeedingImages = updatedSegments.filter(s => !s.imageUrl);
     
     if (segmentsNeedingImages.length > 0) {
@@ -237,6 +237,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
                 
                 if (data?.imageUrl) {
                   console.log(`AI image generated for segment ${segmentIndex + 1}`);
+                  
+                  // APPLY WATERMARK to AI-generated images
+                  try {
+                    const watermarkResult = await supabase.functions.invoke("add-watermark", {
+                      body: { 
+                        imageUrl: data.imageUrl,
+                        watermarkText: "Neural Update"
+                      },
+                    });
+                    
+                    if (!watermarkResult.error && watermarkResult.data?.publicUrl) {
+                      console.log(`[IMAGES] Watermark applied to AI image ${segmentIndex + 1}`);
+                      return { index: segmentIndex, imageUrl: watermarkResult.data.publicUrl };
+                    }
+                  } catch (wmErr) {
+                    console.warn(`[IMAGES] Watermark failed, using original:`, wmErr);
+                  }
+                  
+                  // Return original if watermark fails
                   return { index: segmentIndex, imageUrl: data.imageUrl };
                 } else {
                   console.warn(`No imageUrl in response for segment ${segmentIndex + 1}`);
