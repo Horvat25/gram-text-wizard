@@ -133,101 +133,160 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, [segmentCount, segmentDuration, setError]);
 
-  // Step 2: Generate images for each segment (OPTIMIZED: parallel batches of 3)
-  const generateImages = useCallback(async (segments: StorySegment[]) => {
+  // Step 2: Search for real images from the web first, fallback to AI generation
+  // PRIORIDADE: Imagens reais da internet > Geração com IA
+  const generateImages = useCallback(async (segments: StorySegment[], topic?: string) => {
     setState(prev => ({ ...prev, step: "images", progress: 20 }));
     
     const updatedSegments = [...segments];
     const progressPerImage = 50 / segments.length;
     
-    // OPTIMIZED: Generate images in parallel batches of 3 (was 2)
-    const batchSize = 3;
-    for (let i = 0; i < segments.length; i += batchSize) {
-      if (abortRef.current) return null;
-      
-      const batch = segments.slice(i, i + batchSize);
-      console.log(`[IMAGES] Generating batch ${Math.floor(i/batchSize) + 1}: segments ${i + 1} to ${i + batch.length}`);
-      
-      const results = await Promise.all(
-        batch.map(async (segment, batchIndex) => {
-          const segmentIndex = i + batchIndex;
-          const maxRetries = 2;
-          
-          for (let retry = 0; retry <= maxRetries; retry++) {
-            try {
-              if (retry > 0) {
-                console.log(`Retrying image generation for segment ${segmentIndex + 1}, attempt ${retry + 1}`);
-                // Wait before retry with exponential backoff
-                await new Promise(r => setTimeout(r, 2000 * retry));
-              }
-              
-              const { data, error } = await supabase.functions.invoke("generate-image", {
-                body: { 
-                  prompt: `${segment.imagePrompt}. Cinematic style, high quality, 9:16 vertical aspect ratio.`,
-                  format: "portrait",
-                  model: "gemini",
-                },
-              });
-
-              if (error) {
-                console.error(`API error for segment ${segmentIndex + 1}:`, error);
-                if (retry === maxRetries) {
-                  return { index: segmentIndex, imageUrl: "", error: error.message };
-                }
-                continue;
-              }
-              
-              if (data?.imageUrl) {
-                console.log(`Image generated successfully for segment ${segmentIndex + 1}`);
-                return { index: segmentIndex, imageUrl: data.imageUrl };
-              } else {
-                console.warn(`No imageUrl in response for segment ${segmentIndex + 1}`);
-                if (retry === maxRetries) {
-                  return { index: segmentIndex, imageUrl: "", error: "Sem imagem na resposta" };
-                }
-              }
-            } catch (err: any) {
-              console.error(`Error generating image ${segmentIndex + 1}, attempt ${retry + 1}:`, err);
-              if (retry === maxRetries) {
-                return { index: segmentIndex, imageUrl: "", error: err.message };
-              }
-            }
-          }
-          
-          return { index: segmentIndex, imageUrl: "", error: "Falha após múltiplas tentativas" };
-        })
-      );
-
-      // Update segments with results
-      results.forEach(({ index, imageUrl, error }) => {
-        updatedSegments[index] = { ...updatedSegments[index], imageUrl };
-        if (error) {
-          console.warn(`Segment ${index + 1} image generation failed: ${error}`);
+    console.log('[IMAGES] 🌐 Searching for real images from the web first...');
+    
+    // STEP 1: Try to find real images from the internet
+    try {
+      const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
+        body: {
+          topic: topic || segments[0]?.text || 'tecnologia',
+          segments: segments.map(s => ({ text: s.text, imagePrompt: s.imagePrompt })),
+          preferRealImages: true
         }
       });
-
-      setState(prev => ({ 
-        ...prev, 
-        segments: [...updatedSegments],
-        progress: Math.min(20 + (i + batch.length) * progressPerImage, 70),
-      }));
       
-      // OPTIMIZED: Reduced delay between batches (was 1500ms)
-      if (i + batchSize < segments.length) {
-        await new Promise(r => setTimeout(r, 800));
+      if (!searchError && searchResult?.success && searchResult.images?.length > 0) {
+        console.log(`[IMAGES] ✅ Found ${searchResult.images.length} real images from the web!`);
+        console.log(`[IMAGES] Stats - Web: ${searchResult.stats?.fromWeb || 0}, AI: ${searchResult.stats?.fromAI || 0}`);
+        
+        // Assign web images to segments
+        searchResult.images.forEach((img: any, index: number) => {
+          if (index < updatedSegments.length && img.imageUrl) {
+            updatedSegments[index] = { 
+              ...updatedSegments[index], 
+              imageUrl: img.imageUrl 
+            };
+            console.log(`[IMAGES] Segment ${index + 1}: ${img.source === 'web' ? '🌐 Web' : '🤖 AI'}`);
+          }
+        });
+        
+        setState(prev => ({ 
+          ...prev, 
+          segments: [...updatedSegments],
+          progress: 70,
+        }));
+        
+        // Check if we have enough images
+        const validSegments = updatedSegments.filter(s => s.imageUrl);
+        if (validSegments.length >= Math.ceil(segments.length * 0.5)) {
+          // At least 50% of segments have images, we're good
+          let currentTime = 0;
+          validSegments.forEach(seg => {
+            seg.startTime = currentTime;
+            currentTime += seg.duration;
+          });
+          
+          toast.success(`🌐 ${validSegments.length} imagens reais encontradas!`);
+          return validSegments;
+        }
+      }
+    } catch (e) {
+      console.warn('[IMAGES] Web search failed, falling back to AI:', e);
+    }
+    
+    // STEP 2: Fill remaining segments with AI-generated images (fallback)
+    const segmentsNeedingImages = updatedSegments.filter(s => !s.imageUrl);
+    
+    if (segmentsNeedingImages.length > 0) {
+      console.log(`[IMAGES] 🤖 Need to generate ${segmentsNeedingImages.length} images with AI (fallback)...`);
+      toast.info(`Gerando ${segmentsNeedingImages.length} imagens com IA...`);
+      
+      // OPTIMIZED: Generate images in parallel batches of 3
+      const batchSize = 3;
+      for (let i = 0; i < segmentsNeedingImages.length; i += batchSize) {
+        if (abortRef.current) return null;
+        
+        const batch = segmentsNeedingImages.slice(i, i + batchSize);
+        console.log(`[IMAGES] Generating AI batch ${Math.floor(i/batchSize) + 1}: ${batch.length} images`);
+        
+        const results = await Promise.all(
+          batch.map(async (segment) => {
+            const segmentIndex = updatedSegments.findIndex(s => s.id === segment.id);
+            const maxRetries = 2;
+            
+            for (let retry = 0; retry <= maxRetries; retry++) {
+              try {
+                if (retry > 0) {
+                  console.log(`Retrying image generation for segment ${segmentIndex + 1}, attempt ${retry + 1}`);
+                  await new Promise(r => setTimeout(r, 2000 * retry));
+                }
+                
+                const { data, error } = await supabase.functions.invoke("generate-image", {
+                  body: { 
+                    prompt: `${segment.imagePrompt}. Cinematic style, high quality, 9:16 vertical aspect ratio.`,
+                    format: "portrait",
+                    model: "gemini",
+                  },
+                });
+
+                if (error) {
+                  console.error(`API error for segment ${segmentIndex + 1}:`, error);
+                  if (retry === maxRetries) {
+                    return { index: segmentIndex, imageUrl: "", error: error.message };
+                  }
+                  continue;
+                }
+                
+                if (data?.imageUrl) {
+                  console.log(`AI image generated for segment ${segmentIndex + 1}`);
+                  return { index: segmentIndex, imageUrl: data.imageUrl };
+                } else {
+                  console.warn(`No imageUrl in response for segment ${segmentIndex + 1}`);
+                  if (retry === maxRetries) {
+                    return { index: segmentIndex, imageUrl: "", error: "Sem imagem na resposta" };
+                  }
+                }
+              } catch (err: any) {
+                console.error(`Error generating image ${segmentIndex + 1}, attempt ${retry + 1}:`, err);
+                if (retry === maxRetries) {
+                  return { index: segmentIndex, imageUrl: "", error: err.message };
+                }
+              }
+            }
+            
+            return { index: segmentIndex, imageUrl: "", error: "Falha após múltiplas tentativas" };
+          })
+        );
+
+        // Update segments with results
+        results.forEach(({ index, imageUrl, error }) => {
+          if (index >= 0 && index < updatedSegments.length) {
+            updatedSegments[index] = { ...updatedSegments[index], imageUrl };
+            if (error) {
+              console.warn(`Segment ${index + 1} AI image generation failed: ${error}`);
+            }
+          }
+        });
+
+        setState(prev => ({ 
+          ...prev, 
+          segments: [...updatedSegments],
+          progress: Math.min(20 + (i + batch.length) * progressPerImage, 70),
+        }));
+        
+        if (i + batchSize < segmentsNeedingImages.length) {
+          await new Promise(r => setTimeout(r, 800));
+        }
       }
     }
 
-    // Check how many images we got
+    // Check how many images we got in total
     const validSegments = updatedSegments.filter(s => s.imageUrl);
     const failedCount = updatedSegments.length - validSegments.length;
     
     if (validSegments.length === 0) {
-      setError("Nenhuma imagem foi gerada. Tente novamente.");
+      setError("Nenhuma imagem foi encontrada ou gerada. Tente novamente.");
       return null;
     }
     
-    // If some images failed but we have at least 2, continue with valid ones
     if (failedCount > 0 && validSegments.length >= 2) {
       toast.warning(`${failedCount} de ${updatedSegments.length} imagens falharam, continuando com ${validSegments.length} cenas`);
     }
@@ -246,7 +305,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       progress: 70,
     }));
 
-    toast.success(`${validSegments.length} imagens cinematográficas criadas!`);
+    const webCount = validSegments.filter((s, i) => i < (segments.length - segmentsNeedingImages.length)).length;
+    toast.success(`${validSegments.length} imagens prontas! (${webCount} da web, ${validSegments.length - webCount} IA)`);
     return validSegments;
   }, [setError]);
 
@@ -610,8 +670,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return;
     }
 
-    // Step 2: Images
-    const segmentsWithImages = await generateImages(segments);
+    // Step 2: Images (busca da web primeiro, IA como fallback)
+    const segmentsWithImages = await generateImages(segments, topic);
     if (!segmentsWithImages || abortRef.current) {
       setIsGenerating(false);
       return;
@@ -668,8 +728,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    // Step 2: Images (generate from existing prompts)
-    const segmentsWithImages = await generateImages(segments);
+    // Step 2: Images (busca da web primeiro, IA como fallback)
+    const segmentsWithImages = await generateImages(segments, title);
     if (!segmentsWithImages || abortRef.current) {
       setIsGenerating(false);
       return;

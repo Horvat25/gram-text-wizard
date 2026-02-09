@@ -143,6 +143,7 @@ serve(async (req) => {
     };
 
     // System prompt: strategy + constraints, topic-driven, with CURRENT YEAR context
+    // UPDATED: Generate searchQueries for finding real images on the web instead of AI image prompts
     const systemPrompt = `Você é um estrategista de conteúdo digital do perfil ${BRAND}.
 
 DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
@@ -157,8 +158,8 @@ REGRAS CRÍTICAS:
 - NUNCA mencionar anos passados como 2023, 2024 ou 2025 - estamos em ${currentYear}!
 - Nada de conteúdo genérico/repetitivo. Sem promessas milagrosas. Sem hype vazio.
 - Linguagem clara, direta e interessante.
-- TUDO em PORTUGUÊS BRASILEIRO (incluindo os textos e imagePrompt).
-- NÃO USE INGLÊS EM NENHUMA PARTE DO ROTEIRO OU imagePrompt!
+- TUDO em PORTUGUÊS BRASILEIRO (incluindo os textos e imageSearch).
+- NÃO USE INGLÊS EM NENHUMA PARTE DO ROTEIRO!
 
 📝 ORTOGRAFIA - REGRAS OBRIGATÓRIAS:
 - Revise CADA palavra antes de finalizar. ZERO erros ortográficos são aceitáveis.
@@ -189,20 +190,24 @@ ESTRUTURA (4 CENAS):
 FORMATO:
 - Frases curtas (8–16 palavras por segmento).
 - Português brasileiro PERFEITO, sem NENHUM erro ortográfico ou de acentuação.
-- Para cada cena, crie um imagePrompt EM PORTUGUÊS com visual REALISTA e relacionado ao tema.
-- O imagePrompt PODE incluir textos/títulos se fizer sentido para o conteúdo, MAS com ortografia PERFEITA.
 
-⚠️ REGRAS PARA imagePrompt:
-1. Use estilo cinematográfico: "iluminação dramática", "ângulo baixo", "close-up", "perspectiva aérea".
-2. Se incluir texto no imagePrompt, garanta que está 100% correto ortograficamente.
-3. Foco em ATMOSFERA e EMOÇÃO.
-4. Textos curtos funcionam melhor (máximo 3-4 palavras por texto na imagem).
+⚠️ IMPORTANTE - BUSCA DE IMAGENS REAIS:
+Em vez de criar prompts para gerar imagens com IA, você vai criar QUERIES DE BUSCA para encontrar imagens REAIS na internet.
 
-Exemplo de imagePrompt com texto:
-✅ "Robô humanoide em arena futurista com texto 'Revolução Robótica' em neon azul, iluminação dramática"
+Para cada cena, crie um "imageSearch" que seja uma busca simples para encontrar fotos/imagens relevantes:
+- Use termos específicos relacionados ao tema (ex: "Elon Musk Tesla", "robô humanoide Boston Dynamics")
+- Prefira nomes de pessoas/empresas/produtos reais quando relevante
+- Evite termos abstratos como "conceito futurista" - prefira coisas reais e fotografáveis
+- O objetivo é encontrar fotos de notícias/eventos REAIS, não arte conceitual
 
-Exemplo de imagePrompt sem texto:
-✅ "Close-up de mãos robóticas em movimento, cenário industrial com faíscas, estilo cinematográfico"`;
+Exemplo de imageSearch para tema "Elon Musk compra Twitter":
+✅ "Elon Musk Twitter CEO"
+✅ "sede Twitter San Francisco"
+✅ "logotipo X Twitter"
+
+Exemplo de imageSearch RUIM (muito abstrato):
+❌ "conceito futuro redes sociais"
+❌ "ilustração aquisição empresa"`;
 
     const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
 "${topic}"
@@ -220,13 +225,14 @@ ESPECIFICAÇÕES:
 
 IMPORTANTE:
 - Inclua termos específicos do tema no texto (não responda com um roteiro genérico).
-- Todos os textos e imagePrompts devem estar em PORTUGUÊS BRASILEIRO CORRETO.
+- Todos os textos devem estar em PORTUGUÊS BRASILEIRO CORRETO.
+- Para imageSearch: crie queries simples para buscar imagens REAIS (fotos de pessoas, eventos, produtos) - não arte abstrata.
 
 Responda APENAS com JSON no formato:
 {
   "title": "Título curto e específico do tema EM PORTUGUÊS",
   "segments": [
-    { "text": "texto em português com ortografia perfeita...", "imagePrompt": "descrição da imagem em português..." }
+    { "text": "texto em português com ortografia perfeita...", "imagePrompt": "query de busca para imagem real - ex: Elon Musk SpaceX foguete" }
   ]
 }`;
 

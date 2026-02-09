@@ -508,14 +508,16 @@ function drawMarketingCTA(
 
 /**
  * Transition types for professional video editing
+ * Enhanced with more cinematic effects
  */
-type TransitionType = 'crossfade' | 'slide' | 'zoom' | 'none';
+type TransitionType = 'crossfade' | 'slide' | 'zoom' | 'wipe' | 'blur' | 'none';
 
 /**
- * Get transition duration in seconds (20% of segment duration, max 0.8s)
+ * Get transition duration in seconds
+ * IMPROVED: Longer transitions for smoother flow (30% of segment, max 1.2s)
  */
 function getTransitionDuration(segmentDuration: number): number {
-  return Math.min(segmentDuration * 0.2, 0.8);
+  return Math.min(segmentDuration * 0.30, 1.2);
 }
 
 /**
@@ -577,7 +579,8 @@ function renderFrame(
   ctx.fillRect(0, 0, width, height);
   
   // Determine transition type based on segment index for variety
-  const transitionTypes: TransitionType[] = ['crossfade', 'slide', 'zoom', 'crossfade'];
+  // IMPROVED: More variety with 6 transition types
+  const transitionTypes: TransitionType[] = ['crossfade', 'wipe', 'zoom', 'blur', 'slide', 'crossfade'];
   const transitionType = transitionTypes[segmentIndex % transitionTypes.length];
 
   if (isEnteringTransition && segmentIndex > 0) {
@@ -606,12 +609,21 @@ function renderFrame(
   const showText = !isEnteringTransition; // Hide text during entering transition
   
   if (showText && segment.text) {
-    // Apply a subtle fade-in effect for text after transition
-    const textFadeInDuration = 0.15; // 150ms fade-in
-    const timeSinceTransition = isEnteringTransition ? 0 : (timeIntoSegment - transitionDuration);
-    const textOpacity = segmentIndex === 0 
-      ? Math.min(1, timeIntoSegment / textFadeInDuration) // First segment: fade in from start
-      : Math.min(1, timeSinceTransition / textFadeInDuration); // Other segments: fade after transition
+    // IMPROVED: Smoother text fade-in with longer duration
+    const textFadeInDuration = 0.25; // 250ms fade-in (was 150ms)
+    const timeSinceTransition = timeIntoSegment - transitionDuration;
+    
+    // Calculate text opacity based on timing
+    let textOpacity = 1;
+    if (segmentIndex === 0) {
+      // First segment: fade in from start
+      textOpacity = Math.min(1, timeIntoSegment / textFadeInDuration);
+    } else if (timeSinceTransition >= 0) {
+      // Other segments: fade in after transition completes
+      textOpacity = Math.min(1, timeSinceTransition / textFadeInDuration);
+    } else {
+      textOpacity = 0; // During transition, hide text
+    }
     
     ctx.save();
     ctx.globalAlpha = Math.max(0, Math.min(1, textOpacity));
@@ -652,6 +664,16 @@ function drawTransition(
     case 'zoom':
       // Zoom out from current, zoom in to next
       drawZoomTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
+      break;
+    
+    case 'wipe':
+      // Horizontal wipe transition
+      drawWipeTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
+      break;
+    
+    case 'blur':
+      // Blur out/in transition (simulated with scale)
+      drawBlurTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
       break;
       
     default:
@@ -756,6 +778,90 @@ function drawZoomTransition(
   ctx.translate(-centerX, -centerY);
   drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
   ctx.restore();
+}
+
+/**
+ * Wipe transition - horizontal wipe from left to right
+ * Professional TV-style transition
+ */
+function drawWipeTransition(
+  ctx: CanvasRenderingContext2D,
+  fromImg: HTMLImageElement,
+  toImg: HTMLImageElement,
+  width: number,
+  height: number,
+  progress: number,
+  fromIndex: number,
+  toIndex: number
+): void {
+  // Draw "to" image full screen first (revealed part)
+  drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
+  
+  // Draw "from" image with clipping (shrinking from right)
+  ctx.save();
+  const wipeX = width * (1 - progress);
+  ctx.beginPath();
+  ctx.rect(wipeX, 0, width - wipeX, height);
+  ctx.clip();
+  drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
+  
+  // Add a white edge line for visual polish
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(wipeX, 0);
+  ctx.lineTo(wipeX, height);
+  ctx.stroke();
+  
+  ctx.restore();
+}
+
+/**
+ * Blur transition - simulated with rapid zoom and opacity
+ * Creates a dreamy transition effect
+ */
+function drawBlurTransition(
+  ctx: CanvasRenderingContext2D,
+  fromImg: HTMLImageElement,
+  toImg: HTMLImageElement,
+  width: number,
+  height: number,
+  progress: number,
+  fromIndex: number,
+  toIndex: number
+): void {
+  const centerX = width / 2;
+  const centerY = height / 2;
+  
+  // First half: "from" image zooms in and fades
+  if (progress < 0.5) {
+    const localProgress = progress * 2; // 0 to 1 in first half
+    ctx.save();
+    ctx.globalAlpha = 1 - localProgress;
+    const scale = 1 + localProgress * 0.2; // Zoom in
+    ctx.translate(centerX, centerY);
+    ctx.scale(scale, scale);
+    ctx.translate(-centerX, -centerY);
+    drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
+    ctx.restore();
+    
+    // Start fading in "to" at reduced opacity
+    ctx.save();
+    ctx.globalAlpha = localProgress * 0.5;
+    drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
+    ctx.restore();
+  } else {
+    // Second half: "to" image zooms out from large and fades in
+    const localProgress = (progress - 0.5) * 2; // 0 to 1 in second half
+    ctx.save();
+    ctx.globalAlpha = 0.5 + localProgress * 0.5;
+    const scale = 1.2 - localProgress * 0.2; // Start zoomed in, end at 1
+    ctx.translate(centerX, centerY);
+    ctx.scale(scale, scale);
+    ctx.translate(-centerX, -centerY);
+    drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
+    ctx.restore();
+  }
 }
 
 /**
