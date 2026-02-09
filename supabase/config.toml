@@ -107,3 +107,6 @@ verify_jwt = false
 
 [functions.upload-external-image]
 verify_jwt = false
+
+[functions.apply-text-overlay]
+verify_jwt = false
