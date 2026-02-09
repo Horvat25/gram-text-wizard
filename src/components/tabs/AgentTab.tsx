@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageCircle, FileText } from 'lucide-react';
-import AgentHeroChat from '@/components/agent/AgentHeroChat';
+import AgentDashboard from '@/components/agent/AgentDashboard';
 import AgentReportsTab from '@/components/agent/AgentReportsTab';
-
-// Unified agent chat - no platform separation
 
 export default function AgentTab() {
   const [activeTab, setActiveTab] = useState('chat');
@@ -23,9 +21,9 @@ export default function AgentTab() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="chat" className="flex-1 mt-2 overflow-hidden data-[state=active]:flex data-[state=active]:flex-col">
+        <TabsContent value="chat" className="flex-1 mt-0 overflow-hidden data-[state=active]:flex data-[state=active]:flex-col">
           <div className="h-full">
-            <AgentHeroChat />
+            <AgentDashboard />
           </div>
         </TabsContent>
 
