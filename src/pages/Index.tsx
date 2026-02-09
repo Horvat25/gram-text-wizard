@@ -151,23 +151,9 @@ const Index = () => {
             exit={{ opacity: 0, x: -50 }}
             className="h-screen flex flex-col"
           >
-            {/* Minimal Header - Just dashboard button */}
-            <div className="flex items-center justify-end px-2 py-1 bg-background/80">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDashboard(true)}
-                className="text-muted-foreground hover:text-primary text-xs h-7 px-2"
-              >
-                <LayoutDashboard className="h-3 w-3 mr-1" />
-                Dashboard
-                <ChevronRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-            
-            {/* Agent Tab - Maximum Height */}
-            <div className="flex-1 overflow-hidden px-2 pb-2">
-              <AgentTab />
+            {/* Agent Tab - Full Height */}
+            <div className="flex-1 overflow-hidden">
+              <AgentTab onNavigate={handleNavigateFromAgent} />
             </div>
           </motion.div>
         ) : (
