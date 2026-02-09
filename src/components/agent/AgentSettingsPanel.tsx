@@ -391,19 +391,20 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                         <Badge variant="secondary">{assignedTotal}/{weeklyTotal}</Badge>
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         {[
-                          { key: 'content_distribution_videos', icon: Video, label: 'Vídeos', color: 'text-pink-500' },
-                          { key: 'content_distribution_carousels', icon: Layers, label: 'Carrosséis', color: 'text-purple-500' },
+                          { key: 'content_distribution_videos', icon: Video, label: 'Reels/Vídeos', color: 'text-pink-500' },
+                          { key: 'content_distribution_images', icon: ImageIcon, label: 'Posts Imagem', color: 'text-green-500' },
                           { key: 'content_distribution_news', icon: Newspaper, label: 'Notícias', color: 'text-blue-500' },
-                          { key: 'content_distribution_images', icon: ImageIcon, label: 'Imagens', color: 'text-green-500' },
+                          { key: 'content_distribution_carousels', icon: Layers, label: 'Carrosséis', color: 'text-purple-500' },
                         ].map((item) => (
-                          <div key={item.key} className="text-center p-3 rounded-lg bg-muted/30 border">
-                            <div className={cn("text-xl font-bold", item.color)}>
-                              {config[item.key as keyof typeof config] as number}
+                          <div key={item.key} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border">
+                            <div className="flex items-center gap-2">
+                              <item.icon className={cn("h-4 w-4", item.color)} />
+                              <span className="text-xs text-muted-foreground">{item.label}</span>
                             </div>
-                            <div className="text-[10px] text-muted-foreground flex items-center justify-center gap-1 mt-1">
-                              <item.icon className="h-3 w-3" />
+                            <div className={cn("text-lg font-bold", item.color)}>
+                              {config[item.key as keyof typeof config] as number}
                             </div>
                           </div>
                         ))}
