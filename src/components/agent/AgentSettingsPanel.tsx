@@ -429,41 +429,17 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                       />
                     </div>
 
-                    {/* Avatar Selection */}
-                    <div className="space-y-2">
-                      <Label>Avatar do Agente</Label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {[
-                          { url: null, label: 'Padrão' },
-                          { url: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent1', label: 'Bot 1' },
-                          { url: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent2', label: 'Bot 2' },
-                          { url: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent3', label: 'Bot 3' },
-                          { url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent1', label: 'Avatar 1' },
-                          { url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent2', label: 'Avatar 2' },
-                          { url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=agent1', label: 'Lorelei 1' },
-                          { url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=agent2', label: 'Lorelei 2' },
-                        ].map((avatar, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setConfig(c => ({ ...c, agent_avatar_url: avatar.url }))}
-                            className={cn(
-                              "p-2 rounded-lg border-2 transition-all hover:border-primary/50",
-                              config.agent_avatar_url === avatar.url 
-                                ? "border-primary bg-primary/10" 
-                                : "border-border bg-muted/30"
-                            )}
-                          >
-                            {avatar.url ? (
-                              <img src={avatar.url} alt={avatar.label} className="w-full h-10 object-contain" />
-                            ) : (
-                              <div className="w-full h-10 flex items-center justify-center">
-                                <Bot className="h-6 w-6 text-muted-foreground" />
-                              </div>
-                            )}
-                          </button>
-                        ))}
+                    {/* Agent Avatar Info */}
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-violet-500/5 border border-primary/20">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-xl neural-gradient">
+                          <Bot className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Avatar 3D</p>
+                          <p className="text-xs text-muted-foreground">O visual do agente é exibido na tela principal</p>
+                        </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">Escolha um avatar para o seu agente</p>
                     </div>
 
                     <div className="space-y-2">
