@@ -180,6 +180,51 @@ const AGENT_TOOLS = [
         properties: {}
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_web_images",
+      description: "🖼️ Busca imagens na web sobre um tema. Use quando o usuário quer ver opções de imagens ou escolher uma imagem específica para um post. Retorna uma lista de imagens para o usuário selecionar.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: { type: "string", description: "Termo de busca para as imagens (ex: 'inteligência artificial', 'robô humanoide', 'chip de computador')" },
+          count: { type: "number", description: "Quantidade de imagens para buscar (padrão: 5, máx: 10)" }
+        },
+        required: ["query"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_post_with_image_url",
+      description: "📸 Cria um post usando uma imagem específica da web (URL). Use quando o usuário escolher uma imagem específica ou fornecer uma URL de imagem. A imagem será processada com nossa marca e headline.",
+      parameters: {
+        type: "object",
+        properties: {
+          image_url: { type: "string", description: "URL da imagem a usar" },
+          headline_text: { type: "string", description: "Headline para sobrepor na imagem (CAIXA ALTA, máx 2 linhas)" },
+          caption: { type: "string", description: "Legenda do post" },
+          hashtags: { type: "array", items: { type: "string" }, description: "Hashtags" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601)" },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: ["image_url", "caption"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "explain_capabilities",
+      description: "📋 Explica ao usuário o que o agente pode fazer. Use quando o usuário perguntar 'o que você faz?', 'me ajuda?', 'quais suas capacidades?' ou similar.",
+      parameters: {
+        type: "object",
+        properties: {}
+      }
+    }
   }
 ];
 
@@ -1919,6 +1964,210 @@ async function executeListAvailableNews(supabase: any, userId: string, workspace
   }
 }
 
+// Search web images using Firecrawl
+async function executeSearchWebImages(args: any) {
+  const { query, count = 5 } = args;
+  const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
+  
+  if (!firecrawlApiKey) {
+    return {
+      success: false,
+      message: '❌ Busca de imagens não configurada. Use imagens dos feeds RSS!'
+    };
+  }
+  
+  try {
+    console.log('[SEARCH_IMAGES] Searching for:', query);
+    
+    const response = await fetch('https://api.firecrawl.dev/v1/search', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${firecrawlApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `${query} imagem foto`,
+        limit: Math.min(count, 10),
+        lang: 'pt',
+        country: 'BR'
+      }),
+    });
+    
+    if (!response.ok) {
+      console.error('[SEARCH_IMAGES] API error:', response.status);
+      return {
+        success: false,
+        message: '❌ Erro na busca. Tente usar imagens dos feeds RSS.'
+      };
+    }
+    
+    const data = await response.json();
+    const results = data.data || [];
+    
+    // Extract image URLs from results
+    const images = results
+      .filter((r: any) => r.url || r.markdown?.includes('!['))
+      .slice(0, count)
+      .map((r: any, i: number) => ({
+        index: i + 1,
+        title: r.title || 'Imagem',
+        url: r.url,
+        source: new URL(r.url || 'https://example.com').hostname
+      }));
+    
+    if (images.length === 0) {
+      return {
+        success: true,
+        message: `🔍 Não encontrei imagens específicas para "${query}". Sugiro usar imagens dos feeds RSS que já estão prontas!`,
+        images: []
+      };
+    }
+    
+    const imageList = images.map((img: any) => 
+      `${img.index}. **${img.title}** (${img.source})`
+    ).join('\n');
+    
+    return {
+      success: true,
+      message: `🖼️ Encontrei ${images.length} opções para "${query}":\n\n${imageList}\n\n💡 Me diga qual número você quer usar, ou prefere que eu use uma imagem dos feeds RSS?`,
+      images,
+      query
+    };
+  } catch (error: any) {
+    console.error('[SEARCH_IMAGES] Error:', error);
+    return {
+      success: false,
+      message: `❌ Erro ao buscar imagens: ${error.message}`
+    };
+  }
+}
+
+// Create post with specific image URL
+async function executeCreatePostWithImageUrl(supabase: any, userId: string, workspaceId: string, args: any) {
+  const { image_url, headline_text, caption, hashtags, scheduled_for, platforms } = args;
+  
+  try {
+    console.log('[CREATE_POST_IMAGE_URL] Creating post with image:', image_url);
+    
+    // Apply watermark/overlay to the image
+    const overlayResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/apply-text-overlay`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+      },
+      body: JSON.stringify({
+        imageUrl: image_url,
+        headlineText: headline_text || '',
+        userId
+      })
+    });
+    
+    let finalImageUrl = image_url;
+    if (overlayResponse.ok) {
+      const overlayResult = await overlayResponse.json();
+      if (overlayResult.imageUrl) {
+        finalImageUrl = overlayResult.imageUrl;
+        console.log('[CREATE_POST_IMAGE_URL] Overlay applied:', finalImageUrl);
+      }
+    }
+    
+    // Convert scheduled_for to UTC
+    const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    
+    // Create the post
+    const postData = {
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption,
+      hashtags: hashtags || ['#tecnologia', '#inovacao'],
+      post_type: 'curated',
+      platforms: platforms || ['instagram'],
+      status: scheduledForUTC ? 'scheduled' : 'draft',
+      scheduled_for: scheduledForUTC,
+      media_type: 'image',
+      image_url: finalImageUrl,
+      overlay_metadata: {
+        type: 'custom_image_post',
+        original_image_url: image_url,
+        headline_applied: headline_text,
+        created_by_agent: true
+      }
+    };
+    
+    const { data: post, error } = await supabase
+      .from('posts')
+      .insert(postData)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('[CREATE_POST_IMAGE_URL] Error:', error);
+      return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
+    }
+    
+    const scheduleInfo = scheduledForUTC 
+      ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
+      : '📝 Salvo como rascunho';
+    
+    return {
+      success: true,
+      message: `✅ Post criado com sucesso!\n\n${headline_text ? `📰 Headline: "${headline_text}"` : ''}\n${scheduleInfo}\n\n💡 A imagem foi processada com nossa marca!`,
+      post: {
+        id: post.id,
+        status: post.status,
+        has_headline: !!headline_text
+      }
+    };
+  } catch (error: any) {
+    console.error('[CREATE_POST_IMAGE_URL] Error:', error);
+    return { success: false, message: `❌ Erro: ${error.message}` };
+  }
+}
+
+// Explain agent capabilities
+function executeExplainCapabilities() {
+  return {
+    success: true,
+    message: `# 🤖 O Que Eu Posso Fazer
+
+## 📰 **Criar Posts de Notícia**
+Busco notícias REAIS dos feeds RSS (Tecnoblog, TecMundo, etc) e crio posts com:
+- Imagem REAL da notícia (não gero com IA)
+- Headline impactante sobreposta
+- Legenda estruturada em 3 blocos
+- Correção ortográfica automática
+
+## 🎬 **Criar Vídeos/Reels**
+Crio vídeos narrados com:
+- Roteiro viral em 4 cenas
+- Imagens cinematográficas
+- Narração neural (voz de tecnologia)
+- Trilha sonora de fundo
+
+## 🖼️ **Usar Imagens da Web**
+Posso buscar imagens na web e criar posts com elas, aplicando nossa marca.
+
+## 📅 **Gerenciar Publicações**
+- Agendar posts para horários específicos
+- Listar posts (rascunhos, agendados, publicados)
+- Deletar posts
+- Ver analytics e métricas
+
+## ⚙️ **Configurações**
+- Ativar/desativar publicação automática
+- Definir limite diário de posts
+- Ajustar intervalo entre posts
+
+---
+**Como usar:** Me peça naturalmente! Exemplo:
+- "Cria um post de notícia sobre IA"
+- "Faz um reels sobre o futuro da tecnologia"
+- "Agenda pra amanhã às 11h"
+- "Mostra meus posts agendados"`
+  };
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
@@ -1949,6 +2198,14 @@ async function executeTool(supabase: any, userId: string, workspaceId: string, t
       return executeDeletePost(supabase, userId, workspaceId, args);
     case 'update_agent_settings':
       return executeUpdateSettings(supabase, userId, workspaceId, args);
+    
+    // New tools
+    case 'search_web_images':
+      return executeSearchWebImages(args);
+    case 'create_post_with_image_url':
+      return executeCreatePostWithImageUrl(supabase, userId, workspaceId, args);
+    case 'explain_capabilities':
+      return executeExplainCapabilities();
     
     // Legacy tools (kept for backwards compatibility, but won't be suggested)
     case 'create_posts':
