@@ -201,68 +201,71 @@ Deno.serve(async (req) => {
       console.log(`[RENDER-SERVER] Usando Replicate para composição de vídeo...`);
 
       try {
-        // Use a slideshow model or image-to-video model
-        // deforum-art/deforum_stable_diffusion is good for image animations
-        // Or use a simpler approach with img2vid models
+        // Use stability-ai/stable-video-diffusion for image-to-video
+        // This model takes a single image and creates a short video with motion
+        const firstImage = renderedSegments[0]?.imageUrl;
         
-        // For now, we'll create individual video clips and concatenate
-        // Using luma/dream-machine or similar for image-to-video
-        
-        const videoClips: string[] = [];
-        
-        for (let i = 0; i < Math.min(renderedSegments.length, 4); i++) {
-          const segment = renderedSegments[i];
-          if (!segment.imageUrl) continue;
-
-          // Create video from image using Replicate
+        if (firstImage) {
+          // Create video from first image using Replicate stable-video-diffusion
           const prediction = await fetch(REPLICATE_API, {
             method: "POST",
             headers: {
-              "Authorization": `Bearer ${replicateApiKey}`,
+              "Authorization": `Token ${replicateApiKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              version: "minimax/video-01", // Fast image-to-video
+              // Using stability-ai/stable-video-diffusion model
+              version: "3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438",
               input: {
-                prompt: segments[i].text || "cinematic motion, Ken Burns effect",
-                first_frame_image: segment.imageUrl,
+                input_image: firstImage,
+                motion_bucket_id: 127,
+                fps: 25,
+                cond_aug: 0.02,
               },
             }),
           });
 
           if (prediction.ok) {
             const predData = await prediction.json();
-            console.log(`[RENDER-SERVER] Clip ${i + 1} iniciado: ${predData.id}`);
+            console.log(`[RENDER-SERVER] Vídeo iniciado via Replicate: ${predData.id}`);
             
-            // Poll for completion (max 2 minutes per clip)
+            // Poll for completion (max 5 minutes)
             let attempts = 0;
-            while (attempts < 24) {
+            const maxAttempts = 60; // 5 minutes with 5 second intervals
+            
+            while (attempts < maxAttempts) {
               await new Promise((r) => setTimeout(r, 5000));
               
               const statusRes = await fetch(`${REPLICATE_API}/${predData.id}`, {
-                headers: { "Authorization": `Bearer ${replicateApiKey}` },
+                headers: { "Authorization": `Token ${replicateApiKey}` },
               });
               
               if (statusRes.ok) {
                 const status = await statusRes.json();
+                console.log(`[RENDER-SERVER] Status Replicate: ${status.status}`);
+                
                 if (status.status === "succeeded" && status.output) {
-                  videoClips.push(status.output);
-                  console.log(`[RENDER-SERVER] Clip ${i + 1} completo`);
+                  finalVideoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
+                  console.log(`[RENDER-SERVER] ✅ Vídeo renderizado via Replicate: ${finalVideoUrl}`);
                   break;
                 } else if (status.status === "failed") {
-                  console.error(`[RENDER-SERVER] Clip ${i + 1} falhou:`, status.error);
+                  console.error(`[RENDER-SERVER] ❌ Replicate falhou:`, status.error);
+                  break;
+                } else if (status.status === "canceled") {
+                  console.error(`[RENDER-SERVER] ❌ Replicate cancelado`);
                   break;
                 }
               }
               attempts++;
             }
+            
+            if (attempts >= maxAttempts) {
+              console.error(`[RENDER-SERVER] ⏰ Timeout aguardando Replicate`);
+            }
+          } else {
+            const errorText = await prediction.text();
+            console.error(`[RENDER-SERVER] ❌ Erro ao criar prediction:`, errorText);
           }
-        }
-
-        // If we got at least one clip, use the first one as the video
-        if (videoClips.length > 0) {
-          finalVideoUrl = videoClips[0];
-          console.log(`[RENDER-SERVER] Vídeo renderizado via Replicate`);
         }
       } catch (e) {
         console.error(`[RENDER-SERVER] Erro Replicate:`, e);
