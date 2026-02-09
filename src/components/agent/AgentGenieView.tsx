@@ -1,12 +1,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   MessageCircle, 
   ImageIcon, 
   FileText, 
-  Bot,
   Loader2,
   LayoutDashboard
 } from 'lucide-react';
@@ -248,23 +246,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       </Suspense>
       
       {/* Top Bar - Minimal */}
-      <header className="relative z-20 flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Avatar className="h-10 w-10 border-2 border-primary/30 shadow-lg">
-              <AvatarImage src={agentConfig.agent_avatar_url || undefined} />
-              <AvatarFallback className="neural-gradient text-primary-foreground">
-                <Bot className="h-5 w-5" />
-              </AvatarFallback>
-            </Avatar>
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background bg-emerald-500" />
-          </div>
-          <div>
-            <h1 className="text-base font-semibold text-foreground">{agentConfig.agent_name}</h1>
-            <p className="text-xs text-muted-foreground">Online • Pronto para ajudar</p>
-          </div>
-        </div>
-        
+      <header className="relative z-20 flex items-center justify-end px-4 py-3">
         <Button
           variant="outline"
           size="sm"
@@ -272,7 +254,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           onClick={() => onNavigate?.('dashboard')}
         >
           <LayoutDashboard className="h-4 w-4" />
-          <span className="hidden sm:inline">Dashboard</span>
+          Dashboard
         </Button>
       </header>
       
