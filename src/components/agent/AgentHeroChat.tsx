@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useInstagramAccounts } from '@/hooks/useInstagramAccounts';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle, Instagram } from 'lucide-react';
 
 // Type definitions for Web Speech API
 interface SpeechRecognitionEvent extends Event {
@@ -106,8 +110,10 @@ _"Mostre meus analytics dos últimos 30 dias"_
 **O que você gostaria que eu faça?**`;
 
 export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
+  const { accounts: instagramAccounts, loading: loadingInstagram } = useInstagramAccounts();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -118,6 +124,8 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  
+  const hasNoConnectedAccount = !loadingInstagram && instagramAccounts.length === 0;
 
   // Initialize speech recognition
   useEffect(() => {
@@ -439,6 +447,22 @@ export default function AgentHeroChat({ onNavigate }: AgentHeroChatProps) {
         style={{ backgroundImage: `url(${agentHeroBg})` }}
       />
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-background/80 via-background/95 to-background" />
+      
+      {/* Alert: No Instagram Account Connected */}
+      {hasNoConnectedAccount && (
+        <Alert 
+          className="relative z-20 mx-4 mt-2 border-amber-500/50 bg-amber-500/10 cursor-pointer hover:bg-amber-500/20 transition-colors"
+          onClick={() => navigate('/settings?tab=instagram')}
+        >
+          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <AlertDescription className="flex items-center justify-between text-sm">
+            <span className="text-amber-600 dark:text-amber-400">
+              <strong>Nenhuma conta do Instagram conectada.</strong> Clique aqui para conectar e publicar posts automaticamente.
+            </span>
+            <Instagram className="h-4 w-4 text-amber-500 ml-2 flex-shrink-0" />
+          </AlertDescription>
+        </Alert>
+      )}
       
       {/* Compact Header */}
       <div className="relative z-10 flex items-center justify-between px-4 py-2 border-b backdrop-blur-sm border-primary/30 bg-gradient-to-r from-primary/5 to-violet-500/5">

@@ -621,13 +621,13 @@ async function createCarouselContent(
 ): Promise<any> {
   console.log('[AGENT] Criando carrossel:', plan.theme);
   
-  // Generate 4 images for carousel - ALL IN PORTUGUESE
+  // Generate 4 images for carousel - NO TEXT IN IMAGES
   const currentYear = new Date().getFullYear(); // 2026
   const slidePrompts = [
-    `Slide 1: Introdução visual sobre ${plan.theme}. Design moderno, tecnológico, profissional. Alta qualidade para Instagram. Ano ${currentYear}. Todo texto em PORTUGUÊS BRASILEIRO.`,
-    `Slide 2: Dados ou estatísticas sobre ${plan.theme}. Estilo infográfico, clean, profissional. Cores vibrantes. Ano ${currentYear}. Texto em português.`,
-    `Slide 3: Benefícios ou aplicações de ${plan.theme}. Design inovador, futurista mas realista. Ano ${currentYear}. Português brasileiro.`,
-    `Slide 4: Conclusão e chamada para ação sobre ${plan.theme}. Impactante, memorável, profissional. Ano ${currentYear}. PORTUGUÊS.`
+    `Slide 1 de carrossel sobre ${plan.theme}. Design moderno, tecnológico, profissional. Alta qualidade para Instagram. Ano ${currentYear}. REGRA ABSOLUTA: NÃO INCLUA NENHUM TEXTO, PALAVRA OU LETRA NA IMAGEM. Apenas elementos visuais.`,
+    `Slide 2 de carrossel: conceito visual representando dados ou estatísticas sobre ${plan.theme}. Estilo infográfico visual com ícones e gráficos SEM TEXTO. Cores vibrantes. Ano ${currentYear}. NÃO use palavras.`,
+    `Slide 3 de carrossel: benefícios visuais de ${plan.theme}. Design inovador, futurista mas realista. Ano ${currentYear}. PROIBIDO incluir texto ou letras. Use apenas símbolos e ícones.`,
+    `Slide 4 de carrossel: conclusão visual impactante sobre ${plan.theme}. Memorável, profissional. Ano ${currentYear}. SEM TEXTO OU LETRAS NA IMAGEM.`
   ];
   
   const carouselImages: string[] = [];
@@ -770,14 +770,14 @@ async function createNewsContent(
     }
   }
   
-  // Generate image if no article image - PORTUGUESE PROMPT
+  // Generate image if no article image - NO TEXT IN IMAGE
   const newsYear = new Date().getFullYear(); // 2026
   if (!imageUrl) {
     const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        prompt: `Ilustração de notícia sobre: ${selectedArticle?.title || plan.theme}. Estilo jornalístico profissional, cores realistas. Qualidade para Instagram ${newsYear}. Sem texto na imagem. Se houver texto, deve ser em PORTUGUÊS BRASILEIRO.`,
+        prompt: `Ilustração fotorrealista representando o conceito de: ${selectedArticle?.title || plan.theme}. Estilo jornalístico profissional, cores realistas. Qualidade para Instagram ${newsYear}. REGRA ABSOLUTA: NÃO INCLUA NENHUM TEXTO, PALAVRA, LETRA OU NÚMERO NA IMAGEM. Apenas elementos visuais. A notícia será explicada na legenda, a imagem deve ser puramente visual.`,
         format: 'square',
         model: 'gemini'
       })
@@ -854,13 +854,13 @@ async function createImageContent(
 ): Promise<any> {
   console.log('[AGENT] Criando post de imagem:', plan.theme);
   
-  // Generate image with PORTUGUESE prompt
+  // Generate image - NO TEXT ALLOWED
   const imageYear = new Date().getFullYear(); // 2026
   const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      prompt: `Post profissional para redes sociais sobre: ${plan.theme}. Design moderno, estético tecnológico, cores vibrantes. Qualidade profissional para Instagram ${imageYear}. Sem texto na imagem ou se houver texto, deve ser em PORTUGUÊS BRASILEIRO. Contexto: ano ${imageYear}.`,
+      prompt: `Post visual profissional para redes sociais representando o conceito: ${plan.theme}. Design moderno, estética tecnológica, cores vibrantes e harmoniosas. Qualidade profissional para Instagram ${imageYear}. Iluminação de estúdio ou golden hour. REGRA ABSOLUTA: NÃO INCLUA NENHUM TEXTO, PALAVRA, LETRA, NÚMERO OU SÍMBOLO ESCRITO NA IMAGEM. A imagem deve ser 100% visual. Use ícones ou formas abstratas se necessário, nunca texto.`,
       format: 'square',
       model: 'gemini'
     })
