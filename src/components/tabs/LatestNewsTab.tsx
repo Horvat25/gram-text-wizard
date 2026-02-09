@@ -241,6 +241,7 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
         body: { 
           topic: `${news.title}. ${news.description || ''}`, 
           postType: 'noticia',
+          mediaType: asCarousel ? 'carousel' : 'image', // CTA programático por tipo de mídia
           sourceUrl: news.url,
           sourceName: sourceDomain,
           customInstructions: `Esta é uma notícia REAL. A fonte é: ${sourceDomain} (${news.url}). 

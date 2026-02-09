@@ -181,10 +181,10 @@ REGRAS CRÍTICAS:
 - PROIBIDO usar termos em inglês como "AI", "Generative AI", "Robotics", "Computing" - use equivalentes em português!
 
 ESTRUTURA (4 CENAS):
-1) GANCHO (0-2s): frase curta e específica do tema.
+1) GANCHO (0-2s): frase curta e específica do tema. Use formato: "IMPACTO + contexto".
 2) CONTEXTO (3-6s): explique o que é / por que importa, sem jargão.
 3) PROVA/INSIGHT (7-15s): 1 insight prático (ex.: passo, exemplo, erro comum, comparação).
-4) CTA (final): peça ação de engajamento (salvar/comentar/seguir) de forma natural.
+4) CTA (final): SEMPRE use "LEIA A LEGENDA 👇" - isso é OBRIGATÓRIO para engajamento.
 
 FORMATO:
 - Frases curtas (8–16 palavras por segmento).

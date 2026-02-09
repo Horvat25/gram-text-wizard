@@ -128,7 +128,7 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, postType = "engajamento", customInstructions } = await req.json();
+    const { topic, postType = "engajamento", mediaType, customInstructions } = await req.json();
 
     if (!topic || typeof topic !== "string") {
       throw new Error("Topic é obrigatório e deve ser uma string");
@@ -141,9 +141,20 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
-    console.log(`Gerando caption tipo: ${selectedType.name} para tópico: ${topic}`);
+    console.log(`Gerando caption tipo: ${selectedType.name}, mídia: ${mediaType || 'image'} para tópico: ${topic}`);
 
     const currentYear = new Date().getFullYear(); // Always use current year (2025+)
+    
+    // CTA programático baseado no tipo de mídia
+    let mediaCTA = "";
+    if (mediaType === "carousel") {
+      mediaCTA = "\n\n🔹 ARRASTE PRO LADO para ver mais 👉";
+    } else if (mediaType === "video" || mediaType === "reel") {
+      mediaCTA = "\n\n📺 ASSISTA ATÉ O FINAL ▶️";
+    } else {
+      // Para imagens (posts de notícia)
+      mediaCTA = "\n\n👇 LEIA A LEGENDA COMPLETA";
+    }
 
     // Build system prompt with custom instructions and year context
     let systemPrompt = selectedType.systemPrompt;
@@ -239,6 +250,18 @@ REGRAS OBRIGATÓRIAS:
         .map((tag: string) => tag.replace("#", "").replace(/[.,!?;:]$/, ""));
     } else {
       caption = fullText.trim();
+    }
+
+    // Adicionar CTA programático baseado no tipo de mídia (no início da caption)
+    if (mediaCTA) {
+      // Inserir o CTA no início, após o primeiro parágrafo
+      const paragraphs = caption.split('\n\n');
+      if (paragraphs.length > 1) {
+        paragraphs.splice(1, 0, mediaCTA.trim());
+        caption = paragraphs.join('\n\n');
+      } else {
+        caption = caption + mediaCTA;
+      }
     }
 
     console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
