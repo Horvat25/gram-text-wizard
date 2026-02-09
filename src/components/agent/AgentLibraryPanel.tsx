@@ -13,17 +13,19 @@ import {
   Check,
   Sparkles,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Settings2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { useRssFeeds, RssItem, DEFAULT_FEEDS } from '@/hooks/useRssFeeds';
+import { useRssFeeds, RssItem, RssFeed, DEFAULT_FEEDS } from '@/hooks/useRssFeeds';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { CustomFeedsManager, CustomFeed } from '@/components/CustomFeedsManager';
 
 interface ImageCardProps {
   item: RssItem;
@@ -98,6 +100,8 @@ export default function AgentLibraryPanel({ isOpen, onClose }: AgentLibraryPanel
   const { items, loading, stats, fetchFeeds, loadSavedItems } = useRssFeeds();
   const [selectedItem, setSelectedItem] = useState<RssItem | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showFeedsManager, setShowFeedsManager] = useState(false);
+  const [customFeeds, setCustomFeeds] = useState<CustomFeed[]>([]);
   const [headline, setHeadline] = useState('');
   const [caption, setCaption] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -109,7 +113,10 @@ export default function AgentLibraryPanel({ isOpen, onClose }: AgentLibraryPanel
   }, [isOpen, user, currentWorkspace]);
 
   const handleRefresh = async () => {
-    await fetchFeeds(DEFAULT_FEEDS, 30);
+    const feedsToUse = customFeeds.length > 0 
+      ? customFeeds.map(f => ({ name: f.name, url: f.url })) as RssFeed[]
+      : DEFAULT_FEEDS;
+    await fetchFeeds(feedsToUse, 30);
     await loadSavedItems(true, true);
   };
 
@@ -205,7 +212,16 @@ export default function AgentLibraryPanel({ isOpen, onClose }: AgentLibraryPanel
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowFeedsManager(true)}
+                className="h-8 w-8"
+                title="Gerenciar sites de notícias"
+              >
+                <Settings2 className="h-4 w-4" />
+              </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -377,6 +393,29 @@ export default function AgentLibraryPanel({ isOpen, onClose }: AgentLibraryPanel
                   Criar Post
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Feeds Manager Dialog */}
+      <Dialog open={showFeedsManager} onOpenChange={setShowFeedsManager}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5 text-orange-500" />
+              Gerenciar Sites de Notícias
+            </DialogTitle>
+            <DialogDescription>
+              Adicione seus próprios sites de tecnologia para buscar notícias
+            </DialogDescription>
+          </DialogHeader>
+          
+          <CustomFeedsManager onFeedsChange={setCustomFeeds} />
+          
+          <DialogFooter>
+            <Button onClick={() => setShowFeedsManager(false)}>
+              Fechar
             </Button>
           </DialogFooter>
         </DialogContent>
