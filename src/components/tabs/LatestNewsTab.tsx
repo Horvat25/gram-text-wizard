@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   Newspaper, 
   TrendingUp, 
@@ -30,13 +31,16 @@ import {
   Hash,
   Flame,
   Images,
-  LayoutGrid
+  LayoutGrid,
+  Settings2,
+  ChevronDown
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CreatePostData } from '@/hooks/usePosts';
 import { useInstagramAccounts } from '@/hooks/useInstagramAccounts';
 import { addMinutes, format } from 'date-fns';
+import { CustomFeedsManager, CustomFeed, DEFAULT_TECH_FEEDS } from '@/components/CustomFeedsManager';
 
 interface NewsResult {
   url: string;
@@ -105,6 +109,8 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [loadingTrending, setLoadingTrending] = useState(false);
+  const [customFeeds, setCustomFeeds] = useState<CustomFeed[]>(DEFAULT_TECH_FEEDS);
+  const [showFeedsSettings, setShowFeedsSettings] = useState(false);
   
   const { accounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
@@ -325,7 +331,7 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
     }
   };
 
-  // Save as draft
+  // Save as draft (with watermark processing)
   const saveAsDraft = async () => {
     const hasSelection = isCarouselMode ? selectedImages.length >= 2 : !!selectedImage;
     if (!selectedNews || !hasSelection) {
@@ -339,11 +345,33 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
 
     setIsSaving(true);
     try {
+      // Process images with watermark before saving
+      const imagesToProcess = isCarouselMode ? selectedImages : [selectedImage!];
+      const processedImages: string[] = [];
+      
+      for (const img of imagesToProcess) {
+        const isExternalImage = !img.includes('supabase') && 
+                                !img.includes(import.meta.env.VITE_SUPABASE_URL || '');
+        
+        if (isExternalImage) {
+          try {
+            const processed = await uploadExternalImageWithWatermark(img);
+            processedImages.push(processed);
+          } catch (uploadError) {
+            console.error('Image upload error:', uploadError);
+            // Fallback to original
+            processedImages.push(img);
+          }
+        } else {
+          processedImages.push(img);
+        }
+      }
+      
       const postData: CreatePostData = {
         caption: caption.trim(),
         hashtags,
-        image_url: isCarouselMode ? selectedImages[0] : selectedImage!,
-        carousel_images: isCarouselMode ? selectedImages : undefined,
+        image_url: processedImages[0],
+        carousel_images: isCarouselMode ? processedImages : undefined,
         status: 'draft',
         post_type: 'noticia',
         media_type: isCarouselMode ? 'carousel' : 'image',
@@ -351,7 +379,7 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
 
       if (onPostCreated) {
         await onPostCreated(postData);
-        toast.success('Rascunho salvo!');
+        toast.success('Rascunho salvo com marca d\'água!');
         backToNewsList();
       } else {
         const { data: { user } } = await supabase.auth.getUser();
@@ -366,7 +394,7 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
         });
         
         if (error) throw error;
-        toast.success('Rascunho salvo!');
+        toast.success('Rascunho salvo com marca d\'água!');
         backToNewsList();
       }
     } catch (error: any) {
@@ -377,7 +405,7 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
     }
   };
 
-  // Schedule post
+  // Schedule post (with watermark processing)
   const schedulePost = async () => {
     const hasSelection = isCarouselMode ? selectedImages.length >= 2 : !!selectedImage;
     if (!selectedNews || !hasSelection) {
@@ -399,11 +427,32 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
 
     setIsSaving(true);
     try {
+      // Process images with watermark before scheduling
+      const imagesToProcess = isCarouselMode ? selectedImages : [selectedImage!];
+      const processedImages: string[] = [];
+      
+      for (const img of imagesToProcess) {
+        const isExternalImage = !img.includes('supabase') && 
+                                !img.includes(import.meta.env.VITE_SUPABASE_URL || '');
+        
+        if (isExternalImage) {
+          try {
+            const processed = await uploadExternalImageWithWatermark(img);
+            processedImages.push(processed);
+          } catch (uploadError) {
+            console.error('Image upload error:', uploadError);
+            processedImages.push(img);
+          }
+        } else {
+          processedImages.push(img);
+        }
+      }
+      
       const postData: CreatePostData = {
         caption: caption.trim(),
         hashtags,
-        image_url: isCarouselMode ? selectedImages[0] : selectedImage!,
-        carousel_images: isCarouselMode ? selectedImages : undefined,
+        image_url: processedImages[0],
+        carousel_images: isCarouselMode ? processedImages : undefined,
         status: 'scheduled',
         scheduled_for: localToUTC(scheduledFor),
         post_type: 'noticia',
@@ -412,7 +461,7 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
 
       if (onPostCreated) {
         await onPostCreated(postData);
-        toast.success('Post agendado!');
+        toast.success('Post agendado com marca d\'água!');
         backToNewsList();
       } else {
         const { data: { user } } = await supabase.auth.getUser();
@@ -427,7 +476,7 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
         });
         
         if (error) throw error;
-        toast.success('Post agendado!');
+        toast.success('Post agendado com marca d\'água!');
         backToNewsList();
       }
     } catch (error: any) {
@@ -881,6 +930,25 @@ Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha 
           Sem precisar gerar imagem com IA!
         </p>
       </div>
+
+      {/* Custom Feeds Settings - Collapsible */}
+      <Collapsible open={showFeedsSettings} onOpenChange={setShowFeedsSettings}>
+        <CollapsibleTrigger asChild>
+          <Button 
+            variant="outline" 
+            className="w-full justify-between border-dashed border-primary/30 hover:bg-primary/5"
+          >
+            <div className="flex items-center gap-2">
+              <Settings2 className="w-4 h-4" />
+              <span>Gerenciar Sites de Notícias ({customFeeds.length} fontes)</span>
+            </div>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showFeedsSettings ? 'rotate-180' : ''}`} />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">
+          <CustomFeedsManager onFeedsChange={setCustomFeeds} />
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Search */}
       <Card className="border-primary/20 bg-gradient-neural-soft overflow-hidden">
