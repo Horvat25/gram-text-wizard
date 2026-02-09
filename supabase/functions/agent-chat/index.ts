@@ -1658,37 +1658,62 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
   
   try {
     // 1. Find RSS item from database
-    let query = supabase
-      .from('rss_items')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .eq('is_used', false)
-      .eq('has_image', true)
-      .order('fetched_at', { ascending: false });
+    // STRATEGY: Try with filter first, if nothing found, ignore filter and get most recent
+    let rssItems: any[] = [];
+    let usedFilter = false;
     
-    // Apply topic filter if provided
+    // First try: with topic filter (if provided)
     if (topic_filter && topic_filter.trim()) {
-      query = query.or(`title.ilike.%${topic_filter}%,description.ilike.%${topic_filter}%`);
+      const { data: filteredItems, error: filterError } = await supabase
+        .from('rss_items')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .eq('is_used', false)
+        .eq('has_image', true)
+        .or(`title.ilike.%${topic_filter}%,description.ilike.%${topic_filter}%`)
+        .order('fetched_at', { ascending: false })
+        .limit(5);
+      
+      if (!filterError && filteredItems && filteredItems.length > 0) {
+        rssItems = filteredItems;
+        usedFilter = true;
+        console.log('[RSS_NEWS_POST] Found', rssItems.length, 'items matching filter:', topic_filter);
+      } else {
+        console.log('[RSS_NEWS_POST] No items match filter "' + topic_filter + '", falling back to most recent');
+      }
     }
     
-    const { data: rssItems, error: rssError } = await query.limit(5);
-    
-    if (rssError) {
-      console.error('[RSS_NEWS_POST] DB error:', rssError);
-      return { success: false, message: `❌ Erro ao buscar notícias: ${rssError.message}` };
+    // Fallback: get most recent news (ignoring filter)
+    if (rssItems.length === 0) {
+      const { data: recentItems, error: recentError } = await supabase
+        .from('rss_items')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .eq('is_used', false)
+        .eq('has_image', true)
+        .order('fetched_at', { ascending: false })
+        .limit(5);
+      
+      if (recentError) {
+        console.error('[RSS_NEWS_POST] DB error:', recentError);
+        return { success: false, message: `❌ Erro ao buscar notícias: ${recentError.message}` };
+      }
+      
+      rssItems = recentItems || [];
     }
     
-    if (!rssItems || rssItems.length === 0) {
-      // Try to refresh RSS feeds first
-      console.log('[RSS_NEWS_POST] No RSS items found, suggesting refresh');
+    // If still nothing, suggest refresh
+    if (rssItems.length === 0) {
+      console.log('[RSS_NEWS_POST] No RSS items found at all, suggesting refresh');
       return { 
         success: false, 
-        message: `⚠️ Nenhuma notícia encontrada${topic_filter ? ` sobre "${topic_filter}"` : ''} com imagem. Use **refresh_rss_feeds** para buscar notícias novas!`
+        message: `⚠️ Nenhuma notícia com imagem disponível. Use **refresh_rss_feeds** para buscar notícias novas!`
       };
     }
     
     // Pick the first (most recent) item
     const newsItem = rssItems[0];
+    console.log('[RSS_NEWS_POST] Selected:', newsItem.title, usedFilter ? '(matched filter)' : '(most recent)');
     console.log('[RSS_NEWS_POST] Selected:', newsItem.title);
     
     // 2. Build headline (use provided or from title)
@@ -2352,13 +2377,26 @@ Você ENTENDE COMANDOS IMPLÍCITOS. Quando o usuário fala algo vago, você INTE
 
 | Usuário diz... | Você ENTENDE que... | AÇÃO CORRETA |
 |----------------|---------------------|--------------|
-| "crie um post" | Quer post de notícia | \`create_rss_news_post\` com headline criativa |
-| "crie pra amanhã às 10" | Criar + agendar | \`create_rss_news_post\` com scheduled_for |
-| "me surpreenda" | Escolha você | Pegar notícia mais impactante do RSS |
-| "posta algo agora" | Criar + publicar imediato | \`create_rss_news_post\` sem scheduled_for |
+| "crie um post" | Quer post de notícia | \`create_rss_news_post\` SEM topic_filter (pega mais recente) |
+| "crie pra amanhã às 10" | Criar + agendar | \`create_rss_news_post\` com scheduled_for, SEM topic_filter |
+| "me surpreenda" | ESCOLHA VOCÊ a melhor | \`create_rss_news_post\` **SEM topic_filter** (você decide!) |
+| "posta algo agora" | Criar + publicar imediato | \`create_rss_news_post\` sem scheduled_for, SEM topic_filter |
 | "faz um vídeo" | REELS/vídeo narrado | \`create_narrated_video\` |
+| "post sobre OpenAI" | Tema ESPECÍFICO | \`create_rss_news_post\` COM topic_filter="OpenAI" |
 | "agenda isso" + post_id | Agendar existente | \`schedule_post\` |
 | "quantos posts?" | Estatísticas | \`get_detailed_analytics\` |
+
+### ⚠️ REGRA DO topic_filter (MUITO IMPORTANTE!)
+
+**USE topic_filter APENAS quando o usuário especificar um tema exato.**
+
+❌ "crie um post" → NÃO use topic_filter
+❌ "me surpreenda" → NÃO use topic_filter
+❌ "posta pra amanhã" → NÃO use topic_filter
+✅ "crie sobre IA" → USE topic_filter="IA"
+✅ "post sobre OpenAI" → USE topic_filter="OpenAI"
+
+Quando NÃO usa topic_filter, o sistema pega a notícia MAIS RECENTE disponível.
 
 ### REGRA DE OURO: NUNCA LISTE SEM EXECUTAR
 
@@ -2367,10 +2405,10 @@ Você ENTENDE COMANDOS IMPLÍCITOS. Quando o usuário fala algo vago, você INTE
 
 ### QUANDO O USUÁRIO DIZ "ME SURPREENDA" OU SIMILAR:
 1. **NÃO PERGUNTE NADA** - tome decisão
-2. **ESCOLHA** a notícia mais impactante/recente
-3. **CRIE** uma headline provocativa
+2. **NÃO USE topic_filter** - pegue a mais impactante/recente
+3. **CRIE** uma headline provocativa baseada na notícia
 4. **EXECUTE** a ação completa
-5. **EXPLIQUE** o que fez depois
+5. **EXPLIQUE** o que fez e por que escolheu essa notícia
 
 ### COMANDOS COMPOSTOS (MUITO IMPORTANTE!)
 Quando o usuário combina ações em uma frase, execute TODAS:
