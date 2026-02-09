@@ -32,13 +32,18 @@ export interface RssStats {
   errors: number;
 }
 
-// Feeds padrão de tecnologia brasileira
+// Feeds padrão de tecnologia brasileira - EXPANDIDO para mais fontes
 export const DEFAULT_FEEDS: RssFeed[] = [
   { name: 'Olhar Digital', url: 'https://olhardigital.com.br/feed/' },
   { name: 'TecMundo', url: 'https://rss.tecmundo.com.br/feed' },
   { name: 'Canaltech', url: 'https://canaltech.com.br/rss/' },
   { name: 'Tecnoblog', url: 'https://tecnoblog.net/feed/' },
   { name: 'Gizmodo Brasil', url: 'https://gizmodo.uol.com.br/feed/' },
+  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
+  { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index' },
+  { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
+  { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
+  { name: 'Engadget', url: 'https://www.engadget.com/rss.xml' },
 ];
 
 export function useRssFeeds() {
