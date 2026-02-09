@@ -129,9 +129,43 @@ serve(async (req) => {
       for (let i = 0; i < segmentCount && i < uniqueImages.length; i++) {
         const img = uniqueImages[i];
         
-        // Upload image to Supabase storage with watermark
+        // Upload image to Supabase storage WITH WATERMARK
         try {
-          const imageResponse = await fetch(img.url);
+          // Apply Neural Update watermark via add-watermark function
+          const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseKey}`,
+            },
+            body: JSON.stringify({ 
+              imageUrl: img.url,
+              watermarkText: "Neural Update"
+            }),
+          });
+
+          if (watermarkResponse.ok) {
+            const watermarkResult = await watermarkResponse.json();
+            if (watermarkResult.publicUrl) {
+              results.push({
+                imageUrl: watermarkResult.publicUrl,
+                source: 'web',
+                sourceUrl: img.sourceUrl
+              });
+              console.log(`[search-images-for-video] ✅ Image ${i + 1} saved from web + watermark`);
+              continue;
+            }
+          }
+          
+          // Fallback: upload without watermark if watermark fails
+          console.log(`[search-images-for-video] Watermark failed, uploading without watermark...`);
+          const imageResponse = await fetch(img.url, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'image/*',
+            }
+          });
+          
           if (imageResponse.ok) {
             const imageBlob = await imageResponse.blob();
             const fileName = `video-${Date.now()}-${i}.jpg`;
@@ -153,7 +187,7 @@ serve(async (req) => {
                 source: 'web',
                 sourceUrl: img.sourceUrl
               });
-              console.log(`[search-images-for-video] ✅ Image ${i + 1} saved from web`);
+              console.log(`[search-images-for-video] ✅ Image ${i + 1} saved from web (no watermark fallback)`);
             }
           }
         } catch (e) {
