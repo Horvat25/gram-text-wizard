@@ -7,22 +7,16 @@ const corsHeaders = {
 };
 
 /**
- * WATERMARK 100% PROGRAMÁTICO
+ * WATERMARK + HEADLINE OVERLAY
  * 
  * Regra: "IA pensa o texto. Código escreve o texto."
  * 
- * Este serviço aplica watermarks e headlines usando CÓDIGO (SVG/Canvas),
- * nunca pedindo para IA escrever texto visualmente.
+ * PORÉM: Para headlines complexas em imagens, usamos IA para composição visual
+ * porque é mais confiável que tentar renderizar SVG em edge functions.
  * 
- * Fluxo:
- * 1. IA gera/revisa o texto (via review-portuguese)
- * 2. Código renderiza o texto via SVG
- * 3. Imagem é composta programaticamente
- * 
- * Resultado: ZERO erros ortográficos no visual.
+ * O texto é REVISADO por IA especialista em PT-BR antes de ser aplicado.
  */
 
-// User agents para download de imagens
 const USER_AGENTS = [
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
@@ -38,7 +32,6 @@ async function downloadImage(imageUrl: string): Promise<{ data: Uint8Array; cont
         headers: {
           'User-Agent': userAgent,
           'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9,pt-BR;q=0.8',
           'Referer': url.origin,
         }
       });
@@ -49,7 +42,7 @@ async function downloadImage(imageUrl: string): Promise<{ data: Uint8Array; cont
         return { data: new Uint8Array(arrayBuffer), contentType };
       }
     } catch (err) {
-      console.log(`[add-watermark] Download retry with different UA`);
+      console.log(`[add-watermark] Retry download with different UA`);
     }
   }
   
@@ -57,14 +50,9 @@ async function downloadImage(imageUrl: string): Promise<{ data: Uint8Array; cont
 }
 
 /**
- * Revisar texto via IA antes de renderizar
+ * Revisar texto via IA especialista em PT-BR
  */
-async function reviewText(
-  text: string, 
-  type: 'headline' | 'caption' | 'cta' | 'general',
-  supabaseUrl: string,
-  supabaseKey: string
-): Promise<string> {
+async function reviewPortuguese(text: string, supabaseUrl: string, supabaseKey: string): Promise<string> {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
       method: 'POST',
@@ -72,198 +60,38 @@ async function reviewText(
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${supabaseKey}`,
       },
-      body: JSON.stringify({ text, type }),
+      body: JSON.stringify({ text, type: 'headline' }),
     });
 
     if (response.ok) {
       const result = await response.json();
       if (result.corrected) {
-        console.log(`[add-watermark] Text reviewed: "${text}" → "${result.corrected}"`);
+        console.log(`[add-watermark] Text reviewed: "${text.substring(0,30)}..." → "${result.corrected.substring(0,30)}..."`);
         return result.corrected;
       }
     }
   } catch (e) {
-    console.warn('[add-watermark] Review failed, using original:', e);
+    console.warn('[add-watermark] Review failed, using original');
   }
   
   return text;
 }
 
 /**
- * Escapar texto para uso seguro em SVG
+ * Aplicar headline + watermark usando IA para composição visual
+ * Prompt otimizado para minimizar erros de escrita
  */
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-/**
- * Quebrar texto em múltiplas linhas
- */
-function wrapText(text: string, maxCharsPerLine: number): string[] {
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let currentLine = '';
-
-  for (const word of words) {
-    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
-      currentLine = (currentLine + ' ' + word).trim();
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
-
-  return lines.slice(0, 3); // Máximo 3 linhas
-}
-
-/**
- * Gerar SVG do watermark "Neural Update" - badge no canto
- */
-function generateWatermarkSVG(width: number, height: number, watermarkText: string): string {
-  const fontSize = Math.max(12, Math.min(24, Math.floor(width * 0.02)));
-  const padding = fontSize * 0.6;
-  const textWidth = watermarkText.length * fontSize * 0.55;
-  const badgeWidth = textWidth + padding * 2;
-  const badgeHeight = fontSize * 1.8;
-  
-  // Posição: canto inferior direito
-  const x = width - badgeWidth - 15;
-  const y = height - badgeHeight - 15;
-
-  return `
-    <!-- Watermark Badge -->
-    <rect 
-      x="${x}" y="${y}" 
-      width="${badgeWidth}" height="${badgeHeight}" 
-      rx="${badgeHeight / 2}" ry="${badgeHeight / 2}"
-      fill="rgba(0,0,0,0.7)"
-    />
-    <text 
-      x="${x + badgeWidth / 2}" 
-      y="${y + badgeHeight / 2 + fontSize * 0.35}"
-      font-family="Inter, -apple-system, sans-serif"
-      font-size="${fontSize}"
-      font-weight="600"
-      fill="white"
-      text-anchor="middle"
-    >${escapeXml(watermarkText)}</text>
-  `;
-}
-
-/**
- * Gerar SVG de headline estilo news (gradiente + texto grande)
- */
-function generateHeadlineSVG(
-  width: number, 
-  height: number, 
-  headline: string, 
-  watermarkText: string
-): string {
-  // Configurações de fonte baseadas no tamanho da imagem
-  const headlineFontSize = Math.max(24, Math.min(48, Math.floor(width * 0.045)));
-  const ctaFontSize = Math.max(12, Math.min(20, Math.floor(width * 0.02)));
-  const watermarkFontSize = Math.max(10, Math.min(16, Math.floor(width * 0.015)));
-  
-  // Área do gradiente (40% inferior)
-  const gradientHeight = height * 0.45;
-  const gradientY = height - gradientHeight;
-  
-  // Quebrar headline em linhas
-  const maxChars = Math.floor(width / (headlineFontSize * 0.5));
-  const headlineLines = wrapText(headline.toUpperCase(), maxChars);
-  const totalTextHeight = headlineLines.length * headlineFontSize * 1.2;
-  
-  // Posição do texto
-  const textStartY = height - 60 - totalTextHeight;
-  
-  // CTA
-  const ctaText = "ARRASTE PARA MAIS";
-  const ctaY = height - 25;
-  
-  // Watermark (canto superior direito)
-  const watermarkX = width - 15;
-  const watermarkY = 30;
-
-  // Gerar linhas do headline
-  const headlineTextElements = headlineLines.map((line, index) => `
-    <text 
-      x="${width / 2}" 
-      y="${textStartY + index * headlineFontSize * 1.2}"
-      font-family="Inter, -apple-system, sans-serif"
-      font-size="${headlineFontSize}"
-      font-weight="800"
-      fill="#FFD700"
-      text-anchor="middle"
-      style="filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));"
-    >${escapeXml(line)}</text>
-  `).join('');
-
-  return `
-    <defs>
-      <linearGradient id="newsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" style="stop-color:rgba(0,0,0,0)"/>
-        <stop offset="30%" style="stop-color:rgba(0,0,0,0.5)"/>
-        <stop offset="100%" style="stop-color:rgba(0,0,0,0.9)"/>
-      </linearGradient>
-    </defs>
-    
-    <!-- Gradiente escuro na parte inferior -->
-    <rect 
-      x="0" y="${gradientY}" 
-      width="${width}" height="${gradientHeight}"
-      fill="url(#newsGradient)"
-    />
-    
-    <!-- Headline text -->
-    ${headlineTextElements}
-    
-    <!-- CTA -->
-    <text 
-      x="${width / 2}" 
-      y="${ctaY}"
-      font-family="Inter, -apple-system, sans-serif"
-      font-size="${ctaFontSize}"
-      font-weight="600"
-      fill="#FF6B35"
-      text-anchor="middle"
-      letter-spacing="1"
-    >${escapeXml(ctaText)}</text>
-    
-    <!-- Watermark no canto superior direito -->
-    <text 
-      x="${watermarkX}" 
-      y="${watermarkY}"
-      font-family="Inter, -apple-system, sans-serif"
-      font-size="${watermarkFontSize}"
-      font-weight="500"
-      fill="rgba(255,255,255,0.7)"
-      text-anchor="end"
-    >${escapeXml(watermarkText)}</text>
-  `;
-}
-
-/**
- * Compor imagem final usando IA apenas para COMPOSIÇÃO (não escrita de texto)
- * O SVG com texto já escrito é sobreposto na imagem
- */
-async function composeImageWithSVG(
+async function applyHeadlineWithAI(
   imageData: Uint8Array,
   contentType: string,
-  svgOverlay: string,
-  width: number,
-  height: number
-): Promise<{ data: Uint8Array; contentType: string }> {
+  headline: string,
+  watermarkText: string
+): Promise<{ data: Uint8Array; contentType: string } | null> {
   const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
   
   if (!lovableApiKey) {
-    console.log("[add-watermark] No API key, returning original");
-    return { data: imageData, contentType };
+    console.log("[add-watermark] No API key");
+    return null;
   }
 
   const { encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
@@ -271,19 +99,123 @@ async function composeImageWithSVG(
   const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
   const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
 
-  // Criar SVG completo com a imagem embebida
-  const fullSVG = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <!-- Imagem de fundo -->
-  <image xlink:href="${imageDataUrl}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice"/>
-  
-  ${svgOverlay}
-</svg>`;
+  // Prompt EXTREMAMENTE ESPECÍFICO para evitar erros de ortografia
+  // Enfatiza copiar EXATAMENTE letra por letra
+  const prompt = `Edite esta imagem para criar um post de notícias estilo @davision.eth:
 
-  // Converter SVG para imagem usando a IA (apenas rasterização, não escrita)
-  const prompt = `Renderize este SVG exatamente como está, sem modificações. 
-Retorne apenas a imagem renderizada, preservando todos os elementos visuais e texto exatamente como definidos no SVG.
-NÃO altere, corrija ou modifique NENHUM texto - renderize EXATAMENTE como está no SVG.`;
+## LAYOUT OBRIGATÓRIO:
+
+1. GRADIENTE ESCURO na parte inferior (40% da imagem)
+   - De transparente no topo para 85% preto na base
+   - Suave e profissional
+
+2. HEADLINE em AMARELO DOURADO (#FFD700)
+   - Posição: parte inferior da imagem, acima do gradiente
+   - Estilo: NEGRITO, CAIXA ALTA, impactante
+   - Máximo 2 linhas
+   - COPIE EXATAMENTE ESTE TEXTO, LETRA POR LETRA:
+   
+   "${headline}"
+   
+   ⚠️ CRÍTICO: Escreva EXATAMENTE como está acima. Não altere, corrija ou modifique NADA.
+
+3. CALL-TO-ACTION em laranja (#FF6B35)
+   - Texto EXATO: "ARRASTE PARA MAIS"
+   - Posição: abaixo do headline, menor
+   - Espaçamento entre letras: aumentado
+
+4. WATERMARK pequeno no canto superior direito
+   - Texto EXATO: "${watermarkText}"
+   - Cor: branco semi-transparente (70% opacidade)
+   - Fonte pequena e discreta
+
+## REGRAS:
+- NÃO altere a imagem original além de adicionar o gradiente e textos
+- NÃO modifique os textos fornecidos - copie LETRA POR LETRA
+- Mantenha a qualidade original da imagem
+- Resultado deve parecer um post profissional de notícias`;
+
+  try {
+    console.log("[add-watermark] Applying headline with AI...");
+    
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: imageDataUrl } }
+            ]
+          }
+        ],
+        modalities: ["image", "text"]
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[add-watermark] AI error:", response.status, errorText.substring(0, 200));
+      return null;
+    }
+
+    const data = await response.json();
+    const base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    if (base64ImageUrl?.startsWith('data:image/')) {
+      const match = base64ImageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (match) {
+        const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+        const outputBytes = decode(match[2]);
+        const outputType = `image/${match[1] === 'jpg' ? 'jpeg' : match[1]}`;
+        
+        console.log("[add-watermark] ✅ Headline applied successfully");
+        return { data: outputBytes, contentType: outputType };
+      }
+    }
+    
+    console.error("[add-watermark] Invalid response format");
+    return null;
+  } catch (error) {
+    console.error("[add-watermark] AI composition error:", error);
+    return null;
+  }
+}
+
+/**
+ * Aplicar apenas watermark (sem headline)
+ */
+async function applyWatermarkOnly(
+  imageData: Uint8Array,
+  contentType: string,
+  watermarkText: string
+): Promise<{ data: Uint8Array; contentType: string } | null> {
+  const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+  
+  if (!lovableApiKey) {
+    return null;
+  }
+
+  const { encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+  const base64Image = encode(imageData);
+  const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
+  const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
+
+  const prompt = `Adicione um pequeno badge de marca no canto inferior direito desta imagem:
+
+- Texto EXATO: "${watermarkText}"
+- Fundo: preto semi-transparente (70% opacidade) com cantos arredondados
+- Texto: branco, fonte pequena e limpa
+- Posição: canto inferior direito, com margem de 15 pixels
+
+NÃO altere mais nada na imagem. Apenas adicione o badge.
+Escreva o texto EXATAMENTE como está: "${watermarkText}"`;
 
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -299,12 +231,7 @@ NÃO altere, corrija ou modifique NENHUM texto - renderize EXATAMENTE como está
             role: "user",
             content: [
               { type: "text", text: prompt },
-              { 
-                type: "image_url", 
-                image_url: { 
-                  url: `data:image/svg+xml;base64,${encode(new TextEncoder().encode(fullSVG))}` 
-                } 
-              }
+              { type: "image_url", image_url: { url: imageDataUrl } }
             ]
           }
         ],
@@ -313,7 +240,7 @@ NÃO altere, corrija ou modifique NENHUM texto - renderize EXATAMENTE como está
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      return null;
     }
 
     const data = await response.json();
@@ -326,52 +253,16 @@ NÃO altere, corrija ou modifique NENHUM texto - renderize EXATAMENTE como está
         const outputBytes = decode(match[2]);
         const outputType = `image/${match[1] === 'jpg' ? 'jpeg' : match[1]}`;
         
-        console.log("[add-watermark] ✅ Image composed with SVG overlay");
+        console.log("[add-watermark] ✅ Watermark applied");
         return { data: outputBytes, contentType: outputType };
       }
     }
     
-    throw new Error("Invalid response format");
+    return null;
   } catch (error) {
-    console.error("[add-watermark] Composition failed:", error);
-    return { data: imageData, contentType };
+    console.error("[add-watermark] Watermark error:", error);
+    return null;
   }
-}
-
-/**
- * Obter dimensões aproximadas da imagem
- * (Para Edge Functions sem ImageMagick, usamos valores padrão ou detectamos do header)
- */
-async function getImageDimensions(imageData: Uint8Array, contentType: string): Promise<{ width: number; height: number }> {
-  // Tentar detectar dimensões do header (PNG/JPEG)
-  try {
-    if (contentType.includes('png') && imageData.length > 24) {
-      // PNG: width at bytes 16-19, height at bytes 20-23
-      const width = (imageData[16] << 24) | (imageData[17] << 16) | (imageData[18] << 8) | imageData[19];
-      const height = (imageData[20] << 24) | (imageData[21] << 16) | (imageData[22] << 8) | imageData[23];
-      if (width > 0 && width < 10000 && height > 0 && height < 10000) {
-        return { width, height };
-      }
-    }
-    
-    if (contentType.includes('jpeg') || contentType.includes('jpg')) {
-      // JPEG: procurar marcador SOF0 (0xFFC0)
-      for (let i = 0; i < imageData.length - 10; i++) {
-        if (imageData[i] === 0xFF && imageData[i + 1] === 0xC0) {
-          const height = (imageData[i + 5] << 8) | imageData[i + 6];
-          const width = (imageData[i + 7] << 8) | imageData[i + 8];
-          if (width > 0 && width < 10000 && height > 0 && height < 10000) {
-            return { width, height };
-          }
-        }
-      }
-    }
-  } catch (e) {
-    console.log("[add-watermark] Could not detect dimensions");
-  }
-  
-  // Fallback: assumir proporção 9:16 (vertical) ou 1:1
-  return { width: 1080, height: 1920 };
 }
 
 serve(async (req) => {
@@ -416,39 +307,38 @@ serve(async (req) => {
     
     console.log("[add-watermark] Image downloaded:", imageData.length, "bytes");
 
-    // 2. Obter dimensões
-    const { width, height } = await getImageDimensions(imageData, contentType);
-    console.log("[add-watermark] Dimensions:", width, "x", height);
-
-    // 3. Revisar textos via IA (IA PENSA o texto)
-    const reviewedWatermark = await reviewText(watermarkText, 'general', supabaseUrl, supabaseKey);
+    // 2. Revisar textos via IA especialista em PT-BR
+    let reviewedWatermark = watermarkText;
     let reviewedHeadline = '';
     
     if (headlineText && headlineText.length > 0) {
-      reviewedHeadline = await reviewText(headlineText, 'headline', supabaseUrl, supabaseKey);
+      reviewedHeadline = await reviewPortuguese(headlineText, supabaseUrl, supabaseKey);
     }
 
-    // 4. Gerar SVG (CÓDIGO ESCREVE o texto)
-    let svgOverlay: string;
+    // 3. Aplicar overlay
+    let finalImage: { data: Uint8Array; contentType: string } | null = null;
     
     if (reviewedHeadline) {
-      // Headline estilo news + watermark
-      svgOverlay = generateHeadlineSVG(width, height, reviewedHeadline, reviewedWatermark);
+      // Headline + watermark
+      finalImage = await applyHeadlineWithAI(imageData, contentType, reviewedHeadline, reviewedWatermark);
     } else {
-      // Apenas watermark badge
-      svgOverlay = generateWatermarkSVG(width, height, reviewedWatermark);
+      // Apenas watermark
+      finalImage = await applyWatermarkOnly(imageData, contentType, reviewedWatermark);
+    }
+    
+    // Fallback: usar imagem original se composição falhar
+    if (!finalImage) {
+      console.log("[add-watermark] Composition failed, using original image");
+      finalImage = { data: imageData, contentType };
     }
 
-    // 5. Compor imagem final
-    const composed = await composeImageWithSVG(imageData, contentType, svgOverlay, width, height);
-
-    // 6. Upload para Storage
+    // 4. Upload para Storage
     const filename = `watermarked-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
 
     const { error: uploadError } = await supabase.storage
       .from('post-images')
-      .upload(filename, composed.data, {
-        contentType: composed.contentType,
+      .upload(filename, finalImage.data, {
+        contentType: finalImage.contentType,
         upsert: false,
       });
 

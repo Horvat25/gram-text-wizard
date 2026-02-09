@@ -1989,80 +1989,126 @@ async function executeListAvailableNews(supabase: any, userId: string, workspace
   }
 }
 
-// Search web images using Firecrawl
+// Search web images using Firecrawl + search-images-for-video
 async function executeSearchWebImages(args: any) {
   const { query, count = 5 } = args;
-  const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
-  
-  if (!firecrawlApiKey) {
-    return {
-      success: false,
-      message: '❌ Busca de imagens não configurada. Use imagens dos feeds RSS!'
-    };
-  }
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   
   try {
     console.log('[SEARCH_IMAGES] Searching for:', query);
     
-    const response = await fetch('https://api.firecrawl.dev/v1/search', {
+    // Usar a função search-images-for-video que já tem múltiplas fontes
+    const response = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${firecrawlApiKey}`,
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`,
       },
       body: JSON.stringify({
-        query: `${query} imagem foto`,
-        limit: Math.min(count, 10),
-        lang: 'pt',
-        country: 'BR'
+        query: query,
+        preferRealImages: true
       }),
     });
     
     if (!response.ok) {
       console.error('[SEARCH_IMAGES] API error:', response.status);
+      
+      // Fallback: tentar Firecrawl diretamente
+      const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
+      if (firecrawlApiKey) {
+        const fcResponse = await fetch('https://api.firecrawl.dev/v1/search', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${firecrawlApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query: `${query} imagem foto`,
+            limit: Math.min(count, 10),
+            lang: 'pt',
+            country: 'BR',
+            scrapeOptions: { formats: ['html'] }
+          }),
+        });
+        
+        if (fcResponse.ok) {
+          const fcData = await fcResponse.json();
+          const articles = fcData.data || [];
+          
+          // Extrair imagens dos artigos
+          const images: { url: string; title: string; source: string }[] = [];
+          for (const article of articles) {
+            if (article.images?.length > 0) {
+              for (const img of article.images) {
+                if (img && !img.includes('icon') && !img.includes('logo') && !img.includes('avatar')) {
+                  images.push({
+                    url: img,
+                    title: article.title || query,
+                    source: new URL(article.url || 'https://example.com').hostname.replace('www.', '')
+                  });
+                }
+              }
+            }
+          }
+          
+          if (images.length > 0) {
+            const limitedImages = images.slice(0, count);
+            const imageList = limitedImages.map((img, i) => 
+              `${i + 1}. [${img.source}] - ${img.title.substring(0, 50)}...\n   🔗 URL: ${img.url.substring(0, 80)}...`
+            ).join('\n\n');
+            
+            return {
+              success: true,
+              message: `🖼️ Encontrei ${limitedImages.length} imagens sobre "${query}":\n\n${imageList}\n\n💡 Para criar um post com uma dessas imagens, use: "criar post com a imagem 1" ou me dê a URL direta.`,
+              images: limitedImages,
+              query
+            };
+          }
+        }
+      }
+      
       return {
         success: false,
-        message: '❌ Erro na busca. Tente usar imagens dos feeds RSS.'
+        message: '❌ Não encontrei imagens para esse tema. Tente outro termo de busca ou use as notícias do RSS!'
       };
     }
     
     const data = await response.json();
-    const results = data.data || [];
+    const imageUrls = data.images || [];
+    const detailedImages = data.detailedImages || [];
     
-    // Extract image URLs from results
-    const images = results
-      .filter((r: any) => r.url || r.markdown?.includes('!['))
-      .slice(0, count)
-      .map((r: any, i: number) => ({
-        index: i + 1,
-        title: r.title || 'Imagem',
-        url: r.url,
-        source: new URL(r.url || 'https://example.com').hostname
-      }));
-    
-    if (images.length === 0) {
+    if (imageUrls.length === 0) {
       return {
         success: true,
-        message: `🔍 Não encontrei imagens específicas para "${query}". Sugiro usar imagens dos feeds RSS que já estão prontas!`,
+        message: `🔍 Não encontrei imagens específicas para "${query}". Sugiro:\n1. Tentar outro termo de busca\n2. Usar imagens dos feeds RSS\n3. Gerar imagem com IA`,
         images: []
       };
     }
     
-    const imageList = images.map((img: any) => 
-      `${img.index}. **${img.title}** (${img.source})`
-    ).join('\n');
+    // Formatar lista de imagens
+    const limitedImages = imageUrls.slice(0, count);
+    const imageList = limitedImages.map((url: string, i: number) => {
+      const detailed = detailedImages[i];
+      const source = detailed?.source || 'web';
+      return `${i + 1}. [${source}] ${url.substring(0, 70)}...`;
+    }).join('\n');
     
     return {
       success: true,
-      message: `🖼️ Encontrei ${images.length} opções para "${query}":\n\n${imageList}\n\n💡 Me diga qual número você quer usar, ou prefere que eu use uma imagem dos feeds RSS?`,
-      images,
+      message: `🖼️ Encontrei ${limitedImages.length} imagens sobre "${query}":\n\n${imageList}\n\n💡 Diga qual número quer usar, ou peça "criar post com a imagem 1 sobre [tema]"`,
+      images: limitedImages.map((url: string, i: number) => ({
+        index: i + 1,
+        url,
+        source: detailedImages[i]?.source || 'web'
+      })),
       query
     };
   } catch (error: any) {
     console.error('[SEARCH_IMAGES] Error:', error);
     return {
       success: false,
-      message: `❌ Erro ao buscar imagens: ${error.message}`
+      message: `❌ Erro ao buscar imagens: ${error.message}. Tente usar os feeds RSS ou gerar imagem com IA.`
     };
   }
 }
@@ -2074,41 +2120,55 @@ async function executeCreatePostWithImageUrl(supabase: any, userId: string, work
   try {
     console.log('[CREATE_POST_IMAGE_URL] Creating post with image:', image_url);
     
-    // Apply watermark/overlay to the image
-    const overlayResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/apply-text-overlay`, {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Apply watermark/headline overlay using add-watermark
+    let finalImageUrl = image_url;
+    
+    const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+        'Authorization': `Bearer ${serviceRoleKey}`
       },
       body: JSON.stringify({
         imageUrl: image_url,
-        headlineText: headline_text || '',
-        userId
+        watermarkText: 'Neural Update',
+        headlineText: headline_text || null
       })
     });
     
-    let finalImageUrl = image_url;
     if (overlayResponse.ok) {
       const overlayResult = await overlayResponse.json();
-      if (overlayResult.imageUrl) {
-        finalImageUrl = overlayResult.imageUrl;
-        console.log('[CREATE_POST_IMAGE_URL] Overlay applied:', finalImageUrl);
+      if (overlayResult.publicUrl) {
+        finalImageUrl = overlayResult.publicUrl;
+        console.log('[CREATE_POST_IMAGE_URL] ✅ Headline + watermark applied:', finalImageUrl);
       }
+    } else {
+      console.log('[CREATE_POST_IMAGE_URL] Overlay failed, using original image');
     }
     
-    // Convert scheduled_for to UTC
+    // Check auto-publish setting
+    const { data: agentContext } = await supabase
+      .from('agent_context')
+      .select('auto_post_enabled')
+      .eq('workspace_id', workspaceId)
+      .maybeSingle();
+    
+    const autoPostEnabled = agentContext?.auto_post_enabled ?? false;
     const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
+    const status = scheduledForUTC ? 'scheduled' : 'draft';
     
     // Create the post
     const postData = {
       user_id: userId,
       workspace_id: workspaceId,
-      caption,
-      hashtags: hashtags || ['#tecnologia', '#inovacao'],
-      post_type: 'curated',
+      caption: caption || '🚀 Conteúdo tech',
+      hashtags: hashtags || ['#tecnologia', '#inovacao', '#ia', '#futuro'],
+      post_type: headline_text ? 'noticia' : 'curated',
       platforms: platforms || ['instagram'],
-      status: scheduledForUTC ? 'scheduled' : 'draft',
+      status,
       scheduled_for: scheduledForUTC,
       media_type: 'image',
       image_url: finalImageUrl,
@@ -2131,17 +2191,44 @@ async function executeCreatePostWithImageUrl(supabase: any, userId: string, work
       return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
     }
     
+    // Auto-publish if enabled and not scheduled
+    let publishStatus = '';
+    if (autoPostEnabled && !scheduledForUTC) {
+      console.log('[CREATE_POST_IMAGE_URL] Auto-publishing...');
+      for (const platform of (platforms || ['instagram'])) {
+        try {
+          if (platform === 'instagram') {
+            const pubResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serviceRoleKey}`
+              },
+              body: JSON.stringify({ postId: post.id })
+            });
+            if (pubResponse.ok) {
+              publishStatus = '\n🚀 Publicado automaticamente no Instagram!';
+              await supabase.from('posts').update({ status: 'published' }).eq('id', post.id);
+            }
+          }
+        } catch (pubError) {
+          console.error('[CREATE_POST_IMAGE_URL] Publish error:', pubError);
+        }
+      }
+    }
+    
     const scheduleInfo = scheduledForUTC 
       ? `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}`
-      : '📝 Salvo como rascunho';
+      : publishStatus || '📝 Salvo como rascunho';
     
     return {
       success: true,
-      message: `✅ Post criado com sucesso!\n\n${headline_text ? `📰 Headline: "${headline_text}"` : ''}\n${scheduleInfo}\n\n💡 A imagem foi processada com nossa marca!`,
+      message: `✅ Post criado com sucesso!\n\n${headline_text ? `📰 Headline: "${headline_text}"` : '🖼️ Imagem com nossa marca'}\n${scheduleInfo}`,
       post: {
         id: post.id,
         status: post.status,
-        has_headline: !!headline_text
+        has_headline: !!headline_text,
+        image_url: finalImageUrl
       }
     };
   } catch (error: any) {
