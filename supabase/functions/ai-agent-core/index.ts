@@ -509,7 +509,7 @@ async function executeContentPlan(
   }
 }
 
-// Create VIDEO content (reels/narrated video)
+// Create VIDEO content (reels/narrated video) - NOW WITH SERVER-SIDE RENDERING
 async function createVideoContent(
   supabase: any,
   plan: ContentPlan,
@@ -542,7 +542,7 @@ async function createVideoContent(
     console.log('[AGENT] Script gerado:', script.title);
     
     // Generate thumbnail from first segment - PORTUGUESE PROMPT
-    const currentYear = new Date().getFullYear(); // 2026
+    const currentYear = new Date().getFullYear();
     if (script.segments?.[0]?.imagePrompt) {
       const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
         method: 'POST',
@@ -581,17 +581,16 @@ async function createVideoContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Create post with video metadata (needs_processing for frontend render)
-  // Videos always stay as draft because they need client-side rendering
+  // Create post first (needed for server-side render)
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
-    caption, // ← CRITICAL: Include caption field
+    caption,
     hashtags,
     post_type: 'entretenimento',
     media_type: 'reels',
     platforms: plan.platforms || ['instagram'],
-    status: 'draft', // Videos ALWAYS draft - need frontend render
+    status: 'draft', // Will be updated to 'scheduled' after server render
     image_url: thumbnailUrl,
     overlay_metadata: {
       type: 'narrated_video',
@@ -599,13 +598,52 @@ async function createVideoContent(
       topic: plan.theme,
       needs_processing: true,
       created_by_agent: true,
-      publish_after_render: autoPublish // Publish after frontend renders
+      publish_after_render: autoPublish
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Vídeo criado (aguardando render):', post.id);
+  console.log('[AGENT] Vídeo criado:', post.id);
+  
+  // *** NEW: Trigger server-side rendering if autoPublish is enabled ***
+  if (autoPublish && script) {
+    console.log('[AGENT] Iniciando renderização server-side para publicação automática...');
+    
+    try {
+      const renderResponse = await fetch(`${supabaseUrl}/functions/v1/render-video-server`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          postId: post.id,
+          script,
+          workspaceId,
+          userId
+        })
+      });
+      
+      if (renderResponse.ok) {
+        const renderResult = await renderResponse.json();
+        console.log('[AGENT] Renderização iniciada:', renderResult.status);
+        
+        // If server rendered successfully, update post status
+        if (renderResult.status === 'completed' && renderResult.videoUrl) {
+          await supabase.from('posts').update({
+            video_url: renderResult.videoUrl,
+            status: 'scheduled',
+            scheduled_for: new Date().toISOString()
+          }).eq('id', post.id);
+          console.log('[AGENT] Vídeo renderizado e agendado para publicação!');
+        }
+      } else {
+        console.log('[AGENT] Renderização server-side não disponível, vídeo requer render manual');
+      }
+    } catch (renderError) {
+      console.log('[AGENT] Erro na renderização server-side:', renderError);
+      // Video stays as draft - user can render manually
+    }
+  }
+  
   return post;
 }
 
@@ -693,8 +731,8 @@ async function createCarouselContent(
   return post;
 }
 
-// Create NEWS content (using Firecrawl + real images + code-applied text overlay)
-// FLUXO: 1) Buscar notícia real 2) Pegar imagem real do site 3) LLM gera texto da headline 4) Código aplica overlay
+// Create NEWS content - PRIORITY: RSS feeds first, Firecrawl fallback
+// FLUXO: 1) Buscar notícia do RSS 2) Se não houver, usar Firecrawl 3) Pegar imagem real 4) Aplicar overlay por código
 async function createNewsContent(
   supabase: any,
   plan: ContentPlan,
@@ -704,56 +742,110 @@ async function createNewsContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando post de notícia (imagem real + overlay por código):', plan.theme);
+  console.log('[AGENT] Criando post de notícia (RSS prioritário + overlay por código):', plan.theme);
   
-  // STEP 1: Search for news using Firecrawl
-  const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      query: `${plan.theme} notícia recente tecnologia`,
-      limit: 10,
-      lang: 'pt-BR',
-      country: 'BR'
-    })
-  });
-  
-  let selectedArticle = null;
-  let selectedImage = null;
+  let selectedArticle: any = null;
+  let selectedImage: string | null = null;
   let sourceDomain = '';
   let sourceUrl = '';
   
-  if (searchResponse.ok) {
-    const searchResult = await searchResponse.json();
-    const articles = searchResult.data || [];
+  // STEP 1: Try to get news from RSS feed first (most current)
+  console.log('[AGENT] Buscando notícias do RSS...');
+  
+  // First, refresh RSS feeds to get latest news
+  try {
+    await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        workspaceId,
+        userId,
+        limit: 20
+      })
+    });
+    console.log('[AGENT] RSS atualizado');
+  } catch (e) {
+    console.log('[AGENT] Erro ao atualizar RSS:', e);
+  }
+  
+  // Get unused RSS items from the last 24 hours
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: rssItems } = await supabase
+    .from('rss_items')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_used', false)
+    .eq('has_image', true)
+    .gte('published_at', yesterday)
+    .order('published_at', { ascending: false })
+    .limit(10);
+  
+  if (rssItems && rssItems.length > 0) {
+    // Select the most recent article with image
+    selectedArticle = {
+      title: rssItems[0].title,
+      description: rssItems[0].description,
+      url: rssItems[0].link,
+      images: rssItems[0].image_url ? [rssItems[0].image_url] : []
+    };
+    selectedImage = rssItems[0].image_url;
+    sourceUrl = rssItems[0].link;
+    sourceDomain = rssItems[0].source_name || new URL(rssItems[0].source_url).hostname.replace('www.', '');
     
-    // Find article with best images (prioritize og:image which comes first in images array)
-    const withImages = articles.filter((a: any) => a.images?.length > 0)
-      .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
+    // Mark RSS item as used
+    await supabase
+      .from('rss_items')
+      .update({ is_used: true })
+      .eq('id', rssItems[0].id);
     
-    selectedArticle = withImages[0] || articles[0];
+    console.log('[AGENT] Notícia RSS selecionada:', selectedArticle.title);
+  }
+  
+  // STEP 2: Fallback to Firecrawl if no RSS news available
+  if (!selectedArticle) {
+    console.log('[AGENT] Sem notícias RSS, buscando via Firecrawl...');
     
-    if (selectedArticle) {
-      sourceUrl = selectedArticle.url || '';
-      try {
-        sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
-      } catch { sourceDomain = 'fonte'; }
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: `${plan.theme} notícia recente tecnologia`,
+        limit: 10,
+        lang: 'pt-BR',
+        country: 'BR'
+      })
+    });
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      const articles = searchResult.data || [];
       
-      // STEP 2: Select REAL image from site (og:image, twitter:image, or main article image)
-      // Filter out icons, logos, favicons - we want editorial/news photos
-      if (selectedArticle.images?.length > 0) {
-        const qualityImages = selectedArticle.images.filter((img: string) =>
-          img && 
-          !img.includes('icon') && 
-          !img.includes('logo') && 
-          !img.includes('avatar') && 
-          !img.includes('favicon') &&
-          !img.includes('1x1') &&
-          !img.includes('pixel') &&
-          (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp') || img.includes('image'))
-        );
-        // First image is usually og:image (best quality for sharing)
-        selectedImage = qualityImages[0] || selectedArticle.images[0];
+      // Find article with best images
+      const withImages = articles.filter((a: any) => a.images?.length > 0)
+        .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
+      
+      selectedArticle = withImages[0] || articles[0];
+      
+      if (selectedArticle) {
+        sourceUrl = selectedArticle.url || '';
+        try {
+          sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
+        } catch { sourceDomain = 'fonte'; }
+        
+        // Select REAL image from site
+        if (selectedArticle.images?.length > 0) {
+          const qualityImages = selectedArticle.images.filter((img: string) =>
+            img && 
+            !img.includes('icon') && 
+            !img.includes('logo') && 
+            !img.includes('avatar') && 
+            !img.includes('favicon') &&
+            !img.includes('1x1') &&
+            !img.includes('pixel') &&
+            (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp') || img.includes('image'))
+          );
+          selectedImage = qualityImages[0] || selectedArticle.images[0];
+        }
       }
     }
   }
