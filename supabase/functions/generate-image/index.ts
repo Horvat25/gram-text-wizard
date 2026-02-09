@@ -15,15 +15,30 @@ async function generateWithGemini(prompt: string, format: string, LOVABLE_API_KE
   const currentYear = new Date().getFullYear(); // 2026
   const aspectRatio = format === "portrait" ? "9:16 vertical" : format === "landscape" ? "16:9 horizontal" : "1:1 quadrado";
   
-  // CRITICAL: Force Portuguese output and current year context
-  const enhancedPrompt = `${prompt}. 
-INSTRUÇÕES OBRIGATÓRIAS:
-- Todo texto visível na imagem DEVE ser em PORTUGUÊS BRASILEIRO
-- Contexto: ano ${currentYear}
-- Qualidade profissional, estilo fotográfico, cores vibrantes
-- Proporção: ${aspectRatio}
-- Pronto para Instagram, ultra alta resolução
-- NÃO use texto em inglês na imagem`;
+  // CRITICAL: Enhanced prompt for better quality and NO TEXT in image
+  // The key insight is that AI image generators produce UGLY TEXT - so we avoid text entirely
+  const enhancedPrompt = `${prompt}
+
+## INSTRUÇÕES CRÍTICAS DE QUALIDADE:
+1. ESTILO VISUAL: Fotorrealista OU ilustração vetorial moderna e limpa. Escolha UM estilo consistente.
+2. COMPOSIÇÃO: Regra dos terços, ponto focal claro, espaço negativo elegante.
+3. CORES: Paleta de cores harmoniosa e vibrante, bom contraste, não saturado demais.
+4. ILUMINAÇÃO: Iluminação profissional de estúdio ou golden hour natural.
+5. PROPORÇÃO: ${aspectRatio}
+6. QUALIDADE: Ultra alta definição, nítido, sem ruído, pronto para Instagram.
+
+## REGRA ABSOLUTA - TEXTO:
+⛔ NÃO INCLUA NENHUM TEXTO NA IMAGEM ⛔
+- Sem palavras, letras, números ou símbolos escritos
+- Sem logotipos, marcas d'água ou legendas
+- Sem placas, banners ou cartazes com texto
+- A imagem deve ser 100% visual, sem elementos tipográficos
+- Se precisar indicar conceito, use ÍCONES ou SÍMBOLOS visuais, nunca texto
+
+## CONTEXTO:
+- Ano atual: ${currentYear}
+- Mercado: Brasil
+- Uso: Post profissional para Instagram`;
   
   const maxAttempts = 3;
   let base64ImageUrl: string | undefined;
