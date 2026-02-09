@@ -69,7 +69,7 @@ export default function AgentReelsRenderer({
     brandName: brandSettings.brandName || "NeuralUpdate",
     segmentCount: script.segments.length,
     segmentDuration: 5,
-    preferredVoice: "camila",
+    preferredVoice: "tech_male", // Professional tech voice (Antonio Neural)
   });
 
   // When video is complete, save to database and optionally publish
