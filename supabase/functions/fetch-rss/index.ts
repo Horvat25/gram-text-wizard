@@ -6,16 +6,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Feeds RSS de sites de tecnologia brasileiros
+// Feeds RSS de sites de tecnologia - PRIORIDADE PORTUGUÊS
 const DEFAULT_FEEDS = [
   { name: 'Olhar Digital', url: 'https://olhardigital.com.br/feed/' },
   { name: 'TecMundo', url: 'https://rss.tecmundo.com.br/feed' },
   { name: 'Canaltech', url: 'https://canaltech.com.br/rss/' },
   { name: 'Tecnoblog', url: 'https://tecnoblog.net/feed/' },
   { name: 'Gizmodo Brasil', url: 'https://gizmodo.uol.com.br/feed/' },
-  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
-  { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
-  { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/technology-lab' },
+  { name: 'UOL Tecnologia', url: 'https://tecnologia.uol.com.br/ultnot/index.xml' },
+  { name: 'G1 Tecnologia', url: 'https://g1.globo.com/rss/g1/tecnologia/' },
+  { name: 'Estadão Tech', url: 'https://www.estadao.com.br/pf/feed/0/Sf9xdCNAYDgKbDMDOg==,/?format=rss' },
+  { name: 'Exame Tech', url: 'https://exame.com/noticias-sobre/tecnologia/feed/' },
+  { name: 'InfoMoney Tech', url: 'https://www.infomoney.com.br/feed/tecnologia/' },
 ];
 
 interface RssItem {

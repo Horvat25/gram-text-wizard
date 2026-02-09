@@ -215,8 +215,8 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
     }
   };
 
-  // Select news and go to creation mode
-  const selectNewsForPost = (news: NewsResult, asCarousel: boolean = false) => {
+  // Select news and go to creation mode - AUTO-GENERATE CAPTION
+  const selectNewsForPost = async (news: NewsResult, asCarousel: boolean = false) => {
     setSelectedNews(news);
     setIsCarouselMode(asCarousel);
     
@@ -228,8 +228,41 @@ export function LatestNewsTab({ onPostCreated }: LatestNewsTabProps) {
       setSelectedImages([]);
     }
     
+    // Auto-generate caption immediately
     setCaption('');
     setHashtags([]);
+    
+    // Start generating caption automatically
+    setIsGeneratingCaption(true);
+    try {
+      const sourceDomain = getDomainFromUrl(news.url);
+      
+      const { data, error } = await supabase.functions.invoke("generate-caption", {
+        body: { 
+          topic: `${news.title}. ${news.description || ''}`, 
+          postType: 'noticia',
+          sourceUrl: news.url,
+          sourceName: sourceDomain,
+          customInstructions: `Esta é uma notícia REAL. A fonte é: ${sourceDomain} (${news.url}). 
+OBRIGATÓRIO: Inclua a fonte no final da legenda no formato:
+📰 Fonte: ${sourceDomain}
+
+Escreva em tom jornalístico e informativo. Inclua emojis relevantes e mantenha credibilidade.
+IMPORTANTE: Escreva TUDO em português brasileiro.`
+        },
+      });
+
+      if (error) throw error;
+
+      setCaption(data.caption);
+      setHashtags(data.hashtags);
+      toast.success('Legenda e hashtags geradas automaticamente!');
+    } catch (error: any) {
+      console.error("Error auto-generating caption:", error);
+      toast.error('Erro ao gerar legenda automática. Gere manualmente.');
+    } finally {
+      setIsGeneratingCaption(false);
+    }
   };
 
   // Toggle image selection for carousel

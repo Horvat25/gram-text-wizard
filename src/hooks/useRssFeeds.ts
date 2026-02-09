@@ -32,18 +32,19 @@ export interface RssStats {
   errors: number;
 }
 
-// Feeds padrão de tecnologia brasileira - EXPANDIDO para mais fontes
+// Feeds padrão de tecnologia - PRIORIDADE para fontes em português
 export const DEFAULT_FEEDS: RssFeed[] = [
+  // Fontes principais em português (prioridade)
   { name: 'Olhar Digital', url: 'https://olhardigital.com.br/feed/' },
   { name: 'TecMundo', url: 'https://rss.tecmundo.com.br/feed' },
   { name: 'Canaltech', url: 'https://canaltech.com.br/rss/' },
   { name: 'Tecnoblog', url: 'https://tecnoblog.net/feed/' },
   { name: 'Gizmodo Brasil', url: 'https://gizmodo.uol.com.br/feed/' },
-  { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
-  { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index' },
-  { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
-  { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
-  { name: 'Engadget', url: 'https://www.engadget.com/rss.xml' },
+  { name: 'UOL Tecnologia', url: 'https://tecnologia.uol.com.br/ultnot/index.xml' },
+  { name: 'G1 Tecnologia', url: 'https://g1.globo.com/rss/g1/tecnologia/' },
+  { name: 'Estadão Tech', url: 'https://www.estadao.com.br/pf/feed/0/Sf9xdCNAYDgKbDMDOg==,/?format=rss' },
+  { name: 'Exame Tech', url: 'https://exame.com/noticias-sobre/tecnologia/feed/' },
+  { name: 'InfoMoney Tech', url: 'https://www.infomoney.com.br/feed/tecnologia/' },
 ];
 
 export function useRssFeeds() {
