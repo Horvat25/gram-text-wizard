@@ -16,27 +16,17 @@ interface ImageResult {
   photographer?: string;
 }
 
-// PEXELS API - Imagens de alta qualidade, gratuitas
+// PEXELS API - Imagens de alta qualidade (opcional - requer PEXELS_API_KEY)
 async function searchPexels(query: string, limit: number = 5): Promise<ImageResult[]> {
   const apiKey = Deno.env.get('PEXELS_API_KEY');
-  if (!apiKey) {
-    console.log('[search-images] Pexels API key not configured');
-    return [];
-  }
+  if (!apiKey) return []; // API não configurada - skip silenciosamente
 
   try {
-    console.log('[search-images] Searching Pexels:', query);
     const response = await fetch(
       `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${limit}&orientation=portrait`,
-      {
-        headers: { 'Authorization': apiKey }
-      }
+      { headers: { 'Authorization': apiKey } }
     );
-
-    if (!response.ok) {
-      console.log('[search-images] Pexels error:', response.status);
-      return [];
-    }
+    if (!response.ok) return [];
 
     const data = await response.json();
     return (data.photos || []).map((photo: any) => ({
@@ -46,32 +36,21 @@ async function searchPexels(query: string, limit: number = 5): Promise<ImageResu
       photographer: photo.photographer
     }));
   } catch (e) {
-    console.error('[search-images] Pexels error:', e);
     return [];
   }
 }
 
-// UNSPLASH API - Imagens artísticas de alta qualidade
+// UNSPLASH API - Imagens artísticas (opcional - requer UNSPLASH_ACCESS_KEY)
 async function searchUnsplash(query: string, limit: number = 5): Promise<ImageResult[]> {
   const accessKey = Deno.env.get('UNSPLASH_ACCESS_KEY');
-  if (!accessKey) {
-    console.log('[search-images] Unsplash API key not configured');
-    return [];
-  }
+  if (!accessKey) return [];
 
   try {
-    console.log('[search-images] Searching Unsplash:', query);
     const response = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=${limit}&orientation=portrait`,
-      {
-        headers: { 'Authorization': `Client-ID ${accessKey}` }
-      }
+      { headers: { 'Authorization': `Client-ID ${accessKey}` } }
     );
-
-    if (!response.ok) {
-      console.log('[search-images] Unsplash error:', response.status);
-      return [];
-    }
+    if (!response.ok) return [];
 
     const data = await response.json();
     return (data.results || []).map((photo: any) => ({
@@ -81,29 +60,20 @@ async function searchUnsplash(query: string, limit: number = 5): Promise<ImageRe
       photographer: photo.user?.name
     }));
   } catch (e) {
-    console.error('[search-images] Unsplash error:', e);
     return [];
   }
 }
 
-// PIXABAY API - Grande variedade, gratuito
+// PIXABAY API - Grande variedade (opcional - requer PIXABAY_API_KEY)
 async function searchPixabay(query: string, limit: number = 5): Promise<ImageResult[]> {
   const apiKey = Deno.env.get('PIXABAY_API_KEY');
-  if (!apiKey) {
-    console.log('[search-images] Pixabay API key not configured');
-    return [];
-  }
+  if (!apiKey) return [];
 
   try {
-    console.log('[search-images] Searching Pixabay:', query);
     const response = await fetch(
       `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&per_page=${limit}&image_type=photo&orientation=vertical&safesearch=true`
     );
-
-    if (!response.ok) {
-      console.log('[search-images] Pixabay error:', response.status);
-      return [];
-    }
+    if (!response.ok) return [];
 
     const data = await response.json();
     return (data.hits || []).map((photo: any) => ({
@@ -113,7 +83,6 @@ async function searchPixabay(query: string, limit: number = 5): Promise<ImageRes
       photographer: photo.user
     }));
   } catch (e) {
-    console.error('[search-images] Pixabay error:', e);
     return [];
   }
 }
@@ -274,12 +243,14 @@ serve(async (req) => {
 
       console.log('[search-images] Search queries:', searchQueries.length);
 
-      // Buscar em TODAS as fontes em paralelo
-      const searchPromises = searchQueries.slice(0, 2).flatMap(q => [
-        searchPexels(q, 3),
-        searchUnsplash(q, 3),
-        searchPixabay(q, 3),
-        searchFirecrawl(q, 3),
+      // Buscar em TODAS as fontes disponíveis em paralelo
+      // Firecrawl é a fonte principal (já configurada)
+      // APIs opcionais (Pexels, Unsplash, Pixabay) só funcionam se configuradas
+      const searchPromises = searchQueries.slice(0, 3).flatMap(q => [
+        searchFirecrawl(q, 5), // Prioridade: Firecrawl (já tem API key)
+        searchPexels(q, 3),    // Opcional
+        searchUnsplash(q, 3),  // Opcional
+        searchPixabay(q, 3),   // Opcional
       ]);
 
       const allResults = await Promise.all(searchPromises);
@@ -287,12 +258,12 @@ serve(async (req) => {
 
       console.log('[search-images] Found', allImages.length, 'candidate images from all sources');
 
-      // Priorizar por fonte (Pexels/Unsplash são mais confiáveis)
+      // Priorizar por fonte (Firecrawl é principal, APIs opcionais são bônus)
       const prioritizedImages = [
-        ...allImages.filter(i => i.source === 'pexels'),
-        ...allImages.filter(i => i.source === 'unsplash'),
-        ...allImages.filter(i => i.source === 'pixabay'),
-        ...allImages.filter(i => i.source === 'firecrawl'),
+        ...allImages.filter(i => i.source === 'firecrawl'), // Principal
+        ...allImages.filter(i => i.source === 'pexels'),    // Opcional
+        ...allImages.filter(i => i.source === 'unsplash'),  // Opcional
+        ...allImages.filter(i => i.source === 'pixabay'),   // Opcional
       ];
 
       // Deduplicate por URL
