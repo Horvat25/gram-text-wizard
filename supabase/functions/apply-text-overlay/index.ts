@@ -239,18 +239,50 @@ function escapeXml(text: string): string {
     .replace(/'/g, '&apos;');
 }
 
+// Upload image to Supabase Storage first (to avoid external URL blocking)
+async function uploadImageToStorage(
+  imageUrl: string,
+  supabase: any
+): Promise<string> {
+  console.log("[apply-text-overlay] Downloading and uploading image to storage...");
+  
+  // Download the image
+  const { data: imageData, contentType } = await downloadImage(imageUrl);
+  
+  // Generate unique filename
+  const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
+  const filename = `temp-overlay-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+  
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('post-images')
+    .upload(filename, imageData, {
+      contentType,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new Error(`Failed to upload temp image: ${uploadError.message}`);
+  }
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('post-images')
+    .getPublicUrl(filename);
+
+  console.log("[apply-text-overlay] Image uploaded to:", publicUrl);
+  return publicUrl;
+}
+
 // Composite image with SVG overlay using Lovable AI image editing
 async function compositeImageWithOverlay(
-  originalImageUrl: string,
+  storageImageUrl: string, // Must be a publicly accessible URL (Supabase Storage)
   overlaySvg: string,
   headlineText: string,
   lovableApiKey: string
 ): Promise<{ data: Uint8Array; contentType: string }> {
   console.log("[apply-text-overlay] Compositing image with text overlay...");
-  
-  // Since we can't use ImageMagick in Deno edge functions,
-  // we use Lovable AI to composite the image with explicit text instructions
-  // The key difference: we give EXACT text to render, not ask AI to create text
+  console.log("[apply-text-overlay] Using storage URL:", storageImageUrl);
   
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -287,7 +319,7 @@ REGRAS CRÍTICAS:
             },
             { 
               type: "image_url", 
-              image_url: { url: originalImageUrl } 
+              image_url: { url: storageImageUrl } 
             }
           ]
         }
@@ -363,10 +395,13 @@ serve(async (req) => {
       headlineText = await generateHeadlineText(title, lovableApiKey);
     }
 
-    // STEP 2: Aplicar overlay via código (IA aplica o texto exato fornecido)
+    // STEP 2: Upload external image to Supabase first (avoid URL blocking by Gemini)
+    const storageImageUrl = await uploadImageToStorage(imageUrl, supabase);
+
+    // STEP 3: Aplicar overlay via Gemini (usando URL do Supabase que é acessível)
     const { data: finalImageData, contentType } = await compositeImageWithOverlay(
-      imageUrl,
-      "", // SVG not used directly, but keeping for future pure-code implementation
+      storageImageUrl,
+      "", // SVG not used directly
       headlineText,
       lovableApiKey
     );
