@@ -1,5 +1,4 @@
 import { useState, useEffect, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -7,7 +6,6 @@ import {
   MessageCircle, 
   ImageIcon, 
   FileText, 
-  Settings,
   Bot,
   Loader2,
   LayoutDashboard
@@ -24,7 +22,6 @@ import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
 import AgentLibraryPanel from './AgentLibraryPanel';
 import AgentResponsesPanel from './AgentResponsesPanel';
-import AgentConfigPanel from './AgentConfigPanel';
 
 interface AgentConfig {
   agent_name: string;
@@ -51,7 +48,6 @@ interface AgentGenieViewProps {
 }
 
 export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   
@@ -269,36 +265,15 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs gap-1.5 px-2.5 py-1 bg-card/50 backdrop-blur-sm">
-            <span className={cn(
-              "w-2 h-2 rounded-full",
-              agentConfig.auto_post_enabled ? "bg-emerald-500" : "bg-muted-foreground"
-            )} />
-            {agentConfig.auto_post_enabled ? 'Auto' : 'Manual'}
-          </Badge>
-          
-          <AgentConfigPanel 
-            onConfigChange={(config) => {
-              setAgentConfig(prev => ({
-                ...prev,
-                agent_name: config.agent_name,
-                agent_avatar_url: config.agent_avatar_url,
-                auto_post_enabled: config.auto_post_enabled
-              }));
-            }}
-          />
-          
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5 bg-card/50 backdrop-blur-sm"
-            onClick={() => onNavigate?.('dashboard')}
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">Dashboard</span>
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 bg-card/50 backdrop-blur-sm border-border/50"
+          onClick={() => onNavigate?.('dashboard')}
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          <span className="hidden sm:inline">Dashboard</span>
+        </Button>
       </header>
       
       {/* Center Area - 3D Genie Display */}
