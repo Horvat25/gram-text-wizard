@@ -522,6 +522,9 @@ function getTransitionDuration(segmentDuration: number): number {
  * Render a single frame to the canvas with professional transitions
  * Uses split image layout: top image + center text + bottom image
  * Supports crossfade transitions between segments
+ * 
+ * FIX: Text overlay is delayed until AFTER the transition completes
+ * This ensures the narration matches the displayed image
  */
 function renderFrame(
   ctx: CanvasRenderingContext2D,
@@ -597,9 +600,23 @@ function renderFrame(
   // Draw watermark
   drawWatermark(ctx, width, height, brandName);
 
-  // Draw text overlay in center
-  if (segment.text) {
+  // 🔧 FIX: Only show text AFTER the entering transition completes
+  // This ensures the narration matches the displayed image
+  // During exit transition, we still show current text as it's still the current segment's audio
+  const showText = !isEnteringTransition; // Hide text during entering transition
+  
+  if (showText && segment.text) {
+    // Apply a subtle fade-in effect for text after transition
+    const textFadeInDuration = 0.15; // 150ms fade-in
+    const timeSinceTransition = isEnteringTransition ? 0 : (timeIntoSegment - transitionDuration);
+    const textOpacity = segmentIndex === 0 
+      ? Math.min(1, timeIntoSegment / textFadeInDuration) // First segment: fade in from start
+      : Math.min(1, timeSinceTransition / textFadeInDuration); // Other segments: fade after transition
+    
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, textOpacity));
     drawTextOverlay(ctx, segment.text, width, height);
+    ctx.restore();
   }
 }
 

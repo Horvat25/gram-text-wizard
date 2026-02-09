@@ -238,8 +238,9 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   };
 
   const weeklyTotal = config.daily_post_limit * 7;
-  const assignedTotal = config.content_distribution_videos + config.content_distribution_carousels + 
-                        config.content_distribution_news + config.content_distribution_images;
+  const assignedTotal = config.content_distribution_videos + 
+                        config.content_distribution_news + 
+                        config.content_distribution_carousels;
 
   const sections = [
     { id: 'automation', label: 'Automação', icon: Zap },
@@ -391,20 +392,46 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                         <Badge variant="secondary">{assignedTotal}/{weeklyTotal}</Badge>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-3">
                         {[
-                          { key: 'content_distribution_videos', icon: Video, label: 'Reels/Vídeos', color: 'text-pink-500' },
-                          { key: 'content_distribution_images', icon: ImageIcon, label: 'Posts Imagem', color: 'text-green-500' },
-                          { key: 'content_distribution_news', icon: Newspaper, label: 'Notícias', color: 'text-blue-500' },
-                          { key: 'content_distribution_carousels', icon: Layers, label: 'Carrosséis', color: 'text-purple-500' },
+                          { key: 'content_distribution_videos', icon: Video, label: 'Reels/Vídeos', color: 'text-pink-500', description: 'Vídeos com narração e imagens' },
+                          { key: 'content_distribution_news', icon: Newspaper, label: 'Notícias', color: 'text-blue-500', description: 'Posts com imagens de notícias' },
+                          { key: 'content_distribution_carousels', icon: Layers, label: 'Carrosséis', color: 'text-purple-500', description: 'Múltiplas imagens de notícias' },
                         ].map((item) => (
                           <div key={item.key} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border">
-                            <div className="flex items-center gap-2">
-                              <item.icon className={cn("h-4 w-4", item.color)} />
-                              <span className="text-xs text-muted-foreground">{item.label}</span>
+                            <div className="flex items-center gap-3">
+                              <item.icon className={cn("h-5 w-5", item.color)} />
+                              <div>
+                                <span className="text-sm font-medium">{item.label}</span>
+                                <p className="text-xs text-muted-foreground">{item.description}</p>
+                              </div>
                             </div>
-                            <div className={cn("text-lg font-bold", item.color)}>
-                              {config[item.key as keyof typeof config] as number}
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setConfig(c => ({ 
+                                  ...c, 
+                                  [item.key]: Math.max(0, (c[item.key as keyof typeof c] as number) - 1) 
+                                }))}
+                              >
+                                <span className="text-lg font-bold">−</span>
+                              </Button>
+                              <div className={cn("w-8 text-center text-lg font-bold", item.color)}>
+                                {config[item.key as keyof typeof config] as number}
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setConfig(c => ({ 
+                                  ...c, 
+                                  [item.key]: Math.min(20, (c[item.key as keyof typeof c] as number) + 1) 
+                                }))}
+                              >
+                                <span className="text-lg font-bold">+</span>
+                              </Button>
                             </div>
                           </div>
                         ))}
