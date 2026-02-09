@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   FileText, 
   Bot, 
@@ -16,10 +17,13 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Zap,
+  Play
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -42,6 +46,17 @@ interface ExecutionReport {
   created_at: string;
 }
 
+interface ChatAction {
+  id: string;
+  created_at: string;
+  content: string;
+  actions: Array<{
+    tool: string;
+    success: boolean;
+    message: string;
+  }>;
+}
+
 interface ReportCardProps {
   report: ExecutionReport;
   isExpanded: boolean;
@@ -52,7 +67,7 @@ function ReportCard({ report, isExpanded, onToggle }: ReportCardProps) {
   const getDecisionColor = (decision: string | null) => {
     switch (decision) {
       case 'POST':
-        return 'bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/30';
+        return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30';
       case 'NO_POST':
         return 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/30';
       case 'WAIT':
@@ -64,7 +79,7 @@ function ReportCard({ report, isExpanded, onToggle }: ReportCardProps) {
 
   const getDecisionIcon = (decision: string | null) => {
     switch (decision) {
-      case 'POST': return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'POST': return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
       case 'NO_POST': return <XCircle className="h-4 w-4 text-yellow-500" />;
       case 'WAIT': return <Pause className="h-4 w-4 text-blue-500" />;
       default: return <Bot className="h-4 w-4" />;
@@ -84,42 +99,31 @@ function ReportCard({ report, isExpanded, onToggle }: ReportCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border rounded-xl overflow-hidden transition-colors border-primary/20 hover:border-primary/40"
+      className="border rounded-xl overflow-hidden transition-colors border-border hover:border-primary/30"
     >
-      {/* Header - Always visible */}
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between transition-colors bg-primary/5 hover:bg-primary/10"
+        className="w-full p-3 flex items-center justify-between transition-colors bg-card hover:bg-muted/30"
       >
         <div className="flex items-center gap-3">
           {getDecisionIcon(report.decision)}
           <div className="text-left">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className={`text-xs ${getDecisionColor(report.decision)}`}>
+              <Badge variant="outline" className={cn("text-xs", getDecisionColor(report.decision))}>
                 {getDecisionLabel(report.decision)}
               </Badge>
               <Badge variant="outline" className="text-xs">
-                {report.trigger === 'cron' ? '⏰ CRON' : '🖐️ Manual'}
+                {report.trigger === 'cron' ? '⏰ Auto' : '🖐️ Manual'}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {formatDistanceToNow(new Date(report.created_at), { 
-                addSuffix: true, 
-                locale: ptBR 
-              })}
-              {' • '}
-              {format(new Date(report.created_at), "HH:mm 'de' dd/MM", { locale: ptBR })}
+            <p className="text-xs text-muted-foreground mt-1">
+              {formatDistanceToNow(new Date(report.created_at), { addSuffix: true, locale: ptBR })}
             </p>
           </div>
         </div>
-        {isExpanded ? (
-          <ChevronDown className="h-5 w-5 text-muted-foreground" />
-        ) : (
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-        )}
+        {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
       </button>
 
-      {/* Expanded Content */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
@@ -128,100 +132,60 @@ function ReportCard({ report, isExpanded, onToggle }: ReportCardProps) {
             exit={{ height: 0, opacity: 0 }}
             className="border-t border-border/50"
           >
-            <div className="p-4 space-y-4 bg-muted/10">
-              {/* Summary/Message from Agent */}
+            <div className="p-3 space-y-3 bg-muted/10">
               {report.summary && (
-                <div className="p-3 rounded-lg border bg-primary/5 border-primary/20">
+                <div className="p-2.5 rounded-lg border bg-primary/5 border-primary/20">
                   <div className="flex items-start gap-2">
-                    <Sparkles className="h-4 w-4 mt-0.5 text-primary" />
-                    <div>
-                      <p className="text-xs font-medium mb-1 text-primary">
-                        Mensagem do Agente
-                      </p>
-                      <p className="text-sm">{report.summary}</p>
-                    </div>
+                    <Sparkles className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+                    <p className="text-sm">{report.summary}</p>
                   </div>
                 </div>
               )}
 
-              {/* Decision Reason */}
               {report.decision_reason && (
                 <div className="text-sm">
-                  <p className="font-medium mb-1">💭 Raciocínio:</p>
-                  <p className="text-muted-foreground">{report.decision_reason}</p>
+                  <p className="font-medium text-xs mb-1 text-muted-foreground">💭 Raciocínio</p>
+                  <p className="text-sm">{report.decision_reason}</p>
                 </div>
               )}
 
-              {/* Metrics Snapshot */}
               {report.metrics_snapshot && (
-                <div className="p-3 rounded-lg bg-muted/30 border">
-                  <p className="text-xs font-medium mb-2 flex items-center gap-1">
+                <div className="p-2.5 rounded-lg bg-muted/30 border">
+                  <p className="text-xs font-medium mb-2 flex items-center gap-1 text-muted-foreground">
                     <TrendingUp className="h-3 w-3" />
-                    Métricas no momento
+                    Métricas
                   </p>
                   <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div>
-                      <span className="text-muted-foreground">Engajamento:</span>
-                      <span className="ml-1 font-medium">
-                        {report.metrics_snapshot.avgEngagement?.toFixed(1) || '0'}%
-                      </span>
+                    <div className="text-center p-1.5 rounded bg-background/50">
+                      <div className="font-medium">{report.metrics_snapshot.avgEngagement?.toFixed(1) || '0'}%</div>
+                      <div className="text-muted-foreground text-[10px]">Engajamento</div>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground">Último post:</span>
-                      <span className="ml-1 font-medium">
-                        {Math.round(report.metrics_snapshot.lastPostHours || 0)}h atrás
-                      </span>
+                    <div className="text-center p-1.5 rounded bg-background/50">
+                      <div className="font-medium">{Math.round(report.metrics_snapshot.lastPostHours || 0)}h</div>
+                      <div className="text-muted-foreground text-[10px]">Último post</div>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground">Posts hoje:</span>
-                      <span className="ml-1 font-medium">
-                        {report.metrics_snapshot.postsToday || 0}
-                      </span>
+                    <div className="text-center p-1.5 rounded bg-background/50">
+                      <div className="font-medium">{report.metrics_snapshot.postsToday || 0}</div>
+                      <div className="text-muted-foreground text-[10px]">Hoje</div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Content Plan */}
-              {report.content_plan && (
-                <div className="text-sm">
-                  <p className="font-medium mb-1">📝 Plano de Conteúdo:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {report.content_plan.format && (
-                      <Badge variant="outline" className="text-xs">
-                        {report.content_plan.format}
-                      </Badge>
-                    )}
-                    {report.content_plan.theme && (
-                      <Badge variant="outline" className="text-xs">
-                        {report.content_plan.theme}
-                      </Badge>
-                    )}
-                    {report.content_plan.mediaType && (
-                      <Badge variant="outline" className="text-xs">
-                        {report.content_plan.mediaType}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Hypothesis */}
               {report.hypothesis && (
-                <div className="text-sm p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
-                  <p className="font-medium mb-1 flex items-center gap-1">
-                    <Lightbulb className="h-3 w-3 text-yellow-500" />
-                    Hipótese testada:
+                <div className="text-sm p-2.5 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                  <p className="text-xs font-medium mb-1 flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+                    <Lightbulb className="h-3 w-3" />
+                    Hipótese
                   </p>
-                  <p className="text-muted-foreground">{report.hypothesis}</p>
+                  <p className="text-sm">{report.hypothesis}</p>
                 </div>
               )}
 
-              {/* Learning */}
               {report.learning && (
-                <div className="text-sm p-3 rounded-lg bg-green-500/5 border border-green-500/20">
-                  <p className="font-medium mb-1">🎓 Aprendizado:</p>
-                  <p className="text-muted-foreground">{report.learning}</p>
+                <div className="text-sm p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                  <p className="text-xs font-medium mb-1 text-emerald-600 dark:text-emerald-400">🎓 Aprendizado</p>
+                  <p className="text-sm">{report.learning}</p>
                 </div>
               )}
             </div>
@@ -232,41 +196,167 @@ function ReportCard({ report, isExpanded, onToggle }: ReportCardProps) {
   );
 }
 
+function ActionCard({ action, isExpanded, onToggle }: { action: ChatAction; isExpanded: boolean; onToggle: () => void }) {
+  const successCount = action.actions.filter(a => a.success).length;
+  const totalCount = action.actions.length;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="border rounded-xl overflow-hidden transition-colors border-border hover:border-primary/30"
+    >
+      <button
+        onClick={onToggle}
+        className="w-full p-3 flex items-center justify-between transition-colors bg-card hover:bg-muted/30"
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 rounded-lg bg-primary/10">
+            <Zap className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className={cn(
+                "text-xs",
+                successCount === totalCount 
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
+              )}>
+                {successCount}/{totalCount} ações
+              </Badge>
+              <Badge variant="outline" className="text-xs">💬 Chat</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+              {action.content.slice(0, 50)}...
+            </p>
+          </div>
+        </div>
+        {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="border-t border-border/50"
+          >
+            <div className="p-3 space-y-2 bg-muted/10">
+              {action.actions.map((act, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className={cn(
+                    "flex items-center gap-2 p-2.5 rounded-lg border",
+                    act.success 
+                      ? "bg-emerald-500/10 border-emerald-500/30" 
+                      : "bg-destructive/10 border-destructive/30"
+                  )}
+                >
+                  {act.success ? (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                  )}
+                  <span className={cn(
+                    "flex-1 text-sm",
+                    act.success ? "text-emerald-700 dark:text-emerald-300" : "text-destructive"
+                  )}>
+                    {act.message}
+                  </span>
+                  <Badge variant="outline" className="text-[10px] shrink-0">
+                    {act.tool.replace(/_/g, ' ')}
+                  </Badge>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
 export default function AgentReportsTab() {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const [reports, setReports] = useState<ExecutionReport[]>([]);
+  const [chatActions, setChatActions] = useState<ChatAction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('all');
 
-  const fetchReports = async () => {
-    if (!user) return;
+  const fetchData = async () => {
+    if (!user || !currentWorkspace) return;
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch execution reports
+      const { data: reportsData, error: reportsError } = await supabase
         .from('agent_execution_reports')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(30);
 
-      if (error) throw error;
-      setReports((data as ExecutionReport[]) || []);
+      if (reportsError) throw reportsError;
+      setReports((reportsData as ExecutionReport[]) || []);
+
+      // Fetch chat messages with actions
+      const { data: chatData, error: chatError } = await supabase
+        .from('agent_chat_messages')
+        .select('*')
+        .eq('workspace_id', currentWorkspace.id)
+        .eq('role', 'assistant')
+        .not('actions', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      if (chatError) throw chatError;
       
-      // Auto-expand the first report
-      if (data && data.length > 0 && !expandedId) {
-        setExpandedId(data[0].id);
+      const actionsData = (chatData || [])
+        .filter((m: any) => Array.isArray(m.actions) && m.actions.length > 0)
+        .map((m: any) => ({
+          id: m.id,
+          created_at: m.created_at,
+          content: m.content,
+          actions: m.actions as ChatAction['actions']
+        }));
+      
+      setChatActions(actionsData);
+
+      // Auto-expand first item
+      if (!expandedId) {
+        if (reportsData && reportsData.length > 0) {
+          setExpandedId(reportsData[0].id);
+        } else if (actionsData.length > 0) {
+          setExpandedId(actionsData[0].id);
+        }
       }
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchReports();
-  }, [user]);
+    fetchData();
+  }, [user, currentWorkspace]);
+
+  const allItems = [
+    ...reports.map(r => ({ type: 'report' as const, data: r, date: new Date(r.created_at) })),
+    ...chatActions.map(a => ({ type: 'action' as const, data: a, date: new Date(a.created_at) }))
+  ].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  const filteredItems = activeTab === 'all' 
+    ? allItems 
+    : activeTab === 'reports' 
+      ? allItems.filter(i => i.type === 'report')
+      : allItems.filter(i => i.type === 'action');
 
   if (isLoading) {
     return (
@@ -277,25 +367,23 @@ export default function AgentReportsTab() {
   }
 
   return (
-    <Card className="border border-primary/20 bg-gradient-to-br from-primary/5 to-violet-500/5">
+    <Card className="border border-border bg-card">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-primary/10">
-              <Bot className="h-5 w-5 text-primary" />
+              <FileText className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg">Relatórios do Agente</CardTitle>
-              <CardDescription>
-                Histórico de execuções e decisões
-              </CardDescription>
+              <CardTitle className="text-lg">Atividades do Agente</CardTitle>
+              <CardDescription>Ações executadas e relatórios automáticos</CardDescription>
             </div>
           </div>
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={fetchReports}
-            className="gap-1 border-primary/30 hover:border-primary/50"
+            onClick={fetchData}
+            className="gap-1"
           >
             <RefreshCw className="h-3 w-3" />
             Atualizar
@@ -303,28 +391,60 @@ export default function AgentReportsTab() {
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[500px] pr-2">
-          {reports.length > 0 ? (
-            <div className="space-y-3">
-              {reports.map((report) => (
-                <ReportCard
-                  key={report.id}
-                  report={report}
-                  isExpanded={expandedId === report.id}
-                  onToggle={() => setExpandedId(
-                    expandedId === report.id ? null : report.id
-                  )}
-                />
+        {/* Filter Tabs */}
+        <div className="flex gap-1 p-1 rounded-lg bg-muted/50 mb-4">
+          {[
+            { id: 'all', label: 'Tudo', count: allItems.length },
+            { id: 'actions', label: 'Ações', count: chatActions.length },
+            { id: 'reports', label: 'Relatórios', count: reports.length },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                activeTab === tab.id 
+                  ? "bg-background shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.label}
+              <Badge variant="secondary" className="ml-1.5 text-[10px] h-4 px-1">
+                {tab.count}
+              </Badge>
+            </button>
+          ))}
+        </div>
+
+        <ScrollArea className="h-[450px] pr-2">
+          {filteredItems.length > 0 ? (
+            <div className="space-y-2">
+              {filteredItems.map((item) => (
+                item.type === 'report' ? (
+                  <ReportCard
+                    key={item.data.id}
+                    report={item.data as ExecutionReport}
+                    isExpanded={expandedId === item.data.id}
+                    onToggle={() => setExpandedId(expandedId === item.data.id ? null : item.data.id)}
+                  />
+                ) : (
+                  <ActionCard
+                    key={item.data.id}
+                    action={item.data as ChatAction}
+                    isExpanded={expandedId === item.data.id}
+                    onToggle={() => setExpandedId(expandedId === item.data.id ? null : item.data.id)}
+                  />
+                )
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-center">
-              <div className="p-4 rounded-full mb-4 bg-primary/10">
-                <Clock className="h-10 w-10 text-primary" />
+              <div className="p-4 rounded-full mb-4 bg-muted">
+                <Clock className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground font-medium">Nenhuma execução registrada</p>
+              <p className="text-muted-foreground font-medium">Nenhuma atividade registrada</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Ative o modo automático ou execute o agente manualmente
+                Use o chat para executar ações ou ative o modo automático
               </p>
             </div>
           )}
