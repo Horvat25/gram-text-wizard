@@ -1127,12 +1127,17 @@ Deno.serve(async (req) => {
     let userId: string | null = null;
     let workspaceId: string | null = null;
     let trigger = 'manual';
+    let forceContentType: ContentType | null = null;
     
     try {
       const body = await req.json();
       userId = body.userId;
       workspaceId = body.workspaceId;
       trigger = body.trigger || 'manual';
+      forceContentType = body.forceContentType as ContentType | null;
+      if (forceContentType) {
+        console.log('[AGENT] FORÇANDO tipo de conteúdo:', forceContentType);
+      }
     } catch {
       // No body or invalid JSON
     }
@@ -1188,7 +1193,7 @@ Deno.serve(async (req) => {
       );
     }
     
-    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger);
+    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType);
     
     console.log('[AGENT] ===== CICLO FINALIZADO =====');
     return new Response(
@@ -1213,7 +1218,8 @@ async function processWorkspace(
   workspaceId: string,
   lovableApiKey: string,
   supabaseUrl: string,
-  trigger: string = 'manual'
+  trigger: string = 'manual',
+  forceContentType: ContentType | null = null
 ): Promise<any> {
   console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId})`);
   
@@ -1246,6 +1252,12 @@ async function processWorkspace(
     
     // ETAPA 1: Análise - passar workspaceId para buscar dados corretos
     const state = await analyzeCurrentState(supabase, userId, workspaceId);
+    
+    // If forceContentType is set, override the state's nextContentType
+    if (forceContentType) {
+      console.log(`[AGENT] Sobrescrevendo tipo: ${state.nextContentType} -> ${forceContentType}`);
+      state.nextContentType = forceContentType;
+    }
     
     // Send decision update
     await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'deciding', {
