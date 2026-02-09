@@ -97,9 +97,9 @@ export default function AgentMinimalChat({
   };
 
   return (
-    <div className="relative z-20 px-4 pb-6 pt-2">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 bg-card/80 backdrop-blur-xl rounded-2xl px-4 py-3 border border-border/50 shadow-lg">
+    <div className="relative z-20 px-4 pb-4 pt-2">
+      <div className="max-w-xl mx-auto">
+        <div className="flex items-center gap-2">
           <Input
             ref={inputRef}
             value={input}
@@ -107,7 +107,7 @@ export default function AgentMinimalChat({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={isLoading}
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60 text-foreground"
+            className="flex-1 h-10 border-0 bg-card/60 backdrop-blur-sm rounded-full px-4 focus-visible:ring-1 focus-visible:ring-primary/30 placeholder:text-muted-foreground/50 text-sm"
           />
           
           <Button
@@ -115,7 +115,7 @@ export default function AgentMinimalChat({
             size="icon"
             onClick={toggleListening}
             className={cn(
-              "h-9 w-9 shrink-0 rounded-xl transition-all",
+              "h-10 w-10 shrink-0 rounded-full bg-card/60 backdrop-blur-sm",
               isListening && "bg-destructive/20 text-destructive animate-pulse"
             )}
           >
@@ -126,7 +126,7 @@ export default function AgentMinimalChat({
             size="icon"
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="h-9 w-9 shrink-0 rounded-xl neural-gradient"
+            className="h-10 w-10 shrink-0 rounded-full neural-gradient"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
