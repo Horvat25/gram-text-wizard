@@ -73,6 +73,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   // Config state
   const [config, setConfig] = useState({
     agent_name: 'Agente IA',
+    agent_avatar_url: null as string | null,
     brand_voice: 'Autêntico e valioso',
     personality_traits: ['Analítico', 'Criativo'] as string[],
     content_focus: ['Notícias', 'Tendências'] as string[],
@@ -112,6 +113,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
         setContext(data as AgentContext);
         setConfig({
           agent_name: data.agent_name || 'Agente IA',
+          agent_avatar_url: data.agent_avatar_url || null,
           brand_voice: data.brand_voice || 'Autêntico e valioso',
           personality_traits: data.personality_traits || ['Analítico', 'Criativo'],
           content_focus: data.content_focus || ['Notícias', 'Tendências'],
@@ -424,6 +426,43 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                         onChange={(e) => setConfig(c => ({ ...c, agent_name: e.target.value }))}
                         placeholder="Ex: Aria"
                       />
+                    </div>
+
+                    {/* Avatar Selection */}
+                    <div className="space-y-2">
+                      <Label>Avatar do Agente</Label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { url: null, label: 'Padrão' },
+                          { url: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent1', label: 'Bot 1' },
+                          { url: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent2', label: 'Bot 2' },
+                          { url: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent3', label: 'Bot 3' },
+                          { url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent1', label: 'Avatar 1' },
+                          { url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent2', label: 'Avatar 2' },
+                          { url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=agent1', label: 'Lorelei 1' },
+                          { url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=agent2', label: 'Lorelei 2' },
+                        ].map((avatar, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setConfig(c => ({ ...c, agent_avatar_url: avatar.url }))}
+                            className={cn(
+                              "p-2 rounded-lg border-2 transition-all hover:border-primary/50",
+                              config.agent_avatar_url === avatar.url 
+                                ? "border-primary bg-primary/10" 
+                                : "border-border bg-muted/30"
+                            )}
+                          >
+                            {avatar.url ? (
+                              <img src={avatar.url} alt={avatar.label} className="w-full h-10 object-contain" />
+                            ) : (
+                              <div className="w-full h-10 flex items-center justify-center">
+                                <Bot className="h-6 w-6 text-muted-foreground" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">Escolha um avatar para o seu agente</p>
                     </div>
 
                     <div className="space-y-2">

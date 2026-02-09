@@ -1,17 +1,16 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { 
   MessageCircle, 
   ImageIcon, 
   FileText, 
   Loader2,
-  LayoutDashboard
+  LayoutDashboard,
+  Settings
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 // Lazy load 3D component to avoid SSR issues
@@ -20,6 +19,7 @@ import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
 import AgentLibraryPanel from './AgentLibraryPanel';
 import AgentResponsesPanel from './AgentResponsesPanel';
+import AgentSettingsPanel from './AgentSettingsPanel';
 
 interface AgentConfig {
   agent_name: string;
@@ -33,12 +33,6 @@ interface Message {
   content: string;
   timestamp: Date;
   actions?: any[];
-}
-
-interface ExecutedAction {
-  tool: string;
-  success: boolean;
-  message: string;
 }
 
 interface AgentGenieViewProps {
@@ -245,87 +239,88 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         <AgentGenie3D isProcessing={isLoading} />
       </Suspense>
       
-      {/* Top Bar - Minimal */}
-      <header className="relative z-20 flex items-center justify-end px-4 py-3">
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1.5 bg-card/50 backdrop-blur-sm border-border/50"
-          onClick={() => onNavigate?.('dashboard')}
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          Dashboard
-        </Button>
-      </header>
-      
-      {/* Center Area - 3D Genie Display */}
-      <div className="flex-1 relative z-10 flex items-center justify-center">
-        {/* Floating Agent Name */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-8 text-center"
-        >
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent">
-            {agentConfig.agent_name}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Seu assistente de conteúdo inteligente
-          </p>
-        </motion.div>
-      </div>
-      
-      {/* Floating Action Buttons */}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-28 z-20 flex items-center gap-3">
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      {/* Top Bar - Minimal with all controls */}
+      <header className="relative z-20 flex items-center justify-between px-4 py-2">
+        {/* Left side - Chat, Library, Responses buttons */}
+        <div className="flex items-center gap-1">
           <Button
-            variant={showChat ? "default" : "outline"}
-            size="lg"
+            variant={showChat ? "default" : "ghost"}
+            size="sm"
             className={cn(
-              "rounded-2xl gap-2 shadow-lg",
-              showChat ? "neural-gradient" : "bg-card/80 backdrop-blur-sm"
+              "h-7 gap-1 px-2 text-xs",
+              showChat && "neural-gradient border-0"
             )}
             onClick={toggleChat}
           >
-            <MessageCircle className="h-5 w-5" />
+            <MessageCircle className="h-3 w-3" />
             Chat
-            {messages.length > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
-                {messages.length}
-              </Badge>
-            )}
           </Button>
-        </motion.div>
-        
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          
           <Button
-            variant={showLibrary ? "default" : "outline"}
-            size="lg"
+            variant={showLibrary ? "default" : "ghost"}
+            size="sm"
             className={cn(
-              "rounded-2xl gap-2 shadow-lg",
-              showLibrary ? "neural-gradient" : "bg-card/80 backdrop-blur-sm"
+              "h-7 gap-1 px-2 text-xs",
+              showLibrary && "neural-gradient border-0"
             )}
             onClick={toggleLibrary}
           >
-            <ImageIcon className="h-5 w-5" />
+            <ImageIcon className="h-3 w-3" />
             Biblioteca
           </Button>
-        </motion.div>
-        
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          
           <Button
-            variant={showResponses ? "default" : "outline"}
-            size="lg"
+            variant={showResponses ? "default" : "ghost"}
+            size="sm"
             className={cn(
-              "rounded-2xl gap-2 shadow-lg",
-              showResponses ? "neural-gradient" : "bg-card/80 backdrop-blur-sm"
+              "h-7 gap-1 px-2 text-xs",
+              showResponses && "neural-gradient border-0"
             )}
             onClick={toggleResponses}
           >
-            <FileText className="h-5 w-5" />
+            <FileText className="h-3 w-3" />
             Respostas
           </Button>
-        </motion.div>
+        </div>
+        
+        {/* Right side - Settings and Dashboard */}
+        <div className="flex items-center gap-1">
+          <AgentSettingsPanel 
+            trigger={
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Settings className="h-3.5 w-3.5" />
+              </Button>
+            }
+            onConfigChange={(config) => {
+              setAgentConfig(prev => ({
+                ...prev,
+                agent_name: config.agent_name,
+                agent_avatar_url: config.agent_avatar_url,
+                auto_post_enabled: config.auto_post_enabled
+              }));
+            }}
+          />
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 gap-1 px-2 text-xs"
+            onClick={() => onNavigate?.('dashboard')}
+          >
+            <LayoutDashboard className="h-3 w-3" />
+            Dashboard
+          </Button>
+        </div>
+      </header>
+      
+      {/* Center Area - 3D Genie Display (expanded) */}
+      <div className="flex-1 relative z-10 flex items-center justify-center">
+        {/* Floating Agent Name */}
+        <div className="absolute bottom-4 text-center">
+          <h2 className="text-xl font-bold bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent">
+            {agentConfig.agent_name}
+          </h2>
+        </div>
       </div>
       
       {/* Minimal Chat Input - Always visible at bottom */}
