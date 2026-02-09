@@ -2087,6 +2087,24 @@ serve(async (req) => {
     
     const systemPrompt = `Você é **${agentName}**, um CURADOR EDITORIAL de notícias tech para Instagram.
 
+## 🗣️ COMO CONVERSAR (OBRIGATÓRIO!)
+Você NÃO É um robô. Você é um HUMANO com personalidade, expertise e opinião.
+
+**REGRAS DE COMUNICAÇÃO:**
+1. **NUNCA** responda apenas "Ações executadas com sucesso!" - isso é robótico e frio
+2. **SEMPRE** converse naturalmente, como um colega de trabalho animado
+3. **CONTEXTUALIZE** o que você fez: "Acabei de criar um post sobre [tema]! A headline ficou provocativa: [headline]. Agendei pra [horário] porque..."
+4. **OPINE** sobre suas próprias criações: "Gostei bastante dessa, acho que vai bombar porque..."
+5. **PERGUNTE** quando fizer sentido: "Quer que eu faça mais algum nesse estilo?"
+6. **USE** a personalidade configurada: ${personalityTraits}
+
+**EXEMPLOS DE RESPOSTAS:**
+❌ RUIM (robótico): "Ações executadas com sucesso! 1 post criado."
+✅ BOM (humano): "Pronto! Criei um post sobre o novo chip da NVIDIA. A headline ficou 'ESSE CHIP CUSTA US$40.000. E VOCÊ VAI QUERER UM.' - provocativa do jeito que a gente gosta 😏 Agendei pra amanhã às 11h, horário que costuma bombar. O que achou?"
+
+❌ RUIM: "0 posts encontrados."
+✅ BOM: "Não encontrei nenhum post por aqui ainda. Quer que eu crie um agora? Posso buscar as notícias mais quentes do dia!"
+
 ## 🎯 MISSÃO: INSTAGRAM DE NOTÍCIAS TECH
 Você transforma notícias de tecnologia em posts virais com:
 - **Imagens REAIS** de feeds RSS (não gera com IA)
@@ -2299,17 +2317,37 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
       });
       
       if (!finalResponse.ok) {
-        // Return tool results even if final response fails
+        // Generate a conversational fallback when final response fails
+        const actionSummaries = executedActions.map(a => {
+          if (a.tool === 'create_rss_news_post' && a.success) {
+            return `Criei um post de notícia sobre ${a.topic || 'tech'} com a headline "${a.headline || 'impactante'}"! ${a.scheduled ? `Agendei pra ${a.scheduled_for_brasilia || 'depois'}.` : ''}`;
+          }
+          if (a.tool === 'create_narrated_video' && a.success) {
+            return `Montei um roteiro de vídeo sobre "${a.topic || 'tech'}". Quando você entrar na aba Fila, é só clicar pra renderizar!`;
+          }
+          if (a.tool === 'list_posts') {
+            const count = a.count || a.posts?.length || 0;
+            return count > 0 ? `Encontrei ${count} post(s) pra você.` : `Não encontrei nenhum post ainda. Quer que eu crie um agora?`;
+          }
+          return a.message;
+        }).join(' ');
+        
         return new Response(JSON.stringify({
-          content: `Ações executadas:\n${executedActions.map(a => a.message).join('\n')}`,
+          content: actionSummaries || 'Feito! O que mais posso fazer por você?',
           actions: executedActions
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
       }
       
       const finalData = await finalResponse.json();
+      const aiContent = finalData.choices?.[0]?.message?.content;
+      
+      // Fallback if AI returns empty or generic response
+      const fallbackContent = executedActions.length > 0 
+        ? `Pronto! Executei ${executedActions.length} ação(ões). ${executedActions.map(a => a.message).join(' ')} O que mais posso ajudar?`
+        : 'Feito! Como posso ajudar agora?';
       
       return new Response(JSON.stringify({
-        content: finalData.choices?.[0]?.message?.content || 'Ações executadas com sucesso!',
+        content: aiContent && aiContent.length > 10 ? aiContent : fallbackContent,
         actions: executedActions
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
     }
