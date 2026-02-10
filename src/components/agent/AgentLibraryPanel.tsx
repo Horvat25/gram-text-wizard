@@ -219,7 +219,7 @@ Use emojis relevantes. Marque @neuralupdate no final.`
 
       if (overlayError) throw overlayError;
       
-      const finalImageUrl = overlayData?.processedImageUrl || selectedItem.imageUrl;
+      const finalImageUrl = overlayData?.publicUrl || overlayData?.processedImageUrl || selectedItem.imageUrl;
 
       const { data: post, error: postError } = await supabase
         .from('posts')

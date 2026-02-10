@@ -150,7 +150,7 @@ export default function AgentImageLibrary() {
 
       if (overlayError) throw overlayError;
       
-      const finalImageUrl = overlayData?.processedImageUrl || selectedItem.imageUrl;
+      const finalImageUrl = overlayData?.publicUrl || overlayData?.processedImageUrl || selectedItem.imageUrl;
 
       // Create the post
       const { data: post, error: postError } = await supabase
