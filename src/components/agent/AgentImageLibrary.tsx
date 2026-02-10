@@ -124,9 +124,13 @@ export default function AgentImageLibrary() {
       setSelectedItem(null);
     } else {
       setSelectedItem(item);
-      // Pre-fill headline with a shortened version of the title
-      const shortTitle = item.title.length > 60 ? item.title.slice(0, 57) + '...' : item.title;
-      setHeadline(shortTitle.toUpperCase());
+      // Safe truncation that doesn't break accented characters
+      const truncated = item.title.length > 60 ? (() => {
+        const t = item.title.slice(0, 60);
+        const lastSpace = t.lastIndexOf(' ');
+        return lastSpace > 30 ? t.slice(0, lastSpace) + '...' : t + '...';
+      })() : item.title;
+      setHeadline(truncated.toUpperCase());
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -17,29 +17,87 @@ import {
   Settings2,
   Hash,
   TrendingUp,
-  Wand2
+  Wand2,
+  Flame,
+  ArrowUpDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useRssFeeds, RssItem, RssFeed, DEFAULT_FEEDS } from '@/hooks/useRssFeeds';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CustomFeedsManager, CustomFeed } from '@/components/CustomFeedsManager';
 
+// Safe truncation that doesn't break accented characters
+function safeTruncate(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text;
+  // Find last space before maxLen to avoid cutting words
+  const truncated = text.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > maxLen * 0.5) {
+    return truncated.slice(0, lastSpace) + '...';
+  }
+  return truncated + '...';
+}
+
+// Calculate a relevance/ranking score for a news item
+function calculateNewsScore(item: RssItem): number {
+  let score = 50; // base score
+  
+  // Recency bonus (newer = higher score)
+  if (item.publishedAt) {
+    const hoursAgo = differenceInHours(new Date(), new Date(item.publishedAt));
+    if (hoursAgo < 1) score += 40;
+    else if (hoursAgo < 3) score += 30;
+    else if (hoursAgo < 6) score += 20;
+    else if (hoursAgo < 12) score += 10;
+    else if (hoursAgo < 24) score += 5;
+    else if (hoursAgo > 48) score -= 10;
+  }
+  
+  // Has image bonus
+  if (item.imageUrl) score += 10;
+  
+  // Title engagement keywords (viral potential)
+  const viralKeywords = ['ia', 'inteligência artificial', 'gpt', 'openai', 'google', 'apple', 'tesla', 'elon musk', 'meta', 'microsoft', 'nvidia', 'samsung', 'iphone', 'android', 'chatgpt', 'gemini', 'robot', 'robô', 'futuro', 'revolução', 'bilhão', 'milhão', 'grátis', 'novo', 'lança', 'anuncia', 'revela', 'exclusivo', 'urgente', 'polêmica', 'proíbe', 'bane', 'hack'];
+  const titleLower = item.title.toLowerCase();
+  for (const kw of viralKeywords) {
+    if (titleLower.includes(kw)) {
+      score += 8;
+    }
+  }
+  
+  // Title length sweet spot (not too short, not too long)
+  if (item.title.length >= 30 && item.title.length <= 80) score += 5;
+  
+  // Has description bonus
+  if (item.description && item.description.length > 50) score += 5;
+  
+  // Not yet used bonus
+  if (!item.isUsed) score += 15;
+  
+  return Math.min(score, 100);
+}
+
 interface ImageCardProps {
   item: RssItem;
   onSelect: (item: RssItem) => void;
   isSelected: boolean;
+  score?: number;
 }
 
-function ImageCard({ item, onSelect, isSelected }: ImageCardProps) {
+function ImageCard({ item, onSelect, isSelected, score }: ImageCardProps) {
   const [imageError, setImageError] = useState(false);
   
   if (!item.imageUrl || imageError) return null;
+  
+  const scoreColor = score && score >= 80 ? 'text-green-400 bg-green-500/20' 
+    : score && score >= 60 ? 'text-amber-400 bg-amber-500/20' 
+    : 'text-muted-foreground bg-muted/50';
   
   return (
     <motion.div
@@ -69,6 +127,14 @@ function ImageCard({ item, onSelect, isSelected }: ImageCardProps) {
         >
           {item.sourceName}
         </Badge>
+        
+        {/* Score badge */}
+        {score !== undefined && (
+          <div className={cn("absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm", scoreColor)}>
+            <Flame className="h-2.5 w-2.5" />
+            {score}
+          </div>
+        )}
         
         {isSelected && (
           <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
@@ -111,6 +177,25 @@ export default function AgentLibraryPanel({ isOpen, onClose }: AgentLibraryPanel
   const [estimatedEngagement, setEstimatedEngagement] = useState<{ likes: number; comments: number; reach: number } | null>(null);
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [sortByRanking, setSortByRanking] = useState(true);
+  const [minScore, setMinScore] = useState(0); // 0 = show all
+
+  // Calculate scores and sort
+  const scoredItems = useMemo(() => {
+    const withScores = items
+      .filter(item => item.imageUrl)
+      .map(item => ({ item, score: calculateNewsScore(item) }));
+    
+    if (sortByRanking) {
+      withScores.sort((a, b) => b.score - a.score);
+    }
+    
+    if (minScore > 0) {
+      return withScores.filter(s => s.score >= minScore);
+    }
+    
+    return withScores;
+  }, [items, sortByRanking, minScore]);
 
   useEffect(() => {
     if (isOpen && user && currentWorkspace) {
@@ -131,8 +216,7 @@ export default function AgentLibraryPanel({ isOpen, onClose }: AgentLibraryPanel
       setSelectedItem(null);
     } else {
       setSelectedItem(item);
-      const shortTitle = item.title.length > 60 ? item.title.slice(0, 57) + '...' : item.title;
-      setHeadline(shortTitle.toUpperCase());
+      setHeadline(safeTruncate(item.title, 60).toUpperCase());
       // Reset states
       setCaption('');
       setHashtags([]);
@@ -261,7 +345,7 @@ Use emojis relevantes. Marque @neuralupdate no final.`
     }
   };
 
-  const imagesWithContent = items.filter(item => item.imageUrl);
+  // Remove old imagesWithContent - now using scoredItems
 
   return (
     <AnimatePresence>
@@ -282,7 +366,7 @@ Use emojis relevantes. Marque @neuralupdate no final.`
               <div>
                 <h2 className="font-semibold text-sm">Biblioteca</h2>
                 <p className="text-xs text-muted-foreground">
-                  {imagesWithContent.length} imagens disponíveis
+                  {scoredItems.length} imagens disponíveis
                 </p>
               </div>
             </div>
@@ -324,22 +408,48 @@ Use emojis relevantes. Marque @neuralupdate no final.`
                 📡 {stats.sources} fontes
               </Badge>
             </div>
-          )}
+           )}
           
+          {/* Ranking Filter */}
+          <div className="flex items-center gap-1 px-3 py-1.5 border-b border-border/30">
+            <Button
+              variant={sortByRanking ? "default" : "ghost"}
+              size="sm"
+              className={cn("h-6 text-[10px] gap-1 px-2", sortByRanking && "neural-gradient border-0")}
+              onClick={() => setSortByRanking(!sortByRanking)}
+            >
+              <ArrowUpDown className="h-2.5 w-2.5" />
+              Ranking
+            </Button>
+            {[60, 70, 80].map(score => (
+              <Button
+                key={score}
+                variant={minScore === score ? "default" : "ghost"}
+                size="sm"
+                className={cn("h-6 text-[10px] gap-1 px-2", minScore === score && "neural-gradient border-0")}
+                onClick={() => setMinScore(minScore === score ? 0 : score)}
+              >
+                <Flame className="h-2.5 w-2.5" />
+                {score}+
+              </Button>
+            ))}
+          </div>
+           
           {/* Content */}
           {loading ? (
             <div className="flex-1 flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : imagesWithContent.length > 0 ? (
+          ) : scoredItems.length > 0 ? (
             <ScrollArea className="flex-1 p-3">
               <div className="grid grid-cols-2 gap-2">
-                {imagesWithContent.map((item, index) => (
+                {scoredItems.map(({ item, score }, index) => (
                   <ImageCard 
-                    key={item.id || index}
+                    key={item.id || `item-${index}`}
                     item={item}
                     onSelect={handleSelectItem}
                     isSelected={selectedItem?.id === item.id}
+                    score={score}
                   />
                 ))}
               </div>
