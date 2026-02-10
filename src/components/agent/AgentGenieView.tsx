@@ -134,7 +134,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   };
 
   const sendMessage = async (content: string) => {
-    if (!content.trim() || !user) return;
+    if (!content.trim() || !user || !currentWorkspace) return;
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -165,7 +165,11 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('agent-chat invoke error:', error);
+        throw error;
+      }
+      if (!data) throw new Error('Resposta vazia do servidor');
       if (data.error) throw new Error(data.error);
 
       const assistantContent = data.content || 'Desculpe, não consegui processar.';
@@ -182,12 +186,13 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       setMessages(prev => [...prev, assistantMessage]);
       saveMessage(assistantMessage);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error sending message to agent:', error);
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
+      console.error('Agent error details:', { errorMsg, userId: user?.id, workspaceId: currentWorkspace?.id });
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `❌ ${errorMsg}`,
+        content: `❌ Erro: ${errorMsg}. Tente novamente.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
