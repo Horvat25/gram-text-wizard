@@ -208,7 +208,9 @@ Use emojis relevantes. Marque @neuralupdate no final.`
       const { data: overlayData, error: overlayError } = await supabase.functions.invoke('apply-text-overlay', {
         body: {
           imageUrl: selectedItem.imageUrl,
+          title: selectedItem.title || headline,
           headlineText: headline,
+          generateHeadline: false,
           userId: user.id,
           workspaceId: currentWorkspace.id,
           sourceName: selectedItem.sourceName
