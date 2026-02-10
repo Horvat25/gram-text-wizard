@@ -303,18 +303,20 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, title, watermarkText = "Neural Update", generateHeadline = true } = await req.json();
+    const body = await req.json();
+    const { imageUrl, title, headlineText: providedHeadline, watermarkText = "Neural Update", generateHeadline = true } = body;
 
     if (!imageUrl) {
       throw new Error("imageUrl é obrigatório");
     }
 
-    if (!title) {
-      throw new Error("title é obrigatório para gerar headline");
+    const effectiveTitle = title || providedHeadline || '';
+    if (!effectiveTitle) {
+      throw new Error("title ou headlineText é obrigatório");
     }
 
     console.log("[apply-text-overlay] Processing image:", imageUrl);
-    console.log("[apply-text-overlay] Title:", title.substring(0, 50) + "...");
+    console.log("[apply-text-overlay] Title:", effectiveTitle.substring(0, 50) + "...");
 
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!lovableApiKey) {
@@ -325,13 +327,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // STEP 1: Generate headline text with AI + spelling correction
-    let headlineText = title;
-    if (generateHeadline) {
+    // STEP 1: Generate or use provided headline text
+    let headlineText = providedHeadline || effectiveTitle;
+    if (generateHeadline && title) {
       headlineText = await generateHeadlineText(title, lovableApiKey);
     } else {
-      // Even if not generating, apply spelling correction
-      headlineText = await correctSpellingWithAI(title, lovableApiKey);
+      // Apply spelling correction to provided text
+      headlineText = await correctSpellingWithAI(headlineText, lovableApiKey);
     }
 
     // STEP 2: Download the external image
