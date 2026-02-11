@@ -520,72 +520,66 @@ async function createVideoContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando vídeo/reels (arquitetura externa):', plan.theme);
+  console.log('[AGENT] Criando vídeo/reels (da biblioteca RSS):', plan.theme);
   
-  // STEP 1: Buscar imagens existentes ou gerar novas
-  // Prioridade: imagens reais > imagens geradas por IA
+  // STEP 1: Get images from RSS library
   const images: string[] = [];
-  const currentYear = new Date().getFullYear();
+  const titles: string[] = [];
   
-  // Tentar buscar imagens da web primeiro (Firecrawl)
-  console.log('[AGENT] Buscando imagens para vídeo...');
+  // Refresh RSS and get items
   try {
-    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+    await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        topic: plan.theme,
-        preferRealImages: true
-      })
+      body: JSON.stringify({ workspaceId, userId, limit: 30 })
     });
-    
-    if (searchResponse.ok) {
-      const searchResult = await searchResponse.json();
-      if (searchResult.images && searchResult.images.length > 0) {
-        images.push(...searchResult.images.slice(0, 4));
-        console.log(`[AGENT] Encontradas ${images.length} imagens da web`);
-      }
-    }
   } catch (e) {
-    console.log('[AGENT] Erro ao buscar imagens:', e);
+    console.log('[AGENT] Erro ao atualizar RSS:', e);
   }
   
-  // Se não encontrou imagens suficientes, gerar com IA
-  if (images.length < 4) {
-    console.log('[AGENT] Gerando imagens adicionais com IA...');
-    const prompts = [
-      `Cena 1: ${plan.theme}. Cinematográfico, vertical 9:16, ultra HD. Ano ${currentYear}. SEM TEXTO.`,
-      `Cena 2: Impacto de ${plan.theme} na sociedade. Futurista, vibrante. SEM TEXTO.`,
-      `Cena 3: Benefícios de ${plan.theme}. Visual impactante, moderno. SEM TEXTO.`,
-      `Cena 4: O futuro com ${plan.theme}. Inspirador, profissional. SEM TEXTO.`
-    ];
+  const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  const { data: rssItems } = await supabase
+    .from('rss_items')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_used', false)
+    .eq('has_image', true)
+    .gte('published_at', twoDaysAgo)
+    .order('published_at', { ascending: false })
+    .limit(20);
+  
+  if (rssItems && rssItems.length > 0) {
+    const scored = rssItems.map((item: any) => ({
+      item,
+      score: calculateNewsRankingScore(item)
+    })).sort((a: any, b: any) => b.score - a.score);
     
-    for (let i = images.length; i < 4; i++) {
-      try {
-        const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            prompt: prompts[i] || prompts[0],
-            format: 'portrait',
-            model: 'gemini',
-            applyWatermark: true
-          })
-        });
-        
-        if (imgResponse.ok) {
-          const imgData = await imgResponse.json();
-          if (imgData.imageUrl) {
-            images.push(imgData.imageUrl);
+    // Take top 4 items for video slides
+    for (const { item } of scored.slice(0, 4)) {
+      if (item.image_url) {
+        // Upload image to storage
+        try {
+          const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ imageUrl: item.image_url })
+          });
+          if (uploadResponse.ok) {
+            const uploadResult = await uploadResponse.json();
+            if (uploadResult.publicUrl) {
+              images.push(uploadResult.publicUrl);
+              titles.push(item.title);
+            }
           }
+        } catch (e) {
+          console.log('[AGENT] Erro upload imagem video:', e);
         }
-      } catch (e) {
-        console.log(`[AGENT] Erro ao gerar imagem ${i}:`, e);
       }
+      await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
     }
   }
   
-  console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
+  console.log(`[AGENT] Total de imagens da biblioteca para vídeo: ${images.length}`);
   
   // STEP 2: Gerar caption
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
@@ -702,7 +696,7 @@ async function createVideoContent(
   return post;
 }
 
-// Create CAROUSEL content
+// Create CAROUSEL content - NOW USES LIBRARY (RSS) images
 async function createCarouselContent(
   supabase: any,
   plan: ContentPlan,
@@ -712,51 +706,126 @@ async function createCarouselContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando carrossel:', plan.theme);
+  console.log('[AGENT] Criando carrossel (da biblioteca RSS):', plan.theme);
   
-  // Generate 4 images for carousel - NO TEXT IN IMAGES
-  const currentYear = new Date().getFullYear(); // 2026
-  const slidePrompts = [
-    `Slide 1 de carrossel sobre ${plan.theme}. Design moderno, tecnológico, profissional. Alta qualidade para Instagram. Ano ${currentYear}. REGRA ABSOLUTA: NÃO INCLUA NENHUM TEXTO, PALAVRA OU LETRA NA IMAGEM. Apenas elementos visuais.`,
-    `Slide 2 de carrossel: conceito visual representando dados ou estatísticas sobre ${plan.theme}. Estilo infográfico visual com ícones e gráficos SEM TEXTO. Cores vibrantes. Ano ${currentYear}. NÃO use palavras.`,
-    `Slide 3 de carrossel: benefícios visuais de ${plan.theme}. Design inovador, futurista mas realista. Ano ${currentYear}. PROIBIDO incluir texto ou letras. Use apenas símbolos e ícones.`,
-    `Slide 4 de carrossel: conclusão visual impactante sobre ${plan.theme}. Memorável, profissional. Ano ${currentYear}. SEM TEXTO OU LETRAS NA IMAGEM.`
-  ];
+  // Get multiple RSS items for carousel slides
+  const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   
-  const carouselImages: string[] = [];
-  
-  for (const prompt of slidePrompts) {
-    const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+  // First refresh RSS
+  try {
+    await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        prompt,
-        format: 'square',
-        model: 'gemini'
-      })
+      body: JSON.stringify({ workspaceId, userId, limit: 30 })
     });
-    
-    if (imgResponse.ok) {
-      const imgData = await imgResponse.json();
-      if (imgData.imageUrl) {
-        carouselImages.push(imgData.imageUrl);
+  } catch (e) {
+    console.log('[AGENT] Erro ao atualizar RSS:', e);
+  }
+  
+  const { data: rssItems } = await supabase
+    .from('rss_items')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_used', false)
+    .eq('has_image', true)
+    .gte('published_at', twoDaysAgo)
+    .order('published_at', { ascending: false })
+    .limit(20);
+  
+  if (!rssItems || rssItems.length < 2) {
+    console.log('[AGENT] ⚠️ Notícias insuficientes para carrossel');
+    const { data: post, error } = await supabase.from('posts').insert({
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption: '⚠️ Notícias insuficientes para carrossel',
+      hashtags: ['#tecnologia'],
+      post_type: 'educacional',
+      media_type: 'carousel',
+      platforms: plan.platforms || ['instagram'],
+      status: 'failed',
+      error_message: 'Menos de 2 notícias com imagem na biblioteca. Adicione mais fontes RSS.',
+      ai_model_used: 'none'
+    }).select().single();
+    if (error) throw error;
+    return post;
+  }
+  
+  // Score and rank, pick top 4
+  const scored = rssItems.map((item: any) => ({
+    item,
+    score: calculateNewsRankingScore(item)
+  })).sort((a: any, b: any) => b.score - a.score);
+  
+  const selectedItems = scored.slice(0, Math.min(4, scored.length));
+  const carouselImages: string[] = [];
+  const titles: string[] = [];
+  
+  for (const { item } of selectedItems) {
+    if (item.image_url) {
+      // Apply overlay to each image
+      try {
+        const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            imageUrl: item.image_url,
+            title: item.title,
+            watermarkText: 'Neural Update',
+            generateHeadline: true
+          })
+        });
+        
+        if (overlayResponse.ok) {
+          const overlayResult = await overlayResponse.json();
+          if (overlayResult.publicUrl) {
+            carouselImages.push(overlayResult.publicUrl);
+            titles.push(item.title);
+          }
+        }
+      } catch (e) {
+        console.log('[AGENT] Erro overlay slide:', e);
+      }
+      
+      // Fallback: use original image
+      if (carouselImages.length < titles.length + 1 && item.image_url) {
+        try {
+          const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ imageUrl: item.image_url })
+          });
+          if (uploadResponse.ok) {
+            const uploadResult = await uploadResponse.json();
+            if (uploadResult.publicUrl) {
+              carouselImages.push(uploadResult.publicUrl);
+              titles.push(item.title);
+            }
+          }
+        } catch (e) {
+          console.log('[AGENT] Erro upload slide:', e);
+        }
       }
     }
+    
+    // Mark as used
+    await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
   }
+  
+  console.log(`[AGENT] Carrossel com ${carouselImages.length} slides da biblioteca`);
   
   // Generate caption
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      topic: plan.theme,
-      postType: 'educacional',
-      customInstructions: `Este é um CARROSSEL com ${carouselImages.length} slides. ${plan.cta}`
+      topic: `Resumo das principais notícias: ${titles.join('; ')}`,
+      postType: 'noticia',
+      customInstructions: `Este é um CARROSSEL com ${carouselImages.length} notícias da biblioteca. Faça um resumo envolvente.`
     })
   });
   
-  let caption = `📚 ${plan.theme}`;
-  let hashtags: string[] = ['#carrossel', '#tecnologia', '#dicas', '#educacional'];
+  let caption = `📰 As principais notícias de hoje`;
+  let hashtags: string[] = ['#carrossel', '#tecnologia', '#noticias', '#ia'];
   
   if (captionResponse.ok) {
     const captionData = await captionResponse.json();
@@ -764,20 +833,24 @@ async function createCarouselContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Create carousel post - can publish directly if has enough images and autoPublish
   const canPublish = autoPublish && carouselImages.length >= 2;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
     caption,
     hashtags,
-    post_type: 'educacional',
+    post_type: 'noticia',
     media_type: 'carousel',
     platforms: plan.platforms || ['instagram'],
     status: carouselImages.length >= 2 ? (canPublish ? 'scheduled' : 'draft') : 'failed',
-    scheduled_for: canPublish ? new Date().toISOString() : null, // Immediate schedule for publish
+    scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: carouselImages[0] || null,
     carousel_images: carouselImages,
+    overlay_metadata: {
+      type: 'library_carousel',
+      titles,
+      ranking_scores: selectedItems.map((s: any) => s.score)
+    },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
   
@@ -786,8 +859,90 @@ async function createCarouselContent(
   return post;
 }
 
-// Create NEWS content - PRIORITY: RSS feeds first, Firecrawl fallback
-// FLUXO: 1) Buscar notícia do RSS 2) Se não houver, usar Firecrawl 3) Pegar imagem real 4) Aplicar overlay por código
+// Calculate news ranking score (0-100) for RSS items
+function calculateNewsRankingScore(item: any): number {
+  let score = 50; // Base score
+  
+  const titleLower = (item.title || '').toLowerCase();
+  const descLower = (item.description || '').toLowerCase();
+  const combined = titleLower + ' ' + descLower;
+  
+  // Recency bonus (0-25 points)
+  if (item.published_at) {
+    const hoursAgo = (Date.now() - new Date(item.published_at).getTime()) / (1000 * 60 * 60);
+    if (hoursAgo < 3) score += 25;
+    else if (hoursAgo < 6) score += 20;
+    else if (hoursAgo < 12) score += 15;
+    else if (hoursAgo < 24) score += 10;
+    else score += 5;
+  }
+  
+  // Viral/trending keywords bonus (0-15 points)
+  const viralKeywords = ['ia', 'inteligência artificial', 'gpt', 'openai', 'google', 'apple', 'nvidia', 
+    'elon musk', 'tesla', 'meta', 'microsoft', 'chatgpt', 'gemini', 'robô', 'robot',
+    'lança', 'anuncia', 'revela', 'urgente', 'breaking', 'exclusivo', 'viral',
+    'milhões', 'bilhões', 'recorde', 'primeiro', 'inédito', 'revolucion'];
+  const matchedKeywords = viralKeywords.filter(kw => combined.includes(kw));
+  score += Math.min(15, matchedKeywords.length * 5);
+  
+  // Image quality bonus (0-10 points)
+  if (item.has_image && item.image_url) {
+    score += 10;
+  }
+  
+  // Description completeness bonus (0-5 points)  
+  if (item.description && item.description.length > 100) score += 5;
+  else if (item.description && item.description.length > 50) score += 3;
+  
+  return Math.min(100, score);
+}
+
+// Select best RSS item using ranking
+async function selectBestRssItem(supabase: any, workspaceId: string, supabaseUrl: string, headers: any, userId: string): Promise<{ item: any; score: number } | null> {
+  // Refresh RSS feeds first
+  try {
+    await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ workspaceId, userId, limit: 30 })
+    });
+    console.log('[AGENT] RSS atualizado');
+  } catch (e) {
+    console.log('[AGENT] Erro ao atualizar RSS:', e);
+  }
+  
+  // Get unused RSS items from the last 48 hours (wider window)
+  const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  const { data: rssItems } = await supabase
+    .from('rss_items')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_used', false)
+    .eq('has_image', true)
+    .gte('published_at', twoDaysAgo)
+    .order('published_at', { ascending: false })
+    .limit(30);
+  
+  if (!rssItems || rssItems.length === 0) {
+    console.log('[AGENT] Nenhum item RSS disponível');
+    return null;
+  }
+  
+  // Score and rank all items
+  const scoredItems = rssItems.map((item: any) => ({
+    item,
+    score: calculateNewsRankingScore(item)
+  })).sort((a: any, b: any) => b.score - a.score);
+  
+  console.log('[AGENT] RSS ranking (top 5):');
+  scoredItems.slice(0, 5).forEach((s: any, i: number) => {
+    console.log(`  ${i + 1}. [${s.score}pts] ${s.item.title?.substring(0, 60)}...`);
+  });
+  
+  return scoredItems[0];
+}
+
+// Create NEWS content - ONLY FROM LIBRARY (RSS)
 async function createNewsContent(
   supabase: any,
   plan: ContentPlan,
@@ -797,112 +952,55 @@ async function createNewsContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando post de notícia (RSS prioritário + overlay por código):', plan.theme);
+  console.log('[AGENT] Criando post de notícia (APENAS da biblioteca RSS):', plan.theme);
   
   let selectedArticle: any = null;
   let selectedImage: string | null = null;
   let sourceDomain = '';
   let sourceUrl = '';
   
-  // STEP 1: Try to get news from RSS feed first (most current)
-  console.log('[AGENT] Buscando notícias do RSS...');
+  // STEP 1: Select best RSS item using ranking
+  const bestItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
   
-  // First, refresh RSS feeds to get latest news
-  try {
-    await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        workspaceId,
-        userId,
-        limit: 20
-      })
-    });
-    console.log('[AGENT] RSS atualizado');
-  } catch (e) {
-    console.log('[AGENT] Erro ao atualizar RSS:', e);
-  }
-  
-  // Get unused RSS items from the last 24 hours
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { data: rssItems } = await supabase
-    .from('rss_items')
-    .select('*')
-    .eq('workspace_id', workspaceId)
-    .eq('is_used', false)
-    .eq('has_image', true)
-    .gte('published_at', yesterday)
-    .order('published_at', { ascending: false })
-    .limit(10);
-  
-  if (rssItems && rssItems.length > 0) {
-    // Select the most recent article with image
+  if (bestItem) {
+    const rssItem = bestItem.item;
     selectedArticle = {
-      title: rssItems[0].title,
-      description: rssItems[0].description,
-      url: rssItems[0].link,
-      images: rssItems[0].image_url ? [rssItems[0].image_url] : []
+      title: rssItem.title,
+      description: rssItem.description,
+      url: rssItem.link,
+      images: rssItem.image_url ? [rssItem.image_url] : []
     };
-    selectedImage = rssItems[0].image_url;
-    sourceUrl = rssItems[0].link;
-    sourceDomain = rssItems[0].source_name || new URL(rssItems[0].source_url).hostname.replace('www.', '');
+    selectedImage = rssItem.image_url;
+    sourceUrl = rssItem.link;
+    sourceDomain = rssItem.source_name || new URL(rssItem.source_url).hostname.replace('www.', '');
     
     // Mark RSS item as used
     await supabase
       .from('rss_items')
       .update({ is_used: true })
-      .eq('id', rssItems[0].id);
+      .eq('id', rssItem.id);
     
-    console.log('[AGENT] Notícia RSS selecionada:', selectedArticle.title);
+    console.log(`[AGENT] Notícia selecionada (score: ${bestItem.score}): ${selectedArticle.title}`);
   }
   
-  // STEP 2: Fallback to Firecrawl if no RSS news available
+  // NO FALLBACK to Firecrawl - library only!
   if (!selectedArticle) {
-    console.log('[AGENT] Sem notícias RSS, buscando via Firecrawl...');
-    
-    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        query: `${plan.theme} notícia recente tecnologia`,
-        limit: 10,
-        lang: 'pt-BR',
-        country: 'BR'
-      })
-    });
-    
-    if (searchResponse.ok) {
-      const searchResult = await searchResponse.json();
-      const articles = searchResult.data || [];
-      
-      // Find article with best images
-      const withImages = articles.filter((a: any) => a.images?.length > 0)
-        .sort((a: any, b: any) => (b.images?.length || 0) - (a.images?.length || 0));
-      
-      selectedArticle = withImages[0] || articles[0];
-      
-      if (selectedArticle) {
-        sourceUrl = selectedArticle.url || '';
-        try {
-          sourceDomain = new URL(sourceUrl).hostname.replace('www.', '');
-        } catch { sourceDomain = 'fonte'; }
-        
-        // Select REAL image from site
-        if (selectedArticle.images?.length > 0) {
-          const qualityImages = selectedArticle.images.filter((img: string) =>
-            img && 
-            !img.includes('icon') && 
-            !img.includes('logo') && 
-            !img.includes('avatar') && 
-            !img.includes('favicon') &&
-            !img.includes('1x1') &&
-            !img.includes('pixel') &&
-            (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp') || img.includes('image'))
-          );
-          selectedImage = qualityImages[0] || selectedArticle.images[0];
-        }
-      }
-    }
+    console.log('[AGENT] ⚠️ Sem notícias na biblioteca! Post não será criado.');
+    // Create a draft post with error message
+    const { data: post, error } = await supabase.from('posts').insert({
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption: '⚠️ Nenhuma notícia disponível na biblioteca',
+      hashtags: ['#tecnologia'],
+      post_type: 'noticia',
+      media_type: 'image',
+      platforms: plan.platforms || ['instagram'],
+      status: 'failed',
+      error_message: 'Sem notícias na biblioteca RSS. Adicione mais fontes RSS na aba Biblioteca.',
+      ai_model_used: 'none'
+    }).select().single();
+    if (error) throw error;
+    return post;
   }
   
   console.log('[AGENT] Artigo selecionado:', selectedArticle?.title || 'nenhum');
@@ -1027,7 +1125,7 @@ OBRIGATÓRIO ao final:
   return post;
 }
 
-// Create IMAGE content (simple static post)
+// Create IMAGE content - NOW USES LIBRARY (RSS) instead of AI generation
 async function createImageContent(
   supabase: any,
   plan: ContentPlan,
@@ -1037,24 +1135,70 @@ async function createImageContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando post de imagem:', plan.theme);
+  console.log('[AGENT] Criando post de imagem (da biblioteca RSS):', plan.theme);
   
-  // Generate image - NO TEXT ALLOWED
-  const imageYear = new Date().getFullYear(); // 2026
-  const imgResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      prompt: `Post visual profissional para redes sociais representando o conceito: ${plan.theme}. Design moderno, estética tecnológica, cores vibrantes e harmoniosas. Qualidade profissional para Instagram ${imageYear}. Iluminação de estúdio ou golden hour. REGRA ABSOLUTA: NÃO INCLUA NENHUM TEXTO, PALAVRA, LETRA, NÚMERO OU SÍMBOLO ESCRITO NA IMAGEM. A imagem deve ser 100% visual. Use ícones ou formas abstratas se necessário, nunca texto.`,
-      format: 'square',
-      model: 'gemini'
-    })
-  });
+  // Use RSS library to get content
+  const bestItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
   
+  if (!bestItem) {
+    console.log('[AGENT] ⚠️ Sem notícias na biblioteca para post de imagem!');
+    const { data: post, error } = await supabase.from('posts').insert({
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption: '⚠️ Nenhuma notícia disponível na biblioteca',
+      hashtags: ['#tecnologia'],
+      post_type: plan.format,
+      media_type: 'image',
+      platforms: plan.platforms || ['instagram'],
+      status: 'failed',
+      error_message: 'Sem notícias na biblioteca RSS. Adicione mais fontes RSS.',
+      ai_model_used: 'none'
+    }).select().single();
+    if (error) throw error;
+    return post;
+  }
+  
+  const rssItem = bestItem.item;
+  const selectedImage = rssItem.image_url;
+  const sourceUrl = rssItem.link;
+  const sourceDomain = rssItem.source_name || 'fonte';
+  
+  // Mark as used
+  await supabase.from('rss_items').update({ is_used: true }).eq('id', rssItem.id);
+  
+  console.log(`[AGENT] Usando notícia da biblioteca (score: ${bestItem.score}): ${rssItem.title}`);
+  
+  // Apply text overlay
   let imageUrl = null;
-  if (imgResponse.ok) {
-    const imgData = await imgResponse.json();
-    imageUrl = imgData.imageUrl;
+  if (selectedImage && rssItem.title) {
+    const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        imageUrl: selectedImage,
+        title: rssItem.title,
+        watermarkText: 'Neural Update',
+        generateHeadline: true
+      })
+    });
+    
+    if (overlayResponse.ok) {
+      const overlayResult = await overlayResponse.json();
+      imageUrl = overlayResult.publicUrl;
+    }
+  }
+  
+  // Fallback: upload original image
+  if (!imageUrl && selectedImage) {
+    const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ imageUrl: selectedImage })
+    });
+    if (uploadResponse.ok) {
+      const uploadResult = await uploadResponse.json();
+      imageUrl = uploadResult.publicUrl;
+    }
   }
   
   // Generate caption
@@ -1062,13 +1206,15 @@ async function createImageContent(
     method: 'POST',
     headers,
     body: JSON.stringify({
-      topic: plan.theme,
+      topic: `${rssItem.title}. ${rssItem.description || ''}`,
       postType: plan.format,
-      customInstructions: `Tom: ${plan.tone}. CTA: ${plan.cta}`
+      sourceUrl,
+      sourceName: sourceDomain,
+      customInstructions: `Tom: ${plan.tone}. CTA: ${plan.cta}. OBRIGATÓRIO ao final: 📰 Fonte: ${sourceDomain}`
     })
   });
   
-  let caption = plan.theme;
+  let caption = `📰 ${rssItem.title}`;
   let hashtags: string[] = ['#tecnologia', '#ia', '#futuro', '#inovacao'];
   
   if (captionResponse.ok) {
@@ -1077,24 +1223,37 @@ async function createImageContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // Create post - publish directly if autoPublish and has image
+  // Ensure source attribution
+  if (!caption.includes('Fonte:') && sourceUrl) {
+    caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
+  }
+  
   const canPublish = autoPublish && imageUrl;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
     caption,
     hashtags,
-    post_type: plan.format,
+    post_type: 'noticia',
     media_type: 'image',
     platforms: plan.platforms || ['instagram'],
-    status: canPublish ? 'scheduled' : 'draft',
+    status: imageUrl ? (canPublish ? 'scheduled' : 'draft') : 'draft',
     scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: imageUrl,
+    overlay_metadata: {
+      type: 'library_post',
+      source_url: sourceUrl,
+      source_domain: sourceDomain,
+      original_title: rssItem.title,
+      ranking_score: bestItem.score,
+      used_real_image: true,
+      text_applied_by_code: true
+    },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Post de imagem criado:', post.id);
+  console.log('[AGENT] Post de imagem (biblioteca) criado:', post.id);
   return post;
 }
 
