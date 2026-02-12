@@ -7,96 +7,66 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ============= MÚLTIPLAS FONTES DE IMAGENS =============
-
 interface ImageResult {
   url: string;
-  source: 'pexels' | 'unsplash' | 'pixabay' | 'firecrawl' | 'ai';
-  sourceUrl?: string;
-  photographer?: string;
+  source: 'pexels' | 'unsplash' | 'firecrawl' | 'ai';
+  sourceId?: string; // ID da imagem na fonte (para evitar repetição)
 }
 
-// PEXELS API - Imagens de alta qualidade (opcional - requer PEXELS_API_KEY)
+// ============= PEXELS (PRINCIPAL) =============
 async function searchPexels(query: string, limit: number = 5): Promise<ImageResult[]> {
   const apiKey = Deno.env.get('PEXELS_API_KEY');
-  if (!apiKey) return []; // API não configurada - skip silenciosamente
+  if (!apiKey) { console.log('[images] Pexels: no API key'); return []; }
 
   try {
     const response = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${limit}&orientation=portrait`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${limit}&orientation=portrait&size=large`,
       { headers: { 'Authorization': apiKey } }
     );
-    if (!response.ok) return [];
+    if (!response.ok) { console.log('[images] Pexels error:', response.status); return []; }
 
     const data = await response.json();
-    return (data.photos || []).map((photo: any) => ({
-      url: photo.src?.large2x || photo.src?.large || photo.src?.original,
+    return (data.photos || []).map((p: any) => ({
+      url: p.src?.large2x || p.src?.large || p.src?.original,
       source: 'pexels' as const,
-      sourceUrl: photo.url,
-      photographer: photo.photographer
+      sourceId: `pexels_${p.id}`,
     }));
   } catch (e) {
+    console.error('[images] Pexels error:', e);
     return [];
   }
 }
 
-// UNSPLASH API - Imagens artísticas (opcional - requer UNSPLASH_ACCESS_KEY)
+// ============= UNSPLASH (FALLBACK) =============
 async function searchUnsplash(query: string, limit: number = 5): Promise<ImageResult[]> {
   const accessKey = Deno.env.get('UNSPLASH_ACCESS_KEY');
-  if (!accessKey) return [];
+  if (!accessKey) { console.log('[images] Unsplash: no API key'); return []; }
 
   try {
     const response = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=${limit}&orientation=portrait`,
       { headers: { 'Authorization': `Client-ID ${accessKey}` } }
     );
-    if (!response.ok) return [];
+    if (!response.ok) { console.log('[images] Unsplash error:', response.status); return []; }
 
     const data = await response.json();
-    return (data.results || []).map((photo: any) => ({
-      url: photo.urls?.regular || photo.urls?.full,
+    return (data.results || []).map((p: any) => ({
+      url: p.urls?.regular || p.urls?.full,
       source: 'unsplash' as const,
-      sourceUrl: photo.links?.html,
-      photographer: photo.user?.name
+      sourceId: `unsplash_${p.id}`,
     }));
   } catch (e) {
+    console.error('[images] Unsplash error:', e);
     return [];
   }
 }
 
-// PIXABAY API - Grande variedade (opcional - requer PIXABAY_API_KEY)
-async function searchPixabay(query: string, limit: number = 5): Promise<ImageResult[]> {
-  const apiKey = Deno.env.get('PIXABAY_API_KEY');
+// ============= FIRECRAWL (ÚLTIMO RECURSO WEB) =============
+async function searchFirecrawl(query: string, limit: number = 5): Promise<ImageResult[]> {
+  const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
   if (!apiKey) return [];
 
   try {
-    const response = await fetch(
-      `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&per_page=${limit}&image_type=photo&orientation=vertical&safesearch=true`
-    );
-    if (!response.ok) return [];
-
-    const data = await response.json();
-    return (data.hits || []).map((photo: any) => ({
-      url: photo.largeImageURL || photo.webformatURL,
-      source: 'pixabay' as const,
-      sourceUrl: photo.pageURL,
-      photographer: photo.user
-    }));
-  } catch (e) {
-    return [];
-  }
-}
-
-// FIRECRAWL - Busca imagens em sites de notícias
-async function searchFirecrawl(query: string, limit: number = 5): Promise<ImageResult[]> {
-  const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
-  if (!apiKey) {
-    console.log('[search-images] Firecrawl API key not configured');
-    return [];
-  }
-
-  try {
-    console.log('[search-images] Searching Firecrawl:', query);
     const response = await fetch('https://api.firecrawl.dev/v1/search', {
       method: 'POST',
       headers: {
@@ -105,71 +75,90 @@ async function searchFirecrawl(query: string, limit: number = 5): Promise<ImageR
       },
       body: JSON.stringify({
         query: `${query} imagens fotos`,
-        limit: limit,
+        limit,
         lang: 'pt-BR',
         country: 'BR',
         scrapeOptions: { formats: ['html'] },
       }),
     });
 
-    if (!response.ok) {
-      console.log('[search-images] Firecrawl error:', response.status);
-      return [];
-    }
+    if (!response.ok) return [];
 
     const data = await response.json();
     const images: ImageResult[] = [];
 
     for (const result of (data.data || [])) {
       const html = result.html || '';
-      const sourceUrl = result.metadata?.sourceURL || result.url;
-
-      // Extrair og:image
-      const ogImageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
-      if (ogImageMatch?.[1]) {
-        images.push({ url: ogImageMatch[1], source: 'firecrawl', sourceUrl });
-      }
-
-      // Extrair twitter:image
-      const twitterMatch = html.match(/<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
-      if (twitterMatch?.[1] && !images.some(i => i.url === twitterMatch[1])) {
-        images.push({ url: twitterMatch[1], source: 'firecrawl', sourceUrl });
-      }
-
-      // Extrair imagens grandes do HTML
-      const imgRegex = /<img[^>]*src=["']([^"']+)["'][^>]*>/gi;
-      let match;
-      while ((match = imgRegex.exec(html)) !== null) {
-        const src = match[1];
-        const isValid = src.startsWith('http') && 
-                       src.length > 50 &&
-                       !src.includes('icon') && 
-                       !src.includes('logo') && 
-                       !src.includes('avatar') &&
-                       !src.includes('1x1') &&
-                       !src.includes('pixel') &&
-                       !src.includes('thumb') &&
-                       !src.includes('sprite') &&
-                       !src.includes('data:image') &&
-                       !images.some(i => i.url === src);
-        if (isValid) {
-          images.push({ url: src, source: 'firecrawl', sourceUrl });
-        }
+      const ogMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
+      if (ogMatch?.[1]) {
+        images.push({ url: ogMatch[1], source: 'firecrawl', sourceId: `fc_${images.length}` });
       }
     }
 
     return images.slice(0, limit);
   } catch (e) {
-    console.error('[search-images] Firecrawl error:', e);
+    console.error('[images] Firecrawl error:', e);
     return [];
   }
 }
 
-// ============= WATERMARK =============
+// ============= DOWNLOAD + UPLOAD TO STORAGE =============
+async function downloadAndStore(
+  imageUrl: string,
+  supabase: any,
+  index: number
+): Promise<string | null> {
+  try {
+    const response = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'image/*',
+      }
+    });
 
+    if (!response.ok) {
+      console.warn(`[images] Download failed (${response.status}): ${imageUrl.slice(0, 80)}`);
+      return null;
+    }
+
+    const blob = await response.blob();
+    
+    // Verificar se é realmente uma imagem
+    if (!blob.type.startsWith('image/')) {
+      console.warn(`[images] Not an image: ${blob.type}`);
+      return null;
+    }
+
+    const ext = blob.type.includes('png') ? 'png' : 'jpg';
+    const fileName = `video-${Date.now()}-${index}.${ext}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('post-images')
+      .upload(fileName, blob, {
+        contentType: blob.type || 'image/jpeg',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error(`[images] Upload error:`, uploadError);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('post-images')
+      .getPublicUrl(fileName);
+
+    return urlData.publicUrl;
+  } catch (e) {
+    console.error(`[images] Download/store error:`, e);
+    return null;
+  }
+}
+
+// ============= WATERMARK =============
 async function applyWatermark(
-  imageUrl: string, 
-  supabaseUrl: string, 
+  imageUrl: string,
+  supabaseUrl: string,
   supabaseKey: string
 ): Promise<string | null> {
   try {
@@ -179,10 +168,7 @@ async function applyWatermark(
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${supabaseKey}`,
       },
-      body: JSON.stringify({ 
-        imageUrl,
-        watermarkText: "Neural Update"
-      }),
+      body: JSON.stringify({ imageUrl, watermarkText: "Neural Update" }),
     });
 
     if (response.ok) {
@@ -191,7 +177,7 @@ async function applyWatermark(
     }
     return null;
   } catch (e) {
-    console.error('[search-images] Watermark error:', e);
+    console.warn('[images] Watermark error:', e);
     return null;
   }
 }
@@ -204,15 +190,9 @@ serve(async (req) => {
   }
 
   try {
-    const { 
-      topic, 
-      segments,
-      preferRealImages = true,
-      query // Query direta para busca
-    } = await req.json();
+    const { topic, segments, query, usedImageIds = [] } = await req.json();
 
     const searchQuery = query || topic;
-    
     if (!searchQuery && (!segments || segments.length === 0)) {
       return new Response(
         JSON.stringify({ success: false, error: 'Topic, query or segments required' }),
@@ -223,129 +203,102 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    console.log('[search-images] Topic/Query:', searchQuery);
-    console.log('[search-images] Segments:', segments?.length || 0);
-    console.log('[search-images] Prefer real images:', preferRealImages);
-
-    const results: { imageUrl: string; source: string; sourceUrl?: string }[] = [];
     const neededCount = segments?.length || 4;
+    const searchTerms = [
+      searchQuery,
+      ...(segments || []).map((s: any) => s.imagePrompt || s.text).slice(0, 2)
+    ].filter(Boolean);
 
-    // ============= ESTRATÉGIA: BUSCAR EM PARALELO DE MÚLTIPLAS FONTES =============
+    console.log(`[images] Need ${neededCount} images for: ${searchTerms[0]}`);
+    console.log(`[images] Used IDs to avoid: ${usedImageIds.length}`);
+
+    const results: { imageUrl: string; source: string; sourceId: string }[] = [];
+
+    // ============= ESTRATÉGIA: Pexels → Unsplash → Firecrawl =============
+
+    // 1. PEXELS (principal) - buscar com múltiplos termos
+    let allCandidates: ImageResult[] = [];
     
-    if (preferRealImages) {
-      // Criar queries de busca
-      const searchQueries = [
-        searchQuery,
-        ...(segments || []).map((s: any) => s.imagePrompt || s.text).slice(0, 3)
-      ].filter(Boolean);
+    const pexelsResults = await Promise.all(
+      searchTerms.slice(0, 2).map(q => searchPexels(q, 6))
+    );
+    allCandidates.push(...pexelsResults.flat());
+    console.log(`[images] Pexels: ${allCandidates.length} candidatas`);
 
-      console.log('[search-images] Search queries:', searchQueries.length);
-
-      // Buscar em TODAS as fontes disponíveis em paralelo
-      // Firecrawl é a fonte principal (já configurada)
-      // APIs opcionais (Pexels, Unsplash, Pixabay) só funcionam se configuradas
-      const searchPromises = searchQueries.slice(0, 3).flatMap(q => [
-        searchFirecrawl(q, 5), // Prioridade: Firecrawl (já tem API key)
-        searchPexels(q, 3),    // Opcional
-        searchUnsplash(q, 3),  // Opcional
-        searchPixabay(q, 3),   // Opcional
-      ]);
-
-      const allResults = await Promise.all(searchPromises);
-      const allImages = allResults.flat();
-
-      console.log('[search-images] Found', allImages.length, 'candidate images from all sources');
-
-      // Priorizar por fonte (Firecrawl é principal, APIs opcionais são bônus)
-      const prioritizedImages = [
-        ...allImages.filter(i => i.source === 'firecrawl'), // Principal
-        ...allImages.filter(i => i.source === 'pexels'),    // Opcional
-        ...allImages.filter(i => i.source === 'unsplash'),  // Opcional
-        ...allImages.filter(i => i.source === 'pixabay'),   // Opcional
-      ];
-
-      // Deduplicate por URL
-      const uniqueImages = Array.from(
-        new Map(prioritizedImages.map(img => [img.url, img])).values()
+    // 2. UNSPLASH (fallback) - só se Pexels não tiver o suficiente
+    if (allCandidates.length < neededCount) {
+      const unsplashResults = await Promise.all(
+        searchTerms.slice(0, 2).map(q => searchUnsplash(q, 5))
       );
+      allCandidates.push(...unsplashResults.flat());
+      console.log(`[images] + Unsplash: total ${allCandidates.length} candidatas`);
+    }
 
-      console.log('[search-images] Unique images:', uniqueImages.length);
+    // 3. FIRECRAWL (último recurso web)
+    if (allCandidates.length < neededCount) {
+      const firecrawlResults = await searchFirecrawl(searchTerms[0], 5);
+      allCandidates.push(...firecrawlResults);
+      console.log(`[images] + Firecrawl: total ${allCandidates.length} candidatas`);
+    }
 
-      // Processar imagens (aplicar watermark e fazer upload)
-      for (let i = 0; i < neededCount && i < uniqueImages.length; i++) {
-        const img = uniqueImages[i];
-        
-        try {
-          // Aplicar watermark via função dedicada
-          const watermarkedUrl = await applyWatermark(img.url, supabaseUrl, supabaseKey);
-          
-          if (watermarkedUrl) {
-            results.push({
-              imageUrl: watermarkedUrl,
-              source: img.source,
-              sourceUrl: img.sourceUrl
-            });
-            console.log(`[search-images] ✅ Image ${i + 1} from ${img.source} + watermark`);
-            continue;
-          }
-          
-          // Fallback: upload sem watermark
-          console.log(`[search-images] Watermark failed, uploading without...`);
-          const imageResponse = await fetch(img.url, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-              'Accept': 'image/*',
-            }
-          });
-          
-          if (imageResponse.ok) {
-            const imageBlob = await imageResponse.blob();
-            const fileName = `video-${Date.now()}-${i}.jpg`;
-            
-            const { data: uploadData, error: uploadError } = await supabase.storage
-              .from('post-images')
-              .upload(fileName, imageBlob, { 
-                contentType: imageBlob.type || 'image/jpeg',
-                upsert: true 
-              });
-            
-            if (!uploadError && uploadData) {
-              const { data: urlData } = supabase.storage
-                .from('post-images')
-                .getPublicUrl(fileName);
-              
-              results.push({
-                imageUrl: urlData.publicUrl,
-                source: img.source,
-                sourceUrl: img.sourceUrl
-              });
-              console.log(`[search-images] ✅ Image ${i + 1} from ${img.source} (no watermark)`);
-            }
-          }
-        } catch (e) {
-          console.warn(`[search-images] Failed to process image ${i}:`, e);
-        }
+    // Deduplicate e filtrar imagens já usadas
+    const seenUrls = new Set<string>();
+    const usedSet = new Set(usedImageIds);
+    const uniqueCandidates = allCandidates.filter(img => {
+      if (!img.url || seenUrls.has(img.url)) return false;
+      if (img.sourceId && usedSet.has(img.sourceId)) return false;
+      seenUrls.add(img.url);
+      return true;
+    });
+
+    console.log(`[images] Unique candidates after dedup: ${uniqueCandidates.length}`);
+
+    // ============= DOWNLOAD + STORE (garante CORS no render) =============
+    
+    for (let i = 0; i < Math.min(neededCount, uniqueCandidates.length); i++) {
+      const candidate = uniqueCandidates[i];
+
+      // Tentar watermark primeiro (já faz upload)
+      const watermarkedUrl = await applyWatermark(candidate.url, supabaseUrl, supabaseKey);
+      
+      if (watermarkedUrl) {
+        results.push({
+          imageUrl: watermarkedUrl,
+          source: candidate.source,
+          sourceId: candidate.sourceId || `${candidate.source}_${i}`,
+        });
+        console.log(`[images] ✅ ${i + 1}/${neededCount} from ${candidate.source} + watermark`);
+        continue;
+      }
+
+      // Fallback: download direto pro storage (sem watermark)
+      const storedUrl = await downloadAndStore(candidate.url, supabase, i);
+      if (storedUrl) {
+        results.push({
+          imageUrl: storedUrl,
+          source: candidate.source,
+          sourceId: candidate.sourceId || `${candidate.source}_${i}`,
+        });
+        console.log(`[images] ✅ ${i + 1}/${neededCount} from ${candidate.source} (no watermark)`);
+      } else {
+        console.warn(`[images] ❌ Failed to store image ${i + 1} from ${candidate.source}`);
       }
     }
 
-    // ============= FALLBACK: GERAR COM IA =============
+    // ============= FALLBACK AI (se não tiver imagens suficientes) =============
     
-    const remainingCount = neededCount - results.length;
-    if (remainingCount > 0 && LOVABLE_API_KEY) {
-      console.log(`[search-images] Generating ${remainingCount} images with AI...`);
+    const remaining = neededCount - results.length;
+    if (remaining > 0) {
+      console.log(`[images] Generating ${remaining} AI fallback images...`);
       
-      for (let i = 0; i < remainingCount; i++) {
-        const segmentIndex = results.length;
-        const prompt = segments?.[segmentIndex]?.imagePrompt || 
-                      segments?.[segmentIndex]?.text || 
+      for (let i = 0; i < remaining; i++) {
+        const segIdx = results.length;
+        const prompt = segments?.[segIdx]?.imagePrompt || 
+                      segments?.[segIdx]?.text || 
                       searchQuery;
         
         try {
-          console.log(`[search-images] Generating AI image ${i + 1}/${remainingCount}...`);
-          
-          // Usar generate-image que já tem retry logic
           const response = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
             method: 'POST',
             headers: {
@@ -353,7 +306,7 @@ serve(async (req) => {
               'Authorization': `Bearer ${supabaseKey}`,
             },
             body: JSON.stringify({
-              prompt: `${prompt}. Cinematográfico, vertical 9:16, ultra HD. NENHUM TEXTO.`,
+              prompt: `${prompt}. Cinematografico, vertical 9:16, ultra HD. NENHUM TEXTO.`,
               format: 'portrait',
               model: 'gemini',
             }),
@@ -361,47 +314,43 @@ serve(async (req) => {
 
           if (response.ok) {
             const imgData = await response.json();
-            
             if (imgData.imageUrl) {
-              // Aplicar watermark na imagem gerada
               const watermarkedUrl = await applyWatermark(imgData.imageUrl, supabaseUrl, supabaseKey);
-              
               results.push({
                 imageUrl: watermarkedUrl || imgData.imageUrl,
-                source: 'ai'
+                source: 'ai',
+                sourceId: `ai_${Date.now()}_${i}`,
               });
-              console.log(`[search-images] ✅ AI image ${i + 1} generated${watermarkedUrl ? ' + watermark' : ''}`);
+              console.log(`[images] ✅ AI image ${i + 1}/${remaining}`);
             }
           }
         } catch (e) {
-          console.warn(`[search-images] AI generation failed:`, e);
+          console.warn(`[images] AI generation failed:`, e);
         }
       }
     }
 
-    // Estatísticas por fonte
     const stats = {
       total: results.length,
       pexels: results.filter(r => r.source === 'pexels').length,
       unsplash: results.filter(r => r.source === 'unsplash').length,
-      pixabay: results.filter(r => r.source === 'pixabay').length,
       firecrawl: results.filter(r => r.source === 'firecrawl').length,
       ai: results.filter(r => r.source === 'ai').length,
     };
 
-    console.log(`[search-images] Final stats:`, stats);
+    console.log(`[images] Final:`, JSON.stringify(stats));
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        images: results.map(r => r.imageUrl), // Compatibilidade
-        detailedImages: results, // Info completa
-        stats
+      JSON.stringify({
+        success: true,
+        images: results.map(r => ({ imageUrl: r.imageUrl, source: r.source })),
+        imageIds: results.map(r => r.sourceId), // Para controle de repetição
+        stats,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('[search-images] Error:', error);
+    console.error('[images] Error:', error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
