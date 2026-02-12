@@ -133,176 +133,65 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, [segmentCount, segmentDuration, setError]);
 
-  // Step 2: Search for real images from the web first, fallback to AI generation
-  // PRIORIDADE: Imagens reais da internet > Geração com IA
+  // Step 2: Search for real images (Pexels > Unsplash > Firecrawl > AI)
+  // TODAS as imagens são salvas no Storage antes de retornar (elimina CORS no render)
   const generateImages = useCallback(async (segments: StorySegment[], topic?: string) => {
     setState(prev => ({ ...prev, step: "images", progress: 20 }));
     
     const updatedSegments = [...segments];
-    const progressPerImage = 50 / segments.length;
     
-    console.log('[IMAGES] 🌐 Searching for real images from the web first...');
+    console.log('[IMAGES] 🌐 Buscando imagens (Pexels > Unsplash > Firecrawl > AI)...');
     
-    // STEP 1: Try to find real images from the internet
     try {
       const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
         body: {
           topic: topic || segments[0]?.text || 'tecnologia',
           segments: segments.map(s => ({ text: s.text, imagePrompt: s.imagePrompt })),
-          preferRealImages: true
         }
       });
       
-      if (!searchError && searchResult?.success && searchResult.images?.length > 0) {
-        console.log(`[IMAGES] ✅ Found ${searchResult.images.length} real images from the web!`);
-        console.log(`[IMAGES] Stats - Web: ${searchResult.stats?.fromWeb || 0}, AI: ${searchResult.stats?.fromAI || 0}`);
+      if (searchError) {
+        console.error('[IMAGES] Search error:', searchError);
+        throw new Error(searchError.message || 'Erro na busca de imagens');
+      }
+
+      if (searchResult?.success && searchResult.images?.length > 0) {
+        const images = searchResult.images;
+        const stats = searchResult.stats || {};
         
-        // Assign web images to segments
-        searchResult.images.forEach((img: any, index: number) => {
-          if (index < updatedSegments.length && img.imageUrl) {
-            updatedSegments[index] = { 
-              ...updatedSegments[index], 
-              imageUrl: img.imageUrl 
-            };
-            console.log(`[IMAGES] Segment ${index + 1}: ${img.source === 'web' ? '🌐 Web' : '🤖 AI'}`);
+        console.log(`[IMAGES] ✅ ${images.length} imagens encontradas!`);
+        console.log(`[IMAGES] Stats: Pexels=${stats.pexels||0} Unsplash=${stats.unsplash||0} Firecrawl=${stats.firecrawl||0} AI=${stats.ai||0}`);
+        
+        // Assign images to segments (all are already in Storage = no CORS issues)
+        images.forEach((img: any, index: number) => {
+          if (index < updatedSegments.length) {
+            const imageUrl = typeof img === 'string' ? img : img.imageUrl;
+            if (imageUrl) {
+              updatedSegments[index] = { ...updatedSegments[index], imageUrl };
+              console.log(`[IMAGES] Segment ${index + 1}: ${typeof img === 'object' ? img.source : 'storage'}`);
+            }
           }
         });
         
-        setState(prev => ({ 
-          ...prev, 
-          segments: [...updatedSegments],
-          progress: 70,
-        }));
-        
-        // Check if we have enough images
-        const validSegments = updatedSegments.filter(s => s.imageUrl);
-        if (validSegments.length >= Math.ceil(segments.length * 0.5)) {
-          // At least 50% of segments have images, we're good
-          let currentTime = 0;
-          validSegments.forEach(seg => {
-            seg.startTime = currentTime;
-            currentTime += seg.duration;
-          });
-          
-          toast.success(`🌐 ${validSegments.length} imagens reais encontradas!`);
-          return validSegments;
+        // Store used image IDs for repetition control
+        if (searchResult.imageIds?.length > 0) {
+          try {
+            const stored = JSON.parse(localStorage.getItem('usedImageIds') || '[]');
+            const updated = [...new Set([...stored, ...searchResult.imageIds])].slice(-100);
+            localStorage.setItem('usedImageIds', JSON.stringify(updated));
+          } catch (e) { /* ignore */ }
         }
       }
     } catch (e) {
-      console.warn('[IMAGES] Web search failed, falling back to AI:', e);
-    }
-    
-    // STEP 2: Fill remaining segments with AI-generated images (fallback) + WATERMARK
-    const segmentsNeedingImages = updatedSegments.filter(s => !s.imageUrl);
-    
-    if (segmentsNeedingImages.length > 0) {
-      console.log(`[IMAGES] 🤖 Need to generate ${segmentsNeedingImages.length} images with AI (fallback)...`);
-      toast.info(`Gerando ${segmentsNeedingImages.length} imagens com IA...`);
-      
-      // OPTIMIZED: Generate images in parallel batches of 3
-      const batchSize = 3;
-      for (let i = 0; i < segmentsNeedingImages.length; i += batchSize) {
-        if (abortRef.current) return null;
-        
-        const batch = segmentsNeedingImages.slice(i, i + batchSize);
-        console.log(`[IMAGES] Generating AI batch ${Math.floor(i/batchSize) + 1}: ${batch.length} images`);
-        
-        const results = await Promise.all(
-          batch.map(async (segment) => {
-            const segmentIndex = updatedSegments.findIndex(s => s.id === segment.id);
-            const maxRetries = 2;
-            
-            for (let retry = 0; retry <= maxRetries; retry++) {
-              try {
-                if (retry > 0) {
-                  console.log(`Retrying image generation for segment ${segmentIndex + 1}, attempt ${retry + 1}`);
-                  await new Promise(r => setTimeout(r, 2000 * retry));
-                }
-                
-                const { data, error } = await supabase.functions.invoke("generate-image", {
-                  body: { 
-                    prompt: `${segment.imagePrompt}. Cinematic style, high quality, 9:16 vertical aspect ratio.`,
-                    format: "portrait",
-                    model: "gemini",
-                  },
-                });
-
-                if (error) {
-                  console.error(`API error for segment ${segmentIndex + 1}:`, error);
-                  if (retry === maxRetries) {
-                    return { index: segmentIndex, imageUrl: "", error: error.message };
-                  }
-                  continue;
-                }
-                
-                if (data?.imageUrl) {
-                  console.log(`AI image generated for segment ${segmentIndex + 1}`);
-                  
-                  // APPLY WATERMARK to AI-generated images
-                  try {
-                    const watermarkResult = await supabase.functions.invoke("add-watermark", {
-                      body: { 
-                        imageUrl: data.imageUrl,
-                        watermarkText: "Neural Update"
-                      },
-                    });
-                    
-                    if (!watermarkResult.error && watermarkResult.data?.publicUrl) {
-                      console.log(`[IMAGES] Watermark applied to AI image ${segmentIndex + 1}`);
-                      return { index: segmentIndex, imageUrl: watermarkResult.data.publicUrl };
-                    }
-                  } catch (wmErr) {
-                    console.warn(`[IMAGES] Watermark failed, using original:`, wmErr);
-                  }
-                  
-                  // Return original if watermark fails
-                  return { index: segmentIndex, imageUrl: data.imageUrl };
-                } else {
-                  console.warn(`No imageUrl in response for segment ${segmentIndex + 1}`);
-                  if (retry === maxRetries) {
-                    return { index: segmentIndex, imageUrl: "", error: "Sem imagem na resposta" };
-                  }
-                }
-              } catch (err: any) {
-                console.error(`Error generating image ${segmentIndex + 1}, attempt ${retry + 1}:`, err);
-                if (retry === maxRetries) {
-                  return { index: segmentIndex, imageUrl: "", error: err.message };
-                }
-              }
-            }
-            
-            return { index: segmentIndex, imageUrl: "", error: "Falha após múltiplas tentativas" };
-          })
-        );
-
-        // Update segments with results
-        results.forEach(({ index, imageUrl, error }) => {
-          if (index >= 0 && index < updatedSegments.length) {
-            updatedSegments[index] = { ...updatedSegments[index], imageUrl };
-            if (error) {
-              console.warn(`Segment ${index + 1} AI image generation failed: ${error}`);
-            }
-          }
-        });
-
-        setState(prev => ({ 
-          ...prev, 
-          segments: [...updatedSegments],
-          progress: Math.min(20 + (i + batch.length) * progressPerImage, 70),
-        }));
-        
-        if (i + batchSize < segmentsNeedingImages.length) {
-          await new Promise(r => setTimeout(r, 800));
-        }
-      }
+      console.warn('[IMAGES] Search failed:', e);
     }
 
-    // Check how many images we got in total
+    // Filter segments that got images
     const validSegments = updatedSegments.filter(s => s.imageUrl);
     const failedCount = updatedSegments.length - validSegments.length;
     
     if (validSegments.length === 0) {
-      setError("Nenhuma imagem foi encontrada ou gerada. Tente novamente.");
+      setError("Nenhuma imagem foi encontrada ou gerada. Verifique as API keys (Pexels/Unsplash).");
       return null;
     }
     
@@ -310,7 +199,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       toast.warning(`${failedCount} de ${updatedSegments.length} imagens falharam, continuando com ${validSegments.length} cenas`);
     }
 
-    // Recalculate timings for valid segments
+    // Recalculate timings
     let currentTime = 0;
     validSegments.forEach(seg => {
       seg.startTime = currentTime;
@@ -324,8 +213,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       progress: 70,
     }));
 
-    const webCount = validSegments.filter((s, i) => i < (segments.length - segmentsNeedingImages.length)).length;
-    toast.success(`${validSegments.length} imagens prontas! (${webCount} da web, ${validSegments.length - webCount} IA)`);
+    const stats = { total: validSegments.length };
+    toast.success(`📸 ${validSegments.length} imagens prontas (todas no storage)!`);
     return validSegments;
   }, [setError]);
 
