@@ -520,62 +520,103 @@ async function createVideoContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando vídeo/reels (da biblioteca RSS):', plan.theme);
+  console.log('[AGENT] Criando vídeo/reels:', plan.theme);
   
-  // STEP 1: Get images from RSS library
+  // STEP 1: Get THEMED images using search-images-for-video (Pexels/Unsplash)
   const images: string[] = [];
   const titles: string[] = [];
   
-  // Refresh RSS and get items
+  // First, search for theme-related images from Pexels/Unsplash
+  console.log('[AGENT] Buscando imagens temáticas para vídeo:', plan.theme);
   try {
-    await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ workspaceId, userId, limit: 30 })
+      body: JSON.stringify({
+        query: plan.theme,
+        limit: 6,
+        orientation: 'portrait'
+      })
     });
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      if (searchResult.images && searchResult.images.length > 0) {
+        for (const img of searchResult.images.slice(0, 4)) {
+          const imgUrl = img.imageUrl || img.url || img;
+          if (imgUrl && typeof imgUrl === 'string') {
+            images.push(imgUrl);
+            titles.push(plan.theme);
+          }
+        }
+        console.log(`[AGENT] ${images.length} imagens temáticas encontradas via Pexels/Unsplash`);
+      }
+    }
   } catch (e) {
-    console.log('[AGENT] Erro ao atualizar RSS:', e);
+    console.log('[AGENT] Erro na busca temática:', e);
   }
   
-  const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-  const { data: rssItems } = await supabase
-    .from('rss_items')
-    .select('*')
-    .eq('workspace_id', workspaceId)
-    .eq('is_used', false)
-    .eq('has_image', true)
-    .gte('published_at', twoDaysAgo)
-    .order('published_at', { ascending: false })
-    .limit(20);
-  
-  if (rssItems && rssItems.length > 0) {
-    const scored = rssItems.map((item: any) => ({
-      item,
-      score: calculateNewsRankingScore(item)
-    })).sort((a: any, b: any) => b.score - a.score);
+  // Fallback: If not enough themed images, supplement with RSS library
+  if (images.length < 3) {
+    console.log('[AGENT] Complementando com imagens da biblioteca RSS...');
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ workspaceId, userId, limit: 30 })
+      });
+    } catch (e) {
+      console.log('[AGENT] Erro ao atualizar RSS:', e);
+    }
     
-    // Take top 4 items for video slides
-    for (const { item } of scored.slice(0, 4)) {
-      if (item.image_url) {
-        // Upload image to storage
-        try {
-          const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ imageUrl: item.image_url })
-          });
-          if (uploadResponse.ok) {
-            const uploadResult = await uploadResponse.json();
-            if (uploadResult.publicUrl) {
-              images.push(uploadResult.publicUrl);
-              titles.push(item.title);
+    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    const { data: rssItems } = await supabase
+      .from('rss_items')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .eq('is_used', false)
+      .eq('has_image', true)
+      .gte('published_at', twoDaysAgo)
+      .order('published_at', { ascending: false })
+      .limit(20);
+    
+    if (rssItems && rssItems.length > 0) {
+      // Filter by theme keywords if possible
+      const themeWords = plan.theme.toLowerCase().split(' ').filter(w => w.length > 3);
+      const themeMatched = rssItems.filter((item: any) => {
+        const titleLower = (item.title || '').toLowerCase();
+        return themeWords.some(w => titleLower.includes(w));
+      });
+      
+      // Use theme-matched first, then fall back to scored
+      const itemsToUse = themeMatched.length > 0 ? themeMatched : rssItems;
+      const scored = itemsToUse.map((item: any) => ({
+        item,
+        score: calculateNewsRankingScore(item)
+      })).sort((a: any, b: any) => b.score - a.score);
+      
+      const needed = 4 - images.length;
+      for (const { item } of scored.slice(0, needed)) {
+        if (item.image_url) {
+          try {
+            const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ imageUrl: item.image_url })
+            });
+            if (uploadResponse.ok) {
+              const uploadResult = await uploadResponse.json();
+              if (uploadResult.publicUrl) {
+                images.push(uploadResult.publicUrl);
+                titles.push(item.title);
+              }
             }
+          } catch (e) {
+            console.log('[AGENT] Erro upload imagem video:', e);
           }
-        } catch (e) {
-          console.log('[AGENT] Erro upload imagem video:', e);
         }
+        await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
       }
-      await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
     }
   }
   
@@ -1014,38 +1055,67 @@ async function createNewsContent(
   let imageUrl = null;
   if (selectedImage && selectedArticle?.title) {
     console.log('[AGENT] Aplicando overlay de texto via código...');
-    const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        imageUrl: selectedImage,
-        title: selectedArticle.title,  // LLM will generate headline from this
-        watermarkText: 'Neural Update',
-        generateHeadline: true  // LLM generates text, code applies it
-      })
-    });
+    try {
+      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          title: selectedArticle.title,
+          watermarkText: 'Neural Update',
+          generateHeadline: true
+        })
+      });
+      
+      if (overlayResponse.ok) {
+        const overlayResult = await overlayResponse.json();
+        imageUrl = overlayResult.publicUrl;
+        console.log('[AGENT] Overlay aplicado com sucesso, headline:', overlayResult.headline);
+      } else {
+        console.error('[AGENT] Overlay falhou (status:', overlayResponse.status, ')');
+      }
+    } catch (overlayErr) {
+      console.error('[AGENT] Erro ao aplicar overlay:', overlayErr);
+    }
     
-    if (overlayResponse.ok) {
-      const overlayResult = await overlayResponse.json();
-      imageUrl = overlayResult.publicUrl;
-      console.log('[AGENT] Overlay aplicado com sucesso, headline:', overlayResult.headline);
-    } else {
-      console.error('[AGENT] Erro ao aplicar overlay:', await overlayResponse.text());
+    // FALLBACK 1: Use add-watermark if overlay failed (no AI credits needed)
+    if (!imageUrl) {
+      console.log('[AGENT] Fallback: aplicando watermark programático...');
+      try {
+        const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            imageUrl: selectedImage,
+            watermarkText: 'Neural Update'
+          })
+        });
+        if (wmResponse.ok) {
+          const wmResult = await wmResponse.json();
+          imageUrl = wmResult.publicUrl;
+          console.log('[AGENT] Watermark programático aplicado ✅');
+        }
+      } catch (wmErr) {
+        console.log('[AGENT] Watermark também falhou:', wmErr);
+      }
     }
   }
   
-  // Fallback: If overlay failed, just upload the original image without text
+  // FALLBACK 2: Just upload the original image
   if (!imageUrl && selectedImage) {
     console.log('[AGENT] Fallback: usando imagem original sem overlay');
-    const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ imageUrl: selectedImage })
-    });
-    
-    if (uploadResponse.ok) {
-      const uploadResult = await uploadResponse.json();
-      imageUrl = uploadResult.publicUrl;
+    try {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ imageUrl: selectedImage })
+      });
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.publicUrl;
+      }
+    } catch (e) {
+      console.log('[AGENT] Erro upload fallback:', e);
     }
   }
   
@@ -1168,36 +1238,66 @@ async function createImageContent(
   
   console.log(`[AGENT] Usando notícia da biblioteca (score: ${bestItem.score}): ${rssItem.title}`);
   
-  // Apply text overlay
+  // Apply text overlay with fallback
   let imageUrl = null;
   if (selectedImage && rssItem.title) {
-    const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        imageUrl: selectedImage,
-        title: rssItem.title,
-        watermarkText: 'Neural Update',
-        generateHeadline: true
-      })
-    });
-    
-    if (overlayResponse.ok) {
-      const overlayResult = await overlayResponse.json();
-      imageUrl = overlayResult.publicUrl;
+    // Try overlay first
+    try {
+      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          title: rssItem.title,
+          watermarkText: 'Neural Update',
+          generateHeadline: true
+        })
+      });
+      
+      if (overlayResponse.ok) {
+        const overlayResult = await overlayResponse.json();
+        imageUrl = overlayResult.publicUrl;
+      }
+    } catch (e) {
+      console.log('[AGENT] Overlay falhou para imagem:', e);
     }
-  }
-  
-  // Fallback: upload original image
-  if (!imageUrl && selectedImage) {
-    const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ imageUrl: selectedImage })
-    });
-    if (uploadResponse.ok) {
-      const uploadResult = await uploadResponse.json();
-      imageUrl = uploadResult.publicUrl;
+    
+    // Fallback 1: watermark programático
+    if (!imageUrl) {
+      try {
+        const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            imageUrl: selectedImage,
+            watermarkText: 'Neural Update'
+          })
+        });
+        if (wmResponse.ok) {
+          const wmResult = await wmResponse.json();
+          imageUrl = wmResult.publicUrl;
+          console.log('[AGENT] Watermark programático aplicado ✅');
+        }
+      } catch (e) {
+        console.log('[AGENT] Watermark falhou:', e);
+      }
+    }
+    
+    // Fallback 2: upload original
+    if (!imageUrl) {
+      try {
+        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ imageUrl: selectedImage })
+        });
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          imageUrl = uploadResult.publicUrl;
+        }
+      } catch (e) {
+        console.log('[AGENT] Upload fallback falhou:', e);
+      }
     }
   }
   

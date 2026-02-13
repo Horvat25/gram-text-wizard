@@ -289,21 +289,44 @@ Use emojis relevantes. Marque @neuralupdate no final.`
     
     setIsCreating(true);
     try {
-      const { data: overlayData, error: overlayError } = await supabase.functions.invoke('apply-text-overlay', {
-        body: {
-          imageUrl: selectedItem.imageUrl,
-          title: selectedItem.title || headline,
-          headlineText: headline,
-          generateHeadline: false,
-          userId: user.id,
-          workspaceId: currentWorkspace.id,
-          sourceName: selectedItem.sourceName
-        }
-      });
-
-      if (overlayError) throw overlayError;
+      let finalImageUrl = selectedItem.imageUrl;
       
-      const finalImageUrl = overlayData?.publicUrl || overlayData?.processedImageUrl || selectedItem.imageUrl;
+      // Try apply-text-overlay first (uses AI for compositing)
+      try {
+        const { data: overlayData, error: overlayError } = await supabase.functions.invoke('apply-text-overlay', {
+          body: {
+            imageUrl: selectedItem.imageUrl,
+            title: selectedItem.title || headline,
+            headlineText: headline,
+            generateHeadline: false,
+            userId: user.id,
+            workspaceId: currentWorkspace.id,
+            sourceName: selectedItem.sourceName
+          }
+        });
+
+        if (!overlayError && overlayData?.publicUrl) {
+          finalImageUrl = overlayData.publicUrl;
+        } else {
+          throw new Error(overlayError?.message || 'Overlay falhou');
+        }
+      } catch (overlayErr) {
+        console.warn('Overlay failed, falling back to add-watermark:', overlayErr);
+        // Fallback: use add-watermark (programmatic, no AI credits needed)
+        try {
+          const { data: wmData, error: wmError } = await supabase.functions.invoke('add-watermark', {
+            body: {
+              imageUrl: selectedItem.imageUrl,
+              watermarkText: 'Neural Update'
+            }
+          });
+          if (!wmError && wmData?.publicUrl) {
+            finalImageUrl = wmData.publicUrl;
+          }
+        } catch (wmErr) {
+          console.warn('Watermark also failed, using original image:', wmErr);
+        }
+      }
 
       const { data: post, error: postError } = await supabase
         .from('posts')
