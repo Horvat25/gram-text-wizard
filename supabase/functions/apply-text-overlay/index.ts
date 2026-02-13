@@ -179,9 +179,9 @@ EXEMPLOS CORRETOS:
   });
 
   if (!response.ok) {
-    console.error("LLM error:", await response.text());
-    // Fallback: use title with simple processing
-    return title.toUpperCase().slice(0, 60);
+    console.warn("[generateHeadlineText] LLM error:", response.status);
+    // Fallback: use title directly
+    return title.length > 60 ? title.substring(0, 57) + '...' : title;
   }
 
   const data = await response.json();
@@ -209,7 +209,7 @@ async function createProgrammaticOverlay(
   imageContentType: string,
   headlineText: string,
   watermarkText: string = "Neural Update"
-): Promise<Uint8Array> {
+): Promise<Uint8Array | null> {
   console.log("[apply-text-overlay] Creating programmatic SVG overlay...");
   console.log("[apply-text-overlay] Headline:", headlineText);
   
@@ -269,8 +269,9 @@ LAYOUT:
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Image compositing error:", errorText);
-    throw new Error(`Erro ao processar imagem: ${response.status}`);
+    console.warn("[apply-text-overlay] Image compositing failed:", response.status, errorText);
+    // Return null to trigger fallback
+    return null;
   }
 
   const data = await response.json();
@@ -342,12 +343,21 @@ serve(async (req) => {
     console.log("[apply-text-overlay] Image downloaded:", imageData.length, "bytes");
 
     // STEP 3: Create overlay with programmatic text (no AI text generation)
-    const finalImageData = await createProgrammaticOverlay(
+    let finalImageData = await createProgrammaticOverlay(
       imageData,
       contentType,
       headlineText,
       watermarkText
     );
+
+    let hasOverlay = true;
+
+    // FALLBACK: If AI compositing failed (e.g. 402 credits), use original image
+    if (!finalImageData) {
+      console.warn("[apply-text-overlay] ⚠️ Using original image as fallback (no credits)");
+      finalImageData = imageData;
+      hasOverlay = false;
+    }
 
     // STEP 4: Upload to Supabase Storage
     const filename = `news-headline-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
@@ -377,7 +387,7 @@ serve(async (req) => {
         publicUrl,
         originalUrl: imageUrl,
         headline: headlineText,
-        hasOverlay: true,
+        hasOverlay,
         spellingCorrected: true,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
