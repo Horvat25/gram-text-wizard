@@ -122,6 +122,45 @@ REGRAS OBRIGATÓRIAS:
   },
 };
 
+// Fallback programático quando créditos acabam
+function generateFallbackCaption(topic: string, postType: string, mediaType?: string) {
+  const topicClean = topic.length > 200 ? topic.substring(0, 200) : topic;
+  
+  // Extrair primeira frase como headline
+  const firstSentence = topicClean.split(/[.!?]/)[0].trim();
+  const headline = firstSentence.length > 80 ? firstSentence.substring(0, 77) + '...' : firstSentence;
+  
+  const ctaMap: Record<string, string> = {
+    engajamento: '💬 O que você acha? Comenta aqui!',
+    educacional: '📌 Salva esse post para consultar depois!',
+    storytelling: '❤️ Se identificou? Compartilha com alguém!',
+    viral: '🔥 Manda pra quem precisa ver isso!',
+    vendas: '📩 Quer saber mais? Chama no DM!',
+    noticia: '📰 Segue a gente para mais notícias de tecnologia!',
+  };
+
+  const mediaCTA: Record<string, string> = {
+    carousel: '\n\n🔹 ARRASTE PRO LADO para ver mais 👉',
+    video: '\n\n📺 ASSISTA ATÉ O FINAL ▶️',
+    reel: '\n\n📺 ASSISTA ATÉ O FINAL ▶️',
+  };
+
+  const cta = ctaMap[postType] || ctaMap.engajamento;
+  const extra = mediaCTA[mediaType || ''] || '';
+
+  const caption = `${headline.toUpperCase()}${extra}\n\n${topicClean}\n\n${cta}`;
+
+  const defaultHashtags = ['Tecnologia', 'Inovação', 'IA', 'InteligênciaArtificial', 'Tech', 'Futuro', 'NeuralUpdate', 'Notícias'];
+
+  return {
+    caption,
+    hashtags: defaultHashtags,
+    postType,
+    characterCount: caption.length,
+    fallback: true,
+  };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -210,7 +249,12 @@ REGRAS OBRIGATÓRIAS:
         throw new Error("Limite de requisições excedido. Aguarde alguns minutos.");
       }
       if (response.status === 402) {
-        throw new Error("Créditos insuficientes. Adicione créditos no workspace.");
+        console.warn("⚠️ Créditos insuficientes - usando fallback programático");
+        const fallbackCaption = generateFallbackCaption(topic, postType, mediaType);
+        return new Response(
+          JSON.stringify(fallbackCaption),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
       
       throw new Error(`Erro na API: ${response.status}`);
