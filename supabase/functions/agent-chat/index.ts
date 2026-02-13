@@ -2681,9 +2681,11 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
         }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
       }
       if (response.status === 402) {
+        // Return friendly message instead of error so chat doesn't break
         return new Response(JSON.stringify({ 
-          error: 'Créditos esgotados.' 
-        }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          response: '⚠️ Os créditos de IA estão esgotados no momento. Aguarde a renovação dos créditos para continuar usando o chat. Enquanto isso, você ainda pode usar a biblioteca de notícias e as ferramentas manuais da plataforma!',
+          actions: []
+        }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
       }
       throw new Error(`API error: ${response.status}`);
     }
