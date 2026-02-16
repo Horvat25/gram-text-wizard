@@ -901,12 +901,72 @@ async function createCarouselContent(
 }
 
 // Calculate news ranking score (0-100) for RSS items
+// PRIORIZA conteúdo de TECNOLOGIA, IA, INOVAÇÃO - penaliza off-topic
 function calculateNewsRankingScore(item: any): number {
-  let score = 50; // Base score
+  let score = 30; // Base score (lower to make tech bonus more impactful)
   
   const titleLower = (item.title || '').toLowerCase();
   const descLower = (item.description || '').toLowerCase();
   const combined = titleLower + ' ' + descLower;
+  
+  // ===== TECH RELEVANCE FILTER (most important) =====
+  // Core tech keywords (high priority) - +20 points each match (max 30)
+  const coreTechKeywords = [
+    'inteligência artificial', 'ia ', ' ia,', ' ia.', 'machine learning', 'deep learning',
+    'gpt', 'openai', 'chatgpt', 'gemini', 'claude', 'llm', 'modelo de linguagem',
+    'nvidia', 'chip', 'processador', 'semicondut', 'quantum', 'quântic',
+    'ciberseguranç', 'hacker', 'ransomware', 'dados pessoais', 'privacidade digital',
+    'robô', 'robot', 'automação', 'automat', 'algoritmo',
+    'blockchain', 'criptomoeda', 'bitcoin', 'ethereum', 'web3',
+    'realidade virtual', 'realidade aumentada', 'metaverso', 'vr ', ' ar ',
+    'spacex', 'foguete', 'satélite', 'starlink', '5g', '6g',
+    'programação', 'desenvolvedor', 'software', 'código', 'api',
+    'startup', 'fintech', 'healthtech', 'edtech', 'agritech',
+    'rede neural', 'visão computacional', 'nlp', 'processamento de linguagem'
+  ];
+  const coreTechMatches = coreTechKeywords.filter(kw => combined.includes(kw));
+  score += Math.min(30, coreTechMatches.length * 15);
+  
+  // Big tech companies (medium priority) - +10 points each (max 20)
+  const bigTechKeywords = [
+    'google', 'apple', 'microsoft', 'meta', 'amazon', 'tesla',
+    'samsung', 'intel', 'amd', 'qualcomm', 'ibm', 'oracle',
+    'elon musk', 'sam altman', 'mark zuckerberg', 'tim cook', 'satya nadella',
+    'alibaba', 'tencent', 'bytedance', 'tiktok', 'huawei'
+  ];
+  const bigTechMatches = bigTechKeywords.filter(kw => combined.includes(kw));
+  score += Math.min(20, bigTechMatches.length * 10);
+  
+  // General tech terms (lower priority) - +5 points each (max 15)
+  const generalTechKeywords = [
+    'tecnologia', 'inovação', 'digital', 'internet', 'aplicativo', 'app ',
+    'celular', 'smartphone', 'computador', 'notebook', 'gadget',
+    'lança', 'anuncia', 'revela', 'atualização', 'update',
+    'milhões', 'bilhões', 'recorde', 'primeiro', 'inédito', 'revolucion'
+  ];
+  const generalTechMatches = generalTechKeywords.filter(kw => combined.includes(kw));
+  score += Math.min(15, generalTechMatches.length * 5);
+  
+  // ===== PENALTY: Non-tech content (HEAVY penalty) =====
+  const nonTechKeywords = [
+    'novela', 'bbb', 'big brother', 'reality show', 'celebridade', 'fofoca',
+    'futebol', 'campeonato', 'seleção', 'gol ', 'copa ', 'libertadores',
+    'político', 'eleição', 'deputado', 'senador', 'presidente', 'congresso',
+    'netflix serie', 'temporada', 'episódio', 'anime', 'manga',
+    'triângulo amoroso', 'namoro', 'separação', 'casamento', 'romance',
+    'horóscopo', 'signo', 'astrolog', 'receita', 'culinária',
+    'moda', 'beleza', 'maquiagem', 'skincare', 'fitness',
+    'música', 'cantor', 'show', 'festival', 'álbum', 'clipe'
+  ];
+  const nonTechMatches = nonTechKeywords.filter(kw => combined.includes(kw));
+  if (nonTechMatches.length > 0) {
+    // Heavy penalty: -30 per match, but check if it's also tech-related
+    const isAlsoTech = coreTechMatches.length > 0 || bigTechMatches.length > 0;
+    if (!isAlsoTech) {
+      score -= nonTechMatches.length * 30; // Strong penalty for pure non-tech
+      console.log(`[AGENT] ⚠️ Non-tech penalty for: "${titleLower.substring(0, 50)}" (-${nonTechMatches.length * 30}pts)`);
+    }
+  }
   
   // Recency bonus (0-25 points)
   if (item.published_at) {
@@ -918,14 +978,6 @@ function calculateNewsRankingScore(item: any): number {
     else score += 5;
   }
   
-  // Viral/trending keywords bonus (0-15 points)
-  const viralKeywords = ['ia', 'inteligência artificial', 'gpt', 'openai', 'google', 'apple', 'nvidia', 
-    'elon musk', 'tesla', 'meta', 'microsoft', 'chatgpt', 'gemini', 'robô', 'robot',
-    'lança', 'anuncia', 'revela', 'urgente', 'breaking', 'exclusivo', 'viral',
-    'milhões', 'bilhões', 'recorde', 'primeiro', 'inédito', 'revolucion'];
-  const matchedKeywords = viralKeywords.filter(kw => combined.includes(kw));
-  score += Math.min(15, matchedKeywords.length * 5);
-  
   // Image quality bonus (0-10 points)
   if (item.has_image && item.image_url) {
     score += 10;
@@ -935,7 +987,7 @@ function calculateNewsRankingScore(item: any): number {
   if (item.description && item.description.length > 100) score += 5;
   else if (item.description && item.description.length > 50) score += 3;
   
-  return Math.min(100, score);
+  return Math.max(0, Math.min(100, score)); // Clamp 0-100
 }
 
 // Select best RSS item using ranking
@@ -1069,8 +1121,41 @@ async function createNewsContent(
       
       if (overlayResponse.ok) {
         const overlayResult = await overlayResponse.json();
-        imageUrl = overlayResult.publicUrl;
-        console.log('[AGENT] Overlay aplicado com sucesso, headline:', overlayResult.headline);
+        if (overlayResult.hasOverlay) {
+          imageUrl = overlayResult.publicUrl;
+          console.log('[AGENT] ✅ Overlay com headline aplicado:', overlayResult.headline);
+        } else {
+          // Overlay returned image but WITHOUT headline (e.g. 402 credits)
+          console.log('[AGENT] ⚠️ Overlay sem headline (créditos?), tentando add-watermark com headline...');
+          // Try add-watermark WITH the headline text
+          try {
+            const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                imageUrl: selectedImage,
+                watermarkText: 'Neural Update',
+                headlineText: overlayResult.headline || selectedArticle?.title
+              })
+            });
+            if (wmResponse.ok) {
+              const wmResult = await wmResponse.json();
+              if (wmResult.hasHeadline) {
+                imageUrl = wmResult.publicUrl;
+                console.log('[AGENT] ✅ Headline aplicada via add-watermark');
+              } else {
+                // add-watermark also failed to apply headline, use overlay's image
+                imageUrl = overlayResult.publicUrl;
+                console.log('[AGENT] ⚠️ add-watermark sem headline, usando imagem sem overlay');
+              }
+            } else {
+              imageUrl = overlayResult.publicUrl;
+            }
+          } catch (wmErr) {
+            console.log('[AGENT] add-watermark falhou:', wmErr);
+            imageUrl = overlayResult.publicUrl;
+          }
+        }
       } else {
         console.error('[AGENT] Overlay falhou (status:', overlayResponse.status, ')');
       }
@@ -1078,22 +1163,23 @@ async function createNewsContent(
       console.error('[AGENT] Erro ao aplicar overlay:', overlayErr);
     }
     
-    // FALLBACK 1: Use add-watermark if overlay failed (no AI credits needed)
+    // FALLBACK 1: Use add-watermark if overlay completely failed
     if (!imageUrl) {
-      console.log('[AGENT] Fallback: aplicando watermark programático...');
+      console.log('[AGENT] Fallback: aplicando watermark com headline...');
       try {
         const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
             imageUrl: selectedImage,
-            watermarkText: 'Neural Update'
+            watermarkText: 'Neural Update',
+            headlineText: selectedArticle?.title // Pass headline text!
           })
         });
         if (wmResponse.ok) {
           const wmResult = await wmResponse.json();
           imageUrl = wmResult.publicUrl;
-          console.log('[AGENT] Watermark programático aplicado ✅');
+          console.log('[AGENT] Watermark' + (wmResult.hasHeadline ? ' + headline' : '') + ' aplicado ✅');
         }
       } catch (wmErr) {
         console.log('[AGENT] Watermark também falhou:', wmErr);
