@@ -1844,35 +1844,30 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
       .eq('id', newsItem.id);
     
     // 8. Auto-publish with HUMAN DELAY if enabled
-    // Delay makes feed feel natural, avoiding bot detection patterns
+    // Instead of blocking the function (which causes chat timeouts), 
+    // we schedule the post for a few minutes from now using scheduled_for
     let publishStatus = '';
     let humanDelayMinutes = 0;
     
     if (autoPostEnabled && !scheduledForUTC) {
       // Generate pseudo-random delay (2-8 min)
       humanDelayMinutes = generateHumanDelay();
-      const delayMs = Math.round(humanDelayMinutes * 60 * 1000);
       
       console.log(`[RSS_NEWS_POST] Human delay: ${humanDelayMinutes} min before publishing...`);
       
-      // Wait for the delay before publishing (simulates human behavior)
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      // Schedule the post for X minutes from now instead of blocking
+      const publishAt = new Date(Date.now() + humanDelayMinutes * 60 * 1000);
       
-      console.log('[RSS_NEWS_POST] Delay complete. Auto-publishing now...');
+      await supabase
+        .from('posts')
+        .update({ 
+          status: 'scheduled',
+          scheduled_for: publishAt.toISOString()
+        })
+        .eq('id', post.id);
       
-      for (const platform of platforms) {
-        if (platform === 'instagram') {
-          const pubResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${serviceRoleKey}`
-            },
-            body: JSON.stringify({ postId: post.id })
-          });
-          publishStatus = pubResponse.ok ? '✅ Publicado no Instagram!' : '⚠️ Erro ao publicar';
-        }
-      }
+      publishStatus = `⏰ Agendado para publicar em ${humanDelayMinutes.toFixed(0)} minutos`;
+      console.log(`[RSS_NEWS_POST] Scheduled for ${publishAt.toISOString()} (${humanDelayMinutes.toFixed(1)} min from now)`);
     }
     
     const scheduleInfo = scheduledForUTC 
