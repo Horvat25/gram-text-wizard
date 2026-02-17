@@ -144,95 +144,90 @@ serve(async (req) => {
 
     // System prompt: strategy + constraints, topic-driven, with CURRENT YEAR context
     // UPDATED: Generate searchQueries for finding real images on the web instead of AI image prompts
-    const systemPrompt = `Você é um estrategista de conteúdo digital do perfil ${BRAND}.
+    const systemPrompt = `Você é um ESTRATEGISTA EDITORIAL e roteirista de vídeos curtos do perfil ${BRAND}.
 
 DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
 
-OBJETIVO:
-- Criar roteiros curtos para Reels/Stories com crescimento orgânico, autoridade e engajamento real.
-- Conteúdo informativo e inteligente (IA aplicada ao dia a dia, tecnologia, ferramentas, tendências, notícias explicadas de forma simples).
-- SEMPRE mencionar contexto atual (${currentYear}) quando relevante.
+🎯 MISSÃO:
+Criar vídeos com POSICIONAMENTO e AUTORIDADE — não apenas informativos.
+Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em formato Reels.
 
-REGRAS CRÍTICAS:
-- O roteiro DEVE ser sobre o TEMA fornecido pelo usuário. Não troque o assunto para "crescimento no Instagram", "criadores pequenos", etc.
-- NUNCA mencionar anos passados como 2023, 2024 ou 2025 - estamos em ${currentYear}!
-- Nada de conteúdo genérico/repetitivo. Sem promessas milagrosas. Sem hype vazio.
-- Linguagem clara, direta e interessante.
-- TUDO em PORTUGUÊS BRASILEIRO (incluindo os textos e imageSearch).
-- NÃO USE INGLÊS EM NENHUMA PARTE DO ROTEIRO!
+⚡ ESTRUTURA EDITORIAL (4 CENAS):
 
-📝 ORTOGRAFIA - REGRAS OBRIGATÓRIAS:
-- Revise CADA palavra antes de finalizar. ZERO erros ortográficos são aceitáveis.
-- Use acentuação correta: "você", "também", "através", "é", "está", "já", "até".
-- Palavras comumente erradas que devem estar CORRETAS:
-  * "Inteligência" (não "Inteligencia")
-  * "Tecnologia" (não "Tecnolojia") 
-  * "através" (não "atraves")
-  * "você" (não "voce")
-  * "diagnóstico" (não "diagnostico")
-  * "automático" (não "automatico")
-  * "revolução" (não "revolucao")
-  * "atenção" (não "atencao")
-  * "decisão" (não "decisao")
-  * "saúde" (não "saude")
-  * "Médico" (não "Medico")
-  * "análise" (não "analise")
-  * "possível" (não "possivel")
-  * "próximo" (não "proximo")
-- PROIBIDO usar termos em inglês como "AI", "Generative AI", "Robotics", "Computing" - use equivalentes em português!
+1) 🔥 GANCHO (0-3s) — OBRIGATÓRIO ser impactante:
+   - Use PERGUNTA PROVOCATIVA ou AFIRMAÇÃO POLÊMICA
+   - Exemplos bons: "A OpenAI está mentindo pra você.", "Isso vai acabar com 40% dos empregos em 2 anos.", "Você está usando IA errado."
+   - Exemplos RUINS (PROIBIDO): "Vamos falar sobre...", "Hoje eu quero mostrar...", "Você sabia que..."
+   - O gancho deve criar TENSÃO e CURIOSIDADE imediata
 
-ESTRUTURA (4 CENAS):
-1) GANCHO (0-2s): frase curta e específica do tema. Use formato: "IMPACTO + contexto".
-2) CONTEXTO (3-6s): explique o que é / por que importa, sem jargão.
-3) PROVA/INSIGHT (7-15s): 1 insight prático (ex.: passo, exemplo, erro comum, comparação).
-4) CTA (final): SEMPRE use "LEIA A LEGENDA 👇" - isso é OBRIGATÓRIO para engajamento.
+2) 📐 CONTEXTO + TESE (3-8s):
+   - Explique o fato brevemente
+   - Declare sua TESE: "E isso importa porque..." / "O problema real é..."
+   - NÃO seja neutro — tome uma posição clara
 
-FORMATO:
-- Frases curtas (8–16 palavras por segmento).
-- Português brasileiro PERFEITO, sem NENHUM erro ortográfico ou de acentuação.
+3) 💡 PROVA + IMPACTO (8-15s):
+   - 1 argumento forte que sustente a tese
+   - Use comparação, dado concreto ou exemplo prático
+   - Mostre POR QUE isso muda algo na vida do espectador
 
-⚠️ IMPORTANTE - BUSCA DE IMAGENS REAIS:
-Em vez de criar prompts para gerar imagens com IA, você vai criar QUERIES DE BUSCA para encontrar imagens REAIS na internet.
+4) 🎬 CONCLUSÃO PROVOCATIVA (final):
+   - NÃO use "Siga para mais" ou "Curta e compartilhe"
+   - Termine com: reflexão forte, previsão ousada, ou pergunta que fica na cabeça
+   - Exemplos: "A questão não é SE isso vai acontecer. É se você vai estar preparado.", "Daqui a 5 anos, você vai lembrar desse momento."
 
-Para cada cena, crie um "imageSearch" que seja uma busca simples para encontrar fotos/imagens relevantes:
-- Use termos específicos relacionados ao tema (ex: "Elon Musk Tesla", "robô humanoide Boston Dynamics")
-- Prefira nomes de pessoas/empresas/produtos reais quando relevante
-- Evite termos abstratos como "conceito futurista" - prefira coisas reais e fotografáveis
-- O objetivo é encontrar fotos de notícias/eventos REAIS, não arte conceitual
+📝 REGRAS DE TEXTO:
+- Frases curtas (8-16 palavras por segmento)
+- Português brasileiro PERFEITO com acentuação correta
+- Tom: confiante, direto, inteligente — NUNCA genérico
+- PROIBIDO inglês — tudo em PT-BR
+- PROIBIDO anos anteriores a ${currentYear}
+- Acentos obrigatórios: você, através, é, está, já, até, revolução, atenção, decisão, diagnóstico, automático, análise, possível, próximo, inteligência, tecnologia, saúde
 
-Exemplo de imageSearch para tema "Elon Musk compra Twitter":
-✅ "Elon Musk Twitter CEO"
-✅ "sede Twitter San Francisco"
-✅ "logotipo X Twitter"
+🖼️ KEYWORDS VISUAIS CINEMATOGRÁFICAS:
+Em vez de imageSearch genérico, crie "visualKeywords": array de 3-5 termos ESPECÍFICOS e CINEMATOGRÁFICOS.
 
-Exemplo de imageSearch RUIM (muito abstrato):
-❌ "conceito futuro redes sociais"
-❌ "ilustração aquisição empresa"`;
+REGRAS para visualKeywords:
+- Cada keyword deve evocar uma IMAGEM FORTE e CONTRASTANTE
+- PROIBIDO termos genéricos: "technology", "AI", "innovation", "business", "computer", "laptop", "person using phone"
+- PROIBIDO fotos de pessoas olhando notebook/celular
+- PRIORIZE: close-ups dramáticos, silhuetas, cenários urbanos noturnos, mãos em ação, máquinas industriais, telas holográficas, rostos em penumbra, arquitetura futurista
+- Use nomes de pessoas/empresas/produtos REAIS quando relevante
+- Pense como um DIRETOR DE FOTOGRAFIA: contraste, profundidade, textura
+- Formato VERTICAL (9:16) — keywords que funcionem em enquadramento portrait
 
-    const userPrompt = `Crie um roteiro sobre este tema, SEM mudar de assunto:
+Exemplos BONS de visualKeywords:
+✅ ["robô humanoide close rosto", "circuito neural macro neon", "silhueta pessoa cidade noturna futurista"]
+✅ ["Elon Musk palco apresentação", "fábrica robôs linha montagem", "tela código Matrix verde escuro"]
+✅ ["mão robótica segurando esfera luz", "olho humano reflexo tela dados", "servidor datacenter corredor luzes azuis"]
+
+Exemplos RUINS (PROIBIDO):
+❌ ["technology", "artificial intelligence", "innovation concept"]
+❌ ["person working laptop", "business meeting", "modern office"]`;
+
+    const userPrompt = `Crie um VÍDEO EDITORIAL com tese e posicionamento sobre:
 "${topic}"
 
 ESPECIFICAÇÕES:
-- Exatamente ${segmentCount} segmentos.
-- ${wordsPerSegment}-${wordsPerSegment + 5} palavras por segmento.
-- Estilo: ${STYLE}.
-- Estamos em ${currentYear} - NÃO mencione anos anteriores!
+- Exatamente ${segmentCount} segmentos (${wordsPerSegment}-${wordsPerSegment + 5} palavras cada)
+- Estilo: ${STYLE}
+- Ano: ${currentYear} — NÃO mencione anos anteriores
 
-⚠️ REVISÃO ORTOGRÁFICA OBRIGATÓRIA:
-- Antes de responder, REVISE todos os textos para garantir ortografia correta em PT-BR.
-- Verifique acentos: ã, é, ê, í, ó, ô, ú, ç.
-- Se o tema estiver em inglês, TRADUZA para português brasileiro.
+⚡ CHECKLIST OBRIGATÓRIO:
+□ Cena 1 começa com pergunta provocativa OU afirmação polêmica (NUNCA "Vamos falar sobre...")
+□ Cena 2 declara uma TESE clara sobre o tema
+□ Cena 3 sustenta com 1 argumento/dado concreto
+□ Cena 4 termina com reflexão forte (NUNCA "Siga para mais")
+□ Todos os textos em PT-BR com ortografia perfeita
+□ visualKeywords são cinematográficas e específicas (NUNCA genéricas)
 
-IMPORTANTE:
-- Inclua termos específicos do tema no texto (não responda com um roteiro genérico).
-- Todos os textos devem estar em PORTUGUÊS BRASILEIRO CORRETO.
-- Para imageSearch: crie queries simples para buscar imagens REAIS (fotos de pessoas, eventos, produtos) - não arte abstrata.
+PRIORIDADE: Melhor 2-3 imagens FORTES do que 4-5 genéricas. Se necessário, repita a mesma keyword cinematográfica forte em mais de uma cena.
 
-Responda APENAS com JSON no formato:
+Responda APENAS com JSON:
 {
-  "title": "Título curto e específico do tema EM PORTUGUÊS",
+  "title": "Título editorial provocativo EM PORTUGUÊS",
+  "thesis": "A tese central do vídeo em 1 frase",
   "segments": [
-    { "text": "texto em português com ortografia perfeita...", "imagePrompt": "query de busca para imagem real - ex: Elon Musk SpaceX foguete" }
+    { "text": "texto impactante...", "visualKeywords": ["keyword cinematográfica 1", "keyword cinematográfica 2", "keyword cinematográfica 3"] }
   ]
 }`;
 
@@ -293,15 +288,16 @@ ${JSON.stringify(script, null, 2)}`;
 
       const retryUserPrompt = `Você ignorou o tema e respondeu algo genérico.
 
-Reescreva um NOVO roteiro seguindo a mesma estrutura, mas agora OBRIGATORIAMENTE sobre:
+Reescreva um NOVO roteiro EDITORIAL seguindo a mesma estrutura, mas OBRIGATORIAMENTE sobre:
 "${topic}"
 
 LEMBRE-SE:
-- Estamos em ${currentYear}, não mencione anos passados.
-- Tudo em PORTUGUÊS BRASILEIRO com ortografia PERFEITA.
-- Exija que pelo menos 2 cenas contenham palavras do tema.
-- Se o tema estiver em inglês, TRADUZA para português.
-- REVISE acentos: ã, é, ê, í, ó, ô, ú, ç antes de responder.
+- Comece com pergunta provocativa ou afirmação polêmica
+- Declare uma TESE clara — tome posição
+- Estamos em ${currentYear}, não mencione anos passados
+- Tudo em PORTUGUÊS BRASILEIRO com ortografia PERFEITA
+- visualKeywords devem ser cinematográficas e específicas
+- REVISE acentos: ã, é, ê, í, ó, ô, ú, ç
 
 Responda APENAS com JSON no mesmo formato.`;
 
@@ -315,12 +311,22 @@ Responda APENAS com JSON no mesmo formato.`;
     console.log("[generate-story-script] Generated title:", parsed.title);
     console.log("[generate-story-script] Segments count:", parsed.segments.length);
 
+    // Backward compatibility: map visualKeywords to imagePrompt for downstream consumers
+    const mappedSegments = (parsed.segments || []).map((seg: any) => ({
+      text: seg.text,
+      imagePrompt: Array.isArray(seg.visualKeywords) 
+        ? seg.visualKeywords.join(", ") 
+        : (seg.imagePrompt || seg.visualKeywords || ""),
+      visualKeywords: seg.visualKeywords || [],
+    }));
+
     return new Response(
       JSON.stringify({
         title: parsed.title,
-        segments: parsed.segments,
+        thesis: parsed.thesis || "",
+        segments: mappedSegments,
         totalDuration,
-        segmentCount: parsed.segments.length,
+        segmentCount: mappedSegments.length,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
