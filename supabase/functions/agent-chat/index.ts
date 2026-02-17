@@ -939,55 +939,78 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
   console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
   
   try {
-    // Step 1: Generate the story script using AI
-    const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-      },
-      body: JSON.stringify({
-        topic,
-        segmentCount: 4,
-        wordsPerSegment: 12,
-        totalDuration: 20,
-        style: style || 'impactante e provocativo'
-      })
-    });
+    // Step 1: Generate the story script using AI (with local fallback)
+    let script: any = null;
     
-    if (!scriptResponse.ok) {
-      const errorText = await scriptResponse.text();
-      console.error('Script generation failed:', errorText);
-      return { success: false, message: `❌ Erro ao gerar roteiro: ${errorText}` };
+    try {
+      const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+        },
+        body: JSON.stringify({
+          topic,
+          segmentCount: 4,
+          wordsPerSegment: 12,
+          totalDuration: 20,
+          style: style || 'impactante e provocativo'
+        })
+      });
+      
+      if (scriptResponse.ok) {
+        script = await scriptResponse.json();
+        console.log('Script generated via AI:', script.title, '- Segments:', script.segments?.length);
+      } else {
+        console.warn('Script generation failed (possibly no credits), using local fallback');
+      }
+    } catch (e) {
+      console.warn('Script generation error, using local fallback:', e);
     }
     
-    const script = await scriptResponse.json();
-    console.log('Script generated:', script.title, '- Segments:', script.segments?.length);
+    // FALLBACK: Generate local script template when AI credits are exhausted
+    if (!script || !script.segments || script.segments.length === 0) {
+      console.log('[VIDEO] Using LOCAL script fallback for topic:', topic);
+      const topicClean = topic.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').trim();
+      script = {
+        title: `${topicClean}: O Que Você Precisa Saber`,
+        segments: [
+          { text: `${topicClean} está mudando tudo que conhecemos sobre tecnologia.`, imagePrompt: `${topicClean} futuristic technology concept` },
+          { text: `Especialistas apontam avanços impressionantes nessa área.`, imagePrompt: `${topicClean} innovation breakthrough` },
+          { text: `As implicações para o futuro são enormes e irreversíveis.`, imagePrompt: `${topicClean} future impact society` },
+          { text: `Fique por dentro. Siga Neural Update para mais.`, imagePrompt: `technology news social media follow` },
+        ],
+        totalDuration: 20,
+        _fallback: true,
+      };
+    }
     
-    // Step 2: Generate image for first segment as thumbnail
+    // Step 2: Get thumbnail from Pexels (FREE, no AI credits needed)
     let thumbnailUrl = null;
     if (script.segments && script.segments.length > 0) {
       try {
-        const imageResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-image`, {
+        // Use search-images-for-video which uses Pexels/Unsplash (FREE)
+        const imgSearchResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
           },
           body: JSON.stringify({
-            prompt: `${script.segments[0].imagePrompt}. Cinematic style, high quality, 9:16 vertical aspect ratio for Instagram Reels.`,
-            format: 'portrait',
-            model: 'gemini'
+            topic: topic,
+            segments: [script.segments[0]],
           })
         });
         
-        if (imageResponse.ok) {
-          const imageResult = await imageResponse.json();
-          thumbnailUrl = imageResult.imageUrl;
-          console.log('Thumbnail generated:', thumbnailUrl);
+        if (imgSearchResponse.ok) {
+          const imgResult = await imgSearchResponse.json();
+          if (imgResult.images && imgResult.images.length > 0) {
+            thumbnailUrl = imgResult.images[0].imageUrl;
+            console.log('Thumbnail from stock photos:', thumbnailUrl);
+          }
         }
       } catch (imgError) {
-        console.error('Thumbnail generation failed:', imgError);
+        console.error('Thumbnail search failed:', imgError);
       }
     }
     
@@ -2682,8 +2705,9 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
       }
       if (response.status === 402) {
         // Return friendly message instead of error so chat doesn't break
+        // CRITICAL: use 'content' key (not 'response') to match frontend expectations
         return new Response(JSON.stringify({ 
-          response: '⚠️ Os créditos de IA estão esgotados no momento. Aguarde a renovação dos créditos para continuar usando o chat. Enquanto isso, você ainda pode usar a biblioteca de notícias e as ferramentas manuais da plataforma!',
+          content: '⚠️ Os créditos de IA estão esgotados no momento. Aguarde a renovação dos créditos para continuar usando o chat. Enquanto isso, você ainda pode usar a biblioteca de notícias e as ferramentas manuais da plataforma!',
           actions: []
         }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
       }
