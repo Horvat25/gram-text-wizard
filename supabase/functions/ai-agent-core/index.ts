@@ -403,8 +403,10 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     contentType: state.nextContentType
   };
   
-  // Use AI to refine the theme based on trends
-  const systemPrompt = `Você é um especialista em conteúdo tech. 
+  // For 'news' type: skip AI theme refinement - the RSS ranking already picks the best article
+  // This saves 1 AI call per news post (significant cost reduction)
+  if (state.nextContentType !== 'news') {
+    const systemPrompt = `Você é um especialista em conteúdo tech. 
 O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType.format}).
 
 PROGRESSO SEMANAL:
@@ -421,40 +423,43 @@ CONTEXTO:
 Sugira um tema ESPECÍFICO e atual para o ${state.nextContentType}.
 Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
 
-  try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-lite', // Use lite for speed
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Crie um tema para ${state.nextContentType}. JSON only.` }
-        ],
-        response_format: { type: 'json_object' }
-      })
-    });
+    try {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash-lite',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Crie um tema para ${state.nextContentType}. JSON only.` }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
 
-    if (response.ok) {
-      const result = await response.json();
-      const content = result.choices?.[0]?.message?.content;
-      if (content) {
-        try {
-          const themeData = JSON.parse(content);
-          contentPlan.theme = themeData.theme || contentPlan.theme;
-          contentPlan.cta = themeData.cta || contentPlan.cta;
-          contentPlan.tone = themeData.tone || contentPlan.tone;
-          console.log('[AGENT] Tema refinado pela IA:', contentPlan.theme);
-        } catch {
-          console.log('[AGENT] Usando tema padrão');
+      if (response.ok) {
+        const result = await response.json();
+        const content = result.choices?.[0]?.message?.content;
+        if (content) {
+          try {
+            const themeData = JSON.parse(content);
+            contentPlan.theme = themeData.theme || contentPlan.theme;
+            contentPlan.cta = themeData.cta || contentPlan.cta;
+            contentPlan.tone = themeData.tone || contentPlan.tone;
+            console.log('[AGENT] Tema refinado pela IA:', contentPlan.theme);
+          } catch {
+            console.log('[AGENT] Usando tema padrão');
+          }
         }
       }
+    } catch (e) {
+      console.log('[AGENT] Erro ao refinar tema, usando padrão:', e);
     }
-  } catch (e) {
-    console.log('[AGENT] Erro ao refinar tema, usando padrão:', e);
+  } else {
+    console.log('[AGENT] Tipo "news": tema definido pelo RSS ranking (sem chamada de IA extra)');
   }
 
   // Return decision with content plan (no need for another AI call - we already decided based on distribution)
