@@ -42,16 +42,21 @@ async function downloadImage(imageUrl: string): Promise<{ data: Uint8Array; cont
 }
 
 /**
- * SPELLING CORRECTION AGENT
- * Uses Gemini Flash Lite to correct Portuguese spelling in headlines
- * This ensures zero spelling errors in the final output
+ * Generate headline text using LLM - single call with built-in spelling correction
+ * Eliminates the separate spelling correction call (saves 1 AI call per post)
  */
-async function correctSpellingWithAI(
-  text: string, 
+async function generateHeadlineText(
+  title: string, 
   lovableApiKey: string
 ): Promise<string> {
-  console.log("[apply-text-overlay] Running spelling correction on:", text);
+  console.log("[apply-text-overlay] Generating headline text via LLM...");
   
+  // Deterministic fallback: just shorten the title cleanly (no AI needed)
+  const simpleFallback = (t: string) => {
+    const cleaned = t.replace(/\s*[:\-–|]\s*.+$/, '').trim(); // remove subtitle
+    return cleaned.length > 65 ? cleaned.substring(0, 62).replace(/\s\S+$/, '') + '...' : cleaned;
+  };
+
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -64,140 +69,68 @@ async function correctSpellingWithAI(
         messages: [
           {
             role: "system",
-            content: `Você é um revisor ortográfico rigoroso de português brasileiro.
+            content: `Você é um editor de headlines para notícias virais de tecnologia no Instagram.
 
-TAREFA: Corrija TODOS os erros ortográficos e de acentuação no texto fornecido.
+TAREFA: Transforme o título da notícia em uma HEADLINE curta, impactante e 100% correta em PT-BR.
 
-REGRAS OBRIGATÓRIAS:
-- Corrija acentos faltando: você (não voce), através (não atraves), é, está, já, até
-- Corrija palavras comuns:
-  * "Inteligência" (não Inteligencia)
-  * "revolução" (não revolucao)  
-  * "você" (não voce/vouê)
-  * "conhece" (não connee/conece)
-  * "finalmente" (não finalment)
-  * "entendeu" (não entended/entendeo)
-  * "diagnóstico" (não diagnostico)
-  * "automático" (não automatico)
-  * "atenção" (não atencao)
-  * "decisão" (não decisao)
-  * "análise" (não analise)
-  * "possível" (não possivel)
-  * "próximo" (não proximo)
-- Traduza termos em inglês para português: AI→IA, Robotics→Robótica
-- NÃO altere o significado ou estrutura
-- Responda APENAS com o texto corrigido, sem explicações`
+REGRAS DE GERAÇÃO:
+- Máximo 8-10 palavras
+- Use TENSÃO IMPLÍCITA para gerar curiosidade
+- Estilo: profissional, direto, impactante
+- NÃO use emojis nem pontuação excessiva
+- NÃO inclua aspas na resposta
+
+ACENTUAÇÃO OBRIGATÓRIA (revise antes de responder):
+- você (NUNCA voce/vouê)
+- Inteligência (NUNCA Inteligencia)
+- IA (NUNCA "AI")
+- revolução, atenção, decisão, ação (sempre com acento)
+- através, análise, possível, próximo, automático (sempre com acento)
+- é, está, já, até, então (sempre com acento)
+
+EXEMPLOS CORRETOS:
+✅ "OpenAI Revela GPT-5 e Muda Tudo"
+✅ "Apple Compra Startup de IA por US$ 1 Bilhão"  
+✅ "Meta Fecha Acordo Bilionário com Nvidia para Chips de IA"
+✅ "Antártida Revela 23 Milhões de Anos de História Climática"
+
+Responda APENAS com o texto da headline, sem explicações.`
           },
           {
             role: "user",
-            content: `Corrija este texto: "${text}"`
+            content: `Notícia: "${title}"`
           }
         ],
-        max_tokens: 200,
-        temperature: 0.1 // Low temperature for precision
+        max_tokens: 80,
+        temperature: 0.5
       }),
     });
 
     if (!response.ok) {
-      console.warn("[spelling-correction] AI failed, using original:", response.status);
-      return text;
+      console.warn("[generateHeadlineText] LLM error:", response.status, "- using fallback");
+      return simpleFallback(title);
     }
 
     const data = await response.json();
-    const corrected = data.choices?.[0]?.message?.content?.trim() || text;
+    let headline = data.choices?.[0]?.message?.content?.trim() || '';
     
-    // Clean up the response (remove quotes if present)
-    const cleaned = corrected
-      .replace(/^["']|["']$/g, '')
-      .replace(/^Texto corrigido:\s*/i, '')
+    if (!headline) {
+      return simpleFallback(title);
+    }
+
+    // Clean up the headline (remove surrounding quotes the model sometimes adds)
+    headline = headline
+      .replace(/^["'"'«»]|["'"'«»]$/g, '')
+      .replace(/\n/g, ' ')
       .trim();
     
-    console.log("[spelling-correction] Original:", text);
-    console.log("[spelling-correction] Corrected:", cleaned);
-    
-    return cleaned;
+    console.log("[apply-text-overlay] Generated headline:", headline);
+    return headline;
+
   } catch (error) {
-    console.warn("[spelling-correction] Error, using original:", error);
-    return text;
+    console.warn("[generateHeadlineText] Error, using fallback:", error);
+    return simpleFallback(title);
   }
-}
-
-/**
- * Generate headline text using LLM - IA GERA APENAS O TEXTO
- * Then applies spelling correction
- */
-async function generateHeadlineText(
-  title: string, 
-  lovableApiKey: string
-): Promise<string> {
-  console.log("[apply-text-overlay] Generating headline text via LLM...");
-  
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${lovableApiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash-lite",
-      messages: [
-        {
-          role: "system",
-          content: `Você é um editor de headlines para notícias virais de tecnologia no Instagram.
-
-REGRAS:
-- Crie uma headline CURTA e IMPACTANTE (máximo 8-10 palavras)
-- Use TENSÃO IMPLÍCITA para gerar curiosidade
-- Português brasileiro PERFEITO, sem NENHUM erro ortográfico
-- NÃO use emojis
-- NÃO use pontuação excessiva
-- Estilo: profissional, direto, impactante
-
-REVISÃO ORTOGRÁFICA OBRIGATÓRIA:
-- "você" (não voce/vouê)
-- "Inteligência" (não Inteligencia)
-- "revolução" (não revolucao)
-- "através" (não atraves)
-- "conhece" (não connee)
-- "finalmente" (não finalment/finalement)
-- "entendeu" (não entended/entendeo)
-
-EXEMPLOS CORRETOS:
-- "OpenAI Revela GPT-5 e Muda Tudo"
-- "Apple Compra Startup de IA por US$ 1 Bilhão"
-- "Brasil Lidera Adoção de IA na América Latina"
-- "Elon Musk Anuncia Mudanças Radicais no X"`
-        },
-        {
-          role: "user",
-          content: `Crie uma headline impactante para esta notícia: "${title}". Responda APENAS com o texto da headline, nada mais.`
-        }
-      ],
-      max_tokens: 100,
-      temperature: 0.7
-    }),
-  });
-
-  if (!response.ok) {
-    console.warn("[generateHeadlineText] LLM error:", response.status);
-    // Fallback: use title directly
-    return title.length > 60 ? title.substring(0, 57) + '...' : title;
-  }
-
-  const data = await response.json();
-  let headline = data.choices?.[0]?.message?.content?.trim() || title;
-  
-  // Clean up the headline
-  headline = headline
-    .replace(/^["']|["']$/g, '') // Remove quotes
-    .replace(/\n/g, ' ')
-    .trim();
-  
-  // Apply spelling correction as final step
-  headline = await correctSpellingWithAI(headline, lovableApiKey);
-  
-  console.log("[apply-text-overlay] Final headline:", headline);
-  return headline;
 }
 
 /**
@@ -328,14 +261,12 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // STEP 1: Generate or use provided headline text
+    // STEP 1: Generate or use provided headline text (single AI call with built-in spelling)
     let headlineText = providedHeadline || effectiveTitle;
     if (generateHeadline && title) {
       headlineText = await generateHeadlineText(title, lovableApiKey);
-    } else {
-      // Apply spelling correction to provided text
-      headlineText = await correctSpellingWithAI(headlineText, lovableApiKey);
     }
+    // No separate spelling correction call - generateHeadlineText already handles it inline
 
     // STEP 2: Download the external image
     console.log("[apply-text-overlay] Downloading external image...");
