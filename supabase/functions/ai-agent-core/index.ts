@@ -502,8 +502,29 @@ async function executeContentPlan(
   
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
-    case 'video':
-      return createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+    case 'video': {
+      // For video content, fetch the best RSS item to use as article context
+      // This enables intelligent real-image curation instead of generic stock photos
+      let rssArticle: { url: string; title: string; description?: string } | undefined;
+      try {
+        const bestItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
+        if (bestItem?.item) {
+          rssArticle = {
+            url: bestItem.item.link,
+            title: bestItem.item.title,
+            description: bestItem.item.description || '',
+          };
+          // Update plan theme to match the actual news article
+          plan.theme = bestItem.item.title;
+          console.log(`[AGENT] Video usando artigo RSS: ${rssArticle.title}`);
+          // Mark as used so it won't be reused
+          await supabase.from('rss_items').update({ is_used: true }).eq('id', bestItem.item.id);
+        }
+      } catch (e) {
+        console.log('[AGENT] Sem artigo RSS para video, usando tema genérico:', e);
+      }
+      return createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+    }
     case 'carousel':
       return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'news':
@@ -523,109 +544,85 @@ async function createVideoContent(
   workspaceId: string,
   supabaseUrl: string,
   headers: any,
-  autoPublish: boolean = false
+  autoPublish: boolean = false,
+  rssArticle?: { url: string; title: string; description?: string } // Optional RSS article context
 ): Promise<any> {
   console.log('[AGENT] Criando vídeo/reels:', plan.theme);
   
-  // STEP 1: Get THEMED images using search-images-for-video (Pexels/Unsplash)
   const images: string[] = [];
   const titles: string[] = [];
-  
-  // First, search for theme-related images from Pexels/Unsplash
-  console.log('[AGENT] Buscando imagens temáticas para vídeo:', plan.theme);
-  try {
-    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        query: plan.theme,
-        limit: 6,
-        orientation: 'portrait'
-      })
-    });
-    
-    if (searchResponse.ok) {
-      const searchResult = await searchResponse.json();
-      if (searchResult.images && searchResult.images.length > 0) {
-        for (const img of searchResult.images.slice(0, 4)) {
-          const imgUrl = img.imageUrl || img.url || img;
-          if (imgUrl && typeof imgUrl === 'string') {
-            images.push(imgUrl);
-            titles.push(plan.theme);
-          }
-        }
-        console.log(`[AGENT] ${images.length} imagens temáticas encontradas via Pexels/Unsplash`);
-      }
-    }
-  } catch (e) {
-    console.log('[AGENT] Erro na busca temática:', e);
-  }
-  
-  // Fallback: If not enough themed images, supplement with RSS library
-  if (images.length < 3) {
-    console.log('[AGENT] Complementando com imagens da biblioteca RSS...');
+
+  // STEP 1: Use INTELLIGENT image curation if we have article context
+  // Otherwise fall back to generic Pexels/Unsplash search
+  const hasArticleContext = rssArticle?.url || rssArticle?.title;
+
+  if (hasArticleContext) {
+    console.log('[AGENT] 🎯 INTELLIGENT MODE: Curating 4 real news images from article:', rssArticle!.title);
     try {
-      await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
+      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ workspaceId, userId, limit: 30 })
+        body: JSON.stringify({
+          useArticleMode: true,
+          articleUrl: rssArticle!.url || null,
+          articleTitle: rssArticle!.title,
+          articleDescription: rssArticle!.description || '',
+          topic: rssArticle!.title,
+        })
       });
-    } catch (e) {
-      console.log('[AGENT] Erro ao atualizar RSS:', e);
-    }
-    
-    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    const { data: rssItems } = await supabase
-      .from('rss_items')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .eq('is_used', false)
-      .eq('has_image', true)
-      .gte('published_at', twoDaysAgo)
-      .order('published_at', { ascending: false })
-      .limit(20);
-    
-    if (rssItems && rssItems.length > 0) {
-      // Filter by theme keywords if possible
-      const themeWords = plan.theme.toLowerCase().split(' ').filter(w => w.length > 3);
-      const themeMatched = rssItems.filter((item: any) => {
-        const titleLower = (item.title || '').toLowerCase();
-        return themeWords.some(w => titleLower.includes(w));
-      });
-      
-      // Use theme-matched first, then fall back to scored
-      const itemsToUse = themeMatched.length > 0 ? themeMatched : rssItems;
-      const scored = itemsToUse.map((item: any) => ({
-        item,
-        score: calculateNewsRankingScore(item)
-      })).sort((a: any, b: any) => b.score - a.score);
-      
-      const needed = 4 - images.length;
-      for (const { item } of scored.slice(0, needed)) {
-        if (item.image_url) {
-          try {
-            const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ imageUrl: item.image_url })
-            });
-            if (uploadResponse.ok) {
-              const uploadResult = await uploadResponse.json();
-              if (uploadResult.publicUrl) {
-                images.push(uploadResult.publicUrl);
-                titles.push(item.title);
-              }
+
+      if (searchResponse.ok) {
+        const searchResult = await searchResponse.json();
+        if (searchResult.images && searchResult.images.length > 0) {
+          for (const img of searchResult.images) {
+            const imgUrl = img.imageUrl || img.url;
+            if (imgUrl && typeof imgUrl === 'string') {
+              images.push(imgUrl);
+              titles.push(rssArticle!.title);
             }
-          } catch (e) {
-            console.log('[AGENT] Erro upload imagem video:', e);
           }
+          console.log(`[AGENT] ✅ ${images.length} imagens inteligentes curadas (fontes: ${JSON.stringify(searchResult.stats)})`);
         }
-        await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
       }
+    } catch (e) {
+      console.log('[AGENT] Erro na curadoria inteligente, usando busca genérica:', e);
     }
   }
-  
-  console.log(`[AGENT] Total de imagens da biblioteca para vídeo: ${images.length}`);
+
+  // Fallback: Generic Pexels/Unsplash search (for non-article videos or if intelligent mode failed)
+  if (images.length < 3) {
+    const fallbackQuery = plan.theme;
+    console.log(`[AGENT] Busca genérica (Pexels/Unsplash): "${fallbackQuery}"`);
+    try {
+      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          query: fallbackQuery,
+          usedImageIds: images.map((_, i) => `used_${i}`), // avoid reuse
+        })
+      });
+
+      if (searchResponse.ok) {
+        const searchResult = await searchResponse.json();
+        if (searchResult.images && searchResult.images.length > 0) {
+          const needed = 4 - images.length;
+          for (const img of searchResult.images.slice(0, needed)) {
+            const imgUrl = img.imageUrl || img.url || img;
+            if (imgUrl && typeof imgUrl === 'string' && !images.includes(imgUrl)) {
+              images.push(imgUrl);
+              titles.push(plan.theme);
+            }
+          }
+          console.log(`[AGENT] ${images.length} imagens após fallback genérico`);
+        }
+      }
+    } catch (e) {
+      console.log('[AGENT] Erro na busca genérica:', e);
+    }
+  }
+
+  console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
   
   // STEP 2: Gerar caption
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {

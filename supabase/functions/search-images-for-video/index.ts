@@ -7,10 +7,106 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ============= TRANSLATE QUERY TO ENGLISH (for better Pexels results) =============
-async function translateToEnglish(query: string): Promise<string> {
-  const lovableKey = Deno.env.get('LOVABLE_API_KEY');
-  if (!lovableKey) return query;
+// ============= SCRAPE ARTICLE VIA FIRECRAWL =============
+async function scrapeArticle(url: string, firecrawlKey: string): Promise<{
+  title: string;
+  description: string;
+  ogImage: string | null;
+  images: string[];
+  content: string;
+} | null> {
+  if (!url || !firecrawlKey) return null;
+
+  try {
+    const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${firecrawlKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url,
+        formats: ['markdown', 'html'],
+        onlyMainContent: false,
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    const result = data.data || data;
+
+    const html = result.html || '';
+    const markdown = result.markdown || '';
+    const metadata = result.metadata || {};
+
+    // Extract OG image (most reliable)
+    const ogImage = metadata.ogImage || metadata.og?.image || null;
+
+    // Extract all images from HTML
+    const images: string[] = [];
+    if (ogImage) images.push(ogImage);
+
+    // Parse srcset and img src from HTML
+    const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+    let imgMatch;
+    while ((imgMatch = imgRegex.exec(html)) !== null) {
+      const src = imgMatch[1];
+      if (src.startsWith('http') && !src.includes('icon') && !src.includes('logo') &&
+          !src.includes('1x1') && !src.includes('pixel') && !images.includes(src)) {
+        images.push(src);
+      }
+    }
+
+    // Extract from markdown
+    const mdImgRegex = /!\[.*?\]\((https?:\/\/[^\s)]+)\)/gi;
+    let mdMatch;
+    while ((mdMatch = mdImgRegex.exec(markdown)) !== null) {
+      const url = mdMatch[1];
+      if (!images.includes(url) && !url.includes('icon') && !url.includes('logo')) {
+        images.push(url);
+      }
+    }
+
+    return {
+      title: metadata.title || '',
+      description: metadata.description || '',
+      ogImage,
+      images: images.slice(0, 5),
+      content: markdown.slice(0, 3000),
+    };
+  } catch (e) {
+    console.warn('[images] Firecrawl scrape failed:', e);
+    return null;
+  }
+}
+
+// ============= EXTRACT ENTITIES FROM ARTICLE =============
+async function extractEntities(title: string, content: string, lovableKey: string): Promise<{
+  companies: string[];
+  products: string[];
+  technologies: string[];
+  people: string[];
+  searchQueries: {
+    image1: string; // Primary - article main subject
+    image2: string; // Product/technology specific
+    image3: string; // Context - event or demo
+    image4: string; // Strategic complement
+  };
+}> {
+  const defaultResult = {
+    companies: [],
+    products: [],
+    technologies: [],
+    people: [],
+    searchQueries: {
+      image1: title,
+      image2: title + ' product launch',
+      image3: title + ' event announcement',
+      image4: title + ' impact future',
+    }
+  };
+
+  if (!lovableKey) return defaultResult;
 
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -23,28 +119,89 @@ async function translateToEnglish(query: string): Promise<string> {
         model: "google/gemini-2.5-flash-lite",
         messages: [{
           role: "user",
-          content: `Translate this image search query to English. Return ONLY the translated query, nothing else. Keep proper nouns as-is. Make it a good stock photo search query (2-4 words).
+          content: `You are a news image researcher. Analyze this article and extract entities + generate 4 specific image search queries in ENGLISH for finding real news photos.
 
-Query: "${query}"`
+ARTICLE TITLE: ${title}
+CONTENT: ${content.slice(0, 1500)}
+
+Generate search queries following this narrative logic:
+- image1: Main subject of the news (most specific, use real names/brands)
+- image2: Product or technology mentioned (e.g. "Apple iPhone 16 Pro official photo")
+- image3: Context - event, demo, or environment where this happened (e.g. "CES 2025 keynote stage")
+- image4: Strategic complement - CEO, headquarters, competitor comparison, or visual impact
+
+Rules for queries:
+- Use REAL proper nouns (company names, product names, person names)
+- Add "official" or "press release" when searching for brand images  
+- For people: use "full name speaking" or "full name interview"
+- For events: use event name + year
+- NEVER use generic terms like "technology", "innovation", "business meeting"
+- Maximum 5 words per query
+
+Respond ONLY with JSON:
+{
+  "companies": ["Company1", "Company2"],
+  "products": ["Product1"],
+  "technologies": ["Tech1"],
+  "people": ["Person Name"],
+  "searchQueries": {
+    "image1": "specific query for main subject",
+    "image2": "specific query for product/tech",
+    "image3": "specific query for context/event",
+    "image4": "specific query for complement"
+  }
+}`
         }],
       }),
     });
 
-    if (!response.ok) return query;
+    if (!response.ok) return defaultResult;
     const data = await response.json();
-    const translated = data.choices?.[0]?.message?.content?.trim();
-    if (translated && translated.length > 2 && translated.length < 100) {
-      console.log(`[images] Translated: "${query}" → "${translated}"`);
-      return translated;
-    }
-    return query;
-  } catch {
-    return query;
+    let content2 = data.choices?.[0]?.message?.content?.trim() || '';
+    content2 = content2.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    const parsed = JSON.parse(content2);
+    console.log('[images] Entities extracted:', JSON.stringify(parsed.searchQueries));
+    return parsed;
+  } catch (e) {
+    console.warn('[images] Entity extraction failed:', e);
+    return defaultResult;
   }
 }
 
-// ============= PEXELS (per-segment search) =============
-async function searchPexels(query: string, limit: number = 3): Promise<{ url: string; sourceId: string }[]> {
+// ============= VALIDATE IMAGE RELEVANCE =============
+async function validateImageRelevance(
+  imageUrl: string,
+  query: string,
+  entities: string[],
+  lovableKey: string
+): Promise<boolean> {
+  // Basic URL validation - check if domain matches entity names
+  const urlLower = imageUrl.toLowerCase();
+  const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 3);
+
+  // Auto-approve official domains and known press image CDNs
+  const trustedCdns = ['images.apple.com', 'newsroom.apple.com', 'static01.nyt', 
+    'media.wired', 'techcrunch.com', 'arstechnica.net', 'cdn.vox-cdn',
+    'images.macrumors', 'assets.bwbx.io', 'image.cnbc', 'zdnet', 'verge',
+    'engadget', 'theguardian', 'reuters', 'apnews', 'bloomberg'];
+  
+  if (trustedCdns.some(cdn => urlLower.includes(cdn))) return true;
+
+  // Check if entity names appear in the URL path (good signal)
+  const entitiesInUrl = entities.some(e => urlLower.includes(e.toLowerCase().replace(' ', '')));
+  if (entitiesInUrl) return true;
+
+  // Reject obviously irrelevant: ads, tracking, tiny images
+  const rejected = ['ads', 'tracking', 'banner', 'sponsor', 'promo', 'pixel', 
+                    'avatar', '1x1', 'favicon', 'icon', 'badge'];
+  if (rejected.some(r => urlLower.includes(r))) return false;
+
+  return true; // Default: accept
+}
+
+// ============= SEARCH PEXELS =============
+async function searchPexels(query: string, limit: number = 5): Promise<{ url: string; sourceId: string }[]> {
   const apiKey = Deno.env.get('PEXELS_API_KEY');
   if (!apiKey) return [];
 
@@ -54,7 +211,6 @@ async function searchPexels(query: string, limit: number = 3): Promise<{ url: st
       { headers: { 'Authorization': apiKey } }
     );
     if (!response.ok) return [];
-
     const data = await response.json();
     return (data.photos || []).map((p: any) => ({
       url: p.src?.large2x || p.src?.large || p.src?.original,
@@ -65,8 +221,8 @@ async function searchPexels(query: string, limit: number = 3): Promise<{ url: st
   }
 }
 
-// ============= UNSPLASH (fallback per-segment) =============
-async function searchUnsplash(query: string, limit: number = 3): Promise<{ url: string; sourceId: string }[]> {
+// ============= SEARCH UNSPLASH =============
+async function searchUnsplash(query: string, limit: number = 5): Promise<{ url: string; sourceId: string }[]> {
   const accessKey = Deno.env.get('UNSPLASH_ACCESS_KEY');
   if (!accessKey) return [];
 
@@ -76,7 +232,6 @@ async function searchUnsplash(query: string, limit: number = 3): Promise<{ url: 
       { headers: { 'Authorization': `Client-ID ${accessKey}` } }
     );
     if (!response.ok) return [];
-
     const data = await response.json();
     return (data.results || []).map((p: any) => ({
       url: p.urls?.regular || p.urls?.full,
@@ -94,6 +249,7 @@ async function downloadAndStore(imageUrl: string, supabase: any, index: number):
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'image/*',
+        'Referer': new URL(imageUrl).origin,
       }
     });
 
@@ -101,7 +257,7 @@ async function downloadAndStore(imageUrl: string, supabase: any, index: number):
     const blob = await response.blob();
     if (!blob.type.startsWith('image/')) return null;
 
-    const ext = blob.type.includes('png') ? 'png' : 'jpg';
+    const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
     const fileName = `video-${Date.now()}-${index}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
@@ -109,7 +265,6 @@ async function downloadAndStore(imageUrl: string, supabase: any, index: number):
       .upload(fileName, blob, { contentType: blob.type || 'image/jpeg', upsert: true });
 
     if (uploadError) return null;
-
     const { data: urlData } = supabase.storage.from('post-images').getPublicUrl(fileName);
     return urlData.publicUrl;
   } catch {
@@ -117,18 +272,14 @@ async function downloadAndStore(imageUrl: string, supabase: any, index: number):
   }
 }
 
-// ============= WATERMARK =============
+// ============= APPLY WATERMARK =============
 async function applyWatermark(imageUrl: string, supabaseUrl: string, supabaseKey: string): Promise<string | null> {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseKey}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
       body: JSON.stringify({ imageUrl, watermarkText: "Neural Update" }),
     });
-
     if (response.ok) {
       const result = await response.json();
       return result.publicUrl || null;
@@ -139,98 +290,101 @@ async function applyWatermark(imageUrl: string, supabaseUrl: string, supabaseKey
   }
 }
 
-// ============= FIND BEST IMAGE FOR A SEGMENT =============
-async function findImageForSegment(
+// ============= FIND ONE IMAGE FOR A SLOT =============
+async function findImageForSlot(
+  slot: 'image1' | 'image2' | 'image3' | 'image4',
   searchQuery: string,
+  articleImages: string[],
   usedIds: Set<string>,
   supabase: any,
   supabaseUrl: string,
   supabaseKey: string,
-  segIndex: number
+  slotIndex: number,
+  lovableKey: string,
+  entities: string[]
 ): Promise<{ imageUrl: string; source: string; sourceId: string } | null> {
   
-  // Translate to English for better stock photo results
-  const englishQuery = await translateToEnglish(searchQuery);
-  
-  // Try Pexels first
-  let candidates = await searchPexels(englishQuery, 5);
-  let source = 'pexels';
-  
-  // Filter already used
-  candidates = candidates.filter(c => !usedIds.has(c.sourceId));
-  
-  // Fallback to Unsplash
-  if (candidates.length === 0) {
-    candidates = await searchUnsplash(englishQuery, 5);
-    candidates = candidates.filter(c => !usedIds.has(c.sourceId));
-    source = 'unsplash';
-  }
-  
-  // Also try original Portuguese query if English gave nothing
-  if (candidates.length === 0 && englishQuery !== searchQuery) {
-    candidates = await searchPexels(searchQuery, 5);
-    candidates = candidates.filter(c => !usedIds.has(c.sourceId));
-    source = 'pexels';
-  }
-  
-  if (candidates.length === 0) return null;
-  
-  const chosen = candidates[0];
-  usedIds.add(chosen.sourceId);
-  
-  // Try watermark first (also uploads to storage)
-  const watermarkedUrl = await applyWatermark(chosen.url, supabaseUrl, supabaseKey);
-  if (watermarkedUrl) {
-    console.log(`[images] ✅ Seg ${segIndex + 1}: ${source} + watermark (query: "${englishQuery}")`);
-    return { imageUrl: watermarkedUrl, source, sourceId: chosen.sourceId };
-  }
-  
-  // Fallback: direct download to storage
-  const storedUrl = await downloadAndStore(chosen.url, supabase, segIndex);
-  if (storedUrl) {
-    console.log(`[images] ✅ Seg ${segIndex + 1}: ${source} stored (query: "${englishQuery}")`);
-    return { imageUrl: storedUrl, source, sourceId: chosen.sourceId };
-  }
-  
-  return null;
-}
+  console.log(`[images] Slot ${slot} (${slotIndex + 1}/4): "${searchQuery}"`);
 
-// ============= AI FALLBACK =============
-async function generateAIImage(
-  prompt: string,
-  supabaseUrl: string,
-  supabaseKey: string,
-  segIndex: number
-): Promise<{ imageUrl: string; source: string; sourceId: string } | null> {
-  try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseKey}`,
-      },
-      body: JSON.stringify({
-        prompt: `${prompt}. Cinematografico, vertical 9:16, ultra HD. NENHUM TEXTO.`,
-        format: 'portrait',
-        model: 'gemini',
-      }),
-    });
-
-    if (response.ok) {
-      const imgData = await response.json();
-      if (imgData.imageUrl) {
-        const watermarkedUrl = await applyWatermark(imgData.imageUrl, supabaseUrl, supabaseKey);
-        console.log(`[images] ✅ Seg ${segIndex + 1}: AI generated`);
-        return {
-          imageUrl: watermarkedUrl || imgData.imageUrl,
-          source: 'ai',
-          sourceId: `ai_${Date.now()}_${segIndex}`,
-        };
+  // === SLOT 1: Try article og:image first ===
+  if (slot === 'image1' && articleImages.length > 0) {
+    for (const artImg of articleImages) {
+      const isValid = await validateImageRelevance(artImg, searchQuery, entities, lovableKey);
+      if (isValid) {
+        const sourceId = `article_${slotIndex}`;
+        if (usedIds.has(sourceId)) continue;
+        usedIds.add(sourceId);
+        
+        const watermarked = await applyWatermark(artImg, supabaseUrl, supabaseKey);
+        if (watermarked) {
+          console.log(`[images] ✅ Slot ${slot}: article og:image with watermark`);
+          return { imageUrl: watermarked, source: 'article', sourceId };
+        }
+        // Fallback: store directly
+        const stored = await downloadAndStore(artImg, supabase, slotIndex);
+        if (stored) {
+          console.log(`[images] ✅ Slot ${slot}: article og:image stored`);
+          return { imageUrl: stored, source: 'article', sourceId };
+        }
       }
     }
-  } catch (e) {
-    console.warn(`[images] AI generation failed for seg ${segIndex}:`, e);
   }
+
+  // === Search Pexels with specific entity-based query ===
+  let pexelsCandidates = await searchPexels(searchQuery, 5);
+  pexelsCandidates = pexelsCandidates.filter(c => !usedIds.has(c.sourceId));
+
+  if (pexelsCandidates.length > 0) {
+    const chosen = pexelsCandidates[0];
+    usedIds.add(chosen.sourceId);
+    const watermarked = await applyWatermark(chosen.url, supabaseUrl, supabaseKey);
+    if (watermarked) {
+      console.log(`[images] ✅ Slot ${slot}: Pexels "${searchQuery}"`);
+      return { imageUrl: watermarked, source: 'pexels', sourceId: chosen.sourceId };
+    }
+    const stored = await downloadAndStore(chosen.url, supabase, slotIndex);
+    if (stored) {
+      console.log(`[images] ✅ Slot ${slot}: Pexels stored`);
+      return { imageUrl: stored, source: 'pexels', sourceId: chosen.sourceId };
+    }
+  }
+
+  // === Fallback to Unsplash ===
+  let unsplashCandidates = await searchUnsplash(searchQuery, 5);
+  unsplashCandidates = unsplashCandidates.filter(c => !usedIds.has(c.sourceId));
+
+  if (unsplashCandidates.length > 0) {
+    const chosen = unsplashCandidates[0];
+    usedIds.add(chosen.sourceId);
+    const watermarked = await applyWatermark(chosen.url, supabaseUrl, supabaseKey);
+    if (watermarked) {
+      console.log(`[images] ✅ Slot ${slot}: Unsplash "${searchQuery}"`);
+      return { imageUrl: watermarked, source: 'unsplash', sourceId: chosen.sourceId };
+    }
+    const stored = await downloadAndStore(chosen.url, supabase, slotIndex);
+    if (stored) {
+      console.log(`[images] ✅ Slot ${slot}: Unsplash stored`);
+      return { imageUrl: stored, source: 'unsplash', sourceId: chosen.sourceId };
+    }
+  }
+
+  // === Last resort: try article images for non-slot1 ===
+  if (slot !== 'image1' && articleImages.length > slotIndex) {
+    const artImg = articleImages[slotIndex] || articleImages[articleImages.length - 1];
+    if (artImg) {
+      const sourceId = `article_fallback_${slotIndex}`;
+      if (!usedIds.has(sourceId)) {
+        usedIds.add(sourceId);
+        const stored = await downloadAndStore(artImg, supabase, slotIndex + 100);
+        if (stored) {
+          console.log(`[images] ✅ Slot ${slot}: article image fallback`);
+          return { imageUrl: stored, source: 'article', sourceId };
+        }
+      }
+    }
+  }
+
+  console.warn(`[images] ❌ Slot ${slot}: all sources failed`);
   return null;
 }
 
@@ -241,9 +395,26 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, segments, query, usedImageIds = [] } = await req.json();
+    const { 
+      topic, 
+      segments, 
+      query, 
+      usedImageIds = [],
+      // New: article-based mode
+      articleUrl,
+      articleTitle,
+      articleDescription,
+      useArticleMode = false, // explicit flag to use intelligent mode
+    } = await req.json();
 
-    const searchQuery = query || topic;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
+    const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const usedIds = new Set<string>(usedImageIds);
+
+    const searchQuery = query || topic || articleTitle;
     if (!searchQuery && (!segments || segments.length === 0)) {
       return new Response(
         JSON.stringify({ success: false, error: 'Topic, query or segments required' }),
@@ -251,34 +422,152 @@ serve(async (req) => {
       );
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // ============= INTELLIGENT ARTICLE-BASED MODE =============
+    // Activated when articleUrl is provided OR useArticleMode is true
+    if ((articleUrl || useArticleMode) && (articleUrl || articleTitle)) {
+      console.log('[images] 🎯 INTELLIGENT MODE: Article-based image curation');
+      console.log('[images] Article URL:', articleUrl || '(no URL)');
+      console.log('[images] Article title:', articleTitle || searchQuery);
 
+      // Step 1: Scrape the article
+      let articleData: { title: string; description: string; ogImage: string | null; images: string[]; content: string } | null = null;
+      
+      if (articleUrl && firecrawlKey) {
+        console.log('[images] Scraping article with Firecrawl...');
+        articleData = await scrapeArticle(articleUrl, firecrawlKey);
+        if (articleData) {
+          console.log(`[images] Article scraped: ${articleData.images.length} images found, og:image: ${articleData.ogImage ? 'yes' : 'no'}`);
+        }
+      }
+
+      // Use provided data as fallback if scraping failed/not possible
+      const finalTitle = articleData?.title || articleTitle || searchQuery;
+      const finalContent = articleData?.content || articleDescription || '';
+      const articleImages = articleData?.images || [];
+
+      // Step 2: Extract entities and generate specific search queries
+      console.log('[images] Extracting entities and generating search queries...');
+      const entities = await extractEntities(finalTitle, finalContent, lovableKey || '');
+
+      const slots: Array<'image1' | 'image2' | 'image3' | 'image4'> = ['image1', 'image2', 'image3', 'image4'];
+      const results: { imageUrl: string; source: string; sourceId: string }[] = [];
+
+      // Step 3: Find one specific image per slot in parallel
+      const allEntities = [
+        ...entities.companies,
+        ...entities.products, 
+        ...entities.technologies,
+        ...entities.people
+      ];
+
+      for (let i = 0; i < 4; i++) {
+        const slot = slots[i];
+        const slotQuery = entities.searchQueries[slot];
+        
+        const result = await findImageForSlot(
+          slot,
+          slotQuery,
+          articleImages,
+          usedIds,
+          supabase,
+          supabaseUrl,
+          supabaseKey,
+          i,
+          lovableKey || '',
+          allEntities
+        );
+
+        if (result) {
+          results.push(result);
+        }
+      }
+
+      const stats = {
+        total: results.length,
+        article: results.filter(r => r.source === 'article').length,
+        pexels: results.filter(r => r.source === 'pexels').length,
+        unsplash: results.filter(r => r.source === 'unsplash').length,
+        mode: 'intelligent_article',
+        entities: {
+          companies: entities.companies,
+          products: entities.products,
+          people: entities.people,
+        }
+      };
+
+      console.log(`[images] 🎯 Intelligent mode results:`, JSON.stringify(stats));
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          images: results.map(r => ({ imageUrl: r.imageUrl, source: r.source })),
+          imageIds: results.map(r => r.sourceId),
+          stats,
+          searchQueries: entities.searchQueries,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ============= LEGACY: SEGMENT-BASED MODE (for NarrativeVideoGenerator) =============
     const neededCount = segments?.length || 4;
-    const usedIds = new Set<string>(usedImageIds);
-
-    console.log(`[images] Need ${neededCount} images for: "${searchQuery}"`);
-    console.log(`[images] Segments with imagePrompt: ${segments?.filter((s: any) => s.imagePrompt).length || 0}`);
+    console.log(`[images] Legacy mode: ${neededCount} images for: "${searchQuery}"`);
 
     const results: { imageUrl: string; source: string; sourceId: string }[] = [];
 
-    // ============= SEARCH PER SEGMENT (each gets its own targeted query) =============
     for (let i = 0; i < neededCount; i++) {
       const segQuery = segments?.[i]?.imagePrompt || segments?.[i]?.text || searchQuery;
       
-      const result = await findImageForSegment(segQuery, usedIds, supabase, supabaseUrl, supabaseKey, i);
+      // Translate to English for better results
+      let englishQuery = segQuery;
+      if (lovableKey && segQuery.match(/[àáâãéêíóôõúçÀÁÂÃÉÊÍÓÔÕÚÇ]/)) {
+        try {
+          const transResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${lovableKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash-lite",
+              messages: [{ role: "user", content: `Translate to English, 2-4 words only for stock photo search: "${segQuery}"` }],
+            }),
+          });
+          if (transResp.ok) {
+            const td = await transResp.json();
+            const t = td.choices?.[0]?.message?.content?.trim();
+            if (t && t.length > 2 && t.length < 80) englishQuery = t;
+          }
+        } catch { /* use original */ }
+      }
+
+      // Try Pexels first, then Unsplash
+      let pexels = (await searchPexels(englishQuery, 5)).filter(c => !usedIds.has(c.sourceId));
       
-      if (result) {
-        results.push(result);
-      } else {
-        // AI fallback for this segment
-        console.log(`[images] ⚠️ Seg ${i + 1}: no stock photo found, trying AI...`);
-        const aiResult = await generateAIImage(segQuery, supabaseUrl, supabaseKey, i);
-        if (aiResult) {
-          results.push(aiResult);
-        } else {
-          console.warn(`[images] ❌ Seg ${i + 1}: all sources failed`);
+      if (pexels.length > 0) {
+        const chosen = pexels[0];
+        usedIds.add(chosen.sourceId);
+        const wm = await applyWatermark(chosen.url, supabaseUrl, supabaseKey);
+        if (wm) {
+          results.push({ imageUrl: wm, source: 'pexels', sourceId: chosen.sourceId });
+          continue;
+        }
+        const stored = await downloadAndStore(chosen.url, supabase, i);
+        if (stored) {
+          results.push({ imageUrl: stored, source: 'pexels', sourceId: chosen.sourceId });
+          continue;
+        }
+      }
+
+      let unsplash = (await searchUnsplash(englishQuery, 5)).filter(c => !usedIds.has(c.sourceId));
+      if (unsplash.length > 0) {
+        const chosen = unsplash[0];
+        usedIds.add(chosen.sourceId);
+        const wm = await applyWatermark(chosen.url, supabaseUrl, supabaseKey);
+        if (wm) {
+          results.push({ imageUrl: wm, source: 'unsplash', sourceId: chosen.sourceId });
+          continue;
+        }
+        const stored = await downloadAndStore(chosen.url, supabase, i);
+        if (stored) {
+          results.push({ imageUrl: stored, source: 'unsplash', sourceId: chosen.sourceId });
         }
       }
     }
@@ -287,10 +576,10 @@ serve(async (req) => {
       total: results.length,
       pexels: results.filter(r => r.source === 'pexels').length,
       unsplash: results.filter(r => r.source === 'unsplash').length,
-      ai: results.filter(r => r.source === 'ai').length,
+      mode: 'legacy_segment',
     };
 
-    console.log(`[images] Final:`, JSON.stringify(stats));
+    console.log(`[images] Legacy mode final:`, JSON.stringify(stats));
 
     return new Response(
       JSON.stringify({
@@ -301,6 +590,7 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
   } catch (error) {
     console.error('[images] Error:', error);
     return new Response(
