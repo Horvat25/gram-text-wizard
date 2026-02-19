@@ -183,26 +183,30 @@ Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em 
 - PROIBIDO anos anteriores a ${currentYear}
 - Acentos obrigatórios: você, através, é, está, já, até, revolução, atenção, decisão, diagnóstico, automático, análise, possível, próximo, inteligência, tecnologia, saúde
 
-🖼️ KEYWORDS VISUAIS CINEMATOGRÁFICAS:
-Em vez de imageSearch genérico, crie "visualKeywords": array de 3-5 termos ESPECÍFICOS e CINEMATOGRÁFICOS.
+🖼️ KEYWORDS VISUAIS CINEMATOGRÁFICAS (OBRIGATÓRIO EM INGLÊS):
+Crie "visualKeywords": array de 2-4 termos ESPECÍFICOS em INGLÊS para busca no Pexels/Unsplash.
+
+🚨 REGRA CRÍTICA: visualKeywords SEMPRE em INGLÊS — o sistema de busca usa APIs anglófonas.
 
 REGRAS para visualKeywords:
-- Cada keyword deve evocar uma IMAGEM FORTE e CONTRASTANTE
-- PROIBIDO termos genéricos: "technology", "AI", "innovation", "business", "computer", "laptop", "person using phone"
-- PROIBIDO fotos de pessoas olhando notebook/celular
-- PRIORIZE: close-ups dramáticos, silhuetas, cenários urbanos noturnos, mãos em ação, máquinas industriais, telas holográficas, rostos em penumbra, arquitetura futurista
-- Use nomes de pessoas/empresas/produtos REAIS quando relevante
-- Pense como um DIRETOR DE FOTOGRAFIA: contraste, profundidade, textura
-- Formato VERTICAL (9:16) — keywords que funcionem em enquadramento portrait
+- SEMPRE em INGLÊS — nunca em português
+- Cada keyword deve ser uma frase de busca curta e específica (3-5 palavras)
+- PROIBIDO termos ultra-genéricos: "technology", "AI", "innovation", "business", "computer"
+- PRIORIZE: imagens de produtos REAIS, empresas REAIS, hardware específico, cenários concretos
+- Use nomes REAIS: "OpenAI headquarters", "Nvidia GPU chip", "Boston Dynamics robot", "Sam Altman speaking"
+- Pense como um DIRETOR DE ARTE buscando stock photos: contraste, profundidade, textura
+- Formato VERTICAL (9:16) — termos que funcionem em portrait
 
-Exemplos BONS de visualKeywords:
-✅ ["robô humanoide close rosto", "circuito neural macro neon", "silhueta pessoa cidade noturna futurista"]
-✅ ["Elon Musk palco apresentação", "fábrica robôs linha montagem", "tela código Matrix verde escuro"]
-✅ ["mão robótica segurando esfera luz", "olho humano reflexo tela dados", "servidor datacenter corredor luzes azuis"]
+Exemplos BONS de visualKeywords (INGLÊS + ESPECÍFICO):
+✅ ["humanoid robot close up face", "neural circuit neon macro", "city night silhouette futuristic"]
+✅ ["Sam Altman conference stage", "robot factory assembly line", "server datacenter corridor blue lights"]
+✅ ["Nvidia GPU chip macro", "OpenAI logo screen", "AI data visualization hologram"]
+✅ ["quantum computer close up", "microchip silicon wafer macro", "space rocket launch dramatic"]
 
 Exemplos RUINS (PROIBIDO):
-❌ ["technology", "artificial intelligence", "innovation concept"]
-❌ ["person working laptop", "business meeting", "modern office"]`;
+❌ ["tecnologia", "inteligência artificial", "inovação"] ← português!
+❌ ["technology concept", "artificial intelligence", "innovation"] ← muito genérico!
+❌ ["person working laptop", "business meeting", "modern office"] ← clichê!`;
 
     const userPrompt = `Crie um VÍDEO EDITORIAL com tese e posicionamento sobre:
 "${topic}"
