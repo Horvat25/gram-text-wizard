@@ -254,11 +254,12 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // ===== CONTENT DISTRIBUTION TRACKING =====
   // Weekly goals from context settings
+  // 💰 METAS REDUZIDAS: de 46 para 11 posts/semana (corte de 76% nos custos)
   const weeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 3,
-    carousels: context.content_distribution_carousels || 2,
-    news: context.content_distribution_news || 4,
-    images: context.content_distribution_images || 5
+    videos: context.content_distribution_videos || 2,    // era 3→9, agora 2
+    carousels: context.content_distribution_carousels || 1, // era 2→6, agora 1
+    news: context.content_distribution_news || 5,        // era 4→17, agora 5
+    images: context.content_distribution_images || 3     // era 5→14, agora 3
   };
   
   // Count progress this week by media type

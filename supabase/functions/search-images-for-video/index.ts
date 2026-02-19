@@ -80,93 +80,49 @@ async function scrapeArticle(url: string, firecrawlKey: string): Promise<{
   }
 }
 
-// ============= EXTRACT ENTITIES FROM ARTICLE =============
-async function extractEntities(title: string, content: string, lovableKey: string): Promise<{
+// ============= GENERATE SEARCH QUERIES FROM TITLE (SEM IA — CUSTO ZERO) =============
+/**
+ * Gera 4 queries de busca diretamente a partir do título, sem chamar nenhuma IA.
+ * Custo: $0.00 (era ~$0.0002 por vídeo com flash-lite, mas desnecessário)
+ */
+function buildSearchQueriesFromTitle(title: string, description: string = ''): {
   companies: string[];
   products: string[];
   technologies: string[];
   people: string[];
   searchQueries: {
-    image1: string; // Primary - article main subject
-    image2: string; // Product/technology specific
-    image3: string; // Context - event or demo
-    image4: string; // Strategic complement
+    image1: string;
+    image2: string;
+    image3: string;
+    image4: string;
   };
-}> {
-  const defaultResult = {
+} {
+  // Palavras chave extraídas do título (primeiras palavras significativas)
+  const cleanTitle = title.replace(/["""''«»\[\]()]/g, '').trim();
+  
+  // Pega as primeiras 4-5 palavras do título como query principal
+  const titleWords = cleanTitle.split(/\s+/).filter(w => w.length > 2);
+  const shortTitle = titleWords.slice(0, 5).join(' ');
+  
+  // Combina título + início da descrição para contexto
+  const contextWords = description ? description.split(/\s+/).slice(0, 4).join(' ') : '';
+
+  const searchQueries = {
+    image1: shortTitle,
+    image2: titleWords.slice(0, 4).join(' ') + ' technology',
+    image3: titleWords.slice(0, 3).join(' ') + (contextWords ? ' ' + contextWords.split(' ')[0] : ' innovation'),
+    image4: titleWords.slice(0, 3).join(' ') + ' future',
+  };
+
+  console.log('[images] 💰 Queries sem IA (custo zero):', JSON.stringify(searchQueries));
+
+  return {
     companies: [],
     products: [],
     technologies: [],
     people: [],
-    searchQueries: {
-      image1: title,
-      image2: title + ' product launch',
-      image3: title + ' event announcement',
-      image4: title + ' impact future',
-    }
+    searchQueries,
   };
-
-  if (!lovableKey) return defaultResult;
-
-  try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${lovableKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [{
-          role: "user",
-          content: `You are a news image researcher. Analyze this article and extract entities + generate 4 specific image search queries in ENGLISH for finding real news photos.
-
-ARTICLE TITLE: ${title}
-CONTENT: ${content.slice(0, 1500)}
-
-Generate search queries following this narrative logic:
-- image1: Main subject of the news (most specific, use real names/brands)
-- image2: Product or technology mentioned (e.g. "Apple iPhone 16 Pro official photo")
-- image3: Context - event, demo, or environment where this happened (e.g. "CES 2025 keynote stage")
-- image4: Strategic complement - CEO, headquarters, competitor comparison, or visual impact
-
-Rules for queries:
-- Use REAL proper nouns (company names, product names, person names)
-- Add "official" or "press release" when searching for brand images  
-- For people: use "full name speaking" or "full name interview"
-- For events: use event name + year
-- NEVER use generic terms like "technology", "innovation", "business meeting"
-- Maximum 5 words per query
-
-Respond ONLY with JSON:
-{
-  "companies": ["Company1", "Company2"],
-  "products": ["Product1"],
-  "technologies": ["Tech1"],
-  "people": ["Person Name"],
-  "searchQueries": {
-    "image1": "specific query for main subject",
-    "image2": "specific query for product/tech",
-    "image3": "specific query for context/event",
-    "image4": "specific query for complement"
-  }
-}`
-        }],
-      }),
-    });
-
-    if (!response.ok) return defaultResult;
-    const data = await response.json();
-    let content2 = data.choices?.[0]?.message?.content?.trim() || '';
-    content2 = content2.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
-    const parsed = JSON.parse(content2);
-    console.log('[images] Entities extracted:', JSON.stringify(parsed.searchQueries));
-    return parsed;
-  } catch (e) {
-    console.warn('[images] Entity extraction failed:', e);
-    return defaultResult;
-  }
 }
 
 // ============= VALIDATE IMAGE RELEVANCE =============
@@ -445,20 +401,15 @@ serve(async (req) => {
       const finalContent = articleData?.content || articleDescription || '';
       const articleImages = articleData?.images || [];
 
-      // Step 2: Extract entities and generate specific search queries
-      console.log('[images] Extracting entities and generating search queries...');
-      const entities = await extractEntities(finalTitle, finalContent, lovableKey || '');
+      // Step 2: Gerar queries de busca a partir do título — SEM chamar IA (custo zero)
+      console.log('[images] 💰 Gerando queries sem IA...');
+      const entities = buildSearchQueriesFromTitle(finalTitle, finalContent);
 
       const slots: Array<'image1' | 'image2' | 'image3' | 'image4'> = ['image1', 'image2', 'image3', 'image4'];
       const results: { imageUrl: string; source: string; sourceId: string }[] = [];
 
-      // Step 3: Find one specific image per slot in parallel
-      const allEntities = [
-        ...entities.companies,
-        ...entities.products, 
-        ...entities.technologies,
-        ...entities.people
-      ];
+      // Step 3: Find one image per slot
+      const allEntities: string[] = [];
 
       for (let i = 0; i < 4; i++) {
         const slot = slots[i];
@@ -518,25 +469,9 @@ serve(async (req) => {
     for (let i = 0; i < neededCount; i++) {
       const segQuery = segments?.[i]?.imagePrompt || segments?.[i]?.text || searchQuery;
       
-      // Translate to English for better results
-      let englishQuery = segQuery;
-      if (lovableKey && segQuery.match(/[àáâãéêíóôõúçÀÁÂÃÉÊÍÓÔÕÚÇ]/)) {
-        try {
-          const transResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model: "google/gemini-2.5-flash-lite",
-              messages: [{ role: "user", content: `Translate to English, 2-4 words only for stock photo search: "${segQuery}"` }],
-            }),
-          });
-          if (transResp.ok) {
-            const td = await transResp.json();
-            const t = td.choices?.[0]?.message?.content?.trim();
-            if (t && t.length > 2 && t.length < 80) englishQuery = t;
-          }
-        } catch { /* use original */ }
-      }
+      // 💰 CUSTO ZERO: usar query diretamente (sem tradução com IA)
+      // Pexels aceita pt-BR muito bem, e o título em inglês já é comum em tech
+      const englishQuery = segQuery;
 
       // Try Pexels first, then Unsplash
       let pexels = (await searchPexels(englishQuery, 5)).filter(c => !usedIds.has(c.sourceId));
