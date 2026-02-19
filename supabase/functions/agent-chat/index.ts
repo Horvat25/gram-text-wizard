@@ -237,7 +237,46 @@ function generateHumanDelay(): number {
   return Math.round((baseDelay + extraDelay) * 10) / 10; // Round to 1 decimal
 }
 
-// Helper function to convert Brasília time to UTC
+// ============= IMAGE RELEVANCE GUARD FOR RSS NEWS POSTS =============
+// Validates if an og:image URL is relevant to a tech/news topic before using it.
+// Prevents off-topic images (politicians, sports events) from appearing in tech content.
+function isRssImageRelevant(imageUrl: string, title: string, description: string): boolean {
+  if (!imageUrl) return false;
+
+  const urlLower = imageUrl.toLowerCase();
+  const textLower = (title + ' ' + description).toLowerCase();
+
+  // Check if this is a tech/AI/business topic
+  const techKeywords = ['ai', 'openai', 'google', 'apple', 'microsoft', 'meta', 'nvidia',
+    'robot', 'tech', 'gpt', 'llm', 'chip', 'software', 'data', 'cloud', 'cyber',
+    'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon', 'iphone',
+    'android', 'computador', 'inteligência', 'artificial', 'machine learning', 'neural'];
+
+  const isTechTopic = techKeywords.some(k => textLower.includes(k));
+
+  // For non-tech topics, accept any image
+  if (!isTechTopic) return true;
+
+  // For tech topics, reject URLs with human/political/sports signals
+  const humanSignals = ['politician', 'presidente', 'candidato', 'eleicao', 'election',
+    'futebol', 'soccer', 'sport', 'athlete', 'celebrity', 'actor', 'singer', 'singer',
+    'jersey', 'stadium', 'rally', 'protest', 'manifestacao', 'partido', 'campaign',
+    'voto', 'politica', 'ancelotti', 'governo', 'senado', 'camara', 'deputado',
+    '/pessoas/', '/person/', '/people/', '/portrait/', '/rostos/', '/face/'];
+
+  if (humanSignals.some(s => urlLower.includes(s))) {
+    console.log('[RSS] ⚠️ Rejected og:image (human/political signal):', imageUrl.substring(0, 80));
+    return false;
+  }
+
+  // Reject suspiciously small or tracking images
+  const badSignals = ['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'avatar', 'logo'];
+  if (badSignals.some(s => urlLower.includes(s))) return false;
+
+  return true;
+}
+
+
 // The AI sends times as if they are in Brasília (UTC-3), so we need to convert to UTC for storage
 function convertBrasiliaToUTC(dateString: string): string {
   if (!dateString) return dateString;
@@ -1741,44 +1780,80 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
     
     // 2. Build headline (use provided or from title)
     const finalHeadline = headline_text || newsItem.title.toUpperCase().slice(0, 80);
-    
-    // 3. Apply headline overlay to image
-    let imageUrl: string | null = null;
-    
-    const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${serviceRoleKey}`
-      },
-      body: JSON.stringify({
-        imageUrl: newsItem.image_url,
-        watermarkText: 'Neural Update',
-        headlineText: finalHeadline
-      })
-    });
-    
-    if (watermarkResponse.ok) {
-      const wmResult = await watermarkResponse.json();
-      imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
-      console.log('[RSS_NEWS_POST] Headline overlay applied!');
+
+    // 3. Select best image: validate og:image relevance before using it
+    // If the og:image looks off-topic (political figure, sports event etc), search Pexels/Unsplash instead
+    let rawImageUrl: string | null = null;
+    let imageSource = 'rss-og';
+
+    const ogImageUrl: string | null = newsItem.image_url || null;
+    const isOgImageSafe = ogImageUrl ? isRssImageRelevant(ogImageUrl, newsItem.title, newsItem.description || '') : false;
+
+    if (isOgImageSafe && ogImageUrl) {
+      rawImageUrl = ogImageUrl;
+      imageSource = 'rss-og';
+      console.log('[RSS_NEWS_POST] ✅ og:image validated as relevant');
     } else {
-      // Fallback: upload original image to storage
-      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${serviceRoleKey}`
-        },
-        body: JSON.stringify({ imageUrl: newsItem.image_url })
-      });
-      
-      if (uploadResponse.ok) {
-        const uploadResult = await uploadResponse.json();
-        imageUrl = uploadResult.publicUrl;
+      console.log('[RSS_NEWS_POST] ⚠️ og:image rejected or missing — searching Pexels/Unsplash for topic');
+      try {
+        const imgSearchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+          body: JSON.stringify({
+            articleTitle: newsItem.title,
+            articleDescription: newsItem.description || '',
+            articleUrl: newsItem.link,
+            useArticleMode: true,
+            skipWatermark: true, // Skip watermark so add-watermark can apply headline cleanly
+          })
+        });
+        if (imgSearchResponse.ok) {
+          const imgResult = await imgSearchResponse.json();
+          if (imgResult.images && imgResult.images.length > 0) {
+            rawImageUrl = imgResult.images[0].imageUrl;
+            imageSource = imgResult.images[0].source || 'pexels';
+            console.log('[RSS_NEWS_POST] ✅ Fallback image from:', imageSource);
+          }
+        }
+      } catch (e) {
+        console.warn('[RSS_NEWS_POST] Image search failed:', e);
+      }
+      // Last resort: use og:image even if risky
+      if (!rawImageUrl && ogImageUrl) {
+        rawImageUrl = ogImageUrl;
+        imageSource = 'rss-og-fallback';
+        console.log('[RSS_NEWS_POST] Using og:image as last resort');
       }
     }
-    
+
+    // 4. Apply headline overlay to the chosen image
+    let imageUrl: string | null = null;
+
+    if (rawImageUrl) {
+      const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+        body: JSON.stringify({ imageUrl: rawImageUrl, watermarkText: 'Neural Update', headlineText: finalHeadline })
+      });
+
+      if (watermarkResponse.ok) {
+        const wmResult = await watermarkResponse.json();
+        imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
+        console.log('[RSS_NEWS_POST] Headline overlay applied! Source:', imageSource);
+      } else {
+        // Fallback: upload original without headline
+        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+          body: JSON.stringify({ imageUrl: rawImageUrl })
+        });
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          imageUrl = uploadResult.publicUrl;
+        }
+      }
+    }
+
     if (!imageUrl) {
       return { success: false, message: `❌ Erro ao processar imagem da notícia. Tente outra.` };
     }

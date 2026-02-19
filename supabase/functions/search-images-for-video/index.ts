@@ -77,12 +77,48 @@ async function scrapeArticle(url: string, firecrawlKey: string): Promise<{
 
 // ============= BUILD 3 SEARCH QUERIES FROM TITLE =============
 function buildThreeQueries(title: string, description: string = ''): [string, string, string] {
-  const clean = title.replace(/["""''«»\[\]()]/g, '').trim();
-  const words = clean.split(/\s+/).filter(w => w.length > 2);
+  const text = (title + ' ' + (description || '')).replace(/["""''«»\[\]()]/g, '').trim();
 
-  const q1 = words.slice(0, 5).join(' ');                    // Principal: primeiras 5 palavras
-  const q2 = words.slice(0, 3).join(' ') + ' technology';   // Tech angle
-  const q3 = words.slice(0, 3).join(' ') + ' innovation';   // Innovation angle
+  // Known tech entities — if found, use as the anchor of all queries
+  const knownEntities: Record<string, string> = {
+    'openai': 'OpenAI artificial intelligence', 'chatgpt': 'ChatGPT AI chatbot',
+    'gpt': 'OpenAI GPT language model', 'claude': 'Anthropic Claude AI',
+    'gemini': 'Google Gemini AI', 'copilot': 'Microsoft Copilot AI',
+    'meta ai': 'Meta AI laboratory', 'llama': 'Meta LLaMA AI model',
+    'nvidia': 'Nvidia GPU data center', 'tesla': 'Tesla electric vehicle',
+    'spacex': 'SpaceX rocket launch', 'apple': 'Apple technology product',
+    'microsoft': 'Microsoft technology', 'google': 'Google technology',
+    'amazon': 'Amazon technology cloud', 'robot': 'humanoid robot close up',
+    'humanoid': 'humanoid robot futuristic', 'quantum': 'quantum computer laboratory',
+    'chip': 'microchip silicon wafer macro', 'bitcoin': 'Bitcoin cryptocurrency',
+    'blockchain': 'blockchain network visualization', 'deepmind': 'Google DeepMind AI',
+    'anthropic': 'Anthropic AI research', 'mistral': 'AI model server',
+    'sora': 'AI video generation screen', 'samsung': 'Samsung technology display',
+    'intel': 'Intel processor chip macro', 'arm': 'ARM chip semiconductor',
+  };
+
+  const textLower = text.toLowerCase();
+  let entityQuery = '';
+  for (const [key, value] of Object.entries(knownEntities)) {
+    if (textLower.includes(key)) { entityQuery = value; break; }
+  }
+
+  // Stopwords filter
+  const stopwords = new Set(['de','da','do','dos','das','em','no','na','por','com','para',
+    'como','que','uma','um','o','a','e','é','vai','foi','ser','ter','está','isso','essa',
+    'esse','agora','hoje','novo','nova','já','mais','mas','são','tem','sua','seu','the',
+    'and','for','with','this','that','from','has','was','are','will','can','its','not']);
+
+  const words = text.split(/\s+/)
+    .filter(w => w.length > 3)
+    .filter(w => !stopwords.has(w.toLowerCase()))
+    .filter(w => /^[a-zA-ZÀ-ÿ]/.test(w));
+
+  // Build queries with fallback
+  const q1 = entityQuery || words.slice(0, 4).join(' ') || 'technology futuristic';
+  const subject = entityQuery.split(' ')[0] || words[0] || 'technology';
+  const q2 = entityQuery ? `${subject} close up dramatic lighting` : `${words.slice(0, 3).join(' ')} dramatic`;
+  const q3 = entityQuery ? `${subject} innovation research laboratory` : `${words.slice(0, 2).join(' ')} future`;
 
   console.log('[images] 3 queries:', q1, '|', q2, '|', q3);
   return [q1, q2, q3];
@@ -251,10 +287,13 @@ async function processImage(
   supabase: any,
   supabaseUrl: string,
   supabaseKey: string,
-  index: number
+  index: number,
+  skipWatermark = false,
 ): Promise<string | null> {
-  const watermarked = await applyWatermark(url, supabaseUrl, supabaseKey);
-  if (watermarked) return watermarked;
+  if (!skipWatermark) {
+    const watermarked = await applyWatermark(url, supabaseUrl, supabaseKey);
+    if (watermarked) return watermarked;
+  }
   return await downloadAndStore(url, supabase, index);
 }
 
@@ -274,6 +313,7 @@ serve(async (req) => {
       articleTitle,
       articleDescription,
       useArticleMode = false,
+      skipWatermark = false, // When true: skip watermark so caller can apply its own overlay
     } = await req.json();
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -402,7 +442,7 @@ serve(async (req) => {
 
       for (let i = 0; i < selected.length; i++) {
         const candidate = selected[i];
-        const processed = await processImage(candidate.url, supabase, supabaseUrl, supabaseKey, i);
+        const processed = await processImage(candidate.url, supabase, supabaseUrl, supabaseKey, i, skipWatermark);
         if (processed) {
           usedIds.add(candidate.sourceId);
           results.push({ imageUrl: processed, source: candidate.source, sourceId: candidate.sourceId });
@@ -448,7 +488,7 @@ serve(async (req) => {
       if (pexels.length > 0) {
         const chosen = pexels[0];
         usedIds.add(chosen.sourceId);
-        const processed = await processImage(chosen.url, supabase, supabaseUrl, supabaseKey, i);
+        const processed = await processImage(chosen.url, supabase, supabaseUrl, supabaseKey, i, skipWatermark);
         if (processed) {
           results.push({ imageUrl: processed, source: 'pexels', sourceId: chosen.sourceId });
           continue;
@@ -459,7 +499,7 @@ serve(async (req) => {
       if (unsplash.length > 0) {
         const chosen = unsplash[0];
         usedIds.add(chosen.sourceId);
-        const processed = await processImage(chosen.url, supabase, supabaseUrl, supabaseKey, i);
+        const processed = await processImage(chosen.url, supabase, supabaseUrl, supabaseKey, i, skipWatermark);
         if (processed) {
           results.push({ imageUrl: processed, source: 'unsplash', sourceId: chosen.sourceId });
         }
