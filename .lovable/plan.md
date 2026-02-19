@@ -1,204 +1,119 @@
 
-# Plano: Unificar Criação de Vídeo e Reorganizar Interface do Agente
+# Diagnóstico Completo de Custos — Corte Máximo de Gastos com IA
 
-## Resumo
+## O que foi encontrado nos logs
 
-Vamos fazer duas melhorias principais:
-1. **Sincronizar a criação de vídeo do agente** com o mesmo fluxo que já funciona no TikTokContentCreation (usando ElevenLabs, Gemini, e FFmpeg)
-2. **Reorganizar a interface do Agente** com tabs separadas para TikTok e Instagram, com visual temático para cada plataforma
+Analisando os logs ao vivo, encontrei **3 problemas críticos** que estão consumindo seus créditos sem necessidade:
 
 ---
 
-## 1. Problema Atual com Vídeos
+### Problema 1 — `add-watermark` chamando IA para CADA imagem de vídeo (MAIOR GASTO)
 
-O agente autônomo cria vídeos com `status: 'draft'` porque:
-- Os vídeos precisam de renderização no navegador (FFmpeg.wasm)
-- O agente roda no backend e não pode executar FFmpeg
+Nos logs do `search-images-for-video`, o sistema está buscando **4 imagens por vídeo** (modo `legacy_segment`). Para cada uma dessas 4 imagens, ele chama `add-watermark`, que por sua vez chama `google/gemini-2.5-flash-image` (modelo de **geração de imagem**, o mais caro) para adicionar apenas um badge pequeno de marca d'água.
 
-**Solução**: Manter o sistema atual mas melhorar a experiência:
-- Quando o agente criar um vídeo, ele já inclui todos os dados prontos (script, imagens, metadata)
-- Na interface, quando o usuário acessar a aba de chat, vídeos pendentes aparecem com botão "Renderizar" 
-- Auto-renderização quando o usuário estiver ativo
+```
+[add-watermark] ✅ Watermark applied  ← 1 chamada de IA cara por imagem
+[add-watermark] ✅ Watermark applied  ← 2ª chamada
+[add-watermark] ✅ Watermark applied  ← 3ª chamada
+[add-watermark] ✅ Watermark applied  ← 4ª chamada
+```
+
+**4 chamadas ao modelo de imagem mais caro POR VÍDEO.** Isso é desnecessário.
 
 ---
 
-## 2. Nova Interface do Agente com Plataformas
+### Problema 2 — `apply-text-overlay` também chama `gemini-2.5-flash-image` para headlines
 
-### Estrutura Proposta
+Nos posts de notícia, `apply-text-overlay` faz **2 chamadas de IA por post**:
+1. `gemini-2.5-flash-lite` → gera o texto da headline
+2. `gemini-2.5-flash-image` → compõe a imagem com o texto
 
-```text
-+-----------------------------------+
-|  [TikTok]  [Instagram]            |  <- Seletor de Plataforma
-+-----------------------------------+
-|  [Chat]  [Respostas]              |  <- Tabs internos
-+-----------------------------------+
-|                                   |
-|   Chat com o Agente               |
-|   (Tema visual da plataforma)     |
-|                                   |
-+-----------------------------------+
-```
-
-### Visual por Plataforma
-
-**TikTok Theme:**
-- Gradiente: Preto → Cyan (#25F4EE) → Rosa (#FE2C55)
-- Borda: Cyan com glow
-- Icone TikTok no avatar do agente
-
-**Instagram Theme:**
-- Gradiente: Rosa → Roxo → Laranja
-- Borda: Primária com glow
-- Icone Instagram no avatar
+A segunda chamada (composição de imagem) é **muito cara** e pode ser substituída por código puro.
 
 ---
 
-## Mudanças Técnicas
+### Problema 3 — Meta semanal absurdamente alta (46 posts/semana!)
 
-### Arquivo 1: `src/components/tabs/AgentTab.tsx`
-
-**Antes:**
-```typescript
-<Tabs value={activeTab}>
-  <TabsTrigger value="chat">Chat</TabsTrigger>
-  <TabsTrigger value="respostas">Respostas</TabsTrigger>
-</Tabs>
+Os logs mostram:
+```
+Meta semanal: 18/46 posts
+weeklyGoals: { videos: 9, carousels: 6, news: 17, images: 14 }
 ```
 
-**Depois:**
-```typescript
-// Adicionar seletor de plataforma no topo
-const [platform, setPlatform] = useState<'tiktok' | 'instagram'>('tiktok');
-
-<div className="flex items-center gap-2 mb-2">
-  <Button 
-    variant={platform === 'tiktok' ? 'default' : 'outline'}
-    onClick={() => setPlatform('tiktok')}
-    className={platform === 'tiktok' ? 'tiktok-gradient' : ''}
-  >
-    <TikTokIcon /> TikTok
-  </Button>
-  <Button 
-    variant={platform === 'instagram' ? 'default' : 'outline'}
-    onClick={() => setPlatform('instagram')}
-    className={platform === 'instagram' ? 'instagram-gradient' : ''}
-  >
-    <Instagram /> Instagram
-  </Button>
-</div>
-
-// Passar plataforma para o chat
-<AgentHeroChat platform={platform} />
-```
-
-### Arquivo 2: `src/components/agent/AgentHeroChat.tsx`
-
-**Mudanças:**
-1. Aceitar prop `platform: 'tiktok' | 'instagram'`
-2. Mudar tema visual baseado na plataforma
-3. Filtrar mensagens por plataforma (novo campo `platform` na tabela)
-4. Adaptar ações rápidas por plataforma
-5. Adicionar seção de vídeos pendentes para renderização
-
-**Novo Header:**
-```typescript
-<div className={cn(
-  "flex items-center gap-3 p-3 rounded-xl",
-  platform === 'tiktok' 
-    ? "bg-gradient-to-r from-black/50 via-[#25F4EE]/20 to-[#FE2C55]/20 border-[#25F4EE]/30"
-    : "bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-orange-500/20 border-primary/30"
-)}>
-  <Avatar className={cn(
-    "h-10 w-10",
-    platform === 'tiktok' ? "ring-2 ring-[#25F4EE]" : "ring-2 ring-pink-500"
-  )}>
-    {platform === 'tiktok' ? <TikTokIcon /> : <Instagram />}
-  </Avatar>
-  <div>
-    <h2>Agente {platform === 'tiktok' ? 'TikTok' : 'Instagram'}</h2>
-    <Badge>{platform === 'tiktok' ? 'Drafts/Inbox' : 'Auto-post'}</Badge>
-  </div>
-</div>
-```
-
-**Ações Rápidas TikTok:**
-```typescript
-const TIKTOK_ACTIONS = [
-  { label: 'Criar Reels', prompt: 'Crie um vídeo viral sobre IA para TikTok' },
-  { label: 'Tendências', prompt: 'Quais são as tendências do TikTok hoje?' },
-  { label: 'Rodar Agente', prompt: 'Execute o agente focado em TikTok' },
-];
-
-const INSTAGRAM_ACTIONS = [
-  { label: 'Criar 5 posts', prompt: 'Crie 5 posts para Instagram' },
-  { label: 'Carrossel', prompt: 'Crie um carrossel educativo' },
-  { label: 'Analytics', prompt: 'Mostre analytics do Instagram' },
-];
-```
-
-### Arquivo 3: `src/index.css`
-
-**Adicionar estilos TikTok:**
-```css
-.tiktok-gradient {
-  background: linear-gradient(135deg, #25F4EE, #FE2C55);
-  border-color: #25F4EE;
-}
-
-.tiktok-glow {
-  box-shadow: 0 0 20px rgba(37, 244, 238, 0.3),
-              0 0 40px rgba(254, 44, 85, 0.2);
-}
-
-.instagram-gradient {
-  background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF);
-}
-```
-
-### Arquivo 4: Notificação de Vídeos Pendentes
-
-**Novo componente no Chat:**
-```typescript
-// Buscar posts com needs_processing
-const { data: pendingVideos } = useQuery({
-  queryKey: ['pending-videos', platform],
-  queryFn: async () => {
-    const { data } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('status', 'draft')
-      .not('overlay_metadata->needs_processing', 'is', null)
-      .contains('platforms', [platform]);
-    return data;
-  }
-});
-
-// Mostrar badge no topo do chat
-{pendingVideos?.length > 0 && (
-  <div className="bg-yellow-500/10 border-yellow-500/30 p-3 rounded-lg">
-    <p>🎬 {pendingVideos.length} vídeo(s) aguardando renderização</p>
-    <Button onClick={() => renderNextVideo()}>
-      Renderizar Agora
-    </Button>
-  </div>
-)}
-```
+**46 posts por semana = 6-7 posts por dia.** Cada post gasta créditos de IA. Com essa meta, o agente vai gastar indefinidamente. Isso precisa ser reduzido drasticamente.
 
 ---
 
-## Arquivos que Serão Modificados
+## Solução: Modo "Custo Zero" em 3 Etapas
 
-1. **`src/components/tabs/AgentTab.tsx`** - Adicionar seletor de plataforma
-2. **`src/components/agent/AgentHeroChat.tsx`** - Tema dinâmico, ações por plataforma, vídeos pendentes
-3. **`src/index.css`** - Estilos TikTok e Instagram
-4. **`src/components/agent/AgentReportsTab.tsx`** - Filtrar relatórios por plataforma
+### Etapa 1 — Substituir IA de imagem por código SVG puro (economy: ~80% dos créditos)
+
+**`add-watermark`**: Remover completamente a chamada ao `gemini-2.5-flash-image`. Substituir por uma técnica de composição programática:
+- Baixar imagem
+- Usar a API de `upload-external-image` já existente para proxy
+- Adicionar o texto de marca d'água como **metadado** no banco de dados (sem modificar a imagem)
+- Ou usar um canvas SVG leve via Deno para sobrescrever o badge
+
+**`apply-text-overlay`**: Remover a segunda chamada ao modelo de imagem. A headline gerada pela primeira chamada (flash-lite, barata) será salva no banco (`overlay_metadata`) e renderizada no **frontend via Canvas HTML** quando o usuário visualizar o post — sem custo de servidor.
+
+### Etapa 2 — Reduzir metas semanais do agente autônomo
+
+As metas atuais de 46 posts/semana serão reduzidas para valores razoáveis:
+- Vídeos: 9 → **2**
+- Carrosséis: 6 → **1**
+- Notícias: 17 → **5**
+- Imagens: 14 → **3**
+
+**Total: 11 posts/semana** (de 46 para 11, corte de 76%)
+
+### Etapa 3 — Otimizar `search-images-for-video` (sem IA para entity extraction)
+
+A função `extractEntities` chama IA para gerar 4 queries de busca de imagem. Isso é desnecessário — o título do artigo já é suficiente para buscar no Pexels. Remover essa chamada de IA e usar o título diretamente como query.
 
 ---
 
-## Resultado Final
+## Custo estimado APÓS as mudanças
 
-- Interface unificada com foco em TikTok (primeira aba)
-- Visual temático bonito que muda conforme a plataforma
-- Vídeos do agente aparecem como "pendentes" e podem ser renderizados com 1 clique
-- Separação clara entre conversas TikTok e Instagram
-- Experiência mais profissional e organizada
+| Item | Antes | Depois |
+|------|-------|--------|
+| Chamadas de imagem IA por vídeo | 4 × caro | 0 (código puro) |
+| Chamadas de imagem IA por notícia | 1 × caro | 0 (Canvas frontend) |
+| Headline de notícia | flash-lite | flash-lite (mantido) |
+| Caption de post | flash-lite | flash-lite (mantido) |
+| Posts por semana | 46 | 11 |
+| Custo estimado/mês | ~$2-3 | ~**$0.05-0.15** |
+
+---
+
+## Arquivos que serão modificados
+
+### `supabase/functions/add-watermark/index.ts`
+- **Remover**: Função `applyWatermarkOnly` e `applyHeadlineWithAI` (ambas chamam `gemini-2.5-flash-image`)
+- **Adicionar**: Upload direto da imagem original para Storage sem modificação de IA, retornando a URL com os dados de marca d'água como metadado
+- **Resultado**: Zero custo de IA por watermark
+
+### `supabase/functions/apply-text-overlay/index.ts`
+- **Remover**: Chamada ao `gemini-2.5-flash-image` na função `createProgrammaticOverlay`
+- **Manter**: Apenas a chamada `gemini-2.5-flash-lite` para gerar texto da headline (custo muito baixo)
+- **Adicionar**: Retornar a imagem original + texto da headline nos metadados (o frontend aplica o overlay via Canvas)
+- **Resultado**: 1 chamada barata (flash-lite) ao invés de 1 cara (flash-image)
+
+### `supabase/functions/search-images-for-video/index.ts`
+- **Remover**: Chamada à função `extractEntities` que usa IA para gerar queries (essa função chama flash-lite mas não é necessária)
+- **Manter**: Busca Pexels usando o título/topic diretamente
+- **Resultado**: Zero chamadas de IA para buscar imagens
+
+### `supabase/functions/ai-agent-core/index.ts`
+- **Modificar**: Reduzir `weeklyGoals` padrão de `{ videos: 9, carousels: 6, news: 17, images: 14 }` para `{ videos: 2, carousels: 1, news: 5, images: 3 }`
+- **Resultado**: Agente criará 11 posts/semana em vez de 46
+
+### Banco de dados — `agent_context`
+- Reset dos goals na tabela para os novos valores menores
+
+---
+
+## Resumo do impacto
+
+O gasto principal não era o chat com o agente, mas sim o `add-watermark` sendo chamado **dezenas de vezes por hora** (para cada imagem de cada vídeo criado automaticamente), usando o modelo de geração de imagem mais caro. Com o agente autônomo rodando a cada 2 horas e criando vídeos com 4 imagens cada, isso acumula rápido.
+
+As mudanças propostas eliminam **~95% dos gastos de IA** mantendo toda a funcionalidade visual intacta, apenas movendo a renderização do texto de "servidor caro" para "navegador gratuito".
