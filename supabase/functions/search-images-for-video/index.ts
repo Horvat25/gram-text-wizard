@@ -88,11 +88,50 @@ function buildThreeQueries(title: string, description: string = ''): [string, st
   return [q1, q2, q3];
 }
 
+// ============= CHECK ARTICLE IMAGE TOPIC RELEVANCE =============
+function isArticleImageRelevant(imageUrl: string, title: string, description: string): boolean {
+  const urlLower = imageUrl.toLowerCase();
+  const textLower = (title + ' ' + description).toLowerCase();
+
+  // Sinais de que o tema é tech/IA/negócios
+  const techKeywords = ['ai', 'openai', 'google', 'apple', 'microsoft', 'meta', 'nvidia',
+    'robot', 'tech', 'gpt', 'llm', 'chip', 'software', 'data', 'cloud', 'cyber',
+    'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon'];
+
+  const isTechTopic = techKeywords.some(k => textLower.includes(k));
+
+  if (!isTechTopic) return true; // Não é tech → aceitar qualquer imagem do artigo
+
+  // Se é tech, rejeitar imagens com sinais de conteúdo humano/político/esportivo
+  const humanSignals = [
+    'politician', 'presidente', 'candidato', 'eleicao', 'bolsonaro', 'lula',
+    'futebol', 'soccer', 'sport', 'athlete', 'celebrit', 'actor', 'singer',
+    'jersey', 'stadium', 'rally', 'protest', 'manifestacao', 'partido',
+    'campaign', 'election', 'vote', 'politica',
+  ];
+
+  // Checar na URL
+  if (humanSignals.some(s => urlLower.includes(s))) {
+    console.warn('[images] ⚠️ Article og:image rejected — human/political signal in URL:', imageUrl.substring(0, 80));
+    return false;
+  }
+
+  // Checar extensões suspeitas de imagens de pessoas (tamanhos pequenos típicos de rostos)
+  const suspectPatterns = [/\/people\//, /\/person\//, /\/face\//, /\/portrait\//];
+  if (suspectPatterns.some(p => p.test(urlLower))) {
+    console.warn('[images] ⚠️ Article og:image rejected — person pattern in URL');
+    return false;
+  }
+
+  return true;
+}
+
 // ============= SCORE CANDIDATE =============
 function scoreCandidate(url: string, query: string, isArticleImage: boolean): number {
   let score = 50;
 
-  if (isArticleImage) score += 30; // artigo original tem prioridade alta
+  // Artigo tem prioridade APENAS se relevante (validado antes de chamar esta função)
+  if (isArticleImage) score += 25;
 
   const urlLower = url.toLowerCase();
   const queryWords = query.toLowerCase().split(' ').filter(w => w.length > 3);
@@ -296,11 +335,16 @@ serve(async (req) => {
 
       const pool: Candidate[] = [];
 
-      // Article images — highest priority
+      // Article images — alta prioridade SOMENTE se relevantes ao tema
       for (let i = 0; i < articleImages.length; i++) {
         const img = articleImages[i];
         const sid = `article_${i}`;
         if (!usedIds.has(sid)) {
+          const relevant = isArticleImageRelevant(img, finalTitle, finalDescription);
+          if (!relevant) {
+            console.warn(`[images] ⛔ Skipping article image[${i}] — not relevant to topic`);
+            continue;
+          }
           pool.push({
             url: img,
             sourceId: sid,
