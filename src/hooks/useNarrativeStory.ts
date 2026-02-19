@@ -430,8 +430,12 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log("[TTS] Audio duration detected:", audioDuration, "seconds");
       console.log("[Music] Background music URL:", backgroundMusicUrl ? "Generated" : "None");
       
-      if (audioDuration > 0) {
-        const durationPerSegment = audioDuration / segments.length;
+      // 🔒 Limite máximo de 30 segundos
+      const MAX_DURATION = 30;
+      const clampedDuration = Math.min(audioDuration > 0 ? audioDuration : 0, MAX_DURATION);
+
+      if (clampedDuration > 0) {
+        const durationPerSegment = clampedDuration / segments.length;
         
         setState(prev => {
           let currentTime = 0;
@@ -443,7 +447,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           return { 
             ...prev, 
             segments: updatedSegments,
-            totalDuration: audioDuration,
+            totalDuration: clampedDuration,
             narrationUrl, 
             ctaNarrationUrl,
             backgroundMusicUrl,
@@ -462,8 +466,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         });
       }
       
-      // Estimate duration based on text length
-      const estimatedDuration = estimateSpeechDuration(fullScript);
+      // Estimate duration based on text length — capped at 30s
+      const estimatedDuration = Math.min(estimateSpeechDuration(fullScript), 30);
       const durationPerSegment = estimatedDuration / segments.length;
       
       setState(prev => {
