@@ -238,70 +238,102 @@ function generateHumanDelay(): number {
 }
 
 // ============= IMAGE RELEVANCE GUARD FOR RSS NEWS POSTS =============
+// ── Image Relevance Engine (inline for agent-chat — mirrors _shared/image-relevance.ts) ──
+// Full version lives in _shared/image-relevance.ts used by search-images-for-video.
+// Duplicated here to avoid cross-function import issues in edge function bundling.
+
+const MARKETING_CDNS_AGENT = [
+  'prismic.io', 'cdn.sanity.io', 'images.ctfassets.net',
+  'assets.anthropic.com', 'images.openai.com', 'cdn.openai.com',
+  'storage.googleapis.com/openai', '/og-image', '/social-card',
+  '/social-share', '/opengraph', '/hero-image', '/marketing/', '/ads/',
+  '/blog-images/', '/press-release/',
+];
+
+const FORBIDDEN_TERMS_AGENT = [
+  'woman', 'man', 'girl', 'boy', 'fashion', 'beauty', 'fitness', 'body',
+  'sexy', 'posing', 'sensual', 'attractive', 'glamour', 'bikini',
+  'wedding', 'party', 'lifestyle', 'influencer', 'makeup', 'hairstyle',
+  'dress', 'people smiling', 'couple', 'children', 'baby', 'crowd',
+];
+
+const TECH_ENTITY_MAP_AGENT: Record<string, string[]> = {
+  'openai': ['openai', 'gpt'], 'chatgpt': ['chatgpt'], 'gpt': ['gpt', 'openai'],
+  'claude': ['anthropic', 'ai'], 'anthropic': ['anthropic', 'ai'],
+  'gemini': ['google', 'gemini'], 'copilot': ['microsoft', 'copilot'],
+  'nvidia': ['nvidia', 'gpu'], 'tesla': ['tesla'], 'spacex': ['spacex'],
+  'apple': ['apple', 'iphone'], 'microsoft': ['microsoft'], 'google': ['google'],
+  'amazon': ['amazon', 'aws'], 'deepmind': ['deepmind'], 'mistral': ['mistral'],
+  'xai': ['xai', 'grok'], 'grok': ['grok', 'xai'], 'robot': ['robot'],
+  'humanoid': ['humanoid'], 'chip': ['chip', 'semiconductor'],
+  'bitcoin': ['bitcoin'], 'blockchain': ['blockchain'],
+  'h100': ['nvidia', 'gpu'], 'colossus': ['data center', 'server'],
+  'sam altman': ['openai', 'ai'], 'elon musk': ['tesla', 'spacex'],
+};
+
+function extractEntitiesAgent(title: string): string[] {
+  const entities: string[] = [];
+  const titleLower = title.toLowerCase();
+  for (const [key, values] of Object.entries(TECH_ENTITY_MAP_AGENT)) {
+    if (titleLower.includes(key)) entities.push(...values);
+  }
+  const capWords = title.match(/\b[A-Z][a-zA-Z]{2,}\b/g) || [];
+  const generic = new Set(['The','New','This','That','With','From','For','And','Are',
+    'Has','Was','Will','Can','Its','Not','More','Says','Said','Nova','Novo']);
+  for (const w of capWords) {
+    if (!generic.has(w) && !entities.includes(w.toLowerCase())) entities.push(w.toLowerCase());
+  }
+  return [...new Set(entities)].slice(0, 6);
+}
+
 // Validates if an og:image URL is relevant to a tech/news topic before using it.
-// Prevents off-topic images (ads, politicians, sports, company marketing) from appearing in tech content.
+// Uses the Image Relevance Engine logic (forbidden terms + marketing CDN detection).
 function isRssImageRelevant(imageUrl: string, title: string, description: string): boolean {
   if (!imageUrl) return false;
 
   const urlLower = imageUrl.toLowerCase();
-  const textLower = (title + ' ' + description).toLowerCase();
 
   // Always reject tracking/icon images
-  const badSignals = ['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'avatar', 'logo'];
-  if (badSignals.some(s => urlLower.includes(s))) return false;
+  if (['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'avatar', 'logo']
+      .some(s => urlLower.includes(s))) return false;
 
-  // Check if this is a tech/AI/business topic
-  const techKeywords = ['ai', 'openai', 'google', 'apple', 'microsoft', 'meta', 'nvidia',
-    'robot', 'tech', 'gpt', 'llm', 'chip', 'software', 'data', 'cloud', 'cyber',
-    'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon', 'iphone',
-    'android', 'computador', 'inteligência', 'artificial', 'machine learning', 'neural',
-    'anthropic', 'claude', 'gemini', 'copilot', 'mistral', 'deepmind', 'xai', 'grok'];
-
-  const isTechTopic = techKeywords.some(k => textLower.includes(k));
-
-  // For non-tech topics, accept any image
-  if (!isTechTopic) return true;
-
-  // For tech topics, reject URLs with human/political/sports signals in the path
-  const humanSignals = ['politician', 'presidente', 'candidato', 'eleicao', 'election',
-    'futebol', 'soccer', 'sport', 'athlete', 'celebrity', 'actor', 'singer',
-    'jersey', 'stadium', 'rally', 'protest', 'manifestacao', 'partido', 'campaign',
-    'voto', 'politica', 'ancelotti', 'governo', 'senado', 'camara', 'deputado',
-    '/pessoas/', '/person/', '/people/', '/portrait/', '/rostos/', '/face/'];
-
-  if (humanSignals.some(s => urlLower.includes(s))) {
-    console.log('[RSS] ⚠️ Rejected og:image (human/political signal):', imageUrl.substring(0, 80));
+  // ── Marketing CDN check (always reject — company ads/people photos) ──
+  if (MARKETING_CDNS_AGENT.some(s => urlLower.includes(s))) {
+    console.log('[RSS] ⛔ Marketing CDN rejected:', imageUrl.substring(0, 80));
     return false;
   }
 
-  // ⚡ KEY FIX: Reject images from company marketing/blog CDNs.
-  // Tech company blog og:images are typically ads or people-centric marketing shots,
-  // not useful product visuals. E.g. Anthropic Claude ad with smiling woman.
-  const marketingCdnSignals = [
-    'prismic.io',            // Anthropic, many AI startups use Prismic CMS
-    'cdn.sanity.io',         // Sanity CMS (marketing sites)
-    'images.ctfassets.net',  // Contentful (used by Anthropic, OpenAI blog)
-    'assets.anthropic.com',  // Anthropic direct assets
-    'images.openai.com',     // OpenAI marketing images
-    'cdn.openai.com',        // OpenAI CDN
-    'storage.googleapis.com/openai', // OpenAI GCS bucket
-    'blogimages.',           // Generic blog image subdomains
-    '/blog-images/',
-    '/blog/assets/',
-    '/press-release/',
-    '/newsroom/images/',
-    '/marketing/',
-    '/ads/',
-    '/banner',
-    '/hero-image',
-    '/og-image',             // Generic og:image placeholders
-    '/social-card',          // Social media cards (usually branding/people)
-    '/social-share',
-    '/opengraph',
-  ];
+  const textLower = (title + ' ' + description).toLowerCase();
 
-  if (marketingCdnSignals.some(s => urlLower.includes(s))) {
-    console.log('[RSS] ⚠️ Rejected og:image (marketing CDN/path):', imageUrl.substring(0, 80));
+  // Tech/AI topic check
+  const techKeywords = ['ai', 'openai', 'google', 'apple', 'microsoft', 'meta', 'nvidia',
+    'robot', 'tech', 'gpt', 'llm', 'chip', 'software', 'data', 'cloud', 'cyber',
+    'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon', 'iphone',
+    'computador', 'inteligência', 'artificial', 'anthropic', 'claude', 'gemini',
+    'copilot', 'mistral', 'deepmind', 'xai', 'grok'];
+
+  const isTechTopic = techKeywords.some(k => textLower.includes(k));
+  if (!isTechTopic) return true; // Non-tech → accept
+
+  // ── Forbidden terms check ──
+  const entities = extractEntitiesAgent(title);
+  const hasForbiddenTerm = FORBIDDEN_TERMS_AGENT.some(term => urlLower.includes(term));
+  if (hasForbiddenTerm) {
+    const hasStrongEntity = entities.some(e => e.length > 3 && urlLower.includes(e));
+    if (!hasStrongEntity) {
+      console.log('[RSS] ⛔ Forbidden term in og:image URL:', imageUrl.substring(0, 80));
+      return false;
+    }
+  }
+
+  // ── Human/political URL signals ──
+  const humanSignals = ['politician', 'presidente', 'candidato', 'eleicao', 'election',
+    'futebol', 'soccer', 'sport', 'athlete', 'celebrity', 'actor', 'singer',
+    'jersey', 'stadium', 'rally', 'protest', 'manifestacao', 'partido', 'campaign',
+    'voto', 'politica', '/pessoas/', '/person/', '/people/', '/portrait/', '/rostos/'];
+
+  if (humanSignals.some(s => urlLower.includes(s))) {
+    console.log('[RSS] ⛔ Human/political signal in URL:', imageUrl.substring(0, 80));
     return false;
   }
 
@@ -1826,7 +1858,10 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
       imageSource = 'rss-og';
       console.log('[RSS_NEWS_POST] ✅ og:image validated as relevant');
     } else {
-      console.log('[RSS_NEWS_POST] ⚠️ og:image rejected or missing — searching Pexels/Unsplash for topic');
+      // og:image rejected → search Pexels/Unsplash with entity-based query
+      const entities = extractEntitiesAgent(newsItem.title);
+      const entityQuery = entities.slice(0, 3).join(' ') || topic_filter || newsItem.title;
+      console.log('[RSS_NEWS_POST] ⚠️ og:image rejected — fallback search with entities:', entities, '| query:', entityQuery);
       try {
         const imgSearchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
           method: 'POST',
@@ -1836,7 +1871,7 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
             articleDescription: newsItem.description || '',
             articleUrl: newsItem.link,
             useArticleMode: true,
-            skipWatermark: true, // Skip watermark so add-watermark can apply headline cleanly
+            skipWatermark: true,
           })
         });
         if (imgSearchResponse.ok) {
@@ -1844,7 +1879,7 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
           if (imgResult.images && imgResult.images.length > 0) {
             rawImageUrl = imgResult.images[0].imageUrl;
             imageSource = imgResult.images[0].source || 'pexels';
-            console.log('[RSS_NEWS_POST] ✅ Fallback image from:', imageSource);
+            console.log('[RSS_NEWS_POST] ✅ Engine fallback image from:', imageSource, '| entities used:', imgResult.stats?.entities);
           }
         }
       } catch (e) {
@@ -1854,7 +1889,7 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
       if (!rawImageUrl && ogImageUrl) {
         rawImageUrl = ogImageUrl;
         imageSource = 'rss-og-fallback';
-        console.log('[RSS_NEWS_POST] Using og:image as last resort');
+        console.log('[RSS_NEWS_POST] ⚠️ Using og:image as last resort');
       }
     }
 
