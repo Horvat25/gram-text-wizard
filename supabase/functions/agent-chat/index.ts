@@ -239,27 +239,32 @@ function generateHumanDelay(): number {
 
 // ============= IMAGE RELEVANCE GUARD FOR RSS NEWS POSTS =============
 // Validates if an og:image URL is relevant to a tech/news topic before using it.
-// Prevents off-topic images (politicians, sports events) from appearing in tech content.
+// Prevents off-topic images (ads, politicians, sports, company marketing) from appearing in tech content.
 function isRssImageRelevant(imageUrl: string, title: string, description: string): boolean {
   if (!imageUrl) return false;
 
   const urlLower = imageUrl.toLowerCase();
   const textLower = (title + ' ' + description).toLowerCase();
 
+  // Always reject tracking/icon images
+  const badSignals = ['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'avatar', 'logo'];
+  if (badSignals.some(s => urlLower.includes(s))) return false;
+
   // Check if this is a tech/AI/business topic
   const techKeywords = ['ai', 'openai', 'google', 'apple', 'microsoft', 'meta', 'nvidia',
     'robot', 'tech', 'gpt', 'llm', 'chip', 'software', 'data', 'cloud', 'cyber',
     'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon', 'iphone',
-    'android', 'computador', 'inteligência', 'artificial', 'machine learning', 'neural'];
+    'android', 'computador', 'inteligência', 'artificial', 'machine learning', 'neural',
+    'anthropic', 'claude', 'gemini', 'copilot', 'mistral', 'deepmind', 'xai', 'grok'];
 
   const isTechTopic = techKeywords.some(k => textLower.includes(k));
 
   // For non-tech topics, accept any image
   if (!isTechTopic) return true;
 
-  // For tech topics, reject URLs with human/political/sports signals
+  // For tech topics, reject URLs with human/political/sports signals in the path
   const humanSignals = ['politician', 'presidente', 'candidato', 'eleicao', 'election',
-    'futebol', 'soccer', 'sport', 'athlete', 'celebrity', 'actor', 'singer', 'singer',
+    'futebol', 'soccer', 'sport', 'athlete', 'celebrity', 'actor', 'singer',
     'jersey', 'stadium', 'rally', 'protest', 'manifestacao', 'partido', 'campaign',
     'voto', 'politica', 'ancelotti', 'governo', 'senado', 'camara', 'deputado',
     '/pessoas/', '/person/', '/people/', '/portrait/', '/rostos/', '/face/'];
@@ -269,9 +274,36 @@ function isRssImageRelevant(imageUrl: string, title: string, description: string
     return false;
   }
 
-  // Reject suspiciously small or tracking images
-  const badSignals = ['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'avatar', 'logo'];
-  if (badSignals.some(s => urlLower.includes(s))) return false;
+  // ⚡ KEY FIX: Reject images from company marketing/blog CDNs.
+  // Tech company blog og:images are typically ads or people-centric marketing shots,
+  // not useful product visuals. E.g. Anthropic Claude ad with smiling woman.
+  const marketingCdnSignals = [
+    'prismic.io',            // Anthropic, many AI startups use Prismic CMS
+    'cdn.sanity.io',         // Sanity CMS (marketing sites)
+    'images.ctfassets.net',  // Contentful (used by Anthropic, OpenAI blog)
+    'assets.anthropic.com',  // Anthropic direct assets
+    'images.openai.com',     // OpenAI marketing images
+    'cdn.openai.com',        // OpenAI CDN
+    'storage.googleapis.com/openai', // OpenAI GCS bucket
+    'blogimages.',           // Generic blog image subdomains
+    '/blog-images/',
+    '/blog/assets/',
+    '/press-release/',
+    '/newsroom/images/',
+    '/marketing/',
+    '/ads/',
+    '/banner',
+    '/hero-image',
+    '/og-image',             // Generic og:image placeholders
+    '/social-card',          // Social media cards (usually branding/people)
+    '/social-share',
+    '/opengraph',
+  ];
+
+  if (marketingCdnSignals.some(s => urlLower.includes(s))) {
+    console.log('[RSS] ⚠️ Rejected og:image (marketing CDN/path):', imageUrl.substring(0, 80));
+    return false;
+  }
 
   return true;
 }

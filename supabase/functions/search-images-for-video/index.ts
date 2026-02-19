@@ -129,33 +129,58 @@ function isArticleImageRelevant(imageUrl: string, title: string, description: st
   const urlLower = imageUrl.toLowerCase();
   const textLower = (title + ' ' + description).toLowerCase();
 
+  // Always reject tracking/icon images
+  const badSignals = ['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'avatar'];
+  if (badSignals.some(s => urlLower.includes(s))) return false;
+
   // Sinais de que o tema é tech/IA/negócios
   const techKeywords = ['ai', 'openai', 'google', 'apple', 'microsoft', 'meta', 'nvidia',
     'robot', 'tech', 'gpt', 'llm', 'chip', 'software', 'data', 'cloud', 'cyber',
-    'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon'];
+    'startup', 'crypto', 'bitcoin', 'space', 'tesla', 'samsung', 'amazon',
+    'anthropic', 'claude', 'gemini', 'copilot', 'mistral', 'deepmind', 'xai'];
 
   const isTechTopic = techKeywords.some(k => textLower.includes(k));
 
   if (!isTechTopic) return true; // Não é tech → aceitar qualquer imagem do artigo
 
-  // Se é tech, rejeitar imagens com sinais de conteúdo humano/político/esportivo
+  // Se é tech, rejeitar imagens com sinais de conteúdo humano/político/esportivo na URL
   const humanSignals = [
     'politician', 'presidente', 'candidato', 'eleicao', 'bolsonaro', 'lula',
     'futebol', 'soccer', 'sport', 'athlete', 'celebrit', 'actor', 'singer',
     'jersey', 'stadium', 'rally', 'protest', 'manifestacao', 'partido',
     'campaign', 'election', 'vote', 'politica',
+    '/people/', '/person/', '/face/', '/portrait/',
   ];
 
-  // Checar na URL
   if (humanSignals.some(s => urlLower.includes(s))) {
     console.warn('[images] ⚠️ Article og:image rejected — human/political signal in URL:', imageUrl.substring(0, 80));
     return false;
   }
 
-  // Checar extensões suspeitas de imagens de pessoas (tamanhos pequenos típicos de rostos)
-  const suspectPatterns = [/\/people\//, /\/person\//, /\/face\//, /\/portrait\//];
-  if (suspectPatterns.some(p => p.test(urlLower))) {
-    console.warn('[images] ⚠️ Article og:image rejected — person pattern in URL');
+  // ⚡ KEY FIX: Rejeitar imagens de CDNs de marketing corporativo tech.
+  // og:images de blogs de empresas tech (Anthropic, OpenAI, etc.) costumam ser
+  // anúncios com rostos humanos, não imagens de produto.
+  const marketingCdnSignals = [
+    'prismic.io',            // Anthropic e outras AI startups usam Prismic
+    'cdn.sanity.io',         // Sanity CMS (sites de marketing)
+    'images.ctfassets.net',  // Contentful (Anthropic, OpenAI blog)
+    'assets.anthropic.com',
+    'images.openai.com',
+    'cdn.openai.com',
+    'storage.googleapis.com/openai',
+    '/og-image',
+    '/social-card',
+    '/social-share',
+    '/opengraph',
+    '/hero-image',
+    '/banner',
+    '/marketing/',
+    '/ads/',
+    '/blog-images/',
+  ];
+
+  if (marketingCdnSignals.some(s => urlLower.includes(s))) {
+    console.warn('[images] ⚠️ Article og:image rejected — marketing CDN:', imageUrl.substring(0, 80));
     return false;
   }
 
