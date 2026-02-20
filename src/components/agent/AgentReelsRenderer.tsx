@@ -161,7 +161,11 @@ export default function AgentReelsRenderer({
           segmentsToUse.length,
           "segments"
         );
-        await renderFromScript(segmentsToUse, titleToUse);
+        const articleInfo = {
+          articleUrl: metadata?.article_url,
+          articleImageUrl: metadata?.article_image_url,
+        };
+        await renderFromScript(segmentsToUse, titleToUse, articleInfo);
       } else {
         // Fallback to generating from topic if no segments
         console.log("[AgentReelsRenderer] No existing segments, generating from topic:", topicToUse);

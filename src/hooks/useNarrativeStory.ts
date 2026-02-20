@@ -135,18 +135,24 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
   // Step 2: Search for real images (Pexels > Unsplash > Firecrawl > AI)
   // TODAS as imagens são salvas no Storage antes de retornar (elimina CORS no render)
-  const generateImages = useCallback(async (segments: StorySegment[], topic?: string) => {
+  const generateImages = useCallback(async (segments: StorySegment[], topic?: string, articleInfo?: { articleUrl?: string; articleImageUrl?: string }) => {
     setState(prev => ({ ...prev, step: "images", progress: 20 }));
     
     const updatedSegments = [...segments];
     
     console.log('[IMAGES] 🌐 Buscando imagens (Pexels > Unsplash > Firecrawl > AI)...');
+    if (articleInfo?.articleImageUrl) {
+      console.log('[IMAGES] 📰 Article image available:', articleInfo.articleImageUrl.substring(0, 60));
+    }
     
     try {
       const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
         body: {
           topic: topic || segments[0]?.text || 'tecnologia',
           segments: segments.map(s => ({ text: s.text, imagePrompt: s.imagePrompt })),
+          articleUrl: articleInfo?.articleUrl || undefined,
+          articleImageUrl: articleInfo?.articleImageUrl || undefined,
+          useArticleMode: !!(articleInfo?.articleUrl || articleInfo?.articleImageUrl),
         }
       });
       
@@ -607,12 +613,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
   }, [generateScript, generateImages, generateAudio, generateVideo]);
 
   // Render from existing script - uses pre-generated segments instead of generating new ones
-  const renderFromScript = useCallback(async (existingSegments: Array<{ text: string; imagePrompt: string }>, title?: string) => {
+  const renderFromScript = useCallback(async (existingSegments: Array<{ text: string; imagePrompt: string }>, title?: string, articleInfo?: { articleUrl?: string; articleImageUrl?: string }) => {
     abortRef.current = false;
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
     console.log('[renderFromScript] Using existing script with', existingSegments.length, 'segments');
+    if (articleInfo?.articleImageUrl) {
+      console.log('[renderFromScript] 📰 Article image provided:', articleInfo.articleImageUrl.substring(0, 60));
+    }
 
     // Build segments with timing from existing data
     let currentTime = 0;
@@ -640,8 +649,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    // Step 2: Images (busca da web primeiro, IA como fallback)
-    const segmentsWithImages = await generateImages(segments, title);
+    // Step 2: Images (article image first, then web search for remaining)
+    const segmentsWithImages = await generateImages(segments, title, articleInfo);
     if (!segmentsWithImages || abortRef.current) {
       setIsGenerating(false);
       return;
