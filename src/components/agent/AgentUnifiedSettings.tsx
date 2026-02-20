@@ -6,46 +6,18 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Slider } from '@/components/ui/slider';
 import { 
-  Settings, 
-  Save,
-  Instagram,
-  Music2,
-  Clock,
-  Gauge,
-  Bot,
-  Sparkles,
-  Target,
-  Hash,
-  Ban,
-  Upload,
-  Brain,
-  Users,
-  Briefcase,
-  Loader2,
-  Check,
-  X,
-  Play,
-  Timer,
-  Zap,
-  Calendar,
-  Video,
-  Image,
-  Newspaper,
-  ChevronDown,
-  ChevronUp,
-  Settings2
+  Settings, Save, Instagram, Music2, Clock, Gauge, Bot, Sparkles,
+  Target, Hash, Play, Timer, Zap, Calendar, ChevronDown, ChevronUp,
+  Settings2, Loader2, Eye, Users, TrendingUp, Briefcase, Brain
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 import { format, setHours, setMinutes, isBefore, differenceInMinutes } from 'date-fns';
 import { AgentContext } from '@/hooks/useAgentContext';
 
@@ -54,14 +26,6 @@ interface AgentUnifiedSettingsProps {
   onUpdate: (updates: Partial<AgentContext>) => Promise<void>;
   onRunAgent: () => void;
   isRunning: boolean;
-}
-
-interface WeeklyGoals {
-  totalPosts: number;
-  videos: number;
-  carousels: number;
-  news: number;
-  images: number;
 }
 
 const CRON_FREQUENCIES = [
@@ -73,14 +37,6 @@ const CRON_FREQUENCIES = [
   { value: '12', label: '12h' },
   { value: '24', label: '24h' },
 ];
-
-const DEFAULT_GOALS: WeeklyGoals = {
-  totalPosts: 14,
-  videos: 3,
-  carousels: 2,
-  news: 4,
-  images: 5
-};
 
 const PERSONALITY_TRAITS = [
   'Analítico', 'Criativo', 'Estratégico', 'Empático', 
@@ -102,10 +58,8 @@ export default function AgentUnifiedSettings({
   const [isSaving, setIsSaving] = useState(false);
   const [cronFrequency, setCronFrequency] = useState('6');
   const [countdown, setCountdown] = useState<string>('');
-  const [goals, setGoals] = useState<WeeklyGoals>(DEFAULT_GOALS);
   const [showGoals, setShowGoals] = useState(false);
   
-  // Config state
   const [config, setConfig] = useState({
     agent_name: context?.agent_name || 'Aria',
     agent_avatar_url: context?.agent_avatar_url || null,
@@ -115,13 +69,15 @@ export default function AgentUnifiedSettings({
     target_audience: context?.target_audience || '',
     industry_niche: context?.industry_niche || 'Tecnologia',
     hashtag_strategy: context?.hashtag_strategy || 'moderate',
-    daily_post_limit: context?.daily_post_limit || 2,
     min_hours_between_posts: context?.min_hours_between_posts || 4,
     preferred_platforms: context?.preferred_platforms || ['instagram'],
     auto_post_enabled: context?.auto_post_enabled || false,
+    // Macro objectives
+    goal_weekly_views: (context as any)?.goal_weekly_views || 10000,
+    goal_weekly_followers: (context as any)?.goal_weekly_followers || 100,
+    goal_weekly_engagement: (context as any)?.goal_weekly_engagement || 5.0,
   });
 
-  // Update local state when context changes
   useEffect(() => {
     if (context) {
       setConfig({
@@ -133,10 +89,12 @@ export default function AgentUnifiedSettings({
         target_audience: context.target_audience || '',
         industry_niche: context.industry_niche || 'Tecnologia',
         hashtag_strategy: context.hashtag_strategy || 'moderate',
-        daily_post_limit: context.daily_post_limit || 2,
         min_hours_between_posts: context.min_hours_between_posts || 4,
         preferred_platforms: context.preferred_platforms || ['instagram'],
         auto_post_enabled: context.auto_post_enabled || false,
+        goal_weekly_views: (context as any)?.goal_weekly_views || 10000,
+        goal_weekly_followers: (context as any)?.goal_weekly_followers || 100,
+        goal_weekly_engagement: (context as any)?.goal_weekly_engagement || 5.0,
       });
     }
   }, [context]);
@@ -174,7 +132,7 @@ export default function AgentUnifiedSettings({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await onUpdate(config);
+      await onUpdate(config as any);
       toast.success('Configurações salvas!');
     } catch (error) {
       toast.error('Erro ao salvar configurações');
@@ -273,45 +231,84 @@ export default function AgentUnifiedSettings({
             {isRunning ? 'Executando...' : 'Executar Agora'}
           </Button>
 
-          {/* Weekly Goals - Collapsible */}
+          {/* Macro Objectives */}
           <Collapsible open={showGoals} onOpenChange={setShowGoals}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" className="w-full justify-between">
                 <span className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-green-500" />
-                  Metas Semanais
+                  Objetivos Macro (Semanal)
                 </span>
                 {showGoals ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3">
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-primary">{goals.totalPosts}</div>
-                  <div className="text-xs text-muted-foreground">Total</div>
-                </div>
-                <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-pink-500">{goals.videos}</div>
-                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                    <Video className="h-3 w-3" /> Vídeos
+            <CollapsibleContent className="pt-3 space-y-4">
+              <p className="text-xs text-muted-foreground">
+                O agente decide automaticamente quantos posts criar com base nesses objetivos. Quanto mais distante da meta, mais posts ele cria por dia.
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Views Goal */}
+                <div className="p-4 rounded-lg bg-muted/30 border space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm font-medium">Visualizações</span>
                   </div>
+                  <Input
+                    type="number"
+                    min={1000}
+                    step={1000}
+                    value={config.goal_weekly_views}
+                    onChange={(e) => setConfig(c => ({ ...c, goal_weekly_views: parseInt(e.target.value) || 10000 }))}
+                    className="text-center text-lg font-bold"
+                  />
+                  <p className="text-[10px] text-muted-foreground text-center">alcance semanal</p>
                 </div>
-                <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-purple-500">{goals.carousels}</div>
-                  <div className="text-xs text-muted-foreground">Carrosséis</div>
-                </div>
-                <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-blue-500">{goals.news}</div>
-                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                    <Newspaper className="h-3 w-3" /> Notícias
+
+                {/* Followers Goal */}
+                <div className="p-4 rounded-lg bg-muted/30 border space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-purple-500" />
+                    <span className="text-sm font-medium">Seguidores</span>
                   </div>
+                  <Input
+                    type="number"
+                    min={10}
+                    step={10}
+                    value={config.goal_weekly_followers}
+                    onChange={(e) => setConfig(c => ({ ...c, goal_weekly_followers: parseInt(e.target.value) || 100 }))}
+                    className="text-center text-lg font-bold"
+                  />
+                  <p className="text-[10px] text-muted-foreground text-center">novos por semana</p>
                 </div>
-                <div className="p-3 rounded-lg bg-muted/30 border text-center">
-                  <div className="text-2xl font-bold text-green-500">{goals.images}</div>
-                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                    <Image className="h-3 w-3" /> Imagens
+
+                {/* Engagement Goal */}
+                <div className="p-4 rounded-lg bg-muted/30 border space-y-3">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <span className="text-sm font-medium">Engajamento</span>
                   </div>
+                  <Input
+                    type="number"
+                    min={0.5}
+                    step={0.5}
+                    max={20}
+                    value={config.goal_weekly_engagement}
+                    onChange={(e) => setConfig(c => ({ ...c, goal_weekly_engagement: parseFloat(e.target.value) || 5.0 }))}
+                    className="text-center text-lg font-bold"
+                  />
+                  <p className="text-[10px] text-muted-foreground text-center">% taxa de engajamento</p>
                 </div>
+              </div>
+
+              <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                <div className="flex items-center gap-2 text-xs text-primary">
+                  <Brain className="h-3 w-3" />
+                  <span className="font-medium">Modo Inteligente</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  O agente ajusta automaticamente: se está longe das metas → até 4 posts/dia. Se já atingiu → 1 post/dia (manutenção).
+                </p>
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -350,7 +347,6 @@ export default function AgentUnifiedSettings({
 
             {/* IDENTITY TAB */}
             <TabsContent value="identity" className="space-y-4 mt-4">
-              {/* Agent Name */}
               <div className="space-y-2">
                 <Label>Nome do Agente</Label>
                 <Input
@@ -359,8 +355,6 @@ export default function AgentUnifiedSettings({
                   placeholder="Aria"
                 />
               </div>
-
-              {/* Brand Voice */}
               <div className="space-y-2">
                 <Label>Tom de Voz</Label>
                 <Textarea
@@ -370,8 +364,6 @@ export default function AgentUnifiedSettings({
                   className="resize-none h-20"
                 />
               </div>
-
-              {/* Personality Traits */}
               <div className="space-y-2">
                 <Label>Traços de Personalidade</Label>
                 <div className="flex flex-wrap gap-2">
@@ -391,7 +383,6 @@ export default function AgentUnifiedSettings({
 
             {/* CONTENT TAB */}
             <TabsContent value="content" className="space-y-4 mt-4">
-              {/* Niche */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4" />
@@ -403,8 +394,6 @@ export default function AgentUnifiedSettings({
                   placeholder="Tecnologia, IA, Inovação..."
                 />
               </div>
-
-              {/* Target Audience */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
@@ -416,8 +405,6 @@ export default function AgentUnifiedSettings({
                   placeholder="Profissionais de TI, entusiastas..."
                 />
               </div>
-
-              {/* Content Focus */}
               <div className="space-y-2">
                 <Label>Foco de Conteúdo</Label>
                 <div className="flex flex-wrap gap-2">
@@ -433,8 +420,6 @@ export default function AgentUnifiedSettings({
                   ))}
                 </div>
               </div>
-
-              {/* Hashtag Strategy */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Hash className="h-4 w-4" />
@@ -458,7 +443,6 @@ export default function AgentUnifiedSettings({
 
             {/* LIMITS TAB */}
             <TabsContent value="limits" className="space-y-4 mt-4">
-              {/* Platforms */}
               <div className="space-y-2">
                 <Label>Plataformas Ativas</Label>
                 <div className="flex gap-2">
@@ -485,48 +469,30 @@ export default function AgentUnifiedSettings({
 
               <Separator />
 
-              {/* Posting Limits */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Gauge className="h-4 w-4" />
-                    Posts/Dia
-                  </Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={config.daily_post_limit}
-                    onChange={(e) => setConfig(c => ({ 
-                      ...c, 
-                      daily_post_limit: parseInt(e.target.value) || 2 
-                    }))}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Intervalo (h)
-                  </Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={24}
-                    value={config.min_hours_between_posts}
-                    onChange={(e) => setConfig(c => ({ 
-                      ...c, 
-                      min_hours_between_posts: parseInt(e.target.value) || 4 
-                    }))}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Intervalo mínimo entre posts (horas)
+                </Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={24}
+                  value={config.min_hours_between_posts}
+                  onChange={(e) => setConfig(c => ({ 
+                    ...c, 
+                    min_hours_between_posts: parseInt(e.target.value) || 4 
+                  }))}
+                />
+                <p className="text-xs text-muted-foreground">
+                  O número de posts por dia é decidido automaticamente pelo agente com base nos objetivos macro.
+                </p>
               </div>
             </TabsContent>
           </Tabs>
 
           <Separator className="my-6" />
 
-          {/* Save Button */}
           <Button 
             onClick={handleSave} 
             disabled={isSaving}

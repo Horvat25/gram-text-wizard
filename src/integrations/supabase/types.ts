@@ -67,8 +67,15 @@ export type Database = {
           content_distribution_news: number | null
           content_distribution_videos: number | null
           content_focus: string[] | null
+          current_weekly_engagement: number | null
+          current_weekly_followers: number | null
+          current_weekly_views: number | null
           daily_post_limit: number | null
           emoji_usage: string | null
+          goal_type: string | null
+          goal_weekly_engagement: number | null
+          goal_weekly_followers: number | null
+          goal_weekly_views: number | null
           hashtag_strategy: string | null
           id: string
           industry_niche: string | null
@@ -101,8 +108,15 @@ export type Database = {
           content_distribution_news?: number | null
           content_distribution_videos?: number | null
           content_focus?: string[] | null
+          current_weekly_engagement?: number | null
+          current_weekly_followers?: number | null
+          current_weekly_views?: number | null
           daily_post_limit?: number | null
           emoji_usage?: string | null
+          goal_type?: string | null
+          goal_weekly_engagement?: number | null
+          goal_weekly_followers?: number | null
+          goal_weekly_views?: number | null
           hashtag_strategy?: string | null
           id?: string
           industry_niche?: string | null
@@ -135,8 +149,15 @@ export type Database = {
           content_distribution_news?: number | null
           content_distribution_videos?: number | null
           content_focus?: string[] | null
+          current_weekly_engagement?: number | null
+          current_weekly_followers?: number | null
+          current_weekly_views?: number | null
           daily_post_limit?: number | null
           emoji_usage?: string | null
+          goal_type?: string | null
+          goal_weekly_engagement?: number | null
+          goal_weekly_followers?: number | null
+          goal_weekly_views?: number | null
           hashtag_strategy?: string | null
           id?: string
           industry_niche?: string | null

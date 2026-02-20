@@ -331,11 +331,64 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   };
 }
 
+// Calculate dynamic daily post limit based on macro objectives
+function calculateDynamicDailyLimit(state: AgentState): number {
+  const goalType = state.context?.goal_type || 'macro';
+  
+  // Legacy fixed mode
+  if (goalType === 'fixed') {
+    return state.context?.daily_post_limit || 2;
+  }
+  
+  // MACRO MODE: Calculate based on objectives progress
+  const goalViews = state.context?.goal_weekly_views || 10000;
+  const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
+  
+  // Calculate current weekly reach from published posts
+  const weeklyReach = state.recentPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
+  const viewsProgress = goalViews > 0 ? (weeklyReach / goalViews) * 100 : 100;
+  const engagementProgress = goalEngagement > 0 ? (state.avgEngagement / goalEngagement) * 100 : 100;
+  
+  // Day of week (0=Sun, 6=Sat) - how many days left in the week
+  const now = new Date();
+  const brasiliaOffset = -3 * 60 * 60 * 1000;
+  const todayBrasilia = new Date(now.getTime() + brasiliaOffset);
+  const dayOfWeek = todayBrasilia.getDay();
+  const daysLeftInWeek = Math.max(1, 7 - dayOfWeek);
+  
+  // Average progress toward goals
+  const avgProgress = (viewsProgress + engagementProgress) / 2;
+  
+  console.log(`[AGENT] Macro objectives: views ${Math.round(viewsProgress)}%, engagement ${Math.round(engagementProgress)}%, avg ${Math.round(avgProgress)}%`);
+  console.log(`[AGENT] Days left in week: ${daysLeftInWeek}`);
+  
+  // Dynamic daily limit based on how far behind we are
+  let dynamicLimit: number;
+  if (avgProgress >= 100) {
+    // Goals met - maintenance mode: 1 post/day
+    dynamicLimit = 1;
+  } else if (avgProgress >= 70) {
+    // Almost there - moderate: 2 posts/day
+    dynamicLimit = 2;
+  } else if (avgProgress >= 40) {
+    // Behind - aggressive: 3 posts/day
+    dynamicLimit = 3;
+  } else {
+    // Far behind - maximum effort: 4 posts/day
+    dynamicLimit = Math.min(4, Math.ceil((100 - avgProgress) / (daysLeftInWeek * 10)));
+    dynamicLimit = Math.max(3, dynamicLimit);
+  }
+  
+  // Hard cap at 5 posts/day to avoid spam
+  return Math.min(5, dynamicLimit);
+}
+
 // ETAPA 2: DECISÃO ESTRATÉGICA
 async function makeStrategicDecision(state: AgentState, lovableApiKey: string): Promise<AgentDecision> {
   console.log('[AGENT] Etapa 2: Tomando decisão estratégica...');
   
-  const dailyLimit = state.context?.daily_post_limit || 5;
+  const goalType = state.context?.goal_type || 'macro';
+  const dynamicDailyLimit = calculateDynamicDailyLimit(state);
   const minHoursBetween = state.context?.min_hours_between_posts || 2;
   const preferredPlatforms = state.context?.preferred_platforms || ['instagram'];
   const bestTimes = state.context?.best_posting_times || ['10:00', '14:00', '19:00'];
@@ -347,17 +400,25 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
                         state.weeklyProgress.news + state.weeklyProgress.images;
   
-  console.log(`[AGENT] Meta semanal: ${totalProgress}/${totalGoals} posts`);
-  console.log(`[AGENT] Limite diário: ${state.postsToday}/${dailyLimit} posts CRIADOS hoje`);
+  // Macro objectives info
+  const goalViews = state.context?.goal_weekly_views || 10000;
+  const goalFollowers = state.context?.goal_weekly_followers || 100;
+  const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
+  const weeklyReach = state.recentPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
+  
+  console.log(`[AGENT] Modo: ${goalType.toUpperCase()}`);
+  console.log(`[AGENT] Meta semanal: ${totalProgress} posts criados`);
+  console.log(`[AGENT] Limite diário dinâmico: ${state.postsToday}/${dynamicDailyLimit} posts CRIADOS hoje`);
+  console.log(`[AGENT] Objetivos macro: views ${weeklyReach}/${goalViews}, engagement ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%`);
   console.log(`[AGENT] Próximo tipo de conteúdo: ${state.nextContentType || 'meta completa'}`);
   
-  // *** MUDANÇA: Limite diário - se atingiu, parar por hoje ***
-  if (state.postsToday >= dailyLimit) {
-    console.log('[AGENT] Limite diário atingido - PARAR por hoje');
+  // Dynamic daily limit check
+  if (state.postsToday >= dynamicDailyLimit) {
+    console.log(`[AGENT] Limite diário dinâmico atingido (${dynamicDailyLimit}) - PARAR por hoje`);
     return {
       decision: 'NO_POST',
-      reason: `🎯 Meta diária alcançada! ${state.postsToday}/${dailyLimit} posts criados hoje. Voltarei amanhã para continuar.`,
-      hypothesis: 'Respeitar limites diários melhora a qualidade e evita spam.'
+      reason: `🎯 Limite diário inteligente atingido! ${state.postsToday}/${dynamicDailyLimit} posts hoje. Objetivos: Views ${Math.round((weeklyReach/goalViews)*100)}%, Engajamento ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%.`,
+      hypothesis: 'O agente ajusta automaticamente a frequência com base nos objetivos macro.'
     };
   }
   
@@ -371,8 +432,24 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     };
   }
   
-  // Check if weekly goals are complete
-  if (!state.nextContentType) {
+  // In macro mode, don't stop at weekly content goals - keep posting if objectives not met
+  if (!state.nextContentType && goalType === 'macro') {
+    // Check if macro objectives are met
+    const viewsMet = weeklyReach >= goalViews;
+    const engagementMet = state.avgEngagement >= goalEngagement;
+    
+    if (viewsMet && engagementMet) {
+      console.log('[AGENT] Objetivos macro alcançados!');
+      return {
+        decision: 'NO_POST',
+        reason: `🏆 Objetivos macro alcançados! Views: ${weeklyReach}/${goalViews}, Engajamento: ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%. Modo manutenção ativo.`
+      };
+    }
+    
+    // Objectives NOT met - override nextContentType to keep posting (prefer news - cheapest)
+    console.log('[AGENT] Metas de tipo completas mas objetivos macro NÃO atingidos - continuando com news');
+    state.nextContentType = 'news';
+  } else if (!state.nextContentType) {
     console.log('[AGENT] Meta semanal completa!');
     return {
       decision: 'NO_POST',
