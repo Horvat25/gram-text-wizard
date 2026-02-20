@@ -505,21 +505,27 @@ serve(async (req) => {
     }
 
     for (let i = startSegment; i < neededCount; i++) {
-      const segQuery = segments?.[i]?.imagePrompt || segments?.[i]?.text || searchQuery;
-      const segEntities = extractEntities(segQuery + ' ' + searchQuery);
+      const segPrompt = segments?.[i]?.imagePrompt || segments?.[i]?.text || searchQuery;
+      const segEntities = extractEntities(segPrompt + ' ' + searchQuery);
 
-      console.log(`[images] Segment [${i + 1}] query: "${segQuery}" | entities: ${segEntities.join(', ')}`);
+      // Use AI to generate smart English queries for each segment (instead of raw Portuguese)
+      const [sq1, sq2, sq3] = await generateSmartQueries(segPrompt, searchQuery);
+      console.log(`[images] Segment [${i + 1}] AI queries: "${sq1}" | "${sq2}" | "${sq3}" | entities: ${segEntities.join(', ')}`);
 
-      // Fetch more candidates to allow engine to filter
-      const [pexelsCandidates, unsplashCandidates] = await Promise.all([
-        searchPexels(segQuery, 10),
-        searchUnsplash(segQuery, 10),
+      // Fetch more candidates using AI-generated English queries
+      const [pexels1, pexels2, unsplash1, unsplash2] = await Promise.all([
+        searchPexels(sq1, 8),
+        searchPexels(sq2, 6),
+        searchUnsplash(sq1, 8),
+        searchUnsplash(sq2, 6),
       ]);
 
-      // Filter already used
+      // Filter already used — combine all batches
       const allCandidates = [
-        ...pexelsCandidates.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'pexels' as const })),
-        ...unsplashCandidates.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'unsplash' as const })),
+        ...pexels1.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'pexels' as const })),
+        ...pexels2.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'pexels' as const })),
+        ...unsplash1.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'unsplash' as const })),
+        ...unsplash2.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'unsplash' as const })),
       ];
 
       // Apply engine: never accept first result without validation
