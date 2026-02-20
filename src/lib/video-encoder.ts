@@ -1157,13 +1157,36 @@ export async function generateVideoFromSegments(
   const { mimeType, isMP4 } = getBestCodec();
   console.log(`[VideoEncoder] Using codec: ${mimeType} (MP4: ${isMP4})`);
 
-  const recorder = new MediaRecorder(stream, {
-    mimeType,
-    videoBitsPerSecond: 8000000,
-  });
+  // Try to create MediaRecorder with retry on different codecs
+  let recorder: MediaRecorder;
+  let actualMimeType = mimeType;
+  try {
+    recorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 8000000,
+    });
+  } catch (e) {
+    console.warn(`[VideoEncoder] Failed with codec ${mimeType}, trying fallback...`);
+    // Fallback: try without specific codec
+    const fallbackCodecs = ['video/webm;codecs=vp8', 'video/webm', ''];
+    let created = false;
+    for (const fallback of fallbackCodecs) {
+      try {
+        if (fallback && !MediaRecorder.isTypeSupported(fallback)) continue;
+        recorder = new MediaRecorder(stream, fallback ? { mimeType: fallback, videoBitsPerSecond: 6000000 } : { videoBitsPerSecond: 6000000 });
+        actualMimeType = fallback || 'video/webm';
+        console.log(`[VideoEncoder] Fallback codec succeeded: ${actualMimeType}`);
+        created = true;
+        break;
+      } catch { continue; }
+    }
+    if (!created) {
+      throw new Error("Nenhum codec de vídeo suportado neste navegador.");
+    }
+  }
 
   const chunks: Blob[] = [];
-  recorder.ondataavailable = (e) => {
+  recorder!.ondataavailable = (e) => {
     if (e.data.size > 0) {
       chunks.push(e.data);
     }
@@ -1172,20 +1195,20 @@ export async function generateVideoFromSegments(
   return new Promise((resolve, reject) => {
     const maxTimeout = setTimeout(() => {
       console.error("[VideoEncoder] Generation timeout after 3 minutes");
-      recorder.stop();
+      recorder!.stop();
       reject(new Error("Video generation timeout"));
     }, 180000);
 
-    recorder.onstop = async () => {
+    recorder!.onstop = async () => {
       clearTimeout(maxTimeout);
       console.log(`[VideoEncoder] Recording stopped, chunks: ${chunks.length}`);
-      const rawBlob = new Blob(chunks, { type: mimeType });
+      const rawBlob = new Blob(chunks, { type: actualMimeType });
       console.log(`[VideoEncoder] Raw blob size: ${(rawBlob.size / 1024 / 1024).toFixed(2)} MB, type: ${rawBlob.type}`);
       
       // FIX: Apply duration fix for WebM videos
       // MediaRecorder doesn't write duration metadata, causing "0 seconds" issue on mobile
       let finalBlob = rawBlob;
-      if (!isMP4) {
+      if (!actualMimeType.includes('mp4')) {
         try {
           console.log(`[VideoEncoder] Fixing WebM duration metadata (${totalDuration.toFixed(1)}s)...`);
           finalBlob = await fixWebmDuration(rawBlob, totalDuration * 1000, { logger: false });
@@ -1199,14 +1222,20 @@ export async function generateVideoFromSegments(
       resolve(finalBlob);
     };
 
-    recorder.onerror = (e) => {
-      clearTimeout(maxTimeout);
-      console.error("[VideoEncoder] Recorder error:", e);
-      reject(new Error("MediaRecorder error"));
+    recorder!.onerror = (e: Event) => {
+      console.error("[VideoEncoder] Recorder error event:", e);
+      // Don't reject immediately — some browsers fire error but still produce valid output
+      // Only reject if we have no chunks at all
+      if (chunks.length === 0) {
+        clearTimeout(maxTimeout);
+        reject(new Error("MediaRecorder error — nenhum dado gravado. Tente recarregar a página."));
+      } else {
+        console.warn("[VideoEncoder] Error fired but chunks exist, attempting to continue...");
+      }
     };
 
     // Start recording
-    recorder.start(100);
+    recorder!.start(100);
     console.log("[VideoEncoder] Recording started");
 
     // Start audio if available
@@ -1246,7 +1275,7 @@ export async function generateVideoFromSegments(
           musicAudioElement.pause();
         }
         // ⚠️ NÃO fechar o AudioContext global - ele é reutilizado
-        recorder.stop();
+        recorder!.stop();
         return;
       }
 
