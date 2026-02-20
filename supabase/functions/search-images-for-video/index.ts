@@ -69,45 +69,108 @@ async function scrapeArticle(url: string, firecrawlKey: string): Promise<{
   }
 }
 
-// ============= BUILD 3 SEARCH QUERIES FROM ENTITIES =============
-function buildThreeQueries(title: string, description: string = ''): [string, string, string] {
+// ============= AI-POWERED SMART QUERY GENERATION =============
+async function generateSmartQueries(title: string, description: string = ''): Promise<[string, string, string]> {
+  const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+  if (!lovableKey) {
+    console.log('[images] No LOVABLE_API_KEY, falling back to heuristic queries');
+    return buildHeuristicQueries(title, description);
+  }
+
+  try {
+    const prompt = `You are an image search expert. Given a news article title and description, generate exactly 3 short English search queries for finding relevant stock photos on Pexels/Unsplash.
+
+RULES:
+- Each query must be 3-5 words maximum
+- Queries must describe VISUAL SCENES that represent the article's main subject
+- Focus on the PRIMARY subject (company, product, technology) NOT secondary mentions
+- For AI/tech companies: describe their products, logos, offices, or technology visuals
+- For people: describe what they're known for, not generic portraits
+- NEVER use generic terms like "technology" or "innovation" alone
+- Make queries specific and visually descriptive
+
+Title: ${title}
+Description: ${description || 'N/A'}
+
+Respond with ONLY 3 lines, one query per line. No numbering, no quotes, no explanation.`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 100,
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn('[images] AI query generation failed:', response.status);
+      return buildHeuristicQueries(title, description);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content?.trim();
+    
+    if (!content) {
+      return buildHeuristicQueries(title, description);
+    }
+
+    const lines = content.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 2);
+    const q1 = lines[0] || 'technology innovation';
+    const q2 = lines[1] || q1;
+    const q3 = lines[2] || q1;
+
+    console.log('[images] 🤖 AI-generated queries:', q1, '|', q2, '|', q3);
+    return [q1, q2, q3];
+  } catch (e) {
+    console.warn('[images] AI query generation error:', e);
+    return buildHeuristicQueries(title, description);
+  }
+}
+
+// ============= HEURISTIC FALLBACK QUERIES =============
+function buildHeuristicQueries(title: string, description: string = ''): [string, string, string] {
   const entities = extractEntities(title + ' ' + description);
   const text = (title + ' ' + (description || '')).replace(/["""''«»\[\]()]/g, '').trim();
 
-  // Known entities → fixed English visual search anchor
   const knownEntities: Record<string, string> = {
-    'openai': 'OpenAI artificial intelligence lab',
-    'chatgpt': 'ChatGPT AI chatbot interface',
-    'gpt': 'OpenAI GPT language model',
-    'claude': 'AI research server infrastructure',
-    'anthropic': 'AI research server infrastructure',
+    'openai': 'OpenAI ChatGPT AI interface screen',
+    'chatgpt': 'ChatGPT AI chatbot conversation screen',
+    'gpt': 'OpenAI GPT AI model neural network',
+    'o1': 'OpenAI AI reasoning model screen',
+    'claude': 'Anthropic AI research laboratory',
+    'anthropic': 'Anthropic AI safety research lab',
     'gemini': 'Google Gemini AI interface',
     'copilot': 'Microsoft Copilot AI assistant',
     'meta ai': 'Meta AI laboratory',
     'llama': 'Meta LLaMA AI model server',
-    'nvidia': 'Nvidia GPU data center server',
-    'tesla': 'Tesla electric vehicle technology',
+    'nvidia': 'Nvidia GPU data center server rack',
+    'tesla': 'Tesla electric vehicle autopilot',
     'spacex': 'SpaceX rocket launch pad',
-    'apple': 'Apple technology product design',
-    'microsoft': 'Microsoft technology office',
-    'google': 'Google technology data center',
-    'amazon': 'Amazon cloud computing server',
+    'apple': 'Apple iPhone MacBook product',
+    'microsoft': 'Microsoft Windows office technology',
+    'google': 'Google search data center server',
+    'amazon': 'Amazon AWS cloud computing server',
     'robot': 'humanoid robot close up',
     'humanoid': 'humanoid robot futuristic',
     'quantum': 'quantum computer laboratory',
     'chip': 'microchip silicon wafer macro',
-    'bitcoin': 'Bitcoin cryptocurrency digital',
+    'bitcoin': 'Bitcoin cryptocurrency digital gold',
     'blockchain': 'blockchain network visualization',
     'deepmind': 'Google DeepMind AI research',
-    'mistral': 'AI model server rack',
+    'mistral': 'AI model server rack data center',
     'sora': 'AI video generation screen',
-    'samsung': 'Samsung technology display',
+    'samsung': 'Samsung Galaxy smartphone display',
     'intel': 'Intel processor chip macro',
     'arm': 'ARM chip semiconductor wafer',
     'h100': 'Nvidia H100 GPU data center',
-    'colossus': 'supercomputer server rack data center',
-    'sam altman': 'OpenAI artificial intelligence office',
-    'elon musk': 'Tesla SpaceX technology electric vehicle',
+    'sam altman': 'OpenAI CEO tech conference stage',
+    'elon musk': 'Tesla SpaceX rocket technology',
   };
 
   const textLower = text.toLowerCase();
@@ -116,7 +179,6 @@ function buildThreeQueries(title: string, description: string = ''): [string, st
     if (textLower.includes(key)) { entityQuery = value; break; }
   }
 
-  // Fallback to extracted entities if no known entity matched
   if (!entityQuery && entities.length > 0) {
     entityQuery = entities.slice(0, 3).join(' ');
   }
@@ -130,8 +192,7 @@ function buildThreeQueries(title: string, description: string = ''): [string, st
     ? `${subject} innovation research laboratory`
     : `${entities.slice(0, 2).join(' ')} future`;
 
-  console.log('[images] 3 queries:', q1, '|', q2, '|', q3);
-  console.log('[images] Entities extracted:', entities);
+  console.log('[images] 📋 Heuristic queries:', q1, '|', q2, '|', q3);
   return [q1, q2, q3];
 }
 
@@ -289,8 +350,8 @@ serve(async (req) => {
       const entities = extractEntities(finalTitle + ' ' + finalDescription);
       console.log('[images] Entities:', entities);
 
-      // Step 3: Build 3 search queries using entities
-      const [q1, q2, q3] = buildThreeQueries(finalTitle, finalDescription);
+      // Step 3: Build 3 search queries using AI (with heuristic fallback)
+      const [q1, q2, q3] = await generateSmartQueries(finalTitle, finalDescription);
 
       // Step 4: Fetch pool in parallel
       console.log('[images] Fetching pool from Pexels + Unsplash (3 queries each)...');
