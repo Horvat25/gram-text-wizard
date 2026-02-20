@@ -39,6 +39,14 @@ export interface AgentContext {
   content_distribution_carousels: number | null;
   content_distribution_news: number | null;
   content_distribution_images: number | null;
+  // Macro objectives
+  goal_type: string | null;
+  goal_weekly_views: number | null;
+  goal_weekly_followers: number | null;
+  goal_weekly_engagement: number | null;
+  current_weekly_views: number | null;
+  current_weekly_followers: number | null;
+  current_weekly_engagement: number | null;
 }
 
 export interface AgentDecision {
