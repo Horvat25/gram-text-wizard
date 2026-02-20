@@ -72,7 +72,9 @@ const AGENT_TOOLS = [
           scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília)." },
           publish_now: { type: "boolean", description: "Se true, publicar assim que o vídeo estiver pronto." },
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" },
-          style: { type: "string", description: "Estilo: impactante, educativo, provocativo, inspirador" }
+          style: { type: "string", description: "Estilo: impactante, educativo, provocativo, inspirador" },
+          article_url: { type: "string", description: "URL do artigo de notícia (para extrair imagens do site original)" },
+          article_image_url: { type: "string", description: "URL da imagem principal do artigo (og:image da notícia RSS)" }
         },
         required: ["topic", "caption"]
       }
@@ -1037,7 +1039,7 @@ async function executeUpdateSettings(supabase: any, userId: string, workspaceId:
 
 // Execute create_narrated_video - creates a video post with script for frontend processing
 async function executeCreateNarratedVideo(supabase: any, userId: string, workspaceId: string, args: any) {
-  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style } = args;
+  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style, article_url, article_image_url } = args;
   
   console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
   
@@ -1137,9 +1139,11 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         script: script,
         topic: topic,
         style: style,
-        needs_processing: true, // Flag for frontend to process
+        article_url: article_url || null,
+        article_image_url: article_image_url || null,
+        needs_processing: true,
         created_by_agent: true,
-        publish_after_render: publish_now === true, // Flag to auto-publish after video is rendered
+        publish_after_render: publish_now === true,
       }
     };
     
@@ -1845,23 +1849,30 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
     // 2. Build headline (use provided or from title)
     const finalHeadline = headline_text || newsItem.title.toUpperCase().slice(0, 80);
 
-    // 3. Select best image: validate og:image relevance before using it
-    // If the og:image looks off-topic (political figure, sports event etc), search Pexels/Unsplash instead
+    // 3. Select image: ALWAYS prefer the article's og:image from RSS library
+    // The og:image is the most contextually relevant image for the news
     let rawImageUrl: string | null = null;
     let imageSource = 'rss-og';
 
     const ogImageUrl: string | null = newsItem.image_url || null;
-    const isOgImageSafe = ogImageUrl ? isRssImageRelevant(ogImageUrl, newsItem.title, newsItem.description || '') : false;
 
-    if (isOgImageSafe && ogImageUrl) {
-      rawImageUrl = ogImageUrl;
-      imageSource = 'rss-og';
-      console.log('[RSS_NEWS_POST] ✅ og:image validated as relevant');
-    } else {
-      // og:image rejected → search Pexels/Unsplash with entity-based query
+    if (ogImageUrl) {
+      // Only reject tracking pixels and tiny icons, NOT content images
+      const urlLower = ogImageUrl.toLowerCase();
+      const isTrackingPixel = ['1x1', 'pixel', 'tracking', 'favicon'].some(s => urlLower.includes(s));
+      
+      if (!isTrackingPixel) {
+        rawImageUrl = ogImageUrl;
+        imageSource = 'rss-og';
+        console.log('[RSS_NEWS_POST] ✅ Using article og:image directly (from RSS library)');
+      }
+    }
+
+    // Only fallback to stock search if article has NO image at all
+    if (!rawImageUrl) {
       const entities = extractEntitiesAgent(newsItem.title);
       const entityQuery = entities.slice(0, 3).join(' ') || topic_filter || newsItem.title;
-      console.log('[RSS_NEWS_POST] ⚠️ og:image rejected — fallback search with entities:', entities, '| query:', entityQuery);
+      console.log('[RSS_NEWS_POST] ⚠️ No article image — fallback search with entities:', entities);
       try {
         const imgSearchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
           method: 'POST',
@@ -1879,17 +1890,11 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
           if (imgResult.images && imgResult.images.length > 0) {
             rawImageUrl = imgResult.images[0].imageUrl;
             imageSource = imgResult.images[0].source || 'pexels';
-            console.log('[RSS_NEWS_POST] ✅ Engine fallback image from:', imageSource, '| entities used:', imgResult.stats?.entities);
+            console.log('[RSS_NEWS_POST] ✅ Fallback image from:', imageSource);
           }
         }
       } catch (e) {
         console.warn('[RSS_NEWS_POST] Image search failed:', e);
-      }
-      // Last resort: use og:image even if risky
-      if (!rawImageUrl && ogImageUrl) {
-        rawImageUrl = ogImageUrl;
-        imageSource = 'rss-og-fallback';
-        console.log('[RSS_NEWS_POST] ⚠️ Using og:image as last resort');
       }
     }
 

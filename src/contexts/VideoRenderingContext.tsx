@@ -25,6 +25,8 @@ interface PendingVideo {
     needs_processing: boolean;
     publish_after_render?: boolean;
     created_by_agent?: boolean;
+    article_url?: string;
+    article_image_url?: string;
   };
 }
 
@@ -306,7 +308,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     }
     
     try {
-      await renderFromScript(script.segments, script.title);
+      const articleInfo = {
+        articleUrl: nextVideo.overlay_metadata?.article_url,
+        articleImageUrl: nextVideo.overlay_metadata?.article_image_url,
+      };
+      await renderFromScript(script.segments, script.title, articleInfo);
     } catch (err) {
       console.error('Error rendering video:', err);
       setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));

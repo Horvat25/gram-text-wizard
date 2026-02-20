@@ -248,6 +248,7 @@ serve(async (req) => {
       articleUrl,
       articleTitle,
       articleDescription,
+      articleImageUrl,
       useArticleMode = false,
       skipWatermark = false,
     } = await req.json();
@@ -267,8 +268,9 @@ serve(async (req) => {
     }
 
     // ============= INTELLIGENT POOL-BASED MODE =============
-    if ((articleUrl || useArticleMode) && (articleUrl || articleTitle)) {
+    if ((articleUrl || useArticleMode) && (articleUrl || articleTitle || articleImageUrl)) {
       console.log('[images] 🎯 POOL MODE — engine: extractEntities + containsForbidden + scoreImage');
+      console.log('[images] articleImageUrl provided:', articleImageUrl ? 'yes' : 'no');
 
       // Step 1: Scrape article
       let articleData: { title: string; description: string; ogImage: string | null; images: string[]; content: string } | null = null;
@@ -369,14 +371,28 @@ serve(async (req) => {
       }
 
       // Step 7: Process (watermark + store)
+      // If articleImageUrl was provided directly, force it as the FIRST image (skip engine for it)
       const results: { imageUrl: string; source: string; sourceId: string }[] = [];
-      for (let i = 0; i < selected.length; i++) {
+      
+      if (articleImageUrl) {
+        console.log('[images] 📰 Force-including article image as first result:', articleImageUrl.substring(0, 60));
+        const processed = await processImage(articleImageUrl, supabase, supabaseUrl, supabaseKey, 0, skipWatermark);
+        if (processed) {
+          results.push({ imageUrl: processed, source: 'article-direct', sourceId: 'article_direct_0' });
+          console.log('[images] ✅ Article image processed successfully');
+        } else {
+          console.warn('[images] ❌ Article image failed to process, continuing with pool');
+        }
+      }
+      
+      const startIndex = results.length;
+      for (let i = 0; i < selected.length && results.length < 4; i++) {
         const candidate = selected[i];
-        const processed = await processImage(candidate.url, supabase, supabaseUrl, supabaseKey, i, skipWatermark);
+        const processed = await processImage(candidate.url, supabase, supabaseUrl, supabaseKey, startIndex + i, skipWatermark);
         if (processed) {
           usedIds.add(candidate.sourceId);
           results.push({ imageUrl: processed, source: candidate.source || 'unknown', sourceId: candidate.sourceId });
-          console.log(`[images] ✅ [${i + 1}/${selected.length}] ${candidate.source} score:${candidate.score}`);
+          console.log(`[images] ✅ [${results.length}/${Math.min(4, selected.length + startIndex)}] ${candidate.source} score:${candidate.score}`);
         } else {
           console.warn(`[images] ❌ [${i + 1}] Failed to process ${candidate.url.substring(0, 60)}`);
         }
@@ -408,13 +424,26 @@ serve(async (req) => {
 
     // ============= SEGMENT-BASED MODE (Videos/Carousels) =============
     // Each segment has its own imagePrompt → individual entity extraction + engine scoring
+    // If articleImageUrl is provided, use it for the first segment directly
     const neededCount = segments?.length || 4;
     const overallEntities = extractEntities(searchQuery);
     console.log(`[images] Segment mode: ${neededCount} images for: "${searchQuery}" | entities: ${overallEntities.join(', ')}`);
 
     const results: { imageUrl: string; source: string; sourceId: string }[] = [];
 
-    for (let i = 0; i < neededCount; i++) {
+    // If article image provided, use it as first segment's image (skip search for segment 0)
+    let startSegment = 0;
+    if (articleImageUrl) {
+      console.log('[images] 📰 Using article image for first segment:', articleImageUrl.substring(0, 60));
+      const processed = await processImage(articleImageUrl, supabase, supabaseUrl, supabaseKey, 0, skipWatermark);
+      if (processed) {
+        results.push({ imageUrl: processed, source: 'article-direct', sourceId: 'article_direct_0' });
+        startSegment = 1;
+        console.log('[images] ✅ Article image set as segment 1');
+      }
+    }
+
+    for (let i = startSegment; i < neededCount; i++) {
       const segQuery = segments?.[i]?.imagePrompt || segments?.[i]?.text || searchQuery;
       const segEntities = extractEntities(segQuery + ' ' + searchQuery);
 
