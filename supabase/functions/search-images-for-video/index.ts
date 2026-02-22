@@ -491,20 +491,41 @@ serve(async (req) => {
 
     const results: { imageUrl: string; source: string; sourceId: string }[] = [];
 
-    // Build progressive prompts based on segments for visual consistency
+    // Build progressive prompts with FULL Neural Update visual identity
     const baseContext = searchQuery || topic || 'tecnologia';
-    const progressiveThemes = ['contexto e cenário', 'desenvolvimento e detalhe', 'impacto e consequência', 'conclusão e futuro'];
+    const sceneStructure = [
+      { phase: 'CONTEXTO', direction: 'Crie uma cena impactante que introduza visualmente o tema da notícia. Mostrar o ambiente principal relacionado ao assunto, com sensação de novidade e descoberta. A imagem deve gerar curiosidade imediata. Foco em: impacto visual inicial, ambiente tecnológico coerente com o tema, clima de antecipação.' },
+      { phase: 'DESENVOLVIMENTO', direction: 'Continuação direta da cena anterior, mesmo ambiente ou universo visual, adicionando novos elementos que representem evolução do tema. Mostrar mais detalhes, dados visuais, interfaces ou interações relacionadas à notícia. Sensação: explicação visual, movimento implícito, construção narrativa.' },
+      { phase: 'IMPACTO', direction: 'Manter identidade visual e continuidade. Agora representar visualmente o impacto da notícia no mundo, sociedade ou mercado. A cena deve parecer maior, mais ampla ou mais intensa que as anteriores. Sensação: escala, transformação, poder.' },
+      { phase: 'CONCLUSÃO', direction: 'Cena final com sensação futurista e reflexiva. Mostrar projeção para o futuro ou consequência de longo prazo da notícia. Manter continuidade estética, mas com composição mais limpa e simbólica. Sensação: futuro, reflexão, encerramento forte.' },
+    ];
 
     for (let i = 0; i < neededCount; i++) {
       const segPrompt = segments?.[i]?.imagePrompt || segments?.[i]?.text || baseContext;
-      const themePhase = progressiveThemes[i] || progressiveThemes[0];
+      const scene = sceneStructure[i] || sceneStructure[0];
       
-      // Build a rich, specific prompt for AI generation
-      const aiPrompt = `Crie uma imagem cinematográfica para um vídeo de notícias de tecnologia.
-Tema principal: ${baseContext}
-Cena ${i + 1} de ${neededCount} (${themePhase}): ${segPrompt}
-Estilo: fotorrealista, dramático, iluminação cinematográfica, formato vertical 9:16.
-IMPORTANTE: Manter identidade visual consistente com as outras cenas do mesmo vídeo.`;
+      // Full Neural Update visual identity prompt
+      const aiPrompt = `Crie uma sequência visual cinematográfica para um vídeo vertical de notícias de tecnologia da marca "Neural Update".
+
+IDENTIDADE VISUAL OBRIGATÓRIA:
+- Paleta predominante: azul escuro (#0B0F1A) e roxo neon (#7B2CFF)
+- Iluminação high-tech com contraste forte
+- Estética futurista minimalista
+- Atmosfera levemente dramática
+- Nitidez alta e acabamento premium
+- Mesmo estilo de lente e enquadramento em todas as cenas
+- Formato vertical 9:16
+- Espaço negativo na parte superior para possível headline
+- Marca d'água discreta "Neural Update" no canto inferior direito, integrada ao ambiente com leve glow roxo neon
+
+ESTILO VISUAL: Fotorrealista cinematográfico, iluminação volumétrica, reflexos sutis, profundidade de campo profissional, composição moderna semelhante a trailers de tecnologia.
+
+TEMA PRINCIPAL: ${baseContext}
+
+🎬 CENA ${i + 1} de ${neededCount} — ${scene.phase} (${segPrompt}):
+${scene.direction}
+
+IMPORTANTE: Todas as 4 imagens devem parecer parte do mesmo vídeo, com continuidade visual, mesma paleta, mesma atmosfera e mesma linguagem estética.`;
 
       console.log(`[images] Segment [${i + 1}/${neededCount}] Generating AI image...`);
 

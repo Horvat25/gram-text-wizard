@@ -636,12 +636,12 @@ async function createVideoContent(
   const articleTitle = rssArticle?.title || plan.theme;
   const articleDesc = rssArticle?.description || '';
   
-  // Build 4 progressive segments for AI generation
+  // Build 4 progressive segments with Neural Update visual identity
   const progressivePhases = [
-    { text: `Contexto e cenário: ${articleTitle}`, imagePrompt: `Cenário introdutório sobre ${articleTitle}` },
-    { text: `Desenvolvimento: ${articleDesc || articleTitle}`, imagePrompt: `Detalhes e desenvolvimento de ${articleTitle}` },
-    { text: `Impacto e consequências de ${articleTitle}`, imagePrompt: `Impacto visual de ${articleTitle}` },
-    { text: `Conclusão e futuro: ${articleTitle}`, imagePrompt: `Visão futurista sobre ${articleTitle}` },
+    { text: `Contexto e cenário: ${articleTitle}`, imagePrompt: `Hook visual forte — cena impactante que introduza ${articleTitle}, ambiente tecnológico, sensação de novidade e descoberta, curiosidade imediata` },
+    { text: `Desenvolvimento: ${articleDesc || articleTitle}`, imagePrompt: `Expansão do tema — continuação direta, mesmo universo visual, novos elementos de evolução sobre ${articleTitle}, detalhes, interfaces, dados visuais` },
+    { text: `Impacto e consequências de ${articleTitle}`, imagePrompt: `Consequência e escala — impacto de ${articleTitle} no mundo/mercado, cena maior e mais intensa, transformação, poder` },
+    { text: `Conclusão e futuro: ${articleTitle}`, imagePrompt: `Visão futura — projeção futurista sobre ${articleTitle}, composição limpa e simbólica, reflexão, encerramento forte` },
   ];
   
   console.log('[AGENT] 🎨 AI GENERATION MODE: Gerando 4 imagens por IA para vídeo');
@@ -858,9 +858,15 @@ async function createCarouselContent(
   
   // Generate 4 AI images based on the selected news articles
   // Uses search-images-for-video in AI GENERATION MODE
+  const carouselSceneDirections = [
+    'Hook visual forte — cena impactante, ambiente tecnológico, curiosidade imediata',
+    'Expansão — continuação direta, novos elementos de evolução, detalhes e interfaces',
+    'Impacto — escala e transformação, cena mais ampla e intensa',
+    'Conclusão — visão futurista, composição limpa e simbólica, encerramento forte',
+  ];
   const segments = selectedItems.map((s: any, i: number) => ({
     text: s.item.title,
-    imagePrompt: `Slide ${i + 1}: ${s.item.title}. ${s.item.description || ''}`,
+    imagePrompt: `${carouselSceneDirections[i] || carouselSceneDirections[0]} sobre: ${s.item.title}. ${s.item.description || ''}`,
   }));
   
   console.log('[AGENT] 🎨 Gerando 4 imagens IA para carrossel...');
