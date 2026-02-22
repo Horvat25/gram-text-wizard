@@ -483,95 +483,78 @@ serve(async (req) => {
       );
     }
 
-    // ============= SEGMENT-BASED MODE (Videos/Carousels) =============
-    // Each segment has its own imagePrompt → individual entity extraction + engine scoring
-    // If articleImageUrl is provided, use it for the first segment directly
+    // ============= AI GENERATION MODE (Videos/Carousels) =============
+    // Generate 4 AI images using generate-image (Gemini Flash Image ~$0.02/img)
+    // This ensures visual consistency and relevance instead of random stock photos
     const neededCount = segments?.length || 4;
-    const overallEntities = extractEntities(searchQuery);
-    console.log(`[images] Segment mode: ${neededCount} images for: "${searchQuery}" | entities: ${overallEntities.join(', ')}`);
+    console.log(`[images] 🎨 AI GENERATION MODE: ${neededCount} images for: "${searchQuery}"`);
 
     const results: { imageUrl: string; source: string; sourceId: string }[] = [];
 
-    // If article image provided, use it as first segment's image (skip search for segment 0)
-    let startSegment = 0;
-    if (articleImageUrl) {
-      console.log('[images] 📰 Using article image for first segment:', articleImageUrl.substring(0, 60));
-      const processed = await processImage(articleImageUrl, supabase, supabaseUrl, supabaseKey, 0, skipWatermark);
-      if (processed) {
-        results.push({ imageUrl: processed, source: 'article-direct', sourceId: 'article_direct_0' });
-        startSegment = 1;
-        console.log('[images] ✅ Article image set as segment 1');
-      }
-    }
+    // Build progressive prompts based on segments for visual consistency
+    const baseContext = searchQuery || topic || 'tecnologia';
+    const progressiveThemes = ['contexto e cenário', 'desenvolvimento e detalhe', 'impacto e consequência', 'conclusão e futuro'];
 
-    for (let i = startSegment; i < neededCount; i++) {
-      const segPrompt = segments?.[i]?.imagePrompt || segments?.[i]?.text || searchQuery;
-      const segEntities = extractEntities(segPrompt + ' ' + searchQuery);
+    for (let i = 0; i < neededCount; i++) {
+      const segPrompt = segments?.[i]?.imagePrompt || segments?.[i]?.text || baseContext;
+      const themePhase = progressiveThemes[i] || progressiveThemes[0];
+      
+      // Build a rich, specific prompt for AI generation
+      const aiPrompt = `Crie uma imagem cinematográfica para um vídeo de notícias de tecnologia.
+Tema principal: ${baseContext}
+Cena ${i + 1} de ${neededCount} (${themePhase}): ${segPrompt}
+Estilo: fotorrealista, dramático, iluminação cinematográfica, formato vertical 9:16.
+IMPORTANTE: Manter identidade visual consistente com as outras cenas do mesmo vídeo.`;
 
-      // Use AI to generate smart English queries for each segment (instead of raw Portuguese)
-      const [sq1, sq2, sq3] = await generateSmartQueries(segPrompt, searchQuery);
-      console.log(`[images] Segment [${i + 1}] AI queries: "${sq1}" | "${sq2}" | "${sq3}" | entities: ${segEntities.join(', ')}`);
+      console.log(`[images] Segment [${i + 1}/${neededCount}] Generating AI image...`);
 
-      // Fetch more candidates using AI-generated English queries
-      const [pexels1, pexels2, unsplash1, unsplash2] = await Promise.all([
-        searchPexels(sq1, 8),
-        searchPexels(sq2, 6),
-        searchUnsplash(sq1, 8),
-        searchUnsplash(sq2, 6),
-      ]);
+      try {
+        const genResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            prompt: aiPrompt,
+            format: 'portrait', // 9:16 for Reels
+            applyWatermark: !skipWatermark,
+          }),
+        });
 
-      // Filter already used — combine all batches
-      const allCandidates = [
-        ...pexels1.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'pexels' as const })),
-        ...pexels2.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'pexels' as const })),
-        ...unsplash1.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'unsplash' as const })),
-        ...unsplash2.filter(c => !usedIds.has(c.sourceId)).map(c => ({ ...c, source: 'unsplash' as const })),
-      ];
-
-      // Apply engine: never accept first result without validation
-      const bestCandidates = selectBestImages(allCandidates, segEntities, segQuery, 3, 1);
-
-      let processed: string | null = null;
-      let chosenSource = 'unknown';
-      let chosenId = '';
-
-      for (const best of bestCandidates) {
-        processed = await processImage(best.url, supabase, supabaseUrl, supabaseKey, i, skipWatermark);
-        if (processed) {
-          usedIds.add(best.sourceId);
-          chosenSource = best.source || 'unknown';
-          chosenId = best.sourceId;
-          break;
+        if (genResponse.ok) {
+          const genResult = await genResponse.json();
+          if (genResult.imageUrl) {
+            results.push({
+              imageUrl: genResult.imageUrl,
+              source: 'ai-generated',
+              sourceId: `ai_gen_${Date.now()}_${i}`,
+            });
+            console.log(`[images] ✅ Segment [${i + 1}] AI image generated — model: ${genResult.modelUsed || 'gemini'}`);
+          } else {
+            console.warn(`[images] ❌ Segment [${i + 1}] AI generation returned no URL`);
+          }
+        } else {
+          const errText = await genResponse.text();
+          console.error(`[images] ❌ Segment [${i + 1}] AI generation failed:`, genResponse.status, errText);
         }
+      } catch (genError) {
+        console.error(`[images] ❌ Segment [${i + 1}] AI generation error:`, genError);
       }
 
-      // Fallback: if engine found nothing, try the raw first candidate
-      if (!processed && allCandidates.length > 0) {
-        const fallback = allCandidates[0];
-        processed = await processImage(fallback.url, supabase, supabaseUrl, supabaseKey, i, skipWatermark);
-        if (processed) {
-          usedIds.add(fallback.sourceId);
-          chosenSource = fallback.source || 'unknown';
-          chosenId = fallback.sourceId;
-          console.warn(`[images] ⚠️ Segment [${i + 1}] fallback to raw first candidate`);
-        }
-      }
-
-      if (processed) {
-        results.push({ imageUrl: processed, source: chosenSource, sourceId: chosenId });
-        console.log(`[images] ✅ Segment [${i + 1}] done — source: ${chosenSource}`);
-      } else {
-        console.warn(`[images] ❌ Segment [${i + 1}] — no image found`);
+      // Small delay between generations to avoid rate limiting
+      if (i < neededCount - 1) {
+        await new Promise(r => setTimeout(r, 500));
       }
     }
 
     const stats = {
       total: results.length,
-      pexels: results.filter(r => r.source === 'pexels').length,
-      unsplash: results.filter(r => r.source === 'unsplash').length,
-      overallEntities,
-      mode: 'engine_segment',
+      aiGenerated: results.length,
+      mode: 'ai_generation',
     };
+
+    console.log(`[images] 🎨 AI generation complete: ${results.length}/${neededCount} images`);
 
     return new Response(
       JSON.stringify({

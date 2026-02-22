@@ -140,19 +140,13 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     const updatedSegments = [...segments];
     
-    console.log('[IMAGES] 🌐 Buscando imagens (Pexels > Unsplash > Firecrawl > AI)...');
-    if (articleInfo?.articleImageUrl) {
-      console.log('[IMAGES] 📰 Article image available:', articleInfo.articleImageUrl.substring(0, 60));
-    }
+    console.log('[IMAGES] 🎨 Gerando imagens via IA para vídeo/carrossel...');
     
     try {
       const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
         body: {
           topic: topic || segments[0]?.text || 'tecnologia',
           segments: segments.map(s => ({ text: s.text, imagePrompt: s.imagePrompt })),
-          articleUrl: articleInfo?.articleUrl || undefined,
-          articleImageUrl: articleInfo?.articleImageUrl || undefined,
-          useArticleMode: !!(articleInfo?.articleUrl || articleInfo?.articleImageUrl),
         }
       });
       
