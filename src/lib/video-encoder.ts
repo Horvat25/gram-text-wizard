@@ -508,25 +508,25 @@ function drawMarketingCTA(
 
 /**
  * Transition types for professional video editing
- * Enhanced with more cinematic effects
  */
-type TransitionType = 'crossfade' | 'slide' | 'zoom' | 'wipe' | 'blur' | 'none';
+type TransitionType = 'crossfade' | 'slide' | 'zoom' | 'none';
 
 /**
  * Get transition duration in seconds
- * IMPROVED: Longer transitions for smoother flow (30% of segment, max 1.2s)
+ * FIX: Reduced to 400ms max for cleaner transitions, no ghosting
  */
 function getTransitionDuration(segmentDuration: number): number {
-  return Math.min(segmentDuration * 0.30, 1.2);
+  return Math.min(segmentDuration * 0.08, 0.4);
 }
 
 /**
  * Render a single frame to the canvas with professional transitions
- * Uses split image layout: top image + center text + bottom image
- * Supports crossfade transitions between segments
  * 
- * FIX: Text overlay is delayed until AFTER the transition completes
- * This ensures the narration matches the displayed image
+ * FIX v2: Complete rewrite of transition logic to eliminate ghosting.
+ * - Only ONE transition zone at the START of each segment (no exit transitions)
+ * - Canvas is fully cleared before every frame
+ * - Text is strictly tied to segment boundaries
+ * - Previous image never reappears after transition completes
  */
 function renderFrame(
   ctx: CanvasRenderingContext2D,
@@ -540,95 +540,98 @@ function renderFrame(
   brandName: string,
   instagramHandle: string
 ): void {
+  // Always clear canvas fully first - prevents any ghosting
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#0a0a0f";
+  ctx.fillRect(0, 0, width, height);
+
   const contentDuration = totalDuration - ctaDuration;
   
-  // Check if we're in CTA phase
+  // CTA phase
   if (currentTime >= contentDuration) {
     const ctaProgress = (currentTime - contentDuration) / ctaDuration;
     drawMarketingCTA(ctx, width, height, ctaProgress, instagramHandle);
     return;
   }
   
-  // Find current segment and calculate transition state
+  // Find current segment by accumulating start times
   let elapsed = 0;
   let segmentIndex = 0;
-  let segmentProgress = 0;
   let timeIntoSegment = 0;
   
   for (let i = 0; i < segments.length; i++) {
     if (currentTime < elapsed + segments[i].duration) {
       segmentIndex = i;
       timeIntoSegment = currentTime - elapsed;
-      segmentProgress = timeIntoSegment / segments[i].duration;
       break;
     }
     elapsed += segments[i].duration;
+    // If we passed all segments, clamp to last
+    if (i === segments.length - 1) {
+      segmentIndex = i;
+      timeIntoSegment = currentTime - elapsed;
+    }
   }
 
   const segment = segments[segmentIndex];
   const currentImg = images[segmentIndex];
   const segmentDuration = segment.duration;
   const transitionDuration = getTransitionDuration(segmentDuration);
+  const segmentProgress = timeIntoSegment / segmentDuration;
   
-  // Calculate if we're in a transition zone
-  const isEnteringTransition = timeIntoSegment < transitionDuration && segmentIndex > 0;
-  const isExitingTransition = timeIntoSegment > (segmentDuration - transitionDuration) && segmentIndex < segments.length - 1;
+  // Transition only at the START of a segment (crossfade FROM previous)
+  // No exit transition - this eliminates the ghosting bug entirely
+  const isInTransition = timeIntoSegment < transitionDuration && segmentIndex > 0;
   
-  // Clear canvas with dark background for center area
-  ctx.fillStyle = "#0a0a0f";
-  ctx.fillRect(0, 0, width, height);
-  
-  // Determine transition type based on segment index for variety
-  // IMPROVED: More variety with 6 transition types
-  const transitionTypes: TransitionType[] = ['crossfade', 'wipe', 'zoom', 'blur', 'slide', 'crossfade'];
-  const transitionType = transitionTypes[segmentIndex % transitionTypes.length];
-
-  if (isEnteringTransition && segmentIndex > 0) {
-    // Entering from previous segment - blend with previous image
+  if (isInTransition) {
     const prevImg = images[segmentIndex - 1];
-    const transitionProgress = timeIntoSegment / transitionDuration; // 0 to 1
+    const transitionProgress = timeIntoSegment / transitionDuration; // 0→1
+    
+    // Simple crossfade: prev fades out, current fades in
+    const transitionTypes: TransitionType[] = ['crossfade', 'zoom', 'slide', 'crossfade'];
+    const transitionType = transitionTypes[segmentIndex % transitionTypes.length];
     
     drawTransition(ctx, prevImg, currentImg, width, height, transitionProgress, transitionType, segmentIndex - 1, segmentIndex);
-  } else if (isExitingTransition && segmentIndex < segments.length - 1) {
-    // Exiting to next segment - blend with next image
-    const nextImg = images[segmentIndex + 1];
-    const transitionProgress = (timeIntoSegment - (segmentDuration - transitionDuration)) / transitionDuration; // 0 to 1
-    
-    drawTransition(ctx, currentImg, nextImg, width, height, transitionProgress, transitionType, segmentIndex, segmentIndex + 1);
   } else {
-    // Normal segment - just show current image with Ken Burns
+    // Normal rendering - only current image, no blending
     drawSplitImages(ctx, currentImg, width, height, segmentProgress, segmentIndex);
   }
 
-  // Draw watermark
+  // Watermark
   drawWatermark(ctx, width, height, brandName);
 
-  // 🔧 FIX: Only show text AFTER the entering transition completes
-  // This ensures the narration matches the displayed image
-  // During exit transition, we still show current text as it's still the current segment's audio
-  const showText = !isEnteringTransition; // Hide text during entering transition
-  
-  if (showText && segment.text) {
-    // IMPROVED: Smoother text fade-in with longer duration
-    const textFadeInDuration = 0.25; // 250ms fade-in (was 150ms)
-    const timeSinceTransition = timeIntoSegment - transitionDuration;
+  // Text overlay - strictly tied to segment timing
+  // Show text only AFTER transition completes, hide instantly at segment end
+  if (segment.text) {
+    const textFadeIn = 0.2; // 200ms fade-in
+    const textFadeOut = 0.15; // 150ms fade-out before segment ends
+    const timeUntilEnd = segmentDuration - timeIntoSegment;
     
-    // Calculate text opacity based on timing
-    let textOpacity = 1;
-    if (segmentIndex === 0) {
+    let textOpacity = 0;
+    
+    if (isInTransition) {
+      // During transition: no text (prevents wrong text showing)
+      textOpacity = 0;
+    } else if (segmentIndex === 0) {
       // First segment: fade in from start
-      textOpacity = Math.min(1, timeIntoSegment / textFadeInDuration);
-    } else if (timeSinceTransition >= 0) {
-      // Other segments: fade in after transition completes
-      textOpacity = Math.min(1, timeSinceTransition / textFadeInDuration);
+      textOpacity = Math.min(1, timeIntoSegment / textFadeIn);
     } else {
-      textOpacity = 0; // During transition, hide text
+      // After transition: fade in
+      const timeSinceTransition = timeIntoSegment - transitionDuration;
+      textOpacity = Math.min(1, timeSinceTransition / textFadeIn);
     }
     
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, Math.min(1, textOpacity));
-    drawTextOverlay(ctx, segment.text, width, height);
-    ctx.restore();
+    // Fade out near segment end (clean transition to next text)
+    if (timeUntilEnd < textFadeOut && segmentIndex < segments.length - 1) {
+      textOpacity *= timeUntilEnd / textFadeOut;
+    }
+    
+    if (textOpacity > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, textOpacity));
+      drawTextOverlay(ctx, segment.text, width, height);
+      ctx.restore();
+    }
   }
 }
 
@@ -666,16 +669,6 @@ function drawTransition(
       drawZoomTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
       break;
     
-    case 'wipe':
-      // Horizontal wipe transition
-      drawWipeTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
-      break;
-    
-    case 'blur':
-      // Blur out/in transition (simulated with scale)
-      drawBlurTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
-      break;
-      
     default:
       // Fallback to simple crossfade
       drawCrossfadeTransition(ctx, fromImg, toImg, width, height, easedProgress, fromIndex, toIndex);
@@ -780,89 +773,7 @@ function drawZoomTransition(
   ctx.restore();
 }
 
-/**
- * Wipe transition - horizontal wipe from left to right
- * Professional TV-style transition
- */
-function drawWipeTransition(
-  ctx: CanvasRenderingContext2D,
-  fromImg: HTMLImageElement,
-  toImg: HTMLImageElement,
-  width: number,
-  height: number,
-  progress: number,
-  fromIndex: number,
-  toIndex: number
-): void {
-  // Draw "to" image full screen first (revealed part)
-  drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
-  
-  // Draw "from" image with clipping (shrinking from right)
-  ctx.save();
-  const wipeX = width * (1 - progress);
-  ctx.beginPath();
-  ctx.rect(wipeX, 0, width - wipeX, height);
-  ctx.clip();
-  drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
-  
-  // Add a white edge line for visual polish
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(wipeX, 0);
-  ctx.lineTo(wipeX, height);
-  ctx.stroke();
-  
-  ctx.restore();
-}
-
-/**
- * Blur transition - simulated with rapid zoom and opacity
- * Creates a dreamy transition effect
- */
-function drawBlurTransition(
-  ctx: CanvasRenderingContext2D,
-  fromImg: HTMLImageElement,
-  toImg: HTMLImageElement,
-  width: number,
-  height: number,
-  progress: number,
-  fromIndex: number,
-  toIndex: number
-): void {
-  const centerX = width / 2;
-  const centerY = height / 2;
-  
-  // First half: "from" image zooms in and fades
-  if (progress < 0.5) {
-    const localProgress = progress * 2; // 0 to 1 in first half
-    ctx.save();
-    ctx.globalAlpha = 1 - localProgress;
-    const scale = 1 + localProgress * 0.2; // Zoom in
-    ctx.translate(centerX, centerY);
-    ctx.scale(scale, scale);
-    ctx.translate(-centerX, -centerY);
-    drawSplitImages(ctx, fromImg, width, height, 1.0, fromIndex);
-    ctx.restore();
-    
-    // Start fading in "to" at reduced opacity
-    ctx.save();
-    ctx.globalAlpha = localProgress * 0.5;
-    drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
-    ctx.restore();
-  } else {
-    // Second half: "to" image zooms out from large and fades in
-    const localProgress = (progress - 0.5) * 2; // 0 to 1 in second half
-    ctx.save();
-    ctx.globalAlpha = 0.5 + localProgress * 0.5;
-    const scale = 1.2 - localProgress * 0.2; // Start zoomed in, end at 1
-    ctx.translate(centerX, centerY);
-    ctx.scale(scale, scale);
-    ctx.translate(-centerX, -centerY);
-    drawSplitImages(ctx, toImg, width, height, 0.0, toIndex);
-    ctx.restore();
-  }
-}
+// Wipe and Blur transitions removed — using only crossfade, slide, zoom for cleaner results
 
 /**
  * Get the best supported video codec for recording
@@ -1279,10 +1190,18 @@ export async function generateVideoFromSegments(
         return;
       }
 
-      // Start CTA audio when entering CTA phase
-      if (elapsed >= contentDuration && !ctaAudioStarted && ctaAudioElement) {
+      // FIX: Stop main narration BEFORE CTA phase to prevent voice overlap
+      // Add 300ms silence buffer before CTA starts
+      const ctaSilenceBuffer = 0.3;
+      if (elapsed >= contentDuration - ctaSilenceBuffer && audioElement && !audioElement.paused) {
+        console.log("[VideoEncoder] Stopping main narration before CTA at", elapsed.toFixed(2), "s");
+        audioElement.pause();
+      }
+      
+      // Start CTA audio when entering CTA phase (after silence buffer)
+      if (elapsed >= contentDuration + ctaSilenceBuffer && !ctaAudioStarted && ctaAudioElement) {
         ctaAudioStarted = true;
-        console.log("[VideoEncoder] Starting CTA audio at", elapsed.toFixed(2), "s");
+        console.log("[VideoEncoder] Starting CTA audio at", elapsed.toFixed(2), "s (after 300ms silence)");
         ctaAudioElement.currentTime = 0;
         ctaAudioElement.play().catch(console.warn);
       }

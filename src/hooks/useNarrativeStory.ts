@@ -435,13 +435,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       const clampedDuration = Math.min(audioDuration > 0 ? audioDuration : 0, MAX_DURATION);
 
       if (clampedDuration > 0) {
-        const durationPerSegment = clampedDuration / segments.length;
+        // FIX: Distribute duration PROPORTIONALLY by word count, not evenly
+        // This ensures each segment's image stays on screen for as long as its narration
+        const wordCounts = segments.map(s => s.text.split(/\s+/).length);
+        const totalWords = wordCounts.reduce((a, b) => a + b, 0);
         
         setState(prev => {
           let currentTime = 0;
-          const updatedSegments = prev.segments.map(seg => {
-            const updated = { ...seg, duration: durationPerSegment, startTime: currentTime };
-            currentTime += durationPerSegment;
+          const updatedSegments = prev.segments.map((seg, i) => {
+            const proportion = totalWords > 0 ? wordCounts[i] / totalWords : 1 / segments.length;
+            const segDuration = clampedDuration * proportion;
+            const updated = { ...seg, duration: segDuration, startTime: currentTime };
+            currentTime += segDuration;
             return updated;
           });
           return { 
@@ -467,14 +472,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       }
       
       // Estimate duration based on text length — capped at 30s
+      // FIX: Use proportional distribution by word count
       const estimatedDuration = Math.min(estimateSpeechDuration(fullScript), 30);
-      const durationPerSegment = estimatedDuration / segments.length;
+      const wordCounts = segments.map(s => s.text.split(/\s+/).length);
+      const totalWords = wordCounts.reduce((a, b) => a + b, 0);
       
       setState(prev => {
         let currentTime = 0;
-        const updatedSegments = prev.segments.map(seg => {
-          const updated = { ...seg, duration: durationPerSegment, startTime: currentTime };
-          currentTime += durationPerSegment;
+        const updatedSegments = prev.segments.map((seg, i) => {
+          const proportion = totalWords > 0 ? wordCounts[i] / totalWords : 1 / segments.length;
+          const segDuration = estimatedDuration * proportion;
+          const updated = { ...seg, duration: segDuration, startTime: currentTime };
+          currentTime += segDuration;
           return updated;
         });
         return { 
