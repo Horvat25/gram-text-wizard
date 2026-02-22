@@ -630,74 +630,46 @@ async function createVideoContent(
   const images: string[] = [];
   const titles: string[] = [];
 
-  // STEP 1: Use INTELLIGENT image curation if we have article context
-  // Otherwise fall back to generic Pexels/Unsplash search
-  const hasArticleContext = rssArticle?.url || rssArticle?.title;
+  // STEP 1: Generate 4 AI images via Gemini Flash Image
+  // Uses search-images-for-video in AI GENERATION MODE (no articleUrl/useArticleMode)
+  // This ensures visual consistency and relevance instead of random stock photos
+  const articleTitle = rssArticle?.title || plan.theme;
+  const articleDesc = rssArticle?.description || '';
+  
+  // Build 4 progressive segments for AI generation
+  const progressivePhases = [
+    { text: `Contexto e cenário: ${articleTitle}`, imagePrompt: `Cenário introdutório sobre ${articleTitle}` },
+    { text: `Desenvolvimento: ${articleDesc || articleTitle}`, imagePrompt: `Detalhes e desenvolvimento de ${articleTitle}` },
+    { text: `Impacto e consequências de ${articleTitle}`, imagePrompt: `Impacto visual de ${articleTitle}` },
+    { text: `Conclusão e futuro: ${articleTitle}`, imagePrompt: `Visão futurista sobre ${articleTitle}` },
+  ];
+  
+  console.log('[AGENT] 🎨 AI GENERATION MODE: Gerando 4 imagens por IA para vídeo');
+  try {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        topic: articleTitle,
+        segments: progressivePhases,
+      })
+    });
 
-  if (hasArticleContext) {
-    console.log('[AGENT] 🎯 INTELLIGENT MODE: Curating 4 real news images from article:', rssArticle!.title);
-    try {
-      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          useArticleMode: true,
-          articleUrl: rssArticle!.url || null,
-          articleTitle: rssArticle!.title,
-          articleDescription: rssArticle!.description || '',
-          topic: rssArticle!.title,
-        })
-      });
-
-      if (searchResponse.ok) {
-        const searchResult = await searchResponse.json();
-        if (searchResult.images && searchResult.images.length > 0) {
-          for (const img of searchResult.images) {
-            const imgUrl = img.imageUrl || img.url;
-            if (imgUrl && typeof imgUrl === 'string') {
-              images.push(imgUrl);
-              titles.push(rssArticle!.title);
-            }
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      if (searchResult.images && searchResult.images.length > 0) {
+        for (const img of searchResult.images) {
+          const imgUrl = img.imageUrl || img.url;
+          if (imgUrl && typeof imgUrl === 'string') {
+            images.push(imgUrl);
+            titles.push(articleTitle);
           }
-          console.log(`[AGENT] ✅ ${images.length} imagens inteligentes curadas (fontes: ${JSON.stringify(searchResult.stats)})`);
         }
+        console.log(`[AGENT] ✅ ${images.length} imagens IA geradas (stats: ${JSON.stringify(searchResult.stats)})`);
       }
-    } catch (e) {
-      console.log('[AGENT] Erro na curadoria inteligente, usando busca genérica:', e);
     }
-  }
-
-  // Fallback: Generic Pexels/Unsplash search (for non-article videos or if intelligent mode failed)
-  if (images.length < 3) {
-    const fallbackQuery = plan.theme;
-    console.log(`[AGENT] Busca genérica (Pexels/Unsplash): "${fallbackQuery}"`);
-    try {
-      const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          query: fallbackQuery,
-          usedImageIds: images.map((_, i) => `used_${i}`), // avoid reuse
-        })
-      });
-
-      if (searchResponse.ok) {
-        const searchResult = await searchResponse.json();
-        if (searchResult.images && searchResult.images.length > 0) {
-          const needed = 4 - images.length;
-          for (const img of searchResult.images.slice(0, needed)) {
-            const imgUrl = img.imageUrl || img.url || img;
-            if (imgUrl && typeof imgUrl === 'string' && !images.includes(imgUrl)) {
-              images.push(imgUrl);
-              titles.push(plan.theme);
-            }
-          }
-          console.log(`[AGENT] ${images.length} imagens após fallback genérico`);
-        }
-      }
-    } catch (e) {
-      console.log('[AGENT] Erro na busca genérica:', e);
-    }
+  } catch (e) {
+    console.log('[AGENT] Erro na geração IA de imagens:', e);
   }
 
   console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
@@ -817,7 +789,7 @@ async function createVideoContent(
   return post;
 }
 
-// Create CAROUSEL content - NOW USES LIBRARY (RSS) images
+// Create CAROUSEL content - USES AI-GENERATED IMAGES for visual consistency
 async function createCarouselContent(
   supabase: any,
   plan: ContentPlan,
@@ -827,12 +799,12 @@ async function createCarouselContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando carrossel (da biblioteca RSS):', plan.theme);
+  console.log('[AGENT] Criando carrossel (imagens IA):', plan.theme);
   
-  // Get multiple RSS items for carousel slides
+  // Get top 4 RSS items for content/captions (but NOT for images)
   const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   
-  // First refresh RSS
+  // Refresh RSS
   try {
     await fetch(`${supabaseUrl}/functions/v1/fetch-rss`, {
       method: 'POST',
@@ -848,7 +820,6 @@ async function createCarouselContent(
     .select('*')
     .eq('workspace_id', workspaceId)
     .eq('is_used', false)
-    .eq('has_image', true)
     .gte('published_at', twoDaysAgo)
     .order('published_at', { ascending: false })
     .limit(20);
@@ -864,7 +835,7 @@ async function createCarouselContent(
       media_type: 'carousel',
       platforms: plan.platforms || ['instagram'],
       status: 'failed',
-      error_message: 'Menos de 2 notícias com imagem na biblioteca. Adicione mais fontes RSS.',
+      error_message: 'Menos de 2 notícias na biblioteca. Adicione mais fontes RSS.',
       ai_model_used: 'none'
     }).select().single();
     if (error) throw error;
@@ -878,61 +849,50 @@ async function createCarouselContent(
   })).sort((a: any, b: any) => b.score - a.score);
   
   const selectedItems = scored.slice(0, Math.min(4, scored.length));
-  const carouselImages: string[] = [];
-  const titles: string[] = [];
+  const titles: string[] = selectedItems.map((s: any) => s.item.title);
   
+  // Mark as used
   for (const { item } of selectedItems) {
-    if (item.image_url) {
-      // Apply overlay to each image
-      try {
-        const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            imageUrl: item.image_url,
-            title: item.title,
-            watermarkText: 'Neural Update',
-            generateHeadline: true
-          })
-        });
-        
-        if (overlayResponse.ok) {
-          const overlayResult = await overlayResponse.json();
-          if (overlayResult.publicUrl) {
-            carouselImages.push(overlayResult.publicUrl);
-            titles.push(item.title);
-          }
-        }
-      } catch (e) {
-        console.log('[AGENT] Erro overlay slide:', e);
-      }
-      
-      // Fallback: use original image
-      if (carouselImages.length < titles.length + 1 && item.image_url) {
-        try {
-          const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ imageUrl: item.image_url })
-          });
-          if (uploadResponse.ok) {
-            const uploadResult = await uploadResponse.json();
-            if (uploadResult.publicUrl) {
-              carouselImages.push(uploadResult.publicUrl);
-              titles.push(item.title);
-            }
-          }
-        } catch (e) {
-          console.log('[AGENT] Erro upload slide:', e);
-        }
-      }
-    }
-    
-    // Mark as used
     await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
   }
   
-  console.log(`[AGENT] Carrossel com ${carouselImages.length} slides da biblioteca`);
+  // Generate 4 AI images based on the selected news articles
+  // Uses search-images-for-video in AI GENERATION MODE
+  const segments = selectedItems.map((s: any, i: number) => ({
+    text: s.item.title,
+    imagePrompt: `Slide ${i + 1}: ${s.item.title}. ${s.item.description || ''}`,
+  }));
+  
+  console.log('[AGENT] 🎨 Gerando 4 imagens IA para carrossel...');
+  const carouselImages: string[] = [];
+  
+  try {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        topic: titles.join('; '),
+        segments,
+      })
+    });
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      if (searchResult.images && searchResult.images.length > 0) {
+        for (const img of searchResult.images) {
+          const imgUrl = img.imageUrl || img.url;
+          if (imgUrl && typeof imgUrl === 'string') {
+            carouselImages.push(imgUrl);
+          }
+        }
+        console.log(`[AGENT] ✅ ${carouselImages.length} imagens IA para carrossel`);
+      }
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro geração IA carrossel:', e);
+  }
+  
+  console.log(`[AGENT] Carrossel com ${carouselImages.length} slides (IA)`);
   
   // Generate caption
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
@@ -941,7 +901,7 @@ async function createCarouselContent(
     body: JSON.stringify({
       topic: `Resumo das principais notícias: ${titles.join('; ')}`,
       postType: 'noticia',
-      customInstructions: `Este é um CARROSSEL com ${carouselImages.length} notícias da biblioteca. Faça um resumo envolvente.`
+      customInstructions: `Este é um CARROSSEL com ${carouselImages.length} notícias. Faça um resumo envolvente.`
     })
   });
   
@@ -968,15 +928,16 @@ async function createCarouselContent(
     image_url: carouselImages[0] || null,
     carousel_images: carouselImages,
     overlay_metadata: {
-      type: 'library_carousel',
+      type: 'ai_carousel',
       titles,
-      ranking_scores: selectedItems.map((s: any) => s.score)
+      ranking_scores: selectedItems.map((s: any) => s.score),
+      ai_generated: true,
     },
-    ai_model_used: 'gemini-2.5-flash'
+    ai_model_used: 'gemini-2.5-flash-image'
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Carrossel criado:', post.id, 'slides:', carouselImages.length);
+  console.log('[AGENT] Carrossel IA criado:', post.id, 'slides:', carouselImages.length);
   return post;
 }
 
@@ -1178,6 +1139,23 @@ async function createNewsContent(
   
   console.log('[AGENT] Artigo selecionado:', selectedArticle?.title || 'nenhum');
   console.log('[AGENT] Imagem real encontrada:', selectedImage ? 'sim' : 'não');
+  
+  // Validate image accessibility (HEAD request to check for 404/broken images)
+  if (selectedImage) {
+    try {
+      const imgCheck = await fetch(selectedImage, { method: 'HEAD', redirect: 'follow' });
+      const contentType = imgCheck.headers.get('content-type') || '';
+      if (!imgCheck.ok || (!contentType.startsWith('image/') && !contentType.includes('octet-stream'))) {
+        console.warn(`[AGENT] ⚠️ Imagem RSS quebrada (${imgCheck.status}, type: ${contentType}): ${selectedImage.substring(0, 60)}`);
+        selectedImage = null; // Will trigger fallback below
+      } else {
+        console.log('[AGENT] ✅ Imagem RSS válida:', imgCheck.status, contentType);
+      }
+    } catch (imgErr) {
+      console.warn('[AGENT] ⚠️ Imagem RSS inacessível:', imgErr);
+      selectedImage = null;
+    }
+  }
   
   // STEP 3 & 4: Apply text overlay via CODE (not AI image generation)
   // The apply-text-overlay function:
