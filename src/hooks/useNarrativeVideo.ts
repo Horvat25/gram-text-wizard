@@ -132,31 +132,29 @@ export function useNarrativeVideo(options: UseNarrativeContentOptions = {}) {
     try {
       // Gerar narração E trilha sonora em paralelo
       const [ttsResult, musicUrl] = await Promise.all([
-        // TTS - ÚNICA TENTATIVA (conforme prompt definitivo)
+        // TTS - ElevenLabs via edge-tts (qualidade premium)
         (async () => {
-          console.log("[TTS] 🎙️ Iniciando narração...");
+          console.log("[TTS] 🎙️ Iniciando narração ElevenLabs...");
           
           try {
-            const result = await supabase.functions.invoke("huggingface-bark-tts", { 
+            const result = await supabase.functions.invoke("edge-tts", { 
               body: { 
                 text: script, 
-                language: "pt-BR" 
+                voice: "camila"
               } 
             });
             
-            // Verificar status
-            if (result.data?.tts_status === "success" && result.data?.audioContent) {
+            if (result.data?.audioContent) {
               const format = result.data.format || "mp3";
-              console.log(`[TTS] ✅ Sucesso! Modelo: ${result.data.model}, Size: ${result.data.size_kb}KB`);
+              console.log(`[TTS] ✅ Sucesso! Provider: ${result.data.provider}, Size: ${(result.data.audioContent.length / 1024).toFixed(1)}KB`);
               return { 
                 url: `data:audio/${format};base64,${result.data.audioContent}`, 
                 status: "success",
-                model: result.data.model 
+                model: result.data.provider 
               };
             }
             
-            // Falha explícita
-            console.log("[TTS] ❌ Falhou:", result.data?.error || "sem áudio");
+            console.log("[TTS] ❌ Sem áudio retornado");
             return { url: "", status: "failed", model: null };
             
           } catch (e: any) {

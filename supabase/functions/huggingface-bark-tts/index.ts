@@ -202,7 +202,7 @@ async function generateFacebookMMS(text: string, apiKey: string): Promise<Uint8A
     
     try {
       const response = await fetch(
-        "https://api-inference.huggingface.co/models/facebook/mms-tts-por",
+        "https://router.huggingface.co/hf-inference/models/facebook/mms-tts-por",
         {
           method: "POST",
           headers: {
@@ -249,7 +249,7 @@ async function generateBarkTTS(text: string, apiKey: string): Promise<Uint8Array
   
   try {
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/suno/bark-small",
+      "https://router.huggingface.co/hf-inference/models/suno/bark-small",
       {
         method: "POST",
         headers: {
