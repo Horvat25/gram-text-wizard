@@ -102,6 +102,35 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
     }
   }, [state.step, state.videoUrl, currentVideoId]);
 
+  // Calculate next optimal schedule time based on completed count
+  const getNextScheduleTime = useCallback((videoIndex: number): Date => {
+    const BEST_HOURS_BRASILIA = [9, 12, 15, 18, 20]; // Horários de pico em Brasília
+    const MIN_HOURS_APART = 6; // Mínimo de horas entre posts
+    
+    const now = new Date();
+    // Convert to Brasília time for calculation
+    const brasiliaOffset = -3 * 60; // UTC-3
+    const localOffset = now.getTimezoneOffset();
+    const brasiliaTime = new Date(now.getTime() + (localOffset + brasiliaOffset) * 60000);
+    
+    // Start scheduling from tomorrow
+    const startDay = new Date(brasiliaTime);
+    startDay.setDate(startDay.getDate() + 1);
+    startDay.setHours(0, 0, 0, 0);
+    
+    // Distribute videos across days and optimal hours
+    const dayOffset = Math.floor(videoIndex / BEST_HOURS_BRASILIA.length);
+    const hourIndex = videoIndex % BEST_HOURS_BRASILIA.length;
+    
+    const scheduleDate = new Date(startDay);
+    scheduleDate.setDate(scheduleDate.getDate() + dayOffset);
+    scheduleDate.setHours(BEST_HOURS_BRASILIA[hourIndex], 0, 0, 0);
+    
+    // Convert back to UTC for storage
+    const utcTime = new Date(scheduleDate.getTime() - (localOffset + brasiliaOffset) * 60000);
+    return utcTime;
+  }, []);
+
   const handleVideoComplete = async (videoUrl: string) => {
     if (!currentVideoId) return;
     
@@ -109,28 +138,27 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
       const currentVideo = renderQueue.find(v => v.id === currentVideoId);
       const shouldPublish = currentVideo?.overlay_metadata?.publish_after_render;
       
-      // Update post with video URL
+      // Auto-schedule at optimal time
+      const scheduleTime = getNextScheduleTime(completedCount);
+      const scheduledFormatted = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit', month: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      }).format(scheduleTime);
+      
+      // Update post with video URL and auto-schedule
       await supabase
         .from('posts')
         .update({
           video_url: videoUrl,
           overlay_metadata: null,
-          status: shouldPublish ? 'scheduled' : 'draft',
-          scheduled_for: shouldPublish ? new Date().toISOString() : null
+          status: 'scheduled',
+          scheduled_for: scheduleTime.toISOString()
         })
         .eq('id', currentVideoId);
 
-      // Auto-publish if flagged
-      if (shouldPublish) {
-        const { error: publishError } = await supabase.functions.invoke('publish-post', {
-          body: { postId: currentVideoId }
-        });
-        
-        if (!publishError) {
-          notifyPostPublished('Instagram');
-        }
-      }
-
+      toast.success(`📅 Vídeo agendado para ${scheduledFormatted}`);
+      
       setCompletedCount(prev => prev + 1);
       onComplete?.(currentVideoId, videoUrl);
       
@@ -158,8 +186,8 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
     if (!nextVideo) {
       setIsRendering(false);
       if (completedCount > 0) {
-        toast.success(`✅ ${completedCount} vídeo(s) renderizado(s)!`);
-        notifyAgentAction('Renderização Concluída', `${completedCount} vídeo(s) processados`);
+        toast.success(`✅ ${completedCount} vídeo(s) renderizado(s) e agendados!`);
+        notifyAgentAction('Renderização Concluída', `${completedCount} vídeo(s) renderizados e agendados automaticamente`);
         refetch();
       }
       return;
