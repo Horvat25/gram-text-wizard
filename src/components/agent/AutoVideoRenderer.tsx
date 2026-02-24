@@ -102,33 +102,89 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
     }
   }, [state.step, state.videoUrl, currentVideoId]);
 
-  // Calculate next optimal schedule time based on completed count
-  const getNextScheduleTime = useCallback((videoIndex: number): Date => {
-    const BEST_HOURS_BRASILIA = [9, 12, 15, 18, 20]; // Horários de pico em Brasília
-    const MIN_HOURS_APART = 6; // Mínimo de horas entre posts
+  // Calculate next optimal schedule time respecting daily limits
+  const getNextScheduleTime = useCallback(async (videoIndex: number): Promise<Date> => {
+    const BEST_HOURS_BRASILIA = [9, 12, 18]; // Max 2 per day, pick from these
+    const MAX_POSTS_PER_DAY = 2;
+    
+    // Fetch already scheduled posts to avoid conflicts
+    const { data: scheduledPosts } = await supabase
+      .from('posts')
+      .select('scheduled_for')
+      .eq('status', 'scheduled')
+      .gte('scheduled_for', new Date().toISOString())
+      .order('scheduled_for', { ascending: true });
+    
+    // Count posts per day (in Brasília timezone)
+    const postsPerDay: Record<string, number> = {};
+    const scheduledTimes: Date[] = [];
+    
+    (scheduledPosts || []).forEach(p => {
+      if (!p.scheduled_for) return;
+      const d = new Date(p.scheduled_for);
+      scheduledTimes.push(d);
+      const dayKey = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(d);
+      postsPerDay[dayKey] = (postsPerDay[dayKey] || 0) + 1;
+    });
+    
+    // Also count videos we're scheduling in THIS batch (prior indices)
+    const batchScheduled: Date[] = [];
+    // We store batch times in a ref-like approach using the videoIndex
     
     const now = new Date();
-    // Convert to Brasília time for calculation
-    const brasiliaOffset = -3 * 60; // UTC-3
-    const localOffset = now.getTimezoneOffset();
-    const brasiliaTime = new Date(now.getTime() + (localOffset + brasiliaOffset) * 60000);
+    const brasiliaFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' });
     
-    // Start scheduling from tomorrow
-    const startDay = new Date(brasiliaTime);
-    startDay.setDate(startDay.getDate() + 1);
-    startDay.setHours(0, 0, 0, 0);
+    // Start from tomorrow
+    let candidateDay = new Date(now);
+    candidateDay.setDate(candidateDay.getDate() + 1);
     
-    // Distribute videos across days and optimal hours
-    const dayOffset = Math.floor(videoIndex / BEST_HOURS_BRASILIA.length);
-    const hourIndex = videoIndex % BEST_HOURS_BRASILIA.length;
+    let scheduled = 0;
     
-    const scheduleDate = new Date(startDay);
-    scheduleDate.setDate(scheduleDate.getDate() + dayOffset);
-    scheduleDate.setHours(BEST_HOURS_BRASILIA[hourIndex], 0, 0, 0);
+    while (scheduled <= videoIndex) {
+      const dayKey = brasiliaFormatter.format(candidateDay);
+      const dayCount = (postsPerDay[dayKey] || 0);
+      
+      if (dayCount < MAX_POSTS_PER_DAY) {
+        // Find available hour slot for this day
+        for (const hour of BEST_HOURS_BRASILIA) {
+          // Create date in Brasília time
+          const target = new Date(candidateDay);
+          // Set to midnight UTC, then adjust for Brasília hour
+          const dateStr = brasiliaFormatter.format(target);
+          const utcDate = new Date(`${dateStr}T${String(hour).padStart(2, '0')}:00:00-03:00`);
+          
+          // Check minimum 6h gap from all scheduled posts on this day
+          const tooClose = scheduledTimes.some(st => 
+            Math.abs(st.getTime() - utcDate.getTime()) < 6 * 60 * 60 * 1000
+          );
+          
+          if (tooClose) continue;
+          
+          if (scheduled === videoIndex) {
+            // Track this slot as taken for future iterations
+            scheduledTimes.push(utcDate);
+            postsPerDay[dayKey] = (postsPerDay[dayKey] || 0) + 1;
+            return utcDate;
+          }
+          
+          // Mark slot as taken for this batch
+          scheduledTimes.push(utcDate);
+          postsPerDay[dayKey] = (postsPerDay[dayKey] || 0) + 1;
+          scheduled++;
+          
+          if ((postsPerDay[dayKey] || 0) >= MAX_POSTS_PER_DAY) break;
+        }
+      }
+      
+      // Move to next day
+      candidateDay.setDate(candidateDay.getDate() + 1);
+    }
     
-    // Convert back to UTC for storage
-    const utcTime = new Date(scheduleDate.getTime() - (localOffset + brasiliaOffset) * 60000);
-    return utcTime;
+    // Fallback: 1 day per video from tomorrow
+    const fallback = new Date(now);
+    fallback.setDate(fallback.getDate() + 1 + videoIndex);
+    fallback.setHours(12, 0, 0, 0);
+    return fallback;
   }, []);
 
   const handleVideoComplete = async (videoUrl: string) => {
@@ -139,7 +195,7 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
       const shouldPublish = currentVideo?.overlay_metadata?.publish_after_render;
       
       // Auto-schedule at optimal time
-      const scheduleTime = getNextScheduleTime(completedCount);
+      const scheduleTime = await getNextScheduleTime(completedCount);
       const scheduledFormatted = new Intl.DateTimeFormat('pt-BR', {
         timeZone: 'America/Sao_Paulo',
         day: '2-digit', month: '2-digit',
