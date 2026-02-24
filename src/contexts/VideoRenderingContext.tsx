@@ -65,7 +65,7 @@ interface VideoRenderingProviderProps {
 export function VideoRenderingProvider({ children }: VideoRenderingProviderProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
-  const { notifyPostPublished, notifyAgentAction } = usePushNotifications();
+  const { notifyVideoReady, notifyPostPublished, notifyAgentAction } = usePushNotifications();
   const { settings: brandSettings } = useBrandSettings();
   
   const [pendingVideos, setPendingVideos] = useState<PendingVideo[]>([]);
@@ -352,7 +352,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     const wasEmpty = prevPendingCountRef.current === 0;
     const hasNewVideos = newCount > 0;
     
-    // If we went from 0 to >0 pending videos and not rendering, auto-start
+    // If we went from 0 to >0 pending videos and not rendering, notify + auto-start
     if (wasEmpty && hasNewVideos && !isRenderingRef.current && !isPausedRef.current) {
       console.log('[VideoRendering] Auto-starting render for new agent-created video(s)');
       
@@ -362,6 +362,10 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       );
       
       if (agentCreatedVideo) {
+        // Send PWA notification so user knows there are videos to render
+        const title = agentCreatedVideo.overlay_metadata?.script?.title || agentCreatedVideo.overlay_metadata?.topic || 'Novo vídeo';
+        notifyVideoReady(title);
+        
         // Small delay to ensure UI is ready
         setTimeout(() => {
           unlockAudio();
@@ -372,10 +376,14 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           setTimeout(processNextVideo, 100);
         }, 2000);
       }
+    } else if (newCount > prevPendingCountRef.current && !isRenderingRef.current) {
+      // New videos added while we already had some — notify user
+      const newOnes = newCount - prevPendingCountRef.current;
+      notifyVideoReady(`${newOnes} novo(s) vídeo(s) aguardando`);
     }
     
     prevPendingCountRef.current = newCount;
-  }, [pendingVideos, processNextVideo]);
+  }, [pendingVideos, processNextVideo, notifyVideoReady]);
 
   const progress = renderQueue.length > 0
     ? Math.round((completedCount / (completedCount + renderQueue.length)) * 100)
