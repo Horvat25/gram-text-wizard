@@ -1843,11 +1843,12 @@ async function processWorkspace(
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
       
-      // Send completion message
+      // Send completion message - use ACTUAL post caption, not planned theme
       const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
+      const actualTheme = post?.caption?.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || decision.contentPlan.theme;
       await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'created', {
         type: mediaTypeName,
-        theme: decision.contentPlan.theme,
+        theme: actualTheme,
         status: post?.status,
         needsRender: isReels && !post?.video_url
       }));
@@ -1960,11 +1961,21 @@ function generateExecutionSummary(decision: AgentDecision, state: AgentState, po
   let greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
   
   if (decision.decision === 'POST' && post) {
+    // Use ACTUAL post content for summary, not planned theme
+    // For news posts, the RSS title may differ from the planned theme
+    const actualCaption = post.caption || '';
+    const actualTitle = actualCaption.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || 
+                        decision.contentPlan?.theme || 'tendências';
+    
+    const mediaTypeName = post.media_type === 'reels' ? 'Reels' : 
+                          post.media_type === 'carousel' ? 'Carrossel' :
+                          post.post_type === 'noticia' ? 'Notícia' : 'Post';
+    
     const wasPublished = state.context?.auto_post_enabled;
     if (wasPublished) {
-      return `${greeting}! 🚀 ${agentName} publicou um novo conteúdo sobre "${decision.contentPlan?.theme || 'tendências'}". O engajamento médio está em ${state.avgEngagement.toFixed(1)}% e decidi testar ${decision.hypothesis || 'um novo formato'}.`;
+      return `${greeting}! 🚀 ${agentName} publicou ${mediaTypeName}: "${actualTitle}". Engajamento médio: ${state.avgEngagement.toFixed(1)}%. ${decision.hypothesis || ''}`;
     } else {
-      return `${greeting}! 📝 ${agentName} criou um rascunho sobre "${decision.contentPlan?.theme || 'tendências'}" para sua aprovação. Ative o modo automático para publicar sem intervenção.`;
+      return `${greeting}! 📝 ${agentName} criou ${mediaTypeName} como rascunho: "${actualTitle}". Ative o modo automático para publicar sem intervenção.`;
     }
   } else if (decision.decision === 'NO_POST') {
     return `${greeting}! 🧠 ${agentName} analisou o cenário e decidiu não postar agora. Motivo: ${decision.reason}. Próxima análise será feita em breve.`;
