@@ -65,8 +65,54 @@ interface VideoRenderingProviderProps {
 export function VideoRenderingProvider({ children }: VideoRenderingProviderProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
-  const { notifyVideoReady, notifyPostPublished, notifyAgentAction } = usePushNotifications();
+  const { notifyVideoReady, notifyPostPublished, notifyAgentAction, requestPermission, permission } = usePushNotifications();
   const { settings: brandSettings } = useBrandSettings();
+  
+  // Proactively request notification permission on first load
+  useEffect(() => {
+    if (user && permission === 'default') {
+      // Small delay so it doesn't block initial render
+      const timer = setTimeout(() => {
+        requestPermission();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, permission, requestPermission]);
+
+  // Listen for posts published by the cron/agent to send notifications
+  useEffect(() => {
+    if (!currentWorkspace) return;
+    
+    const channel = supabase
+      .channel('agent-post-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'posts',
+          filter: `workspace_id=eq.${currentWorkspace.id}`,
+        },
+        (payload) => {
+          const newRecord = payload.new as any;
+          const oldRecord = payload.old as any;
+          
+          // Detect when a post transitions to 'published' (e.g. by cron scheduler)
+          if (oldRecord.status === 'scheduled' && newRecord.status === 'published') {
+            const platform = (newRecord.platforms || ['instagram'])[0];
+            const mediaType = newRecord.media_type === 'reels' ? '🎬 Reels' : 
+                             newRecord.media_type === 'carousel' ? '🎠 Carrossel' : '📸 Post';
+            const caption = (newRecord.caption || '').substring(0, 60);
+            notifyPostPublished(`${platform} - ${mediaType}: "${caption}..."`);
+          }
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentWorkspace, notifyPostPublished]);
   
   const [pendingVideos, setPendingVideos] = useState<PendingVideo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
