@@ -601,10 +601,10 @@ function renderFrame(
   drawWatermark(ctx, width, height, brandName);
 
   // Text overlay - strictly tied to segment timing
-  // Show text only AFTER transition completes, hide instantly at segment end
+  // Show text only AFTER transition completes, stay visible for full segment duration
   if (segment.text) {
-    const textFadeIn = 0.2; // 200ms fade-in
-    const textFadeOut = 0.15; // 150ms fade-out before segment ends
+    const textFadeIn = 0.3; // 300ms fade-in for readability
+    const textFadeOut = 0.2; // 200ms fade-out before segment ends
     const timeUntilEnd = segmentDuration - timeIntoSegment;
     
     let textOpacity = 0;
@@ -621,7 +621,8 @@ function renderFrame(
       textOpacity = Math.min(1, timeSinceTransition / textFadeIn);
     }
     
-    // Fade out near segment end (clean transition to next text)
+    // Fade out near segment end ONLY if not last segment
+    // Last segment keeps text visible until CTA
     if (timeUntilEnd < textFadeOut && segmentIndex < segments.length - 1) {
       textOpacity *= timeUntilEnd / textFadeOut;
     }
@@ -1190,18 +1191,18 @@ export async function generateVideoFromSegments(
         return;
       }
 
-      // FIX: Stop main narration BEFORE CTA phase to prevent voice overlap
-      // Add 300ms silence buffer before CTA starts
-      const ctaSilenceBuffer = 0.3;
-      if (elapsed >= contentDuration - ctaSilenceBuffer && audioElement && !audioElement.paused) {
-        console.log("[VideoEncoder] Stopping main narration before CTA at", elapsed.toFixed(2), "s");
+      // FIX: Stop main narration exactly at content end (no early cut)
+      // Previously stopped 300ms early which cut narration on last segment
+      if (elapsed >= contentDuration && audioElement && !audioElement.paused) {
+        console.log("[VideoEncoder] Stopping main narration at content end:", elapsed.toFixed(2), "s");
         audioElement.pause();
       }
       
-      // Start CTA audio when entering CTA phase (after silence buffer)
-      if (elapsed >= contentDuration + ctaSilenceBuffer && !ctaAudioStarted && ctaAudioElement) {
+      // Start CTA audio 200ms after content ends
+      const ctaDelay = 0.2;
+      if (elapsed >= contentDuration + ctaDelay && !ctaAudioStarted && ctaAudioElement) {
         ctaAudioStarted = true;
-        console.log("[VideoEncoder] Starting CTA audio at", elapsed.toFixed(2), "s (after 300ms silence)");
+        console.log("[VideoEncoder] Starting CTA audio at", elapsed.toFixed(2), "s");
         ctaAudioElement.currentTime = 0;
         ctaAudioElement.play().catch(console.warn);
       }

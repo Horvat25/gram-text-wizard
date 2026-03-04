@@ -430,8 +430,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log("[TTS] Audio duration detected:", audioDuration, "seconds");
       console.log("[Music] Background music URL:", backgroundMusicUrl ? "Generated" : "None");
       
-      // 🔒 Limite máximo de 30 segundos
-      const MAX_DURATION = 30;
+      // 🔒 Limite máximo de 55 segundos (permite narração completa sem corte)
+      // Antes era 30s, mas cortava a narração no último segmento
+      const MAX_DURATION = 55;
       const clampedDuration = Math.min(audioDuration > 0 ? audioDuration : 0, MAX_DURATION);
 
       if (clampedDuration > 0) {
@@ -471,9 +472,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         });
       }
       
-      // Estimate duration based on text length — capped at 30s
+      // Estimate duration based on text length — capped at 55s
       // FIX: Use proportional distribution by word count
-      const estimatedDuration = Math.min(estimateSpeechDuration(fullScript), 30);
+      const estimatedDuration = Math.min(estimateSpeechDuration(fullScript), 55);
       const wordCounts = segments.map(s => s.text.split(/\s+/).length);
       const totalWords = wordCounts.reduce((a, b) => a + b, 0);
       
