@@ -210,12 +210,22 @@ const PublicationQueueTab = ({
   };
 
   // Get script data from overlay_metadata for reels that need rendering
+  // Falls back to extracting from caption if no script metadata exists
   const getReelsScript = (post: Post) => {
-    if (!post.overlay_metadata?.script) return null;
+    if (post.overlay_metadata?.script) {
+      return {
+        title: post.overlay_metadata.script.title || post.overlay_metadata.topic || "Reels",
+        segments: post.overlay_metadata.script.segments || [],
+        topic: post.overlay_metadata.topic || "",
+      };
+    }
+    
+    // Fallback: extract topic from first line of caption
+    const firstLine = (post.caption || "").split("\n")[0].replace(/[🤖🔥💡🎬✨🚀]/g, "").trim();
     return {
-      title: post.overlay_metadata.script.title || post.overlay_metadata.topic || "Reels",
-      segments: post.overlay_metadata.script.segments || [],
-      topic: post.overlay_metadata.topic || "",
+      title: firstLine || "Reels",
+      segments: [],
+      topic: firstLine || "tecnologia",
     };
   };
 
@@ -772,7 +782,7 @@ const PublicationQueueTab = ({
       </Dialog>
 
       {/* Reels Renderer Dialog */}
-      {renderingPost && getReelsScript(renderingPost) && (
+      {renderingPost && (
         <AgentReelsRenderer
           key={renderingPost.id}
           postId={renderingPost.id}
