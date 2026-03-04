@@ -79,40 +79,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     }
   }, [user, permission, requestPermission]);
 
-  // Listen for posts published by the cron/agent to send notifications
-  useEffect(() => {
-    if (!currentWorkspace) return;
-    
-    const channel = supabase
-      .channel('agent-post-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'posts',
-          filter: `workspace_id=eq.${currentWorkspace.id}`,
-        },
-        (payload) => {
-          const newRecord = payload.new as any;
-          const oldRecord = payload.old as any;
-          
-          // Detect when a post transitions to 'published' (e.g. by cron scheduler)
-          if (oldRecord.status === 'scheduled' && newRecord.status === 'published') {
-            const platform = (newRecord.platforms || ['instagram'])[0];
-            const mediaType = newRecord.media_type === 'reels' ? '🎬 Reels' : 
-                             newRecord.media_type === 'carousel' ? '🎠 Carrossel' : '📸 Post';
-            const caption = (newRecord.caption || '').substring(0, 60);
-            notifyPostPublished(`${platform} - ${mediaType}: "${caption}..."`);
-          }
-        }
-      )
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentWorkspace, notifyPostPublished]);
+  // Realtime notification effect is below after fetchPendingVideos declaration
   
   const [pendingVideos, setPendingVideos] = useState<PendingVideo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -194,6 +161,64 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       setIsLoading(false);
     }
   }, [user, currentWorkspace]);
+
+  // Listen for posts published/created by the cron/agent to send notifications
+  useEffect(() => {
+    if (!currentWorkspace) return;
+    
+    const channel = supabase
+      .channel('agent-post-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'posts',
+          filter: `workspace_id=eq.${currentWorkspace.id}`,
+        },
+        (payload) => {
+          const newRecord = payload.new as any;
+          const oldRecord = payload.old as any;
+          
+          if (oldRecord.status === 'scheduled' && newRecord.status === 'published') {
+            const platform = (newRecord.platforms || ['instagram'])[0];
+            const mediaType = newRecord.media_type === 'reels' ? '🎬 Reels' : 
+                             newRecord.media_type === 'carousel' ? '🎠 Carrossel' : '📸 Post';
+            const caption = (newRecord.caption || '').substring(0, 60);
+            notifyPostPublished(`${platform} - ${mediaType}: "${caption}..."`);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'posts',
+          filter: `workspace_id=eq.${currentWorkspace.id}`,
+        },
+        (payload) => {
+          const newPost = payload.new as any;
+          
+          if (newPost.media_type === 'reels' && !newPost.video_url) {
+            const title = (newPost.caption || '').substring(0, 60);
+            notifyVideoReady(title);
+            fetchPendingVideos();
+          }
+          
+          if (newPost.status === 'scheduled' && newPost.media_type !== 'reels') {
+            const mediaType = newPost.media_type === 'carousel' ? '🎠 Carrossel' : 
+                             newPost.post_type === 'noticia' ? '📰 Notícia' : '📸 Post';
+            notifyAgentAction('Novo conteúdo criado', `${mediaType}: "${(newPost.caption || '').substring(0, 50)}..."`);
+          }
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentWorkspace, notifyPostPublished, notifyVideoReady, notifyAgentAction, fetchPendingVideos]);
 
   // Initial fetch and polling
   useEffect(() => {
