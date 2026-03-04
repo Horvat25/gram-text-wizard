@@ -202,12 +202,11 @@ const PublicationQueueTab = ({
   const { accounts, loading: loadingAccounts } = useInstagramAccounts();
   const hasConnectedAccount = accounts.length > 0;
 
-  // Check if a post needs video rendering (agent-created reels without video_url)
+  // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
     const isReels = post.media_type === "reels" || post.media_type === "reel";
     const hasNoVideo = !post.video_url;
-    const needsProcessing = post.overlay_metadata?.needs_processing === true;
-    return isReels && hasNoVideo && needsProcessing;
+    return isReels && hasNoVideo;
   };
 
   // Get script data from overlay_metadata for reels that need rendering
