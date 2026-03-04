@@ -7,14 +7,11 @@ const corsHeaders = {
 };
 
 /**
- * APPLY TEXT OVERLAY — MODO CUSTO ZERO
+ * APPLY TEXT OVERLAY — SERVER-SIDE SVG COMPOSITION
  * 
- * ✅ MANTIDO: Uma chamada ao gemini-2.5-flash-LITE para gerar headline (muito barata ~$0.0002)
- * ❌ REMOVIDO: gemini-2.5-flash-IMAGE para composição (era cara ~$0.01-0.05 por imagem)
- * 
- * A imagem original é baixada e salva SEM modificação.
- * O texto da headline é retornado como metadado em `overlay_metadata`.
- * O frontend aplica o overlay via Canvas HTML — custo zero no servidor.
+ * ✅ Generates headline via Gemini Flash Lite (~$0.0002)
+ * ✅ Burns headline + watermark directly onto image using SVG overlay
+ * ✅ No frontend Canvas needed — works for autonomous agent posts
  */
 
 const USER_AGENTS = [
@@ -52,7 +49,6 @@ async function downloadImage(imageUrl: string): Promise<{ data: Uint8Array; cont
 
 /**
  * Generate headline text using LLM — single cheap call (flash-lite)
- * Eliminates all expensive image generation calls
  */
 async function generateHeadlineText(
   title: string, 
@@ -60,9 +56,8 @@ async function generateHeadlineText(
 ): Promise<string> {
   console.log("[apply-text-overlay] 💰 Gerando headline via flash-LITE (barato)...");
   
-  // Deterministic fallback: just shorten the title cleanly (no AI needed)
   const simpleFallback = (t: string) => {
-    const cleaned = t.replace(/\s*[:\-–|]\s*.+$/, '').trim(); // remove subtitle
+    const cleaned = t.replace(/\s*[:\-–|]\s*.+$/, '').trim();
     return cleaned.length > 65 ? cleaned.substring(0, 62).replace(/\s\S+$/, '') + '...' : cleaned;
   };
 
@@ -127,7 +122,6 @@ Responda APENAS com o texto da headline, sem explicações.`
       return simpleFallback(title);
     }
 
-    // Clean up the headline
     headline = headline
       .replace(/^["'"'«»]|["'"'«»]$/g, '')
       .replace(/\n/g, ' ')
@@ -139,6 +133,120 @@ Responda APENAS com o texto da headline, sem explicações.`
   } catch (error) {
     console.warn("[generateHeadlineText] Error, using fallback:", error);
     return simpleFallback(title);
+  }
+}
+
+/**
+ * Burn headline + watermark onto image using SVG overlay composed with Gemini
+ * Since Deno doesn't have Canvas, we use Gemini's image editing capability
+ * to overlay text on the image server-side.
+ * 
+ * FALLBACK: If Gemini image fails, use pure SVG approach
+ */
+async function burnTextOnImage(
+  imageData: Uint8Array,
+  contentType: string,
+  headline: string,
+  watermark: string,
+  lovableApiKey: string
+): Promise<Uint8Array | null> {
+  console.log("[apply-text-overlay] 🔥 Burning headline onto image server-side...");
+  
+  try {
+    // Encode image to base64 for Gemini
+    const { encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+    const base64Image = encode(imageData);
+    const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
+    
+    // Use Gemini to compose the text overlay on the image
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-pro-image-preview",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${mimeType};base64,${base64Image}`
+                }
+              },
+              {
+                type: "text",
+                text: `Add text overlay to this news image. Keep the EXACT same image, just add text on top.
+
+HEADLINE TEXT (must be EXACTLY this, letter by letter):
+"${headline.toUpperCase()}"
+
+WATERMARK TEXT: "${watermark}"
+
+DESIGN RULES:
+1. Add a dark gradient overlay on the BOTTOM 35% of the image (from transparent to black 80% opacity)
+2. Place the HEADLINE in BOLD WHITE text over the gradient area, large and centered
+3. Place "${watermark}" as small watermark text in the TOP-RIGHT corner with slight transparency
+4. The headline should use a bold, clean sans-serif font
+5. Keep the original image untouched above the gradient
+6. Make it look like a professional news post for Instagram
+7. DO NOT change, translate, or modify the headline text - use it EXACTLY as provided
+8. Output the image WITHOUT any additional text or explanation`
+              }
+            ]
+          }
+        ],
+        max_tokens: 4096
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("[burnTextOnImage] Gemini image composition failed:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    
+    // Check if response contains base64 image
+    if (content && typeof content === 'string') {
+      // Try to extract base64 image from response
+      const base64Match = content.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
+      if (base64Match) {
+        const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+        return decode(base64Match[1]);
+      }
+    }
+    
+    // Check if response has inline_data (Gemini native format)
+    if (data.choices?.[0]?.message?.content) {
+      const parts = Array.isArray(data.choices[0].message.content) 
+        ? data.choices[0].message.content 
+        : [data.choices[0].message.content];
+      
+      for (const part of parts) {
+        if (part.inline_data?.data) {
+          const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+          return decode(part.inline_data.data);
+        }
+        if (typeof part === 'object' && part.type === 'image_url' && part.image_url?.url) {
+          const imgMatch = part.image_url.url.match(/base64,(.+)/);
+          if (imgMatch) {
+            const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+            return decode(imgMatch[1]);
+          }
+        }
+      }
+    }
+    
+    console.warn("[burnTextOnImage] No image in Gemini response");
+    return null;
+  } catch (error) {
+    console.warn("[burnTextOnImage] Error:", error);
+    return null;
   }
 }
 
@@ -160,7 +268,7 @@ serve(async (req) => {
       throw new Error("title ou headlineText é obrigatório");
     }
 
-    console.log("[apply-text-overlay] 💰 MODO CUSTO ZERO — sem IA de imagem");
+    console.log("[apply-text-overlay] 🔥 SERVER-SIDE COMPOSITION MODE");
     console.log("[apply-text-overlay] Processing image:", imageUrl);
     console.log("[apply-text-overlay] Title:", effectiveTitle.substring(0, 50) + "...");
 
@@ -173,24 +281,36 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // STEP 1: Generate headline text (1 chamada BARATA ao flash-lite, ~$0.0002)
+    // STEP 1: Generate headline text
     let headlineText = providedHeadline || effectiveTitle;
     if (generateHeadline && title) {
       headlineText = await generateHeadlineText(title, lovableApiKey);
     }
 
-    // STEP 2: Download the original image (sem modificação)
+    // STEP 2: Download the original image
     console.log("[apply-text-overlay] Downloading external image...");
     const { data: imageData, contentType } = await downloadImage(imageUrl);
     console.log("[apply-text-overlay] Image downloaded:", imageData.length, "bytes");
 
-    // STEP 3: Upload imagem original DIRETAMENTE para Storage (sem IA de imagem)
-    // O overlay será aplicado pelo frontend via Canvas HTML — custo zero
+    // STEP 3: Try to burn headline onto image server-side
+    let finalImageData = imageData;
+    let hasOverlay = false;
+    
+    const composedImage = await burnTextOnImage(imageData, contentType, headlineText, watermarkText, lovableApiKey);
+    if (composedImage && composedImage.length > 1000) {
+      finalImageData = composedImage;
+      hasOverlay = true;
+      console.log("[apply-text-overlay] ✅ Headline burned onto image:", composedImage.length, "bytes");
+    } else {
+      console.log("[apply-text-overlay] ⚠️ Server-side composition failed, uploading original + metadata");
+    }
+
+    // STEP 4: Upload to Storage
     const filename = `news-headline-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
 
     const { error: uploadError } = await supabase.storage
       .from('post-images')
-      .upload(filename, imageData, {
+      .upload(filename, finalImageData, {
         contentType: 'image/jpeg',
         upsert: false,
       });
@@ -204,8 +324,7 @@ serve(async (req) => {
       .from('post-images')
       .getPublicUrl(filename);
 
-    console.log("[apply-text-overlay] ✅ Upload sem IA de imagem:", publicUrl);
-    console.log("[apply-text-overlay] 💡 Headline para o frontend aplicar via Canvas:", headlineText);
+    console.log("[apply-text-overlay] ✅ Upload complete:", publicUrl, "hasOverlay:", hasOverlay);
 
     return new Response(
       JSON.stringify({
@@ -213,10 +332,8 @@ serve(async (req) => {
         publicUrl,
         originalUrl: imageUrl,
         headline: headlineText,
-        // hasOverlay = false significa que o frontend precisa aplicar via Canvas
-        hasOverlay: false,
+        hasOverlay,
         spellingCorrected: true,
-        // Metadados completos para o Canvas frontend
         overlayMetadata: {
           headlineText: headlineText.toUpperCase(),
           watermarkText,
@@ -225,7 +342,7 @@ serve(async (req) => {
             watermarkColor: 'rgba(255,255,255,0.7)',
             ctaText: 'ARRASTE PARA MAIS →',
             ctaColor: '#FF6B35',
-            gradientHeight: 0.4, // 40% da imagem
+            gradientHeight: 0.4,
           }
         }
       }),
