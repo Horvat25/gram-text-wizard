@@ -153,12 +153,11 @@ async function burnTextOnImage(
   console.log("[apply-text-overlay] 🔥 Burning headline onto image server-side...");
   
   try {
-    // Encode image to base64 for Gemini
-    const { encode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+    const { encode, decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
     const base64Image = encode(imageData);
     const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
     
-    // Use Gemini to compose the text overlay on the image
+    // Use Gemini with modalities: ["image", "text"] (same as generate-image)
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -167,6 +166,7 @@ async function burnTextOnImage(
       },
       body: JSON.stringify({
         model: "google/gemini-3-pro-image-preview",
+        modalities: ["image", "text"],
         messages: [
           {
             role: "user",
@@ -179,22 +179,21 @@ async function burnTextOnImage(
               },
               {
                 type: "text",
-                text: `Add text overlay to this news image. Keep the EXACT same image, just add text on top.
+                text: `Edit this image: add a text overlay on top. Keep the EXACT same photo, just overlay text.
 
-HEADLINE TEXT (must be EXACTLY this, letter by letter):
+HEADLINE (use EXACTLY this text, letter by letter):
 "${headline.toUpperCase()}"
 
-WATERMARK TEXT: "${watermark}"
+WATERMARK: "${watermark}"
 
-DESIGN RULES:
-1. Add a dark gradient overlay on the BOTTOM 35% of the image (from transparent to black 80% opacity)
-2. Place the HEADLINE in BOLD WHITE text over the gradient area, large and centered
-3. Place "${watermark}" as small watermark text in the TOP-RIGHT corner with slight transparency
-4. The headline should use a bold, clean sans-serif font
-5. Keep the original image untouched above the gradient
-6. Make it look like a professional news post for Instagram
-7. DO NOT change, translate, or modify the headline text - use it EXACTLY as provided
-8. Output the image WITHOUT any additional text or explanation`
+DESIGN:
+1. Dark gradient on BOTTOM 35% (transparent → black 80%)
+2. HEADLINE in BOLD WHITE large text, centered over gradient
+3. "${watermark}" small white text, TOP-RIGHT, 70% opacity
+4. Keep original photo unchanged above gradient
+5. Professional Instagram news post style
+6. DO NOT change, translate, or modify the headline text
+7. Return ONLY the edited image`
               }
             ]
           }
@@ -204,45 +203,66 @@ DESIGN RULES:
     });
 
     if (!response.ok) {
-      console.warn("[burnTextOnImage] Gemini image composition failed:", response.status);
+      const errText = await response.text().catch(() => '');
+      console.warn("[burnTextOnImage] Gemini failed:", response.status, errText.substring(0, 200));
       return null;
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    console.log("[burnTextOnImage] Response keys:", JSON.stringify(Object.keys(data)).substring(0, 200));
     
-    // Check if response contains base64 image
-    if (content && typeof content === 'string') {
-      // Try to extract base64 image from response
-      const base64Match = content.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
-      if (base64Match) {
-        const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
-        return decode(base64Match[1]);
+    // Parse image from response - try ALL known formats from Lovable gateway
+    
+    // Format 1: images array (same as generate-image)
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url
+      || data.choices?.[0]?.message?.content?.images?.[0]?.url
+      || data.images?.[0]?.url;
+    
+    if (imageUrl && imageUrl.startsWith('data:image/')) {
+      const b64 = imageUrl.split('base64,')[1];
+      if (b64) {
+        console.log("[burnTextOnImage] ✅ Got image via images array");
+        return decode(b64);
       }
     }
     
-    // Check if response has inline_data (Gemini native format)
-    if (data.choices?.[0]?.message?.content) {
-      const parts = Array.isArray(data.choices[0].message.content) 
-        ? data.choices[0].message.content 
-        : [data.choices[0].message.content];
-      
-      for (const part of parts) {
-        if (part.inline_data?.data) {
-          const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+    // Format 2: base64 in string content
+    const content = data.choices?.[0]?.message?.content;
+    if (content && typeof content === 'string') {
+      const b64Match = content.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
+      if (b64Match) {
+        console.log("[burnTextOnImage] ✅ Got image via string content");
+        return decode(b64Match[1]);
+      }
+    }
+    
+    // Format 3: content array with image parts
+    if (Array.isArray(content)) {
+      for (const part of content) {
+        if (part?.inline_data?.data) {
+          console.log("[burnTextOnImage] ✅ Got image via inline_data");
           return decode(part.inline_data.data);
         }
-        if (typeof part === 'object' && part.type === 'image_url' && part.image_url?.url) {
-          const imgMatch = part.image_url.url.match(/base64,(.+)/);
-          if (imgMatch) {
-            const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
-            return decode(imgMatch[1]);
+        if (part?.type === 'image_url' && part?.image_url?.url) {
+          const m = part.image_url.url.match(/base64,(.+)/);
+          if (m) {
+            console.log("[burnTextOnImage] ✅ Got image via content image_url");
+            return decode(m[1]);
+          }
+        }
+        // Format 4: image object in content array
+        if (part?.image?.url) {
+          const m = part.image.url.match(/base64,(.+)/);
+          if (m) {
+            console.log("[burnTextOnImage] ✅ Got image via content image.url");
+            return decode(m[1]);
           }
         }
       }
     }
     
-    console.warn("[burnTextOnImage] No image in Gemini response");
+    console.warn("[burnTextOnImage] No image found in response. Content preview:", 
+      JSON.stringify(data.choices?.[0]?.message).substring(0, 300));
     return null;
   } catch (error) {
     console.warn("[burnTextOnImage] Error:", error);

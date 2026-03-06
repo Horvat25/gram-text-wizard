@@ -18,6 +18,7 @@ import TermsOfService from "./pages/TermsOfService";
 import DataDeletion from "./pages/DataDeletion";
 import NotFound from "./pages/NotFound";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <PWAInstallPrompt />
+          <RealtimeNotifications />
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
