@@ -609,7 +609,25 @@ async function executeContentPlan(
       } catch (e) {
         console.log('[AGENT] Sem artigo RSS para video, usando tema genérico:', e);
       }
-      return createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+      try {
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+      } catch (videoError: any) {
+        console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
+        // Don't silently fail - create a draft with error info
+        const { data: fallbackPost } = await supabase.from('posts').insert({
+          user_id: userId,
+          workspace_id: workspaceId,
+          caption: `🎬 ${plan.theme}`,
+          hashtags: ['#tecnologia', '#reels'],
+          post_type: 'entretenimento',
+          media_type: 'reels',
+          platforms: plan.platforms || ['instagram'],
+          status: 'failed',
+          error_message: `Erro na criação de vídeo: ${videoError?.message || 'Unknown error'}`,
+          ai_model_used: 'none'
+        }).select().single();
+        return fallbackPost;
+      }
     }
     case 'carousel':
       return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
