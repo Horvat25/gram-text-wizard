@@ -270,6 +270,102 @@ DESIGN:
   }
 }
 
+/**
+ * Simplified retry: shorter prompt, uses flash model
+ */
+async function burnTextOnImageSimple(
+  imageData: Uint8Array,
+  contentType: string,
+  headline: string,
+  watermark: string,
+  lovableApiKey: string
+): Promise<Uint8Array | null> {
+  try {
+    const { encode, decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+    const base64Image = encode(imageData);
+    const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
+    
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image",
+        modalities: ["image", "text"],
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } },
+              { type: "text", text: `Add bold white text "${headline.toUpperCase()}" at the bottom of this image over a dark gradient. Add small "${watermark}" text top-right. Keep the photo unchanged. Return the edited image.` }
+            ]
+          }
+        ]
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    if (imageUrl?.startsWith('data:image/')) {
+      return decode(imageUrl.split('base64,')[1]);
+    }
+    return null;
+  } catch { return null; }
+}
+
+/**
+ * Last resort: generate a brand-new news overlay image with headline
+ */
+async function generateFreshOverlayImage(
+  headline: string,
+  watermark: string,
+  lovableApiKey: string
+): Promise<Uint8Array | null> {
+  try {
+    const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+    
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image",
+        modalities: ["image", "text"],
+        messages: [
+          {
+            role: "user",
+            content: `Generate a professional tech news image for Instagram (1080x1080).
+
+Design:
+- Dark blue/purple gradient background with subtle tech grid pattern
+- Large bold white headline text centered: "${headline.toUpperCase()}"
+- Small "${watermark}" watermark text in top-right corner
+- Professional, clean, modern design
+- No other text or decorations
+
+The headline MUST be readable and prominent. Tech news aesthetic.`
+          }
+        ]
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    if (imageUrl?.startsWith('data:image/')) {
+      return decode(imageUrl.split('base64,')[1]);
+    }
+    return null;
+  } catch { return null; }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
