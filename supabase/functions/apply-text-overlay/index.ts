@@ -312,17 +312,36 @@ serve(async (req) => {
     const { data: imageData, contentType } = await downloadImage(imageUrl);
     console.log("[apply-text-overlay] Image downloaded:", imageData.length, "bytes");
 
-    // STEP 3: Try to burn headline onto image server-side
+    // STEP 3: Try to burn headline onto image server-side (with retry)
     let finalImageData = imageData;
     let hasOverlay = false;
     
-    const composedImage = await burnTextOnImage(imageData, contentType, headlineText, watermarkText, lovableApiKey);
+    // Attempt 1: Burn text onto original image
+    let composedImage = await burnTextOnImage(imageData, contentType, headlineText, watermarkText, lovableApiKey);
     if (composedImage && composedImage.length > 1000) {
       finalImageData = composedImage;
       hasOverlay = true;
       console.log("[apply-text-overlay] ✅ Headline burned onto image:", composedImage.length, "bytes");
     } else {
-      console.log("[apply-text-overlay] ⚠️ Server-side composition failed, uploading original + metadata");
+      // Attempt 2: Retry with simpler prompt
+      console.log("[apply-text-overlay] ⚠️ Attempt 1 failed, retrying with simpler prompt...");
+      composedImage = await burnTextOnImageSimple(imageData, contentType, headlineText, watermarkText, lovableApiKey);
+      if (composedImage && composedImage.length > 1000) {
+        finalImageData = composedImage;
+        hasOverlay = true;
+        console.log("[apply-text-overlay] ✅ Headline burned (retry):", composedImage.length, "bytes");
+      } else {
+        // Attempt 3: Generate a NEW image with headline from scratch
+        console.log("[apply-text-overlay] ⚠️ Burn failed, generating fresh overlay image...");
+        const freshImage = await generateFreshOverlayImage(headlineText, watermarkText, lovableApiKey);
+        if (freshImage && freshImage.length > 1000) {
+          finalImageData = freshImage;
+          hasOverlay = true;
+          console.log("[apply-text-overlay] ✅ Fresh overlay image generated:", freshImage.length, "bytes");
+        } else {
+          console.log("[apply-text-overlay] ⚠️ All overlay methods failed, uploading original + metadata");
+        }
+      }
     }
 
     // STEP 4: Upload to Storage
