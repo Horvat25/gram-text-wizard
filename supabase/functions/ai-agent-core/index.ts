@@ -287,22 +287,30 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 }
-  ].filter(t => t.remaining > 0);
+  ];
   
-  // Sort by completion percentage (ascending - lower % first for diversity)
-  // Then by priority (descending) as tiebreaker
-  const remainingByType = typeStats.sort((a, b) => {
-    // Primary sort: completion percentage ascending (0% before 50% before 100%)
-    if (a.percentage !== b.percentage) return a.percentage - b.percentage;
-    // Secondary sort: priority descending (video before carousel before news before image)
+  // Log BEFORE filtering for debugging
+  console.log('[AGENT] Content type stats BEFORE filter:', typeStats.map(t => 
+    `${t.type}: ${t.remaining}/${t.goal} (${Math.round(t.percentage)}%, priority ${t.priority})`
+  ).join(' | '));
+  
+  const remainingTypes = typeStats.filter(t => t.remaining > 0);
+  
+  // Sort: lowest completion % first, then highest priority as tiebreaker
+  // IMPORTANT: Use explicit number comparison to avoid JS sort instability
+  const remainingByType = remainingTypes.sort((a, b) => {
+    const pctDiff = a.percentage - b.percentage;
+    if (Math.abs(pctDiff) > 0.01) return pctDiff;
+    // Same percentage → higher priority first (video > carousel > news > image)
     return b.priority - a.priority;
   });
   
-  console.log('[AGENT] Content distribution analysis:', remainingByType.map(t => 
+  console.log('[AGENT] Content distribution AFTER sort:', remainingByType.map(t => 
     `${t.type}: ${Math.round(t.percentage)}% (${t.goal - t.remaining}/${t.goal})`
   ).join(', '));
   
   const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
   
   console.log('[AGENT] Estado analisado:', {
     avgEngagement: avgEngagement.toFixed(2) + '%',
@@ -601,7 +609,25 @@ async function executeContentPlan(
       } catch (e) {
         console.log('[AGENT] Sem artigo RSS para video, usando tema genérico:', e);
       }
-      return createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+      try {
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+      } catch (videoError: any) {
+        console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
+        // Don't silently fail - create a draft with error info
+        const { data: fallbackPost } = await supabase.from('posts').insert({
+          user_id: userId,
+          workspace_id: workspaceId,
+          caption: `🎬 ${plan.theme}`,
+          hashtags: ['#tecnologia', '#reels'],
+          post_type: 'entretenimento',
+          media_type: 'reels',
+          platforms: plan.platforms || ['instagram'],
+          status: 'failed',
+          error_message: `Erro na criação de vídeo: ${videoError?.message || 'Unknown error'}`,
+          ai_model_used: 'none'
+        }).select().single();
+        return fallbackPost;
+      }
     }
     case 'carousel':
       return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
