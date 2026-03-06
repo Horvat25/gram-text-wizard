@@ -287,22 +287,30 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 }
-  ].filter(t => t.remaining > 0);
+  ];
   
-  // Sort by completion percentage (ascending - lower % first for diversity)
-  // Then by priority (descending) as tiebreaker
-  const remainingByType = typeStats.sort((a, b) => {
-    // Primary sort: completion percentage ascending (0% before 50% before 100%)
-    if (a.percentage !== b.percentage) return a.percentage - b.percentage;
-    // Secondary sort: priority descending (video before carousel before news before image)
+  // Log BEFORE filtering for debugging
+  console.log('[AGENT] Content type stats BEFORE filter:', typeStats.map(t => 
+    `${t.type}: ${t.remaining}/${t.goal} (${Math.round(t.percentage)}%, priority ${t.priority})`
+  ).join(' | '));
+  
+  const remainingTypes = typeStats.filter(t => t.remaining > 0);
+  
+  // Sort: lowest completion % first, then highest priority as tiebreaker
+  // IMPORTANT: Use explicit number comparison to avoid JS sort instability
+  const remainingByType = remainingTypes.sort((a, b) => {
+    const pctDiff = a.percentage - b.percentage;
+    if (Math.abs(pctDiff) > 0.01) return pctDiff;
+    // Same percentage → higher priority first (video > carousel > news > image)
     return b.priority - a.priority;
   });
   
-  console.log('[AGENT] Content distribution analysis:', remainingByType.map(t => 
+  console.log('[AGENT] Content distribution AFTER sort:', remainingByType.map(t => 
     `${t.type}: ${Math.round(t.percentage)}% (${t.goal - t.remaining}/${t.goal})`
   ).join(', '));
   
   const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
   
   console.log('[AGENT] Estado analisado:', {
     avgEngagement: avgEngagement.toFixed(2) + '%',
