@@ -144,7 +144,7 @@ export default function AgentResponsesPanel({ isOpen, onClose }: AgentResponsesP
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 100 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 max-h-[80vh] sm:max-h-[90vh] w-[calc(100vw-1rem)] sm:w-[500px] sm:max-w-[calc(100vw-2rem)] z-30 flex flex-col bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl overflow-hidden"
+          className="fixed inset-x-2 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-14 bottom-14 sm:top-4 sm:bottom-24 sm:w-[500px] sm:max-w-[calc(100vw-2rem)] z-30 flex flex-col bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border/50">
