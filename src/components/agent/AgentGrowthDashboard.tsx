@@ -7,7 +7,8 @@ import { Switch } from '@/components/ui/switch';
 import { 
   Target, TrendingUp, Users, Eye, Brain, Lightbulb,
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
-  Zap, Sparkles, Calendar, BarChart3, ArrowUpRight, ArrowDownRight, Minus
+  Zap, Sparkles, Calendar, BarChart3, ArrowUpRight, ArrowDownRight, Minus,
+  Trophy, Heart, Bookmark, Share2, RefreshCw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 
 interface AgentGrowthDashboardProps {
   context: AgentContext | null;
@@ -55,11 +57,26 @@ interface StrategySnapshot {
   top_performing_type: string | null;
 }
 
-export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
+interface TopPost {
+  id: string;
+  caption: string;
+  reach: number;
+  likes_count: number;
+  comments_count: number;
+  saves_count: number;
+  shares_count: number;
+  media_type: string | null;
+  image_url: string | null;
+  published_at: string | null;
+}
+
   const [isAutoStrategy, setIsAutoStrategy] = useState(true);
   const [period, setPeriod] = useState(30);
   const [snapshots, setSnapshots] = useState<StrategySnapshot[]>([]);
   const [loadingSnapshots, setLoadingSnapshots] = useState(false);
+  const [topPosts, setTopPosts] = useState<TopPost[]>([]);
+  const [loadingTopPosts, setLoadingTopPosts] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
 
   const goalType = context?.goal_type || 'macro';
@@ -84,27 +101,74 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const newsPercent = Math.round(((context?.content_distribution_news || 4) / totalContent) * 100);
   const imagesPercent = Math.round(((context?.content_distribution_images || 5) / totalContent) * 100);
 
-  // Fetch strategy history snapshots
+  // Sync from Instagram directly
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      let offset = 0;
+      let totalUpdated = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
+          body: { offset, batch_size: 30 }
+        });
+        if (error) throw error;
+        totalUpdated += data?.updated || 0;
+        hasMore = data?.has_more || false;
+        offset = data?.next_offset || 0;
+      }
+      toast.success(`Sincronizado! ${totalUpdated} posts atualizados`);
+      fetchTopPosts();
+      fetchSnapshots();
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao sincronizar');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const fetchSnapshots = async () => {
+    if (!currentWorkspace?.id) return;
+    setLoadingSnapshots(true);
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+    
+    const { data } = await supabase
+      .from('agent_strategy_snapshots' as any)
+      .select('*')
+      .eq('workspace_id', currentWorkspace.id)
+      .gte('snapshot_date', since.toISOString().split('T')[0])
+      .order('snapshot_date', { ascending: true });
+    
+    setSnapshots((data as any[]) || []);
+    setLoadingSnapshots(false);
+  };
+
+  const fetchTopPosts = async () => {
+    if (!currentWorkspace?.id) return;
+    setLoadingTopPosts(true);
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+    
+    const { data } = await supabase
+      .from('posts')
+      .select('id, caption, reach, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at')
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('status', 'published')
+      .not('instagram_post_id', 'is', null)
+      .gt('reach', 10)
+      .gte('published_at', since.toISOString())
+      .order('reach', { ascending: false })
+      .limit(10);
+    
+    setTopPosts((data as TopPost[]) || []);
+    setLoadingTopPosts(false);
+  };
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
-    
-    const fetchSnapshots = async () => {
-      setLoadingSnapshots(true);
-      const since = new Date();
-      since.setDate(since.getDate() - period);
-      
-      const { data } = await supabase
-        .from('agent_strategy_snapshots' as any)
-        .select('*')
-        .eq('workspace_id', currentWorkspace.id)
-        .gte('snapshot_date', since.toISOString().split('T')[0])
-        .order('snapshot_date', { ascending: true });
-      
-      setSnapshots((data as any[]) || []);
-      setLoadingSnapshots(false);
-    };
-    
     fetchSnapshots();
+    fetchTopPosts();
   }, [currentWorkspace?.id, period]);
 
   const getStrategyReason = () => {
@@ -443,7 +507,107 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 5. Agent Insights */}
+      {/* Top Posts Ranking */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }}>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2 pt-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Trophy className="h-4 w-4 text-yellow-500" />
+                Top Posts por Alcance
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 gap-1 text-[10px]"
+                onClick={handleSync}
+                disabled={syncing}
+              >
+                <RefreshCw className={cn("h-3 w-3", syncing && "animate-spin")} />
+                {syncing ? 'Sincronizando...' : 'Sincronizar'}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {loadingTopPosts ? (
+              <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">
+                Carregando...
+              </div>
+            ) : topPosts.length === 0 ? (
+              <div className="p-3 rounded-lg bg-muted/30 border border-border/30 text-center">
+                <p className="text-xs text-muted-foreground">Nenhum post com métricas reais encontrado nos últimos {period} dias.</p>
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {topPosts.map((post, i) => {
+                  const engagement = (post.likes_count || 0) + (post.comments_count || 0) + (post.saves_count || 0) + (post.shares_count || 0);
+                  const engRate = post.reach > 0 ? ((engagement / post.reach) * 100).toFixed(1) : '0';
+                  const mediaLabel = post.media_type === 'reels' || post.media_type === 'reel' ? 'Reel' 
+                    : post.media_type === 'carousel' ? 'Carrossel' 
+                    : post.media_type === 'video' ? 'Vídeo' : 'Imagem';
+                  return (
+                    <div key={post.id} className={cn(
+                      "flex items-start gap-2 p-2 rounded-lg border transition-all",
+                      i === 0 ? "bg-yellow-500/5 border-yellow-500/20" :
+                      i === 1 ? "bg-muted/40 border-border/40" :
+                      i === 2 ? "bg-orange-500/5 border-orange-500/10" :
+                      "bg-card/50 border-border/30"
+                    )}>
+                      <div className={cn(
+                        "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5",
+                        i === 0 ? "bg-yellow-500/20 text-yellow-500" :
+                        i === 1 ? "bg-muted text-muted-foreground" :
+                        i === 2 ? "bg-orange-500/20 text-orange-500" :
+                        "bg-muted/50 text-muted-foreground"
+                      )}>
+                        {i + 1}
+                      </div>
+                      {post.image_url && (
+                        <img src={post.image_url} alt="" className="w-8 h-8 rounded object-cover shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-medium line-clamp-1">{post.caption}</p>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                            <Eye className="h-2.5 w-2.5" /> {post.reach.toLocaleString()}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                            <Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                            <Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                            <Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Badge variant="outline" className="text-[8px] h-3.5 px-1">{mediaLabel}</Badge>
+                          <span className="text-[9px] text-emerald-500 font-medium">{engRate}% eng</span>
+                          {post.published_at && (
+                            <span className="text-[9px] text-muted-foreground/60">
+                              {new Date(post.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {topPosts.length > 0 && (
+              <div className="p-2 rounded-lg bg-primary/5 border border-primary/10">
+                <p className="text-[10px] text-muted-foreground">
+                  <Sparkles className="h-3 w-3 inline mr-1 text-primary" />
+                  O agente analisa esses dados para priorizar tipos de conteúdo com maior alcance e ajustar a estratégia automaticamente.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {(insights.length > 0 || topTopics.length > 0) && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <Card className="border-border/50">
