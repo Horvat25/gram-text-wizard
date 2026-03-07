@@ -1592,14 +1592,16 @@ async function recordDecisionAndLearn(
     await supabase
       .from('agent_context')
       .update({
-        success_patterns: newPatterns.slice(-10), // Keep last 10
+        success_patterns: newPatterns.slice(-10),
         updated_at: new Date().toISOString()
       })
       .eq('workspace_id', workspaceId);
     
     console.log('[AGENT] Contexto atualizado com novo padrão de sucesso');
   }
-}
+  
+  // ===== AUTO-EVOLUTION: Adjust content_distribution based on performance =====
+  await autoEvolveStrategy(supabase, state, workspaceId);
 
 // NOVA FUNÇÃO: Gerar análise e insights quando não posta
 async function generateInsightsAndAnalysis(
