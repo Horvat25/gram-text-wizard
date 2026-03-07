@@ -522,24 +522,10 @@ export default function AgentDashboard({ onNavigate }: AgentDashboardProps) {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6 py-8"
+              className="space-y-6 py-4"
             >
-              {/* Hero */}
-              <div className="text-center space-y-3">
-                <div className="relative inline-block">
-                  <Avatar className="h-16 w-16 border-2 border-primary/30 shadow-lg shadow-primary/20">
-                    <AvatarImage src={agentConfig.agent_avatar_url || undefined} />
-                    <AvatarFallback className="neural-gradient text-white text-xl">
-                      <Bot className="h-8 w-8" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-3 border-background bg-emerald-500" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold neural-gradient-text">{agentConfig.agent_name}</h1>
-                  <p className="text-muted-foreground text-sm mt-1">Como posso te ajudar hoje?</p>
-                </div>
-              </div>
+              {/* Growth Dashboard */}
+              <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
 
               {/* Quick Actions */}
               <div className="space-y-2">
