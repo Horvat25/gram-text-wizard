@@ -70,6 +70,7 @@ interface TopPost {
   published_at: string | null;
 }
 
+export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
   const [isAutoStrategy, setIsAutoStrategy] = useState(true);
   const [period, setPeriod] = useState(30);
   const [snapshots, setSnapshots] = useState<StrategySnapshot[]>([]);
