@@ -6,12 +6,15 @@ import {
   FileText, 
   Loader2,
   LayoutDashboard,
-  Settings
+  Settings,
+  TrendingUp
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useAgentContext } from '@/hooks/useAgentContext';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Lazy load 3D component to avoid SSR issues
 import AgentGenie3D from './AgentGenie3D';
@@ -20,6 +23,7 @@ import AgentChatPanel from './AgentChatPanel';
 import AgentLibraryPanel from './AgentLibraryPanel';
 import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
+import AgentGrowthDashboard from './AgentGrowthDashboard';
 
 interface AgentConfig {
   agent_name: string;
@@ -42,6 +46,7 @@ interface AgentGenieViewProps {
 export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
+  const { context: agentCtx, updateContext } = useAgentContext();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +61,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const [showChat, setShowChat] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
   const [showResponses, setShowResponses] = useState(false);
+  const [showGrowth, setShowGrowth] = useState(false);
 
   useEffect(() => {
     if (user && currentWorkspace) {
@@ -207,6 +213,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     if (!showChat) {
       setShowLibrary(false);
       setShowResponses(false);
+      setShowGrowth(false);
     }
   };
 
@@ -215,6 +222,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     if (!showLibrary) {
       setShowChat(false);
       setShowResponses(false);
+      setShowGrowth(false);
     }
   };
 
@@ -223,6 +231,16 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     if (!showResponses) {
       setShowChat(false);
       setShowLibrary(false);
+      setShowGrowth(false);
+    }
+  };
+
+  const toggleGrowth = () => {
+    setShowGrowth(!showGrowth);
+    if (!showGrowth) {
+      setShowChat(false);
+      setShowLibrary(false);
+      setShowResponses(false);
     }
   };
 
@@ -285,6 +303,19 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           >
             <FileText className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Respostas</span>
+          </Button>
+          
+          <Button
+            variant={showGrowth ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showGrowth && "neural-gradient border-0"
+            )}
+            onClick={toggleGrowth}
+          >
+            <TrendingUp className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Crescimento</span>
           </Button>
         </div>
         
@@ -352,6 +383,17 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         isOpen={showResponses}
         onClose={() => setShowResponses(false)}
       />
+      
+      {/* Growth Dashboard Panel */}
+      {showGrowth && (
+        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-lg mx-auto">
+              <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
+            </div>
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
 }
