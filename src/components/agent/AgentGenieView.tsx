@@ -6,12 +6,15 @@ import {
   FileText, 
   Loader2,
   LayoutDashboard,
-  Settings
+  Settings,
+  TrendingUp
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useAgentContext } from '@/hooks/useAgentContext';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Lazy load 3D component to avoid SSR issues
 import AgentGenie3D from './AgentGenie3D';
@@ -20,6 +23,7 @@ import AgentChatPanel from './AgentChatPanel';
 import AgentLibraryPanel from './AgentLibraryPanel';
 import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
+import AgentGrowthDashboard from './AgentGrowthDashboard';
 
 interface AgentConfig {
   agent_name: string;
