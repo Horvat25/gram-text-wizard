@@ -61,6 +61,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const [showChat, setShowChat] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
   const [showResponses, setShowResponses] = useState(false);
+  const [showGrowth, setShowGrowth] = useState(false);
 
   useEffect(() => {
     if (user && currentWorkspace) {
