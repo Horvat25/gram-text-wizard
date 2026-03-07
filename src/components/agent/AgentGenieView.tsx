@@ -304,6 +304,19 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
             <FileText className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Respostas</span>
           </Button>
+          
+          <Button
+            variant={showGrowth ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showGrowth && "neural-gradient border-0"
+            )}
+            onClick={toggleGrowth}
+          >
+            <TrendingUp className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Crescimento</span>
+          </Button>
         </div>
         
         {/* Right side - Settings and Dashboard */}
