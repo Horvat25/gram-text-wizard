@@ -6,7 +6,6 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useNarrativeStory } from '@/hooks/useNarrativeStory';
 import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { unlockAudio } from '@/lib/audio-unlock';
-import { initFFmpeg } from '@/lib/video-converter';
 import { toast } from 'sonner';
 
 interface PendingVideo {
@@ -15,23 +14,23 @@ interface PendingVideo {
   created_at: string;
   image_url: string | null;
   scheduled_for?: string | null;
+  render_attempts?: number;
   overlay_metadata: {
-    type: string;
-    script: {
+    type?: string;
+    script?: {
       title: string;
       segments: Array<{ text: string; imagePrompt: string }>;
     };
-    topic: string;
-    needs_processing: boolean;
+    topic?: string;
+    needs_processing?: boolean;
     publish_after_render?: boolean;
     created_by_agent?: boolean;
     article_url?: string;
     article_image_url?: string;
-  };
+  } | null;
 }
 
 interface VideoRenderingContextType {
-  // State
   renderQueue: PendingVideo[];
   isRendering: boolean;
   isPaused: boolean;
@@ -40,8 +39,6 @@ interface VideoRenderingContextType {
   currentStep: string;
   isGenerating: boolean;
   progress: number;
-  
-  // Actions
   startRendering: () => void;
   pauseRendering: () => void;
   resumeRendering: () => void;
@@ -58,6 +55,9 @@ export function useVideoRendering() {
   return context;
 }
 
+const MAX_RENDER_ATTEMPTS = 3;
+const POLL_INTERVAL_MS = 30_000;
+
 interface VideoRenderingProviderProps {
   children: ReactNode;
 }
@@ -67,46 +67,42 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   const { currentWorkspace } = useWorkspace();
   const { notifyVideoReady, notifyPostPublished, notifyAgentAction, requestPermission, permission } = usePushNotifications();
   const { settings: brandSettings } = useBrandSettings();
-  
-  // Proactively request notification permission on first load
+
+  // Request notification permission on first load
   useEffect(() => {
     if (user && permission === 'default') {
-      // Small delay so it doesn't block initial render
-      const timer = setTimeout(() => {
-        requestPermission();
-      }, 5000);
+      const timer = setTimeout(() => requestPermission(), 5000);
       return () => clearTimeout(timer);
     }
   }, [user, permission, requestPermission]);
 
-  // Realtime notification effect is below after fetchPendingVideos declaration
-  
   const [pendingVideos, setPendingVideos] = useState<PendingVideo[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isRendering, setIsRendering] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   const [renderQueue, setRenderQueue] = useState<PendingVideo[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  
-  // Use refs to maintain state across re-renders without causing loops
+
+  // Refs to avoid stale closures
   const isRenderingRef = useRef(false);
   const isPausedRef = useRef(false);
   const currentVideoIdRef = useRef<string | null>(null);
   const renderQueueRef = useRef<PendingVideo[]>([]);
-  
-  // Keep refs in sync
+  // Lock to prevent concurrent renders
+  const renderLockRef = useRef(false);
+
   useEffect(() => {
     isRenderingRef.current = isRendering;
     isPausedRef.current = isPaused;
     currentVideoIdRef.current = currentVideoId;
     renderQueueRef.current = renderQueue;
   }, [isRendering, isPaused, currentVideoId, renderQueue]);
-  
+
   const {
     state,
     isGenerating,
     renderFromScript,
+    generateStory,
     reset
   } = useNarrativeStory({
     brandName: brandSettings.brandName || 'NeuralUpdate',
@@ -115,8 +111,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     preferredVoice: 'camila'
   });
 
-  // Fetch pending videos (both draft AND scheduled that need rendering)
-  // IMPORTANT: Filter by workspace_id to avoid mixing videos from different workspaces
+  // ─── Fetch pending reels ───────────────────────────────────
+  // Picks draft reels without video_url AND with render_attempts < MAX
   const fetchPendingVideos = useCallback(async () => {
     if (!user || !currentWorkspace) {
       setPendingVideos([]);
@@ -124,177 +120,178 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       return;
     }
 
-    setIsLoading(true);
     try {
-      // Fetch both draft and scheduled videos that need rendering
-      // Use workspace_id for proper isolation between workspaces
       const { data, error } = await supabase
         .from('posts')
-        .select('id, caption, created_at, image_url, scheduled_for, overlay_metadata')
+        .select('id, caption, created_at, image_url, scheduled_for, overlay_metadata, render_attempts')
         .eq('workspace_id', currentWorkspace.id)
-        .in('status', ['draft', 'scheduled']) // Include both statuses
+        .in('status', ['draft', 'scheduled'])
         .eq('media_type', 'reels')
         .is('video_url', null)
-        .order('scheduled_for', { ascending: true, nullsFirst: false }) // Prioritize by schedule
+        .lt('render_attempts', MAX_RENDER_ATTEMPTS)
+        .order('created_at', { ascending: true })
         .limit(20);
 
       if (error) throw error;
 
-      const pending = (data || []).filter((post: any) => {
-        const metadata = post.overlay_metadata;
-        return metadata && 
-               typeof metadata === 'object' && 
-               'needs_processing' in metadata &&
-               metadata.needs_processing === true;
-      }) as PendingVideo[];
-
-      console.log(`[VideoRendering] Found ${pending.length} pending videos for workspace ${currentWorkspace.id}`);
+      const pending = (data || []) as PendingVideo[];
+      console.log(`[AutoRender] Found ${pending.length} pending reels (workspace ${currentWorkspace.id})`);
       setPendingVideos(pending);
-      
-      // Update render queue if not currently rendering
+
       if (!isRenderingRef.current) {
         setRenderQueue(pending);
       }
     } catch (error) {
-      console.error('Error fetching pending videos:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('[AutoRender] Error fetching pending videos:', error);
     }
   }, [user, currentWorkspace]);
 
-  // Listen for posts published/created by the cron/agent to send notifications
+  // ─── Realtime: listen for new reels + published posts ──────
   useEffect(() => {
     if (!currentWorkspace) return;
-    
+
     const channel = supabase
       .channel('agent-post-notifications')
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'posts',
-          filter: `workspace_id=eq.${currentWorkspace.id}`,
-        },
+        { event: 'UPDATE', schema: 'public', table: 'posts', filter: `workspace_id=eq.${currentWorkspace.id}` },
         (payload) => {
-          const newRecord = payload.new as any;
-          const oldRecord = payload.old as any;
-          
-          if (oldRecord.status === 'scheduled' && newRecord.status === 'published') {
-            const platform = (newRecord.platforms || ['instagram'])[0];
-            const mediaType = newRecord.media_type === 'reels' ? '🎬 Reels' : 
-                             newRecord.media_type === 'carousel' ? '🎠 Carrossel' : '📸 Post';
-            const caption = (newRecord.caption || '').substring(0, 60);
-            notifyPostPublished(`${platform} - ${mediaType}: "${caption}..."`);
+          const n = payload.new as any;
+          const o = payload.old as any;
+          if (o.status === 'scheduled' && n.status === 'published') {
+            const platform = (n.platforms || ['instagram'])[0];
+            const mediaType = n.media_type === 'reels' ? '🎬 Reels' : n.media_type === 'carousel' ? '🎠 Carrossel' : '📸 Post';
+            notifyPostPublished(`${platform} - ${mediaType}: "${(n.caption || '').substring(0, 60)}..."`);
           }
         }
       )
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'posts',
-          filter: `workspace_id=eq.${currentWorkspace.id}`,
-        },
+        { event: 'INSERT', schema: 'public', table: 'posts', filter: `workspace_id=eq.${currentWorkspace.id}` },
         (payload) => {
-          const newPost = payload.new as any;
-          
-          if (newPost.media_type === 'reels' && !newPost.video_url) {
-            const title = (newPost.caption || '').substring(0, 60);
-            notifyVideoReady(title);
+          const n = payload.new as any;
+          if (n.media_type === 'reels' && !n.video_url) {
+            notifyVideoReady((n.caption || '').substring(0, 60));
             fetchPendingVideos();
           }
-          
-          if (newPost.status === 'scheduled' && newPost.media_type !== 'reels') {
-            const mediaType = newPost.media_type === 'carousel' ? '🎠 Carrossel' : 
-                             newPost.post_type === 'noticia' ? '📰 Notícia' : '📸 Post';
-            notifyAgentAction('Novo conteúdo criado', `${mediaType}: "${(newPost.caption || '').substring(0, 50)}..."`);
+          if (n.status === 'scheduled' && n.media_type !== 'reels') {
+            notifyAgentAction('Novo conteúdo criado', `${n.media_type === 'carousel' ? '🎠 Carrossel' : '📸 Post'}: "${(n.caption || '').substring(0, 50)}..."`);
           }
         }
       )
       .subscribe();
-    
-    return () => {
-      supabase.removeChannel(channel);
-    };
+
+    return () => { supabase.removeChannel(channel); };
   }, [currentWorkspace, notifyPostPublished, notifyVideoReady, notifyAgentAction, fetchPendingVideos]);
 
-  // Initial fetch and polling
+  // ─── Polling ───────────────────────────────────────────────
   useEffect(() => {
     fetchPendingVideos();
-    
-    // OPTIMIZATION: Pre-load FFmpeg when pending videos exist
-    // This loads the 31MB core in background while user browses
-    if (pendingVideos.length > 0) {
-      initFFmpeg().catch(err => {
-        console.log('[VideoRendering] FFmpeg pre-load deferred:', err.message);
-      });
-    }
-    
-    // Poll every 30 seconds
-    const interval = setInterval(fetchPendingVideos, 30000);
+    const interval = setInterval(fetchPendingVideos, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [fetchPendingVideos, pendingVideos.length]);
+  }, [fetchPendingVideos]);
 
-  // Handle video completion
+  // ─── Handle video completion ───────────────────────────────
   useEffect(() => {
     if (state.step === 'complete' && state.videoUrl && currentVideoIdRef.current) {
       handleVideoComplete(state.videoUrl);
     }
-  }, [state.step, state.videoUrl]);
+    if (state.step === 'error' && currentVideoIdRef.current) {
+      handleVideoError(state.error || 'Erro desconhecido na renderização');
+    }
+  }, [state.step, state.videoUrl, state.error]);
 
   const handleVideoComplete = async (videoUrl: string) => {
     const videoId = currentVideoIdRef.current;
     if (!videoId) return;
-    
+
     try {
       const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
       const videoTitle = currentVideo?.overlay_metadata?.script?.title || 'Vídeo';
-      
-      // ALWAYS save as draft without scheduling - user will schedule manually
-      // This prevents duplicate/overlapping posts
+
+      // Update post: save video, set scheduled, clear processing flag
       await supabase
         .from('posts')
         .update({
           video_url: videoUrl,
           overlay_metadata: null,
-          status: 'draft',
-          scheduled_for: null // Clear any existing schedule
-        })
+          status: 'scheduled',
+          error_message: null,
+          last_render_error: null,
+        } as any)
         .eq('id', videoId);
 
-      // Show success toast with reminder to schedule
-      toast.success(`✅ "${videoTitle}" renderizado!`, {
-        description: 'Agende manualmente quando quiser publicar.',
-        duration: 5000
-      });
+      toast.success(`✅ "${videoTitle}" renderizado e agendado!`, { duration: 5000 });
+      console.log(`[AutoRender] ✅ Video ${videoId} complete → scheduled`);
 
       setCompletedCount(prev => prev + 1);
-      
-      // Remove from queue and process next
       setRenderQueue(prev => prev.filter(v => v.id !== videoId));
       setCurrentVideoId(null);
+      renderLockRef.current = false;
       reset();
-      
-      // Continue with next video after a small delay
+
       setTimeout(() => {
-        if (!isPausedRef.current && isRenderingRef.current) {
-          processNextVideo();
-        }
-      }, 1000);
-      
+        if (!isPausedRef.current && isRenderingRef.current) processNextVideo();
+      }, 2000);
     } catch (err: any) {
-      console.error('Error completing video:', err);
-      toast.error('Erro ao salvar vídeo');
+      console.error('[AutoRender] Error completing video:', err);
+      toast.error('Erro ao salvar vídeo renderizado');
+      renderLockRef.current = false;
     }
   };
 
+  const handleVideoError = async (errorMsg: string) => {
+    const videoId = currentVideoIdRef.current;
+    if (!videoId) return;
+
+    try {
+      const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
+      const attempts = (currentVideo?.render_attempts || 0) + 1;
+      const isFinal = attempts >= MAX_RENDER_ATTEMPTS;
+
+      await supabase
+        .from('posts')
+        .update({
+          status: isFinal ? 'render_failed' : 'draft',
+          render_attempts: attempts,
+          last_render_error: errorMsg,
+          error_message: isFinal ? `Renderização falhou após ${attempts} tentativa(s): ${errorMsg}` : null,
+        } as any)
+        .eq('id', videoId);
+
+      if (isFinal) {
+        toast.error(`❌ Render falhou permanentemente (${attempts}x): ${errorMsg.substring(0, 80)}`);
+        console.error(`[AutoRender] ❌ Video ${videoId} failed permanently after ${attempts} attempts`);
+      } else {
+        toast.warning(`⚠️ Render falhou (tentativa ${attempts}/${MAX_RENDER_ATTEMPTS}), tentará novamente`);
+        console.warn(`[AutoRender] ⚠️ Video ${videoId} attempt ${attempts} failed: ${errorMsg}`);
+      }
+    } catch (err) {
+      console.error('[AutoRender] Error updating failed video:', err);
+    }
+
+    setRenderQueue(prev => prev.filter(v => v.id !== videoId));
+    setCurrentVideoId(null);
+    renderLockRef.current = false;
+    reset();
+
+    setTimeout(() => {
+      if (!isPausedRef.current && isRenderingRef.current) processNextVideo();
+    }, 3000);
+  };
+
+  // ─── Process next video in queue ───────────────────────────
   const processNextVideo = useCallback(async () => {
+    // Prevent concurrent renders
+    if (renderLockRef.current) {
+      console.log('[AutoRender] Render lock active, skipping');
+      return;
+    }
+
     const queue = renderQueueRef.current;
     const currentId = currentVideoIdRef.current;
     const nextVideo = queue.find(v => v.id !== currentId);
-    
+
     if (!nextVideo) {
       setIsRendering(false);
       const completed = completedCount;
@@ -305,27 +302,59 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       }
       return;
     }
-    
+
+    // Acquire lock
+    renderLockRef.current = true;
     setCurrentVideoId(nextVideo.id);
-    
-    let script = nextVideo.overlay_metadata?.script;
-    
-    // If no script, try to generate one from the topic
-    if (!script?.segments?.length) {
-      const topic = nextVideo.overlay_metadata?.topic;
-      
-      if (!topic) {
-        console.error('No script or topic for video:', nextVideo.id);
-        toast.error(`Vídeo sem script ou tema: pulando...`);
+
+    // Double-check in DB that this post still needs rendering (prevent duplicates)
+    try {
+      const { data: freshPost, error: checkError } = await supabase
+        .from('posts')
+        .select('video_url, status, render_attempts')
+        .eq('id', nextVideo.id)
+        .single();
+
+      if (checkError) throw checkError;
+
+      if (freshPost?.video_url) {
+        console.log(`[AutoRender] Post ${nextVideo.id} already has video, skipping`);
         setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
+        renderLockRef.current = false;
         setTimeout(processNextVideo, 100);
         return;
       }
-      
-      // Generate script on-the-fly
+
+      if (freshPost?.status === 'render_failed' || (freshPost?.render_attempts || 0) >= MAX_RENDER_ATTEMPTS) {
+        console.log(`[AutoRender] Post ${nextVideo.id} exceeded max attempts, skipping`);
+        setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
+        renderLockRef.current = false;
+        setTimeout(processNextVideo, 100);
+        return;
+      }
+    } catch (err) {
+      console.error('[AutoRender] Error checking post status:', err);
+      renderLockRef.current = false;
+      return;
+    }
+
+    // Get script from overlay_metadata or generate one
+    let script = nextVideo.overlay_metadata?.script;
+
+    if (!script?.segments?.length) {
+      const topic = nextVideo.overlay_metadata?.topic || nextVideo.caption;
+
+      if (!topic) {
+        console.error('[AutoRender] No script or topic for video:', nextVideo.id);
+        toast.error('Vídeo sem script ou tema: pulando...');
+        setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
+        renderLockRef.current = false;
+        setTimeout(processNextVideo, 100);
+        return;
+      }
+
       toast.info(`Gerando script para: ${topic.substring(0, 50)}...`);
-      console.log('[VideoRendering] Generating script for video without one:', nextVideo.id);
-      
+
       try {
         const { data: scriptData, error: scriptError } = await supabase.functions.invoke('generate-story-script', {
           body: {
@@ -337,70 +366,54 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
             brandName: brandSettings.brandName || 'Neural Update'
           }
         });
-        
+
         if (scriptError || !scriptData?.segments?.length) {
-          console.error('Failed to generate script:', scriptError || 'No segments');
-          toast.error(`Erro ao gerar script: pulando vídeo`);
-          setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
-          setTimeout(processNextVideo, 100);
+          const errMsg = scriptError?.message || 'Sem segmentos gerados';
+          await handleVideoError(`Erro ao gerar script: ${errMsg}`);
           return;
         }
-        
-        // Update the post with the generated script
+
+        // Save generated script back to post
         await supabase
           .from('posts')
           .update({
             overlay_metadata: {
-              ...nextVideo.overlay_metadata,
-              script: {
-                title: scriptData.title,
-                segments: scriptData.segments,
-                segmentCount: scriptData.segmentCount,
-                totalDuration: scriptData.totalDuration
-              }
+              ...(nextVideo.overlay_metadata || {}),
+              script: { title: scriptData.title, segments: scriptData.segments }
             }
           })
           .eq('id', nextVideo.id);
-        
-        script = {
-          title: scriptData.title,
-          segments: scriptData.segments
-        };
-        
-        console.log('[VideoRendering] Script generated successfully:', script.title);
-        
-      } catch (err) {
-        console.error('Error generating script:', err);
-        toast.error(`Erro ao gerar script: pulando vídeo`);
-        setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
-        setTimeout(processNextVideo, 100);
+
+        script = { title: scriptData.title, segments: scriptData.segments };
+        console.log('[AutoRender] Script generated:', script.title);
+      } catch (err: any) {
+        await handleVideoError(`Erro ao gerar script: ${err.message}`);
         return;
       }
     }
-    
+
+    // Render video
     try {
+      console.log(`[AutoRender] 🎬 Starting render for post ${nextVideo.id}: "${script.title}"`);
       const articleInfo = {
         articleUrl: nextVideo.overlay_metadata?.article_url,
         articleImageUrl: nextVideo.overlay_metadata?.article_image_url,
       };
       await renderFromScript(script.segments, script.title, articleInfo);
-    } catch (err) {
-      console.error('Error rendering video:', err);
-      setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
-      setTimeout(processNextVideo, 100);
+      // Completion/error handled by the useEffect watching state.step
+    } catch (err: any) {
+      console.error('[AutoRender] Render threw:', err);
+      await handleVideoError(`Erro na renderização: ${err.message}`);
     }
-  }, [completedCount, renderFromScript, notifyAgentAction, fetchPendingVideos, brandSettings.brandName]);
+  }, [completedCount, renderFromScript, generateStory, notifyAgentAction, fetchPendingVideos, brandSettings.brandName]);
 
+  // ─── Actions ───────────────────────────────────────────────
   const startRendering = useCallback(() => {
     unlockAudio();
     setIsRendering(true);
     setIsPaused(false);
     setCompletedCount(0);
-    
-    // Use setTimeout to ensure state is updated before processing
-    setTimeout(() => {
-      processNextVideo();
-    }, 100);
+    setTimeout(processNextVideo, 100);
   }, [processNextVideo]);
 
   const pauseRendering = useCallback(() => {
@@ -410,49 +423,35 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   const resumeRendering = useCallback(() => {
     setIsPaused(false);
-    if (!isGenerating) {
-      processNextVideo();
-    }
+    if (!isGenerating) processNextVideo();
   }, [isGenerating, processNextVideo]);
 
-  // AUTO-START: Automatically start rendering when agent creates a video
-  // Only trigger when new videos appear and we're not already rendering
+  // ─── Auto-start when new pending videos appear ─────────────
   const prevPendingCountRef = useRef(pendingVideos.length);
   useEffect(() => {
     const newCount = pendingVideos.length;
     const wasEmpty = prevPendingCountRef.current === 0;
     const hasNewVideos = newCount > 0;
-    
-    // If we went from 0 to >0 pending videos and not rendering, notify + auto-start
+
     if (wasEmpty && hasNewVideos && !isRenderingRef.current && !isPausedRef.current) {
-      console.log('[VideoRendering] Auto-starting render for new agent-created video(s)');
-      
-      // Check if any video was created by the agent
-      const agentCreatedVideo = pendingVideos.find(v => 
-        v.overlay_metadata?.created_by_agent === true
-      );
-      
-      if (agentCreatedVideo) {
-        // Send PWA notification so user knows there are videos to render
-        const title = agentCreatedVideo.overlay_metadata?.script?.title || agentCreatedVideo.overlay_metadata?.topic || 'Novo vídeo';
-        notifyVideoReady(title);
-        
-        // Small delay to ensure UI is ready
-        setTimeout(() => {
-          unlockAudio();
-          toast.info('🎬 Iniciando renderização automática do vídeo...');
-          setIsRendering(true);
-          setIsPaused(false);
-          setCompletedCount(0);
-          setTimeout(processNextVideo, 100);
-        }, 2000);
-      }
+      console.log('[AutoRender] Auto-starting render for pending reels');
+      const firstVideo = pendingVideos[0];
+      const title = firstVideo?.overlay_metadata?.script?.title || firstVideo?.overlay_metadata?.topic || 'Novo vídeo';
+      notifyVideoReady(title);
+
+      setTimeout(() => {
+        unlockAudio();
+        toast.info('🎬 Iniciando renderização automática...');
+        setIsRendering(true);
+        setIsPaused(false);
+        setCompletedCount(0);
+        setTimeout(processNextVideo, 100);
+      }, 2000);
     } else if (newCount > prevPendingCountRef.current && !isRenderingRef.current) {
-      // New videos added while we already had some — notify user
-      const newOnes = newCount - prevPendingCountRef.current;
-      notifyVideoReady(`${newOnes} novo(s) vídeo(s) aguardando`);
+      const diff = newCount - prevPendingCountRef.current;
+      notifyVideoReady(`${diff} novo(s) vídeo(s) aguardando`);
     }
-    
+
     prevPendingCountRef.current = newCount;
   }, [pendingVideos, processNextVideo, notifyVideoReady]);
 
