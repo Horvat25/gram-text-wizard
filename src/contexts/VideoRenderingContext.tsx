@@ -13,6 +13,7 @@ interface PendingVideo {
   caption: string;
   created_at: string;
   image_url: string | null;
+  carousel_images: string[] | null;
   scheduled_for?: string | null;
   render_attempts?: number;
   overlay_metadata: {
@@ -123,7 +124,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     try {
       const { data, error } = await supabase
         .from('posts')
-        .select('id, caption, created_at, image_url, scheduled_for, overlay_metadata, render_attempts')
+        .select('id, caption, created_at, image_url, carousel_images, scheduled_for, overlay_metadata, render_attempts')
         .eq('workspace_id', currentWorkspace.id)
         .in('status', ['draft', 'scheduled'])
         .eq('media_type', 'reels')
@@ -399,7 +400,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         articleUrl: nextVideo.overlay_metadata?.article_url,
         articleImageUrl: nextVideo.overlay_metadata?.article_image_url,
       };
-      await renderFromScript(script.segments, script.title, articleInfo);
+      // Pass pre-existing carousel_images so renderFromScript skips image generation
+      const preExistingImages = nextVideo.carousel_images || undefined;
+      await renderFromScript(script.segments, script.title, articleInfo, preExistingImages);
       // Completion/error handled by the useEffect watching state.step
     } catch (err: any) {
       console.error('[AutoRender] Render threw:', err);
