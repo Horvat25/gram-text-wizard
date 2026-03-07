@@ -450,7 +450,9 @@ export type Database = {
           hashtags: string[] | null
           id: string
           image_url: string | null
+          impressions: number | null
           instagram_post_id: string | null
+          last_metrics_sync: string | null
           last_render_error: string | null
           likes_count: number | null
           media_type: string | null
@@ -462,6 +464,7 @@ export type Database = {
           render_attempts: number | null
           saves_count: number | null
           scheduled_for: string | null
+          shares_count: number | null
           status: string
           tiktok_post_id: string | null
           updated_at: string | null
@@ -481,7 +484,9 @@ export type Database = {
           hashtags?: string[] | null
           id?: string
           image_url?: string | null
+          impressions?: number | null
           instagram_post_id?: string | null
+          last_metrics_sync?: string | null
           last_render_error?: string | null
           likes_count?: number | null
           media_type?: string | null
@@ -493,6 +498,7 @@ export type Database = {
           render_attempts?: number | null
           saves_count?: number | null
           scheduled_for?: string | null
+          shares_count?: number | null
           status?: string
           tiktok_post_id?: string | null
           updated_at?: string | null
@@ -512,7 +518,9 @@ export type Database = {
           hashtags?: string[] | null
           id?: string
           image_url?: string | null
+          impressions?: number | null
           instagram_post_id?: string | null
+          last_metrics_sync?: string | null
           last_render_error?: string | null
           likes_count?: number | null
           media_type?: string | null
@@ -524,6 +532,7 @@ export type Database = {
           render_attempts?: number | null
           saves_count?: number | null
           scheduled_for?: string | null
+          shares_count?: number | null
           status?: string
           tiktok_post_id?: string | null
           updated_at?: string | null
