@@ -255,7 +255,7 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
         console.log(`✅ Agent context updated: followers=${followersCount}, reach=${updateData.current_weekly_views || 0}`);
       }
 
-      // 4. Save daily strategy snapshot
+      // 4. Save daily strategy snapshot + auto-learn from top posts
       try {
         const { data: ctxData } = await supabase
           .from("agent_context")
@@ -265,7 +265,7 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
         
         const { data: allPosts } = await supabase
           .from("posts")
-          .select("reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, post_type")
+          .select("reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, post_type, caption, published_at")
           .eq("workspace_id", wsId)
           .eq("status", "published")
           .not("instagram_post_id", "is", null);
@@ -277,13 +277,51 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
         const totalSaves = (allPosts || []).reduce((s: number, p: any) => s + (p.saves_count || 0), 0);
         const totalShares = (allPosts || []).reduce((s: number, p: any) => s + (p.shares_count || 0), 0);
         
-        const typePerf: Record<string, number> = {};
+        // Find top performing type and generate insights
+        const typePerf: Record<string, { reach: number; count: number; engagement: number }> = {};
         for (const p of (allPosts || [])) {
-          const mt = p.media_type === 'reels' ? 'video' : p.post_type === 'noticia' ? 'news' : p.media_type || 'image';
-          const eng = (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
-          typePerf[mt] = (typePerf[mt] || 0) + eng;
+          const mt = p.media_type === 'reels' || p.media_type === 'reel' ? 'video' : p.post_type === 'noticia' ? 'news' : p.media_type || 'image';
+          if (!typePerf[mt]) typePerf[mt] = { reach: 0, count: 0, engagement: 0 };
+          typePerf[mt].reach += (p.reach || 0);
+          typePerf[mt].count += 1;
+          typePerf[mt].engagement += (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
         }
-        const topType = Object.entries(typePerf).sort(([,a],[,b]) => b - a)[0]?.[0] || null;
+        
+        const topType = Object.entries(typePerf).sort(([,a],[,b]) => b.reach - a.reach)[0]?.[0] || null;
+        
+        // Auto-learn: generate insights from real data
+        const insights: string[] = [];
+        const sorted = Object.entries(typePerf).sort(([,a],[,b]) => (b.reach / (b.count || 1)) - (a.reach / (a.count || 1)));
+        if (sorted.length > 0) {
+          const [bestType, bestData] = sorted[0];
+          const avgReach = Math.round(bestData.reach / (bestData.count || 1));
+          const typeLabel = bestType === 'video' ? 'Reels' : bestType === 'carousel' ? 'Carrosséis' : bestType === 'news' ? 'Notícias' : 'Imagens';
+          insights.push(`${typeLabel} têm o maior alcance médio: ${avgReach.toLocaleString()} por post`);
+        }
+        if (sorted.length > 1) {
+          const [worstType] = sorted[sorted.length - 1];
+          const worstLabel = worstType === 'video' ? 'Reels' : worstType === 'carousel' ? 'Carrosséis' : worstType === 'news' ? 'Notícias' : 'Imagens';
+          insights.push(`${worstLabel} têm o menor alcance — considerar reduzir frequência`);
+        }
+        
+        // Find top 3 posts for learning
+        const topReachPosts = [...(allPosts || [])].filter(p => p.reach > 10).sort((a: any, b: any) => (b.reach || 0) - (a.reach || 0)).slice(0, 3);
+        if (topReachPosts.length > 0) {
+          const topCaption = topReachPosts[0].caption?.substring(0, 60) || '';
+          insights.push(`Post de maior alcance (${topReachPosts[0].reach?.toLocaleString()}): "${topCaption}..."`);
+        }
+        
+        // Save insights to agent_context
+        if (insights.length > 0) {
+          await supabase
+            .from("agent_context")
+            .update({ 
+              success_patterns: insights.slice(0, 5),
+              top_topics: sorted.map(([t]) => t === 'video' ? 'Reels' : t === 'carousel' ? 'Carrosséis' : t === 'news' ? 'Notícias' : 'Imagens').slice(0, 4)
+            })
+            .eq("workspace_id", wsId);
+          console.log(`🧠 Auto-learn: ${insights.length} insights saved`);
+        }
         
         const today = new Date().toISOString().split('T')[0];
         
@@ -308,7 +346,7 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
             avg_engagement: updateData.current_weekly_engagement || 0,
             posts_count: (allPosts || []).length,
             top_performing_type: topType,
-            strategy_reason: (ctxData?.success_patterns || []).slice(-1)[0] || null
+            strategy_reason: insights[0] || null
           }, { onConflict: 'workspace_id,snapshot_date,period_type' });
         
         console.log(`📸 Strategy snapshot saved for ${today}`);
