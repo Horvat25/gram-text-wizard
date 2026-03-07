@@ -451,6 +451,7 @@ export type Database = {
           id: string
           image_url: string | null
           instagram_post_id: string | null
+          last_render_error: string | null
           likes_count: number | null
           media_type: string | null
           overlay_metadata: Json | null
@@ -458,6 +459,7 @@ export type Database = {
           post_type: string | null
           published_at: string | null
           reach: number | null
+          render_attempts: number | null
           saves_count: number | null
           scheduled_for: string | null
           status: string
@@ -480,6 +482,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           instagram_post_id?: string | null
+          last_render_error?: string | null
           likes_count?: number | null
           media_type?: string | null
           overlay_metadata?: Json | null
@@ -487,6 +490,7 @@ export type Database = {
           post_type?: string | null
           published_at?: string | null
           reach?: number | null
+          render_attempts?: number | null
           saves_count?: number | null
           scheduled_for?: string | null
           status?: string
@@ -509,6 +513,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           instagram_post_id?: string | null
+          last_render_error?: string | null
           likes_count?: number | null
           media_type?: string | null
           overlay_metadata?: Json | null
@@ -516,6 +521,7 @@ export type Database = {
           post_type?: string | null
           published_at?: string | null
           reach?: number | null
+          render_attempts?: number | null
           saves_count?: number | null
           scheduled_for?: string | null
           status?: string
