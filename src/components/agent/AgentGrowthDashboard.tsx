@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,14 @@ import { Switch } from '@/components/ui/switch';
 import { 
   Target, TrendingUp, Users, Eye, Brain, Lightbulb,
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
-  Zap, ChevronRight, Sparkles
+  Zap, Sparkles, Calendar, BarChart3, ArrowUpRight, ArrowDownRight, Minus
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useWorkspace } from '@/contexts/WorkspaceContext';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface AgentGrowthDashboardProps {
   context: AgentContext | null;
@@ -25,8 +28,39 @@ const GOAL_OPTIONS = [
   { value: 'conversion', label: 'Cliques / conversão', icon: TrendingUp, color: 'text-emerald-500' },
 ];
 
+const PERIOD_OPTIONS = [
+  { value: 30, label: '30d' },
+  { value: 60, label: '60d' },
+  { value: 90, label: '90d' },
+];
+
+interface StrategySnapshot {
+  id: string;
+  snapshot_date: string;
+  goal_type: string | null;
+  content_distribution_videos: number;
+  content_distribution_carousels: number;
+  content_distribution_news: number;
+  content_distribution_images: number;
+  total_reach: number;
+  total_impressions: number;
+  total_likes: number;
+  total_comments: number;
+  total_saves: number;
+  total_shares: number;
+  followers_count: number;
+  avg_engagement: number;
+  posts_count: number;
+  strategy_reason: string | null;
+  top_performing_type: string | null;
+}
+
 export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
   const [isAutoStrategy, setIsAutoStrategy] = useState(true);
+  const [period, setPeriod] = useState(30);
+  const [snapshots, setSnapshots] = useState<StrategySnapshot[]>([]);
+  const [loadingSnapshots, setLoadingSnapshots] = useState(false);
+  const { currentWorkspace } = useWorkspace();
 
   const goalType = context?.goal_type || 'macro';
   const weeklyViews = context?.current_weekly_views || 0;
@@ -40,7 +74,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const followersProgress = Math.min((weeklyFollowers / goalFollowers) * 100, 100);
   const engagementProgress = Math.min((weeklyEngagement / goalEngagement) * 100, 100);
 
-  // Calculate strategy distribution from context
   const totalContent = (context?.content_distribution_videos || 3) + 
     (context?.content_distribution_carousels || 2) + 
     (context?.content_distribution_news || 4) + 
@@ -51,7 +84,29 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const newsPercent = Math.round(((context?.content_distribution_news || 4) / totalContent) * 100);
   const imagesPercent = Math.round(((context?.content_distribution_images || 5) / totalContent) * 100);
 
-  // Generate strategy reasoning based on patterns
+  // Fetch strategy history snapshots
+  useEffect(() => {
+    if (!currentWorkspace?.id) return;
+    
+    const fetchSnapshots = async () => {
+      setLoadingSnapshots(true);
+      const since = new Date();
+      since.setDate(since.getDate() - period);
+      
+      const { data } = await supabase
+        .from('agent_strategy_snapshots' as any)
+        .select('*')
+        .eq('workspace_id', currentWorkspace.id)
+        .gte('snapshot_date', since.toISOString().split('T')[0])
+        .order('snapshot_date', { ascending: true });
+      
+      setSnapshots((data as any[]) || []);
+      setLoadingSnapshots(false);
+    };
+    
+    fetchSnapshots();
+  }, [currentWorkspace?.id, period]);
+
   const getStrategyReason = () => {
     if (context?.success_patterns && context.success_patterns.length > 0) {
       return context.success_patterns[0];
@@ -61,9 +116,66 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     return 'Distribuição balanceada para maximizar diferentes métricas.';
   };
 
-  // Agent insights
   const insights = context?.success_patterns?.slice(0, 3) || [];
   const topTopics = context?.top_topics?.slice(0, 3) || [];
+
+  // Chart data from snapshots
+  const chartData = snapshots.map(s => ({
+    date: new Date(s.snapshot_date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+    reach: s.total_reach,
+    followers: s.followers_count,
+    engagement: Number(s.avg_engagement),
+    likes: s.total_likes,
+    saves: s.total_saves,
+    posts: s.posts_count,
+  }));
+
+  // Calculate trend
+  const getTrend = (key: 'followers' | 'reach' | 'engagement') => {
+    if (snapshots.length < 2) return { direction: 'neutral' as const, value: 0 };
+    const first = snapshots[0];
+    const last = snapshots[snapshots.length - 1];
+    const diff = key === 'followers' 
+      ? last.followers_count - first.followers_count
+      : key === 'reach'
+      ? last.total_reach - first.total_reach
+      : Number(last.avg_engagement) - Number(first.avg_engagement);
+    return {
+      direction: diff > 0 ? 'up' as const : diff < 0 ? 'down' as const : 'neutral' as const,
+      value: Math.abs(diff)
+    };
+  };
+
+  const followersTrend = getTrend('followers');
+  const reachTrend = getTrend('reach');
+  const engagementTrend = getTrend('engagement');
+
+  const TrendIcon = ({ direction }: { direction: 'up' | 'down' | 'neutral' }) => {
+    if (direction === 'up') return <ArrowUpRight className="h-3 w-3 text-emerald-500" />;
+    if (direction === 'down') return <ArrowDownRight className="h-3 w-3 text-red-500" />;
+    return <Minus className="h-3 w-3 text-muted-foreground" />;
+  };
+
+  // Strategy evolution timeline
+  const strategyChanges = snapshots.reduce<Array<{date: string; videos: number; carousels: number; news: number; images: number; reason: string | null; topType: string | null}>>((acc, s, i) => {
+    if (i === 0 || 
+      s.content_distribution_videos !== snapshots[i-1].content_distribution_videos ||
+      s.content_distribution_carousels !== snapshots[i-1].content_distribution_carousels ||
+      s.content_distribution_news !== snapshots[i-1].content_distribution_news ||
+      s.content_distribution_images !== snapshots[i-1].content_distribution_images
+    ) {
+      acc.push({
+        date: new Date(s.snapshot_date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        videos: s.content_distribution_videos,
+        carousels: s.content_distribution_carousels,
+        news: s.content_distribution_news,
+        images: s.content_distribution_images,
+        reason: s.strategy_reason,
+        topType: s.top_performing_type,
+      });
+    }
+    return acc;
+  }, []);
 
   return (
     <div className="space-y-4 pb-4">
@@ -109,7 +221,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Views */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -121,8 +232,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
               </div>
               <Progress value={viewsProgress} className="h-2" />
             </div>
-
-            {/* Followers */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -134,8 +243,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
               </div>
               <Progress value={followersProgress} className="h-2" />
             </div>
-
-            {/* Engagement */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -173,22 +280,18 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* Distribution bars */}
             <div className="space-y-2">
               <StrategyBar icon={Video} label="Reels" percent={reelsPercent} color="bg-cyan-500" count={context?.content_distribution_videos || 3} />
               <StrategyBar icon={LayoutGrid} label="Carrossel" percent={carouselPercent} color="bg-purple-500" count={context?.content_distribution_carousels || 2} />
               <StrategyBar icon={Newspaper} label="Notícias" percent={newsPercent} color="bg-amber-500" count={context?.content_distribution_news || 4} />
               <StrategyBar icon={ImageIcon} label="Imagens" percent={imagesPercent} color="bg-pink-500" count={context?.content_distribution_images || 5} />
             </div>
-
-            {/* Strategy reasoning */}
             <div className="p-2.5 rounded-lg bg-muted/50 border border-border/50">
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 <Sparkles className="h-3 w-3 inline mr-1 text-primary" />
                 {getStrategyReason()}
               </p>
             </div>
-
             {isAutoStrategy && (
               <p className="text-[10px] text-center text-muted-foreground/70">
                 Definido automaticamente pelo agente com base no desempenho
@@ -198,9 +301,151 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 4. Agent Insights */}
+      {/* 4. EVOLUTION — Real Instagram Data */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2 pt-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <BarChart3 className="h-4 w-4 text-blue-500" />
+                Evolução Real
+              </CardTitle>
+              <div className="flex gap-1">
+                {PERIOD_OPTIONS.map(p => (
+                  <Button
+                    key={p.value}
+                    variant={period === p.value ? "default" : "ghost"}
+                    size="sm"
+                    className="h-6 text-[10px] px-2"
+                    onClick={() => setPeriod(p.value)}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loadingSnapshots ? (
+              <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">
+                Carregando dados...
+              </div>
+            ) : snapshots.length === 0 ? (
+              <div className="p-4 rounded-lg bg-muted/30 border border-border/30 text-center">
+                <Calendar className="h-6 w-6 mx-auto text-muted-foreground/50 mb-2" />
+                <p className="text-xs text-muted-foreground">
+                  Ainda não há dados históricos. Os snapshots são salvos automaticamente a cada sync de métricas.
+                </p>
+                <p className="text-[10px] text-muted-foreground/60 mt-1">
+                  Clique em "Sincronizar do Instagram" na aba Analytics para gerar o primeiro snapshot.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Trend summary cards */}
+                <div className="grid grid-cols-3 gap-2">
+                  <TrendCard 
+                    icon={<Users className="h-3 w-3 text-purple-500" />}
+                    label="Seguidores"
+                    value={snapshots[snapshots.length - 1]?.followers_count?.toLocaleString() || '0'}
+                    trend={followersTrend}
+                    TrendIcon={TrendIcon}
+                  />
+                  <TrendCard 
+                    icon={<Eye className="h-3 w-3 text-blue-500" />}
+                    label="Alcance"
+                    value={(snapshots[snapshots.length - 1]?.total_reach || 0) > 1000 
+                      ? `${((snapshots[snapshots.length - 1]?.total_reach || 0) / 1000).toFixed(1)}k`
+                      : String(snapshots[snapshots.length - 1]?.total_reach || 0)}
+                    trend={reachTrend}
+                    TrendIcon={TrendIcon}
+                    formatValue={(v) => v > 1000 ? `${(v/1000).toFixed(1)}k` : String(v)}
+                  />
+                  <TrendCard 
+                    icon={<TrendingUp className="h-3 w-3 text-emerald-500" />}
+                    label="Engage"
+                    value={`${Number(snapshots[snapshots.length - 1]?.avg_engagement || 0).toFixed(1)}%`}
+                    trend={engagementTrend}
+                    TrendIcon={TrendIcon}
+                    suffix="%"
+                  />
+                </div>
+
+                {/* Reach chart */}
+                {chartData.length > 1 && (
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData}>
+                        <defs>
+                          <linearGradient id="reachGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="date" tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
+                        <YAxis tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" width={35} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            background: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            fontSize: '11px'
+                          }}
+                          formatter={(value: number, name: string) => {
+                            const labels: Record<string, string> = { reach: 'Alcance', followers: 'Seguidores', engagement: 'Engajamento' };
+                            return [value.toLocaleString(), labels[name] || name];
+                          }}
+                        />
+                        <Area type="monotone" dataKey="reach" stroke="hsl(var(--primary))" fill="url(#reachGrad)" strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+
+                {/* Strategy evolution timeline */}
+                {strategyChanges.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                      <Brain className="h-3 w-3" />
+                      Evolução da Estratégia
+                    </h4>
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                      {strategyChanges.map((change, i) => {
+                        const total = change.videos + change.carousels + change.news + change.images;
+                        return (
+                          <div key={i} className="p-2 rounded-lg bg-muted/30 border border-border/30">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[10px] font-medium text-muted-foreground">{change.date}</span>
+                              {change.topType && (
+                                <Badge variant="outline" className="text-[9px] h-4 px-1.5">
+                                  🏆 {change.topType === 'video' ? 'Reels' : change.topType === 'carousel' ? 'Carrossel' : change.topType === 'news' ? 'Notícias' : 'Imagens'}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-1.5">
+                              <MiniBar label="R" value={change.videos} total={total} color="bg-cyan-500" />
+                              <MiniBar label="C" value={change.carousels} total={total} color="bg-purple-500" />
+                              <MiniBar label="N" value={change.news} total={total} color="bg-amber-500" />
+                              <MiniBar label="I" value={change.images} total={total} color="bg-pink-500" />
+                            </div>
+                            {change.reason && (
+                              <p className="text-[9px] text-muted-foreground/70 mt-1 line-clamp-1">{change.reason}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* 5. Agent Insights */}
       {(insights.length > 0 || topTopics.length > 0) && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <Card className="border-border/50">
             <CardHeader className="pb-2 pt-4">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -243,6 +488,51 @@ function StrategyBar({ icon: Icon, label, percent, color, count }: {
       </div>
       <span className="text-xs font-mono w-10 text-right text-muted-foreground">{percent}%</span>
       <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">{count}/sem</Badge>
+    </div>
+  );
+}
+
+function MiniBar({ label, value, total, color }: { label: string; value: number; total: number; color: string }) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  return (
+    <div className="flex-1">
+      <div className="flex items-center justify-between mb-0.5">
+        <span className="text-[9px] text-muted-foreground">{label}</span>
+        <span className="text-[9px] font-mono">{value}</span>
+      </div>
+      <div className="h-1 rounded-full bg-muted overflow-hidden">
+        <div className={cn("h-full rounded-full", color)} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function TrendCard({ icon, label, value, trend, TrendIcon, formatValue, suffix }: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  trend: { direction: 'up' | 'down' | 'neutral'; value: number };
+  TrendIcon: React.FC<{ direction: 'up' | 'down' | 'neutral' }>;
+  formatValue?: (v: number) => string;
+  suffix?: string;
+}) {
+  const displayDiff = formatValue ? formatValue(trend.value) : (suffix ? `${trend.value.toFixed(1)}${suffix}` : trend.value.toLocaleString());
+  return (
+    <div className="p-2 rounded-lg bg-muted/30 border border-border/30">
+      <div className="flex items-center gap-1 mb-1">
+        {icon}
+        <span className="text-[10px] text-muted-foreground">{label}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <span className="text-sm font-bold font-mono">{value}</span>
+        <TrendIcon direction={trend.direction} />
+      </div>
+      <p className={cn("text-[10px] font-mono", 
+        trend.direction === 'up' ? 'text-emerald-500' : 
+        trend.direction === 'down' ? 'text-red-500' : 'text-muted-foreground'
+      )}>
+        {trend.direction === 'up' ? '+' : trend.direction === 'down' ? '-' : ''}{displayDiff}
+      </p>
     </div>
   );
 }
