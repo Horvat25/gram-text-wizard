@@ -1602,6 +1602,168 @@ async function recordDecisionAndLearn(
   
   // ===== AUTO-EVOLUTION: Adjust content_distribution based on performance =====
   await autoEvolveStrategy(supabase, state, workspaceId);
+}
+
+// ===== AUTO-EVOLVE STRATEGY =====
+// Analyzes which media types perform best relative to the user's goal_type
+// and adjusts content_distribution accordingly
+async function autoEvolveStrategy(
+  supabase: any,
+  state: AgentState,
+  workspaceId: string
+): Promise<void> {
+  console.log('[AGENT] Auto-evolving strategy based on performance...');
+  
+  try {
+    const goalType = state.context?.goal_type || 'growth';
+    
+    // Get recent published posts with metrics (last 14 days)
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    
+    const { data: recentPosts } = await supabase
+      .from('posts')
+      .select('media_type, post_type, likes_count, comments_count, saves_count, reach, impressions, shares_count')
+      .eq('workspace_id', workspaceId)
+      .eq('status', 'published')
+      .gte('published_at', twoWeeksAgo.toISOString())
+      .gt('reach', 0);
+    
+    if (!recentPosts || recentPosts.length < 5) {
+      console.log('[AGENT] Not enough data to evolve strategy (need 5+ posts with metrics)');
+      return;
+    }
+    
+    // Aggregate performance per media type
+    const perfByType: Record<string, { count: number; totalScore: number }> = {
+      video: { count: 0, totalScore: 0 },
+      carousel: { count: 0, totalScore: 0 },
+      news: { count: 0, totalScore: 0 },
+      image: { count: 0, totalScore: 0 },
+    };
+    
+    for (const post of recentPosts) {
+      const likes = post.likes_count || 0;
+      const comments = post.comments_count || 0;
+      const saves = post.saves_count || 0;
+      const reach = post.reach || 1;
+      const shares = post.shares_count || 0;
+      
+      // Score depends on goal
+      let score = 0;
+      if (goalType === 'growth') {
+        // Growth: saves + shares matter most (viral potential)
+        score = (saves * 3 + shares * 3 + likes + comments * 2) / reach * 100;
+      } else if (goalType === 'reach') {
+        // Reach: raw reach + impressions
+        score = reach + (post.impressions || 0);
+      } else if (goalType === 'authority') {
+        // Authority: saves + comments (depth of engagement)
+        score = (saves * 4 + comments * 3 + likes) / reach * 100;
+      } else if (goalType === 'conversion') {
+        // Conversion: shares + comments (action-oriented)
+        score = (shares * 4 + comments * 2 + saves * 2) / reach * 100;
+      } else {
+        score = (likes + comments + saves) / reach * 100;
+      }
+      
+      // Map media_type to bucket
+      const mt = post.media_type || 'image';
+      const isNews = post.post_type === 'noticia';
+      
+      if (mt === 'reels' || mt === 'video') {
+        perfByType.video.count++;
+        perfByType.video.totalScore += score;
+      } else if (mt === 'carousel') {
+        perfByType.carousel.count++;
+        perfByType.carousel.totalScore += score;
+      } else if (isNews) {
+        perfByType.news.count++;
+        perfByType.news.totalScore += score;
+      } else {
+        perfByType.image.count++;
+        perfByType.image.totalScore += score;
+      }
+    }
+    
+    // Calculate averages
+    const avgScores: Record<string, number> = {};
+    for (const [type, data] of Object.entries(perfByType)) {
+      avgScores[type] = data.count > 0 ? data.totalScore / data.count : 0;
+    }
+    
+    console.log(`[AGENT] Performance scores by type (goal=${goalType}):`, avgScores);
+    
+    // Only redistribute if we have meaningful data
+    const typesWithData = Object.values(perfByType).filter(d => d.count > 0).length;
+    if (typesWithData < 2) {
+      console.log('[AGENT] Not enough variety to evolve. Skipping.');
+      return;
+    }
+    
+    // Get current totals
+    const currentTotal = (state.context?.content_distribution_videos || 3) +
+      (state.context?.content_distribution_carousels || 2) +
+      (state.context?.content_distribution_news || 4) +
+      (state.context?.content_distribution_images || 5);
+    
+    // Calculate new distribution based on scores (weighted)
+    const totalScore = Object.values(avgScores).reduce((a, b) => a + b, 0);
+    
+    if (totalScore === 0) {
+      console.log('[AGENT] No meaningful scores. Skipping evolution.');
+      return;
+    }
+    
+    // Each type gets at least 1 slot (minimum floor)
+    const MIN_SLOTS = 1;
+    const distributableSlots = currentTotal - (4 * MIN_SLOTS); // 4 types * min
+    
+    const newDist = {
+      videos: MIN_SLOTS + Math.round((avgScores.video / totalScore) * distributableSlots),
+      carousels: MIN_SLOTS + Math.round((avgScores.carousel / totalScore) * distributableSlots),
+      news: MIN_SLOTS + Math.round((avgScores.news / totalScore) * distributableSlots),
+      images: MIN_SLOTS + Math.round((avgScores.image / totalScore) * distributableSlots),
+    };
+    
+    // Ensure total matches
+    const newTotal = newDist.videos + newDist.carousels + newDist.news + newDist.images;
+    if (newTotal !== currentTotal) {
+      // Adjust the highest type
+      const maxType = Object.entries(newDist).sort(([,a], [,b]) => b - a)[0][0] as keyof typeof newDist;
+      newDist[maxType] += currentTotal - newTotal;
+    }
+    
+    // Only update if distribution actually changed
+    const changed = newDist.videos !== (state.context?.content_distribution_videos || 3) ||
+      newDist.carousels !== (state.context?.content_distribution_carousels || 2) ||
+      newDist.news !== (state.context?.content_distribution_news || 4) ||
+      newDist.images !== (state.context?.content_distribution_images || 5);
+    
+    if (changed) {
+      const { error } = await supabase
+        .from('agent_context')
+        .update({
+          content_distribution_videos: newDist.videos,
+          content_distribution_carousels: newDist.carousels,
+          content_distribution_news: newDist.news,
+          content_distribution_images: newDist.images,
+          updated_at: new Date().toISOString()
+        })
+        .eq('workspace_id', workspaceId);
+      
+      if (error) {
+        console.error('[AGENT] Error updating strategy:', error);
+      } else {
+        console.log(`[AGENT] ✅ Strategy evolved! Videos=${newDist.videos}, Carousels=${newDist.carousels}, News=${newDist.news}, Images=${newDist.images}`);
+      }
+    } else {
+      console.log('[AGENT] Strategy unchanged. No evolution needed.');
+    }
+  } catch (error) {
+    console.error('[AGENT] Error in autoEvolveStrategy:', error);
+  }
+}
 
 // NOVA FUNÇÃO: Gerar análise e insights quando não posta
 async function generateInsightsAndAnalysis(

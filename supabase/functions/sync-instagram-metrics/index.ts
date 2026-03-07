@@ -164,6 +164,8 @@ serve(async (req) => {
       const workspaceIds = [...new Set(accounts.map((a: any) => a.workspace_id).filter(Boolean))];
       
       for (const wsId of workspaceIds) {
+        const wsAccount = accounts.find((a: any) => a.workspace_id === wsId);
+        
         const now = new Date();
         const brasiliaOffset = -3 * 60 * 60 * 1000;
         const todayBrasilia = new Date(now.getTime() + brasiliaOffset);
@@ -181,9 +183,34 @@ serve(async (req) => {
           .not("instagram_post_id", "is", null)
           .gte("published_at", weekStartUTC.toISOString());
         
+        // Fetch current followers count from Instagram API
+        let followersCount = 0;
+        if (wsAccount) {
+          try {
+            const igUserId = wsAccount.instagram_user_id;
+            const igToken = wsAccount.access_token;
+            const profileRes = await fetch(
+              `https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${igToken}`
+            );
+            if (profileRes.ok) {
+              const profileData = await profileRes.json();
+              followersCount = profileData.followers_count || 0;
+              console.log(`📊 Instagram followers: ${followersCount}`);
+            } else {
+              const errBody = await profileRes.text();
+              console.error('Error fetching followers:', errBody);
+            }
+          } catch (e) {
+            console.error('Error fetching Instagram profile:', e);
+          }
+        }
+        
+        const updateData: Record<string, any> = {
+          updated_at: new Date().toISOString()
+        };
+        
         if (weekPosts && weekPosts.length > 0) {
           const totalReach = weekPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
-          const totalImpressions = weekPosts.reduce((sum: number, p: any) => sum + (p.impressions || 0), 0);
           
           // Calculate average engagement rate
           const engagements = weekPosts.map((p: any) => {
@@ -193,21 +220,24 @@ serve(async (req) => {
           });
           const avgEngagement = engagements.reduce((a: number, b: number) => a + b, 0) / engagements.length;
           
-          // Update agent_context with real weekly metrics
-          const { error: ctxError } = await supabase
-            .from("agent_context")
-            .update({
-              current_weekly_views: totalReach,
-              current_weekly_engagement: Math.round(avgEngagement * 10) / 10,
-              updated_at: new Date().toISOString()
-            })
-            .eq("workspace_id", wsId);
-          
-          if (ctxError) {
-            console.error(`Error updating agent_context for workspace ${wsId}:`, ctxError);
-          } else {
-            console.log(`✅ Agent context updated for workspace ${wsId}: reach=${totalReach}, engagement=${avgEngagement.toFixed(1)}%`);
-          }
+          updateData.current_weekly_views = totalReach;
+          updateData.current_weekly_engagement = Math.round(avgEngagement * 10) / 10;
+        }
+        
+        if (followersCount > 0) {
+          updateData.current_weekly_followers = followersCount;
+        }
+        
+        // Update agent_context with real weekly metrics
+        const { error: ctxError } = await supabase
+          .from("agent_context")
+          .update(updateData)
+          .eq("workspace_id", wsId);
+        
+        if (ctxError) {
+          console.error(`Error updating agent_context for workspace ${wsId}:`, ctxError);
+        } else {
+          console.log(`✅ Agent context updated for workspace ${wsId}: reach=${updateData.current_weekly_views || 0}, engagement=${updateData.current_weekly_engagement || 0}%, followers=${followersCount}`);
         }
       }
     } catch (aggError) {
