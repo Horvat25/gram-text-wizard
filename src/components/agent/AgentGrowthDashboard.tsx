@@ -109,7 +109,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       let offset = 0;
       let totalUpdated = 0;
       let hasMore = true;
+      let batchCount = 0;
       while (hasMore) {
+        batchCount++;
+        toast.loading(`Sincronizando... ${offset} posts processados`, { id: 'sync-progress' });
         const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
           body: { offset, batch_size: 30 }
         });
@@ -117,11 +120,15 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         totalUpdated += data?.updated || 0;
         hasMore = data?.has_more || false;
         offset = data?.next_offset || 0;
+        // Safety: max 10 batches (300 posts) to avoid infinite loop
+        if (batchCount >= 10) break;
       }
+      toast.dismiss('sync-progress');
       toast.success(`Sincronizado! ${totalUpdated} posts atualizados`);
       fetchTopPosts();
       fetchSnapshots();
     } catch (e: any) {
+      toast.dismiss('sync-progress');
       toast.error(e.message || 'Erro ao sincronizar');
     } finally {
       setSyncing(false);
