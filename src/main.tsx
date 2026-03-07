@@ -6,8 +6,8 @@ import "./index.css";
 // Register service worker with auto-update
 const updateSW = registerSW({
   onNeedRefresh() {
-    // New content available, will auto-update
-    console.log('New content available, updating...');
+    console.log('New content available, forcing update...');
+    updateSW(true); // Force immediate update
   },
   onOfflineReady() {
     console.log('App ready to work offline');
