@@ -617,12 +617,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
   }, [generateScript, generateImages, generateAudio, generateVideo]);
 
   // Render from existing script - uses pre-generated segments instead of generating new ones
-  const renderFromScript = useCallback(async (existingSegments: Array<{ text: string; imagePrompt: string }>, title?: string, articleInfo?: { articleUrl?: string; articleImageUrl?: string }) => {
+  const renderFromScript = useCallback(async (
+    existingSegments: Array<{ text: string; imagePrompt: string }>, 
+    title?: string, 
+    articleInfo?: { articleUrl?: string; articleImageUrl?: string },
+    preExistingImageUrls?: string[]
+  ) => {
     abortRef.current = false;
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
     console.log('[renderFromScript] Using existing script with', existingSegments.length, 'segments');
+    if (preExistingImageUrls?.length) {
+      console.log('[renderFromScript] 🖼️ Pre-existing images provided:', preExistingImageUrls.length);
+    }
     if (articleInfo?.articleImageUrl) {
       console.log('[renderFromScript] 📰 Article image provided:', articleInfo.articleImageUrl.substring(0, 60));
     }
@@ -634,7 +642,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         id: `seg-${index}`,
         text: seg.text,
         imagePrompt: seg.imagePrompt,
-        imageUrl: "",
+        imageUrl: preExistingImageUrls?.[index] || "",
         duration: segmentDuration,
         startTime: currentTime,
       };
@@ -653,11 +661,22 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    // Step 2: Images (article image first, then web search for remaining)
-    const segmentsWithImages = await generateImages(segments, title, articleInfo);
-    if (!segmentsWithImages || abortRef.current) {
-      setIsGenerating(false);
-      return;
+    // Step 2: Images — skip if ALL segments already have images from pre-existing data
+    const allHaveImages = segments.every(s => !!s.imageUrl);
+    let segmentsWithImages: StorySegment[];
+    
+    if (allHaveImages) {
+      console.log('[renderFromScript] ✅ All segments have pre-existing images, skipping image generation');
+      toast.success(`📸 ${segments.length} imagens pré-existentes reutilizadas!`);
+      setState(prev => ({ ...prev, step: "images", progress: 70 }));
+      segmentsWithImages = segments;
+    } else {
+      const result = await generateImages(segments, title, articleInfo);
+      if (!result || abortRef.current) {
+        setIsGenerating(false);
+        return;
+      }
+      segmentsWithImages = result;
     }
 
     // Step 3: Audio (main + CTA)
