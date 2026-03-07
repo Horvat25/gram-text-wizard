@@ -8,7 +8,7 @@ import {
   Target, TrendingUp, Users, Eye, Brain, Lightbulb,
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
   Zap, Sparkles, Calendar, BarChart3, ArrowUpRight, ArrowDownRight, Minus,
-  Trophy, Heart, MessageCircle, Bookmark, Share2, RefreshCw
+  Trophy, Heart, Bookmark, Share2, RefreshCw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
