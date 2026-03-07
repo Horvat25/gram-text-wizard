@@ -77,32 +77,58 @@ const AnalyticsTab = ({ posts, onRefresh }: AnalyticsTabProps) => {
 
   const handleSyncMetrics = async () => {
     setIsSyncing(true);
+    let totalUpdated = 0;
+    let totalDeleted = 0;
+    let totalErrors: string[] = [];
+    
     try {
-      const { data, error } = await supabase.functions.invoke("sync-instagram-metrics");
+      let offset = 0;
+      const batchSize = 30;
+      let hasMore = true;
       
-      if (error) throw error;
-      
-      let message = "";
-      
-      if (data.deleted > 0) {
-        message += `${data.deleted} posts deletados no Instagram removidos. `;
+      while (hasMore) {
+        const { data, error } = await supabase.functions.invoke("sync-instagram-metrics", {
+          body: { offset, batch_size: batchSize }
+        });
+        
+        if (error) throw error;
+        
+        totalUpdated += data.updated || 0;
+        totalDeleted += data.deleted || 0;
+        if (data.errors) totalErrors = [...totalErrors, ...data.errors];
+        
+        hasMore = data.has_more === true;
+        offset = data.next_offset || 0;
+        
+        if (hasMore) {
+          toast.info(`Sincronizando... ${totalUpdated} posts processados`);
+        }
       }
       
-      if (data.updated > 0) {
-        message += `${data.updated} posts sincronizados!`;
-        toast.success(message || `${data.updated} posts sincronizados com sucesso!`);
+      let message = "";
+      if (totalDeleted > 0) {
+        message += `${totalDeleted} posts removidos. `;
+      }
+      if (totalUpdated > 0) {
+        message += `${totalUpdated} posts sincronizados!`;
+        toast.success(message || `${totalUpdated} posts sincronizados!`);
         onRefresh?.();
-      } else if (data.deleted > 0) {
+      } else if (totalDeleted > 0) {
         toast.success(message);
         onRefresh?.();
-      } else if (data.errors?.length) {
-        toast.warning(`Sincronização parcial: ${data.errors.length} erros`);
+      } else if (totalErrors.length) {
+        toast.warning(`Sincronização parcial: ${totalErrors.length} erros`);
       } else {
-        toast.info(data.message || "Nenhum post para sincronizar");
+        toast.info("Nenhum post para sincronizar");
       }
     } catch (error: any) {
       console.error("Sync error:", error);
-      toast.error(error.message || "Erro ao sincronizar métricas");
+      if (totalUpdated > 0) {
+        toast.warning(`Parcial: ${totalUpdated} sincronizados, mas houve erro`);
+        onRefresh?.();
+      } else {
+        toast.error(error.message || "Erro ao sincronizar métricas");
+      }
     } finally {
       setIsSyncing(false);
     }
