@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
-import { useWorkspace } from '@/contexts/WorkspaceContext';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface AgentGrowthDashboardProps {
