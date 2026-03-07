@@ -62,6 +62,9 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const [period, setPeriod] = useState(30);
   const [snapshots, setSnapshots] = useState<StrategySnapshot[]>([]);
   const [loadingSnapshots, setLoadingSnapshots] = useState(false);
+  const [topPosts, setTopPosts] = useState<TopPost[]>([]);
+  const [loadingTopPosts, setLoadingTopPosts] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
 
   const goalType = context?.goal_type || 'macro';
@@ -86,27 +89,74 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const newsPercent = Math.round(((context?.content_distribution_news || 4) / totalContent) * 100);
   const imagesPercent = Math.round(((context?.content_distribution_images || 5) / totalContent) * 100);
 
-  // Fetch strategy history snapshots
+  // Sync from Instagram directly
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      let offset = 0;
+      let totalUpdated = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
+          body: { offset, batch_size: 30 }
+        });
+        if (error) throw error;
+        totalUpdated += data?.updated || 0;
+        hasMore = data?.has_more || false;
+        offset = data?.next_offset || 0;
+      }
+      toast.success(`Sincronizado! ${totalUpdated} posts atualizados`);
+      fetchTopPosts();
+      fetchSnapshots();
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao sincronizar');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const fetchSnapshots = async () => {
+    if (!currentWorkspace?.id) return;
+    setLoadingSnapshots(true);
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+    
+    const { data } = await supabase
+      .from('agent_strategy_snapshots' as any)
+      .select('*')
+      .eq('workspace_id', currentWorkspace.id)
+      .gte('snapshot_date', since.toISOString().split('T')[0])
+      .order('snapshot_date', { ascending: true });
+    
+    setSnapshots((data as any[]) || []);
+    setLoadingSnapshots(false);
+  };
+
+  const fetchTopPosts = async () => {
+    if (!currentWorkspace?.id) return;
+    setLoadingTopPosts(true);
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+    
+    const { data } = await supabase
+      .from('posts')
+      .select('id, caption, reach, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at')
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('status', 'published')
+      .not('instagram_post_id', 'is', null)
+      .gt('reach', 10)
+      .gte('published_at', since.toISOString())
+      .order('reach', { ascending: false })
+      .limit(10);
+    
+    setTopPosts((data as TopPost[]) || []);
+    setLoadingTopPosts(false);
+  };
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
-    
-    const fetchSnapshots = async () => {
-      setLoadingSnapshots(true);
-      const since = new Date();
-      since.setDate(since.getDate() - period);
-      
-      const { data } = await supabase
-        .from('agent_strategy_snapshots' as any)
-        .select('*')
-        .eq('workspace_id', currentWorkspace.id)
-        .gte('snapshot_date', since.toISOString().split('T')[0])
-        .order('snapshot_date', { ascending: true });
-      
-      setSnapshots((data as any[]) || []);
-      setLoadingSnapshots(false);
-    };
-    
     fetchSnapshots();
+    fetchTopPosts();
   }, [currentWorkspace?.id, period]);
 
   const getStrategyReason = () => {
