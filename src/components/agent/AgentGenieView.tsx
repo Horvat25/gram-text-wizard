@@ -245,51 +245,51 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       </Suspense>
       
       {/* Top Bar - Minimal with all controls */}
-      <header className="relative z-20 flex items-center justify-between px-4 py-2">
+      <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
         {/* Left side - Chat, Library, Responses buttons */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
           <Button
             variant={showChat ? "default" : "ghost"}
             size="sm"
             className={cn(
-              "h-7 gap-1 px-2 text-xs",
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
               showChat && "neural-gradient border-0"
             )}
             onClick={toggleChat}
           >
             <MessageCircle className="h-3 w-3" />
-            Chat
+            <span className="hidden xs:inline sm:inline">Chat</span>
           </Button>
           
           <Button
             variant={showLibrary ? "default" : "ghost"}
             size="sm"
             className={cn(
-              "h-7 gap-1 px-2 text-xs",
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
               showLibrary && "neural-gradient border-0"
             )}
             onClick={toggleLibrary}
           >
             <ImageIcon className="h-3 w-3" />
-            Biblioteca
+            <span className="hidden xs:inline sm:inline">Biblioteca</span>
           </Button>
           
           <Button
             variant={showResponses ? "default" : "ghost"}
             size="sm"
             className={cn(
-              "h-7 gap-1 px-2 text-xs",
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
               showResponses && "neural-gradient border-0"
             )}
             onClick={toggleResponses}
           >
             <FileText className="h-3 w-3" />
-            Respostas
+            <span className="hidden xs:inline sm:inline">Respostas</span>
           </Button>
         </div>
         
         {/* Right side - Settings and Dashboard */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           <AgentSettingsPanel 
             trigger={
               <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -309,11 +309,11 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 gap-1 px-2 text-xs"
+            className="h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs"
             onClick={() => onNavigate?.('dashboard')}
           >
             <LayoutDashboard className="h-3 w-3" />
-            Dashboard
+            <span className="hidden sm:inline">Dashboard</span>
           </Button>
         </div>
       </header>
