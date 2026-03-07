@@ -105,6 +105,7 @@ export default function AgentDashboard({ onNavigate }: AgentDashboardProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { accounts: instagramAccounts, loading: loadingInstagram } = useInstagramAccounts();
+  const { context: agentCtx, updateContext } = useAgentContext();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
