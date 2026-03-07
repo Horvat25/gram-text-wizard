@@ -156,6 +156,64 @@ serve(async (req) => {
       }
     }
 
+    // ===== AGGREGATE WEEKLY METRICS INTO AGENT CONTEXT =====
+    console.log('📊 Aggregating weekly metrics into agent context...');
+    
+    try {
+      // Get all accounts to aggregate per workspace
+      const workspaceIds = [...new Set(accounts.map((a: any) => a.workspace_id).filter(Boolean))];
+      
+      for (const wsId of workspaceIds) {
+        const now = new Date();
+        const brasiliaOffset = -3 * 60 * 60 * 1000;
+        const todayBrasilia = new Date(now.getTime() + brasiliaOffset);
+        const weekStart = new Date(todayBrasilia);
+        weekStart.setDate(todayBrasilia.getDate() - todayBrasilia.getDay());
+        weekStart.setHours(0, 0, 0, 0);
+        const weekStartUTC = new Date(weekStart.getTime() - brasiliaOffset);
+        
+        // Get all published posts this week for this workspace
+        const { data: weekPosts } = await supabase
+          .from("posts")
+          .select("reach, likes_count, comments_count, saves_count, impressions")
+          .eq("workspace_id", wsId)
+          .eq("status", "published")
+          .not("instagram_post_id", "is", null)
+          .gte("published_at", weekStartUTC.toISOString());
+        
+        if (weekPosts && weekPosts.length > 0) {
+          const totalReach = weekPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
+          const totalImpressions = weekPosts.reduce((sum: number, p: any) => sum + (p.impressions || 0), 0);
+          
+          // Calculate average engagement rate
+          const engagements = weekPosts.map((p: any) => {
+            const total = (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
+            const reach = p.reach || 1;
+            return (total / reach) * 100;
+          });
+          const avgEngagement = engagements.reduce((a: number, b: number) => a + b, 0) / engagements.length;
+          
+          // Update agent_context with real weekly metrics
+          const { error: ctxError } = await supabase
+            .from("agent_context")
+            .update({
+              current_weekly_views: totalReach,
+              current_weekly_engagement: Math.round(avgEngagement * 10) / 10,
+              updated_at: new Date().toISOString()
+            })
+            .eq("workspace_id", wsId);
+          
+          if (ctxError) {
+            console.error(`Error updating agent_context for workspace ${wsId}:`, ctxError);
+          } else {
+            console.log(`✅ Agent context updated for workspace ${wsId}: reach=${totalReach}, engagement=${avgEngagement.toFixed(1)}%`);
+          }
+        }
+      }
+    } catch (aggError) {
+      console.error('Error aggregating weekly metrics:', aggError);
+    }
+
     return new Response(
       JSON.stringify({ 
         message: `Sincronização concluída`, 
