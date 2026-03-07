@@ -57,7 +57,19 @@ interface StrategySnapshot {
   top_performing_type: string | null;
 }
 
-export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
+interface TopPost {
+  id: string;
+  caption: string;
+  reach: number;
+  likes_count: number;
+  comments_count: number;
+  saves_count: number;
+  shares_count: number;
+  media_type: string | null;
+  image_url: string | null;
+  published_at: string | null;
+}
+
   const [isAutoStrategy, setIsAutoStrategy] = useState(true);
   const [period, setPeriod] = useState(30);
   const [snapshots, setSnapshots] = useState<StrategySnapshot[]>([]);
