@@ -7,7 +7,10 @@ import {
   Wifi, 
   WifiOff,
   Clock,
-  Zap
+  Film,
+  Newspaper,
+  Image as ImageIcon,
+  Layers
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
@@ -23,9 +26,16 @@ interface AgentStatusCardProps {
 export default function AgentStatusCard({ context, isRunning, onToggleAutoPost }: AgentStatusCardProps) {
   const isAutoEnabled = context?.auto_post_enabled || false;
   
+  const weeklyGoals = {
+    videos: context?.content_distribution_videos || 2,
+    carousels: context?.content_distribution_carousels || 1,
+    news: context?.content_distribution_news || 5,
+    images: context?.content_distribution_images || 3,
+  };
+  const totalWeekly = weeklyGoals.videos + weeklyGoals.carousels + weeklyGoals.news + weeklyGoals.images;
+  
   return (
     <Card className="overflow-hidden border-primary/20 relative">
-      {/* Background glow when active */}
       {isAutoEnabled && (
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       )}
@@ -33,7 +43,6 @@ export default function AgentStatusCard({ context, isRunning, onToggleAutoPost }
       <CardContent className="p-6 relative">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            {/* Animated Bot Icon */}
             <div className="relative">
               <motion.div 
                 className={`p-4 rounded-2xl ${isAutoEnabled ? 'neural-gradient glow-primary' : 'bg-muted'}`}
@@ -49,7 +58,6 @@ export default function AgentStatusCard({ context, isRunning, onToggleAutoPost }
                 <Bot className={`h-8 w-8 ${isAutoEnabled ? 'text-white' : 'text-muted-foreground'}`} />
               </motion.div>
               
-              {/* Status indicator */}
               <motion.span 
                 className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-background ${
                   isAutoEnabled ? 'bg-green-500' : 'bg-muted-foreground'
@@ -92,7 +100,6 @@ export default function AgentStatusCard({ context, isRunning, onToggleAutoPost }
             </div>
           </div>
           
-          {/* Power Toggle */}
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2">
               <Power className={`h-4 w-4 ${isAutoEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
@@ -119,14 +126,38 @@ export default function AgentStatusCard({ context, isRunning, onToggleAutoPost }
             <p className="text-xs text-muted-foreground">Intervalo</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-primary">
-              {context?.preferred_platforms?.length || 1}
-            </p>
-            <p className="text-xs text-muted-foreground">Plataformas</p>
+            <p className="text-2xl font-bold text-primary">{totalWeekly}</p>
+            <p className="text-xs text-muted-foreground">Posts/semana</p>
           </div>
         </div>
         
-        {/* Running indicator */}
+        {/* Weekly Content Distribution */}
+        <div className="mt-4 pt-3 border-t border-border/30">
+          <p className="text-xs font-medium text-muted-foreground mb-2">📅 Meta semanal por tipo:</p>
+          <div className="grid grid-cols-4 gap-2">
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-muted/40">
+              <Film className="h-3.5 w-3.5 text-purple-500" />
+              <span className="text-sm font-bold">{weeklyGoals.videos}</span>
+              <span className="text-[10px] text-muted-foreground">Reels</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-muted/40">
+              <Newspaper className="h-3.5 w-3.5 text-blue-500" />
+              <span className="text-sm font-bold">{weeklyGoals.news}</span>
+              <span className="text-[10px] text-muted-foreground">Notícias</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-muted/40">
+              <Layers className="h-3.5 w-3.5 text-orange-500" />
+              <span className="text-sm font-bold">{weeklyGoals.carousels}</span>
+              <span className="text-[10px] text-muted-foreground">Carrossel</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-muted/40">
+              <ImageIcon className="h-3.5 w-3.5 text-green-500" />
+              <span className="text-sm font-bold">{weeklyGoals.images}</span>
+              <span className="text-[10px] text-muted-foreground">Imagens</span>
+            </div>
+          </div>
+        </div>
+        
         {isRunning && (
           <motion.div 
             className="absolute inset-x-0 bottom-0 h-1 neural-gradient"
