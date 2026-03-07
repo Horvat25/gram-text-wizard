@@ -31,6 +31,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import agentHeroBg from '@/assets/agent-hero-bg.jpg';
 import AgentConfigPanel from './AgentConfigPanel';
 import AgentExecutionHistory from './AgentExecutionHistory';
+import AgentGrowthDashboard from './AgentGrowthDashboard';
+import { useAgentContext } from '@/hooks/useAgentContext';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
