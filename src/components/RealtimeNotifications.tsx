@@ -72,8 +72,13 @@ export function RealtimeNotifications() {
           const post = payload.new as any;
           const old = payload.old as any;
 
-          // Only notify on status change to published
+          // Only notify on actual status change to published (not metric syncs)
           if (old.status !== 'published' && post.status === 'published') {
+            // Debounce: don't show if published_at is older than 2 minutes
+            const publishedAt = post.published_at ? new Date(post.published_at).getTime() : Date.now();
+            const now = Date.now();
+            if (now - publishedAt > 2 * 60 * 1000) return;
+
             const title = '✅ Post Publicado!';
             const body = (post.caption || '').split('\n')[0].substring(0, 80);
 
