@@ -46,6 +46,7 @@ interface AgentGenieViewProps {
 export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
+  const { context: agentCtx, updateContext } = useAgentContext();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
