@@ -239,6 +239,70 @@ serve(async (req) => {
         } else {
           console.log(`✅ Agent context updated for workspace ${wsId}: reach=${updateData.current_weekly_views || 0}, engagement=${updateData.current_weekly_engagement || 0}%, followers=${followersCount}`);
         }
+        
+        // ===== SAVE DAILY STRATEGY SNAPSHOT =====
+        try {
+          // Get current agent_context for strategy info
+          const { data: ctxData } = await supabase
+            .from("agent_context")
+            .select("goal_type, content_distribution_videos, content_distribution_carousels, content_distribution_news, content_distribution_images, success_patterns")
+            .eq("workspace_id", wsId)
+            .single();
+          
+          // Aggregate ALL posts metrics for this workspace (not just this week)
+          const { data: allPosts } = await supabase
+            .from("posts")
+            .select("reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, post_type")
+            .eq("workspace_id", wsId)
+            .eq("status", "published")
+            .not("instagram_post_id", "is", null);
+          
+          const totalReach = (allPosts || []).reduce((s: number, p: any) => s + (p.reach || 0), 0);
+          const totalImpressions = (allPosts || []).reduce((s: number, p: any) => s + (p.impressions || 0), 0);
+          const totalLikes = (allPosts || []).reduce((s: number, p: any) => s + (p.likes_count || 0), 0);
+          const totalComments = (allPosts || []).reduce((s: number, p: any) => s + (p.comments_count || 0), 0);
+          const totalSaves = (allPosts || []).reduce((s: number, p: any) => s + (p.saves_count || 0), 0);
+          const totalShares = (allPosts || []).reduce((s: number, p: any) => s + (p.shares_count || 0), 0);
+          
+          // Find top performing type
+          const typePerf: Record<string, number> = {};
+          for (const p of (allPosts || [])) {
+            const mt = p.media_type === 'reels' ? 'video' : p.post_type === 'noticia' ? 'news' : p.media_type || 'image';
+            const eng = (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
+            typePerf[mt] = (typePerf[mt] || 0) + eng;
+          }
+          const topType = Object.entries(typePerf).sort(([,a],[,b]) => b - a)[0]?.[0] || null;
+          
+          const today = new Date().toISOString().split('T')[0];
+          
+          await supabase
+            .from("agent_strategy_snapshots")
+            .upsert({
+              workspace_id: wsId,
+              snapshot_date: today,
+              period_type: 'daily',
+              goal_type: ctxData?.goal_type || null,
+              content_distribution_videos: ctxData?.content_distribution_videos || 0,
+              content_distribution_carousels: ctxData?.content_distribution_carousels || 0,
+              content_distribution_news: ctxData?.content_distribution_news || 0,
+              content_distribution_images: ctxData?.content_distribution_images || 0,
+              total_reach: totalReach,
+              total_impressions: totalImpressions,
+              total_likes: totalLikes,
+              total_comments: totalComments,
+              total_saves: totalSaves,
+              total_shares: totalShares,
+              followers_count: followersCount,
+              avg_engagement: updateData.current_weekly_engagement || 0,
+              posts_count: (allPosts || []).length,
+              top_performing_type: topType,
+              strategy_reason: (ctxData?.success_patterns || []).slice(-1)[0] || null
+            }, { onConflict: 'workspace_id,snapshot_date,period_type' });
+          
+          console.log(`📸 Strategy snapshot saved for ${today}`);
+        } catch (snapError) {
+          console.error('Error saving strategy snapshot:', snapError);
+        }
       }
     } catch (aggError) {
       console.error('Error aggregating weekly metrics:', aggError);
