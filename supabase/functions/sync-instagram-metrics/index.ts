@@ -36,7 +36,7 @@ serve(async (req) => {
     // Get all published posts with instagram_post_id
     const { data: posts, error: postsError } = await supabase
       .from("posts")
-      .select("id, instagram_post_id")
+      .select("id, instagram_post_id, media_type")
       .eq("status", "published")
       .not("instagram_post_id", "is", null);
 
@@ -60,7 +60,6 @@ serve(async (req) => {
 
     for (const post of posts) {
       try {
-        // Fetch insights from Instagram Graph API
         const mediaId = post.instagram_post_id;
         
         // Get basic metrics
@@ -71,22 +70,15 @@ serve(async (req) => {
           const errorData = await metricsResponse.json();
           console.error(`Error fetching metrics for ${mediaId}:`, errorData);
           
-          // Check if post was deleted on Instagram (error code 100 = object doesn't exist)
+          // Post deleted on Instagram
           if (errorData.error?.code === 100 || metricsResponse.status === 404) {
-            console.log(`🗑️ Post ${mediaId} foi deletado no Instagram, removendo do banco...`);
-            
-            // Delete the post from database since it doesn't exist on Instagram anymore
+            console.log(`🗑️ Post ${mediaId} deletado no Instagram, removendo...`);
             const { error: deleteError } = await supabase
               .from("posts")
               .delete()
               .eq("id", post.id);
-            
-            if (!deleteError) {
-              deletedCount++;
-              console.log(`✅ Post ${post.id} removido do banco`);
-            } else {
-              errors.push(`Delete ${post.id}: ${deleteError.message}`);
-            }
+            if (!deleteError) deletedCount++;
+            else errors.push(`Delete ${post.id}: ${deleteError.message}`);
             continue;
           }
           
@@ -95,26 +87,36 @@ serve(async (req) => {
         }
 
         const metricsData = await metricsResponse.json();
-        console.log(`📊 Métricas do post ${mediaId}:`, metricsData);
+        const likes = metricsData.like_count || 0;
+        const comments = metricsData.comments_count || 0;
 
-        // Try to get insights (reach, saved) - requires business account
+        // Get insights (reach, saved, impressions, shares)
         let reach = 0;
         let saves = 0;
+        let impressions = 0;
+        let shares = 0;
 
         try {
-          const insightsUrl = `https://graph.facebook.com/v18.0/${mediaId}/insights?metric=reach,saved&access_token=${accessToken}`;
+          // Determine correct metrics based on media type
+          const isReels = post.media_type === "reels" || post.media_type === "reel";
+          const insightMetrics = isReels
+            ? "reach,saved,impressions,shares"
+            : "reach,saved,impressions";
+
+          const insightsUrl = `https://graph.facebook.com/v18.0/${mediaId}/insights?metric=${insightMetrics}&access_token=${accessToken}`;
           const insightsResponse = await fetch(insightsUrl);
           
           if (insightsResponse.ok) {
             const insightsData = await insightsResponse.json();
-            console.log(`📈 Insights do post ${mediaId}:`, insightsData);
+            console.log(`📈 Insights do post ${mediaId}:`, JSON.stringify(insightsData.data?.map((d: any) => ({ name: d.name, value: d.values?.[0]?.value }))));
             
             for (const insight of insightsData.data || []) {
-              if (insight.name === "reach") {
-                reach = insight.values?.[0]?.value || 0;
-              }
-              if (insight.name === "saved") {
-                saves = insight.values?.[0]?.value || 0;
+              const value = insight.values?.[0]?.value || 0;
+              switch (insight.name) {
+                case "reach": reach = value; break;
+                case "saved": saves = value; break;
+                case "impressions": impressions = value; break;
+                case "shares": shares = value; break;
               }
             }
           }
@@ -122,20 +124,21 @@ serve(async (req) => {
           console.log(`Insights não disponíveis para ${mediaId}:`, insightError);
         }
 
-        // Calculate minimum reach based on interactions (someone had to see to interact)
-        const likes = metricsData.like_count || 0;
-        const comments = metricsData.comments_count || 0;
-        const minReach = likes + comments + saves; // At minimum, this many people saw the post
-        const finalReach = Math.max(reach, minReach); // Use Instagram's reach or minimum, whichever is higher
+        // Calculate minimum reach
+        const minReach = likes + comments + saves;
+        const finalReach = Math.max(reach, minReach);
 
-        // Update the post in database with real values
+        // Update the post with real metrics
         const { error: updateError } = await supabase
           .from("posts")
           .update({
             likes_count: likes,
             comments_count: comments,
             saves_count: saves,
-            reach: finalReach, // Real value, with logical minimum
+            reach: finalReach,
+            impressions: impressions,
+            shares_count: shares,
+            last_metrics_sync: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
           .eq("id", post.id);
@@ -145,7 +148,7 @@ serve(async (req) => {
           errors.push(`Update ${post.id}: ${updateError.message}`);
         } else {
           updatedCount++;
-          console.log(`✅ Post ${post.id} atualizado com sucesso`);
+          console.log(`✅ Post ${post.id}: ${likes}❤️ ${comments}💬 ${saves}🔖 ${finalReach}👁️ ${impressions}📊 ${shares}🔗`);
         }
       } catch (postError: any) {
         console.error(`Error processing post ${post.id}:`, postError);

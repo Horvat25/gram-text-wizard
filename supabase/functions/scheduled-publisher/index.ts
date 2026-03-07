@@ -6,6 +6,32 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper: resize image for Instagram compatibility
+async function resizeForInstagram(supabaseUrl: string, supabaseKey: string, imageUrl: string, mediaType: string): Promise<string> {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/resize-image-for-instagram`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({ imageUrl, mediaType }),
+    });
+    const data = await response.json();
+    if (data.url && !data.skipped) {
+      console.log(`[resize] ✅ Resized: ${mediaType} → ${data.url.substring(0, 60)}...`);
+      return data.url;
+    }
+    if (data.skipped) {
+      console.log(`[resize] ⏭️ Skipped (${data.reason})`);
+    }
+    return imageUrl;
+  } catch (e) {
+    console.warn('[resize] Failed, using original:', e);
+    return imageUrl;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -19,12 +45,10 @@ serve(async (req) => {
     const now = new Date();
     const nowIso = now.toISOString();
     
-    // Log current time for debugging
     console.log("🕐 Verificando posts agendados...");
     console.log(`⏰ Hora atual UTC: ${nowIso}`);
     console.log(`⏰ Hora atual Brasília: ${new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString().replace('Z', ' BRT')}`);
 
-    // Find posts that are scheduled and due for publishing
     const { data: scheduledPosts, error: fetchError } = await supabase
       .from("posts")
       .select("*")
@@ -39,25 +63,19 @@ serve(async (req) => {
     if (!scheduledPosts || scheduledPosts.length === 0) {
       console.log("📭 Nenhum post agendado para publicar agora");
       return new Response(
-        JSON.stringify({
-          success: true,
-          message: "Nenhum post agendado para publicar",
-          processed: 0,
-        }),
+        JSON.stringify({ success: true, message: "Nenhum post agendado para publicar", processed: 0 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     console.log(`📬 Encontrados ${scheduledPosts.length} posts para publicar`);
 
-    // Get the first Instagram account for publishing
     const { data: accounts, error: accountError } = await supabase
       .from("instagram_accounts")
       .select("*")
       .limit(1);
 
     const hasConnectedAccount = !accountError && accounts && accounts.length > 0;
-
     const results = [];
 
     for (const post of scheduledPosts) {
@@ -67,12 +85,12 @@ serve(async (req) => {
         const isReels = post.media_type === "reels" || post.media_type === "reel";
         const isVideo = post.media_type === "video" || isReels;
         const isCarousel = post.media_type === "carousel";
-        const carouselImages = post.carousel_images as string[] || [];
-        const mediaUrl = isVideo ? post.video_url : post.image_url;
+        let carouselImages = [...(post.carousel_images as string[] || [])];
+        let mediaUrl = isVideo ? post.video_url : post.image_url;
         
-        // Block Reels without video_url - they need to be rendered first
+        // Block Reels without video_url
         if (isReels && !post.video_url) {
-          console.log(`⚠️ Reels ${post.id} não tem video_url - precisa ser renderizado primeiro`);
+          console.log(`⚠️ Reels ${post.id} não tem video_url`);
           await supabase
             .from("posts")
             .update({
@@ -80,12 +98,7 @@ serve(async (req) => {
               error_message: "Reels precisa ser renderizado antes de publicar. Acesse a Fila e clique em 'Gerar Vídeo'.",
             })
             .eq("id", post.id);
-          
-          results.push({
-            postId: post.id,
-            success: false,
-            error: "Reels sem vídeo renderizado - movido para rascunhos",
-          });
+          results.push({ postId: post.id, success: false, error: "Reels sem vídeo renderizado" });
           continue;
         }
         
@@ -96,15 +109,24 @@ serve(async (req) => {
           const accessToken = account.access_token;
           const instagramUserId = account.instagram_user_id;
 
-          console.log(`📸 Publicando no Instagram para @${account.username}...`);
+          // ── RESIZE IMAGES FOR INSTAGRAM COMPATIBILITY ──
+          if (!isVideo && mediaUrl) {
+            console.log(`📐 Resizing image for Instagram: ${post.media_type}`);
+            mediaUrl = await resizeForInstagram(supabaseUrl, supabaseKey, mediaUrl, post.media_type || 'image');
+          }
+          if (isCarousel && carouselImages.length > 0) {
+            console.log(`📐 Resizing ${carouselImages.length} carousel images...`);
+            for (let i = 0; i < carouselImages.length; i++) {
+              carouselImages[i] = await resizeForInstagram(supabaseUrl, supabaseKey, carouselImages[i], 'carousel');
+            }
+          }
 
+          console.log(`📸 Publicando no Instagram para @${account.username}...`);
           const caption = `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`;
           let creationId: string;
 
           if (isCarousel) {
-            // Carousel post
             console.log(`🎠 Criando carrossel com ${carouselImages.length} imagens...`);
-            
             const childrenIds: string[] = [];
             for (let i = 0; i < carouselImages.length; i++) {
               const itemUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
@@ -114,7 +136,6 @@ serve(async (req) => {
               
               const itemResponse = await fetch(itemUrl.toString(), { method: 'POST' });
               const itemData = await itemResponse.json();
-              
               if (itemData.error) throw new Error(`Carousel item ${i + 1}: ${itemData.error.message}`);
               childrenIds.push(itemData.id);
               await new Promise(resolve => setTimeout(resolve, 500));
@@ -128,13 +149,10 @@ serve(async (req) => {
             
             const carouselResponse = await fetch(carouselUrl.toString(), { method: 'POST' });
             const carouselData = await carouselResponse.json();
-            
             if (carouselData.error) throw new Error(`Carousel: ${carouselData.error.message}`);
             creationId = carouselData.id;
           } else {
-            // Single media post
             const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-            
             if (isVideo) {
               createMediaUrl.searchParams.set('video_url', mediaUrl);
               createMediaUrl.searchParams.set('caption', caption);
@@ -147,7 +165,6 @@ serve(async (req) => {
 
             const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
             const mediaData = await mediaResponse.json();
-
             if (mediaData.error) throw new Error(`Instagram API: ${mediaData.error.message}`);
             creationId = mediaData.id;
           }
@@ -162,19 +179,15 @@ serve(async (req) => {
 
           while (status === "IN_PROGRESS" && attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, 5000));
-            
             const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
             statusUrl.searchParams.set('fields', 'status_code');
             statusUrl.searchParams.set('access_token', accessToken);
             
             const statusResponse = await fetch(statusUrl.toString());
             const statusData = await statusResponse.json();
-            
             status = statusData.status_code || "FINISHED";
             attempts++;
-            
             console.log(`📊 Status: ${status} (tentativa ${attempts}/${maxAttempts})`);
-            
             if (statusData.error || !statusData.status_code || statusData.status_code === "FINISHED") {
               status = "FINISHED";
               break;
@@ -190,9 +203,9 @@ serve(async (req) => {
 
           const publishResponse = await fetch(publishUrl.toString(), { method: 'POST' });
           const publishData = await publishResponse.json();
-
           if (publishData.error) throw new Error(`Instagram API: ${publishData.error.message}`);
 
+          // Save with instagram_post_id — no fake metrics, sync will fill them later
           await supabase
             .from("posts")
             .update({
@@ -209,31 +222,23 @@ serve(async (req) => {
             instagramPostId: publishData.id,
             message: `${typeLabel} publicado no Instagram @${account.username}`,
           });
-
           console.log(`🎉 Post ${post.id} publicado com sucesso no Instagram!`);
         } else {
-          // Simulation mode - no account connected or no media
+          // Simulation mode
           const reason = !hasConnectedAccount 
             ? "Nenhuma conta Instagram conectada" 
             : "Post sem mídia";
-          
           console.log(`⚠️ Modo simulação para post ${post.id}: ${reason}`);
-
-          // Simulate metrics
-          const likes_count = Math.floor(Math.random() * 5000 + 500);
-          const comments_count = Math.floor(Math.random() * 200 + 20);
-          const saves_count = Math.floor(Math.random() * 800 + 100);
-          const reach = Math.floor(Math.random() * 15000 + 2000);
 
           await supabase
             .from("posts")
             .update({
               status: "published",
               published_at: new Date().toISOString(),
-              likes_count,
-              comments_count,
-              saves_count,
-              reach,
+              likes_count: 0,
+              comments_count: 0,
+              saves_count: 0,
+              reach: 0,
             })
             .eq("id", post.id);
 
@@ -242,54 +247,32 @@ serve(async (req) => {
             success: true,
             simulated: true,
             message: `Publicado (simulação - ${reason})`,
-            metrics: { likes_count, comments_count, saves_count, reach },
           });
-
           console.log(`✅ Post ${post.id} publicado (simulação)`);
         }
       } catch (postError: any) {
         console.error(`❌ Erro ao publicar post ${post.id}:`, postError);
-
-        // Update post with error status
         await supabase
           .from("posts")
-          .update({
-            status: "failed",
-            error_message: postError.message,
-          })
+          .update({ status: "failed", error_message: postError.message })
           .eq("id", post.id);
-
-        results.push({
-          postId: post.id,
-          success: false,
-          error: postError.message,
-        });
+        results.push({ postId: post.id, success: false, error: postError.message });
       }
     }
 
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
-
     console.log(`📊 Resumo: ${successCount} sucesso, ${failCount} falhas`);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        processed: scheduledPosts.length,
-        successCount,
-        failCount,
-        results,
-      }),
+      JSON.stringify({ success: true, processed: scheduledPosts.length, successCount, failCount, results }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("Erro em scheduled-publisher:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao processar posts agendados" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
