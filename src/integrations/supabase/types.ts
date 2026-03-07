@@ -324,6 +324,86 @@ export type Database = {
           },
         ]
       }
+      agent_strategy_snapshots: {
+        Row: {
+          avg_engagement: number | null
+          content_distribution_carousels: number | null
+          content_distribution_images: number | null
+          content_distribution_news: number | null
+          content_distribution_videos: number | null
+          created_at: string
+          followers_count: number | null
+          goal_type: string | null
+          id: string
+          period_type: string
+          posts_count: number | null
+          snapshot_date: string
+          strategy_reason: string | null
+          top_performing_type: string | null
+          total_comments: number | null
+          total_impressions: number | null
+          total_likes: number | null
+          total_reach: number | null
+          total_saves: number | null
+          total_shares: number | null
+          workspace_id: string
+        }
+        Insert: {
+          avg_engagement?: number | null
+          content_distribution_carousels?: number | null
+          content_distribution_images?: number | null
+          content_distribution_news?: number | null
+          content_distribution_videos?: number | null
+          created_at?: string
+          followers_count?: number | null
+          goal_type?: string | null
+          id?: string
+          period_type?: string
+          posts_count?: number | null
+          snapshot_date?: string
+          strategy_reason?: string | null
+          top_performing_type?: string | null
+          total_comments?: number | null
+          total_impressions?: number | null
+          total_likes?: number | null
+          total_reach?: number | null
+          total_saves?: number | null
+          total_shares?: number | null
+          workspace_id: string
+        }
+        Update: {
+          avg_engagement?: number | null
+          content_distribution_carousels?: number | null
+          content_distribution_images?: number | null
+          content_distribution_news?: number | null
+          content_distribution_videos?: number | null
+          created_at?: string
+          followers_count?: number | null
+          goal_type?: string | null
+          id?: string
+          period_type?: string
+          posts_count?: number | null
+          snapshot_date?: string
+          strategy_reason?: string | null
+          top_performing_type?: string | null
+          total_comments?: number | null
+          total_impressions?: number | null
+          total_likes?: number | null
+          total_reach?: number | null
+          total_saves?: number | null
+          total_shares?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_strategy_snapshots_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backups: {
         Row: {
           backup_type: string
