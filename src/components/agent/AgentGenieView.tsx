@@ -213,6 +213,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     if (!showChat) {
       setShowLibrary(false);
       setShowResponses(false);
+      setShowGrowth(false);
     }
   };
 
