@@ -721,6 +721,12 @@ async function createVideoContent(
   }
   
   // STEP 3: Criar post (status draft, sem video_url ainda)
+  // Build script segments for frontend rendering (AgentReelsRenderer needs this)
+  const scriptSegments = progressivePhases.map((phase, i) => ({
+    text: phase.text,
+    imagePrompt: phase.imagePrompt,
+  }));
+
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
@@ -734,6 +740,13 @@ async function createVideoContent(
     carousel_images: images, // Todas as imagens para o slideshow
     overlay_metadata: {
       type: 'external_render_slideshow',
+      topic: articleTitle,
+      script: {
+        title: articleTitle,
+        segments: scriptSegments,
+      },
+      article_url: rssArticle?.url || null,
+      article_image_url: null,
       images,
       duration_per_image: 3,
       resolution: '1080x1920',
