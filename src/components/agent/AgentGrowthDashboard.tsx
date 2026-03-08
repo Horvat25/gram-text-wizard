@@ -251,34 +251,31 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   return (
     <div className="space-y-4 pb-4">
-      {/* 1. Macro Goal */}
+      {/* 1. Macro Goal - All priorities active */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Card className="border-primary/20 overflow-hidden">
           <div className="h-1 w-full neural-gradient" />
           <CardHeader className="pb-2 pt-4">
             <CardTitle className="flex items-center gap-2 text-base">
               <Target className="h-4 w-4 text-primary" />
-              Objetivo do Agente
+              Prioridades do Agente
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               {GOAL_OPTIONS.map((goal) => (
-                <button
+                <div
                   key={goal.value}
-                  onClick={() => onUpdate?.({ goal_type: goal.value } as any)}
-                  className={cn(
-                    "flex items-center gap-2 p-2.5 rounded-lg border text-left text-xs transition-all",
-                    goalType === goal.value 
-                      ? "border-primary/50 bg-primary/10 shadow-sm" 
-                      : "border-border/50 bg-card/50 hover:border-primary/30"
-                  )}
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-primary/50 bg-primary/10 shadow-sm text-left text-xs"
                 >
                   <goal.icon className={cn("h-3.5 w-3.5 shrink-0", goal.color)} />
                   <span className="font-medium">{goal.label}</span>
-                </button>
+                </div>
               ))}
             </div>
+            <p className="text-[10px] text-center text-muted-foreground/70">
+              O agente trabalha todas as prioridades simultaneamente para atingir o objetivo macro
+            </p>
           </CardContent>
         </Card>
       </motion.div>

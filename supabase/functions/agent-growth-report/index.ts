@@ -109,6 +109,12 @@ serve(async (req) => {
 
       const reportPrompt = `Você é o social media do perfil de tecnologia. Faça um RELATÓRIO BREVE para o dono do perfil como um humano falaria com seu chefe.
 
+IMPORTANTE: O agente trabalha TODAS as prioridades simultaneamente:
+- 📈 Crescimento de seguidores
+- 👁️ Alcance máximo  
+- 🧠 Autoridade no nicho
+- 🔗 Cliques / conversão
+
 DADOS DA SEMANA:
 - Posts publicados: ${totalPosts}
 - Agendados: ${scheduled.length}
@@ -127,7 +133,7 @@ REGRAS:
 1. Fale como HUMANO (social media falando pro chefe)
 2. Seja BREVE (máx 3-4 parágrafos)
 3. Diga o que FEZ e o que VAI FAZER
-4. Se precisa ajustar posts/dia, explique POR QUÊ
+4. Explique como cada ação contribui para as 4 prioridades
 5. Se precisa postar afiliado, mencione
 6. Use emojis moderados
 7. Termine com o plano pras próximas horas`;
