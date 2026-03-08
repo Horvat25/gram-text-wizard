@@ -309,6 +309,19 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
             <TrendingUp className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Crescimento</span>
           </Button>
+          
+          <Button
+            variant={showMarketing ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showMarketing && "neural-gradient border-0"
+            )}
+            onClick={toggleMarketing}
+          >
+            <Megaphone className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Marketing</span>
+          </Button>
         </div>
         
         {/* Right side - Settings and Dashboard */}
