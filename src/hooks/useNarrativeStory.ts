@@ -500,9 +500,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         });
       }
       
-      // Estimate duration based on text length — capped at 55s
-      // FIX: Use proportional distribution by word count
-      const estimatedDuration = Math.min(estimateSpeechDuration(fullScript), 55);
+      // Estimate duration based on text length — MIN 25s, MAX 55s, MIN 5s per segment
+      const MIN_SEGMENT_DURATION = 5;
+      const estimatedDuration = Math.max(25, Math.min(estimateSpeechDuration(fullScript), 55));
       const wordCounts = segments.map(s => s.text.split(/\s+/).length);
       const totalWords = wordCounts.reduce((a, b) => a + b, 0);
       
@@ -510,7 +510,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         let currentTime = 0;
         const updatedSegments = prev.segments.map((seg, i) => {
           const proportion = totalWords > 0 ? wordCounts[i] / totalWords : 1 / segments.length;
-          const segDuration = estimatedDuration * proportion;
+          const segDuration = Math.max(MIN_SEGMENT_DURATION, estimatedDuration * proportion);
           const updated = { ...seg, duration: segDuration, startTime: currentTime };
           currentTime += segDuration;
           return updated;
@@ -518,7 +518,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         return { 
           ...prev, 
           segments: updatedSegments,
-          totalDuration: estimatedDuration,
+          totalDuration: currentTime,
           narrationUrl: narrationUrl || "", 
           ctaNarrationUrl: ctaNarrationUrl || "",
           backgroundMusicUrl,
