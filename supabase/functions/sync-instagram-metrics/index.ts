@@ -19,20 +19,35 @@ serve(async (req) => {
     let batchOffset = 0;
     let batchSize = 50;
     let periodDays = 90;
+    let workspaceId: string | null = null;
     try {
       const body = await req.json();
       batchOffset = body.offset || 0;
       batchSize = body.batch_size || 50;
       periodDays = body.period_days || 90;
+      workspaceId = body.workspace_id || null;
     } catch { /* no body */ }
 
-    const { data: accounts, error: accountError } = await supabase
+    let accountsQuery = supabase
       .from("instagram_accounts")
       .select("*");
 
+    if (workspaceId) {
+      accountsQuery = accountsQuery.eq("workspace_id", workspaceId);
+    }
+
+    const { data: accounts, error: accountError } = await accountsQuery;
+
     if (accountError || !accounts?.length) {
       return new Response(
-        JSON.stringify({ error: "Nenhuma conta do Instagram conectada" }),
+        JSON.stringify({ error: "Nenhuma conta do Instagram conectada para este workspace" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!workspaceId && accounts.length > 1) {
+      return new Response(
+        JSON.stringify({ error: "workspace_id é obrigatório quando há múltiplas contas conectadas" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -43,16 +58,22 @@ serve(async (req) => {
     // Save snapshots only on first batch
     if (batchOffset === 0) {
       console.log('📊 Step 1: Saving snapshots...');
-      await saveSnapshotsAndContext(supabase, accounts, periodDays);
+      await saveSnapshotsAndContext(supabase, accounts, periodDays, workspaceId);
     }
 
     // Fetch posts batch
-    const { data: posts, error: postsError } = await supabase
+    let postsQuery = supabase
       .from("posts")
       .select("id, instagram_post_id, media_type, reach, impressions, saves_count, shares_count")
       .eq("status", "published")
       .not("instagram_post_id", "is", null)
-      .order("published_at", { ascending: false })
+      .order("published_at", { ascending: false });
+
+    if (workspaceId) {
+      postsQuery = postsQuery.eq("workspace_id", workspaceId);
+    }
+
+    const { data: posts, error: postsError } = await postsQuery
       .range(batchOffset, batchOffset + batchSize - 1);
 
     if (postsError) throw postsError;
@@ -117,16 +138,30 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const mediaId = post.instagram_post_id;
   const isReels = post.media_type === "reels" || post.media_type === "reel";
 
-  // Fetch basic metrics AND insights in parallel
-  // NOTE: 'views' replaced deprecated 'impressions/plays' for newer Instagram media.
-  const insightMetrics = isReels
+  // Fetch basic metrics + insights with fallback by media type
+  const primaryInsightMetrics = isReels
     ? "reach,saved,shares,views"
+    : "impressions,reach,saved";
+
+  const fallbackInsightMetrics = isReels
+    ? "reach,saved,shares,plays"
     : "reach,saved,views";
 
-  const [metricsRes, insightsRes] = await Promise.all([
+  const [metricsRes, primaryInsightsRes] = await Promise.all([
     fetch(`https://graph.facebook.com/v21.0/${mediaId}?fields=like_count,comments_count&access_token=${accessToken}`),
-    fetch(`https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${insightMetrics}&access_token=${accessToken}`).catch(() => null),
+    fetch(`https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${primaryInsightMetrics}&access_token=${accessToken}`).catch(() => null),
   ]);
+
+  let insightsRes = primaryInsightsRes;
+  if (insightsRes && !insightsRes.ok) {
+    const fallbackRes = await fetch(
+      `https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${fallbackInsightMetrics}&access_token=${accessToken}`
+    ).catch(() => null);
+
+    if (fallbackRes?.ok) {
+      insightsRes = fallbackRes;
+    }
+  }
 
   if (!metricsRes.ok) {
     const errorData = await metricsRes.json();
@@ -206,9 +241,10 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 }
 
 // ===== Helper: Save snapshots and update agent_context =====
-async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDays: number) {
+async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDays: number, workspaceId?: string | null) {
   try {
-    const workspaceIds = [...new Set(accounts.map((a: any) => a.workspace_id).filter(Boolean))];
+    const baseWorkspaceIds = [...new Set(accounts.map((a: any) => a.workspace_id).filter(Boolean))];
+    const workspaceIds = workspaceId ? baseWorkspaceIds.filter((id: string) => id === workspaceId) : baseWorkspaceIds;
     
     for (const wsId of workspaceIds) {
       const wsAccount = accounts.find((a: any) => a.workspace_id === wsId);
@@ -226,14 +262,20 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDay
         // Instagram account insights supports fixed timeframe values.
         const timeframe = periodDays >= 90 ? 'last_90_days' : periodDays >= 30 ? 'last_30_days' : 'last_14_days';
 
+        const shouldFetchRange = periodDays <= 30;
+
         // Fetch followers + account-level insights in parallel
         // New API uses views(metric_type=total_value). Keep legacy fallback for impressions.
         const [profileRes, viewsRangeRes, viewsInsightsRes, viewsBreakdownRes, legacyInsightsRes] = await Promise.all([
           fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&since=${sinceTs}&until=${nowTs}&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          shouldFetchRange
+            ? fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&since=${sinceTs}&until=${nowTs}&metric_type=total_value&access_token=${accessToken}`).catch(() => null)
+            : Promise.resolve(null),
           fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=${timeframe}&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
           fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views&period=day&timeframe=${timeframe}&metric_type=total_value&breakdown=media_product_type&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
+          shouldFetchRange
+            ? fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null)
+            : Promise.resolve(null),
         ]);
 
         if (profileRes && profileRes.ok) {
