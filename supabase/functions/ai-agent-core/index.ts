@@ -523,13 +523,13 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   if (!state.nextContentType && goalType === 'macro') {
     // Check if macro objectives are met
     const viewsMet = weeklyReach >= goalViews;
-    const engagementMet = state.avgEngagement >= goalEngagement;
+    const engagementMet = currentEngagement >= goalEngagement;
     
     if (viewsMet && engagementMet) {
       console.log('[AGENT] Objetivos macro alcançados!');
       return {
         decision: 'NO_POST',
-        reason: `🏆 Objetivos macro alcançados! Views: ${weeklyReach}/${goalViews}, Engajamento: ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%. Modo manutenção ativo.`
+        reason: `🏆 Objetivos macro alcançados! Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()}, Engajamento: ${currentEngagement}%/${goalEngagement}%. Modo manutenção ativo.`
       };
     }
     
