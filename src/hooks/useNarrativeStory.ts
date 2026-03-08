@@ -430,22 +430,50 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log("[TTS] Audio duration detected:", audioDuration, "seconds");
       console.log("[Music] Background music URL:", backgroundMusicUrl ? "Generated" : "None");
       
-      // 🔒 Limite máximo de 55 segundos (permite narração completa sem corte)
-      // Antes era 30s, mas cortava a narração no último segmento
+      // 🔒 MIN 25s content, MAX 55s
+      const MIN_DURATION = 25;
       const MAX_DURATION = 55;
-      const clampedDuration = Math.min(audioDuration > 0 ? audioDuration : 0, MAX_DURATION);
+      const MIN_SEGMENT_DURATION = 5; // No segment shorter than 5s
+      const rawDuration = audioDuration > 0 ? audioDuration : 0;
+      const clampedDuration = Math.max(MIN_DURATION, Math.min(rawDuration, MAX_DURATION));
 
       if (clampedDuration > 0) {
-        // FIX: Distribute duration PROPORTIONALLY by word count, not evenly
-        // This ensures each segment's image stays on screen for as long as its narration
+        // Distribute duration PROPORTIONALLY by word count
         const wordCounts = segments.map(s => s.text.split(/\s+/).length);
         const totalWords = wordCounts.reduce((a, b) => a + b, 0);
+        
+        // First pass: calculate proportional durations
+        let rawDurations = wordCounts.map(wc => {
+          const proportion = totalWords > 0 ? wc / totalWords : 1 / segments.length;
+          return clampedDuration * proportion;
+        });
+        
+        // Second pass: enforce minimum 5s per segment, redistribute excess
+        let deficit = 0;
+        rawDurations = rawDurations.map(d => {
+          if (d < MIN_SEGMENT_DURATION) {
+            deficit += MIN_SEGMENT_DURATION - d;
+            return MIN_SEGMENT_DURATION;
+          }
+          return d;
+        });
+        
+        // Redistribute deficit from longer segments proportionally
+        if (deficit > 0) {
+          const longSegments = rawDurations.filter(d => d > MIN_SEGMENT_DURATION);
+          const totalLong = longSegments.reduce((a, b) => a + b, 0);
+          rawDurations = rawDurations.map(d => {
+            if (d > MIN_SEGMENT_DURATION && totalLong > 0) {
+              return d - (deficit * (d / totalLong));
+            }
+            return d;
+          });
+        }
         
         setState(prev => {
           let currentTime = 0;
           const updatedSegments = prev.segments.map((seg, i) => {
-            const proportion = totalWords > 0 ? wordCounts[i] / totalWords : 1 / segments.length;
-            const segDuration = clampedDuration * proportion;
+            const segDuration = Math.max(MIN_SEGMENT_DURATION, rawDurations[i] || MIN_SEGMENT_DURATION);
             const updated = { ...seg, duration: segDuration, startTime: currentTime };
             currentTime += segDuration;
             return updated;
@@ -453,7 +481,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           return { 
             ...prev, 
             segments: updatedSegments,
-            totalDuration: clampedDuration,
+            totalDuration: currentTime,
             narrationUrl, 
             ctaNarrationUrl,
             backgroundMusicUrl,
@@ -472,9 +500,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         });
       }
       
-      // Estimate duration based on text length — capped at 55s
-      // FIX: Use proportional distribution by word count
-      const estimatedDuration = Math.min(estimateSpeechDuration(fullScript), 55);
+      // Estimate duration based on text length — MIN 25s, MAX 55s, MIN 5s per segment
+      const MIN_SEG_DUR = 5;
+      const estimatedDuration = Math.max(25, Math.min(estimateSpeechDuration(fullScript), 55));
       const wordCounts = segments.map(s => s.text.split(/\s+/).length);
       const totalWords = wordCounts.reduce((a, b) => a + b, 0);
       
@@ -482,7 +510,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         let currentTime = 0;
         const updatedSegments = prev.segments.map((seg, i) => {
           const proportion = totalWords > 0 ? wordCounts[i] / totalWords : 1 / segments.length;
-          const segDuration = estimatedDuration * proportion;
+          const segDuration = Math.max(MIN_SEG_DUR, estimatedDuration * proportion);
           const updated = { ...seg, duration: segDuration, startTime: currentTime };
           currentTime += segDuration;
           return updated;
@@ -490,7 +518,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         return { 
           ...prev, 
           segments: updatedSegments,
-          totalDuration: estimatedDuration,
+          totalDuration: currentTime,
           narrationUrl: narrationUrl || "", 
           ctaNarrationUrl: ctaNarrationUrl || "",
           backgroundMusicUrl,

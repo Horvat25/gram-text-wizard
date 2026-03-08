@@ -105,7 +105,8 @@ function applyKenBurnsToRegion(
   regionWidth: number,
   regionHeight: number,
   progress: number,
-  effectType: number
+  effectType: number,
+  isHook: boolean = false
 ) {
   ctx.save();
   
@@ -114,15 +115,19 @@ function applyKenBurnsToRegion(
   ctx.rect(regionX, regionY, regionWidth, regionHeight);
   ctx.clip();
   
-  const scale = 1 + (progress * 0.08);
+  // Stronger Ken Burns: 12% zoom (was 8%), faster pacing with 1.2x speed feel
+  const zoomAmount = isHook ? 0.18 : 0.12;
+  const scale = 1 + (progress * zoomAmount);
   const centerX = regionX + regionWidth / 2;
   const centerY = regionY + regionHeight / 2;
   
   ctx.translate(centerX, centerY);
   ctx.scale(scale, scale);
   
-  const panX = (effectType % 2 === 0 ? 1 : -1) * progress * 15;
-  const panY = (effectType % 3 === 0 ? 1 : -1) * progress * 10;
+  // Faster pan movement for more dynamic feel
+  const panSpeed = isHook ? 25 : 18;
+  const panX = (effectType % 2 === 0 ? 1 : -1) * progress * panSpeed;
+  const panY = (effectType % 3 === 0 ? 1 : -1) * progress * (panSpeed * 0.7);
   
   ctx.translate(-centerX + panX, -centerY + panY);
   
@@ -158,16 +163,17 @@ function drawSplitImages(
   width: number,
   height: number,
   progress: number,
-  effectType: number
+  effectType: number,
+  isHook: boolean = false
 ) {
   // Top image region: 0% to 38% of height
   const topHeight = height * 0.38;
-  applyKenBurnsToRegion(ctx, img, 0, 0, width, topHeight, progress, effectType);
+  applyKenBurnsToRegion(ctx, img, 0, 0, width, topHeight, progress, effectType, isHook);
   
   // Bottom image region: 62% to 100% of height
   const bottomY = height * 0.62;
   const bottomHeight = height * 0.38;
-  applyKenBurnsToRegion(ctx, img, 0, bottomY, width, bottomHeight, progress, effectType + 1);
+  applyKenBurnsToRegion(ctx, img, 0, bottomY, width, bottomHeight, progress, effectType + 1, isHook);
   
   // Add subtle gradient overlays for smooth transitions to center
   ctx.save();
@@ -185,6 +191,13 @@ function drawSplitImages(
   bottomGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
   ctx.fillStyle = bottomGradient;
   ctx.fillRect(0, bottomY, width, 40);
+  
+  // HOOK flash effect — white flash in first 0.5s of first segment
+  if (isHook && progress < 0.08) {
+    const flashAlpha = (1 - progress / 0.08) * 0.3;
+    ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
+    ctx.fillRect(0, 0, width, height);
+  }
   
   ctx.restore();
 }
@@ -582,6 +595,7 @@ function renderFrame(
   // Transition only at the START of a segment (crossfade FROM previous)
   // No exit transition - this eliminates the ghosting bug entirely
   const isInTransition = timeIntoSegment < transitionDuration && segmentIndex > 0;
+  const isHook = segmentIndex === 0 && timeIntoSegment < 3.0; // First 3 seconds = HOOK
   
   if (isInTransition) {
     const prevImg = images[segmentIndex - 1];
@@ -593,8 +607,8 @@ function renderFrame(
     
     drawTransition(ctx, prevImg, currentImg, width, height, transitionProgress, transitionType, segmentIndex - 1, segmentIndex);
   } else {
-    // Normal rendering - only current image, no blending
-    drawSplitImages(ctx, currentImg, width, height, segmentProgress, segmentIndex);
+    // Normal rendering — isHook applies stronger Ken Burns + flash in first segment
+    drawSplitImages(ctx, currentImg, width, height, segmentProgress, segmentIndex, isHook);
   }
 
   // Watermark
@@ -826,7 +840,7 @@ export async function generateVideoFromSegments(
   const {
     width = 1080,
     height = 1920,
-    fps = 24,
+    fps = 30,
     audioUrl,
     ctaAudioUrl,
     backgroundMusicUrl,
@@ -1011,8 +1025,8 @@ export async function generateVideoFromSegments(
         musicAudioElement = new Audio();
         musicAudioElement.crossOrigin = "anonymous";
         musicAudioElement.src = backgroundMusicUrl;
-        musicAudioElement.volume = 0.15; // Low volume for background
-        musicAudioElement.loop = true; // Loop the music
+        musicAudioElement.volume = 0.25; // Background music — louder for energy
+        musicAudioElement.loop = true;
         
         await new Promise<void>((resolve) => {
           const timeout = setTimeout(() => {
@@ -1039,7 +1053,7 @@ export async function generateVideoFromSegments(
             const musicSource = audioContext.createMediaElementSource(musicAudioElement);
             // Create gain node for volume control
             const gainNode = audioContext.createGain();
-            gainNode.gain.value = 0.15; // Background volume
+            gainNode.gain.value = 0.25; // Louder background for energy
             musicSource.connect(gainNode);
             gainNode.connect(destination);
             console.log("[VideoEncoder] Background music connected to video stream");
