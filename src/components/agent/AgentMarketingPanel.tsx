@@ -316,11 +316,28 @@ export default function AgentMarketingPanel() {
             </div>
 
             <div>
-              <Label className="text-xs">Descrição</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label className="text-xs">Descrição</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 gap-1 text-xs text-primary"
+                  onClick={generateDescription}
+                  disabled={generatingDesc || !productName.trim()}
+                >
+                  {generatingDesc ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3" />
+                  )}
+                  {generatingDesc ? 'Gerando...' : 'Gerar com IA'}
+                </Button>
+              </div>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descrição do produto — o agente pesquisa o resto automaticamente"
+                placeholder="Breve descrição do produto — ou clique em 'Gerar com IA'"
                 className="min-h-[60px] text-sm"
               />
             </div>
