@@ -509,6 +509,7 @@ export default function AgentMarketingPanel() {
                 className="min-h-[50px] text-sm mt-1"
               />
             </div>
+          </div>
 
           <DialogFooter>
             <Button variant="ghost" size="sm" onClick={() => { resetForm(); setShowForm(false); }}>
