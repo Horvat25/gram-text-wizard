@@ -755,29 +755,7 @@ const PublicationQueueTab = ({
               <ChevronUp className="h-4 w-4" />
               <span className="sr-only">Voltar ao topo</span>
             </Button>
-          )}
-        </DialogContent>
-      </Dialog>
 
-      {/* Reels Renderer Dialog */}
-      {renderingPost && (
-        <AgentReelsRenderer
-          key={renderingPost.id}
-          postId={renderingPost.id}
-          topic={getReelsScript(renderingPost)!.topic}
-          script={{
-            title: getReelsScript(renderingPost)!.title,
-            segments: getReelsScript(renderingPost)!.segments,
-          }}
-          scheduledFor={renderingPost.scheduled_for}
-          autoPublish={false}
-          onComplete={() => {
-            setRenderingPost(null);
-            toast.success("Vídeo renderizado! Agora você pode publicar ou agendar.");
-          }}
-          onCancel={() => setRenderingPost(null)}
-        />
-      )}
     </div>
   );
 };
