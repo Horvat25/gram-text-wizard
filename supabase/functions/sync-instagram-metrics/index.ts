@@ -288,16 +288,18 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDay
             let total = 0;
             for (const metric of data.data || []) {
               if (metric.name !== 'views') continue;
-              if (typeof metric.total_value?.value === 'number') {
-                total = Math.max(total, metric.total_value.value);
-              }
+
+              const directValue = typeof metric.total_value?.value === 'number' ? metric.total_value.value : 0;
+              let breakdownSum = 0;
               const breakdowns = metric.total_value?.breakdowns || [];
               for (const b of breakdowns) {
                 for (const r of b.results || []) {
                   const v = typeof r?.value === 'number' ? r.value : Number(r?.value) || 0;
-                  total += v;
+                  breakdownSum += v;
                 }
               }
+
+              total = Math.max(total, directValue, breakdownSum);
             }
             if (total > 0) console.log(`📊 Account views(breakdown): ${total}`);
             return total;
