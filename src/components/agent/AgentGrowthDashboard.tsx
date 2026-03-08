@@ -8,14 +8,15 @@ import {
   Target, TrendingUp, Users, Eye, Brain, Lightbulb,
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
   Zap, Sparkles, Calendar, BarChart3, ArrowUpRight, ArrowDownRight, Minus,
-  Trophy, Heart, Bookmark, Share2, RefreshCw
+  Trophy, Heart, Bookmark, Share2, RefreshCw, MessageCircle, Loader2,
+  Hash,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
 
 interface AgentGrowthDashboardProps {
@@ -24,16 +25,24 @@ interface AgentGrowthDashboardProps {
 }
 
 const GOAL_OPTIONS = [
-  { value: 'growth', label: 'Crescimento de seguidores', icon: Users, color: 'text-purple-500' },
-  { value: 'reach', label: 'Alcance máximo', icon: Eye, color: 'text-blue-500' },
-  { value: 'authority', label: 'Autoridade no nicho', icon: Brain, color: 'text-amber-500' },
-  { value: 'conversion', label: 'Cliques / conversão', icon: TrendingUp, color: 'text-emerald-500' },
+  { value: 'growth', label: 'Seguidores', icon: Users, color: 'text-purple-500' },
+  { value: 'reach', label: 'Alcance', icon: Eye, color: 'text-blue-500' },
+  { value: 'authority', label: 'Autoridade', icon: Brain, color: 'text-amber-500' },
+  { value: 'conversion', label: 'Conversão', icon: TrendingUp, color: 'text-emerald-500' },
 ];
 
 const PERIOD_OPTIONS = [
   { value: 30, label: '30d' },
   { value: 60, label: '60d' },
   { value: 90, label: '90d' },
+];
+
+const PIE_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(190, 80%, 50%)',
+  'hsl(280, 60%, 55%)',
+  'hsl(45, 90%, 55%)',
+  'hsl(340, 70%, 55%)',
 ];
 
 interface StrategySnapshot {
@@ -68,6 +77,8 @@ interface TopPost {
   media_type: string | null;
   image_url: string | null;
   published_at: string | null;
+  hashtags: string[] | null;
+  post_type: string | null;
 }
 
 export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
@@ -80,13 +91,12 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
 
-  const goalType = context?.goal_type || 'macro';
-  const weeklyViews = context?.current_weekly_views || 0;
   const goalViews = context?.goal_weekly_views || 10000;
-  const weeklyFollowers = context?.current_weekly_followers || 0;
   const goalFollowers = context?.goal_weekly_followers || 100;
-  const weeklyEngagement = context?.current_weekly_engagement || 0;
   const goalEngagement = context?.goal_weekly_engagement || 5;
+  const weeklyViews = context?.current_weekly_views || 0;
+  const weeklyFollowers = context?.current_weekly_followers || 0;
+  const weeklyEngagement = context?.current_weekly_engagement || 0;
 
   const viewsProgress = Math.min((weeklyViews / goalViews) * 100, 100);
   const followersProgress = Math.min((weeklyFollowers / goalFollowers) * 100, 100);
@@ -102,33 +112,36 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const newsPercent = Math.round(((context?.content_distribution_news || 4) / totalContent) * 100);
   const imagesPercent = Math.round(((context?.content_distribution_images || 5) / totalContent) * 100);
 
-  // Sync from Instagram directly
+  // Sync from Instagram
   const handleSync = async () => {
     setSyncing(true);
     try {
       let offset = 0;
       let totalUpdated = 0;
+      let totalDeleted = 0;
       let hasMore = true;
-      let batchCount = 0;
-      while (hasMore) {
-        batchCount++;
-        toast.loading(`Sincronizando... ${offset} posts processados`, { id: 'sync-progress' });
+      let batch = 0;
+      while (hasMore && batch < 10) {
+        batch++;
+        toast.loading(`Sincronizando... ${offset} posts`, { id: 'sync-ig' });
         const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
           body: { offset, batch_size: 30 }
         });
         if (error) throw error;
         totalUpdated += data?.updated || 0;
+        totalDeleted += data?.deleted || 0;
         hasMore = data?.has_more || false;
         offset = data?.next_offset || 0;
-        // Safety: max 10 batches (300 posts) to avoid infinite loop
-        if (batchCount >= 10) break;
       }
-      toast.dismiss('sync-progress');
-      toast.success(`Sincronizado! ${totalUpdated} posts atualizados`);
+      toast.dismiss('sync-ig');
+      const parts = [];
+      if (totalDeleted > 0) parts.push(`${totalDeleted} removidos`);
+      if (totalUpdated > 0) parts.push(`${totalUpdated} atualizados`);
+      toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       fetchTopPosts();
       fetchSnapshots();
     } catch (e: any) {
-      toast.dismiss('sync-progress');
+      toast.dismiss('sync-ig');
       toast.error(e.message || 'Erro ao sincronizar');
     } finally {
       setSyncing(false);
@@ -140,14 +153,12 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setLoadingSnapshots(true);
     const since = new Date();
     since.setDate(since.getDate() - period);
-    
     const { data } = await supabase
       .from('agent_strategy_snapshots' as any)
       .select('*')
       .eq('workspace_id', currentWorkspace.id)
       .gte('snapshot_date', since.toISOString().split('T')[0])
       .order('snapshot_date', { ascending: true });
-    
     setSnapshots((data as any[]) || []);
     setLoadingSnapshots(false);
   };
@@ -157,18 +168,16 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setLoadingTopPosts(true);
     const since = new Date();
     since.setDate(since.getDate() - period);
-    
     const { data } = await supabase
       .from('posts')
-      .select('id, caption, reach, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at')
+      .select('id, caption, reach, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at, hashtags, post_type')
       .eq('workspace_id', currentWorkspace.id)
       .eq('status', 'published')
       .not('instagram_post_id', 'is', null)
       .gt('reach', 10)
       .gte('published_at', since.toISOString())
       .order('reach', { ascending: false })
-      .limit(10);
-    
+      .limit(15);
     setTopPosts((data as TopPost[]) || []);
     setLoadingTopPosts(false);
   };
@@ -179,10 +188,38 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     fetchTopPosts();
   }, [currentWorkspace?.id, period]);
 
+  // Derived analytics from topPosts
+  const totalLikes = topPosts.reduce((s, p) => s + (p.likes_count || 0), 0);
+  const totalComments = topPosts.reduce((s, p) => s + (p.comments_count || 0), 0);
+  const totalSaves = topPosts.reduce((s, p) => s + (p.saves_count || 0), 0);
+  const totalReach = topPosts.reduce((s, p) => s + (p.reach || 0), 0);
+  const totalShares = topPosts.reduce((s, p) => s + (p.shares_count || 0), 0);
+  const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
+
+  // Post type distribution for pie chart
+  const typeDistribution = topPosts.reduce<Record<string, number>>((acc, p) => {
+    const t = p.media_type === 'reels' || p.media_type === 'reel' ? 'Reels'
+      : p.media_type === 'carousel' ? 'Carrossel'
+      : p.media_type === 'video' ? 'Vídeo' : 'Imagem';
+    acc[t] = (acc[t] || 0) + 1;
+    return acc;
+  }, {});
+  const pieData = Object.entries(typeDistribution).map(([name, value]) => ({ name, value }));
+
+  // Best hashtags
+  const hashtagMap: Record<string, number> = {};
+  topPosts.forEach(p => {
+    (p.hashtags || []).forEach(h => {
+      hashtagMap[h] = (hashtagMap[h] || 0) + 1;
+    });
+  });
+  const bestHashtags = Object.entries(hashtagMap)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([tag]) => tag);
+
   const getStrategyReason = () => {
-    if (context?.success_patterns && context.success_patterns.length > 0) {
-      return context.success_patterns[0];
-    }
+    if (context?.success_patterns && context.success_patterns.length > 0) return context.success_patterns[0];
     if (reelsPercent >= 40) return 'Reels estão gerando maior alcance orgânico no momento.';
     if (newsPercent >= 40) return 'Conteúdo informativo está gerando mais salvamentos.';
     return 'Distribuição balanceada para maximizar diferentes métricas.';
@@ -191,7 +228,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const insights = context?.success_patterns?.slice(0, 3) || [];
   const topTopics = context?.top_topics?.slice(0, 3) || [];
 
-  // Chart data from snapshots
   const chartData = snapshots.map(s => ({
     date: new Date(s.snapshot_date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
     reach: s.total_reach,
@@ -199,23 +235,16 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     engagement: Number(s.avg_engagement),
     likes: s.total_likes,
     saves: s.total_saves,
-    posts: s.posts_count,
   }));
 
-  // Calculate trend
   const getTrend = (key: 'followers' | 'reach' | 'engagement') => {
     if (snapshots.length < 2) return { direction: 'neutral' as const, value: 0 };
     const first = snapshots[0];
     const last = snapshots[snapshots.length - 1];
-    const diff = key === 'followers' 
-      ? last.followers_count - first.followers_count
-      : key === 'reach'
-      ? last.total_reach - first.total_reach
+    const diff = key === 'followers' ? last.followers_count - first.followers_count
+      : key === 'reach' ? last.total_reach - first.total_reach
       : Number(last.avg_engagement) - Number(first.avg_engagement);
-    return {
-      direction: diff > 0 ? 'up' as const : diff < 0 ? 'down' as const : 'neutral' as const,
-      value: Math.abs(diff)
-    };
+    return { direction: diff > 0 ? 'up' as const : diff < 0 ? 'down' as const : 'neutral' as const, value: Math.abs(diff) };
   };
 
   const followersTrend = getTrend('followers');
@@ -228,7 +257,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     return <Minus className="h-3 w-3 text-muted-foreground" />;
   };
 
-  // Strategy evolution timeline
   const strategyChanges = snapshots.reduce<Array<{date: string; videos: number; carousels: number; news: number; images: number; reason: string | null; topType: string | null}>>((acc, s, i) => {
     if (i === 0 || 
       s.content_distribution_videos !== snapshots[i-1].content_distribution_videos ||
@@ -249,39 +277,80 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     return acc;
   }, []);
 
+  const formatNumber = (n: number) => {
+    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+    return n.toString();
+  };
+
   return (
     <div className="space-y-4 pb-4">
-      {/* 1. Macro Goal - All priorities active */}
+      {/* 0. Sync Bar */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium">Crescimento & Analytics</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              {PERIOD_OPTIONS.map(p => (
+                <Button
+                  key={p.value}
+                  variant={period === p.value ? "default" : "ghost"}
+                  size="sm"
+                  className="h-6 text-[10px] px-2"
+                  onClick={() => setPeriod(p.value)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 text-[10px]"
+              onClick={handleSync}
+              disabled={syncing}
+            >
+              {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+              Sincronizar
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 1. KPI Cards — Real Instagram Metrics */}
+      {topPosts.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} />
+            <KPICard icon={<MessageCircle className="h-4 w-4 text-primary" />} label="Comentários" value={formatNumber(totalComments)} />
+            <KPICard icon={<Bookmark className="h-4 w-4 text-amber-500" />} label="Salvamentos" value={formatNumber(totalSaves)} />
+            <KPICard icon={<Eye className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
+          </div>
+        </motion.div>
+      )}
+
+      {/* 2. All priorities active */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>
         <Card className="border-primary/20 overflow-hidden">
           <div className="h-1 w-full neural-gradient" />
-          <CardHeader className="pb-2 pt-4">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Target className="h-4 w-4 text-primary" />
-              Prioridades do Agente
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-2">
+          <CardContent className="p-3 space-y-2">
+            <div className="grid grid-cols-4 gap-1.5">
               {GOAL_OPTIONS.map((goal) => (
-                <div
-                  key={goal.value}
-                  className="flex items-center gap-2 p-2.5 rounded-lg border border-primary/50 bg-primary/10 shadow-sm text-left text-xs"
-                >
-                  <goal.icon className={cn("h-3.5 w-3.5 shrink-0", goal.color)} />
-                  <span className="font-medium">{goal.label}</span>
+                <div key={goal.value} className="flex items-center gap-1.5 p-2 rounded-lg border border-primary/30 bg-primary/5 text-[10px]">
+                  <goal.icon className={cn("h-3 w-3 shrink-0", goal.color)} />
+                  <span className="font-medium truncate">{goal.label}</span>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-center text-muted-foreground/70">
-              O agente trabalha todas as prioridades simultaneamente para atingir o objetivo macro
-            </p>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* 2. Growth Progress */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+      {/* 3. Weekly Progress */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-2 pt-4">
             <CardTitle className="flex items-center gap-2 text-base">
@@ -289,46 +358,16 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
               Progresso Semanal
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <Eye className="h-3 w-3 text-blue-500" /> Alcance
-                </span>
-                <span className="font-mono font-bold">
-                  {weeklyViews.toLocaleString()} <span className="text-muted-foreground font-normal">/ {goalViews.toLocaleString()}</span>
-                </span>
-              </div>
-              <Progress value={viewsProgress} className="h-2" />
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <Users className="h-3 w-3 text-purple-500" /> Seguidores
-                </span>
-                <span className="font-mono font-bold">
-                  +{weeklyFollowers} <span className="text-muted-foreground font-normal">/ +{goalFollowers}</span>
-                </span>
-              </div>
-              <Progress value={followersProgress} className="h-2" />
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <TrendingUp className="h-3 w-3 text-emerald-500" /> Engajamento
-                </span>
-                <span className="font-mono font-bold">
-                  {weeklyEngagement.toFixed(1)}% <span className="text-muted-foreground font-normal">/ {goalEngagement}%</span>
-                </span>
-              </div>
-              <Progress value={engagementProgress} className="h-2" />
-            </div>
+          <CardContent className="space-y-3">
+            <ProgressRow icon={<Eye className="h-3 w-3 text-blue-500" />} label="Alcance" current={weeklyViews} goal={goalViews} progress={viewsProgress} />
+            <ProgressRow icon={<Users className="h-3 w-3 text-purple-500" />} label="Seguidores" current={weeklyFollowers} goal={goalFollowers} progress={followersProgress} prefix="+" />
+            <ProgressRow icon={<TrendingUp className="h-3 w-3 text-emerald-500" />} label="Engajamento" current={weeklyEngagement} goal={goalEngagement} progress={engagementProgress} suffix="%" decimal />
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* 3. Current Strategy */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      {/* 4. Strategy */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-2 pt-4">
             <div className="flex items-center justify-between">
@@ -337,14 +376,8 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                 Estratégia Atual
               </CardTitle>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground">
-                  {isAutoStrategy ? 'Auto' : 'Manual'}
-                </span>
-                <Switch 
-                  checked={isAutoStrategy} 
-                  onCheckedChange={setIsAutoStrategy}
-                  className="scale-75"
-                />
+                <span className="text-[10px] text-muted-foreground">{isAutoStrategy ? 'Auto' : 'Manual'}</span>
+                <Switch checked={isAutoStrategy} onCheckedChange={setIsAutoStrategy} className="scale-75" />
               </div>
             </div>
           </CardHeader>
@@ -361,122 +394,92 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                 {getStrategyReason()}
               </p>
             </div>
-            {isAutoStrategy && (
-              <p className="text-[10px] text-center text-muted-foreground/70">
-                Definido automaticamente pelo agente com base no desempenho
-              </p>
-            )}
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* 4. EVOLUTION — Real Instagram Data */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+      {/* 5. Post Type Distribution (from Analytics) + Evolution Chart */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-2 pt-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <BarChart3 className="h-4 w-4 text-blue-500" />
-                Evolução Real
-              </CardTitle>
-              <div className="flex gap-1">
-                {PERIOD_OPTIONS.map(p => (
-                  <Button
-                    key={p.value}
-                    variant={period === p.value ? "default" : "ghost"}
-                    size="sm"
-                    className="h-6 text-[10px] px-2"
-                    onClick={() => setPeriod(p.value)}
-                  >
-                    {p.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BarChart3 className="h-4 w-4 text-blue-500" />
+              Evolução & Distribuição
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {loadingSnapshots ? (
-              <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">
-                Carregando dados...
-              </div>
-            ) : snapshots.length === 0 ? (
-              <div className="p-4 rounded-lg bg-muted/30 border border-border/30 text-center">
+              <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">Carregando...</div>
+            ) : snapshots.length === 0 && topPosts.length === 0 ? (
+              <div className="p-4 rounded-lg bg-muted/30 border text-center">
                 <Calendar className="h-6 w-6 mx-auto text-muted-foreground/50 mb-2" />
                 <p className="text-xs text-muted-foreground">
-                  Ainda não há dados históricos. Os snapshots são salvos automaticamente a cada sync de métricas.
-                </p>
-                <p className="text-[10px] text-muted-foreground/60 mt-1">
-                  Clique em "Sincronizar do Instagram" na aba Analytics para gerar o primeiro snapshot.
+                  Sem dados ainda. Clique em "Sincronizar" para importar métricas do Instagram.
                 </p>
               </div>
             ) : (
               <>
-                {/* Trend summary cards */}
+                {/* Trend Cards */}
                 <div className="grid grid-cols-3 gap-2">
-                  <TrendCard 
-                    icon={<Users className="h-3 w-3 text-purple-500" />}
-                    label="Seguidores"
-                    value={snapshots[snapshots.length - 1]?.followers_count?.toLocaleString() || '0'}
-                    trend={followersTrend}
-                    TrendIcon={TrendIcon}
-                  />
-                  <TrendCard 
-                    icon={<Eye className="h-3 w-3 text-blue-500" />}
-                    label="Alcance"
-                    value={(snapshots[snapshots.length - 1]?.total_reach || 0) > 1000 
-                      ? `${((snapshots[snapshots.length - 1]?.total_reach || 0) / 1000).toFixed(1)}k`
-                      : String(snapshots[snapshots.length - 1]?.total_reach || 0)}
-                    trend={reachTrend}
-                    TrendIcon={TrendIcon}
-                    formatValue={(v) => v > 1000 ? `${(v/1000).toFixed(1)}k` : String(v)}
-                  />
-                  <TrendCard 
-                    icon={<TrendingUp className="h-3 w-3 text-emerald-500" />}
-                    label="Engage"
-                    value={`${Number(snapshots[snapshots.length - 1]?.avg_engagement || 0).toFixed(1)}%`}
-                    trend={engagementTrend}
-                    TrendIcon={TrendIcon}
-                    suffix="%"
-                  />
+                  <TrendCard icon={<Users className="h-3 w-3 text-purple-500" />} label="Seguidores" value={snapshots.length > 0 ? snapshots[snapshots.length - 1]?.followers_count?.toLocaleString() || '0' : '—'} trend={followersTrend} TrendIcon={TrendIcon} />
+                  <TrendCard icon={<Eye className="h-3 w-3 text-blue-500" />} label="Alcance" value={snapshots.length > 0 ? formatNumber(snapshots[snapshots.length - 1]?.total_reach || 0) : '—'} trend={reachTrend} TrendIcon={TrendIcon} formatValue={(v) => formatNumber(v)} />
+                  <TrendCard icon={<TrendingUp className="h-3 w-3 text-emerald-500" />} label="Engage" value={snapshots.length > 0 ? `${Number(snapshots[snapshots.length - 1]?.avg_engagement || 0).toFixed(1)}%` : '—'} trend={engagementTrend} TrendIcon={TrendIcon} suffix="%" />
                 </div>
 
-                {/* Reach chart */}
-                {chartData.length > 1 && (
-                  <div className="h-32">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={chartData}>
-                        <defs>
-                          <linearGradient id="reachGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <XAxis dataKey="date" tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
-                        <YAxis tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" width={35} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            background: 'hsl(var(--card))', 
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px',
-                            fontSize: '11px'
-                          }}
-                          formatter={(value: number, name: string) => {
-                            const labels: Record<string, string> = { reach: 'Alcance', followers: 'Seguidores', engagement: 'Engajamento' };
-                            return [value.toLocaleString(), labels[name] || name];
-                          }}
-                        />
-                        <Area type="monotone" dataKey="reach" stroke="hsl(var(--primary))" fill="url(#reachGrad)" strokeWidth={2} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
+                {/* Charts side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Reach line chart */}
+                  {chartData.length > 1 && (
+                    <div className="h-32">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={chartData}>
+                          <defs>
+                            <linearGradient id="reachGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <XAxis dataKey="date" tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
+                          <YAxis tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" width={30} />
+                          <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '11px' }} />
+                          <Area type="monotone" dataKey="reach" stroke="hsl(var(--primary))" fill="url(#reachGrad)" strokeWidth={2} name="Alcance" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {/* Pie chart — post type distribution */}
+                  {pieData.length > 0 && (
+                    <div className="h-32 flex items-center justify-center gap-3">
+                      <div className="h-28 w-28">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie data={pieData} cx="50%" cy="50%" innerRadius={25} outerRadius={45} paddingAngle={4} dataKey="value">
+                              {pieData.map((_, i) => (
+                                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '11px' }} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        {pieData.map((entry, i) => (
+                          <div key={entry.name} className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                            <span className="text-[10px] text-muted-foreground">{entry.name} ({entry.value})</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Strategy evolution timeline */}
                 {strategyChanges.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                      <Brain className="h-3 w-3" />
-                      Evolução da Estratégia
+                      <Brain className="h-3 w-3" /> Evolução da Estratégia
                     </h4>
                     <div className="space-y-1.5 max-h-40 overflow-y-auto">
                       {strategyChanges.map((change, i) => {
@@ -497,9 +500,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                               <MiniBar label="N" value={change.news} total={total} color="bg-amber-500" />
                               <MiniBar label="I" value={change.images} total={total} color="bg-pink-500" />
                             </div>
-                            {change.reason && (
-                              <p className="text-[9px] text-muted-foreground/70 mt-1 line-clamp-1">{change.reason}</p>
-                            )}
+                            {change.reason && <p className="text-[9px] text-muted-foreground/70 mt-1 line-clamp-1">{change.reason}</p>}
                           </div>
                         );
                       })}
@@ -512,35 +513,22 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* Top Posts Ranking */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }}>
+      {/* 6. Top Posts Ranking */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-2 pt-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Trophy className="h-4 w-4 text-yellow-500" />
-                Top Posts por Alcance
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 gap-1 text-[10px]"
-                onClick={handleSync}
-                disabled={syncing}
-              >
-                <RefreshCw className={cn("h-3 w-3", syncing && "animate-spin")} />
-                {syncing ? 'Sincronizando...' : 'Sincronizar'}
-              </Button>
-            </div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Trophy className="h-4 w-4 text-yellow-500" />
+              Top Posts
+              {topPosts.length > 0 && <Badge variant="secondary" className="text-[10px]">{topPosts.length} posts</Badge>}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {loadingTopPosts ? (
-              <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">
-                Carregando...
-              </div>
+              <div className="h-20 flex items-center justify-center text-xs text-muted-foreground">Carregando...</div>
             ) : topPosts.length === 0 ? (
-              <div className="p-3 rounded-lg bg-muted/30 border border-border/30 text-center">
-                <p className="text-xs text-muted-foreground">Nenhum post com métricas reais encontrado nos últimos {period} dias.</p>
+              <div className="p-3 rounded-lg bg-muted/30 border text-center">
+                <p className="text-xs text-muted-foreground">Nenhum post com métricas reais nos últimos {period} dias.</p>
               </div>
             ) : (
               <div className="space-y-1.5 max-h-60 overflow-y-auto">
@@ -564,36 +552,20 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                         i === 1 ? "bg-muted text-muted-foreground" :
                         i === 2 ? "bg-orange-500/20 text-orange-500" :
                         "bg-muted/50 text-muted-foreground"
-                      )}>
-                        {i + 1}
-                      </div>
-                      {post.image_url && (
-                        <img src={post.image_url} alt="" className="w-8 h-8 rounded object-cover shrink-0" />
-                      )}
+                      )}>{i + 1}</div>
+                      {post.image_url && <img src={post.image_url} alt="" className="w-8 h-8 rounded object-cover shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-medium line-clamp-1">{post.caption}</p>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Eye className="h-2.5 w-2.5" /> {post.reach.toLocaleString()}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}
-                          </span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {post.reach.toLocaleString()}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
                           <Badge variant="outline" className="text-[8px] h-3.5 px-1">{mediaLabel}</Badge>
                           <span className="text-[9px] text-emerald-500 font-medium">{engRate}% eng</span>
-                          {post.published_at && (
-                            <span className="text-[9px] text-muted-foreground/60">
-                              {new Date(post.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                            </span>
-                          )}
+                          {post.published_at && <span className="text-[9px] text-muted-foreground/60">{new Date(post.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>}
                         </div>
                       </div>
                     </div>
@@ -601,20 +573,36 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                 })}
               </div>
             )}
-            {topPosts.length > 0 && (
-              <div className="p-2 rounded-lg bg-primary/5 border border-primary/10">
-                <p className="text-[10px] text-muted-foreground">
-                  <Sparkles className="h-3 w-3 inline mr-1 text-primary" />
-                  O agente analisa esses dados para priorizar tipos de conteúdo com maior alcance e ajustar a estratégia automaticamente.
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
       </motion.div>
 
+      {/* 7. Best Hashtags */}
+      {bestHashtags.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
+          <Card className="border-border/50">
+            <CardHeader className="pb-2 pt-4">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Hash className="h-4 w-4 text-primary" />
+                Hashtags de Alto Desempenho
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-1.5">
+                {bestHashtags.map((tag, i) => (
+                  <Badge key={tag} variant="secondary" className="text-xs" style={{ opacity: 1 - i * 0.07 }}>
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* 8. Insights */}
       {(insights.length > 0 || topTopics.length > 0) && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>
           <Card className="border-border/50">
             <CardHeader className="pb-2 pt-4">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -632,15 +620,60 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
               {topTopics.length > 0 && (
                 <div className="flex items-start gap-2 p-2 rounded-lg bg-primary/5 border border-primary/10">
                   <TrendingUp className="h-3 w-3 text-primary mt-0.5 shrink-0" />
-                  <p className="text-xs text-foreground/80">
-                    Tópicos fortes: <strong>{topTopics.join(', ')}</strong>
-                  </p>
+                  <p className="text-xs text-foreground/80">Tópicos fortes: <strong>{topTopics.join(', ')}</strong></p>
                 </div>
               )}
             </CardContent>
           </Card>
         </motion.div>
       )}
+
+      {/* Agent self-improvement note */}
+      {topPosts.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <p className="text-[11px] text-muted-foreground">
+              <Sparkles className="h-3 w-3 inline mr-1 text-primary" />
+              O agente usa todos esses dados (KPIs, top posts, hashtags, distribuição) para ajustar a estratégia automaticamente e atingir o objetivo macro mais rápido.
+            </p>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+// ── Sub-components ──
+
+function KPICard({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub?: string }) {
+  return (
+    <Card className="border-border/50">
+      <CardContent className="p-3">
+        <div className="flex items-center gap-2.5">
+          {icon}
+          <div>
+            <p className="text-lg font-bold leading-none">{value}</p>
+            <p className="text-[10px] text-muted-foreground">{label}</p>
+            {sub && <p className="text-[9px] text-emerald-500 font-medium">{sub}</p>}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ProgressRow({ icon, label, current, goal, progress, prefix, suffix, decimal }: {
+  icon: React.ReactNode; label: string; current: number; goal: number; progress: number; prefix?: string; suffix?: string; decimal?: boolean;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-xs">
+        <span className="flex items-center gap-1.5 text-muted-foreground">{icon} {label}</span>
+        <span className="font-mono font-bold">
+          {prefix}{decimal ? current.toFixed(1) : current.toLocaleString()}{suffix} <span className="text-muted-foreground font-normal">/ {prefix}{decimal ? goal.toFixed(1) : goal.toLocaleString()}{suffix}</span>
+        </span>
+      </div>
+      <Progress value={progress} className="h-2" />
     </div>
   );
 }
@@ -677,29 +710,17 @@ function MiniBar({ label, value, total, color }: { label: string; value: number;
 }
 
 function TrendCard({ icon, label, value, trend, TrendIcon, formatValue, suffix }: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
+  icon: React.ReactNode; label: string; value: string;
   trend: { direction: 'up' | 'down' | 'neutral'; value: number };
   TrendIcon: React.FC<{ direction: 'up' | 'down' | 'neutral' }>;
-  formatValue?: (v: number) => string;
-  suffix?: string;
+  formatValue?: (v: number) => string; suffix?: string;
 }) {
   const displayDiff = formatValue ? formatValue(trend.value) : (suffix ? `${trend.value.toFixed(1)}${suffix}` : trend.value.toLocaleString());
   return (
     <div className="p-2 rounded-lg bg-muted/30 border border-border/30">
-      <div className="flex items-center gap-1 mb-1">
-        {icon}
-        <span className="text-[10px] text-muted-foreground">{label}</span>
-      </div>
-      <div className="flex items-center gap-1">
-        <span className="text-sm font-bold font-mono">{value}</span>
-        <TrendIcon direction={trend.direction} />
-      </div>
-      <p className={cn("text-[10px] font-mono", 
-        trend.direction === 'up' ? 'text-emerald-500' : 
-        trend.direction === 'down' ? 'text-red-500' : 'text-muted-foreground'
-      )}>
+      <div className="flex items-center gap-1 mb-1">{icon}<span className="text-[10px] text-muted-foreground">{label}</span></div>
+      <div className="flex items-center gap-1"><span className="text-sm font-bold font-mono">{value}</span><TrendIcon direction={trend.direction} /></div>
+      <p className={cn("text-[10px] font-mono", trend.direction === 'up' ? 'text-emerald-500' : trend.direction === 'down' ? 'text-red-500' : 'text-muted-foreground')}>
         {trend.direction === 'up' ? '+' : trend.direction === 'down' ? '-' : ''}{displayDiff}
       </p>
     </div>

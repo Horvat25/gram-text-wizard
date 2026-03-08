@@ -5,23 +5,13 @@ import Header from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { 
-  Sparkles, 
   CalendarDays, 
-  BarChart3, 
   History, 
-  Lightbulb, 
-  Newspaper, 
   Bot,
   ChevronLeft,
-  ChevronRight,
-  LayoutDashboard
 } from "lucide-react";
-import ContentCreationTab from "@/components/tabs/ContentCreationTab";
 import PublicationQueueTab from "@/components/tabs/PublicationQueueTab";
-import AnalyticsTab from "@/components/tabs/AnalyticsTab";
 import { PostHistoryTab } from "@/components/tabs/PostHistoryTab";
-import { SuggestionsTab } from "@/components/tabs/SuggestionsTab";
-import { LatestNewsTab } from "@/components/tabs/LatestNewsTab";
 
 import AgentTab from "@/components/tabs/AgentTab";
 import PlatformSelector, { Platform } from "@/components/PlatformSelector";
@@ -34,7 +24,7 @@ import { VideoRenderingProvider } from "@/contexts/VideoRenderingContext";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "create");
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "queue");
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>("instagram");
   const [showDashboard, setShowDashboard] = useState(false);
   
@@ -151,13 +141,12 @@ const Index = () => {
             exit={{ opacity: 0, x: -50 }}
             className="h-screen flex flex-col"
           >
-            {/* Agent Tab - Full Height */}
             <div className="flex-1 overflow-hidden">
               <AgentTab onNavigate={handleNavigateFromAgent} />
             </div>
           </motion.div>
         ) : (
-          /* DASHBOARD VIEW - Traditional tabs */
+          /* DASHBOARD VIEW - Queue & History */
           <motion.div
             key="dashboard"
             initial={{ opacity: 0, x: 50 }}
@@ -210,19 +199,7 @@ const Index = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-                      <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
-                        <TabsTrigger value="create" className="flex items-center gap-2">
-                          <Sparkles className="h-4 w-4" />
-                          <span className="hidden sm:inline">Criação</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="news" className="flex items-center gap-2">
-                          <Newspaper className="h-4 w-4" />
-                          <span className="hidden sm:inline">Notícias</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="suggestions" className="flex items-center gap-2">
-                          <Lightbulb className="h-4 w-4" />
-                          <span className="hidden sm:inline">Sugestões</span>
-                        </TabsTrigger>
+                      <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:inline-grid">
                         <TabsTrigger value="queue" className="flex items-center gap-2">
                           <CalendarDays className="h-4 w-4" />
                           <span className="hidden sm:inline">Fila</span>
@@ -231,23 +208,7 @@ const Index = () => {
                           <History className="h-4 w-4" />
                           <span className="hidden sm:inline">Histórico</span>
                         </TabsTrigger>
-                        <TabsTrigger value="analytics" className="flex items-center gap-2">
-                          <BarChart3 className="h-4 w-4" />
-                          <span className="hidden sm:inline">Analytics</span>
-                        </TabsTrigger>
                       </TabsList>
-
-                      <TabsContent value="create" className="space-y-6">
-                        <ContentCreationTab onPostCreated={createPost} />
-                      </TabsContent>
-
-                      <TabsContent value="news" className="space-y-6">
-                        <LatestNewsTab onPostCreated={createPost} />
-                      </TabsContent>
-
-                      <TabsContent value="suggestions" className="space-y-6">
-                        <SuggestionsTab />
-                      </TabsContent>
 
                       <TabsContent value="queue" className="space-y-6">
                         <PublicationQueueTab
@@ -261,10 +222,6 @@ const Index = () => {
 
                       <TabsContent value="history" className="space-y-6">
                         <PostHistoryTab />
-                      </TabsContent>
-
-                      <TabsContent value="analytics" className="space-y-6">
-                        <AnalyticsTab posts={posts} onRefresh={fetchPosts} />
                       </TabsContent>
                     </Tabs>
                   </motion.div>
