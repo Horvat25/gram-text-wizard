@@ -129,9 +129,68 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setLoadingTopPosts(false);
   };
 
+  const fetchSourceRankings = async () => {
+    if (!currentWorkspace?.id) return;
+    // Get rss_items that were used in posts
+    const { data: rssItems } = await supabase
+      .from('rss_items')
+      .select('source_name, used_in_post_id')
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('is_used', true)
+      .not('used_in_post_id', 'is', null);
+
+    if (!rssItems || rssItems.length === 0) {
+      setSourceRankings([]);
+      return;
+    }
+
+    // Get the post IDs and fetch their metrics
+    const postIds = rssItems.map(r => r.used_in_post_id).filter(Boolean) as string[];
+    const { data: posts } = await supabase
+      .from('posts')
+      .select('id, reach, likes_count, comments_count, saves_count, shares_count')
+      .in('id', postIds)
+      .eq('status', 'published');
+
+    // Map post metrics by id
+    const postMap: Record<string, any> = {};
+    (posts || []).forEach(p => { postMap[p.id] = p; });
+
+    // Aggregate by source
+    const sourceMap: Record<string, { count: number; reach: number; likes: number; saves: number; engagement: number }> = {};
+    rssItems.forEach(item => {
+      const post = postMap[item.used_in_post_id!];
+      if (!post) return;
+      if (!sourceMap[item.source_name]) {
+        sourceMap[item.source_name] = { count: 0, reach: 0, likes: 0, saves: 0, engagement: 0 };
+      }
+      const s = sourceMap[item.source_name];
+      s.count++;
+      s.reach += post.reach || 0;
+      s.likes += post.likes_count || 0;
+      s.saves += post.saves_count || 0;
+      const eng = (post.likes_count || 0) + (post.comments_count || 0) + (post.saves_count || 0) + (post.shares_count || 0);
+      s.engagement += post.reach > 0 ? (eng / post.reach) * 100 : 0;
+    });
+
+    const rankings: SourceRanking[] = Object.entries(sourceMap)
+      .map(([name, s]) => ({
+        sourceName: name,
+        postCount: s.count,
+        totalReach: s.reach,
+        totalLikes: s.likes,
+        totalSaves: s.saves,
+        avgEngagement: s.count > 0 ? s.engagement / s.count : 0,
+      }))
+      .sort((a, b) => b.totalReach - a.totalReach);
+
+    setSourceRankings(rankings);
+  };
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
     fetchTopPosts();
+    fetchSourceRankings();
   }, [currentWorkspace?.id, period]);
 
   // Derived analytics from topPosts
