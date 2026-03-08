@@ -47,7 +47,7 @@ serve(async (req) => {
     // Fetch posts batch
     const { data: posts, error: postsError } = await supabase
       .from("posts")
-      .select("id, instagram_post_id, media_type")
+      .select("id, instagram_post_id, media_type, reach, impressions, saves_count, shares_count")
       .eq("status", "published")
       .not("instagram_post_id", "is", null)
       .order("published_at", { ascending: false })
