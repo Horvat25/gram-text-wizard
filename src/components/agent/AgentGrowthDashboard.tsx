@@ -40,6 +40,7 @@ interface TopPost {
   id: string;
   caption: string;
   reach: number;
+  impressions: number;
   likes_count: number;
   comments_count: number;
   saves_count: number;
@@ -103,7 +104,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     since.setDate(since.getDate() - period);
     const { data } = await supabase
       .from('posts')
-      .select('id, caption, reach, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at, hashtags, post_type')
+      .select('id, caption, reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at, hashtags, post_type')
       .eq('workspace_id', currentWorkspace.id)
       .eq('status', 'published')
       .not('instagram_post_id', 'is', null)
@@ -124,6 +125,8 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalComments = topPosts.reduce((s, p) => s + (p.comments_count || 0), 0);
   const totalSaves = topPosts.reduce((s, p) => s + (p.saves_count || 0), 0);
   const totalReach = topPosts.reduce((s, p) => s + (p.reach || 0), 0);
+  const totalImpressions = topPosts.reduce((s, p) => s + (p.impressions || 0), 0);
+  const totalViews = totalImpressions > 0 ? totalImpressions : totalReach; // impressions = views, fallback to reach
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   // Progress based on period data vs goals
