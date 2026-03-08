@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_links: {
+        Row: {
+          affiliate_url: string
+          category: string | null
+          commission_info: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          last_posted_at: string | null
+          posts_count: number | null
+          product_name: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          affiliate_url: string
+          category?: string | null
+          commission_info?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          last_posted_at?: string | null
+          posts_count?: number | null
+          product_name: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          affiliate_url?: string
+          category?: string | null
+          commission_info?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          last_posted_at?: string | null
+          posts_count?: number | null
+          product_name?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_links_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_chat_messages: {
         Row: {
           actions: Json | null
