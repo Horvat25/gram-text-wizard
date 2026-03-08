@@ -166,7 +166,6 @@ export default function AgentMarketingPanel() {
     setAffiliateUrl('');
     setDescription('');
     setMediaFormats(['image']);
-    setPostFrequency(4);
     setMarketingStrategy('');
     setSiteAnalysis('');
     setAnalysisSources(null);
@@ -180,7 +179,6 @@ export default function AgentMarketingPanel() {
     setDescription(link.description || '');
     const formats = link.media_format ? link.media_format.split(',') : ['image'];
     setMediaFormats(formats);
-    setPostFrequency(link.post_frequency || 4);
     setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
     setAnalysisSources(null);
@@ -201,7 +199,6 @@ export default function AgentMarketingPanel() {
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
         media_format: mediaFormats.join(','),
-        post_frequency: postFrequency,
         marketing_strategy: marketingStrategy.trim() || null,
       };
 
