@@ -35,6 +35,21 @@ interface AgentDecision {
   expectedEngagement?: number;
 }
 
+interface HistoricalPerformance {
+  avgReachPerPost: number;
+  avgEngagement: number;
+  totalPosts: number;
+  bestMediaType: string | null;
+  bestMediaTypeAvgReach: number;
+  worstMediaType: string | null;
+  topPostCaption: string | null;
+  topPostReach: number;
+  reelsAvgReach: number;
+  newsAvgReach: number;
+  carouselAvgReach: number;
+  imageAvgReach: number;
+}
+
 interface AgentState {
   avgEngagement: number;
   lastPostHours: number;
@@ -48,6 +63,8 @@ interface AgentState {
   weeklyGoals: ContentDistribution;
   weeklyProgress: ContentDistribution;
   nextContentType: ContentType | null;
+  // 30-day historical analysis
+  historical30d: HistoricalPerformance;
 }
 
 // Calculate engagement rate
@@ -312,6 +329,63 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
   console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
   
+  // ===== 30-DAY HISTORICAL ANALYSIS (like a senior marketer would do) =====
+  const days30Ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const { data: histPosts } = await supabase
+    .from('posts')
+    .select('reach, likes_count, comments_count, saves_count, media_type, post_type, caption, instagram_post_id')
+    .eq('workspace_id', workspaceId)
+    .eq('status', 'published')
+    .not('instagram_post_id', 'is', null)
+    .gt('reach', 10) // Only real synced metrics
+    .gte('published_at', days30Ago.toISOString())
+    .order('reach', { ascending: false });
+  
+  const realPosts = histPosts || [];
+  
+  // Analyze by media type
+  const typeAnalysis: Record<string, { totalReach: number; count: number; totalEng: number }> = {};
+  for (const p of realPosts) {
+    const mt = (p.media_type === 'reels' || p.media_type === 'reel') ? 'reels' 
+      : p.post_type === 'noticia' ? 'news' 
+      : p.media_type === 'carousel' ? 'carousel' 
+      : 'image';
+    if (!typeAnalysis[mt]) typeAnalysis[mt] = { totalReach: 0, count: 0, totalEng: 0 };
+    typeAnalysis[mt].totalReach += (p.reach || 0);
+    typeAnalysis[mt].count += 1;
+    typeAnalysis[mt].totalEng += (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
+  }
+  
+  const getTypeAvgReach = (t: string) => typeAnalysis[t] ? Math.round(typeAnalysis[t].totalReach / typeAnalysis[t].count) : 0;
+  
+  const sortedTypes = Object.entries(typeAnalysis).sort(([,a],[,b]) => (b.totalReach / b.count) - (a.totalReach / a.count));
+  const totalReach30d = realPosts.reduce((s, p: any) => s + (p.reach || 0), 0);
+  const totalEng30d = realPosts.reduce((s, p: any) => s + (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0), 0);
+  
+  const historical30d: HistoricalPerformance = {
+    avgReachPerPost: realPosts.length > 0 ? Math.round(totalReach30d / realPosts.length) : 0,
+    avgEngagement: realPosts.length > 0 ? Math.round((totalEng30d / totalReach30d) * 1000) / 10 : 0,
+    totalPosts: realPosts.length,
+    bestMediaType: sortedTypes[0]?.[0] || null,
+    bestMediaTypeAvgReach: sortedTypes[0] ? Math.round(sortedTypes[0][1].totalReach / sortedTypes[0][1].count) : 0,
+    worstMediaType: sortedTypes.length > 1 ? sortedTypes[sortedTypes.length - 1][0] : null,
+    topPostCaption: realPosts[0]?.caption?.substring(0, 80) || null,
+    topPostReach: realPosts[0]?.reach || 0,
+    reelsAvgReach: getTypeAvgReach('reels'),
+    newsAvgReach: getTypeAvgReach('news'),
+    carouselAvgReach: getTypeAvgReach('carousel'),
+    imageAvgReach: getTypeAvgReach('image'),
+  };
+  
+  console.log('[AGENT] 📊 30-day analysis:', {
+    totalRealPosts: historical30d.totalPosts,
+    avgReach: historical30d.avgReachPerPost,
+    bestType: historical30d.bestMediaType,
+    bestAvgReach: historical30d.bestMediaTypeAvgReach,
+    reels: `${getTypeAvgReach('reels')} avg (${typeAnalysis['reels']?.count || 0} posts)`,
+    news: `${getTypeAvgReach('news')} avg (${typeAnalysis['news']?.count || 0} posts)`,
+  });
+  
   console.log('[AGENT] Estado analisado:', {
     avgEngagement: avgEngagement.toFixed(2) + '%',
     lastPostHours: Math.round(lastPostHours) + 'h',
@@ -335,7 +409,8 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     recentPosts,
     weeklyGoals,
     weeklyProgress,
-    nextContentType
+    nextContentType,
+    historical30d
   };
 }
 
@@ -348,14 +423,16 @@ function calculateDynamicDailyLimit(state: AgentState): number {
     return state.context?.daily_post_limit || 2;
   }
   
-  // MACRO MODE: Calculate based on objectives progress
+  // MACRO MODE: Use real data from agent_context (updated by sync-instagram-metrics)
   const goalViews = state.context?.goal_weekly_views || 10000;
   const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
   
-  // Calculate current weekly reach from published posts
-  const weeklyReach = state.recentPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
-  const viewsProgress = goalViews > 0 ? (weeklyReach / goalViews) * 100 : 100;
-  const engagementProgress = goalEngagement > 0 ? (state.avgEngagement / goalEngagement) * 100 : 100;
+  // Use SYNCED values from agent_context instead of recalculating from 72h posts
+  const currentWeeklyViews = state.context?.current_weekly_views || 0;
+  const currentWeeklyEngagement = state.context?.current_weekly_engagement || 0;
+  
+  const viewsProgress = goalViews > 0 ? (currentWeeklyViews / goalViews) * 100 : 100;
+  const engagementProgress = goalEngagement > 0 ? (currentWeeklyEngagement / goalEngagement) * 100 : 100;
   
   // Day of week (0=Sun, 6=Sat) - how many days left in the week
   const now = new Date();
@@ -365,28 +442,26 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   const daysLeftInWeek = Math.max(1, 7 - dayOfWeek);
   
   // Use MINIMUM progress - if ANY goal is behind, we need to push harder
-  // Average was causing issues: Views 0% + Engagement 200% = avg 100% (maintenance mode)
-  // With min: Views 0% → far behind → aggressive mode (correct behavior)
-  const avgProgress = Math.min(viewsProgress, engagementProgress);
+  const minProgress = Math.min(viewsProgress, engagementProgress);
   
-  console.log(`[AGENT] Macro objectives: views ${Math.round(viewsProgress)}%, engagement ${Math.round(engagementProgress)}%, MIN progress ${Math.round(avgProgress)}%`);
-  console.log(`[AGENT] Days left in week: ${daysLeftInWeek}, using MIN progress strategy`);
+  console.log(`[AGENT] Macro objectives (from synced data): views ${currentWeeklyViews}/${goalViews} (${Math.round(viewsProgress)}%), engagement ${currentWeeklyEngagement}%/${goalEngagement}% (${Math.round(engagementProgress)}%)`);
+  console.log(`[AGENT] MIN progress: ${Math.round(minProgress)}%, days left: ${daysLeftInWeek}`);
   
   // Dynamic daily limit based on how far behind we are
   let dynamicLimit: number;
-  if (avgProgress >= 100) {
+  if (minProgress >= 100) {
     // Goals met - maintenance mode: 1 post/day
     dynamicLimit = 1;
-  } else if (avgProgress >= 70) {
+  } else if (minProgress >= 70) {
     // Almost there - moderate: 2 posts/day
     dynamicLimit = 2;
-  } else if (avgProgress >= 40) {
+  } else if (minProgress >= 40) {
     // Behind - aggressive: 3 posts/day
     dynamicLimit = 3;
   } else {
-    // Far behind - maximum effort: 4 posts/day
-    dynamicLimit = Math.min(4, Math.ceil((100 - avgProgress) / (daysLeftInWeek * 10)));
-    dynamicLimit = Math.max(3, dynamicLimit);
+    // Far behind - maximum effort: 4-5 posts/day
+    // Factor in days left: fewer days = more aggressive
+    dynamicLimit = daysLeftInWeek <= 2 ? 5 : 4;
   }
   
   // Hard cap at 5 posts/day to avoid spam
@@ -410,16 +485,18 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
                         state.weeklyProgress.news + state.weeklyProgress.images;
   
-  // Macro objectives info
+  // Macro objectives info - use SYNCED data from agent_context
   const goalViews = state.context?.goal_weekly_views || 10000;
   const goalFollowers = state.context?.goal_weekly_followers || 100;
   const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
-  const weeklyReach = state.recentPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
+  const weeklyReach = state.context?.current_weekly_views || 0;
+  const currentEngagement = state.context?.current_weekly_engagement || state.avgEngagement;
   
   console.log(`[AGENT] Modo: ${goalType.toUpperCase()}`);
   console.log(`[AGENT] Meta semanal: ${totalProgress} posts criados`);
   console.log(`[AGENT] Limite diário dinâmico: ${state.postsToday}/${dynamicDailyLimit} posts CRIADOS hoje`);
-  console.log(`[AGENT] Objetivos macro: views ${weeklyReach}/${goalViews}, engagement ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%`);
+  console.log(`[AGENT] Objetivos macro (synced): views ${weeklyReach}/${goalViews}, engagement ${currentEngagement}%/${goalEngagement}%`);
+  console.log(`[AGENT] 📊 30d history: ${state.historical30d.totalPosts} posts reais, avg reach ${state.historical30d.avgReachPerPost}, best type: ${state.historical30d.bestMediaType}`);
   console.log(`[AGENT] Próximo tipo de conteúdo: ${state.nextContentType || 'meta completa'}`);
   
   // Dynamic daily limit check
@@ -427,8 +504,8 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     console.log(`[AGENT] Limite diário dinâmico atingido (${dynamicDailyLimit}) - PARAR por hoje`);
     return {
       decision: 'NO_POST',
-      reason: `🎯 Limite diário inteligente atingido! ${state.postsToday}/${dynamicDailyLimit} posts hoje. Objetivos: Views ${Math.round((weeklyReach/goalViews)*100)}%, Engajamento ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%.`,
-      hypothesis: 'O agente ajusta automaticamente a frequência com base nos objetivos macro.'
+      reason: `🎯 Limite diário inteligente atingido! ${state.postsToday}/${dynamicDailyLimit} posts hoje. Objetivos: Views ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%), Engajamento ${currentEngagement}%/${goalEngagement}%. Análise 30d: melhor formato = ${state.historical30d.bestMediaType || 'N/A'} (avg ${state.historical30d.bestMediaTypeAvgReach} alcance).`,
+      hypothesis: 'O agente ajusta automaticamente a frequência com base nos objetivos macro e histórico de 30 dias.'
     };
   }
   
@@ -446,13 +523,13 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   if (!state.nextContentType && goalType === 'macro') {
     // Check if macro objectives are met
     const viewsMet = weeklyReach >= goalViews;
-    const engagementMet = state.avgEngagement >= goalEngagement;
+    const engagementMet = currentEngagement >= goalEngagement;
     
     if (viewsMet && engagementMet) {
       console.log('[AGENT] Objetivos macro alcançados!');
       return {
         decision: 'NO_POST',
-        reason: `🏆 Objetivos macro alcançados! Views: ${weeklyReach}/${goalViews}, Engajamento: ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%. Modo manutenção ativo.`
+        reason: `🏆 Objetivos macro alcançados! Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()}, Engajamento: ${currentEngagement}%/${goalEngagement}%. Modo manutenção ativo.`
       };
     }
     
@@ -494,22 +571,33 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   // For 'news' type: skip AI theme refinement - the RSS ranking already picks the best article
   // This saves 1 AI call per news post (significant cost reduction)
   if (state.nextContentType !== 'news') {
-    const systemPrompt = `Você é um especialista em conteúdo tech. 
+    const h = state.historical30d;
+    const systemPrompt = `Você é um diretor de marketing digital sênior especializado em growth hacking para Instagram.
 O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType.format}).
 
-PROGRESSO SEMANAL:
+📊 ANÁLISE DE 30 DIAS (dados reais do Instagram):
+- ${h.totalPosts} posts com métricas reais sincronizadas
+- Alcance médio por post: ${h.avgReachPerPost.toLocaleString()}
+- Engajamento médio: ${h.avgEngagement}%
+- Melhor formato: ${h.bestMediaType || 'N/A'} (alcance médio: ${h.bestMediaTypeAvgReach.toLocaleString()})
+- Pior formato: ${h.worstMediaType || 'N/A'}
+- Reels: avg ${h.reelsAvgReach.toLocaleString()} alcance | Notícias: avg ${h.newsAvgReach.toLocaleString()} | Carrosséis: avg ${h.carouselAvgReach.toLocaleString()} | Imagens: avg ${h.imageAvgReach.toLocaleString()}
+${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()}): "${h.topPostCaption}..."` : ''}
+
+📈 PROGRESSO SEMANAL:
 - Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
 - Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
 
-CONTEXTO:
-- Engajamento médio: ${state.avgEngagement.toFixed(2)}%
-- Formatos vencedores: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
-- Evitar temas: ${state.saturatedTopics.join(', ') || 'nenhum'}
+🎯 OBJETIVOS MACRO:
+- Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%)
+- Engajamento: ${currentEngagement}%/${goalEngagement}%
 
-Sugira um tema ESPECÍFICO e atual para o ${state.nextContentType}.
-Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
+INSIGHTS DO AGENTE: ${(state.context?.success_patterns || []).join(' | ') || 'Coletando dados...'}
+
+Com base nesses dados REAIS, sugira um tema ESPECÍFICO e atual que maximize o alcance para ${state.nextContentType}.
+Priorize temas que funcionaram bem no histórico. Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
 
     try {
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
