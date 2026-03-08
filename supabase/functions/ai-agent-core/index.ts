@@ -370,7 +370,7 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   const avgProgress = Math.min(viewsProgress, engagementProgress);
   
   console.log(`[AGENT] Macro objectives: views ${Math.round(viewsProgress)}%, engagement ${Math.round(engagementProgress)}%, MIN progress ${Math.round(avgProgress)}%`);
-  console.log(`[AGENT] Days left in week: ${daysLeftInWeek}`);
+  console.log(`[AGENT] Days left in week: ${daysLeftInWeek}, using MIN progress strategy`);
   
   // Dynamic daily limit based on how far behind we are
   let dynamicLimit: number;
