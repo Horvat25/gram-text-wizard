@@ -329,6 +329,63 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
   console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
   
+  // ===== 30-DAY HISTORICAL ANALYSIS (like a senior marketer would do) =====
+  const days30Ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const { data: histPosts } = await supabase
+    .from('posts')
+    .select('reach, likes_count, comments_count, saves_count, media_type, post_type, caption, instagram_post_id')
+    .eq('workspace_id', workspaceId)
+    .eq('status', 'published')
+    .not('instagram_post_id', 'is', null)
+    .gt('reach', 10) // Only real synced metrics
+    .gte('published_at', days30Ago.toISOString())
+    .order('reach', { ascending: false });
+  
+  const realPosts = histPosts || [];
+  
+  // Analyze by media type
+  const typeAnalysis: Record<string, { totalReach: number; count: number; totalEng: number }> = {};
+  for (const p of realPosts) {
+    const mt = (p.media_type === 'reels' || p.media_type === 'reel') ? 'reels' 
+      : p.post_type === 'noticia' ? 'news' 
+      : p.media_type === 'carousel' ? 'carousel' 
+      : 'image';
+    if (!typeAnalysis[mt]) typeAnalysis[mt] = { totalReach: 0, count: 0, totalEng: 0 };
+    typeAnalysis[mt].totalReach += (p.reach || 0);
+    typeAnalysis[mt].count += 1;
+    typeAnalysis[mt].totalEng += (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
+  }
+  
+  const getTypeAvgReach = (t: string) => typeAnalysis[t] ? Math.round(typeAnalysis[t].totalReach / typeAnalysis[t].count) : 0;
+  
+  const sortedTypes = Object.entries(typeAnalysis).sort(([,a],[,b]) => (b.totalReach / b.count) - (a.totalReach / a.count));
+  const totalReach30d = realPosts.reduce((s, p: any) => s + (p.reach || 0), 0);
+  const totalEng30d = realPosts.reduce((s, p: any) => s + (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0), 0);
+  
+  const historical30d: HistoricalPerformance = {
+    avgReachPerPost: realPosts.length > 0 ? Math.round(totalReach30d / realPosts.length) : 0,
+    avgEngagement: realPosts.length > 0 ? Math.round((totalEng30d / totalReach30d) * 1000) / 10 : 0,
+    totalPosts: realPosts.length,
+    bestMediaType: sortedTypes[0]?.[0] || null,
+    bestMediaTypeAvgReach: sortedTypes[0] ? Math.round(sortedTypes[0][1].totalReach / sortedTypes[0][1].count) : 0,
+    worstMediaType: sortedTypes.length > 1 ? sortedTypes[sortedTypes.length - 1][0] : null,
+    topPostCaption: realPosts[0]?.caption?.substring(0, 80) || null,
+    topPostReach: realPosts[0]?.reach || 0,
+    reelsAvgReach: getTypeAvgReach('reels'),
+    newsAvgReach: getTypeAvgReach('news'),
+    carouselAvgReach: getTypeAvgReach('carousel'),
+    imageAvgReach: getTypeAvgReach('image'),
+  };
+  
+  console.log('[AGENT] 📊 30-day analysis:', {
+    totalRealPosts: historical30d.totalPosts,
+    avgReach: historical30d.avgReachPerPost,
+    bestType: historical30d.bestMediaType,
+    bestAvgReach: historical30d.bestMediaTypeAvgReach,
+    reels: `${getTypeAvgReach('reels')} avg (${typeAnalysis['reels']?.count || 0} posts)`,
+    news: `${getTypeAvgReach('news')} avg (${typeAnalysis['news']?.count || 0} posts)`,
+  });
+  
   console.log('[AGENT] Estado analisado:', {
     avgEngagement: avgEngagement.toFixed(2) + '%',
     lastPostHours: Math.round(lastPostHours) + 'h',
@@ -352,7 +409,8 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     recentPosts,
     weeklyGoals,
     weeklyProgress,
-    nextContentType
+    nextContentType,
+    historical30d
   };
 }
 
