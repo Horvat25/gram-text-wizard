@@ -348,14 +348,16 @@ function calculateDynamicDailyLimit(state: AgentState): number {
     return state.context?.daily_post_limit || 2;
   }
   
-  // MACRO MODE: Calculate based on objectives progress
+  // MACRO MODE: Use real data from agent_context (updated by sync-instagram-metrics)
   const goalViews = state.context?.goal_weekly_views || 10000;
   const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
   
-  // Calculate current weekly reach from published posts
-  const weeklyReach = state.recentPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
-  const viewsProgress = goalViews > 0 ? (weeklyReach / goalViews) * 100 : 100;
-  const engagementProgress = goalEngagement > 0 ? (state.avgEngagement / goalEngagement) * 100 : 100;
+  // Use SYNCED values from agent_context instead of recalculating from 72h posts
+  const currentWeeklyViews = state.context?.current_weekly_views || 0;
+  const currentWeeklyEngagement = state.context?.current_weekly_engagement || 0;
+  
+  const viewsProgress = goalViews > 0 ? (currentWeeklyViews / goalViews) * 100 : 100;
+  const engagementProgress = goalEngagement > 0 ? (currentWeeklyEngagement / goalEngagement) * 100 : 100;
   
   // Day of week (0=Sun, 6=Sat) - how many days left in the week
   const now = new Date();
@@ -365,28 +367,26 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   const daysLeftInWeek = Math.max(1, 7 - dayOfWeek);
   
   // Use MINIMUM progress - if ANY goal is behind, we need to push harder
-  // Average was causing issues: Views 0% + Engagement 200% = avg 100% (maintenance mode)
-  // With min: Views 0% → far behind → aggressive mode (correct behavior)
-  const avgProgress = Math.min(viewsProgress, engagementProgress);
+  const minProgress = Math.min(viewsProgress, engagementProgress);
   
-  console.log(`[AGENT] Macro objectives: views ${Math.round(viewsProgress)}%, engagement ${Math.round(engagementProgress)}%, MIN progress ${Math.round(avgProgress)}%`);
-  console.log(`[AGENT] Days left in week: ${daysLeftInWeek}, using MIN progress strategy`);
+  console.log(`[AGENT] Macro objectives (from synced data): views ${currentWeeklyViews}/${goalViews} (${Math.round(viewsProgress)}%), engagement ${currentWeeklyEngagement}%/${goalEngagement}% (${Math.round(engagementProgress)}%)`);
+  console.log(`[AGENT] MIN progress: ${Math.round(minProgress)}%, days left: ${daysLeftInWeek}`);
   
   // Dynamic daily limit based on how far behind we are
   let dynamicLimit: number;
-  if (avgProgress >= 100) {
+  if (minProgress >= 100) {
     // Goals met - maintenance mode: 1 post/day
     dynamicLimit = 1;
-  } else if (avgProgress >= 70) {
+  } else if (minProgress >= 70) {
     // Almost there - moderate: 2 posts/day
     dynamicLimit = 2;
-  } else if (avgProgress >= 40) {
+  } else if (minProgress >= 40) {
     // Behind - aggressive: 3 posts/day
     dynamicLimit = 3;
   } else {
-    // Far behind - maximum effort: 4 posts/day
-    dynamicLimit = Math.min(4, Math.ceil((100 - avgProgress) / (daysLeftInWeek * 10)));
-    dynamicLimit = Math.max(3, dynamicLimit);
+    // Far behind - maximum effort: 4-5 posts/day
+    // Factor in days left: fewer days = more aggressive
+    dynamicLimit = daysLeftInWeek <= 2 ? 5 : 4;
   }
   
   // Hard cap at 5 posts/day to avoid spam
