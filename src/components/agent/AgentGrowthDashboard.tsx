@@ -62,32 +62,36 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const periodLabel = `últimos ${period} dias`;
 
-  // Sync from Instagram
+  // Sync from Instagram — single call, no loop
   const handleSync = async () => {
     setSyncing(true);
+    toast.loading('Sincronizando métricas do Instagram...', { id: 'sync-ig' });
     try {
-      let offset = 0;
-      let totalUpdated = 0;
-      let totalDeleted = 0;
-      let hasMore = true;
-      let batch = 0;
-      while (hasMore && batch < 10) {
-        batch++;
-        toast.loading(`Sincronizando... ${offset} posts`, { id: 'sync-ig' });
-        const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
-          body: { offset, batch_size: 30 }
+      const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
+        body: { offset: 0, batch_size: 50 }
+      });
+      if (error) throw error;
+      
+      const totalUpdated = data?.updated || 0;
+      const totalDeleted = data?.deleted || 0;
+      const hasMore = data?.has_more;
+      
+      // If there are more, do one more batch silently
+      if (hasMore) {
+        const { data: d2 } = await supabase.functions.invoke('sync-instagram-metrics', {
+          body: { offset: data?.next_offset || 50, batch_size: 50 }
         });
-        if (error) throw error;
-        totalUpdated += data?.updated || 0;
-        totalDeleted += data?.deleted || 0;
-        hasMore = data?.has_more || false;
-        offset = data?.next_offset || 0;
+        const u2 = d2?.updated || 0;
+        const d2del = d2?.deleted || 0;
+        toast.dismiss('sync-ig');
+        toast.success(`${totalUpdated + u2} atualizados${totalDeleted + d2del > 0 ? `, ${totalDeleted + d2del} removidos` : ''}`);
+      } else {
+        toast.dismiss('sync-ig');
+        const parts = [];
+        if (totalUpdated > 0) parts.push(`${totalUpdated} atualizados`);
+        if (totalDeleted > 0) parts.push(`${totalDeleted} removidos`);
+        toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       }
-      toast.dismiss('sync-ig');
-      const parts = [];
-      if (totalDeleted > 0) parts.push(`${totalDeleted} removidos`);
-      if (totalUpdated > 0) parts.push(`${totalUpdated} atualizados`);
-      toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       fetchTopPosts();
     } catch (e: any) {
       toast.dismiss('sync-ig');
@@ -129,14 +133,18 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalViews = totalImpressions > 0 ? totalImpressions : totalReach; // impressions = views, fallback to reach
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
-  // Progress based on period data vs goals
-  const goalViews = (context?.goal_weekly_views || 10000) * (period / 7);
-  const goalFollowers = (context?.goal_weekly_followers || 100) * (period / 7);
-  const goalEngagement = context?.goal_weekly_engagement || 5;
+  // Period-based goals (scaled from monthly base)
+  const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
+    30: { views: 10000, likes: 500, saves: 200, comments: 100 },
+    60: { views: 25000, likes: 1200, saves: 500, comments: 250 },
+    90: { views: 50000, likes: 2500, saves: 1000, comments: 500 },
+  };
+  const goals = GOALS[period] || GOALS[90];
 
-  const viewsProgress = Math.min((totalReach / goalViews) * 100, 100);
-  const followersProgress = Math.min(((context?.current_weekly_followers || 0) * (period / 7)) / goalFollowers * 100, 100);
-  const engagementProgress = Math.min((avgEngRate / goalEngagement) * 100, 100);
+  const viewsProgress = goals.views > 0 ? Math.min((totalViews / goals.views) * 100, 100) : 0;
+  const likesProgress = goals.likes > 0 ? Math.min((totalLikes / goals.likes) * 100, 100) : 0;
+  const savesProgress = goals.saves > 0 ? Math.min((totalSaves / goals.saves) * 100, 100) : 0;
+  const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
   // Content strategy
   const totalContent = (context?.content_distribution_videos || 3) + 
@@ -249,9 +257,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <ProgressRow icon={<Eye className="h-3 w-3 text-blue-500" />} label="Alcance" current={totalReach} goal={Math.round(goalViews)} progress={viewsProgress} />
-            <ProgressRow icon={<Users className="h-3 w-3 text-purple-500" />} label="Engajamento" current={Number(avgEngRate.toFixed(1))} goal={goalEngagement} progress={engagementProgress} suffix="%" decimal />
-            <ProgressRow icon={<Bookmark className="h-3 w-3 text-amber-500" />} label="Salvamentos" current={totalSaves} goal={Math.round(totalReach * 0.05)} progress={totalReach > 0 ? Math.min((totalSaves / (totalReach * 0.05)) * 100, 100) : 0} />
+            <ProgressRow icon={<Eye className="h-3 w-3 text-blue-500" />} label="Alcance (Visualizações)" current={totalViews} goal={goals.views} progress={viewsProgress} />
+            <ProgressRow icon={<Heart className="h-3 w-3 text-red-500" />} label="Curtidas" current={totalLikes} goal={goals.likes} progress={likesProgress} />
+            <ProgressRow icon={<Bookmark className="h-3 w-3 text-amber-500" />} label="Salvamentos" current={totalSaves} goal={goals.saves} progress={savesProgress} />
+            <ProgressRow icon={<MessageCircle className="h-3 w-3 text-primary" />} label="Comentários" current={totalComments} goal={goals.comments} progress={commentsProgress} />
           </CardContent>
         </Card>
       </motion.div>
