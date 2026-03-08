@@ -52,6 +52,15 @@ interface TopPost {
   post_type: string | null;
 }
 
+interface SourceRanking {
+  sourceName: string;
+  postCount: number;
+  totalReach: number;
+  totalLikes: number;
+  totalSaves: number;
+  avgEngagement: number;
+}
+
 export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
   const [isAutoStrategy, setIsAutoStrategy] = useState(true);
   const [period, setPeriod] = useState(90);
