@@ -412,6 +412,24 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           </ScrollArea>
         </div>
       )}
+      
+      {/* Marketing Panel */}
+      {showMarketing && (
+        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-lg mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="font-semibold text-sm">Marketing & Afiliados</h2>
+                  <p className="text-xs text-muted-foreground">Links que o agente promove automaticamente</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
+              </div>
+              <AgentMarketingPanel />
+            </div>
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
 }
