@@ -2470,27 +2470,40 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
   const { affiliate_id, headline_text, caption_block1, caption_block2, caption_block3, scheduled_for, platforms } = args;
 
   try {
-    // Get affiliate link - specific one or least promoted active one
-    let query = supabase
-      .from('affiliate_links')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .eq('is_active', true);
+    // Get affiliate link - specific one or round-robin rotation
+    let affiliate: any = null;
 
     if (affiliate_id) {
-      query = query.eq('id', affiliate_id);
+      const { data, error } = await supabase
+        .from('affiliate_links')
+        .select('*')
+        .eq('id', affiliate_id)
+        .eq('workspace_id', workspaceId)
+        .eq('is_active', true)
+        .single();
+      if (error) throw error;
+      affiliate = data;
     } else {
-      query = query.order('posts_count', { ascending: true }).limit(1);
+      // Round-robin: get all active links ordered by last_posted_at (nulls first = never posted)
+      const { data: allLinks, error: fetchError } = await supabase
+        .from('affiliate_links')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .eq('is_active', true)
+        .order('last_posted_at', { ascending: true, nullsFirst: true });
+
+      if (fetchError) throw fetchError;
+      if (!allLinks || allLinks.length === 0) {
+        return { success: false, message: '❌ Nenhum link de afiliado ativo encontrado. Cadastre links na aba Marketing.' };
+      }
+
+      // Pick the one posted longest ago (or never posted) = round-robin
+      affiliate = allLinks[0];
     }
 
-    const { data: affiliateLinks, error: fetchError } = await query;
-    if (fetchError) throw fetchError;
-
-    if (!affiliateLinks || affiliateLinks.length === 0) {
-      return { success: false, message: '❌ Nenhum link de afiliado ativo encontrado. Cadastre links na aba Marketing.' };
+    if (!affiliate) {
+      return { success: false, message: '❌ Link de afiliado não encontrado.' };
     }
-
-    const affiliate = affiliateLinks[0];
 
     // Build caption with affiliate link
     const caption = [
