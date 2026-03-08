@@ -151,9 +151,11 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const fetchTopPosts = async () => {
     if (!currentWorkspace?.id) return;
+
     setLoadingTopPosts(true);
     const since = new Date();
     since.setDate(since.getDate() - period);
+
     const { data } = await supabase
       .from('posts')
       .select('id, caption, reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at, hashtags, post_type')
@@ -161,9 +163,17 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       .eq('status', 'published')
       .not('instagram_post_id', 'is', null)
       .gte('published_at', since.toISOString())
-      .order('reach', { ascending: false })
-      .limit(20);
-    setTopPosts((data as TopPost[]) || []);
+      .limit(500);
+
+    const ranked = ((data as TopPost[]) || [])
+      .sort((a, b) => {
+        const aViews = Math.max(a.impressions || 0, a.reach || 0);
+        const bViews = Math.max(b.impressions || 0, b.reach || 0);
+        return bViews - aViews;
+      })
+      .slice(0, 20);
+
+    setTopPosts(ranked);
     setLoadingTopPosts(false);
   };
 
