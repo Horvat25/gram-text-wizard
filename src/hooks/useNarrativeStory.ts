@@ -566,7 +566,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       const videoBlob = await generateVideoFromSegments({
         width: 1080,
         height: 1920,
-        fps: 24,
+        fps: 30,
         audioUrl: narrationUrl || undefined,
         ctaAudioUrl: ctaNarrationUrl || undefined,
         backgroundMusicUrl: backgroundMusicUrl || undefined,
