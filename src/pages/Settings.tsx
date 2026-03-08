@@ -861,8 +861,8 @@ const Settings = () => {
                               <div>
                                 <p className="font-medium text-sm">@{account.username || 'Conta conectada'}</p>
                                 <div className="flex items-center gap-2">
-                                  <Badge variant={getTokenStatus(account.expires_at) === 'valid' ? 'default' : 'destructive'} className="text-xs">
-                                    {getTokenStatus(account.expires_at) === 'valid' ? 'Ativo' : 'Expirado'}
+                                  <Badge variant={getTokenStatus(account.expires_at) === 'active' ? 'default' : 'destructive'} className="text-xs">
+                                    {getTokenStatus(account.expires_at) === 'active' ? 'Ativo' : getTokenStatus(account.expires_at) === 'expiring' ? 'Expirando' : 'Expirado'}
                                   </Badge>
                                   {getDaysUntilExpiry(account.expires_at) > 0 && (
                                     <span className="text-xs text-muted-foreground">{getDaysUntilExpiry(account.expires_at)}d restantes</span>
