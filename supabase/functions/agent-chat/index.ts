@@ -2535,9 +2535,12 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       postStatus = 'scheduled';
     }
 
-    // Determine media type from affiliate config
-    const mediaFormat = affiliate.media_format || 'image';
-    const mediaType = mediaFormat === 'reels' ? 'reels' : mediaFormat === 'carousel' ? 'carousel' : 'image';
+    // Determine media type from affiliate config (supports comma-separated for rotation)
+    const formats = (affiliate.media_format || 'image').split(',').map((f: string) => f.trim());
+    // Rotate format based on posts_count
+    const formatIndex = (affiliate.posts_count || 0) % formats.length;
+    const chosenFormat = formats[formatIndex];
+    const mediaType = chosenFormat === 'reels' ? 'reels' : chosenFormat === 'carousel' ? 'carousel' : 'image';
 
     // Create the post
     const postData: any = {

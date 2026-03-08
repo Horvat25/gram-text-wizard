@@ -58,7 +58,7 @@ export default function AgentMarketingPanel() {
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [mediaFormat, setMediaFormat] = useState('image');
+  const [mediaFormats, setMediaFormats] = useState<string[]>(['image']);
   const [postFrequency, setPostFrequency] = useState(4);
   const [marketingStrategy, setMarketingStrategy] = useState('');
 
@@ -162,7 +162,7 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
-    setMediaFormat('image');
+    setMediaFormats(['image']);
     setPostFrequency(4);
     setMarketingStrategy('');
     setSiteAnalysis('');
@@ -175,7 +175,8 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
-    setMediaFormat(link.media_format || 'image');
+    const formats = link.media_format ? link.media_format.split(',') : ['image'];
+    setMediaFormats(formats);
     setPostFrequency(link.post_frequency || 4);
     setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
@@ -196,7 +197,7 @@ export default function AgentMarketingPanel() {
         product_name: productName.trim(),
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
-        media_format: mediaFormat,
+        media_format: mediaFormats.join(','),
         post_frequency: postFrequency,
         marketing_strategy: marketingStrategy.trim() || null,
       };
@@ -314,15 +315,17 @@ export default function AgentMarketingPanel() {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{link.description}</p>
                     )}
 
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <Badge variant="outline" className="text-[10px] h-4">
-                        {link.media_format === 'reels' ? '🎬 Reels' : link.media_format === 'carousel' ? '📸 Carrossel' : '🖼️ Imagem'}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] h-4">
-                        🔄 A cada {link.post_frequency} posts
+                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                      {(link.media_format || 'image').split(',').map(f => (
+                        <Badge key={f} variant="outline" className="text-[10px] h-4 px-1.5">
+                          {f === 'reels' ? '🎬' : f === 'carousel' ? '📸' : '🖼️'} {f === 'reels' ? 'Reels' : f === 'carousel' ? 'Carrossel' : 'Imagem'}
+                        </Badge>
+                      ))}
+                      <Badge variant="outline" className="text-[10px] h-4 px-1.5">
+                        🔄 {link.post_frequency}x
                       </Badge>
                       <span className="text-[10px] text-muted-foreground">
-                        📊 {link.posts_count} post(s)
+                        📊 {link.posts_count}
                       </span>
                     </div>
                   </div>
@@ -449,64 +452,61 @@ export default function AgentMarketingPanel() {
               />
             </div>
 
-            {/* Media Format */}
+            {/* Media Format - multi-select toggle */}
             <div>
-              <Label className="text-xs">Formato de Mídia</Label>
-              <div className="flex gap-2 mt-1">
+              <Label className="text-xs">Formato de Mídia (selecione 1 ou mais)</Label>
+              <div className="flex gap-1.5 mt-1">
                 {[
                   { value: 'image', label: '🖼️ Imagem' },
                   { value: 'reels', label: '🎬 Reels' },
                   { value: 'carousel', label: '📸 Carrossel' },
-                ].map((opt) => (
-                  <Button
-                    key={opt.value}
-                    type="button"
-                    variant={mediaFormat === opt.value ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-7 text-xs flex-1"
-                    onClick={() => setMediaFormat(opt.value)}
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
+                ].map((opt) => {
+                  const isSelected = mediaFormats.includes(opt.value);
+                  return (
+                    <Button
+                      key={opt.value}
+                      type="button"
+                      variant={isSelected ? 'default' : 'outline'}
+                      size="sm"
+                      className="h-6 text-[11px] flex-1 px-1"
+                      onClick={() => {
+                        if (isSelected && mediaFormats.length > 1) {
+                          setMediaFormats(mediaFormats.filter(f => f !== opt.value));
+                        } else if (!isSelected) {
+                          setMediaFormats([...mediaFormats, opt.value]);
+                        }
+                      }}
+                    >
+                      {opt.label}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Frequency */}
-            <div>
-              <Label className="text-xs">Frequência (a cada X posts normais)</Label>
-              <div className="flex items-center gap-2 mt-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setPostFrequency(Math.max(2, postFrequency - 1))}
-                >
-                  −
-                </Button>
-                <span className="text-sm font-medium w-8 text-center">{postFrequency}</span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setPostFrequency(Math.min(10, postFrequency + 1))}
-                >
-                  +
-                </Button>
-                <span className="text-xs text-muted-foreground">1 post de marketing a cada {postFrequency} posts</span>
+            {/* Frequency + Strategy in compact layout */}
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Label className="text-xs">Frequência</Label>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <Button type="button" variant="outline" size="icon" className="h-6 w-6 text-xs"
+                    onClick={() => setPostFrequency(Math.max(2, postFrequency - 1))}>−</Button>
+                  <span className="text-xs font-medium w-5 text-center">{postFrequency}</span>
+                  <Button type="button" variant="outline" size="icon" className="h-6 w-6 text-xs"
+                    onClick={() => setPostFrequency(Math.min(10, postFrequency + 1))}>+</Button>
+                  <span className="text-[10px] text-muted-foreground">a cada {postFrequency} posts</span>
+                </div>
               </div>
             </div>
 
-            {/* Strategy Notes */}
             <div>
-              <Label className="text-xs">Estratégia de Marketing (opcional)</Label>
+              <Label className="text-xs">Estratégia (opcional)</Label>
               <Textarea
                 value={marketingStrategy}
                 onChange={(e) => setMarketingStrategy(e.target.value)}
-                placeholder="Ex: Focar nos benefícios de produtividade, usar gatilho de escassez, mencionar desconto exclusivo..."
-                className="min-h-[50px] text-sm mt-1"
+                placeholder="Ex: Focar em produtividade, gatilho de escassez..."
+                className="min-h-[40px] text-xs mt-1"
+                rows={2}
               />
             </div>
           </div>
