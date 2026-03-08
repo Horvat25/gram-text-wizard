@@ -311,10 +311,29 @@ Regras:
     }
 
     const aiData = await aiRes.json();
-    const description = aiData?.choices?.[0]?.message?.content?.trim() || "";
+    const rawContent = aiData?.choices?.[0]?.message?.content?.trim() || "";
+    
+    // Parse JSON response
+    let description = rawContent;
+    let strategy = "";
+    try {
+      let jsonStr = rawContent;
+      if (jsonStr.includes("```json")) {
+        jsonStr = jsonStr.replace(/```json\s*/g, "").replace(/```\s*/g, "");
+      } else if (jsonStr.includes("```")) {
+        jsonStr = jsonStr.replace(/```\s*/g, "");
+      }
+      const parsed = JSON.parse(jsonStr.trim());
+      description = parsed.description || rawContent;
+      strategy = parsed.strategy || "";
+    } catch {
+      // If JSON parse fails, use raw content as description
+      console.log("JSON parse failed, using raw content as description");
+    }
 
     return new Response(JSON.stringify({
       description,
+      strategy,
       sources: {
         site: siteUsed || Boolean(finalAnalysisContext.includes("ANÁLISE DO SITE")),
         web: webUsed || Boolean(finalAnalysisContext.includes("PESQUISA WEB")),
