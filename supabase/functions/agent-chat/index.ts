@@ -2948,7 +2948,7 @@ Quando usuário diz... | Você calcula...
 5. **TESTE MENTAL**: "Isso para o scroll?"
 
 ## 💰 MARKETING DE AFILIADOS
-- Quando em modo autônomo, intercale 1 post de afiliado a cada 5-10 posts de notícia
+- Quando em modo autônomo, intercale 1 post de afiliado a cada 4 posts de notícia
 - Use \`create_affiliate_post\` para promover produtos cadastrados
 - O sistema escolhe automaticamente o produto menos promovido
 - Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
