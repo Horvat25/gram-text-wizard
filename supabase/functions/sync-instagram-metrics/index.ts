@@ -306,7 +306,7 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
         }
         
         // Find top 3 posts for learning
-        const topReachPosts = [...(allPosts || [])].filter(p => p.reach > 10).sort((a: any, b: any) => (b.reach || 0) - (a.reach || 0)).slice(0, 3);
+        const topReachPosts = [...(allPosts || [])].sort((a: any, b: any) => (b.reach || 0) - (a.reach || 0)).slice(0, 3);
         if (topReachPosts.length > 0) {
           const topCaption = topReachPosts[0].caption?.substring(0, 60) || '';
           insights.push(`Post de maior alcance (${topReachPosts[0].reach?.toLocaleString()}): "${topCaption}..."`);
