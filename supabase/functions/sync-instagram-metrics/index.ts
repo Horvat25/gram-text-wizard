@@ -225,7 +225,7 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
 
         const [profileRes, viewsInsightsRes, legacyInsightsRes] = await Promise.all([
           fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=last_30_days&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
           fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
         ]);
 
@@ -299,13 +299,11 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
       const updateData: Record<string, any> = { updated_at: new Date().toISOString() };
       
       // Use account-level views as source of truth (matches Instagram "Visualizações")
+      // If insights are unavailable, keep previous DB value (avoid replacing with tiny fallback values).
       if (accountImpressions > 0) {
         updateData.current_weekly_views = accountImpressions;
       } else if (accountReach > 0) {
         updateData.current_weekly_views = accountReach;
-      } else if (weekPosts && weekPosts.length > 0) {
-        const totalReach = weekPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
-        updateData.current_weekly_views = totalReach;
       }
 
       if (weekPosts && weekPosts.length > 0) {
