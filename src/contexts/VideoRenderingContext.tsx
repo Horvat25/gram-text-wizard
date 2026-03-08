@@ -300,15 +300,14 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   // ─── Process next video in queue ───────────────────────────
   const processNextVideo = useCallback(async () => {
-    // Prevent concurrent renders
-    if (renderLockRef.current) {
-      console.log('[AutoRender] Render lock active, skipping');
+    // Prevent concurrent renders - check BOTH locks
+    if (renderLockRef.current || activeRenderIdRef.current) {
+      console.log(`[AutoRender] Render lock active (lock=${renderLockRef.current}, activeId=${activeRenderIdRef.current}), skipping`);
       return;
     }
 
     const queue = renderQueueRef.current;
-    const currentId = currentVideoIdRef.current;
-    const nextVideo = queue.find(v => v.id !== currentId);
+    const nextVideo = queue[0]; // Always take the first in queue
 
     if (!nextVideo) {
       setIsRendering(false);
@@ -321,9 +320,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       return;
     }
 
-    // Acquire lock
+    // Acquire lock IMMEDIATELY with both mechanisms
     renderLockRef.current = true;
+    activeRenderIdRef.current = nextVideo.id;
     setCurrentVideoId(nextVideo.id);
+    console.log(`[AutoRender] 🔒 Lock acquired for post ${nextVideo.id}`);
 
     // Double-check in DB that this post still needs rendering (prevent duplicates)
     try {
