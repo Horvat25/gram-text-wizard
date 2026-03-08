@@ -32,6 +32,9 @@ interface AffiliateLink {
   posts_count: number;
   last_posted_at: string | null;
   created_at: string;
+  media_format: string;
+  post_frequency: number;
+  marketing_strategy: string | null;
 }
 
 export default function AgentMarketingPanel() {
@@ -51,10 +54,13 @@ export default function AgentMarketingPanel() {
     web_source?: string;
   } | null>(null);
 
-  // Form state — only name, url, description
+  // Form state
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
+  const [mediaFormat, setMediaFormat] = useState('image');
+  const [postFrequency, setPostFrequency] = useState(4);
+  const [marketingStrategy, setMarketingStrategy] = useState('');
 
   const analyzeSite = async () => {
     if (!affiliateUrl.trim()) {
@@ -156,6 +162,9 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
+    setMediaFormat('image');
+    setPostFrequency(4);
+    setMarketingStrategy('');
     setSiteAnalysis('');
     setAnalysisSources(null);
     setEditingLink(null);
@@ -166,6 +175,9 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
+    setMediaFormat(link.media_format || 'image');
+    setPostFrequency(link.post_frequency || 4);
+    setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
     setAnalysisSources(null);
     setShowForm(true);
@@ -184,6 +196,9 @@ export default function AgentMarketingPanel() {
         product_name: productName.trim(),
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
+        media_format: mediaFormat,
+        post_frequency: postFrequency,
+        marketing_strategy: marketingStrategy.trim() || null,
       };
 
       if (editingLink) {
@@ -299,18 +314,16 @@ export default function AgentMarketingPanel() {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{link.description}</p>
                     )}
 
-                    <div className="flex items-center gap-3 mt-1.5">
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <Badge variant="outline" className="text-[10px] h-4">
+                        {link.media_format === 'reels' ? '🎬 Reels' : link.media_format === 'carousel' ? '📸 Carrossel' : '🖼️ Imagem'}
+                      </Badge>
+                      <Badge variant="outline" className="text-[10px] h-4">
+                        🔄 A cada {link.post_frequency} posts
+                      </Badge>
                       <span className="text-[10px] text-muted-foreground">
                         📊 {link.posts_count} post(s)
                       </span>
-                      <a
-                        href={link.affiliate_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] text-primary truncate max-w-[200px] hover:underline"
-                      >
-                        {link.affiliate_url}
-                      </a>
                     </div>
                   </div>
 
@@ -433,6 +446,67 @@ export default function AgentMarketingPanel() {
                   : "Breve descrição do produto — ou clique em 'Gerar com IA'"
                 }
                 className="min-h-[60px] text-sm"
+              />
+            </div>
+
+            {/* Media Format */}
+            <div>
+              <Label className="text-xs">Formato de Mídia</Label>
+              <div className="flex gap-2 mt-1">
+                {[
+                  { value: 'image', label: '🖼️ Imagem' },
+                  { value: 'reels', label: '🎬 Reels' },
+                  { value: 'carousel', label: '📸 Carrossel' },
+                ].map((opt) => (
+                  <Button
+                    key={opt.value}
+                    type="button"
+                    variant={mediaFormat === opt.value ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-7 text-xs flex-1"
+                    onClick={() => setMediaFormat(opt.value)}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Frequency */}
+            <div>
+              <Label className="text-xs">Frequência (a cada X posts normais)</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setPostFrequency(Math.max(2, postFrequency - 1))}
+                >
+                  −
+                </Button>
+                <span className="text-sm font-medium w-8 text-center">{postFrequency}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setPostFrequency(Math.min(10, postFrequency + 1))}
+                >
+                  +
+                </Button>
+                <span className="text-xs text-muted-foreground">1 post de marketing a cada {postFrequency} posts</span>
+              </div>
+            </div>
+
+            {/* Strategy Notes */}
+            <div>
+              <Label className="text-xs">Estratégia de Marketing (opcional)</Label>
+              <Textarea
+                value={marketingStrategy}
+                onChange={(e) => setMarketingStrategy(e.target.value)}
+                placeholder="Ex: Focar nos benefícios de produtividade, usar gatilho de escassez, mencionar desconto exclusivo..."
+                className="min-h-[50px] text-sm mt-1"
               />
             </div>
           </div>

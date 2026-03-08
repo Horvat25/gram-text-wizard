@@ -2522,28 +2522,35 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       postStatus = 'scheduled';
     }
 
+    // Determine media type from affiliate config
+    const mediaFormat = affiliate.media_format || 'image';
+    const mediaType = mediaFormat === 'reels' ? 'reels' : mediaFormat === 'carousel' ? 'carousel' : 'image';
+
     // Create the post
+    const postData: any = {
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption,
+      hashtags,
+      status: postStatus,
+      scheduled_for: scheduledFor,
+      image_url: affiliate.image_url || null,
+      post_type: 'marketing',
+      media_type: mediaType,
+      platforms: platforms || ['instagram'],
+      overlay_metadata: {
+        type: 'affiliate_marketing',
+        affiliate_id: affiliate.id,
+        product_name: affiliate.product_name,
+        headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
+        theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral'],
+        marketing_strategy: affiliate.marketing_strategy || null
+      }
+    };
+
     const { data: post, error: postError } = await supabase
       .from('posts')
-      .insert({
-        user_id: userId,
-        workspace_id: workspaceId,
-        caption,
-        hashtags,
-        status: postStatus,
-        scheduled_for: scheduledFor,
-        image_url: affiliate.image_url || null,
-        post_type: 'marketing',
-        media_type: 'image',
-        platforms: platforms || ['instagram'],
-        overlay_metadata: {
-          type: 'affiliate_marketing',
-          affiliate_id: affiliate.id,
-          product_name: affiliate.product_name,
-          headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
-          theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral']
-        }
-      })
+      .insert(postData)
       .select()
       .single();
 
@@ -2948,12 +2955,13 @@ Quando usuário diz... | Você calcula...
 5. **TESTE MENTAL**: "Isso para o scroll?"
 
 ## 💰 MARKETING DE AFILIADOS
-- Quando em modo autônomo, intercale 1 post de afiliado a cada 4 posts de notícia
-- Use \`create_affiliate_post\` para promover produtos cadastrados
-- O sistema escolhe automaticamente o produto menos promovido
+- REGRA: A cada ${4} posts normais de notícia, intercale 1 post de afiliado usando \`create_affiliate_post\`
+- Cada link tem sua própria frequência configurada (post_frequency), formato (image/reels/carousel) e estratégia
+- O sistema escolhe automaticamente o produto menos promovido quando affiliate_id não é fornecido
 - Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
 - Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
 - NÃO force marketing se não houver links cadastrados
+- Se o link tem marketing_strategy definida, USE-A como guia para o tom e abordagem
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
