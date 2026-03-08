@@ -175,7 +175,8 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
-    setMediaFormat(link.media_format || 'image');
+    const formats = link.media_format ? link.media_format.split(',') : ['image'];
+    setMediaFormats(formats);
     setPostFrequency(link.post_frequency || 4);
     setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
@@ -196,7 +197,7 @@ export default function AgentMarketingPanel() {
         product_name: productName.trim(),
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
-        media_format: mediaFormat,
+        media_format: mediaFormats.join(','),
         post_frequency: postFrequency,
         marketing_strategy: marketingStrategy.trim() || null,
       };
