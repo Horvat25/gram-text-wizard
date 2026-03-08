@@ -189,13 +189,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     // Filter segments that got images
     const validSegments = updatedSegments.filter(s => s.imageUrl);
     const failedCount = updatedSegments.length - validSegments.length;
+    const minimumSegmentsRequired = Math.max(2, Math.ceil(segments.length * 0.75));
     
-    if (validSegments.length === 0) {
-      setError("Nenhuma imagem foi encontrada ou gerada. Verifique as API keys (Pexels/Unsplash).");
+    if (validSegments.length < minimumSegmentsRequired) {
+      setError(`Renderização cancelada: apenas ${validSegments.length}/${segments.length} imagens válidas. Necessário no mínimo ${minimumSegmentsRequired} para manter padrão de Reels.`);
       return null;
     }
     
-    if (failedCount > 0 && validSegments.length >= 2) {
+    if (failedCount > 0) {
       toast.warning(`${failedCount} de ${updatedSegments.length} imagens falharam, continuando com ${validSegments.length} cenas`);
     }
 

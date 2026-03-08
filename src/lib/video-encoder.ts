@@ -1,3 +1,4 @@
+import fixWebmDuration from 'fix-webm-duration';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface VideoSegment {
@@ -39,9 +40,21 @@ export async function generateVideoFromSegments(
     if (e.data.size > 0) chunks.push(e.data);
   };
 
+  const expectedDurationMs = Math.round(
+    segments.reduce((sum, segment) => sum + Math.max(0, segment.duration), 0) * 1000
+  );
+
   return new Promise(async (resolve) => {
-    mediaRecorder.onstop = () => {
-      resolve(new Blob(chunks, { type: 'video/webm' }));
+    mediaRecorder.onstop = async () => {
+      const rawBlob = new Blob(chunks, { type: 'video/webm' });
+
+      try {
+        const fixedBlob = await fixWebmDuration(rawBlob, expectedDurationMs || 1000);
+        resolve(fixedBlob);
+      } catch (error) {
+        console.warn('[video-encoder] Failed to fix WebM duration metadata:', error);
+        resolve(rawBlob);
+      }
     };
 
     mediaRecorder.start();
@@ -52,15 +65,22 @@ export async function generateVideoFromSegments(
     for (const segment of segments) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      await new Promise<void>((res) => {
-        img.onload = () => res();
-        img.onerror = () => res();
+
+      const imageLoaded = await new Promise<boolean>((res) => {
+        img.onload = () => res(true);
+        img.onerror = () => res(false);
         img.src = segment.imageUrl;
       });
 
       const frames = Math.round(segment.duration * fps);
       for (let i = 0; i < frames; i++) {
-        ctx.drawImage(img, 0, 0, width, height);
+        if (imageLoaded) {
+          ctx.drawImage(img, 0, 0, width, height);
+        } else {
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, width, height);
+        }
+
         if (segment.text) {
           ctx.fillStyle = 'rgba(0,0,0,0.6)';
           ctx.fillRect(0, height - 200, width, 200);
@@ -69,6 +89,7 @@ export async function generateVideoFromSegments(
           ctx.textAlign = 'center';
           ctx.fillText(segment.text, width / 2, height - 100, width - 80);
         }
+
         processedFrames++;
         onProgress?.(Math.round((processedFrames / totalFrames) * 100));
         await new Promise(r => setTimeout(r, 1000 / fps));
