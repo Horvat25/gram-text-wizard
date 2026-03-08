@@ -351,6 +351,7 @@ const PublicationQueueTab = ({
     const isOverdue = post.scheduled_for ? isPast(parseISO(post.scheduled_for)) : false;
     const needsRendering = needsVideoRendering(post);
     const isReels = post.media_type === "reels" || post.media_type === "reel";
+    const isRenderingThisPost = isRendering && currentVideoId === post.id;
     
     return (
       <div className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${isOverdue ? 'border-destructive/50' : ''} ${needsRendering ? 'border-amber-500/50' : ''}`}>
@@ -368,6 +369,12 @@ const PublicationQueueTab = ({
             {needsRendering && (
               <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/30">
                 Aguardando renderização
+              </Badge>
+            )}
+            {isRenderingThisPost && (
+              <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                {currentStep === "video" ? `Renderizando ${Math.round(currentRenderProgress)}%` : "Processando"}
               </Badge>
             )}
             {post.post_type && !isReels && (
@@ -420,20 +427,6 @@ const PublicationQueueTab = ({
         )}
 
         <div className="flex gap-2 flex-wrap">
-          {/* Render Video button for agent-created reels */}
-          {needsRendering && (
-            <Button
-              size="sm"
-              variant="default"
-              className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => setRenderingPost(post)}
-            >
-              <Film className="h-3 w-3 mr-1" />
-              Gerar Vídeo
-            </Button>
-          )}
-          
-          <Button
             size="sm"
             variant="outline"
             onClick={() => setViewingPost(post)}
