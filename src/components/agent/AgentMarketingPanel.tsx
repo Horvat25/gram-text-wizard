@@ -14,6 +14,7 @@ import {
   Link2,
   Megaphone,
   ShoppingBag,
+  Sparkles,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -39,11 +40,40 @@ export default function AgentMarketingPanel() {
   const [showForm, setShowForm] = useState(false);
   const [editingLink, setEditingLink] = useState<AffiliateLink | null>(null);
   const [saving, setSaving] = useState(false);
+  const [generatingDesc, setGeneratingDesc] = useState(false);
 
   // Form state — only name, url, description
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
+
+  const generateDescription = async () => {
+    if (!productName.trim()) {
+      toast.error('Preencha o nome do produto primeiro');
+      return;
+    }
+    setGeneratingDesc(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-caption', {
+        body: {
+          topic: `Gere uma descrição curta e objetiva (máximo 2 frases) sobre o produto "${productName.trim()}" para uso interno de marketing. Foque em: o que é, principal benefício. Não use hashtags nem emojis. Apenas descreva o produto.`,
+          postType: 'noticia',
+          language: 'pt-BR',
+        }
+      });
+      if (error) throw error;
+      if (data?.caption) {
+        // Remove hashtags if any leaked through
+        const clean = data.caption.replace(/#\w+/g, '').trim();
+        setDescription(clean);
+        toast.success('Descrição gerada! Revise e ajuste se necessário.');
+      }
+    } catch (err: any) {
+      toast.error('Erro ao gerar descrição: ' + err.message);
+    } finally {
+      setGeneratingDesc(false);
+    }
+  };
 
   const fetchLinks = useCallback(async () => {
     if (!currentWorkspace) return;
@@ -286,11 +316,28 @@ export default function AgentMarketingPanel() {
             </div>
 
             <div>
-              <Label className="text-xs">Descrição</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label className="text-xs">Descrição</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 gap-1 text-xs text-primary"
+                  onClick={generateDescription}
+                  disabled={generatingDesc || !productName.trim()}
+                >
+                  {generatingDesc ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3" />
+                  )}
+                  {generatingDesc ? 'Gerando...' : 'Gerar com IA'}
+                </Button>
+              </div>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descrição do produto — o agente pesquisa o resto automaticamente"
+                placeholder="Breve descrição do produto — ou clique em 'Gerar com IA'"
                 className="min-h-[60px] text-sm"
               />
             </div>
