@@ -315,15 +315,17 @@ export default function AgentMarketingPanel() {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{link.description}</p>
                     )}
 
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <Badge variant="outline" className="text-[10px] h-4">
-                        {link.media_format === 'reels' ? '🎬 Reels' : link.media_format === 'carousel' ? '📸 Carrossel' : '🖼️ Imagem'}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] h-4">
-                        🔄 A cada {link.post_frequency} posts
+                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                      {(link.media_format || 'image').split(',').map(f => (
+                        <Badge key={f} variant="outline" className="text-[10px] h-4 px-1.5">
+                          {f === 'reels' ? '🎬' : f === 'carousel' ? '📸' : '🖼️'} {f === 'reels' ? 'Reels' : f === 'carousel' ? 'Carrossel' : 'Imagem'}
+                        </Badge>
+                      ))}
+                      <Badge variant="outline" className="text-[10px] h-4 px-1.5">
+                        🔄 {link.post_frequency}x
                       </Badge>
                       <span className="text-[10px] text-muted-foreground">
-                        📊 {link.posts_count} post(s)
+                        📊 {link.posts_count}
                       </span>
                     </div>
                   </div>
