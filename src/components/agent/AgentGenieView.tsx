@@ -7,7 +7,8 @@ import {
   Loader2,
   LayoutDashboard,
   Settings,
-  TrendingUp
+  TrendingUp,
+  Megaphone
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,6 +25,7 @@ import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
+import AgentMarketingPanel from './AgentMarketingPanel';
 
 interface AgentConfig {
   agent_name: string;
@@ -62,6 +64,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const [showFeeds, setShowFeeds] = useState(false);
   const [showResponses, setShowResponses] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
+  const [showMarketing, setShowMarketing] = useState(false);
 
   useEffect(() => {
     if (user && currentWorkspace) {
@@ -210,38 +213,27 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   // Close other panels when opening one
   const toggleChat = () => {
     setShowChat(!showChat);
-    if (!showChat) {
-      setShowFeeds(false);
-      setShowResponses(false);
-      setShowGrowth(false);
-    }
+    if (!showChat) { setShowFeeds(false); setShowResponses(false); setShowGrowth(false); setShowMarketing(false); }
   };
 
   const toggleFeeds = () => {
     setShowFeeds(!showFeeds);
-    if (!showFeeds) {
-      setShowChat(false);
-      setShowResponses(false);
-      setShowGrowth(false);
-    }
+    if (!showFeeds) { setShowChat(false); setShowResponses(false); setShowGrowth(false); setShowMarketing(false); }
   };
 
   const toggleResponses = () => {
     setShowResponses(!showResponses);
-    if (!showResponses) {
-      setShowChat(false);
-      setShowFeeds(false);
-      setShowGrowth(false);
-    }
+    if (!showResponses) { setShowChat(false); setShowFeeds(false); setShowGrowth(false); setShowMarketing(false); }
   };
 
   const toggleGrowth = () => {
     setShowGrowth(!showGrowth);
-    if (!showGrowth) {
-      setShowChat(false);
-      setShowFeeds(false);
-      setShowResponses(false);
-    }
+    if (!showGrowth) { setShowChat(false); setShowFeeds(false); setShowResponses(false); setShowMarketing(false); }
+  };
+
+  const toggleMarketing = () => {
+    setShowMarketing(!showMarketing);
+    if (!showMarketing) { setShowChat(false); setShowFeeds(false); setShowResponses(false); setShowGrowth(false); }
   };
 
   if (isLoadingHistory) {
@@ -316,6 +308,19 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           >
             <TrendingUp className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Crescimento</span>
+          </Button>
+          
+          <Button
+            variant={showMarketing ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showMarketing && "neural-gradient border-0"
+            )}
+            onClick={toggleMarketing}
+          >
+            <Megaphone className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Marketing</span>
           </Button>
         </div>
         
@@ -403,6 +408,24 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           <ScrollArea className="h-full">
             <div className="p-4 max-w-lg mx-auto">
               <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+      
+      {/* Marketing Panel */}
+      {showMarketing && (
+        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-lg mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="font-semibold text-sm">Marketing & Afiliados</h2>
+                  <p className="text-xs text-muted-foreground">Links que o agente promove automaticamente</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
+              </div>
+              <AgentMarketingPanel />
             </div>
           </ScrollArea>
         </div>

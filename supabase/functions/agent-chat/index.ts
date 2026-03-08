@@ -227,6 +227,26 @@ const AGENT_TOOLS = [
         properties: {}
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_affiliate_post",
+      description: "💰 Cria um post de marketing promovendo um produto de afiliado cadastrado. Busca um link ativo do banco. Use quando o ciclo autônomo decidir intercalar marketing ou quando o usuário pedir.",
+      parameters: {
+        type: "object",
+        properties: {
+          affiliate_id: { type: "string", description: "ID do link de afiliado específico. Se vazio, escolhe automaticamente o menos promovido." },
+          headline_text: { type: "string", description: "Headline de marketing (CAIXA ALTA, máx 2 linhas). Estilo persuasivo com urgência ou benefício claro." },
+          caption_block1: { type: "string", description: "Bloco 1: Hook que gera curiosidade sobre o produto" },
+          caption_block2: { type: "string", description: "Bloco 2: Benefício principal e diferencial" },
+          caption_block3: { type: "string", description: "Bloco 3: CTA com link e urgência" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília)" },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: []
+      }
+    }
   }
 ];
 
@@ -2445,6 +2465,115 @@ Posso buscar imagens na web e criar posts com elas, aplicando nossa marca.
   };
 }
 
+// Execute create_affiliate_post - Creates a marketing post promoting an affiliate product
+async function executeCreateAffiliatePost(supabase: any, userId: string, workspaceId: string, args: any) {
+  const { affiliate_id, headline_text, caption_block1, caption_block2, caption_block3, scheduled_for, platforms } = args;
+
+  try {
+    // Get affiliate link - specific one or least promoted active one
+    let query = supabase
+      .from('affiliate_links')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .eq('is_active', true);
+
+    if (affiliate_id) {
+      query = query.eq('id', affiliate_id);
+    } else {
+      query = query.order('posts_count', { ascending: true }).limit(1);
+    }
+
+    const { data: affiliateLinks, error: fetchError } = await query;
+    if (fetchError) throw fetchError;
+
+    if (!affiliateLinks || affiliateLinks.length === 0) {
+      return { success: false, message: '❌ Nenhum link de afiliado ativo encontrado. Cadastre links na aba Marketing.' };
+    }
+
+    const affiliate = affiliateLinks[0];
+
+    // Build caption with affiliate link
+    const caption = [
+      caption_block1 || `🔥 ${affiliate.product_name} - você precisa conhecer isso!`,
+      '',
+      caption_block2 || affiliate.description || 'Uma ferramenta que vai mudar seu jogo.',
+      '',
+      caption_block3 || `👉 Link na bio ou acesse: ${affiliate.affiliate_url}`,
+      '',
+      `🔗 ${affiliate.affiliate_url}`
+    ].join('\n');
+
+    const hashtags = ['#tech', '#ferramentas', '#produtividade', '#ia', '#recomendacao'];
+
+    // Determine scheduling
+    let scheduledFor: string | null = null;
+    let postStatus = 'draft';
+
+    if (scheduled_for) {
+      const brasiliaDate = new Date(scheduled_for);
+      brasiliaDate.setHours(brasiliaDate.getHours() + 3); // Convert BRT to UTC
+      scheduledFor = brasiliaDate.toISOString();
+      postStatus = 'scheduled';
+    } else {
+      // Auto-schedule with human delay
+      const delayMinutes = generateHumanDelay();
+      const scheduleDate = new Date(Date.now() + delayMinutes * 60 * 1000);
+      scheduledFor = scheduleDate.toISOString();
+      postStatus = 'scheduled';
+    }
+
+    // Create the post
+    const { data: post, error: postError } = await supabase
+      .from('posts')
+      .insert({
+        user_id: userId,
+        workspace_id: workspaceId,
+        caption,
+        hashtags,
+        status: postStatus,
+        scheduled_for: scheduledFor,
+        image_url: affiliate.image_url || null,
+        post_type: 'marketing',
+        media_type: 'image',
+        platforms: platforms || ['instagram'],
+        overlay_metadata: {
+          type: 'affiliate_marketing',
+          affiliate_id: affiliate.id,
+          product_name: affiliate.product_name,
+          headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
+          theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral']
+        }
+      })
+      .select()
+      .single();
+
+    if (postError) throw postError;
+
+    // Increment posts_count on the affiliate link
+    await supabase
+      .from('affiliate_links')
+      .update({ 
+        posts_count: (affiliate.posts_count || 0) + 1,
+        last_posted_at: new Date().toISOString()
+      })
+      .eq('id', affiliate.id);
+
+    const schedFormatted = scheduledFor ? new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+    }).format(new Date(scheduledFor)) : 'agora';
+
+    return {
+      success: true,
+      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
+      post_id: post.id
+    };
+  } catch (error: any) {
+    console.error('[AFFILIATE] Error:', error);
+    return { success: false, message: `❌ Erro ao criar post de marketing: ${error.message}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
@@ -2483,6 +2612,8 @@ async function executeTool(supabase: any, userId: string, workspaceId: string, t
       return executeCreatePostWithImageUrl(supabase, userId, workspaceId, args);
     case 'explain_capabilities':
       return executeExplainCapabilities();
+    case 'create_affiliate_post':
+      return executeCreateAffiliatePost(supabase, userId, workspaceId, args);
     
     // Legacy tools (kept for backwards compatibility, but won't be suggested)
     case 'create_posts':
@@ -2815,6 +2946,14 @@ Quando usuário diz... | Você calcula...
 3. **PORTUGUÊS BRASILEIRO** sempre
 4. **NUNCA** mencione anos passados (2024, 2025)
 5. **TESTE MENTAL**: "Isso para o scroll?"
+
+## 💰 MARKETING DE AFILIADOS
+- Quando em modo autônomo, intercale 1 post de afiliado a cada 5-10 posts de notícia
+- Use \`create_affiliate_post\` para promover produtos cadastrados
+- O sistema escolhe automaticamente o produto menos promovido
+- Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
+- Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
+- NÃO force marketing se não houver links cadastrados
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
