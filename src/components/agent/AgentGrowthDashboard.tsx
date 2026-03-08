@@ -257,9 +257,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <ProgressRow icon={<Eye className="h-3 w-3 text-blue-500" />} label="Alcance" current={totalReach} goal={Math.round(goalViews)} progress={viewsProgress} />
-            <ProgressRow icon={<Users className="h-3 w-3 text-purple-500" />} label="Engajamento" current={Number(avgEngRate.toFixed(1))} goal={goalEngagement} progress={engagementProgress} suffix="%" decimal />
-            <ProgressRow icon={<Bookmark className="h-3 w-3 text-amber-500" />} label="Salvamentos" current={totalSaves} goal={Math.round(totalReach * 0.05)} progress={totalReach > 0 ? Math.min((totalSaves / (totalReach * 0.05)) * 100, 100) : 0} />
+            <ProgressRow icon={<Eye className="h-3 w-3 text-blue-500" />} label="Alcance (Visualizações)" current={totalViews} goal={goals.views} progress={viewsProgress} />
+            <ProgressRow icon={<Heart className="h-3 w-3 text-red-500" />} label="Curtidas" current={totalLikes} goal={goals.likes} progress={likesProgress} />
+            <ProgressRow icon={<Bookmark className="h-3 w-3 text-amber-500" />} label="Salvamentos" current={totalSaves} goal={goals.saves} progress={savesProgress} />
+            <ProgressRow icon={<MessageCircle className="h-3 w-3 text-primary" />} label="Comentários" current={totalComments} goal={goals.comments} progress={commentsProgress} />
           </CardContent>
         </Card>
       </motion.div>
