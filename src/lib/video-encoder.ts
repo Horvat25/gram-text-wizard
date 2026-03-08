@@ -163,16 +163,17 @@ function drawSplitImages(
   width: number,
   height: number,
   progress: number,
-  effectType: number
+  effectType: number,
+  isHook: boolean = false
 ) {
   // Top image region: 0% to 38% of height
   const topHeight = height * 0.38;
-  applyKenBurnsToRegion(ctx, img, 0, 0, width, topHeight, progress, effectType);
+  applyKenBurnsToRegion(ctx, img, 0, 0, width, topHeight, progress, effectType, isHook);
   
   // Bottom image region: 62% to 100% of height
   const bottomY = height * 0.62;
   const bottomHeight = height * 0.38;
-  applyKenBurnsToRegion(ctx, img, 0, bottomY, width, bottomHeight, progress, effectType + 1);
+  applyKenBurnsToRegion(ctx, img, 0, bottomY, width, bottomHeight, progress, effectType + 1, isHook);
   
   // Add subtle gradient overlays for smooth transitions to center
   ctx.save();
@@ -190,6 +191,13 @@ function drawSplitImages(
   bottomGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
   ctx.fillStyle = bottomGradient;
   ctx.fillRect(0, bottomY, width, 40);
+  
+  // HOOK flash effect — white flash in first 0.5s of first segment
+  if (isHook && progress < 0.08) {
+    const flashAlpha = (1 - progress / 0.08) * 0.3;
+    ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
+    ctx.fillRect(0, 0, width, height);
+  }
   
   ctx.restore();
 }
