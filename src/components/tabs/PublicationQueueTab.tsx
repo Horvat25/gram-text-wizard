@@ -187,7 +187,6 @@ const PublicationQueueTab = ({
   const viewDialogRef = useRef<HTMLDivElement | null>(null);
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
-  const [renderingPost, setRenderingPost] = useState<Post | null>(null);
 
   // When opening the preview, always start at the top so the close (X) is reachable on mobile.
   useEffect(() => {
@@ -199,6 +198,7 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
+  const { startRendering, refetchPendingVideos, isRendering, currentVideoId, currentStep, currentRenderProgress } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false; // Simplified - accounts managed in Settings
 
