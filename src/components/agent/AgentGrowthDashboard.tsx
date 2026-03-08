@@ -137,10 +137,12 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         toast.success(parts.join(', '));
       }
 
-      fetchTopPosts();
-      fetchSummaryMetrics();
-      fetchSourceRankings();
-      fetchAccountViews();
+      await Promise.all([
+        fetchTopPosts(),
+        fetchSummaryMetrics(),
+        fetchSourceRankings(),
+        fetchAccountViews(),
+      ]);
     } catch (e: any) {
       toast.dismiss('sync-ig');
       toast.error(e.message || 'Erro ao sincronizar');
@@ -278,12 +280,18 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setAccountViewsLive(data?.current_weekly_views || 0);
   };
 
+  const refreshDashboardData = async () => {
+    await Promise.all([
+      fetchTopPosts(),
+      fetchSummaryMetrics(),
+      fetchSourceRankings(),
+      fetchAccountViews(),
+    ]);
+  };
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
-    fetchTopPosts();
-    fetchSummaryMetrics();
-    fetchSourceRankings();
-    fetchAccountViews();
+    void refreshDashboardData();
   }, [currentWorkspace?.id, period]);
 
   // Derived analytics from full published dataset in period
