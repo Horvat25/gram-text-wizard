@@ -364,10 +364,12 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   const dayOfWeek = todayBrasilia.getDay();
   const daysLeftInWeek = Math.max(1, 7 - dayOfWeek);
   
-  // Average progress toward goals
-  const avgProgress = (viewsProgress + engagementProgress) / 2;
+  // Use MINIMUM progress - if ANY goal is behind, we need to push harder
+  // Average was causing issues: Views 0% + Engagement 200% = avg 100% (maintenance mode)
+  // With min: Views 0% → far behind → aggressive mode (correct behavior)
+  const avgProgress = Math.min(viewsProgress, engagementProgress);
   
-  console.log(`[AGENT] Macro objectives: views ${Math.round(viewsProgress)}%, engagement ${Math.round(engagementProgress)}%, avg ${Math.round(avgProgress)}%`);
+  console.log(`[AGENT] Macro objectives: views ${Math.round(viewsProgress)}%, engagement ${Math.round(engagementProgress)}%, MIN progress ${Math.round(avgProgress)}%`);
   console.log(`[AGENT] Days left in week: ${daysLeftInWeek}`);
   
   // Dynamic daily limit based on how far behind we are
