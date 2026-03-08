@@ -314,18 +314,16 @@ export default function AgentMarketingPanel() {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{link.description}</p>
                     )}
 
-                    <div className="flex items-center gap-3 mt-1.5">
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <Badge variant="outline" className="text-[10px] h-4">
+                        {link.media_format === 'reels' ? '🎬 Reels' : link.media_format === 'carousel' ? '📸 Carrossel' : '🖼️ Imagem'}
+                      </Badge>
+                      <Badge variant="outline" className="text-[10px] h-4">
+                        🔄 A cada {link.post_frequency} posts
+                      </Badge>
                       <span className="text-[10px] text-muted-foreground">
                         📊 {link.posts_count} post(s)
                       </span>
-                      <a
-                        href={link.affiliate_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] text-primary truncate max-w-[200px] hover:underline"
-                      >
-                        {link.affiliate_url}
-                      </a>
                     </div>
                   </div>
 
