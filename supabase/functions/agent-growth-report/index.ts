@@ -33,6 +33,11 @@ serve(async (req) => {
 
     const now = new Date();
     const brasiliaHour = parseInt(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }));
+    
+    // Only generate AI reports at 6h, 12h, 18h, 0h (4x/day)
+    // Other hours: save data-only report without AI call
+    const aiReportHours = [0, 6, 12, 18];
+    const shouldUseAI = aiReportHours.includes(brasiliaHour);
 
     for (const ctx of contexts) {
       const workspaceId = ctx.workspace_id;
