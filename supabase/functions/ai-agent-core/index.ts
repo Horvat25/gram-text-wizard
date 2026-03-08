@@ -485,16 +485,18 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
                         state.weeklyProgress.news + state.weeklyProgress.images;
   
-  // Macro objectives info
+  // Macro objectives info - use SYNCED data from agent_context
   const goalViews = state.context?.goal_weekly_views || 10000;
   const goalFollowers = state.context?.goal_weekly_followers || 100;
   const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
-  const weeklyReach = state.recentPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
+  const weeklyReach = state.context?.current_weekly_views || 0;
+  const currentEngagement = state.context?.current_weekly_engagement || state.avgEngagement;
   
   console.log(`[AGENT] Modo: ${goalType.toUpperCase()}`);
   console.log(`[AGENT] Meta semanal: ${totalProgress} posts criados`);
   console.log(`[AGENT] Limite diário dinâmico: ${state.postsToday}/${dynamicDailyLimit} posts CRIADOS hoje`);
-  console.log(`[AGENT] Objetivos macro: views ${weeklyReach}/${goalViews}, engagement ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%`);
+  console.log(`[AGENT] Objetivos macro (synced): views ${weeklyReach}/${goalViews}, engagement ${currentEngagement}%/${goalEngagement}%`);
+  console.log(`[AGENT] 📊 30d history: ${state.historical30d.totalPosts} posts reais, avg reach ${state.historical30d.avgReachPerPost}, best type: ${state.historical30d.bestMediaType}`);
   console.log(`[AGENT] Próximo tipo de conteúdo: ${state.nextContentType || 'meta completa'}`);
   
   // Dynamic daily limit check
@@ -502,8 +504,8 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     console.log(`[AGENT] Limite diário dinâmico atingido (${dynamicDailyLimit}) - PARAR por hoje`);
     return {
       decision: 'NO_POST',
-      reason: `🎯 Limite diário inteligente atingido! ${state.postsToday}/${dynamicDailyLimit} posts hoje. Objetivos: Views ${Math.round((weeklyReach/goalViews)*100)}%, Engajamento ${state.avgEngagement.toFixed(1)}%/${goalEngagement}%.`,
-      hypothesis: 'O agente ajusta automaticamente a frequência com base nos objetivos macro.'
+      reason: `🎯 Limite diário inteligente atingido! ${state.postsToday}/${dynamicDailyLimit} posts hoje. Objetivos: Views ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%), Engajamento ${currentEngagement}%/${goalEngagement}%. Análise 30d: melhor formato = ${state.historical30d.bestMediaType || 'N/A'} (avg ${state.historical30d.bestMediaTypeAvgReach} alcance).`,
+      hypothesis: 'O agente ajusta automaticamente a frequência com base nos objetivos macro e histórico de 30 dias.'
     };
   }
   
