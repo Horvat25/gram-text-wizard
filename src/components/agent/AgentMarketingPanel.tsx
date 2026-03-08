@@ -126,11 +126,14 @@ export default function AgentMarketingPanel() {
 
       if (data?.description) {
         setDescription(data.description);
+        if (data.strategy) {
+          setMarketingStrategy(data.strategy);
+        }
         const sources = [];
         if (data.sources?.site) sources.push('site do produto');
         if (data.sources?.web) sources.push('pesquisa web');
         const sourceText = sources.length > 0 ? ` (baseado em: ${sources.join(' + ')})` : '';
-        toast.success(`Descrição gerada!${sourceText} Revise e ajuste.`);
+        toast.success(`Descrição e estratégia geradas!${sourceText} Revise e ajuste.`);
       }
     } catch (err: any) {
       toast.error('Erro ao gerar descrição: ' + err.message);

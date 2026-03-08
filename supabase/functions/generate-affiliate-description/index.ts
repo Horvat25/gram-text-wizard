@@ -248,18 +248,32 @@ serve(async (req) => {
       webUsed = Boolean(webResult.content);
     }
 
-    const prompt = `Você é um estrategista de marketing de afiliados. Gere uma descrição curta (2-3 frases), clara e persuasiva para o produto "${productName}".
+    const prompt = `Você é um ESTRATEGISTA DE MARKETING DIGITAL especializado em afiliados e copywriting persuasivo.
 
-Use SOMENTE as informações do contexto abaixo.
+Para o produto "${productName}", gere DUAS coisas em JSON:
+
+1. **description**: Descrição profissional e completa do produto (4-6 frases). Deve cobrir:
+   - O que é o produto e qual problema resolve
+   - Principais funcionalidades e diferenciais competitivos
+   - Para quem é indicado (público-alvo específico)
+   - Resultados ou benefícios tangíveis que o usuário pode esperar
+   - Por que é uma boa recomendação (autoridade/credibilidade)
+
+2. **strategy**: Estratégia de marketing para promover este produto nas redes sociais (3-5 frases). Deve incluir:
+   - Gatilhos mentais recomendados (escassez, prova social, autoridade, etc.)
+   - Ângulo de abordagem (dor do público, transformação, comparação, tutorial)
+   - Tom e estilo de comunicação ideal
+   - Tipo de CTA mais eficaz para este produto
 
 Contexto pesquisado:\n${finalAnalysisContext || "Sem contexto detalhado"}
 
 Regras:
-- Não usar hashtags
-- Não usar emojis
-- Não inventar dados
-- Escrever em português do Brasil
-- Focar em: o que é, benefício principal e para quem é indicado`;
+- Retorne APENAS JSON válido: {"description": "...", "strategy": "..."}
+- Não usar hashtags nem emojis
+- Não inventar dados — use apenas o contexto fornecido
+- Português do Brasil, tom profissional mas acessível
+- Descrição: 400-800 caracteres
+- Estratégia: 300-600 caracteres`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -297,10 +311,29 @@ Regras:
     }
 
     const aiData = await aiRes.json();
-    const description = aiData?.choices?.[0]?.message?.content?.trim() || "";
+    const rawContent = aiData?.choices?.[0]?.message?.content?.trim() || "";
+    
+    // Parse JSON response
+    let description = rawContent;
+    let strategy = "";
+    try {
+      let jsonStr = rawContent;
+      if (jsonStr.includes("```json")) {
+        jsonStr = jsonStr.replace(/```json\s*/g, "").replace(/```\s*/g, "");
+      } else if (jsonStr.includes("```")) {
+        jsonStr = jsonStr.replace(/```\s*/g, "");
+      }
+      const parsed = JSON.parse(jsonStr.trim());
+      description = parsed.description || rawContent;
+      strategy = parsed.strategy || "";
+    } catch {
+      // If JSON parse fails, use raw content as description
+      console.log("JSON parse failed, using raw content as description");
+    }
 
     return new Response(JSON.stringify({
       description,
+      strategy,
       sources: {
         site: siteUsed || Boolean(finalAnalysisContext.includes("ANÁLISE DO SITE")),
         web: webUsed || Boolean(finalAnalysisContext.includes("PESQUISA WEB")),
