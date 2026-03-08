@@ -214,6 +214,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     const videoId = currentVideoIdRef.current;
     if (!videoId) return;
 
+    // Prevent double-complete
+    if (activeRenderIdRef.current !== videoId) {
+      console.log(`[AutoRender] Ignoring complete for ${videoId} - not the active render`);
+      return;
+    }
+
     try {
       const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
       const videoTitle = currentVideo?.overlay_metadata?.script?.title || 'Vídeo';
@@ -236,6 +242,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       setCompletedCount(prev => prev + 1);
       setRenderQueue(prev => prev.filter(v => v.id !== videoId));
       setCurrentVideoId(null);
+      activeRenderIdRef.current = null;
       renderLockRef.current = false;
       reset();
 
@@ -245,6 +252,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     } catch (err: any) {
       console.error('[AutoRender] Error completing video:', err);
       toast.error('Erro ao salvar vídeo renderizado');
+      activeRenderIdRef.current = null;
       renderLockRef.current = false;
     }
   };
