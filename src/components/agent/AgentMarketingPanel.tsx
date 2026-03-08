@@ -196,6 +196,9 @@ export default function AgentMarketingPanel() {
         product_name: productName.trim(),
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
+        media_format: mediaFormat,
+        post_frequency: postFrequency,
+        marketing_strategy: marketingStrategy.trim() || null,
       };
 
       if (editingLink) {
