@@ -157,19 +157,20 @@ export default function AgentMarketingPanel() {
     }
   }, [currentWorkspace]);
 
-  // Load global frequency from agent_context
+  // Load/save global affiliate frequency
   useEffect(() => {
     if (!currentWorkspace) return;
-    const loadFrequency = async () => {
-      const { data } = await supabase
-        .from('agent_context')
-        .select('min_hours_between_posts')
-        .eq('workspace_id', currentWorkspace.id)
-        .maybeSingle();
-      // Reuse min_hours_between_posts field conceptually; we'll use a dedicated approach
-      // Store affiliate_frequency in the workspace settings JSON instead
-    };
+    const saved = localStorage.getItem(`affiliate_freq_${currentWorkspace.id}`);
+    if (saved) setGlobalFrequency(parseInt(saved, 10) || 4);
   }, [currentWorkspace]);
+
+  const updateGlobalFrequency = (val: number) => {
+    const clamped = Math.max(2, Math.min(10, val));
+    setGlobalFrequency(clamped);
+    if (currentWorkspace) {
+      localStorage.setItem(`affiliate_freq_${currentWorkspace.id}`, String(clamped));
+    }
+  };
 
   useEffect(() => {
     fetchLinks();
