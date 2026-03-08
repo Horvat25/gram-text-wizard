@@ -1046,10 +1046,10 @@ const Settings = () => {
                             <div className="flex-1">
                               <p className="font-semibold">@{account.username || account.display_name || 'TikTok User'}</p>
                               <p className="text-sm text-muted-foreground">
-                                {getTikTokTokenStatus(account) === 'active' ? (
+                                {getTikTokTokenStatus(account.expires_at) === 'active' ? (
                                   <span className="text-green-500">● Ativo</span>
-                                ) : getTikTokTokenStatus(account) === 'expiring' ? (
-                                  <span className="text-amber-500">● Expira em {getTikTokDaysUntilExpiry(account)} dias</span>
+                                ) : getTikTokTokenStatus(account.expires_at) === 'expiring' ? (
+                                  <span className="text-amber-500">● Expira em {getTikTokDaysUntilExpiry(account.expires_at)} dias</span>
                                 ) : (
                                   <span className="text-red-500">● Expirado</span>
                                 )}
