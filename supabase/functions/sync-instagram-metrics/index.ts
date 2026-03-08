@@ -190,22 +190,37 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
       const wsAccount = accounts.find((a: any) => a.workspace_id === wsId);
       
       let followersCount = 0;
+      let accountImpressions = 0;
+      let accountReach = 0;
+      
       if (wsAccount) {
-        try {
-          const igUserId = wsAccount.instagram_user_id;
-          const profileRes = await fetch(
-            `https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`
-          );
-          if (profileRes.ok) {
-            const profileData = await profileRes.json();
-            followersCount = profileData.followers_count || 0;
-            console.log(`📊 Instagram followers: ${followersCount}`);
+        const igUserId = wsAccount.instagram_user_id;
+        
+        // Fetch followers + account-level insights in parallel
+        const [profileRes, insightsRes] = await Promise.all([
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${Math.floor(Date.now()/1000) - 86400*28}&until=${Math.floor(Date.now()/1000)}&access_token=${accessToken}`).catch(() => null),
+        ]);
+
+        if (profileRes && profileRes.ok) {
+          const profileData = await profileRes.json();
+          followersCount = profileData.followers_count || 0;
+          console.log(`📊 Instagram followers: ${followersCount}`);
+        }
+
+        // Account-level impressions = "Visualizações" in Instagram
+        if (insightsRes && insightsRes.ok) {
+          const insData = await insightsRes.json();
+          for (const metric of insData.data || []) {
+            const totalValue = (metric.values || []).reduce((s: number, v: any) => s + (v.value || 0), 0);
+            if (metric.name === 'impressions') accountImpressions = totalValue;
+            if (metric.name === 'reach') accountReach = totalValue;
           }
-        } catch (e) {
-          console.error('Error fetching Instagram profile:', e);
+          console.log(`📊 Account views (impressions): ${accountImpressions}, reach: ${accountReach}`);
         }
       }
 
+      // Calculate weekly metrics from posts
       const now = new Date();
       const brasiliaOffset = -3 * 60 * 60 * 1000;
       const todayBrasilia = new Date(now.getTime() + brasiliaOffset);
@@ -224,15 +239,21 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
 
       const updateData: Record<string, any> = { updated_at: new Date().toISOString() };
       
-      if (weekPosts && weekPosts.length > 0) {
+      // Use account-level impressions for views (this is the real "Visualizações")
+      if (accountImpressions > 0) {
+        updateData.current_weekly_views = accountImpressions;
+      } else if (weekPosts && weekPosts.length > 0) {
         const totalReach = weekPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
+        updateData.current_weekly_views = totalReach;
+      }
+
+      if (weekPosts && weekPosts.length > 0) {
         const engagements = weekPosts.map((p: any) => {
           const total = (p.likes_count || 0) + (p.comments_count || 0) + (p.saves_count || 0);
           const reach = p.reach || 1;
           return (total / reach) * 100;
         });
         const avgEngagement = engagements.reduce((a: number, b: number) => a + b, 0) / engagements.length;
-        updateData.current_weekly_views = totalReach;
         updateData.current_weekly_engagement = Math.round(avgEngagement * 10) / 10;
       }
       
