@@ -289,6 +289,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
     setRenderQueue(prev => prev.filter(v => v.id !== videoId));
     setCurrentVideoId(null);
+    activeRenderIdRef.current = null;
     renderLockRef.current = false;
     reset();
 
