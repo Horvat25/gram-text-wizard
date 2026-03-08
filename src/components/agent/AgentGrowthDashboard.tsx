@@ -9,7 +9,7 @@ import {
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
   Sparkles, BarChart3, ArrowUpRight, ArrowDownRight, Minus,
   Trophy, Heart, Bookmark, Share2, RefreshCw, MessageCircle, Loader2,
-  Hash,
+  Hash, Globe,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
