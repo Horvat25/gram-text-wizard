@@ -103,6 +103,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       }
       fetchTopPosts();
+      fetchSourceRankings();
     } catch (e: any) {
       toast.dismiss('sync-ig');
       toast.error(e.message || 'Erro ao sincronizar');
