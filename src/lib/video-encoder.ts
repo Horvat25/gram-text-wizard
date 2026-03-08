@@ -18,31 +18,116 @@ export interface GenerateVideoOptions {
   onProgress?: (progress: number) => void;
 }
 
+const MAX_TOTAL_DURATION_SECONDS = 55;
+const MIN_SEGMENT_DURATION_SECONDS = 1;
+const FALLBACK_SEGMENT_DURATION_SECONDS = 5;
+
+function normalizeSegments(segments: VideoSegment[]): VideoSegment[] {
+  const sanitized = segments
+    .filter((segment) => !!segment.imageUrl)
+    .map((segment) => {
+      const parsed = Number(segment.duration);
+      const duration = Number.isFinite(parsed) && parsed > 0
+        ? parsed
+        : FALLBACK_SEGMENT_DURATION_SECONDS;
+
+      return {
+        ...segment,
+        duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, duration),
+      };
+    });
+
+  if (sanitized.length === 0) return [];
+
+  const totalDuration = sanitized.reduce((sum, segment) => sum + segment.duration, 0);
+  if (totalDuration <= MAX_TOTAL_DURATION_SECONDS) return sanitized;
+
+  const scale = MAX_TOTAL_DURATION_SECONDS / totalDuration;
+  return sanitized.map((segment) => ({
+    ...segment,
+    duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, segment.duration * scale),
+  }));
+}
+
+function drawFrame(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement | null,
+  width: number,
+  height: number,
+  text?: string
+) {
+  if (img) {
+    ctx.drawImage(img, 0, 0, width, height);
+  } else {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  if (text) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, height - 200, width, 200);
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, width / 2, height - 100, width - 80);
+  }
+}
+
 export async function generateVideoFromSegments(
   options: GenerateVideoOptions
 ): Promise<Blob> {
   const { segments, width = 1080, height = 1920, fps = 30, onProgress } = options;
+  const normalizedSegments = normalizeSegments(segments);
+
+  if (normalizedSegments.length === 0) {
+    throw new Error('Nenhum segmento válido para renderizar vídeo');
+  }
+
+  const timeline: Array<{ segment: VideoSegment; start: number; end: number }> = [];
+  let cursor = 0;
+  for (const segment of normalizedSegments) {
+    const start = cursor;
+    const end = start + segment.duration;
+    timeline.push({ segment, start, end });
+    cursor = end;
+  }
+
+  const expectedDurationMs = Math.round(cursor * 1000);
 
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas context indisponível');
+
   canvas.width = width;
   canvas.height = height;
 
   const stream = canvas.captureStream(fps);
-
   const mediaRecorder = new MediaRecorder(stream, {
     mimeType: 'video/webm;codecs=vp9',
     videoBitsPerSecond: 5000000,
   });
 
+  const imageMap = new Map<string, HTMLImageElement | null>();
+  await Promise.all(
+    normalizedSegments.map(async (segment) => {
+      if (imageMap.has(segment.imageUrl)) return;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      const loaded = await new Promise<boolean>((resolve) => {
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = segment.imageUrl;
+      });
+
+      imageMap.set(segment.imageUrl, loaded ? img : null);
+    })
+  );
+
   const chunks: Blob[] = [];
   mediaRecorder.ondataavailable = (e) => {
     if (e.data.size > 0) chunks.push(e.data);
   };
-
-  const expectedDurationMs = Math.round(
-    segments.reduce((sum, segment) => sum + Math.max(0, segment.duration), 0) * 1000
-  );
 
   return new Promise(async (resolve) => {
     mediaRecorder.onstop = async () => {
@@ -59,44 +144,31 @@ export async function generateVideoFromSegments(
 
     mediaRecorder.start();
 
-    const totalFrames = segments.reduce((sum, s) => sum + Math.round(s.duration * fps), 0);
-    let processedFrames = 0;
+    const startedAt = performance.now();
 
-    for (const segment of segments) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
+    const renderStep = () => {
+      const elapsedSeconds = (performance.now() - startedAt) / 1000;
+      const boundedElapsed = Math.min(elapsedSeconds, cursor);
 
-      const imageLoaded = await new Promise<boolean>((res) => {
-        img.onload = () => res(true);
-        img.onerror = () => res(false);
-        img.src = segment.imageUrl;
-      });
+      const active = timeline.find((entry) => boundedElapsed >= entry.start && boundedElapsed < entry.end)
+        ?? timeline[timeline.length - 1];
 
-      const frames = Math.round(segment.duration * fps);
-      for (let i = 0; i < frames; i++) {
-        if (imageLoaded) {
-          ctx.drawImage(img, 0, 0, width, height);
-        } else {
-          ctx.fillStyle = '#000';
-          ctx.fillRect(0, 0, width, height);
-        }
+      drawFrame(ctx, imageMap.get(active.segment.imageUrl) ?? null, width, height, active.segment.text);
 
-        if (segment.text) {
-          ctx.fillStyle = 'rgba(0,0,0,0.6)';
-          ctx.fillRect(0, height - 200, width, 200);
-          ctx.fillStyle = 'white';
-          ctx.font = 'bold 36px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(segment.text, width / 2, height - 100, width - 80);
-        }
+      const progress = cursor > 0
+        ? Math.round((boundedElapsed / cursor) * 100)
+        : 100;
+      onProgress?.(Math.min(100, Math.max(0, progress)));
 
-        processedFrames++;
-        onProgress?.(Math.round((processedFrames / totalFrames) * 100));
-        await new Promise(r => setTimeout(r, 1000 / fps));
+      if (boundedElapsed >= cursor) {
+        mediaRecorder.stop();
+        return;
       }
-    }
 
-    mediaRecorder.stop();
+      setTimeout(renderStep, Math.max(16, Math.round(1000 / fps)));
+    };
+
+    renderStep();
   });
 }
 
@@ -121,3 +193,4 @@ export async function uploadVideoToStorage(
 
   return urlData.publicUrl;
 }
+
