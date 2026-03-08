@@ -454,13 +454,24 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     const wasEmpty = prevPendingCountRef.current === 0;
     const hasNewVideos = newCount > 0;
 
-    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !isPausedRef.current) {
+    // Only auto-start if: was empty, now has videos, NOT rendering, NOT locked, NOT paused
+    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !renderLockRef.current && !activeRenderIdRef.current && !isPausedRef.current) {
       console.log('[AutoRender] Auto-starting render for pending reels');
       const firstVideo = pendingVideos[0];
       const title = firstVideo?.overlay_metadata?.script?.title || firstVideo?.overlay_metadata?.topic || 'Novo vídeo';
       notifyVideoReady(title);
 
-      setTimeout(() => {
+      // Clear any existing auto-start timeout to prevent duplicates
+      if (autoStartTimeoutRef.current) {
+        clearTimeout(autoStartTimeoutRef.current);
+      }
+
+      autoStartTimeoutRef.current = setTimeout(() => {
+        // Re-check locks before starting (another render may have started in the meantime)
+        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current) {
+          console.log('[AutoRender] Auto-start cancelled - render already active');
+          return;
+        }
         unlockAudio();
         toast.info('🎬 Iniciando renderização automática...');
         setIsRendering(true);
