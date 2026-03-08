@@ -152,12 +152,26 @@ export default function AutoVideoRenderingPanel() {
           <CardContent className="pt-0 space-y-3">
             {/* Progress Bar */}
             {isRendering && (
-              <div className="space-y-1">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Progresso total da fila</span>
+                  <span className="font-semibold">{progress}%</span>
+                </div>
                 <Progress value={progress} className="h-2" />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{completedCount} concluído(s)</span>
                   <span>{renderQueue.length} restante(s)</span>
                 </div>
+
+                {isGenerating && (
+                  <div className="space-y-1 rounded-md border border-border/60 bg-muted/30 p-2">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-muted-foreground">Progresso do vídeo atual</span>
+                      <span className="font-medium">{Math.round(currentRenderProgress)}%</span>
+                    </div>
+                    <Progress value={currentRenderProgress} className="h-1.5" />
+                  </div>
+                )}
               </div>
             )}
 
