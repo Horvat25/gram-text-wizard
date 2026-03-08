@@ -321,19 +321,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
             <span className="hidden xs:inline sm:inline">Marketing</span>
           </Button>
           
-          <Button
-            variant={showResponses ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showResponses && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('responses')}
-          >
-            <FileText className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Respostas</span>
-          </Button>
-          
           {/* History - user command chat history */}
           <Button
             variant={showHistory ? "default" : "ghost"}
