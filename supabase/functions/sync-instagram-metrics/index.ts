@@ -43,7 +43,7 @@ serve(async (req) => {
     // Save snapshots only on first batch
     if (batchOffset === 0) {
       console.log('📊 Step 1: Saving snapshots...');
-      await saveSnapshotsAndContext(supabase, accounts, accessToken);
+      await saveSnapshotsAndContext(supabase, accounts, periodDays);
     }
 
     // Fetch posts batch
