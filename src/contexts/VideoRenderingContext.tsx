@@ -430,6 +430,10 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   // ─── Actions ───────────────────────────────────────────────
   const startRendering = useCallback(() => {
+    if (renderLockRef.current || activeRenderIdRef.current) {
+      console.log('[AutoRender] Cannot start - render already in progress');
+      return;
+    }
     unlockAudio();
     setIsRendering(true);
     setIsPaused(false);
@@ -444,7 +448,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   const resumeRendering = useCallback(() => {
     setIsPaused(false);
-    if (!isGenerating) processNextVideo();
+    if (!isGenerating && !renderLockRef.current && !activeRenderIdRef.current) {
+      processNextVideo();
+    }
   }, [isGenerating, processNextVideo]);
 
   // ─── Auto-start when new pending videos appear ─────────────
