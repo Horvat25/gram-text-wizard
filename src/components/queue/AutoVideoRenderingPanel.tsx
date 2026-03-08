@@ -26,6 +26,7 @@ export default function AutoVideoRenderingPanel() {
     currentStep,
     isGenerating,
     progress,
+    currentRenderProgress,
     startRendering,
     pauseRendering,
     resumeRendering,
