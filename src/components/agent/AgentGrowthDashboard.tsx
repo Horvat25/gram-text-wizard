@@ -216,13 +216,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalImpressions = topPosts.reduce((s, p) => s + (p.impressions || 0), 0);
   const postLevelViews = totalImpressions > totalReach ? totalImpressions : totalReach;
   
-  // Use account-level views from context (real Instagram "Visualizações") when available
-  // Account-level views include profile visits, story views, reel plays, etc.
-  const accountViews = context?.current_weekly_views || 0;
-  // For 30d period use account views directly (synced for ~28 days), scale for longer periods
-  const scaledAccountViews = period === 30 ? accountViews : period === 60 ? Math.round(accountViews * 2) : Math.round(accountViews * 3.2);
-  // Use whichever is higher: account-level or post-level sum
-  const totalViews = Math.max(scaledAccountViews, postLevelViews);
+  // Use live account-level views from DB (synced from Instagram insights) as source of truth
+  const accountViews = accountViewsLive || context?.current_weekly_views || 0;
+  // If account views unavailable, fallback to post-level aggregation
+  const totalViews = accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   // Period-based goals (scaled from monthly base)
