@@ -141,6 +141,38 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setLoadingTopPosts(false);
   };
 
+  const fetchSummaryMetrics = async () => {
+    if (!currentWorkspace?.id) return;
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+
+    const { data } = await supabase
+      .from('posts')
+      .select('reach, impressions, likes_count, comments_count, saves_count, shares_count')
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('status', 'published')
+      .not('instagram_post_id', 'is', null)
+      .gte('published_at', since.toISOString());
+
+    const rows = data || [];
+    const likes = rows.reduce((s, p: any) => s + (p.likes_count || 0), 0);
+    const comments = rows.reduce((s, p: any) => s + (p.comments_count || 0), 0);
+    const saves = rows.reduce((s, p: any) => s + (p.saves_count || 0), 0);
+    const shares = rows.reduce((s, p: any) => s + (p.shares_count || 0), 0);
+    const reach = rows.reduce((s, p: any) => s + (p.reach || 0), 0);
+    const impressions = rows.reduce((s, p: any) => s + (p.impressions || 0), 0);
+
+    setSummaryMetrics({
+      likes,
+      comments,
+      saves,
+      shares,
+      reach,
+      impressions,
+      views: impressions > reach ? impressions : reach,
+    });
+  };
+
   const fetchSourceRankings = async () => {
     if (!currentWorkspace?.id) return;
     // Get rss_items that were used in posts
