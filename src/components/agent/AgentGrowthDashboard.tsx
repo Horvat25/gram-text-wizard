@@ -105,6 +105,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       }
       fetchTopPosts();
       fetchSourceRankings();
+      fetchAccountViews();
     } catch (e: any) {
       toast.dismiss('sync-ig');
       toast.error(e.message || 'Erro ao sincronizar');
