@@ -106,13 +106,11 @@ serve(async (req) => {
         recommendedPostsPerDay = 4; // Aggressive
       }
 
-      // Build report using AI
-      if (!LOVABLE_API_KEY) {
-        console.error('No LOVABLE_API_KEY');
-        continue;
-      }
-
-      const reportPrompt = `Você é o social media do perfil de tecnologia. Faça um RELATÓRIO BREVE para o dono do perfil como um humano falaria com seu chefe.
+      let reportContent = '';
+      
+      if (shouldUseAI && LOVABLE_API_KEY) {
+        // AI report only 4x/day (0h, 6h, 12h, 18h)
+        const reportPrompt = `Você é o social media do perfil de tecnologia. Faça um RELATÓRIO BREVE para o dono do perfil como um humano falaria com seu chefe.
 
 IMPORTANTE: O agente trabalha TODAS as prioridades simultaneamente:
 - 📈 Crescimento de seguidores
@@ -143,28 +141,27 @@ REGRAS:
 6. Use emojis moderados
 7. Termine com o plano pras próximas horas`;
 
-      const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash-lite',
-          messages: [
-            { role: 'user', content: reportPrompt }
-          ]
-        })
-      });
+        const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash-lite',
+            messages: [{ role: 'user', content: reportPrompt }]
+          })
+        });
 
-      let reportContent = '';
-      if (aiResponse.ok) {
-        const aiData = await aiResponse.json();
-        reportContent = aiData.choices?.[0]?.message?.content || '';
+        if (aiResponse.ok) {
+          const aiData = await aiResponse.json();
+          reportContent = aiData.choices?.[0]?.message?.content || '';
+        }
       }
 
       if (!reportContent) {
-        reportContent = `📊 **Relatório da Semana**\n\nPublicamos ${totalPosts} posts com ${totalReach} de alcance. Progresso da meta: ${viewsProgress}%. Recomendo ${recommendedPostsPerDay} posts/dia.`;
+        // Data-only report (no AI cost) — used on non-report hours
+        reportContent = `📊 **Checkpoint ${brasiliaHour}h**\n\n📝 ${totalPosts} posts publicados | 📅 ${scheduled.length} agendados\n❤️ ${totalLikes} curtidas | 💬 ${totalComments} comentários | 🔄 ${totalShares} shares | 💾 ${totalSaves} saves\n👁️ Alcance: ${totalReach.toLocaleString()} (${viewsProgress}% da meta)\n📈 Recomendação: ${recommendedPostsPerDay} posts/dia`;
       }
 
       // Save proactive message
