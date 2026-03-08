@@ -157,6 +157,20 @@ export default function AgentMarketingPanel() {
     }
   }, [currentWorkspace]);
 
+  // Load global frequency from agent_context
+  useEffect(() => {
+    if (!currentWorkspace) return;
+    const loadFrequency = async () => {
+      const { data } = await supabase
+        .from('agent_context')
+        .select('min_hours_between_posts')
+        .eq('workspace_id', currentWorkspace.id)
+        .maybeSingle();
+      // Reuse min_hours_between_posts field conceptually; we'll use a dedicated approach
+      // Store affiliate_frequency in the workspace settings JSON instead
+    };
+  }, [currentWorkspace]);
+
   useEffect(() => {
     fetchLinks();
   }, [fetchLinks]);
