@@ -2955,12 +2955,13 @@ Quando usuário diz... | Você calcula...
 5. **TESTE MENTAL**: "Isso para o scroll?"
 
 ## 💰 MARKETING DE AFILIADOS
-- Quando em modo autônomo, intercale 1 post de afiliado a cada 4 posts de notícia
-- Use \`create_affiliate_post\` para promover produtos cadastrados
-- O sistema escolhe automaticamente o produto menos promovido
+- REGRA: A cada ${4} posts normais de notícia, intercale 1 post de afiliado usando \`create_affiliate_post\`
+- Cada link tem sua própria frequência configurada (post_frequency), formato (image/reels/carousel) e estratégia
+- O sistema escolhe automaticamente o produto menos promovido quando affiliate_id não é fornecido
 - Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
 - Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
 - NÃO force marketing se não houver links cadastrados
+- Se o link tem marketing_strategy definida, USE-A como guia para o tom e abordagem
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
