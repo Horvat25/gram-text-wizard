@@ -139,27 +139,48 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const likes = metricsData.like_count || 0;
   const comments = metricsData.comments_count || 0;
 
-  let reach = 0, saves = 0, impressions = 0, shares = 0;
+  // Keep previously synced values as fallback so we don't regress to tiny numbers.
+  let reach = post.reach || 0;
+  let saves = post.saves_count || 0;
+  let impressions = post.impressions || 0;
+  let shares = post.shares_count || 0;
 
   if (insightsRes && insightsRes.ok) {
     const insightsData = await insightsRes.json();
     for (const insight of insightsData.data || []) {
-      const value = insight.values?.[0]?.value || 0;
+      const rawValue = insight.values?.[0]?.value;
+      const value = typeof rawValue === 'number' ? rawValue : Number(rawValue) || 0;
+
       switch (insight.name) {
-        case "reach": reach = value; break;
-        case "saved": saves = value; break;
-        case "impressions": impressions = value; break;
-        case "shares": shares = value; break;
-        case "plays": 
-          // plays = actual video views, use as impressions for Reels if higher
+        case "reach":
+          reach = value;
+          break;
+        case "saved":
+          saves = value;
+          break;
+        case "impressions":
+        case "views":
+          impressions = value;
+          break;
+        case "shares":
+          shares = value;
+          break;
+        case "plays":
           if (value > impressions) impressions = value;
           break;
       }
     }
+  } else if (insightsRes) {
+    try {
+      const errorData = await insightsRes.json();
+      console.log(`⚠️ Insights unavailable for media ${mediaId}:`, errorData?.error?.message || insightsRes.statusText);
+    } catch {
+      console.log(`⚠️ Insights unavailable for media ${mediaId}: HTTP ${insightsRes.status}`);
+    }
   }
 
   const minReach = likes + comments + saves;
-  const finalReach = Math.max(reach, minReach);
+  const finalReach = Math.max(reach, minReach, post.reach || 0);
 
   const { error } = await supabase
     .from("posts")
