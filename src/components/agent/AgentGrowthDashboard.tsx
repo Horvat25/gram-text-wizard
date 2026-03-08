@@ -67,6 +67,15 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const [topPosts, setTopPosts] = useState<TopPost[]>([]);
   const [sourceRankings, setSourceRankings] = useState<SourceRanking[]>([]);
   const [accountViewsLive, setAccountViewsLive] = useState<number>(0);
+  const [summaryMetrics, setSummaryMetrics] = useState({
+    likes: 0,
+    comments: 0,
+    saves: 0,
+    shares: 0,
+    reach: 0,
+    impressions: 0,
+    views: 0,
+  });
   const [loadingTopPosts, setLoadingTopPosts] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
@@ -79,7 +88,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     toast.loading('Sincronizando métricas do Instagram...', { id: 'sync-ig' });
     try {
       const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
-        body: { offset: 0, batch_size: 50 }
+        body: { offset: 0, batch_size: 50, period_days: period }
       });
       if (error) throw error;
       
@@ -90,7 +99,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       // If there are more, do one more batch silently
       if (hasMore) {
         const { data: d2 } = await supabase.functions.invoke('sync-instagram-metrics', {
-          body: { offset: data?.next_offset || 50, batch_size: 50 }
+          body: { offset: data?.next_offset || 50, batch_size: 50, period_days: period }
         });
         const u2 = d2?.updated || 0;
         const d2del = d2?.deleted || 0;
@@ -104,6 +113,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       }
       fetchTopPosts();
+      fetchSummaryMetrics();
       fetchSourceRankings();
       fetchAccountViews();
     } catch (e: any) {
@@ -130,6 +140,38 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       .limit(20);
     setTopPosts((data as TopPost[]) || []);
     setLoadingTopPosts(false);
+  };
+
+  const fetchSummaryMetrics = async () => {
+    if (!currentWorkspace?.id) return;
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+
+    const { data } = await supabase
+      .from('posts')
+      .select('reach, impressions, likes_count, comments_count, saves_count, shares_count')
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('status', 'published')
+      .not('instagram_post_id', 'is', null)
+      .gte('published_at', since.toISOString());
+
+    const rows = data || [];
+    const likes = rows.reduce((s, p: any) => s + (p.likes_count || 0), 0);
+    const comments = rows.reduce((s, p: any) => s + (p.comments_count || 0), 0);
+    const saves = rows.reduce((s, p: any) => s + (p.saves_count || 0), 0);
+    const shares = rows.reduce((s, p: any) => s + (p.shares_count || 0), 0);
+    const reach = rows.reduce((s, p: any) => s + (p.reach || 0), 0);
+    const impressions = rows.reduce((s, p: any) => s + (p.impressions || 0), 0);
+
+    setSummaryMetrics({
+      likes,
+      comments,
+      saves,
+      shares,
+      reach,
+      impressions,
+      views: impressions > reach ? impressions : reach,
+    });
   };
 
   const fetchSourceRankings = async () => {
@@ -204,22 +246,23 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   useEffect(() => {
     if (!currentWorkspace?.id) return;
     fetchTopPosts();
+    fetchSummaryMetrics();
     fetchSourceRankings();
     fetchAccountViews();
   }, [currentWorkspace?.id, period]);
 
-  // Derived analytics from topPosts
-  const totalLikes = topPosts.reduce((s, p) => s + (p.likes_count || 0), 0);
-  const totalComments = topPosts.reduce((s, p) => s + (p.comments_count || 0), 0);
-  const totalSaves = topPosts.reduce((s, p) => s + (p.saves_count || 0), 0);
-  const totalReach = topPosts.reduce((s, p) => s + (p.reach || 0), 0);
-  const totalImpressions = topPosts.reduce((s, p) => s + (p.impressions || 0), 0);
-  const postLevelViews = totalImpressions > totalReach ? totalImpressions : totalReach;
+  // Derived analytics from full published dataset in period
+  const totalLikes = summaryMetrics.likes;
+  const totalComments = summaryMetrics.comments;
+  const totalSaves = summaryMetrics.saves;
+  const totalReach = summaryMetrics.reach;
+  const totalImpressions = summaryMetrics.impressions;
+  const postLevelViews = summaryMetrics.views;
   
-  // Use live account-level views from DB (synced from Instagram insights) as source of truth
+  // Instagram Account Insights API has a practical 30-day reliable window for this endpoint.
+  // For 60/90d, use aggregated post metrics to avoid under-reporting.
   const accountViews = accountViewsLive || context?.current_weekly_views || 0;
-  // If account views unavailable, fallback to post-level aggregation
-  const totalViews = accountViews > 0 ? accountViews : postLevelViews;
+  const totalViews = period === 30 && accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   // Period-based goals (scaled from monthly base)

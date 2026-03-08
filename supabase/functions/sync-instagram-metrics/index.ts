@@ -17,11 +17,13 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     let batchOffset = 0;
-    let batchSize = 50; // increased from 30
+    let batchSize = 50;
+    let periodDays = 90;
     try {
       const body = await req.json();
       batchOffset = body.offset || 0;
       batchSize = body.batch_size || 50;
+      periodDays = body.period_days || 90;
     } catch { /* no body */ }
 
     const { data: accounts, error: accountError } = await supabase
@@ -41,7 +43,7 @@ serve(async (req) => {
     // Save snapshots only on first batch
     if (batchOffset === 0) {
       console.log('📊 Step 1: Saving snapshots...');
-      await saveSnapshotsAndContext(supabase, accounts, accessToken);
+      await saveSnapshotsAndContext(supabase, accounts, periodDays);
     }
 
     // Fetch posts batch
@@ -204,28 +206,33 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 }
 
 // ===== Helper: Save snapshots and update agent_context =====
-async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessToken: string) {
+async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDays: number) {
   try {
     const workspaceIds = [...new Set(accounts.map((a: any) => a.workspace_id).filter(Boolean))];
     
     for (const wsId of workspaceIds) {
       const wsAccount = accounts.find((a: any) => a.workspace_id === wsId);
+      const accessToken = wsAccount?.access_token;
       
       let followersCount = 0;
       let accountImpressions = 0;
       let accountReach = 0;
       
-      if (wsAccount) {
+      if (wsAccount && accessToken) {
         const igUserId = wsAccount.instagram_user_id;
-        
+        const nowTs = Math.floor(Date.now() / 1000);
+        const sinceTs = nowTs - 86400 * Math.max(14, Math.min(periodDays, 90));
+
+        // Instagram account insights supports fixed timeframe values.
+        const timeframe = periodDays >= 90 ? 'last_90_days' : periodDays >= 30 ? 'last_30_days' : 'last_14_days';
+
         // Fetch followers + account-level insights in parallel
         // New API uses views(metric_type=total_value). Keep legacy fallback for impressions.
-        const nowTs = Math.floor(Date.now() / 1000);
-        const sinceTs = nowTs - 86400 * 30;
-
-        const [profileRes, viewsInsightsRes, legacyInsightsRes] = await Promise.all([
+        const [profileRes, viewsRangeRes, viewsInsightsRes, viewsBreakdownRes, legacyInsightsRes] = await Promise.all([
           fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=last_30_days&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&since=${sinceTs}&until=${nowTs}&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=${timeframe}&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views&period=day&timeframe=${timeframe}&metric_type=total_value&breakdown=media_product_type&access_token=${accessToken}`).catch(() => null),
           fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
         ]);
 
@@ -250,22 +257,65 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
         };
 
         // Primary: account views (new API)
-        if (viewsInsightsRes && viewsInsightsRes.ok) {
-          const insData = await viewsInsightsRes.json();
+        const parseViewsResponse = async (res: Response | null, label: string) => {
+          if (!res) return { views: 0, reach: 0 };
+          if (!res.ok) {
+            try {
+              const errData = await res.json();
+              console.log(`⚠️ Account views ${label} failed: ${errData?.error?.message || res.statusText}`);
+            } catch {
+              console.log(`⚠️ Account views ${label} failed: HTTP ${res.status}`);
+            }
+            return { views: 0, reach: 0 };
+          }
+
+          const insData = await res.json();
+          let views = 0;
+          let reach = 0;
           for (const metric of insData.data || []) {
             const totalValue = parseMetricValue(metric);
-            if (metric.name === 'views') accountImpressions = totalValue;
-            if (metric.name === 'reach') accountReach = totalValue;
+            if (metric.name === 'views') views = totalValue;
+            if (metric.name === 'reach') reach = totalValue;
           }
-          console.log(`📊 Account views(new): ${accountImpressions}, reach: ${accountReach}`);
-        } else if (viewsInsightsRes) {
+          console.log(`📊 Account views(${label}): ${views}, reach: ${reach}`);
+          return { views, reach };
+        };
+
+        const parseBreakdownViews = async (res: Response | null): Promise<number> => {
+          if (!res || !res.ok) return 0;
           try {
-            const errData = await viewsInsightsRes.json();
-            console.log(`⚠️ Account views endpoint failed: ${errData?.error?.message || viewsInsightsRes.statusText}`);
+            const data = await res.json();
+            let total = 0;
+            for (const metric of data.data || []) {
+              if (metric.name !== 'views') continue;
+
+              const directValue = typeof metric.total_value?.value === 'number' ? metric.total_value.value : 0;
+              let breakdownSum = 0;
+              const breakdowns = metric.total_value?.breakdowns || [];
+              for (const b of breakdowns) {
+                for (const r of b.results || []) {
+                  const v = typeof r?.value === 'number' ? r.value : Number(r?.value) || 0;
+                  breakdownSum += v;
+                }
+              }
+
+              total = Math.max(total, directValue, breakdownSum);
+            }
+            if (total > 0) console.log(`📊 Account views(breakdown): ${total}`);
+            return total;
           } catch {
-            console.log(`⚠️ Account views endpoint failed: HTTP ${viewsInsightsRes.status}`);
+            return 0;
           }
-        }
+        };
+
+        const [rangeMetrics, timeframeMetrics, breakdownViews] = await Promise.all([
+          parseViewsResponse(viewsRangeRes, 'range'),
+          parseViewsResponse(viewsInsightsRes, 'timeframe'),
+          parseBreakdownViews(viewsBreakdownRes),
+        ]);
+
+        accountImpressions = Math.max(rangeMetrics.views, timeframeMetrics.views, breakdownViews);
+        accountReach = Math.max(rangeMetrics.reach, timeframeMetrics.reach);
 
         // Fallback: legacy impressions endpoint
         if (accountImpressions === 0 && legacyInsightsRes && legacyInsightsRes.ok) {
