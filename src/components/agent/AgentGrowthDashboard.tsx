@@ -213,11 +213,12 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
       {/* 1. KPI Cards */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} sub={periodLabel} />
-          <KPICard icon={<MessageCircle className="h-4 w-4 text-primary" />} label="Comentários" value={formatNumber(totalComments)} sub={periodLabel} />
-          <KPICard icon={<Bookmark className="h-4 w-4 text-amber-500" />} label="Salvamentos" value={formatNumber(totalSaves)} sub={periodLabel} />
-          <KPICard icon={<Eye className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <KPICard icon={<Eye className="h-4 w-4 text-blue-500" />} label="Visualizações" value={formatNumber(totalViews)} sub={periodLabel} />
+          <KPICard icon={<Users className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
+          <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} />
+          <KPICard icon={<Bookmark className="h-4 w-4 text-amber-500" />} label="Salvamentos" value={formatNumber(totalSaves)} />
+          <KPICard icon={<Share2 className="h-4 w-4 text-purple-500" />} label="Compartilh." value={formatNumber(topPosts.reduce((s, p) => s + (p.shares_count || 0), 0))} />
         </div>
       </motion.div>
 
