@@ -427,6 +427,25 @@ const PublicationQueueTab = ({
         )}
 
         <div className="flex gap-2 flex-wrap">
+          {/* Render Video button for agent-created reels */}
+          {needsRendering && (
+            <Button
+              size="sm"
+              variant="default"
+              className="bg-purple-600 hover:bg-purple-700"
+              onClick={() => handleRenderVideo(post)}
+              disabled={isRendering && !isRenderingThisPost}
+            >
+              {isRenderingThisPost ? (
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <Film className="h-3 w-3 mr-1" />
+              )}
+              {isRenderingThisPost ? `Renderizando ${Math.round(currentRenderProgress)}%` : "Gerar Vídeo"}
+            </Button>
+          )}
+
+          <Button
             size="sm"
             variant="outline"
             onClick={() => setViewingPost(post)}
