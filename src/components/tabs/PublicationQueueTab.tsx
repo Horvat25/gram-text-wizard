@@ -314,6 +314,27 @@ const PublicationQueueTab = ({
     }
   };
 
+  const handleRenderVideo = async (post: Post) => {
+    try {
+      await refetchPendingVideos();
+
+      if (!isRendering) {
+        startRendering();
+        toast.info("Renderização iniciada");
+        return;
+      }
+
+      if (currentVideoId === post.id) {
+        toast.info("Este vídeo já está em renderização");
+      } else {
+        toast.info("Já existe outra renderização em andamento");
+      }
+    } catch (err) {
+      console.error("Error starting render:", err);
+      toast.error("Erro ao iniciar renderização");
+    }
+  };
+
   const getStatusColor = (status: string, isOverdue: boolean = false) => {
     if (isOverdue) return "bg-destructive text-destructive-foreground";
     switch (status) {
