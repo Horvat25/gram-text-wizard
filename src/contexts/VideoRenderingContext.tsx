@@ -121,7 +121,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   const fetchPendingVideos = useCallback(async () => {
     if (!user || !currentWorkspace) {
       setPendingVideos([]);
-      setRenderQueue([]);
+      if (!isRenderingRef.current && !renderLockRef.current) {
+        setRenderQueue([]);
+      }
       return;
     }
 
@@ -143,7 +145,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       console.log(`[AutoRender] Found ${pending.length} pending reels (workspace ${currentWorkspace.id})`);
       setPendingVideos(pending);
 
-      if (!isRenderingRef.current) {
+      // Only update the render queue if we're NOT actively rendering
+      // This prevents the queue from being reset mid-render
+      if (!isRenderingRef.current && !renderLockRef.current) {
         setRenderQueue(pending);
       }
     } catch (error) {
