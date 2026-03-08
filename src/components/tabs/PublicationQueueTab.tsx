@@ -491,24 +491,34 @@ const PublicationQueueTab = ({
     <div className="space-y-6">
 
       {/* Timezone Info */}
-      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Globe className="h-4 w-4" />
-          <span>Fuso horário: <strong>Brasília (UTC-3)</strong></span>
+      <div className="flex flex-col gap-2 p-3 rounded-lg bg-muted/50 border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Globe className="h-4 w-4" />
+            <span>Fuso horário: <strong>Brasília (UTC-3)</strong></span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleProcessScheduled}
+            disabled={isCheckingScheduler}
+          >
+            {isCheckingScheduler ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-2" />
+            )}
+            Processar Agendados
+          </Button>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleProcessScheduled}
-          disabled={isCheckingScheduler}
-        >
-          {isCheckingScheduler ? (
-            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4 mr-2" />
-          )}
-          Processar Agendados
-        </Button>
+        {isRendering && (
+          <div className="text-xs text-primary flex items-center gap-2">
+            <RefreshCw className="h-3 w-3 animate-spin" />
+            <span>
+              Renderização em andamento ({currentStep}) — {Math.round(currentRenderProgress)}%
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Overdue Posts Alert */}
