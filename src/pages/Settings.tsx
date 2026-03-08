@@ -34,7 +34,7 @@ import Header from "@/components/Header";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { useTikTokAccounts } from "@/hooks/useTikTokAccounts";
-import { AccountCard } from "@/components/AccountCard";
+import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 

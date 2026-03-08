@@ -755,7 +755,9 @@ const PublicationQueueTab = ({
               <ChevronUp className="h-4 w-4" />
               <span className="sr-only">Voltar ao topo</span>
             </Button>
-
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
