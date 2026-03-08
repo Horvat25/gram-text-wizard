@@ -251,18 +251,18 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     fetchAccountViews();
   }, [currentWorkspace?.id, period]);
 
-  // Derived analytics from topPosts
-  const totalLikes = topPosts.reduce((s, p) => s + (p.likes_count || 0), 0);
-  const totalComments = topPosts.reduce((s, p) => s + (p.comments_count || 0), 0);
-  const totalSaves = topPosts.reduce((s, p) => s + (p.saves_count || 0), 0);
-  const totalReach = topPosts.reduce((s, p) => s + (p.reach || 0), 0);
-  const totalImpressions = topPosts.reduce((s, p) => s + (p.impressions || 0), 0);
-  const postLevelViews = totalImpressions > totalReach ? totalImpressions : totalReach;
+  // Derived analytics from full published dataset in period
+  const totalLikes = summaryMetrics.likes;
+  const totalComments = summaryMetrics.comments;
+  const totalSaves = summaryMetrics.saves;
+  const totalReach = summaryMetrics.reach;
+  const totalImpressions = summaryMetrics.impressions;
+  const postLevelViews = summaryMetrics.views;
   
-  // Use live account-level views from DB (synced from Instagram insights) as source of truth
+  // Instagram Account Insights API has a practical 30-day reliable window for this endpoint.
+  // For 60/90d, use aggregated post metrics to avoid under-reporting.
   const accountViews = accountViewsLive || context?.current_weekly_views || 0;
-  // If account views unavailable, fallback to post-level aggregation
-  const totalViews = accountViews > 0 ? accountViews : postLevelViews;
+  const totalViews = period === 30 && accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   // Period-based goals (scaled from monthly base)
