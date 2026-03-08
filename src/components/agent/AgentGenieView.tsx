@@ -9,10 +9,6 @@ import {
   Settings,
   TrendingUp
 } from 'lucide-react';
-  LayoutDashboard,
-  Settings,
-  TrendingUp
-} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
