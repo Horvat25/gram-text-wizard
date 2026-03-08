@@ -213,38 +213,27 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   // Close other panels when opening one
   const toggleChat = () => {
     setShowChat(!showChat);
-    if (!showChat) {
-      setShowFeeds(false);
-      setShowResponses(false);
-      setShowGrowth(false);
-    }
+    if (!showChat) { setShowFeeds(false); setShowResponses(false); setShowGrowth(false); setShowMarketing(false); }
   };
 
   const toggleFeeds = () => {
     setShowFeeds(!showFeeds);
-    if (!showFeeds) {
-      setShowChat(false);
-      setShowResponses(false);
-      setShowGrowth(false);
-    }
+    if (!showFeeds) { setShowChat(false); setShowResponses(false); setShowGrowth(false); setShowMarketing(false); }
   };
 
   const toggleResponses = () => {
     setShowResponses(!showResponses);
-    if (!showResponses) {
-      setShowChat(false);
-      setShowFeeds(false);
-      setShowGrowth(false);
-    }
+    if (!showResponses) { setShowChat(false); setShowFeeds(false); setShowGrowth(false); setShowMarketing(false); }
   };
 
   const toggleGrowth = () => {
     setShowGrowth(!showGrowth);
-    if (!showGrowth) {
-      setShowChat(false);
-      setShowFeeds(false);
-      setShowResponses(false);
-    }
+    if (!showGrowth) { setShowChat(false); setShowFeeds(false); setShowResponses(false); setShowMarketing(false); }
+  };
+
+  const toggleMarketing = () => {
+    setShowMarketing(!showMarketing);
+    if (!showMarketing) { setShowChat(false); setShowFeeds(false); setShowResponses(false); setShowGrowth(false); }
   };
 
   if (isLoadingHistory) {
