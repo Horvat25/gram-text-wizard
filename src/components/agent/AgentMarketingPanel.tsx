@@ -59,8 +59,11 @@ export default function AgentMarketingPanel() {
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
   const [mediaFormats, setMediaFormats] = useState<string[]>(['image']);
-  const [postFrequency, setPostFrequency] = useState(4);
   const [marketingStrategy, setMarketingStrategy] = useState('');
+
+  // Global frequency
+  const [globalFrequency, setGlobalFrequency] = useState(4);
+  const [savingFrequency, setSavingFrequency] = useState(false);
 
   const analyzeSite = async () => {
     if (!affiliateUrl.trim()) {
@@ -154,6 +157,21 @@ export default function AgentMarketingPanel() {
     }
   }, [currentWorkspace]);
 
+  // Load/save global affiliate frequency
+  useEffect(() => {
+    if (!currentWorkspace) return;
+    const saved = localStorage.getItem(`affiliate_freq_${currentWorkspace.id}`);
+    if (saved) setGlobalFrequency(parseInt(saved, 10) || 4);
+  }, [currentWorkspace]);
+
+  const updateGlobalFrequency = (val: number) => {
+    const clamped = Math.max(2, Math.min(10, val));
+    setGlobalFrequency(clamped);
+    if (currentWorkspace) {
+      localStorage.setItem(`affiliate_freq_${currentWorkspace.id}`, String(clamped));
+    }
+  };
+
   useEffect(() => {
     fetchLinks();
   }, [fetchLinks]);
@@ -163,7 +181,6 @@ export default function AgentMarketingPanel() {
     setAffiliateUrl('');
     setDescription('');
     setMediaFormats(['image']);
-    setPostFrequency(4);
     setMarketingStrategy('');
     setSiteAnalysis('');
     setAnalysisSources(null);
@@ -177,7 +194,6 @@ export default function AgentMarketingPanel() {
     setDescription(link.description || '');
     const formats = link.media_format ? link.media_format.split(',') : ['image'];
     setMediaFormats(formats);
-    setPostFrequency(link.post_frequency || 4);
     setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
     setAnalysisSources(null);
@@ -198,7 +214,6 @@ export default function AgentMarketingPanel() {
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
         media_format: mediaFormats.join(','),
-        post_frequency: postFrequency,
         marketing_strategy: marketingStrategy.trim() || null,
       };
 
@@ -276,6 +291,19 @@ export default function AgentMarketingPanel() {
         </Button>
       </div>
 
+      {/* Global frequency control */}
+      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border/50">
+        <span className="text-xs text-muted-foreground">🔄 Frequência de marketing</span>
+        <div className="flex items-center gap-1.5">
+          <Button type="button" variant="outline" size="icon" className="h-5 w-5 text-[10px]"
+            onClick={() => updateGlobalFrequency(globalFrequency - 1)}>−</Button>
+          <span className="text-xs font-medium w-5 text-center">{globalFrequency}</span>
+          <Button type="button" variant="outline" size="icon" className="h-5 w-5 text-[10px]"
+            onClick={() => updateGlobalFrequency(globalFrequency + 1)}>+</Button>
+          <span className="text-[10px] text-muted-foreground ml-1">a cada {globalFrequency} posts</span>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -321,9 +349,7 @@ export default function AgentMarketingPanel() {
                           {f === 'reels' ? '🎬' : f === 'carousel' ? '📸' : '🖼️'} {f === 'reels' ? 'Reels' : f === 'carousel' ? 'Carrossel' : 'Imagem'}
                         </Badge>
                       ))}
-                      <Badge variant="outline" className="text-[10px] h-4 px-1.5">
-                        🔄 {link.post_frequency}x
-                      </Badge>
+                      <span className="text-[10px] text-muted-foreground">·</span>
                       <span className="text-[10px] text-muted-foreground">
                         📊 {link.posts_count}
                       </span>
@@ -481,21 +507,6 @@ export default function AgentMarketingPanel() {
                     </Button>
                   );
                 })}
-              </div>
-            </div>
-
-            {/* Frequency + Strategy in compact layout */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Label className="text-xs">Frequência</Label>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Button type="button" variant="outline" size="icon" className="h-6 w-6 text-xs"
-                    onClick={() => setPostFrequency(Math.max(2, postFrequency - 1))}>−</Button>
-                  <span className="text-xs font-medium w-5 text-center">{postFrequency}</span>
-                  <Button type="button" variant="outline" size="icon" className="h-6 w-6 text-xs"
-                    onClick={() => setPostFrequency(Math.min(10, postFrequency + 1))}>+</Button>
-                  <span className="text-[10px] text-muted-foreground">a cada {postFrequency} posts</span>
-                </div>
               </div>
             </div>
 
