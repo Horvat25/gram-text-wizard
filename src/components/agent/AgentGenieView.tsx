@@ -25,6 +25,7 @@ import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
+import AgentMarketingPanel from './AgentMarketingPanel';
 
 interface AgentConfig {
   agent_name: string;
