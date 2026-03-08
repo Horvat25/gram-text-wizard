@@ -133,14 +133,18 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalViews = totalImpressions > 0 ? totalImpressions : totalReach; // impressions = views, fallback to reach
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
-  // Progress based on period data vs goals
-  const goalViews = (context?.goal_weekly_views || 10000) * (period / 7);
-  const goalFollowers = (context?.goal_weekly_followers || 100) * (period / 7);
-  const goalEngagement = context?.goal_weekly_engagement || 5;
+  // Period-based goals (scaled from monthly base)
+  const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
+    30: { views: 10000, likes: 500, saves: 200, comments: 100 },
+    60: { views: 25000, likes: 1200, saves: 500, comments: 250 },
+    90: { views: 50000, likes: 2500, saves: 1000, comments: 500 },
+  };
+  const goals = GOALS[period] || GOALS[90];
 
-  const viewsProgress = Math.min((totalReach / goalViews) * 100, 100);
-  const followersProgress = Math.min(((context?.current_weekly_followers || 0) * (period / 7)) / goalFollowers * 100, 100);
-  const engagementProgress = Math.min((avgEngRate / goalEngagement) * 100, 100);
+  const viewsProgress = goals.views > 0 ? Math.min((totalViews / goals.views) * 100, 100) : 0;
+  const likesProgress = goals.likes > 0 ? Math.min((totalLikes / goals.likes) * 100, 100) : 0;
+  const savesProgress = goals.saves > 0 ? Math.min((totalSaves / goals.saves) * 100, 100) : 0;
+  const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
   // Content strategy
   const totalContent = (context?.content_distribution_videos || 3) + 
