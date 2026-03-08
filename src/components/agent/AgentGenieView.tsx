@@ -25,7 +25,7 @@ import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
 import AgentProactiveChat from './AgentProactiveChat';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
-import AgentResponsesPanel from './AgentResponsesPanel';
+
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
@@ -66,7 +66,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const [showAgentChat, setShowAgentChat] = useState(false); // Agent proactive chat
   const [showHistory, setShowHistory] = useState(false); // User command history
   const [showFeeds, setShowFeeds] = useState(false);
-  const [showResponses, setShowResponses] = useState(false);
+  
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
 
@@ -218,7 +218,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     setShowAgentChat(false);
     setShowHistory(false);
     setShowFeeds(false);
-    setShowResponses(false);
+    
     setShowGrowth(false);
     setShowMarketing(false);
   };
@@ -228,7 +228,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       agentChat: showAgentChat,
       history: showHistory,
       feeds: showFeeds,
-      responses: showResponses,
+      
       growth: showGrowth,
       marketing: showMarketing,
     }[panel];
@@ -239,7 +239,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history': setShowHistory(true); break;
         case 'feeds': setShowFeeds(true); break;
-        case 'responses': setShowResponses(true); break;
+        
         case 'growth': setShowGrowth(true); break;
         case 'marketing': setShowMarketing(true); break;
       }
@@ -430,10 +430,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         </div>
       )}
       
-      <AgentResponsesPanel
-        isOpen={showResponses}
-        onClose={() => setShowResponses(false)}
-      />
       
       {/* Growth Dashboard Panel */}
       {showGrowth && (
