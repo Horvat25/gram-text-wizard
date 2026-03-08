@@ -484,21 +484,6 @@ export default function AgentMarketingPanel() {
               </div>
             </div>
 
-            {/* Frequency + Strategy in compact layout */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Label className="text-xs">Frequência</Label>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Button type="button" variant="outline" size="icon" className="h-6 w-6 text-xs"
-                    onClick={() => setPostFrequency(Math.max(2, postFrequency - 1))}>−</Button>
-                  <span className="text-xs font-medium w-5 text-center">{postFrequency}</span>
-                  <Button type="button" variant="outline" size="icon" className="h-6 w-6 text-xs"
-                    onClick={() => setPostFrequency(Math.min(10, postFrequency + 1))}>+</Button>
-                  <span className="text-[10px] text-muted-foreground">a cada {postFrequency} posts</span>
-                </div>
-              </div>
-            </div>
-
             <div>
               <Label className="text-xs">Estratégia (opcional)</Label>
               <Textarea
