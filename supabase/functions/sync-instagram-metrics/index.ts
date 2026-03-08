@@ -256,22 +256,37 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDay
         };
 
         // Primary: account views (new API)
-        if (viewsInsightsRes && viewsInsightsRes.ok) {
-          const insData = await viewsInsightsRes.json();
+        const parseViewsResponse = async (res: Response | null, label: string) => {
+          if (!res) return { views: 0, reach: 0 };
+          if (!res.ok) {
+            try {
+              const errData = await res.json();
+              console.log(`⚠️ Account views ${label} failed: ${errData?.error?.message || res.statusText}`);
+            } catch {
+              console.log(`⚠️ Account views ${label} failed: HTTP ${res.status}`);
+            }
+            return { views: 0, reach: 0 };
+          }
+
+          const insData = await res.json();
+          let views = 0;
+          let reach = 0;
           for (const metric of insData.data || []) {
             const totalValue = parseMetricValue(metric);
-            if (metric.name === 'views') accountImpressions = totalValue;
-            if (metric.name === 'reach') accountReach = totalValue;
+            if (metric.name === 'views') views = totalValue;
+            if (metric.name === 'reach') reach = totalValue;
           }
-          console.log(`📊 Account views(new): ${accountImpressions}, reach: ${accountReach}`);
-        } else if (viewsInsightsRes) {
-          try {
-            const errData = await viewsInsightsRes.json();
-            console.log(`⚠️ Account views endpoint failed: ${errData?.error?.message || viewsInsightsRes.statusText}`);
-          } catch {
-            console.log(`⚠️ Account views endpoint failed: HTTP ${viewsInsightsRes.status}`);
-          }
-        }
+          console.log(`📊 Account views(${label}): ${views}, reach: ${reach}`);
+          return { views, reach };
+        };
+
+        const [rangeMetrics, timeframeMetrics] = await Promise.all([
+          parseViewsResponse(viewsRangeRes, 'range'),
+          parseViewsResponse(viewsInsightsRes, 'timeframe'),
+        ]);
+
+        accountImpressions = Math.max(rangeMetrics.views, timeframeMetrics.views);
+        accountReach = Math.max(rangeMetrics.reach, timeframeMetrics.reach);
 
         // Fallback: legacy impressions endpoint
         if (accountImpressions === 0 && legacyInsightsRes && legacyInsightsRes.ok) {
