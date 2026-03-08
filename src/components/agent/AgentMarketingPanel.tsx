@@ -3,21 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import {
   Plus,
   Trash2,
-  ExternalLink,
-  Megaphone,
   Edit,
   Loader2,
   Link2,
+  Megaphone,
   ShoppingBag,
-  Tag
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -30,23 +26,11 @@ interface AffiliateLink {
   product_name: string;
   affiliate_url: string;
   description: string | null;
-  image_url: string | null;
-  category: string;
-  commission_info: string | null;
   is_active: boolean;
   posts_count: number;
   last_posted_at: string | null;
   created_at: string;
 }
-
-const CATEGORIES = [
-  { value: 'tech', label: '🖥️ Tecnologia' },
-  { value: 'cursos', label: '📚 Cursos' },
-  { value: 'tools', label: '🔧 Ferramentas' },
-  { value: 'ai', label: '🤖 IA & Automação' },
-  { value: 'hosting', label: '☁️ Hosting' },
-  { value: 'geral', label: '📦 Geral' },
-];
 
 export default function AgentMarketingPanel() {
   const { currentWorkspace } = useWorkspace();
@@ -56,13 +40,10 @@ export default function AgentMarketingPanel() {
   const [editingLink, setEditingLink] = useState<AffiliateLink | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Form state
+  // Form state — only name, url, description
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [category, setCategory] = useState('tech');
-  const [commissionInfo, setCommissionInfo] = useState('');
 
   const fetchLinks = useCallback(async () => {
     if (!currentWorkspace) return;
@@ -90,9 +71,6 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
-    setImageUrl('');
-    setCategory('tech');
-    setCommissionInfo('');
     setEditingLink(null);
   };
 
@@ -101,9 +79,6 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
-    setImageUrl(link.image_url || '');
-    setCategory(link.category || 'tech');
-    setCommissionInfo(link.commission_info || '');
     setShowForm(true);
   };
 
@@ -120,9 +95,6 @@ export default function AgentMarketingPanel() {
         product_name: productName.trim(),
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
-        image_url: imageUrl.trim() || null,
-        category,
-        commission_info: commissionInfo.trim() || null,
       };
 
       if (editingLink) {
@@ -177,10 +149,6 @@ export default function AgentMarketingPanel() {
     }
   };
 
-  const getCategoryLabel = (cat: string) => {
-    return CATEGORIES.find(c => c.value === cat)?.label || '📦 Geral';
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -190,7 +158,7 @@ export default function AgentMarketingPanel() {
             Links de Afiliado
           </h2>
           <p className="text-xs text-muted-foreground">
-            O agente intercala posts de marketing automaticamente (1 a cada 5-10 posts)
+            O agente pesquisa sobre o produto e cria conteúdo de marketing automaticamente
           </p>
         </div>
         <Button
@@ -211,7 +179,7 @@ export default function AgentMarketingPanel() {
         <div className="text-center py-8 space-y-2">
           <ShoppingBag className="h-10 w-10 text-muted-foreground/30 mx-auto" />
           <p className="text-sm text-muted-foreground">Nenhum link cadastrado</p>
-          <p className="text-xs text-muted-foreground">Adicione links de afiliado para o agente promover automaticamente</p>
+          <p className="text-xs text-muted-foreground">Adicione links de afiliado e o agente pesquisa e cria conteúdo</p>
         </div>
       ) : (
         <AnimatePresence mode="popLayout">
@@ -225,46 +193,35 @@ export default function AgentMarketingPanel() {
                 exit={{ opacity: 0, y: -10 }}
                 className={cn(
                   "p-3 rounded-xl border transition-all",
-                  link.is_active 
-                    ? "bg-card border-border" 
+                  link.is_active
+                    ? "bg-card border-border"
                     : "bg-muted/30 border-border/50 opacity-60"
                 )}
               >
                 <div className="flex items-start gap-3">
-                  {link.image_url ? (
-                    <img 
-                      src={link.image_url} 
-                      alt={link.product_name}
-                      className="w-12 h-12 rounded-lg object-cover shrink-0"
-                      onError={(e) => (e.currentTarget.style.display = 'none')}
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Link2 className="h-5 w-5 text-primary" />
-                    </div>
-                  )}
-                  
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Link2 className="h-4 w-4 text-primary" />
+                  </div>
+
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-sm truncate">{link.product_name}</h3>
-                      <Badge variant="secondary" className="text-[10px] shrink-0">
-                        {getCategoryLabel(link.category)}
-                      </Badge>
-                    </div>
-                    
+                    <h3 className="font-medium text-sm truncate">{link.product_name}</h3>
+
                     {link.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{link.description}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{link.description}</p>
                     )}
-                    
+
                     <div className="flex items-center gap-3 mt-1.5">
-                      {link.commission_info && (
-                        <span className="text-[10px] text-primary font-medium">
-                          💰 {link.commission_info}
-                        </span>
-                      )}
                       <span className="text-[10px] text-muted-foreground">
                         📊 {link.posts_count} post(s)
                       </span>
+                      <a
+                        href={link.affiliate_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-primary truncate max-w-[200px] hover:underline"
+                      >
+                        {link.affiliate_url}
+                      </a>
                     </div>
                   </div>
 
@@ -333,44 +290,9 @@ export default function AgentMarketingPanel() {
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descrição do produto para o agente usar na legenda"
+                placeholder="Breve descrição do produto — o agente pesquisa o resto automaticamente"
                 className="min-h-[60px] text-sm"
               />
-            </div>
-
-            <div>
-              <Label className="text-xs">Imagem do Produto (URL)</Label>
-              <Input
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                className="h-8 text-sm"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">Categoria</Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map(c => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Comissão</Label>
-                <Input
-                  value={commissionInfo}
-                  onChange={(e) => setCommissionInfo(e.target.value)}
-                  placeholder="Ex: 30%"
-                  className="h-8 text-sm"
-                />
-              </div>
             </div>
           </div>
 
