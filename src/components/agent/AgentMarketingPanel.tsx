@@ -54,10 +54,13 @@ export default function AgentMarketingPanel() {
     web_source?: string;
   } | null>(null);
 
-  // Form state — only name, url, description
+  // Form state
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
+  const [mediaFormat, setMediaFormat] = useState('image');
+  const [postFrequency, setPostFrequency] = useState(4);
+  const [marketingStrategy, setMarketingStrategy] = useState('');
 
   const analyzeSite = async () => {
     if (!affiliateUrl.trim()) {
