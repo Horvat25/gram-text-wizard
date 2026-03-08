@@ -162,6 +162,9 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
+    setMediaFormat('image');
+    setPostFrequency(4);
+    setMarketingStrategy('');
     setSiteAnalysis('');
     setAnalysisSources(null);
     setEditingLink(null);
@@ -172,6 +175,9 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
+    setMediaFormat(link.media_format || 'image');
+    setPostFrequency(link.post_frequency || 4);
+    setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
     setAnalysisSources(null);
     setShowForm(true);
