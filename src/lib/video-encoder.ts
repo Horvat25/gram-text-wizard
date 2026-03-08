@@ -1176,70 +1176,66 @@ export async function generateVideoFromSegments(
       musicAudioElement.play().catch(console.warn);
     }
 
-    // FIX: Use VIRTUAL CLOCK instead of wall-clock time.
-    // On mobile, when the browser tab goes to background, requestAnimationFrame stops
-    // but performance.now() keeps ticking. This caused the renderer to "jump" past
-    // all content frames and only render CTA frames (the bug: CTA shows entire video).
-    // 
-    // Virtual clock: we advance time by exactly 1/fps per frame rendered.
-    // This ensures EVERY frame of content gets drawn regardless of browser throttling.
-    const frameTime = 1 / fps; // Time per frame in seconds
-    let virtualTime = 0;
+    // Sync timeline to real elapsed time to keep visuals, captions and audio aligned.
+    const startTime = performance.now();
+    const frameIntervalMs = 1000 / fps;
+    let lastFrameIndex = -1;
     let lastProgress = 0;
-    let frameCount = 0;
-    const totalFrames = Math.ceil(totalDuration * fps);
 
-    console.log(`[VideoEncoder] Using virtual clock: ${totalFrames} frames at ${fps}fps for ${totalDuration.toFixed(1)}s`);
+    console.log(`[VideoEncoder] Using real-time timeline at ${fps}fps for ${totalDuration.toFixed(1)}s`);
 
-    const animate = () => {
-      // If we've rendered all frames, stop
-      if (virtualTime >= totalDuration || frameCount >= totalFrames) {
-        console.log(`[VideoEncoder] Animation complete. Frames: ${frameCount}, virtualTime: ${virtualTime.toFixed(2)}s`);
+    const animate = (now: number) => {
+      const elapsedSeconds = (now - startTime) / 1000;
+      const timelineTime = Math.min(elapsedSeconds, totalDuration);
+
+      // Stop main narration at content end
+      if (timelineTime >= contentDuration && audioElement && !audioElement.paused) {
+        console.log("[VideoEncoder] Stopping main narration at content end:", timelineTime.toFixed(2), "s");
+        audioElement.pause();
+      }
+
+      // Start CTA audio 200ms after content ends
+      const ctaDelay = 0.2;
+      if (timelineTime >= contentDuration + ctaDelay && !ctaAudioStarted && ctaAudioElement) {
+        ctaAudioStarted = true;
+        console.log("[VideoEncoder] Starting CTA audio at", timelineTime.toFixed(2), "s");
+        ctaAudioElement.currentTime = 0;
+        ctaAudioElement.play().catch(console.warn);
+      }
+
+      // Throttle rendering to target FPS while keeping timeline in real time
+      const frameIndex = Math.floor((timelineTime * 1000) / frameIntervalMs);
+      if (frameIndex !== lastFrameIndex) {
+        lastFrameIndex = frameIndex;
+
+        try {
+          renderFrame(
+            ctx, width, height, workingSegments, images,
+            timelineTime, totalDuration, ctaDuration,
+            brandName, instagramHandle
+          );
+        } catch (frameError) {
+          console.warn(`[VideoEncoder] Frame render error at ${timelineTime.toFixed(2)}s:`, frameError);
+          // Draw fallback frame instead of crashing
+          ctx.fillStyle = "#0a0a0f";
+          ctx.fillRect(0, 0, width, height);
+          drawWatermark(ctx, width, height, brandName);
+        }
+
+        const progress = Math.round((timelineTime / totalDuration) * 100);
+        if (progress !== lastProgress) {
+          lastProgress = progress;
+          onProgress?.(progress);
+        }
+      }
+
+      if (timelineTime >= totalDuration) {
+        console.log(`[VideoEncoder] Animation complete at ${timelineTime.toFixed(2)}s`);
         if (audioElement) audioElement.pause();
         if (ctaAudioElement) ctaAudioElement.pause();
         if (musicAudioElement) musicAudioElement.pause();
         recorder!.stop();
         return;
-      }
-
-      // Stop main narration at content end
-      if (virtualTime >= contentDuration && audioElement && !audioElement.paused) {
-        console.log("[VideoEncoder] Stopping main narration at content end:", virtualTime.toFixed(2), "s");
-        audioElement.pause();
-      }
-      
-      // Start CTA audio 200ms after content ends
-      const ctaDelay = 0.2;
-      if (virtualTime >= contentDuration + ctaDelay && !ctaAudioStarted && ctaAudioElement) {
-        ctaAudioStarted = true;
-        console.log("[VideoEncoder] Starting CTA audio at", virtualTime.toFixed(2), "s");
-        ctaAudioElement.currentTime = 0;
-        ctaAudioElement.play().catch(console.warn);
-      }
-
-      // Render current frame
-      try {
-        renderFrame(
-          ctx, width, height, workingSegments, images,
-          virtualTime, totalDuration, ctaDuration,
-          brandName, instagramHandle
-        );
-      } catch (frameError) {
-        console.warn(`[VideoEncoder] Frame render error at ${virtualTime.toFixed(2)}s:`, frameError);
-        // Draw fallback frame instead of crashing
-        ctx.fillStyle = "#0a0a0f";
-        ctx.fillRect(0, 0, width, height);
-        drawWatermark(ctx, width, height, brandName);
-      }
-
-      // Advance virtual clock
-      virtualTime += frameTime;
-      frameCount++;
-
-      const progress = Math.round((virtualTime / totalDuration) * 100);
-      if (progress !== lastProgress) {
-        lastProgress = progress;
-        onProgress?.(progress);
       }
 
       requestAnimationFrame(animate);
