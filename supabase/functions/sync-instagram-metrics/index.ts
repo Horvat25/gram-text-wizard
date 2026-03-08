@@ -268,7 +268,8 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
           .select("reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, post_type, caption, published_at")
           .eq("workspace_id", wsId)
           .eq("status", "published")
-          .not("instagram_post_id", "is", null);
+          .not("instagram_post_id", "is", null)
+          .gt("reach", 10); // Only real synced metrics - exclude placeholder data
         
         const totalReach = (allPosts || []).reduce((s: number, p: any) => s + (p.reach || 0), 0);
         const totalImpressions = (allPosts || []).reduce((s: number, p: any) => s + (p.impressions || 0), 0);
