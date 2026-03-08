@@ -205,6 +205,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     if (!currentWorkspace?.id) return;
     fetchTopPosts();
     fetchSourceRankings();
+    fetchAccountViews();
   }, [currentWorkspace?.id, period]);
 
   // Derived analytics from topPosts
