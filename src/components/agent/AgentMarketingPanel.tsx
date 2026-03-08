@@ -321,9 +321,7 @@ export default function AgentMarketingPanel() {
                           {f === 'reels' ? '🎬' : f === 'carousel' ? '📸' : '🖼️'} {f === 'reels' ? 'Reels' : f === 'carousel' ? 'Carrossel' : 'Imagem'}
                         </Badge>
                       ))}
-                      <Badge variant="outline" className="text-[10px] h-4 px-1.5">
-                        🔄 {link.post_frequency}x
-                      </Badge>
+                      <span className="text-[10px] text-muted-foreground">·</span>
                       <span className="text-[10px] text-muted-foreground">
                         📊 {link.posts_count}
                       </span>
