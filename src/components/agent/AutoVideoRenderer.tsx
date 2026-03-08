@@ -78,27 +78,34 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
   }, [pendingVideos, renderQueue.length, isRendering]);
 
   // Auto-start rendering on first load if enabled
+  const autoStartTriggered = useRef(false);
   useEffect(() => {
     if (
       enabled && 
-      !hasStartedRef.current && 
+      !autoStartTriggered.current && 
       renderQueue.length > 0 && 
       !isRendering && 
       !isPaused
     ) {
-      hasStartedRef.current = true;
-      // Auto-start after a short delay to let the UI settle
+      autoStartTriggered.current = true;
       toast.info(
         `🎬 ${renderQueue.length} vídeo(s) pendente(s). Iniciando renderização automática...`,
         { duration: 5000 }
       );
-      setTimeout(() => {
+      // Use a timeout so processNextVideo is defined by then
+      const timer = setTimeout(() => {
         unlockAudio();
         setIsRendering(true);
-        processNextVideo();
+        setIsPaused(false);
+        setCompletedCount(0);
+        // Trigger next video via a state flag
+        setAutoStartReady(true);
       }, 3000);
+      return () => clearTimeout(timer);
     }
-  }, [enabled, renderQueue.length, isRendering, isPaused, processNextVideo]);
+  }, [enabled, renderQueue.length, isRendering, isPaused]);
+
+  const [autoStartReady, setAutoStartReady] = useState(false);
 
   // Handle video completion
   useEffect(() => {
