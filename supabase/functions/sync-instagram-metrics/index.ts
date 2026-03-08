@@ -281,12 +281,38 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDay
           return { views, reach };
         };
 
-        const [rangeMetrics, timeframeMetrics] = await Promise.all([
+        const parseBreakdownViews = async (res: Response | null): Promise<number> => {
+          if (!res || !res.ok) return 0;
+          try {
+            const data = await res.json();
+            let total = 0;
+            for (const metric of data.data || []) {
+              if (metric.name !== 'views') continue;
+              if (typeof metric.total_value?.value === 'number') {
+                total = Math.max(total, metric.total_value.value);
+              }
+              const breakdowns = metric.total_value?.breakdowns || [];
+              for (const b of breakdowns) {
+                for (const r of b.results || []) {
+                  const v = typeof r?.value === 'number' ? r.value : Number(r?.value) || 0;
+                  total += v;
+                }
+              }
+            }
+            if (total > 0) console.log(`📊 Account views(breakdown): ${total}`);
+            return total;
+          } catch {
+            return 0;
+          }
+        };
+
+        const [rangeMetrics, timeframeMetrics, breakdownViews] = await Promise.all([
           parseViewsResponse(viewsRangeRes, 'range'),
           parseViewsResponse(viewsInsightsRes, 'timeframe'),
+          parseBreakdownViews(viewsBreakdownRes),
         ]);
 
-        accountImpressions = Math.max(rangeMetrics.views, timeframeMetrics.views);
+        accountImpressions = Math.max(rangeMetrics.views, timeframeMetrics.views, breakdownViews);
         accountReach = Math.max(rangeMetrics.reach, timeframeMetrics.reach);
 
         // Fallback: legacy impressions endpoint
