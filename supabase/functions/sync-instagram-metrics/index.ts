@@ -17,11 +17,13 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     let batchOffset = 0;
-    let batchSize = 50; // increased from 30
+    let batchSize = 50;
+    let periodDays = 90;
     try {
       const body = await req.json();
       batchOffset = body.offset || 0;
       batchSize = body.batch_size || 50;
+      periodDays = body.period_days || 90;
     } catch { /* no body */ }
 
     const { data: accounts, error: accountError } = await supabase
