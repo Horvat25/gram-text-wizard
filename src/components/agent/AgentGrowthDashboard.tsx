@@ -90,7 +90,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       // If there are more, do one more batch silently
       if (hasMore) {
         const { data: d2 } = await supabase.functions.invoke('sync-instagram-metrics', {
-          body: { offset: data?.next_offset || 50, batch_size: 50 }
+          body: { offset: data?.next_offset || 50, batch_size: 50, period_days: period }
         });
         const u2 = d2?.updated || 0;
         const d2del = d2?.deleted || 0;
