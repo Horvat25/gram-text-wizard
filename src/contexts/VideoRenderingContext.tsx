@@ -89,8 +89,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   const isPausedRef = useRef(false);
   const currentVideoIdRef = useRef<string | null>(null);
   const renderQueueRef = useRef<PendingVideo[]>([]);
-  // Lock to prevent concurrent renders
+  // Lock to prevent concurrent renders - single source of truth
   const renderLockRef = useRef(false);
+  // Track which post IDs are currently being rendered to prevent duplicates
+  const activeRenderIdRef = useRef<string | null>(null);
+  // Debounce auto-start to prevent rapid re-triggers
+  const autoStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     isRenderingRef.current = isRendering;
