@@ -8,7 +8,9 @@ import {
   LayoutDashboard,
   Settings,
   TrendingUp,
-  Megaphone
+  Megaphone,
+  Bot,
+  History
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +23,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import AgentGenie3D from './AgentGenie3D';
 import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
+import AgentProactiveChat from './AgentProactiveChat';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
@@ -60,7 +63,8 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   });
   
   // Panel states
-  const [showChat, setShowChat] = useState(false);
+  const [showAgentChat, setShowAgentChat] = useState(false); // Agent proactive chat
+  const [showHistory, setShowHistory] = useState(false); // User command history
   const [showFeeds, setShowFeeds] = useState(false);
   const [showResponses, setShowResponses] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
@@ -156,8 +160,8 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     saveMessage(userMessage);
     setIsLoading(true);
     
-    // Auto open chat when sending a message
-    if (!showChat) setShowChat(true);
+    // Auto open history when sending a message
+    if (!showHistory) setShowHistory(true);
 
     try {
       const chatMessages = messages
@@ -197,7 +201,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     } catch (error) {
       console.error('Error sending message to agent:', error);
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
-      console.error('Agent error details:', { errorMsg, userId: user?.id, workspaceId: currentWorkspace?.id });
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
@@ -211,29 +214,36 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   };
 
   // Close other panels when opening one
-  const toggleChat = () => {
-    setShowChat(!showChat);
-    if (!showChat) { setShowFeeds(false); setShowResponses(false); setShowGrowth(false); setShowMarketing(false); }
+  const closeAllPanels = () => {
+    setShowAgentChat(false);
+    setShowHistory(false);
+    setShowFeeds(false);
+    setShowResponses(false);
+    setShowGrowth(false);
+    setShowMarketing(false);
   };
 
-  const toggleFeeds = () => {
-    setShowFeeds(!showFeeds);
-    if (!showFeeds) { setShowChat(false); setShowResponses(false); setShowGrowth(false); setShowMarketing(false); }
-  };
+  const togglePanel = (panel: string) => {
+    const isCurrentlyOpen = {
+      agentChat: showAgentChat,
+      history: showHistory,
+      feeds: showFeeds,
+      responses: showResponses,
+      growth: showGrowth,
+      marketing: showMarketing,
+    }[panel];
 
-  const toggleResponses = () => {
-    setShowResponses(!showResponses);
-    if (!showResponses) { setShowChat(false); setShowFeeds(false); setShowGrowth(false); setShowMarketing(false); }
-  };
-
-  const toggleGrowth = () => {
-    setShowGrowth(!showGrowth);
-    if (!showGrowth) { setShowChat(false); setShowFeeds(false); setShowResponses(false); setShowMarketing(false); }
-  };
-
-  const toggleMarketing = () => {
-    setShowMarketing(!showMarketing);
-    if (!showMarketing) { setShowChat(false); setShowFeeds(false); setShowResponses(false); setShowGrowth(false); }
+    closeAllPanels();
+    if (!isCurrentlyOpen) {
+      switch (panel) {
+        case 'agentChat': setShowAgentChat(true); break;
+        case 'history': setShowHistory(true); break;
+        case 'feeds': setShowFeeds(true); break;
+        case 'responses': setShowResponses(true); break;
+        case 'growth': setShowGrowth(true); break;
+        case 'marketing': setShowMarketing(true); break;
+      }
+    }
   };
 
   if (isLoadingHistory) {
@@ -254,21 +264,22 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         <AgentGenie3D isProcessing={isLoading} />
       </Suspense>
       
-      {/* Top Bar - Minimal with all controls */}
+      {/* Top Bar */}
       <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
-        {/* Left side - Chat, Library, Responses buttons */}
+        {/* Left side tabs */}
         <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
+          {/* Agent Chat - proactive reports */}
           <Button
-            variant={showChat ? "default" : "ghost"}
+            variant={showAgentChat ? "default" : "ghost"}
             size="sm"
             className={cn(
               "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showChat && "neural-gradient border-0"
+              showAgentChat && "neural-gradient border-0"
             )}
-            onClick={toggleChat}
+            onClick={() => togglePanel('agentChat')}
           >
-            <MessageCircle className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Chat</span>
+            <Bot className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Agente</span>
           </Button>
           
           <Button
@@ -278,23 +289,10 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
               "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
               showFeeds && "neural-gradient border-0"
             )}
-            onClick={toggleFeeds}
+            onClick={() => togglePanel('feeds')}
           >
             <Rss className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Fontes</span>
-          </Button>
-          
-          <Button
-            variant={showResponses ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showResponses && "neural-gradient border-0"
-            )}
-            onClick={toggleResponses}
-          >
-            <FileText className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Respostas</span>
           </Button>
           
           <Button
@@ -304,7 +302,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
               "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
               showGrowth && "neural-gradient border-0"
             )}
-            onClick={toggleGrowth}
+            onClick={() => togglePanel('growth')}
           >
             <TrendingUp className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Crescimento</span>
@@ -317,14 +315,41 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
               "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
               showMarketing && "neural-gradient border-0"
             )}
-            onClick={toggleMarketing}
+            onClick={() => togglePanel('marketing')}
           >
             <Megaphone className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Marketing</span>
           </Button>
+          
+          <Button
+            variant={showResponses ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showResponses && "neural-gradient border-0"
+            )}
+            onClick={() => togglePanel('responses')}
+          >
+            <FileText className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Respostas</span>
+          </Button>
+          
+          {/* History - user command chat history */}
+          <Button
+            variant={showHistory ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showHistory && "neural-gradient border-0"
+            )}
+            onClick={() => togglePanel('history')}
+          >
+            <History className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Histórico</span>
+          </Button>
         </div>
         
-        {/* Right side - Settings and Dashboard */}
+        {/* Right side */}
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           <AgentSettingsPanel 
             trigger={
@@ -354,9 +379,8 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         </div>
       </header>
       
-      {/* Center Area - 3D Genie Display (expanded) */}
+      {/* Center Area - 3D Genie Display */}
       <div className="flex-1 relative z-10 flex items-center justify-center">
-        {/* Floating Agent Name */}
         <div className="absolute bottom-4 text-center">
           <h2 className="text-xl font-bold bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent">
             {agentConfig.agent_name}
@@ -364,16 +388,25 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         </div>
       </div>
       
-      {/* Minimal Chat Input - Always visible at bottom */}
+      {/* Minimal Chat Input - for user commands */}
       <AgentMinimalChat 
         onSend={sendMessage}
         isLoading={isLoading}
+        placeholder="Peça algo ao agente..."
       />
       
-      {/* Sliding Panels */}
+      {/* Agent Proactive Chat Panel */}
+      <AgentProactiveChat
+        isOpen={showAgentChat}
+        onClose={() => setShowAgentChat(false)}
+        agentName={agentConfig.agent_name}
+        agentAvatar={agentConfig.agent_avatar_url}
+      />
+      
+      {/* User Command History Panel */}
       <AgentChatPanel
-        isOpen={showChat}
-        onClose={() => setShowChat(false)}
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
         messages={messages}
         agentName={agentConfig.agent_name}
         agentAvatar={agentConfig.agent_avatar_url}
