@@ -358,7 +358,11 @@ export default function AgentMarketingPanel() {
               <Label className="text-xs">Nome do Produto *</Label>
               <Input
                 value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                onChange={(e) => {
+                  setProductName(e.target.value);
+                  setSiteAnalysis('');
+                  setAnalysisSources(null);
+                }}
                 placeholder="Ex: ChatGPT Plus, Cursor Pro"
                 className="h-8 text-sm"
               />
@@ -368,10 +372,38 @@ export default function AgentMarketingPanel() {
               <Label className="text-xs">Link de Afiliado *</Label>
               <Input
                 value={affiliateUrl}
-                onChange={(e) => setAffiliateUrl(e.target.value)}
+                onChange={(e) => {
+                  setAffiliateUrl(e.target.value);
+                  setSiteAnalysis('');
+                  setAnalysisSources(null);
+                }}
                 placeholder="https://..."
                 className="h-8 text-sm"
               />
+
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1 text-xs"
+                  onClick={analyzeSite}
+                  disabled={analyzingSite || !affiliateUrl.trim()}
+                >
+                  {analyzingSite ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Search className="h-3 w-3" />
+                  )}
+                  {analyzingSite ? 'Analisando site...' : 'Analisar site'}
+                </Button>
+
+                {analysisSources?.site && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    Site analisado
+                  </Badge>
+                )}
+              </div>
             </div>
 
             <div>
@@ -383,7 +415,7 @@ export default function AgentMarketingPanel() {
                   size="sm"
                   className="h-6 gap-1 text-xs text-primary"
                   onClick={generateDescription}
-                  disabled={generatingDesc || !productName.trim()}
+                  disabled={generatingDesc || !productName.trim() || (!!affiliateUrl.trim() && !siteAnalysis.trim())}
                 >
                   {generatingDesc ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -396,7 +428,10 @@ export default function AgentMarketingPanel() {
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descrição do produto — ou clique em 'Gerar com IA'"
+                placeholder={affiliateUrl.trim() && !siteAnalysis.trim()
+                  ? "Clique em 'Analisar site' antes de gerar a descrição"
+                  : "Breve descrição do produto — ou clique em 'Gerar com IA'"
+                }
                 className="min-h-[60px] text-sm"
               />
             </div>
