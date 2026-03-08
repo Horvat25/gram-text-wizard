@@ -189,6 +189,17 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setSourceRankings(rankings);
   };
 
+  const fetchAccountViews = async () => {
+    if (!currentWorkspace?.id) return;
+    const { data } = await supabase
+      .from('agent_context')
+      .select('current_weekly_views')
+      .eq('workspace_id', currentWorkspace.id)
+      .maybeSingle();
+
+    setAccountViewsLive(data?.current_weekly_views || 0);
+  };
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
     fetchTopPosts();
