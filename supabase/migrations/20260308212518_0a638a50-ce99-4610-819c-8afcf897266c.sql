@@ -1,0 +1,1 @@
+UPDATE agent_context SET min_hours_between_posts = 2 WHERE min_hours_between_posts = 4;
