@@ -40,6 +40,7 @@ interface VideoRenderingContextType {
   currentStep: string;
   isGenerating: boolean;
   progress: number;
+  currentRenderProgress: number;
   startRendering: () => void;
   pauseRendering: () => void;
   resumeRendering: () => void;
@@ -493,8 +494,14 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     prevPendingCountRef.current = newCount;
   }, [pendingVideos, processNextVideo, notifyVideoReady]);
 
-  const progress = renderQueue.length > 0
-    ? Math.round((completedCount / (completedCount + renderQueue.length)) * 100)
+  const totalInBatch = completedCount + renderQueue.length;
+  const currentRenderProgress = isRendering
+    ? Math.max(0, Math.min(100, state.progress || 0))
+    : 0;
+
+  // Overall progress of the full queue (completed + current video partial progress)
+  const progress = totalInBatch > 0
+    ? Math.round(((completedCount + (currentRenderProgress / 100)) / totalInBatch) * 100)
     : 100;
 
   const value: VideoRenderingContextType = {
@@ -506,6 +513,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     currentStep: state.step,
     isGenerating,
     progress,
+    currentRenderProgress,
     startRendering,
     pauseRendering,
     resumeRendering,
