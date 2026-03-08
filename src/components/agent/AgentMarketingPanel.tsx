@@ -58,7 +58,7 @@ export default function AgentMarketingPanel() {
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [mediaFormat, setMediaFormat] = useState('image');
+  const [mediaFormats, setMediaFormats] = useState<string[]>(['image']);
   const [postFrequency, setPostFrequency] = useState(4);
   const [marketingStrategy, setMarketingStrategy] = useState('');
 
