@@ -32,6 +32,9 @@ interface AffiliateLink {
   posts_count: number;
   last_posted_at: string | null;
   created_at: string;
+  media_format: string;
+  post_frequency: number;
+  marketing_strategy: string | null;
 }
 
 export default function AgentMarketingPanel() {
