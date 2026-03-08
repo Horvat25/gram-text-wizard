@@ -284,6 +284,14 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
     }
   }, [renderQueue, currentVideoId, completedCount, renderFromScript, notifyAgentAction, refetch]);
 
+  // Auto-start effect - runs after processNextVideo is defined
+  useEffect(() => {
+    if (autoStartReady) {
+      setAutoStartReady(false);
+      processNextVideo();
+    }
+  }, [autoStartReady, processNextVideo]);
+
   const startRendering = () => {
     unlockAudio();
     setIsRendering(true);
