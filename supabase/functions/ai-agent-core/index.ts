@@ -35,6 +35,21 @@ interface AgentDecision {
   expectedEngagement?: number;
 }
 
+interface HistoricalPerformance {
+  avgReachPerPost: number;
+  avgEngagement: number;
+  totalPosts: number;
+  bestMediaType: string | null;
+  bestMediaTypeAvgReach: number;
+  worstMediaType: string | null;
+  topPostCaption: string | null;
+  topPostReach: number;
+  reelsAvgReach: number;
+  newsAvgReach: number;
+  carouselAvgReach: number;
+  imageAvgReach: number;
+}
+
 interface AgentState {
   avgEngagement: number;
   lastPostHours: number;
@@ -48,6 +63,8 @@ interface AgentState {
   weeklyGoals: ContentDistribution;
   weeklyProgress: ContentDistribution;
   nextContentType: ContentType | null;
+  // 30-day historical analysis
+  historical30d: HistoricalPerformance;
 }
 
 // Calculate engagement rate
