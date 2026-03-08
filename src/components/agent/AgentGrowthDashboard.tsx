@@ -129,8 +129,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalComments = topPosts.reduce((s, p) => s + (p.comments_count || 0), 0);
   const totalSaves = topPosts.reduce((s, p) => s + (p.saves_count || 0), 0);
   const totalReach = topPosts.reduce((s, p) => s + (p.reach || 0), 0);
+  // impressions = per-post views from Instagram (plays for reels, impressions for posts)
+  // Only use impressions when available, otherwise show reach as fallback
   const totalImpressions = topPosts.reduce((s, p) => s + (p.impressions || 0), 0);
-  const totalViews = totalImpressions > 0 ? totalImpressions : totalReach; // impressions = views, fallback to reach
+  const totalViews = totalImpressions > totalReach ? totalImpressions : totalReach;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   // Period-based goals (scaled from monthly base)
