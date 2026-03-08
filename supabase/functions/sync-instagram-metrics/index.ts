@@ -298,9 +298,11 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
 
       const updateData: Record<string, any> = { updated_at: new Date().toISOString() };
       
-      // Use account-level impressions for views (this is the real "Visualizações")
+      // Use account-level views as source of truth (matches Instagram "Visualizações")
       if (accountImpressions > 0) {
         updateData.current_weekly_views = accountImpressions;
+      } else if (accountReach > 0) {
+        updateData.current_weekly_views = accountReach;
       } else if (weekPosts && weekPosts.length > 0) {
         const totalReach = weekPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
         updateData.current_weekly_views = totalReach;
