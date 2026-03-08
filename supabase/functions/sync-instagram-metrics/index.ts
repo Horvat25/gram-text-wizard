@@ -116,9 +116,10 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const isReels = post.media_type === "reels" || post.media_type === "reel";
 
   // Fetch basic metrics AND insights in parallel
+  // NOTE: 'views' replaced deprecated 'impressions/plays' for newer Instagram media.
   const insightMetrics = isReels
-    ? "reach,saved,impressions,shares,plays"
-    : "reach,saved,impressions";
+    ? "reach,saved,shares,views"
+    : "reach,saved,views";
 
   const [metricsRes, insightsRes] = await Promise.all([
     fetch(`https://graph.facebook.com/v21.0/${mediaId}?fields=like_count,comments_count&access_token=${accessToken}`),
