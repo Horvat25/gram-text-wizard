@@ -89,8 +89,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   const isPausedRef = useRef(false);
   const currentVideoIdRef = useRef<string | null>(null);
   const renderQueueRef = useRef<PendingVideo[]>([]);
-  // Lock to prevent concurrent renders
+  // Lock to prevent concurrent renders - single source of truth
   const renderLockRef = useRef(false);
+  // Track which post IDs are currently being rendered to prevent duplicates
+  const activeRenderIdRef = useRef<string | null>(null);
+  // Debounce auto-start to prevent rapid re-triggers
+  const autoStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     isRenderingRef.current = isRendering;
@@ -117,7 +121,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   const fetchPendingVideos = useCallback(async () => {
     if (!user || !currentWorkspace) {
       setPendingVideos([]);
-      setRenderQueue([]);
+      if (!isRenderingRef.current && !renderLockRef.current) {
+        setRenderQueue([]);
+      }
       return;
     }
 
@@ -139,7 +145,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       console.log(`[AutoRender] Found ${pending.length} pending reels (workspace ${currentWorkspace.id})`);
       setPendingVideos(pending);
 
-      if (!isRenderingRef.current) {
+      // Only update the render queue if we're NOT actively rendering
+      // This prevents the queue from being reset mid-render
+      if (!isRenderingRef.current && !renderLockRef.current) {
         setRenderQueue(pending);
       }
     } catch (error) {
@@ -206,6 +214,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     const videoId = currentVideoIdRef.current;
     if (!videoId) return;
 
+    // Prevent double-complete
+    if (activeRenderIdRef.current !== videoId) {
+      console.log(`[AutoRender] Ignoring complete for ${videoId} - not the active render`);
+      return;
+    }
+
     try {
       const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
       const videoTitle = currentVideo?.overlay_metadata?.script?.title || 'Vídeo';
@@ -228,6 +242,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       setCompletedCount(prev => prev + 1);
       setRenderQueue(prev => prev.filter(v => v.id !== videoId));
       setCurrentVideoId(null);
+      activeRenderIdRef.current = null;
       renderLockRef.current = false;
       reset();
 
@@ -237,6 +252,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     } catch (err: any) {
       console.error('[AutoRender] Error completing video:', err);
       toast.error('Erro ao salvar vídeo renderizado');
+      activeRenderIdRef.current = null;
       renderLockRef.current = false;
     }
   };
@@ -273,6 +289,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
     setRenderQueue(prev => prev.filter(v => v.id !== videoId));
     setCurrentVideoId(null);
+    activeRenderIdRef.current = null;
     renderLockRef.current = false;
     reset();
 
@@ -283,15 +300,14 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   // ─── Process next video in queue ───────────────────────────
   const processNextVideo = useCallback(async () => {
-    // Prevent concurrent renders
-    if (renderLockRef.current) {
-      console.log('[AutoRender] Render lock active, skipping');
+    // Prevent concurrent renders - check BOTH locks
+    if (renderLockRef.current || activeRenderIdRef.current) {
+      console.log(`[AutoRender] Render lock active (lock=${renderLockRef.current}, activeId=${activeRenderIdRef.current}), skipping`);
       return;
     }
 
     const queue = renderQueueRef.current;
-    const currentId = currentVideoIdRef.current;
-    const nextVideo = queue.find(v => v.id !== currentId);
+    const nextVideo = queue[0]; // Always take the first in queue
 
     if (!nextVideo) {
       setIsRendering(false);
@@ -304,9 +320,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       return;
     }
 
-    // Acquire lock
+    // Acquire lock IMMEDIATELY with both mechanisms
     renderLockRef.current = true;
+    activeRenderIdRef.current = nextVideo.id;
     setCurrentVideoId(nextVideo.id);
+    console.log(`[AutoRender] 🔒 Lock acquired for post ${nextVideo.id}`);
 
     // Double-check in DB that this post still needs rendering (prevent duplicates)
     try {
@@ -412,6 +430,10 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   // ─── Actions ───────────────────────────────────────────────
   const startRendering = useCallback(() => {
+    if (renderLockRef.current || activeRenderIdRef.current) {
+      console.log('[AutoRender] Cannot start - render already in progress');
+      return;
+    }
     unlockAudio();
     setIsRendering(true);
     setIsPaused(false);
@@ -426,7 +448,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   const resumeRendering = useCallback(() => {
     setIsPaused(false);
-    if (!isGenerating) processNextVideo();
+    if (!isGenerating && !renderLockRef.current && !activeRenderIdRef.current) {
+      processNextVideo();
+    }
   }, [isGenerating, processNextVideo]);
 
   // ─── Auto-start when new pending videos appear ─────────────
@@ -436,13 +460,24 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     const wasEmpty = prevPendingCountRef.current === 0;
     const hasNewVideos = newCount > 0;
 
-    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !isPausedRef.current) {
+    // Only auto-start if: was empty, now has videos, NOT rendering, NOT locked, NOT paused
+    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !renderLockRef.current && !activeRenderIdRef.current && !isPausedRef.current) {
       console.log('[AutoRender] Auto-starting render for pending reels');
       const firstVideo = pendingVideos[0];
       const title = firstVideo?.overlay_metadata?.script?.title || firstVideo?.overlay_metadata?.topic || 'Novo vídeo';
       notifyVideoReady(title);
 
-      setTimeout(() => {
+      // Clear any existing auto-start timeout to prevent duplicates
+      if (autoStartTimeoutRef.current) {
+        clearTimeout(autoStartTimeoutRef.current);
+      }
+
+      autoStartTimeoutRef.current = setTimeout(() => {
+        // Re-check locks before starting (another render may have started in the meantime)
+        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current) {
+          console.log('[AutoRender] Auto-start cancelled - render already active');
+          return;
+        }
         unlockAudio();
         toast.info('🎬 Iniciando renderização automática...');
         setIsRendering(true);
