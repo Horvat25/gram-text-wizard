@@ -113,6 +113,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       }
       fetchTopPosts();
+      fetchSummaryMetrics();
       fetchSourceRankings();
       fetchAccountViews();
     } catch (e: any) {
@@ -245,6 +246,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   useEffect(() => {
     if (!currentWorkspace?.id) return;
     fetchTopPosts();
+    fetchSummaryMetrics();
     fetchSourceRankings();
     fetchAccountViews();
   }, [currentWorkspace?.id, period]);
