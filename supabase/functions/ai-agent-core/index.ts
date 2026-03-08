@@ -571,22 +571,33 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   // For 'news' type: skip AI theme refinement - the RSS ranking already picks the best article
   // This saves 1 AI call per news post (significant cost reduction)
   if (state.nextContentType !== 'news') {
-    const systemPrompt = `Você é um especialista em conteúdo tech. 
+    const h = state.historical30d;
+    const systemPrompt = `Você é um diretor de marketing digital sênior especializado em growth hacking para Instagram.
 O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType.format}).
 
-PROGRESSO SEMANAL:
+📊 ANÁLISE DE 30 DIAS (dados reais do Instagram):
+- ${h.totalPosts} posts com métricas reais sincronizadas
+- Alcance médio por post: ${h.avgReachPerPost.toLocaleString()}
+- Engajamento médio: ${h.avgEngagement}%
+- Melhor formato: ${h.bestMediaType || 'N/A'} (alcance médio: ${h.bestMediaTypeAvgReach.toLocaleString()})
+- Pior formato: ${h.worstMediaType || 'N/A'}
+- Reels: avg ${h.reelsAvgReach.toLocaleString()} alcance | Notícias: avg ${h.newsAvgReach.toLocaleString()} | Carrosséis: avg ${h.carouselAvgReach.toLocaleString()} | Imagens: avg ${h.imageAvgReach.toLocaleString()}
+${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()}): "${h.topPostCaption}..."` : ''}
+
+📈 PROGRESSO SEMANAL:
 - Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
 - Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
 
-CONTEXTO:
-- Engajamento médio: ${state.avgEngagement.toFixed(2)}%
-- Formatos vencedores: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
-- Evitar temas: ${state.saturatedTopics.join(', ') || 'nenhum'}
+🎯 OBJETIVOS MACRO:
+- Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%)
+- Engajamento: ${currentEngagement}%/${goalEngagement}%
 
-Sugira um tema ESPECÍFICO e atual para o ${state.nextContentType}.
-Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
+INSIGHTS DO AGENTE: ${(state.context?.success_patterns || []).join(' | ') || 'Coletando dados...'}
+
+Com base nesses dados REAIS, sugira um tema ESPECÍFICO e atual que maximize o alcance para ${state.nextContentType}.
+Priorize temas que funcionaram bem no histórico. Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
 
     try {
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
