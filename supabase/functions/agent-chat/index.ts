@@ -227,6 +227,26 @@ const AGENT_TOOLS = [
         properties: {}
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_affiliate_post",
+      description: "💰 Cria um post de marketing promovendo um produto de afiliado cadastrado. Busca um link ativo do banco. Use quando o ciclo autônomo decidir intercalar marketing ou quando o usuário pedir.",
+      parameters: {
+        type: "object",
+        properties: {
+          affiliate_id: { type: "string", description: "ID do link de afiliado específico. Se vazio, escolhe automaticamente o menos promovido." },
+          headline_text: { type: "string", description: "Headline de marketing (CAIXA ALTA, máx 2 linhas). Estilo persuasivo com urgência ou benefício claro." },
+          caption_block1: { type: "string", description: "Bloco 1: Hook que gera curiosidade sobre o produto" },
+          caption_block2: { type: "string", description: "Bloco 2: Benefício principal e diferencial" },
+          caption_block3: { type: "string", description: "Bloco 3: CTA com link e urgência" },
+          scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília)" },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: []
+      }
+    }
   }
 ];
 
