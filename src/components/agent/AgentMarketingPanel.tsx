@@ -59,8 +59,11 @@ export default function AgentMarketingPanel() {
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
   const [mediaFormats, setMediaFormats] = useState<string[]>(['image']);
-  const [postFrequency, setPostFrequency] = useState(4);
   const [marketingStrategy, setMarketingStrategy] = useState('');
+
+  // Global frequency
+  const [globalFrequency, setGlobalFrequency] = useState(4);
+  const [savingFrequency, setSavingFrequency] = useState(false);
 
   const analyzeSite = async () => {
     if (!affiliateUrl.trim()) {
