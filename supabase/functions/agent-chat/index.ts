@@ -2947,6 +2947,14 @@ Quando usuário diz... | Você calcula...
 4. **NUNCA** mencione anos passados (2024, 2025)
 5. **TESTE MENTAL**: "Isso para o scroll?"
 
+## 💰 MARKETING DE AFILIADOS
+- Quando em modo autônomo, intercale 1 post de afiliado a cada 5-10 posts de notícia
+- Use \`create_affiliate_post\` para promover produtos cadastrados
+- O sistema escolhe automaticamente o produto menos promovido
+- Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
+- Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
+- NÃO force marketing se não houver links cadastrados
+
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
     // First API call with tools
