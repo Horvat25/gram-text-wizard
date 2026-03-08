@@ -31,11 +31,9 @@ import {
 import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import AgentReelsRenderer from "@/components/agent/AgentReelsRenderer";
-import AutoVideoRenderingPanel from "@/components/queue/AutoVideoRenderingPanel";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -199,8 +197,9 @@ const PublicationQueueTab = ({
     });
   }, [viewingPost]);
   
-  const { accounts, loading: loadingAccounts } = useInstagramAccounts();
-  const hasConnectedAccount = accounts.length > 0;
+  const { currentWorkspace } = useWorkspace();
+  const [loadingAccounts] = useState(false);
+  const hasConnectedAccount = false; // Simplified - accounts managed in Settings
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
@@ -456,27 +455,6 @@ const PublicationQueueTab = ({
 
   return (
     <div className="space-y-6">
-      {/* Auto Video Rendering Panel */}
-      <AutoVideoRenderingPanel />
-
-      {/* Connected Account Info */}
-      {!loadingAccounts && (
-        hasConnectedAccount ? (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-            <Instagram className="h-4 w-4 text-green-600" />
-            <span className="text-sm text-green-700 dark:text-green-400">
-              Publicações serão feitas em: <strong>@{accounts[0].username || 'Conta conectada'}</strong>
-            </span>
-          </div>
-        ) : (
-          <Alert className="border-amber-500/30 bg-amber-500/5">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-700 dark:text-amber-400">
-              Nenhuma conta conectada. Os posts serão salvos mas não publicados automaticamente no Instagram.
-            </AlertDescription>
-          </Alert>
-        )
-      )}
 
       {/* Timezone Info */}
       <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
@@ -780,26 +758,6 @@ const PublicationQueueTab = ({
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Reels Renderer Dialog */}
-      {renderingPost && (
-        <AgentReelsRenderer
-          key={renderingPost.id}
-          postId={renderingPost.id}
-          topic={getReelsScript(renderingPost)!.topic}
-          script={{
-            title: getReelsScript(renderingPost)!.title,
-            segments: getReelsScript(renderingPost)!.segments,
-          }}
-          scheduledFor={renderingPost.scheduled_for}
-          autoPublish={false}
-          onComplete={() => {
-            setRenderingPost(null);
-            toast.success("Vídeo renderizado! Agora você pode publicar ou agendar.");
-          }}
-          onCancel={() => setRenderingPost(null)}
-        />
-      )}
     </div>
   );
 };

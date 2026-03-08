@@ -34,7 +34,7 @@ import Header from "@/components/Header";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { useTikTokAccounts } from "@/hooks/useTikTokAccounts";
-import { AccountCard } from "@/components/AccountCard";
+import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -851,13 +851,31 @@ const Settings = () => {
                 <>
                   <div className="grid gap-4 md:grid-cols-2">
                     {accounts.map(account => (
-                      <AccountCard
-                        key={account.id}
-                        account={account}
-                        onDisconnect={disconnectAccount}
-                        tokenStatus={getTokenStatus(account.expires_at)}
-                        daysUntilExpiry={getDaysUntilExpiry(account.expires_at)}
-                      />
+                      <Card key={account.id} className="border-primary/20">
+                        <CardContent className="pt-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                                <Instagram className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-sm">@{account.username || 'Conta conectada'}</p>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={getTokenStatus(account.expires_at) === 'active' ? 'default' : 'destructive'} className="text-xs">
+                                    {getTokenStatus(account.expires_at) === 'active' ? 'Ativo' : getTokenStatus(account.expires_at) === 'expiring' ? 'Expirando' : 'Expirado'}
+                                  </Badge>
+                                  {getDaysUntilExpiry(account.expires_at) > 0 && (
+                                    <span className="text-xs text-muted-foreground">{getDaysUntilExpiry(account.expires_at)}d restantes</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="destructive" size="sm" onClick={() => disconnectAccount(account.id)}>
+                              Desconectar
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                   
@@ -1028,10 +1046,10 @@ const Settings = () => {
                             <div className="flex-1">
                               <p className="font-semibold">@{account.username || account.display_name || 'TikTok User'}</p>
                               <p className="text-sm text-muted-foreground">
-                                {getTikTokTokenStatus(account) === 'active' ? (
+                                {getTikTokTokenStatus(account.expires_at) === 'active' ? (
                                   <span className="text-green-500">● Ativo</span>
-                                ) : getTikTokTokenStatus(account) === 'expiring' ? (
-                                  <span className="text-amber-500">● Expira em {getTikTokDaysUntilExpiry(account)} dias</span>
+                                ) : getTikTokTokenStatus(account.expires_at) === 'expiring' ? (
+                                  <span className="text-amber-500">● Expira em {getTikTokDaysUntilExpiry(account.expires_at)} dias</span>
                                 ) : (
                                   <span className="text-red-500">● Expirado</span>
                                 )}

@@ -1,75 +1,53 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useWorkspace } from './useWorkspace';
+import { useAuth } from '@/hooks/useAuth';
+import { useWorkspace } from '@/hooks/useWorkspace';
 
 export interface InstagramAccount {
   id: string;
-  page_id: string | null;
   instagram_user_id: string;
   username: string | null;
-  profile_picture_url: string | null;
   access_token: string;
-  expires_at: string | null;
+  page_id: string | null;
+  profile_picture_url: string | null;
   connected_at: string | null;
-  updated_at: string | null;
+  expires_at: string | null;
   workspace_id: string | null;
 }
 
 export function useInstagramAccounts() {
+  const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const [accounts, setAccounts] = useState<InstagramAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const { toast } = useToast();
 
-  const fetchAccounts = useCallback(async (isRetry = false) => {
-    if (!currentWorkspace) {
-      setAccounts([]);
+  const fetchAccounts = useCallback(async () => {
+    if (!user || !currentWorkspace) {
       setLoading(false);
       return;
     }
-
+    
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('instagram_accounts')
         .select('*')
-        .eq('workspace_id', currentWorkspace.id)
-        .order('connected_at', { ascending: false });
+        .eq('workspace_id', currentWorkspace.id);
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
       setAccounts(data || []);
-      setRetryCount(0);
     } catch (err: any) {
-      console.error('Error fetching accounts:', err);
-      const errorMessage = err.message?.includes('Failed to fetch') 
-        ? 'Erro de conexão com o servidor. Verifique sua internet.'
-        : err.message || 'Erro ao carregar contas';
-      
-      setError(errorMessage);
-      
-      // Auto-retry up to 3 times with exponential backoff
-      if (!isRetry && retryCount < 3) {
-        const delay = Math.pow(2, retryCount) * 1000;
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          fetchAccounts(true);
-        }, delay);
-      } else if (!isRetry) {
-        toast({
-          title: 'Erro ao carregar contas',
-          description: errorMessage,
-          variant: 'destructive'
-        });
-      }
+      setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [currentWorkspace, retryCount, toast]);
+  }, [user, currentWorkspace]);
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
 
   const disconnectAccount = async (accountId: string) => {
     try {
@@ -77,56 +55,29 @@ export function useInstagramAccounts() {
         .from('instagram_accounts')
         .delete()
         .eq('id', accountId);
-
       if (error) throw error;
-
-      setAccounts(prev => prev.filter(acc => acc.id !== accountId));
-      
-      toast({
-        title: 'Conta desconectada',
-        description: 'A conta do Instagram foi removida com sucesso.'
-      });
-    } catch (error: any) {
-      console.error('Error disconnecting account:', error);
-      toast({
-        title: 'Erro ao desconectar',
-        description: error.message,
-        variant: 'destructive'
-      });
+      setAccounts(prev => prev.filter(a => a.id !== accountId));
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
   const getTokenStatus = (expiresAt: string | null): 'active' | 'expiring' | 'expired' => {
-    if (!expiresAt) return 'expired';
-    
+    if (!expiresAt) return 'active';
     const now = new Date();
-    const expiry = new Date(expiresAt);
-    const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (daysUntilExpiry <= 0) return 'expired';
-    if (daysUntilExpiry <= 7) return 'expiring';
+    const expires = new Date(expiresAt);
+    const daysLeft = (expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysLeft <= 0) return 'expired';
+    if (daysLeft <= 7) return 'expiring';
     return 'active';
   };
 
   const getDaysUntilExpiry = (expiresAt: string | null): number => {
-    if (!expiresAt) return 0;
-    
+    if (!expiresAt) return 999;
     const now = new Date();
-    const expiry = new Date(expiresAt);
-    return Math.max(0, Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    const expires = new Date(expiresAt);
+    return Math.max(0, Math.floor((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
   };
 
-  useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
-
-  return {
-    accounts,
-    loading,
-    error,
-    fetchAccounts,
-    disconnectAccount,
-    getTokenStatus,
-    getDaysUntilExpiry
-  };
+  return { accounts, loading, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry };
 }
