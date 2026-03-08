@@ -595,6 +595,7 @@ function renderFrame(
   // Transition only at the START of a segment (crossfade FROM previous)
   // No exit transition - this eliminates the ghosting bug entirely
   const isInTransition = timeIntoSegment < transitionDuration && segmentIndex > 0;
+  const isHook = segmentIndex === 0 && timeIntoSegment < 3.0; // First 3 seconds = HOOK
   
   if (isInTransition) {
     const prevImg = images[segmentIndex - 1];
@@ -606,8 +607,8 @@ function renderFrame(
     
     drawTransition(ctx, prevImg, currentImg, width, height, transitionProgress, transitionType, segmentIndex - 1, segmentIndex);
   } else {
-    // Normal rendering - only current image, no blending
-    drawSplitImages(ctx, currentImg, width, height, segmentProgress, segmentIndex);
+    // Normal rendering — isHook applies stronger Ken Burns + flash in first segment
+    drawSplitImages(ctx, currentImg, width, height, segmentProgress, segmentIndex, isHook);
   }
 
   // Watermark
