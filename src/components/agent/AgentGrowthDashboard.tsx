@@ -9,7 +9,7 @@ import {
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
   Sparkles, BarChart3, ArrowUpRight, ArrowDownRight, Minus,
   Trophy, Heart, Bookmark, Share2, RefreshCw, MessageCircle, Loader2,
-  Hash,
+  Hash, Globe,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
@@ -52,10 +52,20 @@ interface TopPost {
   post_type: string | null;
 }
 
+interface SourceRanking {
+  sourceName: string;
+  postCount: number;
+  totalReach: number;
+  totalLikes: number;
+  totalSaves: number;
+  avgEngagement: number;
+}
+
 export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthDashboardProps) {
   const [isAutoStrategy, setIsAutoStrategy] = useState(true);
   const [period, setPeriod] = useState(90);
   const [topPosts, setTopPosts] = useState<TopPost[]>([]);
+  const [sourceRankings, setSourceRankings] = useState<SourceRanking[]>([]);
   const [loadingTopPosts, setLoadingTopPosts] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
@@ -93,6 +103,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       }
       fetchTopPosts();
+      fetchSourceRankings();
     } catch (e: any) {
       toast.dismiss('sync-ig');
       toast.error(e.message || 'Erro ao sincronizar');
@@ -119,9 +130,68 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     setLoadingTopPosts(false);
   };
 
+  const fetchSourceRankings = async () => {
+    if (!currentWorkspace?.id) return;
+    // Get rss_items that were used in posts
+    const { data: rssItems } = await supabase
+      .from('rss_items')
+      .select('source_name, used_in_post_id')
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('is_used', true)
+      .not('used_in_post_id', 'is', null);
+
+    if (!rssItems || rssItems.length === 0) {
+      setSourceRankings([]);
+      return;
+    }
+
+    // Get the post IDs and fetch their metrics
+    const postIds = rssItems.map(r => r.used_in_post_id).filter(Boolean) as string[];
+    const { data: posts } = await supabase
+      .from('posts')
+      .select('id, reach, likes_count, comments_count, saves_count, shares_count')
+      .in('id', postIds)
+      .eq('status', 'published');
+
+    // Map post metrics by id
+    const postMap: Record<string, any> = {};
+    (posts || []).forEach(p => { postMap[p.id] = p; });
+
+    // Aggregate by source
+    const sourceMap: Record<string, { count: number; reach: number; likes: number; saves: number; engagement: number }> = {};
+    rssItems.forEach(item => {
+      const post = postMap[item.used_in_post_id!];
+      if (!post) return;
+      if (!sourceMap[item.source_name]) {
+        sourceMap[item.source_name] = { count: 0, reach: 0, likes: 0, saves: 0, engagement: 0 };
+      }
+      const s = sourceMap[item.source_name];
+      s.count++;
+      s.reach += post.reach || 0;
+      s.likes += post.likes_count || 0;
+      s.saves += post.saves_count || 0;
+      const eng = (post.likes_count || 0) + (post.comments_count || 0) + (post.saves_count || 0) + (post.shares_count || 0);
+      s.engagement += post.reach > 0 ? (eng / post.reach) * 100 : 0;
+    });
+
+    const rankings: SourceRanking[] = Object.entries(sourceMap)
+      .map(([name, s]) => ({
+        sourceName: name,
+        postCount: s.count,
+        totalReach: s.reach,
+        totalLikes: s.likes,
+        totalSaves: s.saves,
+        avgEngagement: s.count > 0 ? s.engagement / s.count : 0,
+      }))
+      .sort((a, b) => b.totalReach - a.totalReach);
+
+    setSourceRankings(rankings);
+  };
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
     fetchTopPosts();
+    fetchSourceRankings();
   }, [currentWorkspace?.id, period]);
 
   // Derived analytics from topPosts
@@ -363,7 +433,60 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 6. Best Hashtags */}
+      {/* 6. Source Rankings */}
+      {sourceRankings.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
+          <Card className="border-border/50">
+            <CardHeader className="pb-2 pt-4">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Globe className="h-4 w-4 text-orange-500" />
+                Ranking de Fontes
+                <Badge variant="secondary" className="text-[10px]">{sourceRankings.length} sites</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1.5">
+              {sourceRankings.map((source, i) => {
+                const maxReach = sourceRankings[0]?.totalReach || 1;
+                const barWidth = Math.max((source.totalReach / maxReach) * 100, 8);
+                return (
+                  <div key={source.sourceName} className={cn(
+                    "flex items-center gap-2 p-2 rounded-lg border transition-all",
+                    i === 0 ? "bg-orange-500/5 border-orange-500/20" :
+                    i === 1 ? "bg-muted/40 border-border/40" :
+                    "bg-card/50 border-border/30"
+                  )}>
+                    <div className={cn(
+                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
+                      i === 0 ? "bg-orange-500/20 text-orange-500" :
+                      i === 1 ? "bg-muted text-muted-foreground" :
+                      "bg-muted/50 text-muted-foreground"
+                    )}>{i + 1}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium truncate">{source.sourceName}</span>
+                        <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{source.postCount} posts</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-orange-500 transition-all" style={{ width: `${barWidth}%` }} />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 mt-0.5">
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {source.totalReach.toLocaleString()}</span>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Heart className="h-2.5 w-2.5" /> {source.totalLikes.toLocaleString()}</span>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bookmark className="h-2.5 w-2.5" /> {source.totalSaves}</span>
+                        <span className="text-[10px] text-emerald-500 font-medium">{source.avgEngagement.toFixed(1)}% eng</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* 7. Best Hashtags */}
       {bestHashtags.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
           <Card className="border-border/50">
