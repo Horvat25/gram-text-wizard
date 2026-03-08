@@ -87,13 +87,18 @@ export default function AutoVideoRenderer({ enabled = true, onComplete }: AutoVi
       !isPaused
     ) {
       hasStartedRef.current = true;
-      // Ask user before auto-starting
+      // Auto-start after a short delay to let the UI settle
       toast.info(
-        `🎬 ${renderQueue.length} vídeo(s) pendente(s). Clique em "Renderizar" para iniciar.`,
-        { duration: 10000 }
+        `🎬 ${renderQueue.length} vídeo(s) pendente(s). Iniciando renderização automática...`,
+        { duration: 5000 }
       );
+      setTimeout(() => {
+        unlockAudio();
+        setIsRendering(true);
+        processNextVideo();
+      }, 3000);
     }
-  }, [enabled, renderQueue.length, isRendering, isPaused]);
+  }, [enabled, renderQueue.length, isRendering, isPaused, processNextVideo]);
 
   // Handle video completion
   useEffect(() => {
