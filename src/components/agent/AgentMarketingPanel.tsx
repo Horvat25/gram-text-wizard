@@ -448,7 +448,67 @@ export default function AgentMarketingPanel() {
                 className="min-h-[60px] text-sm"
               />
             </div>
-          </div>
+
+            {/* Media Format */}
+            <div>
+              <Label className="text-xs">Formato de Mídia</Label>
+              <div className="flex gap-2 mt-1">
+                {[
+                  { value: 'image', label: '🖼️ Imagem' },
+                  { value: 'reels', label: '🎬 Reels' },
+                  { value: 'carousel', label: '📸 Carrossel' },
+                ].map((opt) => (
+                  <Button
+                    key={opt.value}
+                    type="button"
+                    variant={mediaFormat === opt.value ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-7 text-xs flex-1"
+                    onClick={() => setMediaFormat(opt.value)}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Frequency */}
+            <div>
+              <Label className="text-xs">Frequência (a cada X posts normais)</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setPostFrequency(Math.max(2, postFrequency - 1))}
+                >
+                  −
+                </Button>
+                <span className="text-sm font-medium w-8 text-center">{postFrequency}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setPostFrequency(Math.min(10, postFrequency + 1))}
+                >
+                  +
+                </Button>
+                <span className="text-xs text-muted-foreground">1 post de marketing a cada {postFrequency} posts</span>
+              </div>
+            </div>
+
+            {/* Strategy Notes */}
+            <div>
+              <Label className="text-xs">Estratégia de Marketing (opcional)</Label>
+              <Textarea
+                value={marketingStrategy}
+                onChange={(e) => setMarketingStrategy(e.target.value)}
+                placeholder="Ex: Focar nos benefícios de produtividade, usar gatilho de escassez, mencionar desconto exclusivo..."
+                className="min-h-[50px] text-sm mt-1"
+              />
+            </div>
 
           <DialogFooter>
             <Button variant="ghost" size="sm" onClick={() => { resetForm(); setShowForm(false); }}>
