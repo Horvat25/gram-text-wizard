@@ -225,7 +225,7 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
 
         const [profileRes, viewsInsightsRes, legacyInsightsRes] = await Promise.all([
           fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=last_30_days&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
           fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
         ]);
 
