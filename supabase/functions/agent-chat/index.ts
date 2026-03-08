@@ -2522,28 +2522,35 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       postStatus = 'scheduled';
     }
 
+    // Determine media type from affiliate config
+    const mediaFormat = affiliate.media_format || 'image';
+    const mediaType = mediaFormat === 'reels' ? 'reels' : mediaFormat === 'carousel' ? 'carousel' : 'image';
+
     // Create the post
+    const postData: any = {
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption,
+      hashtags,
+      status: postStatus,
+      scheduled_for: scheduledFor,
+      image_url: affiliate.image_url || null,
+      post_type: 'marketing',
+      media_type: mediaType,
+      platforms: platforms || ['instagram'],
+      overlay_metadata: {
+        type: 'affiliate_marketing',
+        affiliate_id: affiliate.id,
+        product_name: affiliate.product_name,
+        headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
+        theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral'],
+        marketing_strategy: affiliate.marketing_strategy || null
+      }
+    };
+
     const { data: post, error: postError } = await supabase
       .from('posts')
-      .insert({
-        user_id: userId,
-        workspace_id: workspaceId,
-        caption,
-        hashtags,
-        status: postStatus,
-        scheduled_for: scheduledFor,
-        image_url: affiliate.image_url || null,
-        post_type: 'marketing',
-        media_type: 'image',
-        platforms: platforms || ['instagram'],
-        overlay_metadata: {
-          type: 'affiliate_marketing',
-          affiliate_id: affiliate.id,
-          product_name: affiliate.product_name,
-          headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
-          theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral']
-        }
-      })
+      .insert(postData)
       .select()
       .single();
 
