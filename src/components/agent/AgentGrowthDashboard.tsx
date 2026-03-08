@@ -66,6 +66,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const [period, setPeriod] = useState(90);
   const [topPosts, setTopPosts] = useState<TopPost[]>([]);
   const [sourceRankings, setSourceRankings] = useState<SourceRanking[]>([]);
+  const [accountViewsLive, setAccountViewsLive] = useState<number>(0);
   const [loadingTopPosts, setLoadingTopPosts] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
