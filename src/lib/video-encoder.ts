@@ -6,36 +6,28 @@ export interface VideoSegment {
   text?: string;
 }
 
+export interface GenerateVideoOptions {
+  width?: number;
+  height?: number;
+  fps?: number;
+  audioUrl?: string;
+  ctaAudioUrl?: string;
+  backgroundMusicUrl?: string;
+  segments: VideoSegment[];
+  onProgress?: (progress: number) => void;
+}
+
 export async function generateVideoFromSegments(
-  segments: VideoSegment[],
-  audioBlob?: Blob,
-  options?: { width?: number; height?: number; fps?: number }
+  options: GenerateVideoOptions
 ): Promise<Blob> {
+  const { segments, width = 1080, height = 1920, fps = 30, onProgress } = options;
+
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
-  const width = options?.width || 1080;
-  const height = options?.height || 1920;
-  const fps = options?.fps || 30;
-
   canvas.width = width;
   canvas.height = height;
 
   const stream = canvas.captureStream(fps);
-  
-  if (audioBlob) {
-    try {
-      const audioCtx = new AudioContext();
-      const audioBuffer = await audioCtx.decodeAudioData(await audioBlob.arrayBuffer());
-      const source = audioCtx.createMediaStreamDestination();
-      const bufferSource = audioCtx.createBufferSource();
-      bufferSource.buffer = audioBuffer;
-      bufferSource.connect(source);
-      bufferSource.start();
-      source.stream.getAudioTracks().forEach(track => stream.addTrack(track));
-    } catch (e) {
-      console.warn('Could not add audio to video:', e);
-    }
-  }
 
   const mediaRecorder = new MediaRecorder(stream, {
     mimeType: 'video/webm;codecs=vp9',
@@ -53,6 +45,9 @@ export async function generateVideoFromSegments(
     };
 
     mediaRecorder.start();
+
+    const totalFrames = segments.reduce((sum, s) => sum + Math.round(s.duration * fps), 0);
+    let processedFrames = 0;
 
     for (const segment of segments) {
       const img = new Image();
@@ -74,6 +69,8 @@ export async function generateVideoFromSegments(
           ctx.textAlign = 'center';
           ctx.fillText(segment.text, width / 2, height - 100, width - 80);
         }
+        processedFrames++;
+        onProgress?.(Math.round((processedFrames / totalFrames) * 100));
         await new Promise(r => setTimeout(r, 1000 / fps));
       }
     }
@@ -84,10 +81,12 @@ export async function generateVideoFromSegments(
 
 export async function uploadVideoToStorage(
   videoBlob: Blob,
-  fileName: string
+  supabaseClient: typeof supabase,
+  bucket: string
 ): Promise<string> {
-  const { data, error } = await supabase.storage
-    .from('videos')
+  const fileName = `video_${Date.now()}.webm`;
+  const { data, error } = await supabaseClient.storage
+    .from(bucket)
     .upload(fileName, videoBlob, {
       contentType: videoBlob.type,
       upsert: true,
@@ -95,8 +94,8 @@ export async function uploadVideoToStorage(
 
   if (error) throw error;
 
-  const { data: urlData } = supabase.storage
-    .from('videos')
+  const { data: urlData } = supabaseClient.storage
+    .from(bucket)
     .getPublicUrl(data.path);
 
   return urlData.publicUrl;
