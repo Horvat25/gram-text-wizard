@@ -291,6 +291,19 @@ export default function AgentMarketingPanel() {
         </Button>
       </div>
 
+      {/* Global frequency control */}
+      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border/50">
+        <span className="text-xs text-muted-foreground">🔄 Frequência de marketing</span>
+        <div className="flex items-center gap-1.5">
+          <Button type="button" variant="outline" size="icon" className="h-5 w-5 text-[10px]"
+            onClick={() => updateGlobalFrequency(globalFrequency - 1)}>−</Button>
+          <span className="text-xs font-medium w-5 text-center">{globalFrequency}</span>
+          <Button type="button" variant="outline" size="icon" className="h-5 w-5 text-[10px]"
+            onClick={() => updateGlobalFrequency(globalFrequency + 1)}>+</Button>
+          <span className="text-[10px] text-muted-foreground ml-1">a cada {globalFrequency} posts</span>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
