@@ -14,6 +14,7 @@ import {
   Link2,
   Megaphone,
   ShoppingBag,
+  Sparkles,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
