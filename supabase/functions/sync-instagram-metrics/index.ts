@@ -47,7 +47,7 @@ serve(async (req) => {
     // Fetch posts batch
     const { data: posts, error: postsError } = await supabase
       .from("posts")
-      .select("id, instagram_post_id, media_type")
+      .select("id, instagram_post_id, media_type, reach, impressions, saves_count, shares_count")
       .eq("status", "published")
       .not("instagram_post_id", "is", null)
       .order("published_at", { ascending: false })
@@ -116,9 +116,10 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const isReels = post.media_type === "reels" || post.media_type === "reel";
 
   // Fetch basic metrics AND insights in parallel
+  // NOTE: 'views' replaced deprecated 'impressions/plays' for newer Instagram media.
   const insightMetrics = isReels
-    ? "reach,saved,impressions,shares,plays"
-    : "reach,saved,impressions";
+    ? "reach,saved,shares,views"
+    : "reach,saved,views";
 
   const [metricsRes, insightsRes] = await Promise.all([
     fetch(`https://graph.facebook.com/v21.0/${mediaId}?fields=like_count,comments_count&access_token=${accessToken}`),
@@ -138,27 +139,48 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const likes = metricsData.like_count || 0;
   const comments = metricsData.comments_count || 0;
 
-  let reach = 0, saves = 0, impressions = 0, shares = 0;
+  // Keep previously synced values as fallback so we don't regress to tiny numbers.
+  let reach = post.reach || 0;
+  let saves = post.saves_count || 0;
+  let impressions = post.impressions || 0;
+  let shares = post.shares_count || 0;
 
   if (insightsRes && insightsRes.ok) {
     const insightsData = await insightsRes.json();
     for (const insight of insightsData.data || []) {
-      const value = insight.values?.[0]?.value || 0;
+      const rawValue = insight.values?.[0]?.value;
+      const value = typeof rawValue === 'number' ? rawValue : Number(rawValue) || 0;
+
       switch (insight.name) {
-        case "reach": reach = value; break;
-        case "saved": saves = value; break;
-        case "impressions": impressions = value; break;
-        case "shares": shares = value; break;
-        case "plays": 
-          // plays = actual video views, use as impressions for Reels if higher
+        case "reach":
+          reach = value;
+          break;
+        case "saved":
+          saves = value;
+          break;
+        case "impressions":
+        case "views":
+          impressions = value;
+          break;
+        case "shares":
+          shares = value;
+          break;
+        case "plays":
           if (value > impressions) impressions = value;
           break;
       }
     }
+  } else if (insightsRes) {
+    try {
+      const errorData = await insightsRes.json();
+      console.log(`⚠️ Insights unavailable for media ${mediaId}:`, errorData?.error?.message || insightsRes.statusText);
+    } catch {
+      console.log(`⚠️ Insights unavailable for media ${mediaId}: HTTP ${insightsRes.status}`);
+    }
   }
 
   const minReach = likes + comments + saves;
-  const finalReach = Math.max(reach, minReach);
+  const finalReach = Math.max(reach, minReach, post.reach || 0);
 
   const { error } = await supabase
     .from("posts")
@@ -197,9 +219,14 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
         const igUserId = wsAccount.instagram_user_id;
         
         // Fetch followers + account-level insights in parallel
-        const [profileRes, insightsRes] = await Promise.all([
+        // New API uses views(metric_type=total_value). Keep legacy fallback for impressions.
+        const nowTs = Math.floor(Date.now() / 1000);
+        const sinceTs = nowTs - 86400 * 30;
+
+        const [profileRes, viewsInsightsRes, legacyInsightsRes] = await Promise.all([
           fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${Math.floor(Date.now()/1000) - 86400*28}&until=${Math.floor(Date.now()/1000)}&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=last_30_days&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
         ]);
 
         if (profileRes && profileRes.ok) {
@@ -208,15 +235,47 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
           console.log(`📊 Instagram followers: ${followersCount}`);
         }
 
-        // Account-level impressions = "Visualizações" in Instagram
-        if (insightsRes && insightsRes.ok) {
-          const insData = await insightsRes.json();
+        const parseMetricValue = (metric: any): number => {
+          if (!metric) return 0;
+          if (typeof metric.total_value?.value === 'number') return metric.total_value.value;
+          if (typeof metric.total_value === 'number') return metric.total_value;
+          if (Array.isArray(metric.values)) {
+            return metric.values.reduce((s: number, v: any) => {
+              if (typeof v?.value === 'number') return s + v.value;
+              if (typeof v?.value?.value === 'number') return s + v.value.value;
+              return s;
+            }, 0);
+          }
+          return 0;
+        };
+
+        // Primary: account views (new API)
+        if (viewsInsightsRes && viewsInsightsRes.ok) {
+          const insData = await viewsInsightsRes.json();
           for (const metric of insData.data || []) {
-            const totalValue = (metric.values || []).reduce((s: number, v: any) => s + (v.value || 0), 0);
-            if (metric.name === 'impressions') accountImpressions = totalValue;
+            const totalValue = parseMetricValue(metric);
+            if (metric.name === 'views') accountImpressions = totalValue;
             if (metric.name === 'reach') accountReach = totalValue;
           }
-          console.log(`📊 Account views (impressions): ${accountImpressions}, reach: ${accountReach}`);
+          console.log(`📊 Account views(new): ${accountImpressions}, reach: ${accountReach}`);
+        } else if (viewsInsightsRes) {
+          try {
+            const errData = await viewsInsightsRes.json();
+            console.log(`⚠️ Account views endpoint failed: ${errData?.error?.message || viewsInsightsRes.statusText}`);
+          } catch {
+            console.log(`⚠️ Account views endpoint failed: HTTP ${viewsInsightsRes.status}`);
+          }
+        }
+
+        // Fallback: legacy impressions endpoint
+        if (accountImpressions === 0 && legacyInsightsRes && legacyInsightsRes.ok) {
+          const legacyData = await legacyInsightsRes.json();
+          for (const metric of legacyData.data || []) {
+            const totalValue = parseMetricValue(metric);
+            if (metric.name === 'impressions') accountImpressions = totalValue;
+            if (metric.name === 'reach' && accountReach === 0) accountReach = totalValue;
+          }
+          console.log(`📊 Account views(legacy impressions): ${accountImpressions}, reach: ${accountReach}`);
         }
       }
 
@@ -239,12 +298,12 @@ async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessTok
 
       const updateData: Record<string, any> = { updated_at: new Date().toISOString() };
       
-      // Use account-level impressions for views (this is the real "Visualizações")
+      // Use account-level views as source of truth (matches Instagram "Visualizações")
+      // If insights are unavailable, keep previous DB value (avoid replacing with tiny fallback values).
       if (accountImpressions > 0) {
         updateData.current_weekly_views = accountImpressions;
-      } else if (weekPosts && weekPosts.length > 0) {
-        const totalReach = weekPosts.reduce((sum: number, p: any) => sum + (p.reach || 0), 0);
-        updateData.current_weekly_views = totalReach;
+      } else if (accountReach > 0) {
+        updateData.current_weekly_views = accountReach;
       }
 
       if (weekPosts && weekPosts.length > 0) {
