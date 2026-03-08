@@ -154,9 +154,15 @@ export function CustomFeedsManager({ onFeedsChange }: CustomFeedsManagerProps) {
     toast.info('Usando feeds padrão do sistema');
   };
 
-  // Feeds ativos (customizados ou padrão)
+  // Feeds ativos (customizados ou padrão, com possibilidade de remover padrões)
   const activeFeeds = customFeeds.length > 0 ? customFeeds : DEFAULT_TECH_FEEDS;
   const isUsingDefaults = customFeeds.length === 0;
+
+  // Quando usando padrões e quer remover um, converte para custom sem o removido
+  const removeDefaultFeed = async (url: string) => {
+    const remaining = DEFAULT_TECH_FEEDS.filter(f => f.url !== url);
+    await saveCustomFeeds(remaining);
+  };
 
   if (isLoading) {
     return (
@@ -251,15 +257,13 @@ export function CustomFeedsManager({ onFeedsChange }: CustomFeedsManagerProps) {
               >
                 <Check className="h-3 w-3" />
                 {feed.name}
-                {!isUsingDefaults && (
-                  <button
-                    onClick={() => removeFeed(feed.url)}
-                    className="ml-1 hover:text-destructive transition-colors"
-                    disabled={isSaving}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                )}
+                <button
+                  onClick={() => isUsingDefaults ? removeDefaultFeed(feed.url) : removeFeed(feed.url)}
+                  className="ml-1 hover:text-destructive transition-colors"
+                  disabled={isSaving}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
               </Badge>
             ))}
           </div>
