@@ -332,7 +332,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-medium line-clamp-1">{post.caption}</p>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {(post.reach || 0).toLocaleString()}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {((post.impressions || post.reach || 0)).toLocaleString()} views</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}</span>
