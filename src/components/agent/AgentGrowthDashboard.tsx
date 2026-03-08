@@ -79,7 +79,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     toast.loading('Sincronizando métricas do Instagram...', { id: 'sync-ig' });
     try {
       const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
-        body: { offset: 0, batch_size: 50 }
+        body: { offset: 0, batch_size: 50, period_days: period }
       });
       if (error) throw error;
       
