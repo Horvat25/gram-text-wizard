@@ -840,7 +840,7 @@ export async function generateVideoFromSegments(
   const {
     width = 1080,
     height = 1920,
-    fps = 24,
+    fps = 30,
     audioUrl,
     ctaAudioUrl,
     backgroundMusicUrl,
