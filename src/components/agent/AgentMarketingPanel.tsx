@@ -162,7 +162,7 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
-    setMediaFormat('image');
+    setMediaFormats(['image']);
     setPostFrequency(4);
     setMarketingStrategy('');
     setSiteAnalysis('');
