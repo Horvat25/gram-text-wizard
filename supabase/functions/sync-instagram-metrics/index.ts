@@ -206,28 +206,31 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 }
 
 // ===== Helper: Save snapshots and update agent_context =====
-async function saveSnapshotsAndContext(supabase: any, accounts: any[], accessToken: string) {
+async function saveSnapshotsAndContext(supabase: any, accounts: any[], periodDays: number) {
   try {
     const workspaceIds = [...new Set(accounts.map((a: any) => a.workspace_id).filter(Boolean))];
     
     for (const wsId of workspaceIds) {
       const wsAccount = accounts.find((a: any) => a.workspace_id === wsId);
+      const accessToken = wsAccount?.access_token;
       
       let followersCount = 0;
       let accountImpressions = 0;
       let accountReach = 0;
       
-      if (wsAccount) {
+      if (wsAccount && accessToken) {
         const igUserId = wsAccount.instagram_user_id;
-        
+        const nowTs = Math.floor(Date.now() / 1000);
+        const sinceTs = nowTs - 86400 * Math.max(14, Math.min(periodDays, 90));
+
+        // Instagram account insights supports fixed timeframe values.
+        const timeframe = periodDays >= 90 ? 'last_90_days' : periodDays >= 30 ? 'last_30_days' : 'last_14_days';
+
         // Fetch followers + account-level insights in parallel
         // New API uses views(metric_type=total_value). Keep legacy fallback for impressions.
-        const nowTs = Math.floor(Date.now() / 1000);
-        const sinceTs = nowTs - 86400 * 30;
-
         const [profileRes, viewsInsightsRes, legacyInsightsRes] = await Promise.all([
           fetch(`https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${accessToken}`).catch(() => null),
-          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=last_30_days&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
+          fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=views,reach&period=day&timeframe=${timeframe}&metric_type=total_value&access_token=${accessToken}`).catch(() => null),
           fetch(`https://graph.facebook.com/v21.0/${igUserId}/insights?metric=impressions,reach&period=day&since=${sinceTs}&until=${nowTs}&access_token=${accessToken}`).catch(() => null),
         ]);
 
