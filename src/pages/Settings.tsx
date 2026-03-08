@@ -851,13 +851,31 @@ const Settings = () => {
                 <>
                   <div className="grid gap-4 md:grid-cols-2">
                     {accounts.map(account => (
-                      <AccountCard
-                        key={account.id}
-                        account={account}
-                        onDisconnect={disconnectAccount}
-                        tokenStatus={getTokenStatus(account.expires_at)}
-                        daysUntilExpiry={getDaysUntilExpiry(account.expires_at)}
-                      />
+                      <Card key={account.id} className="border-primary/20">
+                        <CardContent className="pt-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                                <Instagram className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-sm">@{account.username || 'Conta conectada'}</p>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={getTokenStatus(account.expires_at) === 'valid' ? 'default' : 'destructive'} className="text-xs">
+                                    {getTokenStatus(account.expires_at) === 'valid' ? 'Ativo' : 'Expirado'}
+                                  </Badge>
+                                  {getDaysUntilExpiry(account.expires_at) > 0 && (
+                                    <span className="text-xs text-muted-foreground">{getDaysUntilExpiry(account.expires_at)}d restantes</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="destructive" size="sm" onClick={() => disconnectAccount(account.id)}>
+                              Desconectar
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                   
