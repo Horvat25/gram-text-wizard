@@ -105,7 +105,8 @@ function applyKenBurnsToRegion(
   regionWidth: number,
   regionHeight: number,
   progress: number,
-  effectType: number
+  effectType: number,
+  isHook: boolean = false
 ) {
   ctx.save();
   
@@ -114,15 +115,19 @@ function applyKenBurnsToRegion(
   ctx.rect(regionX, regionY, regionWidth, regionHeight);
   ctx.clip();
   
-  const scale = 1 + (progress * 0.08);
+  // Stronger Ken Burns: 12% zoom (was 8%), faster pacing with 1.2x speed feel
+  const zoomAmount = isHook ? 0.18 : 0.12;
+  const scale = 1 + (progress * zoomAmount);
   const centerX = regionX + regionWidth / 2;
   const centerY = regionY + regionHeight / 2;
   
   ctx.translate(centerX, centerY);
   ctx.scale(scale, scale);
   
-  const panX = (effectType % 2 === 0 ? 1 : -1) * progress * 15;
-  const panY = (effectType % 3 === 0 ? 1 : -1) * progress * 10;
+  // Faster pan movement for more dynamic feel
+  const panSpeed = isHook ? 25 : 18;
+  const panX = (effectType % 2 === 0 ? 1 : -1) * progress * panSpeed;
+  const panY = (effectType % 3 === 0 ? 1 : -1) * progress * (panSpeed * 0.7);
   
   ctx.translate(-centerX + panX, -centerY + panY);
   
