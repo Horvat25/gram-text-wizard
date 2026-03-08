@@ -2,9 +2,13 @@ import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   MessageCircle, 
-  ImageIcon, 
+  Rss, 
   FileText, 
   Loader2,
+  LayoutDashboard,
+  Settings,
+  TrendingUp
+} from 'lucide-react';
   LayoutDashboard,
   Settings,
   TrendingUp
@@ -20,7 +24,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import AgentGenie3D from './AgentGenie3D';
 import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
-import AgentLibraryPanel from './AgentLibraryPanel';
+import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
@@ -59,7 +63,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   
   // Panel states
   const [showChat, setShowChat] = useState(false);
-  const [showLibrary, setShowLibrary] = useState(false);
+  const [showFeeds, setShowFeeds] = useState(false);
   const [showResponses, setShowResponses] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
 
@@ -211,15 +215,15 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const toggleChat = () => {
     setShowChat(!showChat);
     if (!showChat) {
-      setShowLibrary(false);
+      setShowFeeds(false);
       setShowResponses(false);
       setShowGrowth(false);
     }
   };
 
-  const toggleLibrary = () => {
-    setShowLibrary(!showLibrary);
-    if (!showLibrary) {
+  const toggleFeeds = () => {
+    setShowFeeds(!showFeeds);
+    if (!showFeeds) {
       setShowChat(false);
       setShowResponses(false);
       setShowGrowth(false);
@@ -230,7 +234,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     setShowResponses(!showResponses);
     if (!showResponses) {
       setShowChat(false);
-      setShowLibrary(false);
+      setShowFeeds(false);
       setShowGrowth(false);
     }
   };
@@ -239,7 +243,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     setShowGrowth(!showGrowth);
     if (!showGrowth) {
       setShowChat(false);
-      setShowLibrary(false);
+      setShowFeeds(false);
       setShowResponses(false);
     }
   };
@@ -280,16 +284,16 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           </Button>
           
           <Button
-            variant={showLibrary ? "default" : "ghost"}
+            variant={showFeeds ? "default" : "ghost"}
             size="sm"
             className={cn(
               "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showLibrary && "neural-gradient border-0"
+              showFeeds && "neural-gradient border-0"
             )}
-            onClick={toggleLibrary}
+            onClick={toggleFeeds}
           >
-            <ImageIcon className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Biblioteca</span>
+            <Rss className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Fontes</span>
           </Button>
           
           <Button
@@ -374,10 +378,23 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         agentAvatar={agentConfig.agent_avatar_url}
       />
       
-      <AgentLibraryPanel
-        isOpen={showLibrary}
-        onClose={() => setShowLibrary(false)}
-      />
+      {/* Feeds Sources Panel */}
+      {showFeeds && (
+        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-lg mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="font-semibold text-sm">Fontes de Conteúdo</h2>
+                  <p className="text-xs text-muted-foreground">Sites que o agente usa para buscar notícias</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowFeeds(false)} className="h-7 w-7 p-0">✕</Button>
+              </div>
+              <CustomFeedsManager />
+            </div>
+          </ScrollArea>
+        </div>
+      )}
       
       <AgentResponsesPanel
         isOpen={showResponses}
