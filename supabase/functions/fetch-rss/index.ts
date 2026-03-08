@@ -303,6 +303,50 @@ serve(async (req) => {
       }
       
       console.log(`[RSS] Saved: ${savedCount}, Skipped (duplicates): ${skippedCount}`);
+      
+      // === AUTO-CLEANUP: Remove old/used items to prevent database bloat ===
+      try {
+        // 1. Delete items older than 5 days that were already used in posts
+        const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+        const { count: deletedUsed } = await supabase
+          .from('rss_items')
+          .delete({ count: 'exact' })
+          .eq('workspace_id', workspaceId)
+          .eq('is_used', true)
+          .lt('fetched_at', fiveDaysAgo);
+        
+        // 2. Delete items older than 7 days (even unused - stale news)
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { count: deletedOld } = await supabase
+          .from('rss_items')
+          .delete({ count: 'exact' })
+          .eq('workspace_id', workspaceId)
+          .lt('published_at', sevenDaysAgo);
+        
+        // 3. Cap total items per workspace to 150 (keep newest)
+        const { data: totalItems } = await supabase
+          .from('rss_items')
+          .select('id, fetched_at')
+          .eq('workspace_id', workspaceId)
+          .order('fetched_at', { ascending: false });
+        
+        let deletedOverflow = 0;
+        if (totalItems && totalItems.length > 150) {
+          const idsToDelete = totalItems.slice(150).map(i => i.id);
+          const { count } = await supabase
+            .from('rss_items')
+            .delete({ count: 'exact' })
+            .in('id', idsToDelete);
+          deletedOverflow = count || 0;
+        }
+        
+        const totalDeleted = (deletedUsed || 0) + (deletedOld || 0) + deletedOverflow;
+        if (totalDeleted > 0) {
+          console.log(`[RSS] Cleanup: removed ${totalDeleted} old items (used: ${deletedUsed || 0}, stale: ${deletedOld || 0}, overflow: ${deletedOverflow})`);
+        }
+      } catch (cleanupError: any) {
+        console.error('[RSS] Cleanup error (non-fatal):', cleanupError.message);
+      }
     }
     
     // Group items by source for response
