@@ -40,6 +40,7 @@ interface VideoRenderingContextType {
   currentStep: string;
   isGenerating: boolean;
   progress: number;
+  currentRenderProgress: number;
   startRendering: () => void;
   pauseRendering: () => void;
   resumeRendering: () => void;
