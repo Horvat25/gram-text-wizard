@@ -52,7 +52,7 @@ serve(async (req) => {
       );
     }
 
-    const account = workspaceId ? accounts[0] : accounts[0];
+    const account = accounts[0];
     const accessToken = account.access_token;
 
     // Save snapshots only on first batch
