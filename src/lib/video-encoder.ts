@@ -1025,8 +1025,8 @@ export async function generateVideoFromSegments(
         musicAudioElement = new Audio();
         musicAudioElement.crossOrigin = "anonymous";
         musicAudioElement.src = backgroundMusicUrl;
-        musicAudioElement.volume = 0.15; // Low volume for background
-        musicAudioElement.loop = true; // Loop the music
+        musicAudioElement.volume = 0.25; // Background music — louder for energy
+        musicAudioElement.loop = true;
         
         await new Promise<void>((resolve) => {
           const timeout = setTimeout(() => {
@@ -1053,7 +1053,7 @@ export async function generateVideoFromSegments(
             const musicSource = audioContext.createMediaElementSource(musicAudioElement);
             // Create gain node for volume control
             const gainNode = audioContext.createGain();
-            gainNode.gain.value = 0.15; // Background volume
+            gainNode.gain.value = 0.25; // Louder background for energy
             musicSource.connect(gainNode);
             gainNode.connect(destination);
             console.log("[VideoEncoder] Background music connected to video stream");
