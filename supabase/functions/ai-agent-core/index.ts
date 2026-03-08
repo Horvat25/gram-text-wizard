@@ -418,21 +418,28 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
 function calculateDynamicDailyLimit(state: AgentState): number {
   const goalType = state.context?.goal_type || 'macro';
   
-  // Legacy fixed mode
+  // Legacy fixed mode ONLY
   if (goalType === 'fixed') {
     return state.context?.daily_post_limit || 2;
   }
   
-  // MACRO MODE: Use real data from agent_context (updated by sync-instagram-metrics)
+  // ALL OTHER MODES (macro, growth, reach, authority, conversion) use dynamic limits
   const goalViews = state.context?.goal_weekly_views || 10000;
   const goalEngagement = state.context?.goal_weekly_engagement || 5.0;
   
-  // Use SYNCED values from agent_context instead of recalculating from 72h posts
+  // Use SYNCED values from agent_context (updated by sync-instagram-metrics)
   const currentWeeklyViews = state.context?.current_weekly_views || 0;
   const currentWeeklyEngagement = state.context?.current_weekly_engagement || 0;
   
   const viewsProgress = goalViews > 0 ? (currentWeeklyViews / goalViews) * 100 : 100;
   const engagementProgress = goalEngagement > 0 ? (currentWeeklyEngagement / goalEngagement) * 100 : 100;
+  
+  // Also check CONTENT distribution progress (how many posts done vs goal)
+  const totalGoals = (state.weeklyGoals?.videos || 0) + (state.weeklyGoals?.carousels || 0) + 
+                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.images || 0);
+  const totalProgress = (state.weeklyProgress?.videos || 0) + (state.weeklyProgress?.carousels || 0) + 
+                        (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.images || 0);
+  const contentProgress = totalGoals > 0 ? (totalProgress / totalGoals) * 100 : 100;
   
   // Day of week (0=Sun, 6=Sat) - how many days left in the week
   const now = new Date();
@@ -441,28 +448,27 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   const dayOfWeek = todayBrasilia.getDay();
   const daysLeftInWeek = Math.max(1, 7 - dayOfWeek);
   
-  // Use MINIMUM progress - if ANY goal is behind, we need to push harder
-  const minProgress = Math.min(viewsProgress, engagementProgress);
+  // Use MINIMUM of ALL progress metrics - if ANY goal is behind, push harder
+  const minProgress = Math.min(viewsProgress, engagementProgress, contentProgress);
   
-  console.log(`[AGENT] Macro objectives (from synced data): views ${currentWeeklyViews}/${goalViews} (${Math.round(viewsProgress)}%), engagement ${currentWeeklyEngagement}%/${goalEngagement}% (${Math.round(engagementProgress)}%)`);
-  console.log(`[AGENT] MIN progress: ${Math.round(minProgress)}%, days left: ${daysLeftInWeek}`);
+  console.log(`[AGENT] Dynamic limit calc: views ${currentWeeklyViews}/${goalViews} (${Math.round(viewsProgress)}%), engagement ${currentWeeklyEngagement}%/${goalEngagement}% (${Math.round(engagementProgress)}%), content ${totalProgress}/${totalGoals} (${Math.round(contentProgress)}%)`);
+  console.log(`[AGENT] MIN progress: ${Math.round(minProgress)}%, days left: ${daysLeftInWeek}, goalType: ${goalType}`);
   
   // Dynamic daily limit based on how far behind we are
   let dynamicLimit: number;
   if (minProgress >= 100) {
-    // Goals met - maintenance mode: 1 post/day
+    // ALL goals met - maintenance mode
     dynamicLimit = 1;
   } else if (minProgress >= 70) {
-    // Almost there - moderate: 2 posts/day
     dynamicLimit = 2;
   } else if (minProgress >= 40) {
-    // Behind - aggressive: 3 posts/day
     dynamicLimit = 3;
   } else {
-    // Far behind - maximum effort: 4-5 posts/day
-    // Factor in days left: fewer days = more aggressive
+    // Far behind - maximum effort
     dynamicLimit = daysLeftInWeek <= 2 ? 5 : 4;
   }
+  
+  console.log(`[AGENT] ➡️ Dynamic daily limit: ${dynamicLimit} (minProgress=${Math.round(minProgress)}%)`);
   
   // Hard cap at 5 posts/day to avoid spam
   return Math.min(5, dynamicLimit);
@@ -519,8 +525,9 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     };
   }
   
-  // In macro mode, don't stop at weekly content goals - keep posting if objectives not met
-  if (!state.nextContentType && goalType === 'macro') {
+  // For ALL non-fixed goal types (macro, growth, reach, authority, conversion):
+  // Don't stop at weekly content goals - keep posting if macro objectives not met
+  if (!state.nextContentType && goalType !== 'fixed') {
     // Check if macro objectives are met
     const viewsMet = weeklyReach >= goalViews;
     const engagementMet = currentEngagement >= goalEngagement;
@@ -529,15 +536,18 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
       console.log('[AGENT] Objetivos macro alcançados!');
       return {
         decision: 'NO_POST',
-        reason: `🏆 Objetivos macro alcançados! Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()}, Engajamento: ${currentEngagement}%/${goalEngagement}%. Modo manutenção ativo.`
+        reason: `🏆 Objetivos alcançados! Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()}, Engajamento: ${currentEngagement}%/${goalEngagement}%. Modo manutenção ativo.`
       };
     }
     
-    // Objectives NOT met - override nextContentType to keep posting (prefer news - cheapest)
-    console.log('[AGENT] Metas de tipo completas mas objetivos macro NÃO atingidos - continuando com news');
-    state.nextContentType = 'news';
+    // Objectives NOT met - override nextContentType based on goal type
+    // For growth/reach: prioritize reels (higher reach potential)
+    // For authority/conversion: prioritize news (builds credibility)
+    const overrideType: ContentType = (goalType === 'growth' || goalType === 'reach') ? 'video' : 'news';
+    console.log(`[AGENT] Metas de tipo completas mas objetivos NÃO atingidos (${goalType}) - continuando com ${overrideType}`);
+    state.nextContentType = overrideType;
   } else if (!state.nextContentType) {
-    console.log('[AGENT] Meta semanal completa!');
+    console.log('[AGENT] Meta semanal completa (modo fixo)!');
     return {
       decision: 'NO_POST',
       reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}`
