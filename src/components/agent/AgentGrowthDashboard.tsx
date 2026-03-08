@@ -40,6 +40,7 @@ interface TopPost {
   id: string;
   caption: string;
   reach: number;
+  impressions: number;
   likes_count: number;
   comments_count: number;
   saves_count: number;
@@ -103,7 +104,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     since.setDate(since.getDate() - period);
     const { data } = await supabase
       .from('posts')
-      .select('id, caption, reach, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at, hashtags, post_type')
+      .select('id, caption, reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, image_url, published_at, hashtags, post_type')
       .eq('workspace_id', currentWorkspace.id)
       .eq('status', 'published')
       .not('instagram_post_id', 'is', null)
@@ -124,6 +125,8 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalComments = topPosts.reduce((s, p) => s + (p.comments_count || 0), 0);
   const totalSaves = topPosts.reduce((s, p) => s + (p.saves_count || 0), 0);
   const totalReach = topPosts.reduce((s, p) => s + (p.reach || 0), 0);
+  const totalImpressions = topPosts.reduce((s, p) => s + (p.impressions || 0), 0);
+  const totalViews = totalImpressions > 0 ? totalImpressions : totalReach; // impressions = views, fallback to reach
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   // Progress based on period data vs goals
@@ -210,11 +213,12 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
       {/* 1. KPI Cards */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} sub={periodLabel} />
-          <KPICard icon={<MessageCircle className="h-4 w-4 text-primary" />} label="Comentários" value={formatNumber(totalComments)} sub={periodLabel} />
-          <KPICard icon={<Bookmark className="h-4 w-4 text-amber-500" />} label="Salvamentos" value={formatNumber(totalSaves)} sub={periodLabel} />
-          <KPICard icon={<Eye className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <KPICard icon={<Eye className="h-4 w-4 text-blue-500" />} label="Visualizações" value={formatNumber(totalViews)} sub={periodLabel} />
+          <KPICard icon={<Users className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
+          <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} />
+          <KPICard icon={<Bookmark className="h-4 w-4 text-amber-500" />} label="Salvamentos" value={formatNumber(totalSaves)} />
+          <KPICard icon={<Share2 className="h-4 w-4 text-purple-500" />} label="Compartilh." value={formatNumber(topPosts.reduce((s, p) => s + (p.shares_count || 0), 0))} />
         </div>
       </motion.div>
 
@@ -328,7 +332,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-medium line-clamp-1">{post.caption}</p>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {(post.reach || 0).toLocaleString()}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {((post.impressions || post.reach || 0)).toLocaleString()} views</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}</span>
