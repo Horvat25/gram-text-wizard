@@ -62,32 +62,36 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const periodLabel = `últimos ${period} dias`;
 
-  // Sync from Instagram
+  // Sync from Instagram — single call, no loop
   const handleSync = async () => {
     setSyncing(true);
+    toast.loading('Sincronizando métricas do Instagram...', { id: 'sync-ig' });
     try {
-      let offset = 0;
-      let totalUpdated = 0;
-      let totalDeleted = 0;
-      let hasMore = true;
-      let batch = 0;
-      while (hasMore && batch < 10) {
-        batch++;
-        toast.loading(`Sincronizando... ${offset} posts`, { id: 'sync-ig' });
-        const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
-          body: { offset, batch_size: 30 }
+      const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
+        body: { offset: 0, batch_size: 50 }
+      });
+      if (error) throw error;
+      
+      const totalUpdated = data?.updated || 0;
+      const totalDeleted = data?.deleted || 0;
+      const hasMore = data?.has_more;
+      
+      // If there are more, do one more batch silently
+      if (hasMore) {
+        const { data: d2 } = await supabase.functions.invoke('sync-instagram-metrics', {
+          body: { offset: data?.next_offset || 50, batch_size: 50 }
         });
-        if (error) throw error;
-        totalUpdated += data?.updated || 0;
-        totalDeleted += data?.deleted || 0;
-        hasMore = data?.has_more || false;
-        offset = data?.next_offset || 0;
+        const u2 = d2?.updated || 0;
+        const d2del = d2?.deleted || 0;
+        toast.dismiss('sync-ig');
+        toast.success(`${totalUpdated + u2} atualizados${totalDeleted + d2del > 0 ? `, ${totalDeleted + d2del} removidos` : ''}`);
+      } else {
+        toast.dismiss('sync-ig');
+        const parts = [];
+        if (totalUpdated > 0) parts.push(`${totalUpdated} atualizados`);
+        if (totalDeleted > 0) parts.push(`${totalDeleted} removidos`);
+        toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       }
-      toast.dismiss('sync-ig');
-      const parts = [];
-      if (totalDeleted > 0) parts.push(`${totalDeleted} removidos`);
-      if (totalUpdated > 0) parts.push(`${totalUpdated} atualizados`);
-      toast.success(parts.length > 0 ? parts.join(', ') : 'Tudo sincronizado!');
       fetchTopPosts();
     } catch (e: any) {
       toast.dismiss('sync-ig');
