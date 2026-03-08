@@ -2,7 +2,6 @@ import { Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
-import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -13,12 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { WorkspaceSelector } from "@/components/workspace/WorkspaceSelector";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 const Header = () => {
   const navigate = useNavigate();
   const { settings } = useBrandSettings();
-  const { accounts } = useInstagramAccounts();
+  const { currentWorkspace } = useWorkspace();
   const { user, signOut } = useAuth();
   
   const brandName = settings.brandName || "Agente IA Instagram";
@@ -32,9 +31,9 @@ const Header = () => {
   return (
     <header className="border-b border-border/30 bg-background/80 sticky top-0 z-50 backdrop-blur-md">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-2">
-        {/* Workspace Selector - Left side */}
-        <div className="w-[220px] flex-shrink-0">
-          <WorkspaceSelector />
+        {/* Workspace name - Left side */}
+        <div className="flex-shrink-0">
+          <span className="text-sm font-medium">{currentWorkspace?.name || brandName}</span>
         </div>
         
         {/* Right side controls */}

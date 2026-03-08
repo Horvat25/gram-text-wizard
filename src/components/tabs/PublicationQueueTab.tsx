@@ -31,11 +31,9 @@ import {
 import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import AgentReelsRenderer from "@/components/agent/AgentReelsRenderer";
-import AutoVideoRenderingPanel from "@/components/queue/AutoVideoRenderingPanel";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -199,8 +197,9 @@ const PublicationQueueTab = ({
     });
   }, [viewingPost]);
   
-  const { accounts, loading: loadingAccounts } = useInstagramAccounts();
-  const hasConnectedAccount = accounts.length > 0;
+  const { currentWorkspace } = useWorkspace();
+  const [loadingAccounts] = useState(false);
+  const hasConnectedAccount = false; // Simplified - accounts managed in Settings
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
@@ -456,9 +455,6 @@ const PublicationQueueTab = ({
 
   return (
     <div className="space-y-6">
-      {/* Auto Video Rendering Panel */}
-      <AutoVideoRenderingPanel />
-
       {/* Connected Account Info */}
       {!loadingAccounts && (
         hasConnectedAccount ? (
