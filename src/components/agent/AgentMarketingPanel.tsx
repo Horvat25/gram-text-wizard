@@ -54,19 +54,22 @@ export default function AgentMarketingPanel() {
     }
     setGeneratingDesc(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-caption', {
+      const { data, error } = await supabase.functions.invoke('generate-affiliate-description', {
         body: {
-          topic: `Gere uma descrição curta e objetiva (máximo 2 frases) sobre o produto "${productName.trim()}" para uso interno de marketing. Foque em: o que é, principal benefício. Não use hashtags nem emojis. Apenas descreva o produto.`,
-          postType: 'noticia',
-          language: 'pt-BR',
+          productName: productName.trim(),
+          affiliateUrl: affiliateUrl.trim() || null,
         }
       });
       if (error) throw error;
-      if (data?.caption) {
-        // Remove hashtags if any leaked through
-        const clean = data.caption.replace(/#\w+/g, '').trim();
-        setDescription(clean);
-        toast.success('Descrição gerada! Revise e ajuste se necessário.');
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.description) {
+        setDescription(data.description);
+        const sources = [];
+        if (data.sources?.scraped) sources.push('site do produto');
+        if (data.sources?.searched) sources.push('pesquisa web');
+        const sourceText = sources.length > 0 ? ` (baseado em: ${sources.join(' + ')})` : '';
+        toast.success(`Descrição gerada!${sourceText} Revise e ajuste.`);
       }
     } catch (err: any) {
       toast.error('Erro ao gerar descrição: ' + err.message);
