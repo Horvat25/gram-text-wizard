@@ -6,6 +6,7 @@ export interface VideoSegment {
   imageUrl: string;
   duration: number;
   text?: string;
+  scene?: string; // "hook" | "context" | "explanation" | "impact" | "cta"
 }
 
 export interface GenerateVideoOptions {
@@ -19,78 +20,58 @@ export interface GenerateVideoOptions {
   onProgress?: (progress: number) => void;
 }
 
+// ─── Standard durations ──────────────────────────────────────
+const MAX_SCENES = 5;
 const MAX_TOTAL_DURATION_SECONDS = 55;
 const MIN_SEGMENT_DURATION_SECONDS = 1;
-const FALLBACK_SEGMENT_DURATION_SECONDS = 5;
+const FALLBACK_SEGMENT_DURATION_SECONDS = 4;
+const STANDARD_SCENE_DURATIONS = [2, 4, 4, 4, 3]; // hook, context, explanation, impact, cta = 17s
 
-const TRANSITION_SECONDS = 0.35;
+const TRANSITION_SECONDS = 0.3;
 const DEFAULT_VIDEO_BPS = 8_000_000;
-const CTA_DURATION_SECONDS = 4; // Last 4 seconds show CTA overlay
+const MAX_WORDS_PER_CAPTION = 8;
 
-type LoadedImage = {
-  source: CanvasImageSource;
-  width: number;
-  height: number;
-};
-
-type MotionParams = {
-  startScale: number;
-  endScale: number;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-};
+type LoadedImage = { source: CanvasImageSource; width: number; height: number };
+type MotionParams = { startScale: number; endScale: number; startX: number; startY: number; endX: number; endY: number };
 
 // ─── Math helpers ────────────────────────────────────────────
 
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, n));
-}
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
-function easeInOutCubic(t: number) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
+function clamp(n: number, min: number, max: number) { return Math.min(max, Math.max(min, n)); }
+function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
+function easeInOutCubic(t: number) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
 function hashStringToUint(str: string): number {
   let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
   return h >>> 0;
 }
 
 function seededRandom01(seed: number): () => number {
   let x = seed || 123456789;
-  return () => {
-    x ^= x << 13;
-    x ^= x >>> 17;
-    x ^= x << 5;
-    return (x >>> 0) / 4294967296;
-  };
+  return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return (x >>> 0) / 4294967296; };
 }
 
 // ─── Segment helpers ─────────────────────────────────────────
 
-function normalizeSegments(segments: VideoSegment[]): VideoSegment[] {
-  const sanitized = segments
-    .filter((segment) => !!segment.imageUrl)
-    .map((segment) => {
-      const parsed = Number(segment.duration);
-      const duration = Number.isFinite(parsed) && parsed > 0 ? parsed : FALLBACK_SEGMENT_DURATION_SECONDS;
-      const normalizedText = typeof segment.text === "string"
-        ? segment.text.replace(/\s+/g, " ").trim()
-        : "";
+function truncateToMaxWords(text: string, maxWords: number = MAX_WORDS_PER_CAPTION): string {
+  const words = text.trim().split(/\s+/);
+  return words.length > maxWords ? words.slice(0, maxWords).join(" ") : text.trim();
+}
 
-      return {
-        ...segment,
-        duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, duration),
-        text: normalizedText || "Descubra mais no perfil para ver o conteúdo completo.",
-      };
-    });
+function normalizeSegments(segments: VideoSegment[]): VideoSegment[] {
+  // Enforce max 5 scenes
+  const limited = segments.filter((s) => !!s.imageUrl).slice(0, MAX_SCENES);
+
+  const sanitized = limited.map((segment, i) => {
+    const parsed = Number(segment.duration);
+    const standardDuration = STANDARD_SCENE_DURATIONS[i] ?? FALLBACK_SEGMENT_DURATION_SECONDS;
+    const duration = Number.isFinite(parsed) && parsed > 0 ? parsed : standardDuration;
+
+    const rawText = typeof segment.text === "string" ? segment.text.replace(/\s+/g, " ").trim() : "";
+    const text = truncateToMaxWords(rawText || "Descubra mais no perfil.");
+
+    return { ...segment, duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, duration), text };
+  });
 
   if (sanitized.length === 0) return [];
 
@@ -98,10 +79,7 @@ function normalizeSegments(segments: VideoSegment[]): VideoSegment[] {
   if (totalDuration <= MAX_TOTAL_DURATION_SECONDS) return sanitized;
 
   const scale = MAX_TOTAL_DURATION_SECONDS / totalDuration;
-  return sanitized.map((s) => ({
-    ...s,
-    duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, s.duration * scale),
-  }));
+  return sanitized.map((s) => ({ ...s, duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, s.duration * scale) }));
 }
 
 // ─── Image loading ───────────────────────────────────────────
@@ -110,29 +88,13 @@ async function loadImage(url: string): Promise<LoadedImage | null> {
   try {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    const waitForLoad = () =>
-      new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error("image_load_failed"));
-      });
+    const waitForLoad = () => new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = () => reject(new Error("image_load_failed")); });
     img.src = url;
-
     const decodeFn = (img as any).decode;
-    if (typeof decodeFn === "function") {
-      try { await decodeFn.call(img); } catch { await waitForLoad(); }
-    } else {
-      await waitForLoad();
-    }
-
+    if (typeof decodeFn === "function") { try { await decodeFn.call(img); } catch { await waitForLoad(); } } else { await waitForLoad(); }
     const w = (img as any).naturalWidth ?? img.width;
     const h = (img as any).naturalHeight ?? img.height;
-
-    if ("createImageBitmap" in window) {
-      try {
-        const bitmap = await createImageBitmap(img);
-        return { source: bitmap, width: bitmap.width, height: bitmap.height };
-      } catch { /* fallback */ }
-    }
+    if ("createImageBitmap" in window) { try { const bitmap = await createImageBitmap(img); return { source: bitmap, width: bitmap.width, height: bitmap.height }; } catch {} }
     return { source: img, width: w, height: h };
   } catch (e) {
     console.warn("[video-encoder] Failed to load image:", url, e);
@@ -145,27 +107,20 @@ async function loadImage(url: string): Promise<LoadedImage | null> {
 function getMotionParamsForSegment(segment: VideoSegment, canvasW: number, canvasH: number): MotionParams {
   const seed = hashStringToUint(segment.imageUrl + "|" + (segment.text ?? ""));
   const rnd = seededRandom01(seed);
-  // More dramatic zoom range for cinematic feel
   const startScale = 1.04 + rnd() * 0.06;
   const endScale = startScale + (rnd() > 0.5 ? 1 : -1) * (0.04 + rnd() * 0.04);
   const maxX = canvasW * 0.06;
   const maxY = canvasH * 0.06;
   return {
     startScale, endScale,
-    startX: (rnd() - 0.5) * 2 * maxX,
-    startY: (rnd() - 0.5) * 2 * maxY,
-    endX: (rnd() - 0.5) * 2 * maxX,
-    endY: (rnd() - 0.5) * 2 * maxY,
+    startX: (rnd() - 0.5) * 2 * maxX, startY: (rnd() - 0.5) * 2 * maxY,
+    endX: (rnd() - 0.5) * 2 * maxX, endY: (rnd() - 0.5) * 2 * maxY,
   };
 }
 
 // ─── Drawing helpers ─────────────────────────────────────────
 
-function drawImageCover(
-  ctx: CanvasRenderingContext2D, img: LoadedImage,
-  canvasW: number, canvasH: number,
-  extraScale: number, offsetX: number, offsetY: number
-) {
+function drawImageCover(ctx: CanvasRenderingContext2D, img: LoadedImage, canvasW: number, canvasH: number, extraScale: number, offsetX: number, offsetY: number) {
   const scale = Math.max(canvasW / img.width, canvasH / img.height) * extraScale;
   const drawW = img.width * scale;
   const drawH = img.height * scale;
@@ -188,15 +143,13 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
 
 function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number, text: string) {
   if (!text) return;
-  const normalized = text.replace(/\s+/g, " ").trim();
+  const normalized = truncateToMaxWords(text.replace(/\s+/g, " ").trim());
   if (!normalized) return;
-  const clipped = normalized.length > 160 ? `${normalized.slice(0, 157)}…` : normalized;
 
-  // Solid dark panel at bottom for maximum readability
+  // Large central text on dark panel
   const panelH = Math.round(canvasH * 0.22);
   const panelY = Math.round(canvasH * 0.72);
 
-  // Solid dark background - no subtle gradients that can be invisible
   ctx.fillStyle = "rgba(0,0,0,0.82)";
   ctx.fillRect(0, panelY, canvasW, panelH);
 
@@ -205,27 +158,23 @@ function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: nu
   ctx.fillRect(0, panelY, canvasW, 4);
 
   const maxTextW = canvasW - 120;
-  const fontSize = clamp(Math.round(canvasW * 0.048), 36, 56);
+  const fontSize = clamp(Math.round(canvasW * 0.052), 40, 60);
   const lineHeight = Math.round(fontSize * 1.3);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = `bold ${fontSize}px Arial, Helvetica, sans-serif`;
 
-  const lines = wrapLines(ctx, clipped, maxTextW).slice(0, 3);
+  const lines = wrapLines(ctx, normalized, maxTextW).slice(0, 2);
   const blockH = lines.length * lineHeight;
   const startY = panelY + panelH / 2 - blockH / 2 + lineHeight / 2;
 
   for (let i = 0; i < lines.length; i++) {
     const y = startY + i * lineHeight;
-
-    // Strong black outline
     ctx.lineWidth = Math.max(8, Math.round(fontSize * 0.2));
     ctx.strokeStyle = "#000000";
     ctx.lineJoin = "round";
     ctx.strokeText(lines[i], canvasW / 2, y);
-
-    // White fill
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(lines[i], canvasW / 2, y);
   }
@@ -239,7 +188,6 @@ function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: 
   const y = pad;
   const r = Math.round(pillH / 2);
 
-  // Shadow
   ctx.fillStyle = "rgba(0,0,0,0.3)";
   ctx.beginPath();
   ctx.moveTo(x + r + 2, y + 3);
@@ -250,7 +198,6 @@ function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: 
   ctx.closePath();
   ctx.fill();
 
-  // Gradient pill background
   const pillGrad = ctx.createLinearGradient(x, y, x + pillW, y + pillH);
   pillGrad.addColorStop(0, "rgba(139,92,246,0.85)");
   pillGrad.addColorStop(1, "rgba(109,40,217,0.85)");
@@ -271,20 +218,17 @@ function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: 
   ctx.fillText("⚡ Neural Update", x + pillW / 2, y + pillH / 2);
 }
 
-/** Draw CTA overlay on the last seconds of the video */
+/** CTA overlay — ONLY rendered on the LAST scene (scene === "cta") */
 function drawCTAOverlay(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number, fadeIn: number) {
   const alpha = clamp(fadeIn, 0, 1);
 
-  // Dark overlay
-  ctx.fillStyle = `rgba(0,0,0,${0.6 * alpha})`;
+  ctx.fillStyle = `rgba(0,0,0,${0.7 * alpha})`;
   ctx.fillRect(0, 0, canvasW, canvasH);
 
-  // CTA text
   const fontSize = clamp(Math.round(canvasW * 0.065), 42, 72);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = `900 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
-
   ctx.globalAlpha = alpha;
 
   // "SEGUIR AGORA" button
@@ -294,7 +238,6 @@ function drawCTAOverlay(ctx: CanvasRenderingContext2D, canvasW: number, canvasH:
   const btnY = canvasH * 0.42;
   const btnR = Math.round(btnH / 2);
 
-  // Button gradient
   const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
   btnGrad.addColorStop(0, "#8B5CF6");
   btnGrad.addColorStop(1, "#6D28D9");
@@ -311,13 +254,11 @@ function drawCTAOverlay(ctx: CanvasRenderingContext2D, canvasW: number, canvasH:
   ctx.fillStyle = "#FFFFFF";
   ctx.fillText("SEGUIR AGORA", canvasW / 2, btnY + btnH / 2);
 
-  // Handle
   const handleSize = Math.round(fontSize * 0.65);
   ctx.font = `700 ${handleSize}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
   ctx.fillStyle = "rgba(255,255,255,0.9)";
   ctx.fillText("@neuralupdate", canvasW / 2, btnY + btnH + handleSize * 1.5);
 
-  // Subtitle
   const subSize = Math.round(fontSize * 0.42);
   ctx.font = `600 ${subSize}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
   ctx.fillStyle = "rgba(255,255,255,0.7)";
@@ -335,6 +276,7 @@ function drawScene(
   motion: MotionParams | null,
   t01: number,
   text?: string,
+  isCTAScene?: boolean,
   ctaFade?: number,
   globalTime?: number,
   clearFirst: boolean = true
@@ -344,9 +286,12 @@ function drawScene(
   if (!img || !motion) {
     ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvasW, canvasH);
-    if (text) drawCaption(ctx, canvasW, canvasH, text);
+    if (isCTAScene && ctaFade && ctaFade > 0) {
+      drawCTAOverlay(ctx, canvasW, canvasH, ctaFade);
+    } else if (text) {
+      drawCaption(ctx, canvasW, canvasH, text);
+    }
     drawBrandMark(ctx, canvasW, canvasH);
-    if (ctaFade && ctaFade > 0) drawCTAOverlay(ctx, canvasW, canvasH, ctaFade);
     return;
   }
 
@@ -355,18 +300,18 @@ function drawScene(
   const offX = lerp(motion.startX, motion.endX, eased);
   const offY = lerp(motion.startY, motion.endY, eased);
 
-  // Blurred background pass for letterbox fill
+  // Blurred background
   const prevFilter = ctx.filter;
   ctx.filter = "blur(22px) brightness(0.7)";
   ctx.globalAlpha = 0.9;
   drawImageCover(ctx, img, canvasW, canvasH, scale * 1.25, offX * 0.1, offY * 0.1);
   ctx.filter = prevFilter;
 
-  // Foreground image
+  // Foreground
   ctx.globalAlpha = 1;
   drawImageCover(ctx, img, canvasW, canvasH, scale, offX, offY);
 
-  // Enhanced vignette with warm toning
+  // Vignette
   const v = ctx.createRadialGradient(canvasW / 2, canvasH / 2, canvasW * 0.15, canvasW / 2, canvasH / 2, canvasW * 0.9);
   v.addColorStop(0, "rgba(0,0,0,0)");
   v.addColorStop(0.6, "rgba(0,0,0,0.12)");
@@ -381,27 +326,28 @@ function drawScene(
   ctx.fillStyle = topGrad;
   ctx.fillRect(0, 0, canvasW, canvasH * 0.15);
 
-  // Captions (hide when CTA is fully visible)
-  if (text && (!ctaFade || ctaFade < 0.5)) drawCaption(ctx, canvasW, canvasH, text);
+  // CTA scene: show CTA overlay instead of caption
+  if (isCTAScene) {
+    const fade = ctaFade ?? 1;
+    if (fade > 0) drawCTAOverlay(ctx, canvasW, canvasH, fade);
+  } else {
+    // Regular caption
+    if (text) drawCaption(ctx, canvasW, canvasH, text);
+  }
+
   drawBrandMark(ctx, canvasW, canvasH);
 
-  // Title card effect in first 2.5 seconds
+  // Title card in first 2.5 seconds
   if (globalTime !== undefined && globalTime < 2.5) {
     const titleAlpha = globalTime < 0.3 ? globalTime / 0.3 : globalTime > 1.8 ? Math.max(0, (2.5 - globalTime) / 0.7) : 1;
     if (titleAlpha > 0.01) {
       ctx.globalAlpha = titleAlpha * 0.85;
       const titleH = Math.round(canvasH * 0.12);
       const titleY = Math.round(canvasH * 0.38);
-      const titleGrad = ctx.createLinearGradient(0, titleY, 0, titleY + titleH);
-      titleGrad.addColorStop(0, "rgba(0,0,0,0.7)");
-      titleGrad.addColorStop(1, "rgba(0,0,0,0.7)");
-      ctx.fillStyle = titleGrad;
+      ctx.fillStyle = "rgba(0,0,0,0.7)";
       ctx.fillRect(canvasW * 0.08, titleY, canvasW * 0.84, titleH);
-
-      // Purple accent bar
       ctx.fillStyle = "rgba(139,92,246,0.9)";
       ctx.fillRect(canvasW * 0.08, titleY, 5, titleH);
-
       const titleFontSize = clamp(Math.round(canvasW * 0.04), 28, 48);
       ctx.font = `800 ${titleFontSize}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
       ctx.fillStyle = "#FFFFFF";
@@ -411,8 +357,6 @@ function drawScene(
       ctx.globalAlpha = 1;
     }
   }
-
-  if (ctaFade && ctaFade > 0) drawCTAOverlay(ctx, canvasW, canvasH, ctaFade);
 }
 
 // ─── Audio loading ───────────────────────────────────────────
@@ -421,9 +365,7 @@ async function fetchAudioBuffer(audioCtx: AudioContext, url: string): Promise<Au
   try {
     console.log("[video-encoder] Loading audio:", url.substring(0, 80));
     let arrayBuffer: ArrayBuffer;
-
     if (url.startsWith("data:")) {
-      // Base64 data URL
       const base64 = url.split(",")[1];
       if (!base64) return null;
       const binary = atob(base64);
@@ -435,7 +377,6 @@ async function fetchAudioBuffer(audioCtx: AudioContext, url: string): Promise<Au
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       arrayBuffer = await res.arrayBuffer();
     }
-
     const decoded = await audioCtx.decodeAudioData(arrayBuffer);
     console.log("[video-encoder] Audio decoded:", decoded.duration.toFixed(1), "s");
     return decoded;
@@ -448,7 +389,6 @@ async function fetchAudioBuffer(audioCtx: AudioContext, url: string): Promise<Au
 // ─── Codec selection ─────────────────────────────────────────
 
 function pickBestMimeType(): string {
-  // Prefer VP8 first for better cross-browser stability in long Canvas captures
   const candidates = ["video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8", "video/webm;codecs=vp9", "video/webm"];
   const MR = (window as any).MediaRecorder as typeof MediaRecorder | undefined;
   if (!MR?.isTypeSupported) return "video/webm";
@@ -467,16 +407,25 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
   if (normalizedSegments.length === 0) throw new Error("Nenhum segmento válido para renderizar vídeo");
 
   // ─── Build timeline ───
-  const timeline: Array<{ segment: VideoSegment; start: number; end: number; motion: MotionParams }> = [];
+  const timeline: Array<{ segment: VideoSegment; start: number; end: number; motion: MotionParams; isCTA: boolean }> = [];
   let cursor = 0;
-  for (const segment of normalizedSegments) {
-    timeline.push({ segment, start: cursor, end: cursor + segment.duration, motion: getMotionParamsForSegment(segment, width, height) });
+  for (let i = 0; i < normalizedSegments.length; i++) {
+    const segment = normalizedSegments[i];
+    const isCTA = segment.scene === "cta" || i === normalizedSegments.length - 1;
+    timeline.push({
+      segment,
+      start: cursor,
+      end: cursor + segment.duration,
+      motion: getMotionParamsForSegment(segment, width, height),
+      isCTA,
+    });
     cursor += segment.duration;
   }
   const totalDurationSec = cursor;
   const expectedDurationMs = Math.round(totalDurationSec * 1000);
 
   console.log("[video-encoder] Timeline:", totalDurationSec.toFixed(1), "s,", timeline.length, "segments");
+  console.log("[video-encoder] Scenes:", timeline.map(t => `${t.segment.scene || 'scene'}(${t.segment.duration}s${t.isCTA ? ',CTA' : ''})`).join(" → "));
   console.log("[video-encoder] Audio:", !!audioUrl, "| CTA:", !!ctaAudioUrl, "| Music:", !!backgroundMusicUrl);
 
   // ─── Canvas setup ───
@@ -486,16 +435,11 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas context indisponível");
 
-  // ─── Audio setup (mix narration + music into the stream) ───
+  // ─── Audio setup ───
   const audioCtx = getAudioContext();
-  if (audioCtx.state === "suspended") {
-    await audioCtx.resume().catch(() => {});
-  }
-
-  // Create a destination node for mixing audio into MediaRecorder
+  if (audioCtx.state === "suspended") await audioCtx.resume().catch(() => {});
   const dest = audioCtx.createMediaStreamDestination();
 
-  // Load audio assets in parallel
   const [narrationBuffer, ctaBuffer, musicBuffer] = await Promise.all([
     audioUrl ? fetchAudioBuffer(audioCtx, audioUrl) : Promise.resolve(null),
     ctaAudioUrl ? fetchAudioBuffer(audioCtx, ctaAudioUrl) : Promise.resolve(null),
@@ -508,36 +452,21 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
 
   // ─── Preload images ───
   const imageMap = new Map<string, LoadedImage | null>();
-  await Promise.all(
-    normalizedSegments.map(async (s) => {
-      if (!imageMap.has(s.imageUrl)) imageMap.set(s.imageUrl, await loadImage(s.imageUrl));
-    })
-  );
+  await Promise.all(normalizedSegments.map(async (s) => {
+    if (!imageMap.has(s.imageUrl)) imageMap.set(s.imageUrl, await loadImage(s.imageUrl));
+  }));
 
   // ─── Combine canvas video + audio streams ───
-  // Use manual frame requests to avoid frozen captures in throttled tabs/iframes
   const canvasStream = canvas.captureStream(0);
   const canvasTrack = canvasStream.getVideoTracks()[0] as MediaStreamTrack & { requestFrame?: () => void };
   const combinedStream = new MediaStream();
-
-  // Add video tracks from canvas
-  for (const track of canvasStream.getVideoTracks()) {
-    combinedStream.addTrack(track);
-  }
-
-  // Add audio tracks from destination (mixed audio)
-  for (const track of dest.stream.getAudioTracks()) {
-    combinedStream.addTrack(track);
-  }
+  for (const track of canvasStream.getVideoTracks()) combinedStream.addTrack(track);
+  for (const track of dest.stream.getAudioTracks()) combinedStream.addTrack(track);
 
   const mimeType = pickBestMimeType();
   console.log("[video-encoder] Using codec:", mimeType);
 
-  const mediaRecorder = new MediaRecorder(combinedStream, {
-    mimeType,
-    videoBitsPerSecond: DEFAULT_VIDEO_BPS,
-  });
-
+  const mediaRecorder = new MediaRecorder(combinedStream, { mimeType, videoBitsPerSecond: DEFAULT_VIDEO_BPS });
   const chunks: Blob[] = [];
   mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
@@ -547,59 +476,49 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
     mediaRecorder.onstop = async () => {
       if (timerId) clearTimeout(timerId);
       const rawBlob = new Blob(chunks, { type: "video/webm" });
-      try {
-        const fixedBlob = await fixWebmDuration(rawBlob, expectedDurationMs || 1000);
-        resolve(fixedBlob);
-      } catch (error) {
-        console.warn("[video-encoder] Failed to fix WebM duration:", error);
-        resolve(rawBlob);
-      }
+      try { resolve(await fixWebmDuration(rawBlob, expectedDurationMs || 1000)); }
+      catch { resolve(rawBlob); }
     };
 
-    // ─── Start audio playback ───
-    const audioStartTime = audioCtx.currentTime + 0.05; // tiny buffer
+    // ─── Audio playback ───
+    const audioStartTime = audioCtx.currentTime + 0.05;
 
-    // Narration
     if (narrationBuffer) {
       const src = audioCtx.createBufferSource();
       src.buffer = narrationBuffer;
       const gain = audioCtx.createGain();
       gain.gain.value = 1.0;
-      src.connect(gain);
-      gain.connect(dest);
+      src.connect(gain); gain.connect(dest);
       src.start(audioStartTime);
       console.log("[video-encoder] ▶ Narration started");
     }
 
-    // CTA narration (play after main narration ends, with 0.3s gap)
+    // CTA audio: play at the START of the CTA scene (last scene)
     if (ctaBuffer) {
-      const ctaStart = audioStartTime + (narrationBuffer ? narrationBuffer.duration + 0.3 : Math.max(0, totalDurationSec - CTA_DURATION_SECONDS));
+      const ctaSceneEntry = timeline.find(t => t.isCTA);
+      const ctaStartOffset = ctaSceneEntry ? ctaSceneEntry.start : Math.max(0, totalDurationSec - 3);
       const src = audioCtx.createBufferSource();
       src.buffer = ctaBuffer;
       const gain = audioCtx.createGain();
       gain.gain.value = 1.0;
-      src.connect(gain);
-      gain.connect(dest);
-      src.start(ctaStart);
-      console.log("[video-encoder] ▶ CTA audio scheduled at", (ctaStart - audioStartTime).toFixed(1), "s");
+      src.connect(gain); gain.connect(dest);
+      src.start(audioStartTime + ctaStartOffset);
+      console.log("[video-encoder] ▶ CTA audio at", ctaStartOffset.toFixed(1), "s");
     }
 
-    // Background music (lower volume, loops if needed)
     if (musicBuffer) {
       const src = audioCtx.createBufferSource();
       src.buffer = musicBuffer;
-      src.loop = true; // loop music for full video duration
+      src.loop = true;
       const gain = audioCtx.createGain();
-      gain.gain.value = narrationBuffer ? 0.18 : 0.5; // audible but not overpowering
-      src.connect(gain);
-      gain.connect(dest);
+      gain.gain.value = narrationBuffer ? 0.18 : 0.5;
+      src.connect(gain); gain.connect(dest);
       src.start(audioStartTime);
-      // Schedule stop
       src.stop(audioStartTime + totalDurationSec + 0.5);
-      console.log("[video-encoder] ▶ Background music started (vol:", gain.gain.value, ")");
+      console.log("[video-encoder] ▶ Music started (vol:", gain.gain.value, ")");
     }
 
-    // ─── Start recording ───
+    // ─── Recording loop ───
     mediaRecorder.start(1000);
     const startedAt = performance.now();
     let lastRenderedAt = 0;
@@ -619,52 +538,41 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
 
         const current = timeline[idx];
         const currentImg = imageMap.get(current.segment.imageUrl) ?? null;
+        const localT = current.end > current.start ? clamp((boundedElapsed - current.start) / (current.end - current.start), 0, 1) : 1;
 
-        const localT = current.end > current.start
-          ? clamp((boundedElapsed - current.start) / (current.end - current.start), 0, 1)
-          : 1;
-
-        // CTA overlay fade-in for the last CTA_DURATION_SECONDS
-        const timeToEnd = totalDurationSec - boundedElapsed;
-        const ctaFade = timeToEnd <= CTA_DURATION_SECONDS ? clamp(1 - timeToEnd / CTA_DURATION_SECONDS, 0, 1) : 0;
+        // CTA fade only for the CTA scene
+        const ctaFade = current.isCTA ? clamp(localT * 2, 0, 1) : 0;
 
         const secondsToEnd = current.end - boundedElapsed;
         const canTransition = idx < timeline.length - 1;
         const isTransition = canTransition && secondsToEnd <= TRANSITION_SECONDS;
 
         if (!loggedTexts) {
-          console.log("[video-encoder] Segment texts:", timeline.map(t => `"${(t.segment.text || '').substring(0, 40)}"`));
+          console.log("[video-encoder] Segment texts:", timeline.map(t => `[${t.segment.scene || '?'}] "${(t.segment.text || '').substring(0, 30)}"`));
           loggedTexts = true;
         }
 
         if (!isTransition) {
-          drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
+          drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, current.isCTA, ctaFade, boundedElapsed);
         } else {
           const mix = clamp(1 - secondsToEnd / TRANSITION_SECONDS, 0, 1);
           const next = timeline[idx + 1];
           const nextImg = imageMap.get(next.segment.imageUrl) ?? null;
 
           ctx.globalAlpha = 1;
-          drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed, true);
+          drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, current.isCTA, ctaFade, boundedElapsed, true);
           ctx.globalAlpha = mix;
-          drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed, false);
+          drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, next.isCTA, next.isCTA ? mix : 0, boundedElapsed, false);
           ctx.globalAlpha = 1;
         }
 
-        // Force frame push when supported (critical for iframe/background stability)
-        if (canvasTrack?.requestFrame) {
-          canvasTrack.requestFrame();
-        }
+        if (canvasTrack?.requestFrame) canvasTrack.requestFrame();
 
         const progress = totalDurationSec > 0 ? Math.round((boundedElapsed / totalDurationSec) * 100) : 100;
         onProgress?.(clamp(progress, 0, 100));
       }
 
-      if (boundedElapsed >= totalDurationSec) {
-        mediaRecorder.stop();
-        return;
-      }
-
+      if (boundedElapsed >= totalDurationSec) { mediaRecorder.stop(); return; }
       timerId = setTimeout(tick, minFrameMs);
     };
 
@@ -672,16 +580,9 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
   });
 }
 
-export async function uploadVideoToStorage(
-  videoBlob: Blob,
-  supabaseClient: typeof supabase,
-  bucket: string
-): Promise<string> {
+export async function uploadVideoToStorage(videoBlob: Blob, supabaseClient: typeof supabase, bucket: string): Promise<string> {
   const fileName = `video_${Date.now()}.webm`;
-  const { data, error } = await supabaseClient.storage.from(bucket).upload(fileName, videoBlob, {
-    contentType: videoBlob.type,
-    upsert: true,
-  });
+  const { data, error } = await supabaseClient.storage.from(bucket).upload(fileName, videoBlob, { contentType: videoBlob.type, upsert: true });
   if (error) throw error;
   const { data: urlData } = supabaseClient.storage.from(bucket).getPublicUrl(data.path);
   return urlData.publicUrl;

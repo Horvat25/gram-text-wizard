@@ -36,8 +36,9 @@ interface UseNarrativeStoryOptions {
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  // Default to tech_male (Antonio Neural) for professional technology content
-  const { segmentCount = 4, segmentDuration = 5, preferredVoice = "tech_male" } = options;
+  // Standard: 5 scenes (hook 2s, context 4s, explanation 4s, impact 4s, cta 3s) = 17s
+  const { segmentCount = 5, segmentDuration = 4, preferredVoice = "tech_male" } = options;
+  const SCENE_DURATIONS = [2, 4, 4, 4, 3];
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
@@ -79,21 +80,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     toast.error(error);
   }, []);
 
-  // Step 1: Generate structured script with segments
+  // Step 1: Generate structured script with 5 scenes
   const generateScript = useCallback(async (topic: string) => {
     setState(prev => ({ ...prev, step: "script", progress: 5 }));
     
     try {
-      const totalDuration = segmentCount * segmentDuration;
-      const wordsPerSegment = Math.ceil(segmentDuration * 2.5); // ~2.5 words per second
-      
       const { data, error } = await supabase.functions.invoke("generate-story-script", {
         body: { 
           topic, 
-          segmentCount,
-          wordsPerSegment,
-          totalDuration,
-          style: "informativo, envolvente, com começo-meio-fim",
+          segmentCount: 5,
+          wordsPerSegment: 8,
+          totalDuration: 17,
+          style: "informativo, envolvente, editorial provocativo",
         },
       });
 
@@ -102,18 +100,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         throw new Error("Nenhum roteiro gerado");
       }
 
-      // Build segments with timing
+      // Build segments with fixed scene durations
+      const sceneDurations = data.scene_durations || SCENE_DURATIONS;
       let currentTime = 0;
-      const segments: StorySegment[] = data.segments.map((seg: any, index: number) => {
+      const segments: StorySegment[] = data.segments.slice(0, 5).map((seg: any, index: number) => {
+        const dur = sceneDurations[index] ?? 4;
         const segment: StorySegment = {
           id: `seg-${index}`,
           text: seg.text,
           imagePrompt: seg.imagePrompt,
           imageUrl: "",
-          duration: segmentDuration,
+          duration: dur,
           startTime: currentTime,
         };
-        currentTime += segmentDuration;
+        currentTime += dur;
         return segment;
       });
 
@@ -125,13 +125,13 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         progress: 15,
       }));
       
-      toast.success(`Roteiro: ${segments.length} cenas criadas`);
+      toast.success(`Roteiro: ${segments.length} cenas criadas (${currentTime}s)`);
       return segments;
     } catch (error: any) {
       setError(error.message || "Erro ao gerar roteiro");
       return null;
     }
-  }, [segmentCount, segmentDuration, setError]);
+  }, [setError, SCENE_DURATIONS]);
 
   // Step 2: Search for real images (Pexels > Unsplash > Firecrawl > AI)
   // TODAS as imagens são salvas no Storage antes de retornar (elimina CORS no render)
@@ -571,10 +571,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         audioUrl: narrationUrl || undefined,
         ctaAudioUrl: ctaNarrationUrl || undefined,
         backgroundMusicUrl: backgroundMusicUrl || undefined,
-        segments: segments.map(seg => ({
+        segments: segments.map((seg, i) => ({
           imageUrl: seg.imageUrl,
           duration: seg.duration,
           text: seg.text,
+          scene: i === segments.length - 1 ? "cta" : ["hook", "context", "explanation", "impact", "cta"][i] || "scene",
         })),
         onProgress: (progress) => {
           // Map 0-100 progress to 82-95 range
@@ -664,10 +665,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log('[renderFromScript] 📰 Article image provided:', articleInfo.articleImageUrl.substring(0, 60));
     }
 
-    // Build segments with timing from existing data
+    // Build segments with fixed scene durations (max 5 scenes)
     let currentTime = 0;
     const safeTitle = (title || "Reels").trim();
-    const segments: StorySegment[] = existingSegments.map((seg, index) => {
+    const limitedSegments = existingSegments.slice(0, 5);
+    const segments: StorySegment[] = limitedSegments.map((seg, index) => {
       const safeText = typeof seg.text === "string" && seg.text.trim()
         ? seg.text.trim()
         : `${safeTitle} — cena ${index + 1}`;
@@ -675,15 +677,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         ? seg.imagePrompt.trim()
         : safeText;
 
+      const dur = SCENE_DURATIONS[index] ?? 4;
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: safeText,
         imagePrompt: safeImagePrompt,
         imageUrl: preExistingImageUrls?.[index] || "",
-        duration: segmentDuration,
+        duration: dur,
         startTime: currentTime,
       };
-      currentTime += segmentDuration;
+      currentTime += dur;
       return segment;
     });
 

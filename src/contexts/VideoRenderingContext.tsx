@@ -59,10 +59,14 @@ export function useVideoRendering() {
 
 const MAX_RENDER_ATTEMPTS = 3;
 const POLL_INTERVAL_MS = 30_000;
+const MAX_SCENES = 5;
+const SCENE_ORDER = ["hook", "context", "explanation", "impact", "cta"];
 
 interface NormalizedScript {
   title: string;
-  segments: Array<{ text: string; imagePrompt: string }>;
+  segments: Array<{ text: string; imagePrompt: string; scene?: string; duration?: number }>;
+  hook?: string;
+  content_type?: string;
 }
 
 function normalizeScriptFromMetadata(
@@ -78,29 +82,50 @@ function normalizeScriptFromMetadata(
       const text = typeof segment?.text === 'string' ? segment.text.trim() : '';
       const imagePrompt = typeof segment?.imagePrompt === 'string' ? segment.imagePrompt.trim() : '';
       const safeText = text || `${baseText} (${index + 1})`;
+      // Enforce max 8 words
+      const words = safeText.split(/\s+/);
+      const truncated = words.length > 8 ? words.slice(0, 8).join(" ") : safeText;
       return {
-        text: safeText,
+        text: truncated,
         imagePrompt: imagePrompt || safeText,
+        scene: segment?.scene || SCENE_ORDER[index] || "scene",
+        duration: segment?.duration,
       };
     })
     .filter((segment: { imagePrompt: string }) => segment.imagePrompt.length > 0)
-    .slice(0, 4);
+    .slice(0, MAX_SCENES);
 
   if (normalized.length === 0) return null;
 
-  while (normalized.length < 4) {
-    const last = normalized[normalized.length - 1];
-    normalized.push({
-      text: `${last.text} (continuação)`,
-      imagePrompt: last.imagePrompt,
-    });
+  // Pad to exactly 5 scenes if needed
+  while (normalized.length < MAX_SCENES) {
+    const sceneType = SCENE_ORDER[normalized.length] || "scene";
+    if (sceneType === "cta") {
+      normalized.push({
+        text: "Siga @neuralupdate para mais IA",
+        imagePrompt: "dark gradient background neon purple",
+        scene: "cta",
+      });
+    } else {
+      const last = normalized[normalized.length - 1];
+      normalized.push({
+        text: `${last.text} (continuação)`,
+        imagePrompt: last.imagePrompt,
+        scene: sceneType,
+      });
+    }
   }
 
   const title = typeof rawScript.title === 'string' && rawScript.title.trim()
     ? rawScript.title.trim()
     : fallbackTitle;
 
-  return { title, segments: normalized };
+  return {
+    title,
+    segments: normalized,
+    hook: rawScript.hook || normalized[0]?.text || "",
+    content_type: rawScript.content_type || "news",
+  };
 }
 
 interface VideoRenderingProviderProps {
@@ -155,8 +180,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     reset
   } = useNarrativeStory({
     brandName: brandSettings.brandName || 'NeuralUpdate',
-    segmentCount: 4,
-    segmentDuration: 5,
+    segmentCount: 5,
+    segmentDuration: 4,
     preferredVoice: 'camila'
   });
 

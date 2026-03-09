@@ -16,95 +16,38 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
-    const { topic, segmentCount = 4, wordsPerSegment = 12, totalDuration = 20, style, brandName } = await req.json();
+    const { topic, segmentCount: _ignored, wordsPerSegment: _ignored2, totalDuration: _ignored3, style, brandName } = await req.json();
 
     if (!topic) {
       throw new Error("Tópico é obrigatório");
     }
 
     console.log("[generate-story-script] Topic:", topic);
-    console.log("[generate-story-script] Segments:", segmentCount, "| Words per segment:", wordsPerSegment);
 
     const BRAND = (brandName && String(brandName).trim()) || "Neural Update";
     const STYLE = (style && String(style).trim()) || "informativo, inteligente, direto e sem hype";
-    const currentYear = new Date().getFullYear(); // Always use current year (2025+)
+    const currentYear = new Date().getFullYear();
 
-    // Helpers
+    // ─── Helpers ─────────────────────────────────────────────
     const normalize = (s: string) =>
-      s
-        .toLowerCase()
-        .normalize("NFD")
-        // remove accents
-        .replace(/\p{Diacritic}/gu, "")
-        // keep letters/numbers/spaces
-        .replace(/[^a-z0-9\s]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+      s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
 
-    const stopwords = new Set([
-      "como",
-      "para",
-      "sobre",
-      "uma",
-      "um",
-      "uns",
-      "umas",
-      "de",
-      "do",
-      "da",
-      "dos",
-      "das",
-      "e",
-      "a",
-      "o",
-      "as",
-      "os",
-      "no",
-      "na",
-      "nos",
-      "nas",
-      "em",
-      "por",
-      "com",
-      "sem",
-      "que",
-      "isso",
-      "essa",
-      "esse",
-      "essas",
-      "esses",
-      "hoje",
-      "agora",
-      "futuro",
-    ]);
+    const stopwords = new Set(["como","para","sobre","uma","um","uns","umas","de","do","da","dos","das","e","a","o","as","os","no","na","nos","nas","em","por","com","sem","que","isso","essa","esse","essas","esses","hoje","agora","futuro"]);
 
     const extractKeywords = (t: string) => {
-      const tokens = normalize(t)
-        .split(" ")
-        .map((w) => w.trim())
-        .filter(Boolean)
-        .filter((w) => w.length >= 3)
-        .filter((w) => !stopwords.has(w));
+      const tokens = normalize(t).split(" ").filter(Boolean).filter((w) => w.length >= 3).filter((w) => !stopwords.has(w));
       return Array.from(new Set(tokens)).slice(0, 10);
     };
 
     const looksOnTopic = (parsed: any, originalTopic: string) => {
       const kws = extractKeywords(originalTopic);
-      if (kws.length === 0) return true; // nothing to validate
-      const hay = normalize(
-        `${parsed?.title || ""} ${(parsed?.segments || [])
-          .map((s: any) => s?.text || "")
-          .join(" ")}`
-      );
+      if (kws.length === 0) return true;
+      const hay = normalize(`${parsed?.title || ""} ${parsed?.hook || ""} ${parsed?.context || ""} ${parsed?.explanation || ""} ${parsed?.impact || ""}`);
       return kws.some((kw) => hay.includes(kw));
     };
 
-    // Robust JSON parsing helpers (LLM outputs can include minor JSON mistakes)
-    const stripMarkdown = (s: string) =>
-      s
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .trim();
+    // ─── JSON parsing helpers ────────────────────────────────
+    const stripMarkdown = (s: string) => s.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
 
     const extractJsonCandidate = (s: string) => {
       const cleaned = stripMarkdown(s);
@@ -119,51 +62,30 @@ serve(async (req) => {
 
     const looksTruncated = (s: string) => {
       const text = s.trim();
-      const openBraces = (text.match(/{/g) || []).length;
-      const closeBraces = (text.match(/}/g) || []).length;
-      const openBrackets = (text.match(/\[/g) || []).length;
-      const closeBrackets = (text.match(/\]/g) || []).length;
-      return openBraces !== closeBraces || openBrackets !== closeBrackets;
+      return (text.match(/{/g) || []).length !== (text.match(/}/g) || []).length || (text.match(/\[/g) || []).length !== (text.match(/\]/g) || []).length;
     };
 
     const repairCommonJsonIssues = (s: string) => {
-      let out = s;
-
-      // Remove ASCII control chars that break JSON.parse
-      out = out.replace(/[\x00-\x1F\x7F]/g, "");
-
-      // Remove trailing commas
+      let out = s.replace(/[\x00-\x1F\x7F]/g, "");
       out = out.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]");
-
-      // Fix a common LLM mistake: a stray '.' after a JSON string value, before the next key
-      // Example: "text": "...?".\n"visualKeywords": ...
       out = out.replace(/"\s*\.\s*(\r?\n\s*")/g, '",$1');
-
-      // Also handle: "...?".\n}
       out = out.replace(/"\s*\.\s*(\r?\n\s*})/g, '"$1');
-
       return out;
     };
 
     const parseJsonRobust = (raw: string) => {
       const candidate = extractJsonCandidate(raw);
-      if (looksTruncated(candidate)) {
-        throw new Error("Resposta da IA truncada");
-      }
-
-      try {
-        return JSON.parse(candidate);
-      } catch {
+      if (looksTruncated(candidate)) throw new Error("Resposta da IA truncada");
+      try { return JSON.parse(candidate); } catch {
         const repaired = repairCommonJsonIssues(candidate);
-        try {
-          return JSON.parse(repaired);
-        } catch {
+        try { return JSON.parse(repaired); } catch {
           console.error("Failed to parse AI response:", candidate);
           throw new Error("Resposta da IA inválida");
         }
       }
     };
 
+    // ─── AI call ─────────────────────────────────────────────
     const callModel = async (systemPrompt: string, userPrompt: string) => {
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -174,7 +96,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: "google/gemini-2.5-flash-lite",
           temperature: 0.4,
-          max_tokens: 1400,
+          max_tokens: 1200,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
@@ -190,128 +112,100 @@ serve(async (req) => {
 
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content;
+      if (!content || typeof content !== "string") throw new Error("Resposta da IA inválida");
 
-      if (!content || typeof content !== "string") {
-        console.error("AI API returned empty/non-string content:", data);
-        throw new Error("Resposta da IA inválida");
-      }
-
-      const parsed = parseJsonRobust(content);
-
-      if (!parsed?.segments || !Array.isArray(parsed.segments) || parsed.segments.length === 0) {
-        throw new Error("Nenhum segmento gerado");
-      }
-
-      return parsed;
+      return parseJsonRobust(content);
     };
 
-    // System prompt: strategy + constraints, topic-driven, with CURRENT YEAR context
-    // UPDATED: Generate searchQueries for finding real images on the web instead of AI image prompts
-    const systemPrompt = `Você é um ESTRATEGISTA EDITORIAL e roteirista de vídeos curtos do perfil ${BRAND}.
+    // ─── System prompt: 5-scene structure ────────────────────
+    const systemPrompt = `Você é um ESTRATEGISTA EDITORIAL e roteirista de vídeos curtos verticais (Reels/Shorts) do perfil ${BRAND}.
 
 DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
 
 🎯 MISSÃO:
-Criar vídeos com POSICIONAMENTO e AUTORIDADE — não apenas informativos.
-Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em formato Reels.
+Criar vídeos curtos (15-20s) com ALTA RETENÇÃO. Cada vídeo segue uma estrutura rígida de 5 CENAS.
 
-⚡ ESTRUTURA EDITORIAL (4 CENAS):
+⚡ ESTRUTURA OBRIGATÓRIA — 5 CENAS:
 
-1) 🔥 GANCHO (0-3s) — OBRIGATÓRIO ser impactante:
-   - Use PERGUNTA PROVOCATIVA ou AFIRMAÇÃO POLÊMICA
-   - Exemplos bons: "A OpenAI está mentindo pra você.", "Isso vai acabar com 40% dos empregos em 2 anos.", "Você está usando IA errado."
-   - Exemplos RUINS (PROIBIDO): "Vamos falar sobre...", "Hoje eu quero mostrar...", "Você sabia que..."
-   - O gancho deve criar TENSÃO e CURIOSIDADE imediata
+CENA 1 — HOOK (2s):
+- Frase curta e IMPACTANTE que pare o scroll
+- MÁXIMO 8 PALAVRAS
+- Use: pergunta provocativa, afirmação chocante, dado surpreendente
+- Exemplos BOM: "Essa IA assustou cientistas", "O fim do Google?", "Ninguém esperava isso da OpenAI"
+- PROIBIDO: "Vamos falar sobre...", "Hoje eu quero...", "Você sabia que..."
 
-2) 📐 CONTEXTO + TESE (3-8s):
-   - Explique o fato brevemente
-   - Declare sua TESE: "E isso importa porque..." / "O problema real é..."
-   - NÃO seja neutro — tome uma posição clara
+CENA 2 — CONTEXTO (4s):
+- Explique rapidamente o QUE aconteceu
+- MÁXIMO 8 PALAVRAS
+- Frase direta sem rodeios
 
-3) 💡 PROVA + IMPACTO (8-15s):
-   - 1 argumento forte que sustente a tese
-   - Use comparação, dado concreto ou exemplo prático
-   - Mostre POR QUE isso muda algo na vida do espectador
+CENA 3 — EXPLICAÇÃO (4s):
+- Explique a tecnologia/notícia em linguagem simples
+- MÁXIMO 8 PALAVRAS
+- Frase clara e objetiva
 
-4) 🎬 CONCLUSÃO PROVOCATIVA (final):
-   - NÃO use "Siga para mais" ou "Curta e compartilhe"
-   - Termine com: reflexão forte, previsão ousada, ou pergunta que fica na cabeça
-   - Exemplos: "A questão não é SE isso vai acontecer. É se você vai estar preparado.", "Daqui a 5 anos, você vai lembrar desse momento."
+CENA 4 — IMPACTO (4s):
+- Mostre POR QUE isso importa para o futuro/pessoas
+- MÁXIMO 8 PALAVRAS
+- Gere reflexão ou urgência
 
-📝 REGRAS DE TEXTO:
-- Frases curtas (8-16 palavras por segmento)
-- Português brasileiro PERFEITO com acentuação correta
-- Tom: confiante, direto, inteligente — NUNCA genérico
-- PROIBIDO inglês — tudo em PT-BR
+CENA 5 — CTA (3s):
+- Call to action direto
+- MÁXIMO 8 PALAVRAS
+- Exemplo: "Siga @neuralupdate para mais IA"
+- Esta cena NÃO precisa de imagem (será tela de CTA)
+
+📝 REGRAS ABSOLUTAS:
+- MÁXIMO 8 PALAVRAS por cena (incluindo artigos/preposições)
+- EXATAMENTE 5 cenas, nem mais nem menos
+- Tudo em PT-BR com ortografia PERFEITA
+- Acentos obrigatórios: você, é, está, já, até, revolução, atenção
 - PROIBIDO anos anteriores a ${currentYear}
-- Acentos obrigatórios: você, através, é, está, já, até, revolução, atenção, decisão, diagnóstico, automático, análise, possível, próximo, inteligência, tecnologia, saúde
+- Tom: confiante, direto, inteligente
 
-🖼️ KEYWORDS VISUAIS CINEMATOGRÁFICAS (OBRIGATÓRIO EM INGLÊS):
-Crie "visualKeywords": array de 2-4 termos ESPECÍFICOS em INGLÊS para busca no Pexels/Unsplash.
+🖼️ KEYWORDS VISUAIS (em INGLÊS, 2-3 termos por cena):
+Crie "visualKeywords" para busca de imagens cinematográficas verticais (9:16).
+- SEMPRE em INGLÊS
+- Específicas e concretas (ex: "robot arm assembly line", "Sam Altman speaking stage")
+- PROIBIDO genérico: "technology", "innovation", "AI concept"
+- Cena 5 (CTA) NÃO precisa de visualKeywords`;
 
-🚨 REGRA CRÍTICA: visualKeywords SEMPRE em INGLÊS — o sistema de busca usa APIs anglófonas.
-
-REGRAS para visualKeywords:
-- SEMPRE em INGLÊS — nunca em português
-- Cada keyword deve ser uma frase de busca curta e específica (3-5 palavras)
-- PROIBIDO termos ultra-genéricos: "technology", "AI", "innovation", "business", "computer"
-- PRIORIZE: imagens de produtos REAIS, empresas REAIS, hardware específico, cenários concretos
-- Use nomes REAIS: "OpenAI headquarters", "Nvidia GPU chip", "Boston Dynamics robot", "Sam Altman speaking"
-- Pense como um DIRETOR DE ARTE buscando stock photos: contraste, profundidade, textura
-- Formato VERTICAL (9:16) — termos que funcionem em portrait
-
-Exemplos BONS de visualKeywords (INGLÊS + ESPECÍFICO):
-✅ ["humanoid robot close up face", "neural circuit neon macro", "city night silhouette futuristic"]
-✅ ["Sam Altman conference stage", "robot factory assembly line", "server datacenter corridor blue lights"]
-✅ ["Nvidia GPU chip macro", "OpenAI logo screen", "AI data visualization hologram"]
-✅ ["quantum computer close up", "microchip silicon wafer macro", "space rocket launch dramatic"]
-
-Exemplos RUINS (PROIBIDO):
-❌ ["tecnologia", "inteligência artificial", "inovação"] ← português!
-❌ ["technology concept", "artificial intelligence", "innovation"] ← muito genérico!
-❌ ["person working laptop", "business meeting", "modern office"] ← clichê!`;
-
-    const userPrompt = `Crie um VÍDEO EDITORIAL com tese e posicionamento sobre:
+    const userPrompt = `Crie um vídeo Reels de 17 segundos sobre:
 "${topic}"
 
-ESPECIFICAÇÕES:
-- Exatamente ${segmentCount} segmentos (${wordsPerSegment}-${wordsPerSegment + 5} palavras cada)
-- Estilo: ${STYLE}
-- Ano: ${currentYear} — NÃO mencione anos anteriores
+Estilo: ${STYLE}
+Ano: ${currentYear}
 
-⚡ CHECKLIST OBRIGATÓRIO:
-□ Cena 1 começa com pergunta provocativa OU afirmação polêmica (NUNCA "Vamos falar sobre...")
-□ Cena 2 declara uma TESE clara sobre o tema
-□ Cena 3 sustenta com 1 argumento/dado concreto
-□ Cena 4 termina com reflexão forte (NUNCA "Siga para mais")
-□ Todos os textos em PT-BR com ortografia perfeita
-□ visualKeywords são cinematográficas e específicas (NUNCA genéricas)
-
-PRIORIDADE: Melhor 2-3 imagens FORTES do que 4-5 genéricas. Se necessário, repita a mesma keyword cinematográfica forte em mais de uma cena.
+⚡ CHECKLIST:
+□ Cena 1 (hook): máx 8 palavras, impactante
+□ Cena 2 (contexto): máx 8 palavras, o que aconteceu  
+□ Cena 3 (explicação): máx 8 palavras, como funciona
+□ Cena 4 (impacto): máx 8 palavras, por que importa
+□ Cena 5 (cta): máx 8 palavras, call to action
+□ visualKeywords em INGLÊS para cenas 1-4
+□ Ortografia PT-BR perfeita
 
 Responda APENAS com JSON:
 {
-  "title": "Título editorial provocativo EM PORTUGUÊS",
-  "thesis": "A tese central do vídeo em 1 frase",
+  "title": "Título editorial curto",
+  "thesis": "Tese central em 1 frase",
+  "hook": "frase do hook (cena 1)",
+  "content_type": "news|trend|insight|opinion",
   "segments": [
-    { "text": "texto impactante...", "visualKeywords": ["keyword cinematográfica 1", "keyword cinematográfica 2", "keyword cinematográfica 3"] }
+    { "scene": "hook", "text": "frase curta...", "visualKeywords": ["keyword1", "keyword2"] },
+    { "scene": "context", "text": "frase curta...", "visualKeywords": ["keyword1", "keyword2"] },
+    { "scene": "explanation", "text": "frase curta...", "visualKeywords": ["keyword1", "keyword2"] },
+    { "scene": "impact", "text": "frase curta...", "visualKeywords": ["keyword1", "keyword2"] },
+    { "scene": "cta", "text": "Siga @neuralupdate para mais IA", "visualKeywords": [] }
   ]
 }`;
 
-    // Spelling correction function - validates and fixes Portuguese spelling
+    // ─── Spelling correction ─────────────────────────────────
     const correctSpelling = async (script: any): Promise<any> => {
-      const spellingPrompt = `Você é um revisor ortográfico rigoroso de português brasileiro.
+      const spellingPrompt = `Revise o JSON abaixo e corrija APENAS erros ortográficos/acentuação em PT-BR.
+NÃO altere significado, estrutura ou quantidade de segmentos. NÃO altere visualKeywords (são em inglês).
+Retorne APENAS o JSON corrigido.
 
-TAREFA: Revise o JSON abaixo e corrija TODOS os erros ortográficos, de acentuação e gramática.
-
-REGRAS:
-- Corrija acentos faltando: você, através, é, está, já, até, revolução, atenção, decisão
-- Corrija palavras em inglês para português: AI→IA, Robotics→Robótica, Computing→Computação
-- NÃO altere o significado ou estrutura do conteúdo
-- NÃO adicione nem remova segmentos
-- Retorne APENAS o JSON corrigido, sem explicações
-
-JSON para revisar:
 ${JSON.stringify(script, null, 2)}`;
 
       try {
@@ -323,90 +217,86 @@ ${JSON.stringify(script, null, 2)}`;
           },
           body: JSON.stringify({
             model: "google/gemini-2.5-flash-lite",
-            messages: [
-              { role: "user", content: spellingPrompt },
-            ],
+            messages: [{ role: "user", content: spellingPrompt }],
           }),
         });
 
-        if (!response.ok) {
-          console.warn("[spelling-check] Failed, using original:", response.status);
-          return script;
-        }
-
+        if (!response.ok) return script;
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content || "";
         content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
         const corrected = JSON.parse(content);
-        console.log("[spelling-check] Corrections applied successfully");
+        console.log("[spelling-check] Corrections applied");
         return corrected;
-      } catch (e) {
-        console.warn("[spelling-check] Error, using original:", e);
+      } catch {
         return script;
       }
     };
 
-    // Try once, then retry if the model ignored the topic
+    // ─── Execute ─────────────────────────────────────────────
     let parsed = await callModel(systemPrompt, userPrompt);
 
     if (!looksOnTopic(parsed, topic)) {
-      console.warn("[generate-story-script] Model output seems off-topic. Retrying...");
-
-      const retryUserPrompt = `Você ignorou o tema e respondeu algo genérico.
-
-Reescreva um NOVO roteiro EDITORIAL seguindo a mesma estrutura, mas OBRIGATORIAMENTE sobre:
-"${topic}"
-
-LEMBRE-SE:
-- Comece com pergunta provocativa ou afirmação polêmica
-- Declare uma TESE clara — tome posição
-- Estamos em ${currentYear}, não mencione anos passados
-- Tudo em PORTUGUÊS BRASILEIRO com ortografia PERFEITA
-- visualKeywords devem ser cinematográficas e específicas
-- REVISE acentos: ã, é, ê, í, ó, ô, ú, ç
-
-Responda APENAS com JSON no mesmo formato.`;
-
-      parsed = await callModel(systemPrompt, retryUserPrompt);
+      console.warn("[generate-story-script] Off-topic, retrying...");
+      const retryPrompt = `Você ignorou o tema. Reescreva sobre: "${topic}"
+Mesma estrutura de 5 cenas. MÁXIMO 8 PALAVRAS por cena. JSON apenas.`;
+      parsed = await callModel(systemPrompt, retryPrompt);
     }
 
-    // Apply spelling correction as final step
-    console.log("[generate-story-script] Running spelling check...");
     parsed = await correctSpelling(parsed);
 
-    console.log("[generate-story-script] Generated title:", parsed.title);
-    console.log("[generate-story-script] Segments count:", parsed.segments.length);
+    console.log("[generate-story-script] Title:", parsed.title);
+    console.log("[generate-story-script] Segments:", parsed.segments?.length);
 
-    // Backward compatibility: map visualKeywords to imagePrompt for downstream consumers
-    const mappedSegments = (parsed.segments || []).map((seg: any) => ({
-      text: seg.text,
-      imagePrompt: Array.isArray(seg.visualKeywords) 
-        ? seg.visualKeywords.join(", ") 
-        : (seg.imagePrompt || seg.visualKeywords || ""),
-      visualKeywords: seg.visualKeywords || [],
-    }));
+    // ─── Validate & enforce 5-scene structure ────────────────
+    const SCENE_ORDER = ["hook", "context", "explanation", "impact", "cta"];
+    const SCENE_DURATIONS = [2, 4, 4, 4, 3]; // total = 17s
+    
+    let segments = (parsed.segments || []).slice(0, 5);
+    
+    // If AI returned fewer than 5, pad with defaults
+    while (segments.length < 5) {
+      const sceneType = SCENE_ORDER[segments.length];
+      segments.push({
+        scene: sceneType,
+        text: sceneType === "cta" ? "Siga @neuralupdate para mais IA" : `${parsed.title || topic}`,
+        visualKeywords: [],
+      });
+    }
+
+    // Enforce max 8 words per segment text
+    segments = segments.map((seg: any, i: number) => {
+      const words = (seg.text || "").trim().split(/\s+/);
+      const truncatedText = words.length > 8 ? words.slice(0, 8).join(" ") : words.join(" ");
+      return {
+        scene: SCENE_ORDER[i],
+        text: truncatedText,
+        imagePrompt: Array.isArray(seg.visualKeywords) ? seg.visualKeywords.join(", ") : (seg.imagePrompt || ""),
+        visualKeywords: seg.visualKeywords || [],
+        duration: SCENE_DURATIONS[i],
+      };
+    });
+
+    const totalDuration = SCENE_DURATIONS.reduce((a, b) => a + b, 0);
 
     return new Response(
       JSON.stringify({
-        title: parsed.title,
+        title: parsed.title || topic,
         thesis: parsed.thesis || "",
-        segments: mappedSegments,
+        hook: parsed.hook || segments[0]?.text || "",
+        content_type: parsed.content_type || "news",
+        segments,
         totalDuration,
-        segmentCount: mappedSegments.length,
+        segmentCount: segments.length,
+        scene_durations: SCENE_DURATIONS,
       }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("Error in generate-story-script:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar roteiro" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
