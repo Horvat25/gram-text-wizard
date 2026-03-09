@@ -2568,12 +2568,123 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       postStatus = 'scheduled';
     }
 
-    // Determine media type from affiliate config (supports comma-separated for rotation)
-    const formats = (affiliate.media_format || 'image').split(',').map((f: string) => f.trim());
-    // Rotate format based on posts_count
-    const formatIndex = (affiliate.posts_count || 0) % formats.length;
-    const chosenFormat = formats[formatIndex];
+    // Determine media type from affiliate config
+    const formats = (affiliate.media_format || 'image').split(',').map((f: string) => f.trim().toLowerCase()).filter(Boolean);
+    const hasReels = formats.includes('reels');
+
+    // Senior choice: if reels is available for this affiliate, prioritize reels for richer marketing delivery
+    const chosenFormat = hasReels
+      ? 'reels'
+      : formats[(affiliate.posts_count || 0) % Math.max(1, formats.length)] || 'image';
+
     const mediaType = chosenFormat === 'reels' ? 'reels' : chosenFormat === 'carousel' ? 'carousel' : 'image';
+
+    let thumbnailUrl: string | null = affiliate.image_url || null;
+    let carouselImages: string[] | null = null;
+    let overlayMetadata: any = {
+      type: 'affiliate_marketing',
+      affiliate_id: affiliate.id,
+      product_name: affiliate.product_name,
+      headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
+      theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral'],
+      marketing_strategy: affiliate.marketing_strategy || null
+    };
+
+    // Reels path: ensure 4-scene script + multi-image pack for cinematic render pipeline
+    if (mediaType === 'reels') {
+      const reelsTopic = `${affiliate.product_name} | ${affiliate.category || 'geral'} | oferta de afiliado`;
+      let reelScript: any = null;
+
+      try {
+        const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+          },
+          body: JSON.stringify({
+            topic: `${reelsTopic}. Gancho: ${hook}. Benefício: ${body}. CTA: ${cta}`,
+            segmentCount: 4,
+            wordsPerSegment: 14,
+            totalDuration: 24,
+            style: 'marketing persuasivo, storytelling, dor-solucao-beneficio-cta, tom profissional'
+          })
+        });
+
+        if (scriptResponse.ok) {
+          const data = await scriptResponse.json();
+          if (data?.segments?.length >= 3) {
+            const normalizedSegments = data.segments.slice(0, 4).map((s: any, i: number) => ({
+              text: s?.text || [hook, body, socialProof || 'Resultado prático para quem agir agora.', cta][i] || cta,
+              imagePrompt: s?.imagePrompt || `${affiliate.product_name} marketing high-tech profissional`,
+            }));
+            // Always keep 4 segments for stable cinematic pacing
+            while (normalizedSegments.length < 4) {
+              normalizedSegments.push({
+                text: [hook, body, socialProof || 'Resultado prático para quem agir agora.', cta][normalizedSegments.length] || cta,
+                imagePrompt: `${affiliate.product_name} marketing premium conversão alta`
+              });
+            }
+            reelScript = {
+              title: data?.title || `Oferta: ${affiliate.product_name}`,
+              segments: normalizedSegments,
+            };
+          }
+        }
+      } catch (scriptErr) {
+        console.warn('[AFFILIATE] Script generation failed, using local fallback:', scriptErr);
+      }
+
+      if (!reelScript) {
+        reelScript = {
+          title: `Oferta: ${affiliate.product_name}`,
+          segments: [
+            { text: hook, imagePrompt: `${affiliate.product_name} problema dor do público` },
+            { text: body, imagePrompt: `${affiliate.product_name} solução benefício transformação` },
+            { text: socialProof || `Pessoas já estão usando ${affiliate.product_name} para acelerar resultados.`, imagePrompt: `${affiliate.product_name} prova social resultados profissionais` },
+            { text: cta, imagePrompt: `${affiliate.product_name} call to action urgente conversão` },
+          ]
+        };
+      }
+
+      try {
+        const imagesResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
+          },
+          body: JSON.stringify({
+            topic: reelsTopic,
+            segments: reelScript.segments,
+          })
+        });
+
+        if (imagesResponse.ok) {
+          const imagesData = await imagesResponse.json();
+          const resolvedImages = (imagesData?.images || [])
+            .map((img: any) => (typeof img === 'string' ? img : img?.imageUrl))
+            .filter((url: string | null) => typeof url === 'string' && !!url);
+
+          if (resolvedImages.length > 0) {
+            carouselImages = resolvedImages.slice(0, 4);
+            thumbnailUrl = carouselImages[0] || thumbnailUrl;
+          }
+        }
+      } catch (imagesErr) {
+        console.warn('[AFFILIATE] Image pack generation failed, renderer will fallback:', imagesErr);
+      }
+
+      overlayMetadata = {
+        ...overlayMetadata,
+        type: 'affiliate_marketing_reels',
+        topic: reelsTopic,
+        script: reelScript,
+        needs_processing: true,
+        created_by_agent: true,
+        publish_after_render: false,
+      };
+    }
 
     // Create the post
     const postData: any = {
@@ -2583,18 +2694,12 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       hashtags,
       status: postStatus,
       scheduled_for: scheduledFor,
-      image_url: affiliate.image_url || null,
+      image_url: thumbnailUrl,
+      carousel_images: mediaType === 'reels' ? carouselImages : null,
       post_type: 'marketing',
       media_type: mediaType,
       platforms: platforms || ['instagram'],
-      overlay_metadata: {
-        type: 'affiliate_marketing',
-        affiliate_id: affiliate.id,
-        product_name: affiliate.product_name,
-        headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
-        theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral'],
-        marketing_strategy: affiliate.marketing_strategy || null
-      }
+      overlay_metadata: overlayMetadata
     };
 
     const { data: post, error: postError } = await supabase
@@ -2621,7 +2726,7 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
 
     return {
       success: true,
-      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
+      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n🎬 Formato: ${mediaType === 'reels' ? `Reels cinematográfico (${carouselImages?.length || 0} imagens)` : mediaType}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
       post_id: post.id
     };
   } catch (error: any) {
