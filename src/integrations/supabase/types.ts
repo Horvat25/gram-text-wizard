@@ -25,6 +25,9 @@ export type Database = {
           image_url: string | null
           is_active: boolean | null
           last_posted_at: string | null
+          marketing_strategy: string | null
+          media_format: string
+          post_frequency: number
           posts_count: number | null
           product_name: string
           updated_at: string | null
@@ -40,6 +43,9 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           last_posted_at?: string | null
+          marketing_strategy?: string | null
+          media_format?: string
+          post_frequency?: number
           posts_count?: number | null
           product_name: string
           updated_at?: string | null
@@ -55,6 +61,9 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           last_posted_at?: string | null
+          marketing_strategy?: string | null
+          media_format?: string
+          post_frequency?: number
           posts_count?: number | null
           product_name?: string
           updated_at?: string | null
