@@ -271,6 +271,9 @@ const PublicationQueueTab = ({
     });
   }, [scheduledPosts]);
 
+  const queueCount = renderQueue.length;
+  const totalInBatch = completedCount + queueCount;
+
   const handleReschedule = async () => {
     if (!reschedulePost || !newScheduleDate) return;
     
@@ -481,47 +484,51 @@ const PublicationQueueTab = ({
       </div>
 
       {/* Auto-Render Status Panel */}
-      {(renderQueue.length > 0 || isRendering) && (
-        <Card className="border-purple-500/30 bg-purple-500/5">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Film className="h-5 w-5 text-purple-500" />
-                <span className="font-medium text-sm">
-                  {isRendering ? '🎬 Renderizando vídeo...' : `${renderQueue.length} vídeo(s) na fila`}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {isRendering && !isPaused && (
-                  <Button size="sm" variant="outline" onClick={pauseRendering} className="text-xs h-7">
-                    Pausar
-                  </Button>
-                )}
-                {isPaused && (
-                  <Button size="sm" variant="outline" onClick={resumeRendering} className="text-xs h-7">
-                    Retomar
-                  </Button>
-                )}
-                {!isRendering && renderQueue.length > 0 && (
-                  <Button size="sm" variant="default" onClick={startRendering} className="text-xs h-7 bg-purple-600 hover:bg-purple-700">
-                    <Film className="h-3 w-3 mr-1" />
-                    Iniciar
-                  </Button>
-                )}
+      <Card>
+        <CardContent className="pt-4 pb-4 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Film className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm font-medium">Auto-renderização</p>
+                <p className="text-xs text-muted-foreground">
+                  {isRendering
+                    ? 'Renderização em andamento'
+                    : queueCount > 0
+                      ? `${queueCount} vídeo(s) aguardando`
+                      : 'Sem vídeos pendentes no momento'}
+                </p>
               </div>
             </div>
-            {isRendering && (
-              <>
-                <Progress value={progress} className="h-2 mb-1" />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{currentStep || 'Preparando...'}{isPaused ? ' (pausado)' : ''}</span>
-                  <span>{completedCount}/{completedCount + renderQueue.length} concluídos • {progress}%</span>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
+
+            <div className="flex items-center gap-2">
+              {isRendering && !isPaused && (
+                <Button size="sm" variant="outline" onClick={pauseRendering} className="h-7 text-xs">
+                  Pausar
+                </Button>
+              )}
+              {isPaused && (
+                <Button size="sm" variant="outline" onClick={resumeRendering} className="h-7 text-xs">
+                  Retomar
+                </Button>
+              )}
+              {!isRendering && queueCount > 0 && (
+                <Button size="sm" onClick={startRendering} className="h-7 text-xs">
+                  <Film className="h-3 w-3 mr-1" />
+                  Iniciar
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <Progress value={isRendering ? progress : queueCount > 0 ? 5 : 0} className="h-2" />
+
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{isRendering ? `${currentStep || 'Preparando...'}${isPaused ? ' (pausado)' : ''}` : 'Aguardando novos vídeos'}</span>
+            <span>{totalInBatch > 0 ? `${completedCount}/${totalInBatch} concluídos` : '0/0 concluídos'}</span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Overdue Posts Alert */}
       {overduePosts.length > 0 && (
