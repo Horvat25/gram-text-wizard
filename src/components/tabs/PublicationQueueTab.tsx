@@ -193,6 +193,22 @@ const PublicationQueueTab = ({
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
   const [renderingPost, setRenderingPost] = useState<Post | null>(null);
+  const [showAutoRenderWarning, setShowAutoRenderWarning] = useState(false);
+
+  const {
+    renderQueue,
+    isRendering: isAutoRendering,
+    isPaused,
+    currentVideoId,
+    completedCount,
+    currentStep,
+    isGenerating,
+    progress: autoRenderProgress,
+    currentRenderProgress,
+    startRendering,
+    pauseRendering,
+    resumeRendering,
+  } = useVideoRendering();
 
   // When opening the preview, always start at the top so the close (X) is reachable on mobile.
   useEffect(() => {
@@ -205,7 +221,7 @@ const PublicationQueueTab = ({
   
   const { currentWorkspace } = useWorkspace();
   const [loadingAccounts] = useState(false);
-  const hasConnectedAccount = false; // Simplified - accounts managed in Settings
+  const hasConnectedAccount = false;
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
