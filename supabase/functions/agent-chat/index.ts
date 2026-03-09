@@ -2726,7 +2726,7 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
 
     return {
       success: true,
-      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
+      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n🎬 Formato: ${mediaType === 'reels' ? `Reels cinematográfico (${carouselImages?.length || 0} imagens)` : mediaType}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
       post_id: post.id
     };
   } catch (error: any) {
