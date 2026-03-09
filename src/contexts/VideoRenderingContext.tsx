@@ -476,8 +476,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       }
 
       autoStartTimeoutRef.current = setTimeout(() => {
-        // Re-check locks before starting (another render may have started in the meantime)
-        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current) {
+        // Re-check ALL locks before starting (another render may have started in the meantime)
+        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current || isGenerating) {
           console.log('[AutoRender] Auto-start cancelled - render already active');
           return;
         }
@@ -494,7 +494,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     }
 
     prevPendingCountRef.current = newCount;
-  }, [pendingVideos, processNextVideo, notifyVideoReady]);
+  }, [pendingVideos, processNextVideo, notifyVideoReady, isGenerating]);
 
   const totalInBatch = completedCount + renderQueue.length;
   const currentRenderProgress = isRendering
