@@ -145,10 +145,11 @@ async function loadImage(url: string): Promise<LoadedImage | null> {
 function getMotionParamsForSegment(segment: VideoSegment, canvasW: number, canvasH: number): MotionParams {
   const seed = hashStringToUint(segment.imageUrl + "|" + (segment.text ?? ""));
   const rnd = seededRandom01(seed);
-  const startScale = 1.02 + rnd() * 0.04;
-  const endScale = startScale + (rnd() - 0.5) * 0.06;
-  const maxX = canvasW * 0.05;
-  const maxY = canvasH * 0.05;
+  // More dramatic zoom range for cinematic feel
+  const startScale = 1.04 + rnd() * 0.06;
+  const endScale = startScale + (rnd() > 0.5 ? 1 : -1) * (0.04 + rnd() * 0.04);
+  const maxX = canvasW * 0.06;
+  const maxY = canvasH * 0.06;
   return {
     startScale, endScale,
     startX: (rnd() - 0.5) * 2 * maxX,
