@@ -336,9 +336,10 @@ function drawScene(
   t01: number,
   text?: string,
   ctaFade?: number,
-  globalTime?: number
+  globalTime?: number,
+  clearFirst: boolean = true
 ) {
-  ctx.clearRect(0, 0, canvasW, canvasH);
+  if (clearFirst) ctx.clearRect(0, 0, canvasW, canvasH);
 
   if (!img || !motion) {
     ctx.fillStyle = "#0a0a0a";
@@ -640,9 +641,9 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
         const nextImg = imageMap.get(next.segment.imageUrl) ?? null;
 
         ctx.globalAlpha = 1;
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
+        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed, true);
         ctx.globalAlpha = mix;
-        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed);
+        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed, false);
         ctx.globalAlpha = 1;
       }
 

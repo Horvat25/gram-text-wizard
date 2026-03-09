@@ -666,11 +666,19 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
     // Build segments with timing from existing data
     let currentTime = 0;
+    const safeTitle = (title || "Reels").trim();
     const segments: StorySegment[] = existingSegments.map((seg, index) => {
+      const safeText = typeof seg.text === "string" && seg.text.trim()
+        ? seg.text.trim()
+        : `${safeTitle} — cena ${index + 1}`;
+      const safeImagePrompt = typeof seg.imagePrompt === "string" && seg.imagePrompt.trim()
+        ? seg.imagePrompt.trim()
+        : safeText;
+
       const segment: StorySegment = {
         id: `seg-${index}`,
-        text: seg.text,
-        imagePrompt: seg.imagePrompt,
+        text: safeText,
+        imagePrompt: safeImagePrompt,
         imageUrl: preExistingImageUrls?.[index] || "",
         duration: segmentDuration,
         startTime: currentTime,
@@ -682,7 +690,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setState(prev => ({ 
       ...prev, 
       step: "script",
-      title: title || "Reels",
+      title: safeTitle,
       segments,
       totalDuration: currentTime,
       progress: 15,
@@ -690,17 +698,28 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    // Step 2: Images — skip if ALL segments already have images from pre-existing data
+    // Step 2: Images — only skip generation when pre-existing images are complete AND sufficiently distinct
     const allHaveImages = segments.every(s => !!s.imageUrl);
+    const preloadedUrls = segments.map(s => s.imageUrl).filter(Boolean) as string[];
+    const uniqueImageCount = new Set(preloadedUrls).size;
+    const minDistinctRequired = Math.max(2, Math.ceil(segments.length * 0.75));
+    const hasDistinctSet = uniqueImageCount >= minDistinctRequired;
+
     let segmentsWithImages: StorySegment[];
     
-    if (allHaveImages) {
-      console.log('[renderFromScript] ✅ All segments have pre-existing images, skipping image generation');
+    if (allHaveImages && hasDistinctSet) {
+      console.log('[renderFromScript] ✅ Reusing pre-existing images:', { total: preloadedUrls.length, unique: uniqueImageCount });
       toast.success(`📸 ${segments.length} imagens pré-existentes reutilizadas!`);
       setState(prev => ({ ...prev, step: "images", progress: 70 }));
       segmentsWithImages = segments;
     } else {
-      const result = await generateImages(segments, title, articleInfo);
+      if (allHaveImages && !hasDistinctSet) {
+        console.warn('[renderFromScript] ⚠️ Pre-existing images are repetitive, regenerating full 4-scene set', { total: preloadedUrls.length, unique: uniqueImageCount });
+      }
+
+      // Force fresh generation for all scenes when image set is incomplete or repetitive
+      const segmentsNeedingImages = segments.map(s => ({ ...s, imageUrl: "" }));
+      const result = await generateImages(segmentsNeedingImages, safeTitle, articleInfo);
       if (!result || abortRef.current) {
         setIsGenerating(false);
         return;
