@@ -187,6 +187,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
 }
 
 function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number, text: string) {
+  if (!text) return;
   const normalized = text.replace(/\s+/g, " ").trim();
   if (!normalized) return;
   const clipped = normalized.length > 160 ? `${normalized.slice(0, 157)}…` : normalized;
