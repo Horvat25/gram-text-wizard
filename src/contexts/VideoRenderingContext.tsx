@@ -180,8 +180,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     reset
   } = useNarrativeStory({
     brandName: brandSettings.brandName || 'NeuralUpdate',
-    segmentCount: 4,
-    segmentDuration: 5,
+    segmentCount: 5,
+    segmentDuration: 4,
     preferredVoice: 'camila'
   });
 
