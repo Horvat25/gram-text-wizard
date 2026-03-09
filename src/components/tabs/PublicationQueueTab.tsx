@@ -426,7 +426,13 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => setRenderingPost(post)}
+              onClick={() => {
+                if (isAutoRendering && !isPaused) {
+                  setShowAutoRenderWarning(true);
+                } else {
+                  setRenderingPost(post);
+                }
+              }}
             >
               <Film className="h-3 w-3 mr-1" />
               Gerar Vídeo
