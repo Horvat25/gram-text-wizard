@@ -592,7 +592,7 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
       src.buffer = musicBuffer;
       src.loop = true; // loop music for full video duration
       const gain = audioCtx.createGain();
-      gain.gain.value = narrationBuffer ? 0.12 : 0.4; // quieter when there's narration
+      gain.gain.value = narrationBuffer ? 0.18 : 0.5; // audible but not overpowering
       src.connect(gain);
       gain.connect(dest);
       src.start(audioStartTime);
