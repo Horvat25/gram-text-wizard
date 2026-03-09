@@ -448,7 +448,8 @@ async function fetchAudioBuffer(audioCtx: AudioContext, url: string): Promise<Au
 // ─── Codec selection ─────────────────────────────────────────
 
 function pickBestMimeType(): string {
-  const candidates = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+  // Prefer VP8 first for better cross-browser stability in long Canvas captures
+  const candidates = ["video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8", "video/webm;codecs=vp9", "video/webm"];
   const MR = (window as any).MediaRecorder as typeof MediaRecorder | undefined;
   if (!MR?.isTypeSupported) return "video/webm";
   return candidates.find((c) => MR.isTypeSupported(c)) ?? "video/webm";
@@ -514,7 +515,9 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
   );
 
   // ─── Combine canvas video + audio streams ───
-  const canvasStream = canvas.captureStream(fps);
+  // Use manual frame requests to avoid frozen captures in throttled tabs/iframes
+  const canvasStream = canvas.captureStream(0);
+  const canvasTrack = canvasStream.getVideoTracks()[0] as MediaStreamTrack & { requestFrame?: () => void };
   const combinedStream = new MediaStream();
 
   // Add video tracks from canvas
@@ -539,7 +542,10 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
   mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
   return new Promise((resolve) => {
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+
     mediaRecorder.onstop = async () => {
+      if (timerId) clearTimeout(timerId);
       const rawBlob = new Blob(chunks, { type: "video/webm" });
       try {
         const fixedBlob = await fixWebmDuration(rawBlob, expectedDurationMs || 1000);
@@ -596,64 +602,70 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
     // ─── Start recording ───
     mediaRecorder.start(1000);
     const startedAt = performance.now();
-    let rafId = 0;
     let lastRenderedAt = 0;
     let loggedTexts = false;
     const minFrameMs = 1000 / fps;
 
     const tick = () => {
-      rafId = requestAnimationFrame(tick);
       const now = performance.now();
-      if (now - lastRenderedAt < minFrameMs * 0.85) return;
-      lastRenderedAt = now;
-
       const elapsedSeconds = (now - startedAt) / 1000;
       const boundedElapsed = Math.min(elapsedSeconds, totalDurationSec);
 
-      let idx = timeline.findIndex((e) => boundedElapsed >= e.start && boundedElapsed < e.end);
-      if (idx === -1) idx = timeline.length - 1;
+      if (now - lastRenderedAt >= minFrameMs * 0.85) {
+        lastRenderedAt = now;
 
-      const current = timeline[idx];
-      const currentImg = imageMap.get(current.segment.imageUrl) ?? null;
+        let idx = timeline.findIndex((e) => boundedElapsed >= e.start && boundedElapsed < e.end);
+        if (idx === -1) idx = timeline.length - 1;
 
-      const localT = current.end > current.start
-        ? clamp((boundedElapsed - current.start) / (current.end - current.start), 0, 1)
-        : 1;
+        const current = timeline[idx];
+        const currentImg = imageMap.get(current.segment.imageUrl) ?? null;
 
-      // CTA overlay fade-in for the last CTA_DURATION_SECONDS
-      const timeToEnd = totalDurationSec - boundedElapsed;
-      const ctaFade = timeToEnd <= CTA_DURATION_SECONDS ? clamp(1 - timeToEnd / CTA_DURATION_SECONDS, 0, 1) : 0;
+        const localT = current.end > current.start
+          ? clamp((boundedElapsed - current.start) / (current.end - current.start), 0, 1)
+          : 1;
 
-      const secondsToEnd = current.end - boundedElapsed;
-      const canTransition = idx < timeline.length - 1;
-      const isTransition = canTransition && secondsToEnd <= TRANSITION_SECONDS;
+        // CTA overlay fade-in for the last CTA_DURATION_SECONDS
+        const timeToEnd = totalDurationSec - boundedElapsed;
+        const ctaFade = timeToEnd <= CTA_DURATION_SECONDS ? clamp(1 - timeToEnd / CTA_DURATION_SECONDS, 0, 1) : 0;
 
-      if (!loggedTexts) {
-        console.log("[video-encoder] Segment texts:", timeline.map(t => `"${(t.segment.text || '').substring(0, 40)}"`));
-        loggedTexts = true;
+        const secondsToEnd = current.end - boundedElapsed;
+        const canTransition = idx < timeline.length - 1;
+        const isTransition = canTransition && secondsToEnd <= TRANSITION_SECONDS;
+
+        if (!loggedTexts) {
+          console.log("[video-encoder] Segment texts:", timeline.map(t => `"${(t.segment.text || '').substring(0, 40)}"`));
+          loggedTexts = true;
+        }
+
+        if (!isTransition) {
+          drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
+        } else {
+          const mix = clamp(1 - secondsToEnd / TRANSITION_SECONDS, 0, 1);
+          const next = timeline[idx + 1];
+          const nextImg = imageMap.get(next.segment.imageUrl) ?? null;
+
+          ctx.globalAlpha = 1;
+          drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed, true);
+          ctx.globalAlpha = mix;
+          drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed, false);
+          ctx.globalAlpha = 1;
+        }
+
+        // Force frame push when supported (critical for iframe/background stability)
+        if (canvasTrack?.requestFrame) {
+          canvasTrack.requestFrame();
+        }
+
+        const progress = totalDurationSec > 0 ? Math.round((boundedElapsed / totalDurationSec) * 100) : 100;
+        onProgress?.(clamp(progress, 0, 100));
       }
-
-      if (!isTransition) {
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
-      } else {
-        const mix = clamp(1 - secondsToEnd / TRANSITION_SECONDS, 0, 1);
-        const next = timeline[idx + 1];
-        const nextImg = imageMap.get(next.segment.imageUrl) ?? null;
-
-        ctx.globalAlpha = 1;
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed, true);
-        ctx.globalAlpha = mix;
-        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed, false);
-        ctx.globalAlpha = 1;
-      }
-
-      const progress = totalDurationSec > 0 ? Math.round((boundedElapsed / totalDurationSec) * 100) : 100;
-      onProgress?.(clamp(progress, 0, 100));
 
       if (boundedElapsed >= totalDurationSec) {
-        cancelAnimationFrame(rafId);
         mediaRecorder.stop();
+        return;
       }
+
+      timerId = setTimeout(tick, minFrameMs);
     };
 
     tick();
