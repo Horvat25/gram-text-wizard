@@ -404,8 +404,11 @@ const PublicationQueueTab = ({
             <video
               src={post.video_url}
               className="w-full h-32 object-cover rounded-md"
+              controls
               muted
               playsInline
+              preload="metadata"
+              crossOrigin="anonymous"
             />
           </div>
         )}
@@ -724,6 +727,10 @@ const PublicationQueueTab = ({
                 <video
                   src={viewingPost.video_url}
                   controls
+                  playsInline
+                  muted
+                  preload="auto"
+                  crossOrigin="anonymous"
                   className="w-full rounded-lg max-h-[400px]"
                 />
               )}
