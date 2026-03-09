@@ -607,6 +607,7 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
     const startedAt = performance.now();
     let rafId = 0;
     let lastRenderedAt = 0;
+    let loggedTexts = false;
     const minFrameMs = 1000 / fps;
 
     const tick = () => {
