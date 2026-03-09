@@ -344,12 +344,13 @@ function drawScene(
   motion: MotionParams | null,
   t01: number,
   text?: string,
-  ctaFade?: number
+  ctaFade?: number,
+  globalTime?: number
 ) {
   ctx.clearRect(0, 0, canvasW, canvasH);
 
   if (!img || !motion) {
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvasW, canvasH);
     if (text) drawCaption(ctx, canvasW, canvasH, text);
     drawBrandMark(ctx, canvasW, canvasH);
@@ -362,26 +363,63 @@ function drawScene(
   const offX = lerp(motion.startX, motion.endX, eased);
   const offY = lerp(motion.startY, motion.endY, eased);
 
-  // blurred background pass
+  // Blurred background pass for letterbox fill
   const prevFilter = ctx.filter;
-  ctx.filter = "blur(18px)";
-  ctx.globalAlpha = 0.95;
-  drawImageCover(ctx, img, canvasW, canvasH, scale * 1.18, offX * 0.15, offY * 0.15);
+  ctx.filter = "blur(22px) brightness(0.7)";
+  ctx.globalAlpha = 0.9;
+  drawImageCover(ctx, img, canvasW, canvasH, scale * 1.25, offX * 0.1, offY * 0.1);
   ctx.filter = prevFilter;
 
-  // foreground
+  // Foreground image
   ctx.globalAlpha = 1;
   drawImageCover(ctx, img, canvasW, canvasH, scale, offX, offY);
 
-  // vignette
-  const v = ctx.createRadialGradient(canvasW / 2, canvasH / 2, canvasW * 0.2, canvasW / 2, canvasH / 2, canvasW * 0.85);
+  // Enhanced vignette with warm toning
+  const v = ctx.createRadialGradient(canvasW / 2, canvasH / 2, canvasW * 0.15, canvasW / 2, canvasH / 2, canvasW * 0.9);
   v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,0.35)");
+  v.addColorStop(0.6, "rgba(0,0,0,0.12)");
+  v.addColorStop(1, "rgba(0,0,0,0.45)");
   ctx.fillStyle = v;
   ctx.fillRect(0, 0, canvasW, canvasH);
 
+  // Top gradient for brand mark readability
+  const topGrad = ctx.createLinearGradient(0, 0, 0, canvasH * 0.15);
+  topGrad.addColorStop(0, "rgba(0,0,0,0.4)");
+  topGrad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, canvasW, canvasH * 0.15);
+
+  // Captions (hide when CTA is fully visible)
   if (text && (!ctaFade || ctaFade < 0.5)) drawCaption(ctx, canvasW, canvasH, text);
   drawBrandMark(ctx, canvasW, canvasH);
+
+  // Title card effect in first 2.5 seconds
+  if (globalTime !== undefined && globalTime < 2.5) {
+    const titleAlpha = globalTime < 0.3 ? globalTime / 0.3 : globalTime > 1.8 ? Math.max(0, (2.5 - globalTime) / 0.7) : 1;
+    if (titleAlpha > 0.01) {
+      ctx.globalAlpha = titleAlpha * 0.85;
+      const titleH = Math.round(canvasH * 0.12);
+      const titleY = Math.round(canvasH * 0.38);
+      const titleGrad = ctx.createLinearGradient(0, titleY, 0, titleY + titleH);
+      titleGrad.addColorStop(0, "rgba(0,0,0,0.7)");
+      titleGrad.addColorStop(1, "rgba(0,0,0,0.7)");
+      ctx.fillStyle = titleGrad;
+      ctx.fillRect(canvasW * 0.08, titleY, canvasW * 0.84, titleH);
+
+      // Purple accent bar
+      ctx.fillStyle = "rgba(139,92,246,0.9)";
+      ctx.fillRect(canvasW * 0.08, titleY, 5, titleH);
+
+      const titleFontSize = clamp(Math.round(canvasW * 0.04), 28, 48);
+      ctx.font = `800 ${titleFontSize}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillStyle = "#FFFFFF";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("⚡ NEURAL UPDATE", canvasW / 2, titleY + titleH / 2);
+      ctx.globalAlpha = 1;
+    }
+  }
+
   if (ctaFade && ctaFade > 0) drawCTAOverlay(ctx, canvasW, canvasH, ctaFade);
 }
 
