@@ -267,8 +267,15 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     try {
       const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
       const videoTitle = currentVideo?.overlay_metadata?.script?.title || 'Vídeo';
+
+      const { data: latestPost } = await supabase
+        .from('posts')
+        .select('overlay_metadata')
+        .eq('id', videoId)
+        .maybeSingle();
+
       const preservedOverlayMetadata = {
-        ...(currentVideo?.overlay_metadata || {}),
+        ...((latestPost as any)?.overlay_metadata || currentVideo?.overlay_metadata || {}),
         needs_processing: false,
         render_status: 'completed',
         rendered_at: new Date().toISOString(),
@@ -458,6 +465,19 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
             }
           } as any)
           .eq('id', nextVideo.id);
+
+        // Keep local queue in sync so completion step preserves script metadata
+        setRenderQueue(prev => prev.map(item => (
+          item.id === nextVideo.id
+            ? {
+                ...item,
+                overlay_metadata: {
+                  ...(item.overlay_metadata || {}),
+                  script: normalizedGeneratedScript,
+                },
+              }
+            : item
+        )));
 
         script = normalizedGeneratedScript;
         console.log('[AutoRender] Script generated:', script.title);
