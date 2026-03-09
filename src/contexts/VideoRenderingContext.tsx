@@ -466,6 +466,19 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           } as any)
           .eq('id', nextVideo.id);
 
+        // Keep local queue in sync so completion step preserves script metadata
+        setRenderQueue(prev => prev.map(item => (
+          item.id === nextVideo.id
+            ? {
+                ...item,
+                overlay_metadata: {
+                  ...(item.overlay_metadata || {}),
+                  script: normalizedGeneratedScript,
+                },
+              }
+            : item
+        )));
+
         script = normalizedGeneratedScript;
         console.log('[AutoRender] Script generated:', script.title);
       } catch (err: any) {
