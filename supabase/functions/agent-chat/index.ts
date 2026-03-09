@@ -2476,7 +2476,11 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
     // Get affiliate link - specific one or round-robin rotation
     let affiliate: any = null;
 
-    if (affiliate_id) {
+    // Validate affiliate_id is a proper UUID before querying
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const validAffiliateId = affiliate_id && uuidRegex.test(affiliate_id);
+
+    if (validAffiliateId) {
       const { data, error } = await supabase
         .from('affiliate_links')
         .select('*')
@@ -2484,9 +2488,13 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
         .eq('workspace_id', workspaceId)
         .eq('is_active', true)
         .single();
-      if (error) throw error;
-      affiliate = data;
-    } else {
+      if (!error && data) {
+        affiliate = data;
+      }
+      // If specific ID fails, fall through to round-robin
+    }
+    
+    if (!affiliate) {
       const { data: allLinks, error: fetchError } = await supabase
         .from('affiliate_links')
         .select('*')
