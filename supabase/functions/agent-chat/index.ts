@@ -229,22 +229,23 @@ const AGENT_TOOLS = [
     }
   },
   {
-    type: "function",
+     type: "function",
     function: {
       name: "create_affiliate_post",
-      description: "💰 Cria um post de marketing promovendo um produto de afiliado cadastrado. Busca um link ativo do banco. Use quando o ciclo autônomo decidir intercalar marketing ou quando o usuário pedir.",
+      description: "💰 Cria post PERSUASIVO de marketing de afiliado. O link do produto é AUTOMATICAMENTE inserido na legenda — NÃO precisa incluir URL nos blocos. Foque em COPY DE ALTA CONVERSÃO: DOR → SOLUÇÃO → PROVA → CTA URGENTE. Use frameworks: AIDA, PAS, ou BAB.",
       parameters: {
         type: "object",
         properties: {
           affiliate_id: { type: "string", description: "ID do link de afiliado específico. Se vazio, escolhe automaticamente o menos promovido." },
-          headline_text: { type: "string", description: "Headline de marketing (CAIXA ALTA, máx 2 linhas). Estilo persuasivo com urgência ou benefício claro." },
-          caption_block1: { type: "string", description: "Bloco 1: Hook que gera curiosidade sobre o produto" },
-          caption_block2: { type: "string", description: "Bloco 2: Benefício principal e diferencial" },
-          caption_block3: { type: "string", description: "Bloco 3: CTA com link e urgência" },
+          headline_text: { type: "string", description: "Headline MAGNÉTICA (CAIXA ALTA, máx 2 linhas). Use gatilhos: escassez, curiosidade, transformação. Ex: 'ELE FATUROU R$47K EM 30 DIAS. A FERRAMENTA QUE NINGUÉM TE CONTOU.'" },
+          caption_hook: { type: "string", description: "OBRIGATÓRIO. Primeira frase que PARA O SCROLL. Pode ser: pergunta retórica, estatística chocante, ou afirmação polêmica. Ex: 'Você está perdendo dinheiro todo dia sem saber.'" },
+          caption_body: { type: "string", description: "OBRIGATÓRIO. 2-3 frases: identifique a DOR do público → apresente o produto como SOLUÇÃO → cite 1 benefício CONCRETO e mensurável. NÃO seja genérico." },
+          caption_cta: { type: "string", description: "OBRIGATÓRIO. Call-to-action com URGÊNCIA real. Ex: 'Vagas limitadas', 'Desconto por tempo limitado', 'Últimas unidades'. O link será adicionado AUTOMATICAMENTE após seu CTA." },
+          caption_social_proof: { type: "string", description: "OPCIONAL. Prova social: quantidade de usuários, avaliações, resultados de clientes. Ex: '+12.000 pessoas já usam'" },
           scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília)" },
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
         },
-        required: []
+        required: ["caption_hook", "caption_body", "caption_cta"]
       }
     }
   }
@@ -2465,9 +2466,11 @@ Posso buscar imagens na web e criar posts com elas, aplicando nossa marca.
   };
 }
 
-// Execute create_affiliate_post - Creates a marketing post promoting an affiliate product
+// Execute create_affiliate_post - Creates a HIGH-CONVERSION marketing post
 async function executeCreateAffiliatePost(supabase: any, userId: string, workspaceId: string, args: any) {
-  const { affiliate_id, headline_text, caption_block1, caption_block2, caption_block3, scheduled_for, platforms } = args;
+  const { affiliate_id, headline_text, caption_hook, caption_body, caption_cta, caption_social_proof, scheduled_for, platforms,
+    // Legacy fallback fields
+    caption_block1, caption_block2, caption_block3 } = args;
 
   try {
     // Get affiliate link - specific one or round-robin rotation
@@ -2484,7 +2487,6 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       if (error) throw error;
       affiliate = data;
     } else {
-      // Round-robin: get all active links ordered by last_posted_at (nulls first = never posted)
       const { data: allLinks, error: fetchError } = await supabase
         .from('affiliate_links')
         .select('*')
@@ -2496,8 +2498,6 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       if (!allLinks || allLinks.length === 0) {
         return { success: false, message: '❌ Nenhum link de afiliado ativo encontrado. Cadastre links na aba Marketing.' };
       }
-
-      // Pick the one posted longest ago (or never posted) = round-robin
       affiliate = allLinks[0];
     }
 
@@ -2505,18 +2505,43 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       return { success: false, message: '❌ Link de afiliado não encontrado.' };
     }
 
-    // Build caption with affiliate link
-    const caption = [
-      caption_block1 || `🔥 ${affiliate.product_name} - você precisa conhecer isso!`,
-      '',
-      caption_block2 || affiliate.description || 'Uma ferramenta que vai mudar seu jogo.',
-      '',
-      caption_block3 || `👉 Link na bio ou acesse: ${affiliate.affiliate_url}`,
-      '',
-      `🔗 ${affiliate.affiliate_url}`
-    ].join('\n');
+    // Build PROFESSIONAL caption - link is ALWAYS injected
+    const hook = caption_hook || caption_block1 || `🔥 Você ainda não conhece ${affiliate.product_name}? Está perdendo tempo.`;
+    const body = caption_body || caption_block2 || affiliate.description || `${affiliate.product_name} resolve o que ninguém mais resolve. Resultados reais, comprovados.`;
+    const cta = caption_cta || caption_block3 || `Não deixe pra depois — as melhores oportunidades não esperam.`;
+    const socialProof = caption_social_proof || '';
 
-    const hashtags = ['#tech', '#ferramentas', '#produtividade', '#ia', '#recomendacao'];
+    // ALWAYS append affiliate link prominently — this is the money line
+    const captionParts = [
+      hook,
+      '',
+      body,
+    ];
+    
+    if (socialProof) {
+      captionParts.push('', socialProof);
+    }
+    
+    captionParts.push(
+      '',
+      cta,
+      '',
+      `🔗 Acesse agora: ${affiliate.affiliate_url}`,
+      '',
+      `👆 Link direto acima 👆`
+    );
+
+    const caption = captionParts.join('\n');
+
+    // Generate contextual hashtags based on product category
+    const categoryTags: Record<string, string[]> = {
+      'tecnologia': ['#tech', '#ferramentas', '#produtividade'],
+      'saude': ['#saude', '#bemestar', '#qualidadedevida'],
+      'financas': ['#financas', '#investimentos', '#renda'],
+      'educacao': ['#educacao', '#cursos', '#conhecimento'],
+    };
+    const baseTags = categoryTags[(affiliate.category || '').toLowerCase()] || ['#recomendacao', '#dica'];
+    const hashtags = [...baseTags, '#linknalegenda', `#${affiliate.product_name.replace(/\s+/g, '').toLowerCase()}`];
 
     // Determine scheduling
     let scheduledFor: string | null = null;
@@ -2970,14 +2995,18 @@ Quando usuário diz... | Você calcula...
 4. **NUNCA** mencione anos passados (2024, 2025)
 5. **TESTE MENTAL**: "Isso para o scroll?"
 
-## 💰 MARKETING DE AFILIADOS
+## 💰 MARKETING DE AFILIADOS — COPY DE ALTA CONVERSÃO
 - REGRA: A cada ${4} posts normais de notícia, intercale 1 post de afiliado usando \`create_affiliate_post\`
-- Cada link tem sua própria frequência configurada (post_frequency), formato (image/reels/carousel) e estratégia
-- O sistema escolhe automaticamente o produto menos promovido quando affiliate_id não é fornecido
-- Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
-- Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
-- NÃO force marketing se não houver links cadastrados
+- O link do produto é inserido AUTOMATICAMENTE na legenda — NÃO inclua URLs nos campos de texto
+- Use frameworks de copywriting profissional: AIDA (Atenção→Interesse→Desejo→Ação) ou PAS (Problema→Agitação→Solução)
+- caption_hook: PARE O SCROLL. Pergunta retórica, dado chocante, ou declaração polêmica. NUNCA comece com "Olá" ou "Ei"
+- caption_body: Identifique a DOR → Apresente o produto como SOLUÇÃO → Cite benefício CONCRETO e mensurável
+- caption_cta: URGÊNCIA REAL — "vagas limitadas", "desconto expira", "últimas unidades". Seja específico
+- caption_social_proof: Se possível, adicione prova social ("+X usuários", "avaliação 4.9/5", "case de sucesso")
+- Headlines: TENSÃO + BENEFÍCIO. Ex: "ELE FATUROU R$47K EM 30 DIAS" não "Conheça essa ferramenta"
 - Se o link tem marketing_strategy definida, USE-A como guia para o tom e abordagem
+- NUNCA gere posts genéricos tipo "confira esse produto incrível" — isso NÃO vende
+- NÃO force marketing se não houver links cadastrados
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
