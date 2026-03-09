@@ -480,6 +480,49 @@ const PublicationQueueTab = ({
         </Button>
       </div>
 
+      {/* Auto-Render Status Panel */}
+      {(renderQueue.length > 0 || isRendering) && (
+        <Card className="border-purple-500/30 bg-purple-500/5">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Film className="h-5 w-5 text-purple-500" />
+                <span className="font-medium text-sm">
+                  {isRendering ? '🎬 Renderizando vídeo...' : `${renderQueue.length} vídeo(s) na fila`}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {isRendering && !isPaused && (
+                  <Button size="sm" variant="outline" onClick={pauseRendering} className="text-xs h-7">
+                    Pausar
+                  </Button>
+                )}
+                {isPaused && (
+                  <Button size="sm" variant="outline" onClick={resumeRendering} className="text-xs h-7">
+                    Retomar
+                  </Button>
+                )}
+                {!isRendering && renderQueue.length > 0 && (
+                  <Button size="sm" variant="default" onClick={startRendering} className="text-xs h-7 bg-purple-600 hover:bg-purple-700">
+                    <Film className="h-3 w-3 mr-1" />
+                    Iniciar
+                  </Button>
+                )}
+              </div>
+            </div>
+            {isRendering && (
+              <>
+                <Progress value={progress} className="h-2 mb-1" />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{currentStep || 'Preparando...'}{isPaused ? ' (pausado)' : ''}</span>
+                  <span>{completedCount}/{completedCount + renderQueue.length} concluídos • {progress}%</span>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Overdue Posts Alert */}
       {overduePosts.length > 0 && (
         <Alert className="border-destructive/50 bg-destructive/10">
