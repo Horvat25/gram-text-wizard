@@ -502,12 +502,17 @@ const PublicationQueueTab = ({
             </div>
 
             <div className="flex items-center gap-2">
+              {isRendering && (
+                <Button size="sm" variant="outline" onClick={stopRendering} className="h-7 text-xs">
+                  Parar
+                </Button>
+              )}
               {isRendering && !isPaused && (
                 <Button size="sm" variant="outline" onClick={pauseRendering} className="h-7 text-xs">
                   Pausar
                 </Button>
               )}
-              {isPaused && (
+              {isPaused && queueCount > 0 && (
                 <Button size="sm" variant="outline" onClick={resumeRendering} className="h-7 text-xs">
                   Retomar
                 </Button>
