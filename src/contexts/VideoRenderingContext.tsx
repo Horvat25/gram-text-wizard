@@ -456,7 +456,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
               ...(nextVideo.overlay_metadata || {}),
               script: normalizedGeneratedScript
             }
-          })
+          } as any)
           .eq('id', nextVideo.id);
 
         script = normalizedGeneratedScript;
