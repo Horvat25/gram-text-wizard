@@ -637,6 +637,11 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
       const canTransition = idx < timeline.length - 1;
       const isTransition = canTransition && secondsToEnd <= TRANSITION_SECONDS;
 
+      if (!loggedTexts) {
+        console.log("[video-encoder] Segment texts:", timeline.map(t => `"${(t.segment.text || '').substring(0, 40)}"`));
+        loggedTexts = true;
+      }
+
       if (!isTransition) {
         drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
       } else {
