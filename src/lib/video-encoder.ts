@@ -187,37 +187,54 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
 
 function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number, text: string) {
   const normalized = text.replace(/\s+/g, " ").trim();
-  const clipped = normalized.length > 140 ? `${normalized.slice(0, 137)}…` : normalized;
+  if (!normalized) return;
+  const clipped = normalized.length > 160 ? `${normalized.slice(0, 157)}…` : normalized;
 
-  const panelH = Math.round(canvasH * 0.22);
-  const panelY = Math.round(canvasH * 0.64);
+  // Large frosted glass panel at bottom area
+  const panelH = Math.round(canvasH * 0.26);
+  const panelY = Math.round(canvasH * 0.60);
 
+  // Multi-stop gradient for depth
   const grad = ctx.createLinearGradient(0, panelY, 0, panelY + panelH);
-  grad.addColorStop(0, "rgba(0,0,0,0.10)");
-  grad.addColorStop(0.35, "rgba(0,0,0,0.45)");
-  grad.addColorStop(1, "rgba(0,0,0,0.75)");
+  grad.addColorStop(0, "rgba(0,0,0,0.0)");
+  grad.addColorStop(0.15, "rgba(0,0,0,0.25)");
+  grad.addColorStop(0.5, "rgba(0,0,0,0.65)");
+  grad.addColorStop(1, "rgba(0,0,0,0.85)");
   ctx.fillStyle = grad;
   ctx.fillRect(0, panelY, canvasW, panelH);
 
-  const maxTextW = canvasW - 160;
-  const fontSize = clamp(Math.round(canvasW * 0.045), 34, 54);
-  const lineHeight = Math.round(fontSize * 1.18);
+  // Accent line at top of panel
+  ctx.fillStyle = "rgba(139,92,246,0.6)";
+  ctx.fillRect(canvasW * 0.15, panelY + Math.round(panelH * 0.08), canvasW * 0.7, 3);
+
+  const maxTextW = canvasW - 140;
+  const fontSize = clamp(Math.round(canvasW * 0.052), 38, 62);
+  const lineHeight = Math.round(fontSize * 1.25);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `800 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+  ctx.font = `900 ${fontSize}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
 
   const lines = wrapLines(ctx, clipped, maxTextW).slice(0, 3);
   const blockH = lines.length * lineHeight;
-  const startY = panelY + panelH / 2 - blockH / 2 + lineHeight / 2;
+  const startY = panelY + panelH * 0.55 - blockH / 2 + lineHeight / 2;
 
-  ctx.lineWidth = Math.max(6, Math.round(fontSize * 0.16));
-  ctx.strokeStyle = "rgba(0,0,0,0.85)";
-  ctx.fillStyle = "rgba(255,255,255,0.98)";
-
+  // Draw each line with heavy outline + white fill + subtle shadow
   for (let i = 0; i < lines.length; i++) {
     const y = startY + i * lineHeight;
+
+    // Shadow pass
+    ctx.lineWidth = Math.max(10, Math.round(fontSize * 0.22));
+    ctx.strokeStyle = "rgba(0,0,0,0.9)";
+    ctx.strokeText(lines[i], canvasW / 2 + 2, y + 2);
+
+    // Outline pass
+    ctx.lineWidth = Math.max(8, Math.round(fontSize * 0.18));
+    ctx.strokeStyle = "rgba(0,0,0,0.95)";
     ctx.strokeText(lines[i], canvasW / 2, y);
+
+    // Fill with slight gradient feel
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillText(lines[i], canvasW / 2, y);
   }
 }
