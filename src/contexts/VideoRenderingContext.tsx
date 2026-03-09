@@ -44,6 +44,7 @@ interface VideoRenderingContextType {
   startRendering: () => void;
   pauseRendering: () => void;
   resumeRendering: () => void;
+  stopRendering: () => void;
   refetchPendingVideos: () => Promise<void>;
 }
 
