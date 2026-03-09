@@ -145,10 +145,11 @@ async function loadImage(url: string): Promise<LoadedImage | null> {
 function getMotionParamsForSegment(segment: VideoSegment, canvasW: number, canvasH: number): MotionParams {
   const seed = hashStringToUint(segment.imageUrl + "|" + (segment.text ?? ""));
   const rnd = seededRandom01(seed);
-  const startScale = 1.02 + rnd() * 0.04;
-  const endScale = startScale + (rnd() - 0.5) * 0.06;
-  const maxX = canvasW * 0.05;
-  const maxY = canvasH * 0.05;
+  // More dramatic zoom range for cinematic feel
+  const startScale = 1.04 + rnd() * 0.06;
+  const endScale = startScale + (rnd() > 0.5 ? 1 : -1) * (0.04 + rnd() * 0.04);
+  const maxX = canvasW * 0.06;
+  const maxY = canvasH * 0.06;
   return {
     startScale, endScale,
     startX: (rnd() - 0.5) * 2 * maxX,
@@ -187,50 +188,82 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
 
 function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number, text: string) {
   const normalized = text.replace(/\s+/g, " ").trim();
-  const clipped = normalized.length > 140 ? `${normalized.slice(0, 137)}…` : normalized;
+  if (!normalized) return;
+  const clipped = normalized.length > 160 ? `${normalized.slice(0, 157)}…` : normalized;
 
-  const panelH = Math.round(canvasH * 0.22);
-  const panelY = Math.round(canvasH * 0.64);
+  // Large frosted glass panel at bottom area
+  const panelH = Math.round(canvasH * 0.26);
+  const panelY = Math.round(canvasH * 0.60);
 
+  // Multi-stop gradient for depth
   const grad = ctx.createLinearGradient(0, panelY, 0, panelY + panelH);
-  grad.addColorStop(0, "rgba(0,0,0,0.10)");
-  grad.addColorStop(0.35, "rgba(0,0,0,0.45)");
-  grad.addColorStop(1, "rgba(0,0,0,0.75)");
+  grad.addColorStop(0, "rgba(0,0,0,0.0)");
+  grad.addColorStop(0.15, "rgba(0,0,0,0.25)");
+  grad.addColorStop(0.5, "rgba(0,0,0,0.65)");
+  grad.addColorStop(1, "rgba(0,0,0,0.85)");
   ctx.fillStyle = grad;
   ctx.fillRect(0, panelY, canvasW, panelH);
 
-  const maxTextW = canvasW - 160;
-  const fontSize = clamp(Math.round(canvasW * 0.045), 34, 54);
-  const lineHeight = Math.round(fontSize * 1.18);
+  // Accent line at top of panel
+  ctx.fillStyle = "rgba(139,92,246,0.6)";
+  ctx.fillRect(canvasW * 0.15, panelY + Math.round(panelH * 0.08), canvasW * 0.7, 3);
+
+  const maxTextW = canvasW - 140;
+  const fontSize = clamp(Math.round(canvasW * 0.052), 38, 62);
+  const lineHeight = Math.round(fontSize * 1.25);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `800 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+  ctx.font = `900 ${fontSize}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
 
   const lines = wrapLines(ctx, clipped, maxTextW).slice(0, 3);
   const blockH = lines.length * lineHeight;
-  const startY = panelY + panelH / 2 - blockH / 2 + lineHeight / 2;
+  const startY = panelY + panelH * 0.55 - blockH / 2 + lineHeight / 2;
 
-  ctx.lineWidth = Math.max(6, Math.round(fontSize * 0.16));
-  ctx.strokeStyle = "rgba(0,0,0,0.85)";
-  ctx.fillStyle = "rgba(255,255,255,0.98)";
-
+  // Draw each line with heavy outline + white fill + subtle shadow
   for (let i = 0; i < lines.length; i++) {
     const y = startY + i * lineHeight;
+
+    // Shadow pass
+    ctx.lineWidth = Math.max(10, Math.round(fontSize * 0.22));
+    ctx.strokeStyle = "rgba(0,0,0,0.9)";
+    ctx.strokeText(lines[i], canvasW / 2 + 2, y + 2);
+
+    // Outline pass
+    ctx.lineWidth = Math.max(8, Math.round(fontSize * 0.18));
+    ctx.strokeStyle = "rgba(0,0,0,0.95)";
     ctx.strokeText(lines[i], canvasW / 2, y);
+
+    // Fill with slight gradient feel
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillText(lines[i], canvasW / 2, y);
   }
 }
 
 function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number) {
-  const pad = Math.round(canvasW * 0.03);
-  const pillH = Math.round(canvasW * 0.07);
-  const pillW = Math.round(canvasW * 0.34);
+  const pad = Math.round(canvasW * 0.035);
+  const pillH = Math.round(canvasW * 0.075);
+  const pillW = Math.round(canvasW * 0.38);
   const x = canvasW - pad - pillW;
   const y = pad;
   const r = Math.round(pillH / 2);
 
-  ctx.fillStyle = "rgba(0,0,0,0.45)";
+  // Shadow
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.beginPath();
+  ctx.moveTo(x + r + 2, y + 3);
+  ctx.arcTo(x + pillW + 2, y + 3, x + pillW + 2, y + pillH + 3, r);
+  ctx.arcTo(x + pillW + 2, y + pillH + 3, x + 2, y + pillH + 3, r);
+  ctx.arcTo(x + 2, y + pillH + 3, x + 2, y + 3, r);
+  ctx.arcTo(x + 2, y + 3, x + pillW + 2, y + 3, r);
+  ctx.closePath();
+  ctx.fill();
+
+  // Gradient pill background
+  const pillGrad = ctx.createLinearGradient(x, y, x + pillW, y + pillH);
+  pillGrad.addColorStop(0, "rgba(139,92,246,0.85)");
+  pillGrad.addColorStop(1, "rgba(109,40,217,0.85)");
+  ctx.fillStyle = pillGrad;
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + pillW, y, x + pillW, y + pillH, r);
@@ -240,11 +273,11 @@ function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: 
   ctx.closePath();
   ctx.fill();
 
-  ctx.font = `700 ${Math.round(pillH * 0.45)}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
-  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.font = `800 ${Math.round(pillH * 0.48)}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  ctx.fillStyle = "#FFFFFF";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("Neural Update", x + pillW / 2, y + pillH / 2);
+  ctx.fillText("⚡ Neural Update", x + pillW / 2, y + pillH / 2);
 }
 
 /** Draw CTA overlay on the last seconds of the video */
@@ -311,12 +344,13 @@ function drawScene(
   motion: MotionParams | null,
   t01: number,
   text?: string,
-  ctaFade?: number
+  ctaFade?: number,
+  globalTime?: number
 ) {
   ctx.clearRect(0, 0, canvasW, canvasH);
 
   if (!img || !motion) {
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "#0a0a0a";
     ctx.fillRect(0, 0, canvasW, canvasH);
     if (text) drawCaption(ctx, canvasW, canvasH, text);
     drawBrandMark(ctx, canvasW, canvasH);
@@ -329,26 +363,63 @@ function drawScene(
   const offX = lerp(motion.startX, motion.endX, eased);
   const offY = lerp(motion.startY, motion.endY, eased);
 
-  // blurred background pass
+  // Blurred background pass for letterbox fill
   const prevFilter = ctx.filter;
-  ctx.filter = "blur(18px)";
-  ctx.globalAlpha = 0.95;
-  drawImageCover(ctx, img, canvasW, canvasH, scale * 1.18, offX * 0.15, offY * 0.15);
+  ctx.filter = "blur(22px) brightness(0.7)";
+  ctx.globalAlpha = 0.9;
+  drawImageCover(ctx, img, canvasW, canvasH, scale * 1.25, offX * 0.1, offY * 0.1);
   ctx.filter = prevFilter;
 
-  // foreground
+  // Foreground image
   ctx.globalAlpha = 1;
   drawImageCover(ctx, img, canvasW, canvasH, scale, offX, offY);
 
-  // vignette
-  const v = ctx.createRadialGradient(canvasW / 2, canvasH / 2, canvasW * 0.2, canvasW / 2, canvasH / 2, canvasW * 0.85);
+  // Enhanced vignette with warm toning
+  const v = ctx.createRadialGradient(canvasW / 2, canvasH / 2, canvasW * 0.15, canvasW / 2, canvasH / 2, canvasW * 0.9);
   v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,0.35)");
+  v.addColorStop(0.6, "rgba(0,0,0,0.12)");
+  v.addColorStop(1, "rgba(0,0,0,0.45)");
   ctx.fillStyle = v;
   ctx.fillRect(0, 0, canvasW, canvasH);
 
+  // Top gradient for brand mark readability
+  const topGrad = ctx.createLinearGradient(0, 0, 0, canvasH * 0.15);
+  topGrad.addColorStop(0, "rgba(0,0,0,0.4)");
+  topGrad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, canvasW, canvasH * 0.15);
+
+  // Captions (hide when CTA is fully visible)
   if (text && (!ctaFade || ctaFade < 0.5)) drawCaption(ctx, canvasW, canvasH, text);
   drawBrandMark(ctx, canvasW, canvasH);
+
+  // Title card effect in first 2.5 seconds
+  if (globalTime !== undefined && globalTime < 2.5) {
+    const titleAlpha = globalTime < 0.3 ? globalTime / 0.3 : globalTime > 1.8 ? Math.max(0, (2.5 - globalTime) / 0.7) : 1;
+    if (titleAlpha > 0.01) {
+      ctx.globalAlpha = titleAlpha * 0.85;
+      const titleH = Math.round(canvasH * 0.12);
+      const titleY = Math.round(canvasH * 0.38);
+      const titleGrad = ctx.createLinearGradient(0, titleY, 0, titleY + titleH);
+      titleGrad.addColorStop(0, "rgba(0,0,0,0.7)");
+      titleGrad.addColorStop(1, "rgba(0,0,0,0.7)");
+      ctx.fillStyle = titleGrad;
+      ctx.fillRect(canvasW * 0.08, titleY, canvasW * 0.84, titleH);
+
+      // Purple accent bar
+      ctx.fillStyle = "rgba(139,92,246,0.9)";
+      ctx.fillRect(canvasW * 0.08, titleY, 5, titleH);
+
+      const titleFontSize = clamp(Math.round(canvasW * 0.04), 28, 48);
+      ctx.font = `800 ${titleFontSize}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillStyle = "#FFFFFF";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("⚡ NEURAL UPDATE", canvasW / 2, titleY + titleH / 2);
+      ctx.globalAlpha = 1;
+    }
+  }
+
   if (ctaFade && ctaFade > 0) drawCTAOverlay(ctx, canvasW, canvasH, ctaFade);
 }
 
@@ -521,7 +592,7 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
       src.buffer = musicBuffer;
       src.loop = true; // loop music for full video duration
       const gain = audioCtx.createGain();
-      gain.gain.value = narrationBuffer ? 0.12 : 0.4; // quieter when there's narration
+      gain.gain.value = narrationBuffer ? 0.18 : 0.5; // audible but not overpowering
       src.connect(gain);
       gain.connect(dest);
       src.start(audioStartTime);
@@ -565,16 +636,16 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
       const isTransition = canTransition && secondsToEnd <= TRANSITION_SECONDS;
 
       if (!isTransition) {
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade);
+        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
       } else {
         const mix = clamp(1 - secondsToEnd / TRANSITION_SECONDS, 0, 1);
         const next = timeline[idx + 1];
         const nextImg = imageMap.get(next.segment.imageUrl) ?? null;
 
         ctx.globalAlpha = 1;
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade);
+        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
         ctx.globalAlpha = mix;
-        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade);
+        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed);
         ctx.globalAlpha = 1;
       }
 
