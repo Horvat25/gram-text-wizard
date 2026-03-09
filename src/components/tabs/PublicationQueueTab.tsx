@@ -517,7 +517,7 @@ const PublicationQueueTab = ({
                   Retomar
                 </Button>
               )}
-              {!isRendering && queueCount > 0 && (
+              {!isRendering && queueCount > 0 && !isPaused && (
                 <Button size="sm" onClick={startRendering} className="h-7 text-xs">
                   <Film className="h-3 w-3 mr-1" />
                   Iniciar
