@@ -240,14 +240,29 @@ function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: nu
 }
 
 function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number) {
-  const pad = Math.round(canvasW * 0.03);
-  const pillH = Math.round(canvasW * 0.07);
-  const pillW = Math.round(canvasW * 0.34);
+  const pad = Math.round(canvasW * 0.035);
+  const pillH = Math.round(canvasW * 0.075);
+  const pillW = Math.round(canvasW * 0.38);
   const x = canvasW - pad - pillW;
   const y = pad;
   const r = Math.round(pillH / 2);
 
-  ctx.fillStyle = "rgba(0,0,0,0.45)";
+  // Shadow
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.beginPath();
+  ctx.moveTo(x + r + 2, y + 3);
+  ctx.arcTo(x + pillW + 2, y + 3, x + pillW + 2, y + pillH + 3, r);
+  ctx.arcTo(x + pillW + 2, y + pillH + 3, x + 2, y + pillH + 3, r);
+  ctx.arcTo(x + 2, y + pillH + 3, x + 2, y + 3, r);
+  ctx.arcTo(x + 2, y + 3, x + pillW + 2, y + 3, r);
+  ctx.closePath();
+  ctx.fill();
+
+  // Gradient pill background
+  const pillGrad = ctx.createLinearGradient(x, y, x + pillW, y + pillH);
+  pillGrad.addColorStop(0, "rgba(139,92,246,0.85)");
+  pillGrad.addColorStop(1, "rgba(109,40,217,0.85)");
+  ctx.fillStyle = pillGrad;
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + pillW, y, x + pillW, y + pillH, r);
@@ -257,11 +272,11 @@ function drawBrandMark(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: 
   ctx.closePath();
   ctx.fill();
 
-  ctx.font = `700 ${Math.round(pillH * 0.45)}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
-  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.font = `800 ${Math.round(pillH * 0.48)}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  ctx.fillStyle = "#FFFFFF";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("Neural Update", x + pillW / 2, y + pillH / 2);
+  ctx.fillText("⚡ Neural Update", x + pillW / 2, y + pillH / 2);
 }
 
 /** Draw CTA overlay on the last seconds of the video */
