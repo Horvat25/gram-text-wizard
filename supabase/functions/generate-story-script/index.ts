@@ -99,6 +99,71 @@ serve(async (req) => {
       return kws.some((kw) => hay.includes(kw));
     };
 
+    // Robust JSON parsing helpers (LLM outputs can include minor JSON mistakes)
+    const stripMarkdown = (s: string) =>
+      s
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/g, "")
+        .trim();
+
+    const extractJsonCandidate = (s: string) => {
+      const cleaned = stripMarkdown(s);
+      const start = cleaned.search(/[\[{]/);
+      if (start === -1) return cleaned;
+      const open = cleaned[start];
+      const close = open === "[" ? "]" : "}";
+      const end = cleaned.lastIndexOf(close);
+      if (end === -1) return cleaned.slice(start);
+      return cleaned.slice(start, end + 1);
+    };
+
+    const looksTruncated = (s: string) => {
+      const text = s.trim();
+      const openBraces = (text.match(/{/g) || []).length;
+      const closeBraces = (text.match(/}/g) || []).length;
+      const openBrackets = (text.match(/\[/g) || []).length;
+      const closeBrackets = (text.match(/\]/g) || []).length;
+      return openBraces !== closeBraces || openBrackets !== closeBrackets;
+    };
+
+    const repairCommonJsonIssues = (s: string) => {
+      let out = s;
+
+      // Remove ASCII control chars that break JSON.parse
+      out = out.replace(/[\x00-\x1F\x7F]/g, "");
+
+      // Remove trailing commas
+      out = out.replace(/,\s*}/g, "}").replace(/,\s*]/g, "]");
+
+      // Fix a common LLM mistake: a stray '.' after a JSON string value, before the next key
+      // Example: "text": "...?".\n"visualKeywords": ...
+      out = out.replace(/"\s*\.\s*(\r?\n\s*")/g, '",$1');
+
+      // Also handle: "...?".\n}
+      out = out.replace(/"\s*\.\s*(\r?\n\s*})/g, '"$1');
+
+      return out;
+    };
+
+    const parseJsonRobust = (raw: string) => {
+      const candidate = extractJsonCandidate(raw);
+      if (looksTruncated(candidate)) {
+        throw new Error("Resposta da IA truncada");
+      }
+
+      try {
+        return JSON.parse(candidate);
+      } catch {
+        const repaired = repairCommonJsonIssues(candidate);
+        try {
+          return JSON.parse(repaired);
+        } catch {
+          console.error("Failed to parse AI response:", candidate);
+          throw new Error("Resposta da IA inválida");
+        }
+      }
+    };
+
     const callModel = async (systemPrompt: string, userPrompt: string) => {
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -108,6 +173,8 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           model: "google/gemini-2.5-flash-lite",
+          temperature: 0.4,
+          max_tokens: 1400,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
@@ -122,18 +189,14 @@ serve(async (req) => {
       }
 
       const data = await response.json();
-      let content = data.choices?.[0]?.message?.content || "";
+      const content = data.choices?.[0]?.message?.content;
 
-      // Clean JSON from markdown code blocks
-      content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-      let parsed;
-      try {
-        parsed = JSON.parse(content);
-      } catch {
-        console.error("Failed to parse AI response:", content);
+      if (!content || typeof content !== "string") {
+        console.error("AI API returned empty/non-string content:", data);
         throw new Error("Resposta da IA inválida");
       }
+
+      const parsed = parseJsonRobust(content);
 
       if (!parsed?.segments || !Array.isArray(parsed.segments) || parsed.segments.length === 0) {
         throw new Error("Nenhum segmento gerado");
