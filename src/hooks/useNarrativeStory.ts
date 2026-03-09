@@ -571,10 +571,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         audioUrl: narrationUrl || undefined,
         ctaAudioUrl: ctaNarrationUrl || undefined,
         backgroundMusicUrl: backgroundMusicUrl || undefined,
-        segments: segments.map(seg => ({
+        segments: segments.map((seg, i) => ({
           imageUrl: seg.imageUrl,
           duration: seg.duration,
           text: seg.text,
+          scene: i === segments.length - 1 ? "cta" : ["hook", "context", "explanation", "impact", "cta"][i] || "scene",
         })),
         onProgress: (progress) => {
           // Map 0-100 progress to 82-95 range
