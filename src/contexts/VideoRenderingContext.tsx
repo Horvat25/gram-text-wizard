@@ -44,6 +44,7 @@ interface VideoRenderingContextType {
   startRendering: () => void;
   pauseRendering: () => void;
   resumeRendering: () => void;
+  stopRendering: () => void;
   refetchPendingVideos: () => Promise<void>;
 }
 
@@ -449,50 +450,40 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   const resumeRendering = useCallback(() => {
     setIsPaused(false);
+    setIsRendering(true);
     if (!isGenerating && !renderLockRef.current && !activeRenderIdRef.current) {
       processNextVideo();
     }
   }, [isGenerating, processNextVideo]);
 
-  // ─── Auto-start when new pending videos appear ─────────────
+  const stopRendering = useCallback(() => {
+    setIsPaused(true);
+    setIsRendering(false);
+    if (autoStartTimeoutRef.current) {
+      clearTimeout(autoStartTimeoutRef.current);
+      autoStartTimeoutRef.current = null;
+    }
+    toast.info('Auto-renderização parada. Clique em Iniciar para continuar.');
+  }, []);
+
+  // ─── Notify when new pending videos appear (manual start) ───
   const prevPendingCountRef = useRef(pendingVideos.length);
   useEffect(() => {
     const newCount = pendingVideos.length;
-    const wasEmpty = prevPendingCountRef.current === 0;
-    const hasNewVideos = newCount > 0;
+    const prevCount = prevPendingCountRef.current;
 
-    // Only auto-start if: was empty, now has videos, NOT rendering, NOT locked, NOT paused
-    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !renderLockRef.current && !activeRenderIdRef.current && !isPausedRef.current) {
-      console.log('[AutoRender] Auto-starting render for pending reels');
+    if (newCount > 0 && prevCount === 0 && !isRenderingRef.current) {
       const firstVideo = pendingVideos[0];
       const title = firstVideo?.overlay_metadata?.script?.title || firstVideo?.overlay_metadata?.topic || 'Novo vídeo';
+      console.log('[AutoRender] Pending reels detected. Waiting manual start.');
       notifyVideoReady(title);
-
-      // Clear any existing auto-start timeout to prevent duplicates
-      if (autoStartTimeoutRef.current) {
-        clearTimeout(autoStartTimeoutRef.current);
-      }
-
-      autoStartTimeoutRef.current = setTimeout(() => {
-        // Re-check locks before starting (another render may have started in the meantime)
-        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current) {
-          console.log('[AutoRender] Auto-start cancelled - render already active');
-          return;
-        }
-        unlockAudio();
-        toast.info('🎬 Iniciando renderização automática...');
-        setIsRendering(true);
-        setIsPaused(false);
-        setCompletedCount(0);
-        setTimeout(processNextVideo, 100);
-      }, 2000);
-    } else if (newCount > prevPendingCountRef.current && !isRenderingRef.current) {
-      const diff = newCount - prevPendingCountRef.current;
+    } else if (newCount > prevCount && !isRenderingRef.current) {
+      const diff = newCount - prevCount;
       notifyVideoReady(`${diff} novo(s) vídeo(s) aguardando`);
     }
 
     prevPendingCountRef.current = newCount;
-  }, [pendingVideos, processNextVideo, notifyVideoReady]);
+  }, [pendingVideos, notifyVideoReady]);
 
   const totalInBatch = completedCount + renderQueue.length;
   const currentRenderProgress = isRendering
@@ -517,6 +508,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     startRendering,
     pauseRendering,
     resumeRendering,
+    stopRendering,
     refetchPendingVideos: fetchPendingVideos,
   };
 

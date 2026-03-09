@@ -200,7 +200,7 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
-  const { renderQueue, isRendering, isPaused, currentStep, progress, currentRenderProgress, completedCount, startRendering, pauseRendering, resumeRendering } = useVideoRendering();
+  const { renderQueue, isRendering, isPaused, currentStep, progress, completedCount, startRendering, pauseRendering, resumeRendering, stopRendering } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false;
 
@@ -502,17 +502,22 @@ const PublicationQueueTab = ({
             </div>
 
             <div className="flex items-center gap-2">
+              {isRendering && (
+                <Button size="sm" variant="outline" onClick={stopRendering} className="h-7 text-xs">
+                  Parar
+                </Button>
+              )}
               {isRendering && !isPaused && (
                 <Button size="sm" variant="outline" onClick={pauseRendering} className="h-7 text-xs">
                   Pausar
                 </Button>
               )}
-              {isPaused && (
+              {isPaused && queueCount > 0 && (
                 <Button size="sm" variant="outline" onClick={resumeRendering} className="h-7 text-xs">
                   Retomar
                 </Button>
               )}
-              {!isRendering && queueCount > 0 && (
+              {!isRendering && queueCount > 0 && !isPaused && (
                 <Button size="sm" onClick={startRendering} className="h-7 text-xs">
                   <Film className="h-3 w-3 mr-1" />
                   Iniciar
