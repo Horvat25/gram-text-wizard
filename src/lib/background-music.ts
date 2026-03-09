@@ -14,7 +14,7 @@ const tracks: MusicTrack[] = [
     id: "ambient-pulse",
     name: "Ambient Pulse",
     url: "generated://ambient-pulse",
-    duration: 16,
+    duration: 18,
     genre: "ambient",
     mood: "calm",
   },
@@ -22,7 +22,7 @@ const tracks: MusicTrack[] = [
     id: "tech-drive",
     name: "Tech Drive",
     url: "generated://tech-drive",
-    duration: 16,
+    duration: 18,
     genre: "electronic",
     mood: "energetic",
   },
@@ -42,18 +42,16 @@ function writeString(view: DataView, offset: number, value: string) {
   }
 }
 
-function audioBufferToWav(buffer: AudioBuffer): ArrayBuffer {
-  const channels = buffer.numberOfChannels;
-  const sampleRate = buffer.sampleRate;
-  const samples = buffer.length;
+function pcmToWavBase64(samples: Float32Array, sampleRate: number): string {
+  const channels = 1;
   const bytesPerSample = 2;
   const blockAlign = channels * bytesPerSample;
   const byteRate = sampleRate * blockAlign;
-  const dataSize = samples * blockAlign;
+  const dataSize = samples.length * bytesPerSample;
   const wavSize = 44 + dataSize;
 
-  const arrayBuffer = new ArrayBuffer(wavSize);
-  const view = new DataView(arrayBuffer);
+  const buffer = new ArrayBuffer(wavSize);
+  const view = new DataView(buffer);
 
   writeString(view, 0, "RIFF");
   view.setUint32(4, 36 + dataSize, true);
@@ -69,22 +67,14 @@ function audioBufferToWav(buffer: AudioBuffer): ArrayBuffer {
   writeString(view, 36, "data");
   view.setUint32(40, dataSize, true);
 
-  const channelData = Array.from({ length: channels }, (_, channel) => buffer.getChannelData(channel));
   let offset = 44;
-
-  for (let sample = 0; sample < samples; sample++) {
-    for (let channel = 0; channel < channels; channel++) {
-      const clamped = Math.max(-1, Math.min(1, channelData[channel][sample] ?? 0));
-      const int16 = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
-      view.setInt16(offset, int16, true);
-      offset += 2;
-    }
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    const int16 = s < 0 ? s * 0x8000 : s * 0x7fff;
+    view.setInt16(offset, int16, true);
+    offset += 2;
   }
 
-  return arrayBuffer;
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
   const chunkSize = 0x8000;
   let binary = "";
@@ -97,78 +87,51 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-function getOfflineAudioContextCtor() {
-  if (typeof window === "undefined") return null;
-  return window.OfflineAudioContext || (window as any).webkitOfflineAudioContext || null;
+function envelope(t: number, duration: number): number {
+  const attack = Math.min(0.5, duration * 0.05);
+  const release = Math.min(0.9, duration * 0.08);
+  if (t < attack) return t / Math.max(attack, 0.001);
+  if (t > duration - release) return Math.max(0, (duration - t) / Math.max(release, 0.001));
+  return 1;
 }
 
-async function generateProceduralTrack(kind: string, durationSeconds = 16): Promise<string> {
+function createProceduralSamples(kind: string, durationSeconds: number, sampleRate: number): Float32Array {
+  const length = Math.max(1, Math.floor(durationSeconds * sampleRate));
+  const samples = new Float32Array(length);
+
+  const bassFreq = kind === "tech-drive" ? 105 : 92;
+  const padFreq = kind === "tech-drive" ? 210 : 176;
+  const leadFreq = kind === "tech-drive" ? 420 : 352;
+  const beatHz = kind === "tech-drive" ? 2.2 : 1.2;
+
+  for (let i = 0; i < length; i++) {
+    const t = i / sampleRate;
+    const env = envelope(t, durationSeconds);
+
+    const bass = Math.sin(2 * Math.PI * bassFreq * t) * 0.35;
+    const pad = Math.sin(2 * Math.PI * padFreq * t + Math.sin(2 * Math.PI * 0.12 * t) * 0.8) * 0.22;
+    const lead = Math.sin(2 * Math.PI * leadFreq * t) * 0.08;
+
+    const pulse = (Math.sin(2 * Math.PI * beatHz * t) * 0.5 + 0.5);
+    const gated = (bass + pad + lead) * (0.55 + pulse * 0.45);
+
+    const noise = (Math.sin(2 * Math.PI * 37 * t) * Math.sin(2 * Math.PI * 29 * t)) * 0.03;
+
+    samples[i] = (gated + noise) * env * 0.75;
+  }
+
+  return samples;
+}
+
+async function generateProceduralTrack(kind: string, durationSeconds = 18): Promise<string> {
   const cacheKey = `${kind}:${durationSeconds}`;
   if (generatedTrackCache.has(cacheKey)) {
     return generatedTrackCache.get(cacheKey)!;
   }
 
-  const OfflineContext = getOfflineAudioContextCtor();
-  if (!OfflineContext) return "";
-
   const sampleRate = 44100;
-  const length = sampleRate * durationSeconds;
-  const ctx = new OfflineContext(1, length, sampleRate);
-
-  const master = ctx.createGain();
-  master.gain.value = 0.22;
-  master.connect(ctx.destination);
-
-  const lowPass = ctx.createBiquadFilter();
-  lowPass.type = "lowpass";
-  lowPass.frequency.value = kind === "tech-drive" ? 1200 : 800;
-  lowPass.Q.value = 0.7;
-  lowPass.connect(master);
-
-  const padA = ctx.createOscillator();
-  padA.type = "sine";
-  padA.frequency.value = kind === "tech-drive" ? 110 : 96;
-
-  const padB = ctx.createOscillator();
-  padB.type = "triangle";
-  padB.frequency.value = kind === "tech-drive" ? 165 : 144;
-
-  const padGain = ctx.createGain();
-  padGain.gain.value = 0.14;
-
-  padA.connect(padGain);
-  padB.connect(padGain);
-  padGain.connect(lowPass);
-
-  padA.start(0);
-  padB.start(0);
-  padA.stop(durationSeconds);
-  padB.stop(durationSeconds);
-
-  const pulse = ctx.createOscillator();
-  pulse.type = "square";
-  pulse.frequency.value = kind === "tech-drive" ? 2.4 : 1.2;
-
-  const pulseGain = ctx.createGain();
-  pulseGain.gain.value = kind === "tech-drive" ? 0.07 : 0.04;
-  pulse.connect(pulseGain);
-  pulseGain.connect(lowPass);
-  pulse.start(0);
-  pulse.stop(durationSeconds);
-
-  const lfo = ctx.createOscillator();
-  lfo.type = "sine";
-  lfo.frequency.value = 0.12;
-  const lfoGain = ctx.createGain();
-  lfoGain.gain.value = 280;
-  lfo.connect(lfoGain);
-  lfoGain.connect(lowPass.frequency);
-  lfo.start(0);
-  lfo.stop(durationSeconds);
-
-  const rendered = await ctx.startRendering();
-  const wav = audioBufferToWav(rendered);
-  const base64 = arrayBufferToBase64(wav);
+  const samples = createProceduralSamples(kind, durationSeconds, sampleRate);
+  const base64 = pcmToWavBase64(samples, sampleRate);
   const dataUrl = `data:audio/wav;base64,${base64}`;
 
   generatedTrackCache.set(cacheKey, dataUrl);
@@ -177,12 +140,12 @@ async function generateProceduralTrack(kind: string, durationSeconds = 16): Prom
 
 export async function preloadTrack(track: MusicTrack): Promise<string> {
   if (!track.url) {
-    return generateProceduralTrack("ambient-pulse", track.duration || 16);
+    return generateProceduralTrack("ambient-pulse", track.duration || 18);
   }
 
   if (track.url.startsWith("generated://")) {
     const kind = track.url.replace("generated://", "") || "ambient-pulse";
-    return generateProceduralTrack(kind, track.duration || 16);
+    return generateProceduralTrack(kind, track.duration || 18);
   }
 
   return track.url;
