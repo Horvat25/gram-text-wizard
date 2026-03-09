@@ -81,7 +81,15 @@ function normalizeSegments(segments: VideoSegment[]): VideoSegment[] {
     .map((segment) => {
       const parsed = Number(segment.duration);
       const duration = Number.isFinite(parsed) && parsed > 0 ? parsed : FALLBACK_SEGMENT_DURATION_SECONDS;
-      return { ...segment, duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, duration) };
+      const normalizedText = typeof segment.text === "string"
+        ? segment.text.replace(/\s+/g, " ").trim()
+        : "";
+
+      return {
+        ...segment,
+        duration: Math.max(MIN_SEGMENT_DURATION_SECONDS, duration),
+        text: normalizedText || "Descubra mais no perfil para ver o conteúdo completo.",
+      };
     });
 
   if (sanitized.length === 0) return [];
