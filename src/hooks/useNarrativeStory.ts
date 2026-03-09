@@ -225,14 +225,32 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       audio.preload = "metadata";
       
       const timeout = setTimeout(() => {
-        console.warn("[getAudioDuration] Timeout, using estimate");
-        resolve(0);
-      }, 10000);
+        console.warn("[getAudioDuration] Timeout, using word-count estimate");
+        // Estimate ~3 words/sec for Portuguese speech
+        resolve(0); // Will be handled by MIN_DURATION clamp downstream
+      }, 15000);
       
       audio.onloadedmetadata = () => {
         clearTimeout(timeout);
-        console.log("[getAudioDuration] Audio duration:", audio.duration, "seconds");
-        resolve(audio.duration);
+        const duration = audio.duration;
+        // Validate: data URIs sometimes report Infinity or NaN
+        if (!isFinite(duration) || duration <= 0) {
+          console.warn("[getAudioDuration] Invalid duration from metadata:", duration);
+          resolve(0);
+          return;
+        }
+        console.log("[getAudioDuration] Audio duration:", duration, "seconds");
+        resolve(duration);
+      };
+      
+      // Also try canplaythrough for data URIs where metadata may not fire
+      audio.oncanplaythrough = () => {
+        clearTimeout(timeout);
+        const duration = audio.duration;
+        if (isFinite(duration) && duration > 0) {
+          console.log("[getAudioDuration] Audio duration (canplaythrough):", duration, "seconds");
+          resolve(duration);
+        }
       };
       
       audio.onerror = () => {
