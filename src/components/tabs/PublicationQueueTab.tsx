@@ -200,8 +200,9 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
+  const { renderQueue, isRendering, isPaused, currentStep, progress, currentRenderProgress, completedCount, startRendering, pauseRendering, resumeRendering } = useVideoRendering();
   const [loadingAccounts] = useState(false);
-  const hasConnectedAccount = false; // Simplified - accounts managed in Settings
+  const hasConnectedAccount = false;
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
