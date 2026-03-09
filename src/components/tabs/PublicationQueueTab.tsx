@@ -20,7 +20,6 @@ import {
   Eye,
   ListOrdered,
   CalendarCheck,
-  Instagram,
   AlertCircle,
   RefreshCw,
   Globe,
@@ -33,7 +32,6 @@ import { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import { useWorkspace } from "@/hooks/useWorkspace";
 import { useVideoRendering } from "@/contexts/VideoRenderingContext";
 import { Progress } from "@/components/ui/progress";
 
