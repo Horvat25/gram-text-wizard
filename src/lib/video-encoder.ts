@@ -214,20 +214,23 @@ function drawCaption(
   canvasH: number,
   text: string
 ) {
-  const safeBottom = Math.round(canvasH * 0.08);
-  const panelH = Math.round(canvasH * 0.26);
-  const panelY = canvasH - panelH;
+  const normalized = text.replace(/\s+/g, " ").trim();
+  const clipped = normalized.length > 140 ? `${normalized.slice(0, 137)}…` : normalized;
 
-  // gradient panel for readability
-  const grad = ctx.createLinearGradient(0, panelY, 0, canvasH);
-  grad.addColorStop(0, "rgba(0,0,0,0)");
-  grad.addColorStop(0.25, "rgba(0,0,0,0.35)");
-  grad.addColorStop(1, "rgba(0,0,0,0.70)");
+  // Keep captions in the lower-middle (avoids IG/TikTok UI overlays at the very bottom).
+  const panelH = Math.round(canvasH * 0.22);
+  const panelY = Math.round(canvasH * 0.64);
+
+  // gradient panel for readability (only behind caption area)
+  const grad = ctx.createLinearGradient(0, panelY, 0, panelY + panelH);
+  grad.addColorStop(0, "rgba(0,0,0,0.10)");
+  grad.addColorStop(0.35, "rgba(0,0,0,0.45)");
+  grad.addColorStop(1, "rgba(0,0,0,0.75)");
   ctx.fillStyle = grad;
   ctx.fillRect(0, panelY, canvasW, panelH);
 
   // typography
-  const maxTextW = canvasW - 140;
+  const maxTextW = canvasW - 160;
   const fontSize = clamp(Math.round(canvasW * 0.045), 34, 54);
   const lineHeight = Math.round(fontSize * 1.18);
 
@@ -235,10 +238,10 @@ function drawCaption(
   ctx.textBaseline = "middle";
   ctx.font = `800 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
 
-  const lines = wrapLines(ctx, text, maxTextW).slice(0, 3);
+  const lines = wrapLines(ctx, clipped, maxTextW).slice(0, 3);
 
   const blockH = lines.length * lineHeight;
-  const startY = canvasH - safeBottom - blockH + lineHeight / 2;
+  const startY = panelY + panelH / 2 - blockH / 2 + lineHeight / 2;
 
   // shadow stroke for crispness on busy images
   ctx.lineWidth = Math.max(6, Math.round(fontSize * 0.16));
@@ -387,7 +390,8 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
 
   return new Promise((resolve) => {
     mediaRecorder.onstop = async () => {
-      const rawBlob = new Blob(chunks, { type: mimeType.startsWith("video/") ? mimeType : "video/webm" });
+      // Force a plain WebM type for better compatibility with duration fixers/players.
+      const rawBlob = new Blob(chunks, { type: "video/webm" });
       try {
         const fixedBlob = await fixWebmDuration(rawBlob, expectedDurationMs || 1000);
         resolve(fixedBlob);
@@ -397,7 +401,8 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
       }
     };
 
-    mediaRecorder.start();
+    // Timeslice helps some browsers produce proper cues/metadata.
+    mediaRecorder.start(1000);
     const startedAt = performance.now();
 
     let rafId = 0;
