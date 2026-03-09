@@ -110,6 +110,3 @@ verify_jwt = false
 
 [functions.apply-text-overlay]
 verify_jwt = false
-
-[functions.generate-affiliate-description]
-verify_jwt = false

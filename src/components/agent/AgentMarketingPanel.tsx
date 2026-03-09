@@ -14,8 +14,6 @@ import {
   Link2,
   Megaphone,
   ShoppingBag,
-  Sparkles,
-  Search,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -41,94 +39,11 @@ export default function AgentMarketingPanel() {
   const [showForm, setShowForm] = useState(false);
   const [editingLink, setEditingLink] = useState<AffiliateLink | null>(null);
   const [saving, setSaving] = useState(false);
-  const [generatingDesc, setGeneratingDesc] = useState(false);
-  const [analyzingSite, setAnalyzingSite] = useState(false);
-  const [siteAnalysis, setSiteAnalysis] = useState('');
-  const [analysisSources, setAnalysisSources] = useState<{
-    site: boolean;
-    web: boolean;
-    site_source?: string;
-    web_source?: string;
-  } | null>(null);
 
   // Form state — only name, url, description
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
-
-  const analyzeSite = async () => {
-    if (!affiliateUrl.trim()) {
-      toast.error('Adicione o link de afiliado para analisar o site');
-      return;
-    }
-
-    setAnalyzingSite(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-affiliate-description', {
-        body: {
-          action: 'analyze',
-          productName: productName.trim() || null,
-          affiliateUrl: affiliateUrl.trim(),
-        },
-      });
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      if (data?.analysisContext) {
-        setSiteAnalysis(data.analysisContext);
-        setAnalysisSources(data.sources || null);
-
-        const sourceParts = [];
-        if (data.sources?.site) sourceParts.push('site');
-        if (data.sources?.web) sourceParts.push('web');
-        toast.success(`Site analisado com sucesso${sourceParts.length ? ` (${sourceParts.join(' + ')})` : ''}.`);
-      }
-    } catch (err: any) {
-      toast.error('Erro ao analisar site: ' + err.message);
-    } finally {
-      setAnalyzingSite(false);
-    }
-  };
-
-  const generateDescription = async () => {
-    if (!productName.trim()) {
-      toast.error('Preencha o nome do produto primeiro');
-      return;
-    }
-
-    if (affiliateUrl.trim() && !siteAnalysis.trim()) {
-      toast.error('Clique em "Analisar site" antes de gerar a descrição');
-      return;
-    }
-
-    setGeneratingDesc(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-affiliate-description', {
-        body: {
-          action: 'generate',
-          productName: productName.trim(),
-          affiliateUrl: affiliateUrl.trim() || null,
-          analysisContext: siteAnalysis || null,
-        }
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      if (data?.description) {
-        setDescription(data.description);
-        const sources = [];
-        if (data.sources?.site) sources.push('site do produto');
-        if (data.sources?.web) sources.push('pesquisa web');
-        const sourceText = sources.length > 0 ? ` (baseado em: ${sources.join(' + ')})` : '';
-        toast.success(`Descrição gerada!${sourceText} Revise e ajuste.`);
-      }
-    } catch (err: any) {
-      toast.error('Erro ao gerar descrição: ' + err.message);
-    } finally {
-      setGeneratingDesc(false);
-    }
-  };
 
   const fetchLinks = useCallback(async () => {
     if (!currentWorkspace) return;
@@ -156,8 +71,6 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
-    setSiteAnalysis('');
-    setAnalysisSources(null);
     setEditingLink(null);
   };
 
@@ -166,8 +79,6 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
-    setSiteAnalysis('');
-    setAnalysisSources(null);
     setShowForm(true);
   };
 
@@ -358,11 +269,7 @@ export default function AgentMarketingPanel() {
               <Label className="text-xs">Nome do Produto *</Label>
               <Input
                 value={productName}
-                onChange={(e) => {
-                  setProductName(e.target.value);
-                  setSiteAnalysis('');
-                  setAnalysisSources(null);
-                }}
+                onChange={(e) => setProductName(e.target.value)}
                 placeholder="Ex: ChatGPT Plus, Cursor Pro"
                 className="h-8 text-sm"
               />
@@ -372,66 +279,18 @@ export default function AgentMarketingPanel() {
               <Label className="text-xs">Link de Afiliado *</Label>
               <Input
                 value={affiliateUrl}
-                onChange={(e) => {
-                  setAffiliateUrl(e.target.value);
-                  setSiteAnalysis('');
-                  setAnalysisSources(null);
-                }}
+                onChange={(e) => setAffiliateUrl(e.target.value)}
                 placeholder="https://..."
                 className="h-8 text-sm"
               />
-
-              <div className="mt-2 flex items-center justify-between gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 gap-1 text-xs"
-                  onClick={analyzeSite}
-                  disabled={analyzingSite || !affiliateUrl.trim()}
-                >
-                  {analyzingSite ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Search className="h-3 w-3" />
-                  )}
-                  {analyzingSite ? 'Analisando site...' : 'Analisar site'}
-                </Button>
-
-                {analysisSources?.site && (
-                  <Badge variant="secondary" className="text-[10px]">
-                    Site analisado
-                  </Badge>
-                )}
-              </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label className="text-xs">Descrição</Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 gap-1 text-xs text-primary"
-                  onClick={generateDescription}
-                  disabled={generatingDesc || !productName.trim() || (!!affiliateUrl.trim() && !siteAnalysis.trim())}
-                >
-                  {generatingDesc ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-3 w-3" />
-                  )}
-                  {generatingDesc ? 'Gerando...' : 'Gerar com IA'}
-                </Button>
-              </div>
+              <Label className="text-xs">Descrição</Label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder={affiliateUrl.trim() && !siteAnalysis.trim()
-                  ? "Clique em 'Analisar site' antes de gerar a descrição"
-                  : "Breve descrição do produto — ou clique em 'Gerar com IA'"
-                }
+                placeholder="Breve descrição do produto — o agente pesquisa o resto automaticamente"
                 className="min-h-[60px] text-sm"
               />
             </div>
