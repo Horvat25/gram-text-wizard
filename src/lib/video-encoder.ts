@@ -103,16 +103,25 @@ async function loadImage(url: string): Promise<LoadedImage | null> {
   try {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = url;
 
-    // decode() is better than onload for precise readiness
-    if ("decode" in img) {
-      await img.decode();
-    } else {
-      await new Promise<void>((resolve, reject) => {
+    const waitForLoad = () =>
+      new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = () => reject(new Error("image_load_failed"));
       });
+
+    img.src = url;
+
+    // Prefer decode() when available, but always keep an onload fallback.
+    const decodeFn = (img as unknown as { decode?: () => Promise<void> }).decode;
+    if (typeof decodeFn === "function") {
+      try {
+        await decodeFn.call(img);
+      } catch {
+        await waitForLoad();
+      }
+    } else {
+      await waitForLoad();
     }
 
     const w = (img as any).naturalWidth ?? img.width;
