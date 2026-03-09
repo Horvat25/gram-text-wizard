@@ -301,9 +301,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   // ─── Process next video in queue ───────────────────────────
   const processNextVideo = useCallback(async () => {
-    // Prevent concurrent renders - check BOTH locks AND isGenerating
-    if (renderLockRef.current || activeRenderIdRef.current || isGenerating) {
-      console.log(`[AutoRender] Render lock active (lock=${renderLockRef.current}, activeId=${activeRenderIdRef.current}, generating=${isGenerating}), skipping`);
+    // Prevent concurrent renders - check BOTH locks
+    if (renderLockRef.current || activeRenderIdRef.current) {
+      console.log(`[AutoRender] Render lock active (lock=${renderLockRef.current}, activeId=${activeRenderIdRef.current}), skipping`);
       return;
     }
 
@@ -341,7 +341,6 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         console.log(`[AutoRender] Post ${nextVideo.id} already has video, skipping`);
         setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
         renderLockRef.current = false;
-        activeRenderIdRef.current = null;
         setTimeout(processNextVideo, 100);
         return;
       }
@@ -350,7 +349,6 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         console.log(`[AutoRender] Post ${nextVideo.id} exceeded max attempts, skipping`);
         setRenderQueue(prev => prev.filter(v => v.id !== nextVideo.id));
         renderLockRef.current = false;
-        activeRenderIdRef.current = null;
         setTimeout(processNextVideo, 100);
         return;
       }
@@ -429,7 +427,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       console.error('[AutoRender] Render threw:', err);
       await handleVideoError(`Erro na renderização: ${err.message}`);
     }
-  }, [completedCount, renderFromScript, generateStory, notifyAgentAction, fetchPendingVideos, brandSettings.brandName, isGenerating]);
+  }, [completedCount, renderFromScript, generateStory, notifyAgentAction, fetchPendingVideos, brandSettings.brandName]);
 
   // ─── Actions ───────────────────────────────────────────────
   const startRendering = useCallback(() => {
@@ -463,8 +461,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     const wasEmpty = prevPendingCountRef.current === 0;
     const hasNewVideos = newCount > 0;
 
-    // Only auto-start if: was empty, now has videos, NOT rendering, NOT locked, NOT paused, NOT generating
-    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !renderLockRef.current && !activeRenderIdRef.current && !isPausedRef.current && !isGenerating) {
+    // Only auto-start if: was empty, now has videos, NOT rendering, NOT locked, NOT paused
+    if (wasEmpty && hasNewVideos && !isRenderingRef.current && !renderLockRef.current && !activeRenderIdRef.current && !isPausedRef.current) {
       console.log('[AutoRender] Auto-starting render for pending reels');
       const firstVideo = pendingVideos[0];
       const title = firstVideo?.overlay_metadata?.script?.title || firstVideo?.overlay_metadata?.topic || 'Novo vídeo';
@@ -476,8 +474,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       }
 
       autoStartTimeoutRef.current = setTimeout(() => {
-        // Re-check ALL locks before starting (another render may have started in the meantime)
-        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current || isGenerating) {
+        // Re-check locks before starting (another render may have started in the meantime)
+        if (renderLockRef.current || activeRenderIdRef.current || isRenderingRef.current) {
           console.log('[AutoRender] Auto-start cancelled - render already active');
           return;
         }
@@ -494,7 +492,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     }
 
     prevPendingCountRef.current = newCount;
-  }, [pendingVideos, processNextVideo, notifyVideoReady, isGenerating]);
+  }, [pendingVideos, processNextVideo, notifyVideoReady]);
 
   const totalInBatch = completedCount + renderQueue.length;
   const currentRenderProgress = isRendering
