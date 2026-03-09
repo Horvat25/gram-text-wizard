@@ -27,6 +27,10 @@ import {
   Film,
   X,
   ChevronUp,
+  Pause,
+  Play,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { parseISO, isPast, differenceInMinutes } from "date-fns";
 import { Post } from "@/hooks/usePosts";
@@ -34,6 +38,8 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { useVideoRendering } from "@/contexts/VideoRenderingContext";
+import { Progress } from "@/components/ui/progress";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -187,6 +193,22 @@ const PublicationQueueTab = ({
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
   const [renderingPost, setRenderingPost] = useState<Post | null>(null);
+  const [showAutoRenderWarning, setShowAutoRenderWarning] = useState(false);
+
+  const {
+    renderQueue,
+    isRendering: isAutoRendering,
+    isPaused,
+    currentVideoId,
+    completedCount,
+    currentStep,
+    isGenerating,
+    progress: autoRenderProgress,
+    currentRenderProgress,
+    startRendering,
+    pauseRendering,
+    resumeRendering,
+  } = useVideoRendering();
 
   // When opening the preview, always start at the top so the close (X) is reachable on mobile.
   useEffect(() => {
@@ -199,7 +221,7 @@ const PublicationQueueTab = ({
   
   const { currentWorkspace } = useWorkspace();
   const [loadingAccounts] = useState(false);
-  const hasConnectedAccount = false; // Simplified - accounts managed in Settings
+  const hasConnectedAccount = false;
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
@@ -404,7 +426,13 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => setRenderingPost(post)}
+              onClick={() => {
+                if (isAutoRendering && !isPaused) {
+                  setShowAutoRenderWarning(true);
+                } else {
+                  setRenderingPost(post);
+                }
+              }}
             >
               <Film className="h-3 w-3 mr-1" />
               Gerar Vídeo
@@ -477,7 +505,57 @@ const PublicationQueueTab = ({
         </Button>
       </div>
 
-      {/* Overdue Posts Alert */}
+      {/* Auto-Render Progress Bar */}
+      {(isAutoRendering || renderQueue.length > 0) && (
+        <Card className="border-purple-500/30 bg-purple-500/5">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Film className="h-4 w-4 text-purple-500" />
+                <span className="text-sm font-medium">
+                  {isPaused ? 'Renderização Pausada' : isGenerating ? 'Gerando...' : isAutoRendering ? 'Renderizando...' : 'Fila de Renderização'}
+                </span>
+                {currentStep && isAutoRendering && !isPaused && (
+                  <Badge variant="outline" className="text-xs">
+                    {currentStep}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {completedCount}/{completedCount + renderQueue.length} concluídos
+                </span>
+                {isAutoRendering && !isPaused && (
+                  <Button size="sm" variant="outline" onClick={pauseRendering}>
+                    <Pause className="h-3 w-3 mr-1" />
+                    Pausar
+                  </Button>
+                )}
+                {isPaused && (
+                  <Button size="sm" variant="outline" onClick={resumeRendering}>
+                    <Play className="h-3 w-3 mr-1" />
+                    Retomar
+                  </Button>
+                )}
+                {!isAutoRendering && renderQueue.length > 0 && (
+                  <Button size="sm" variant="default" className="bg-purple-600 hover:bg-purple-700" onClick={startRendering}>
+                    <Play className="h-3 w-3 mr-1" />
+                    Iniciar
+                  </Button>
+                )}
+              </div>
+            </div>
+            <Progress value={autoRenderProgress} className="h-2" />
+            {currentVideoId && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Renderizando: {renderQueue.find(v => v.id === currentVideoId)?.caption?.substring(0, 60) || currentVideoId}...
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+
       {overduePosts.length > 0 && (
         <Alert className="border-destructive/50 bg-destructive/10">
           <AlertCircle className="h-4 w-4 text-destructive" />
