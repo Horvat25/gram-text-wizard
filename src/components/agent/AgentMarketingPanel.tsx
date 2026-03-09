@@ -32,9 +32,6 @@ interface AffiliateLink {
   posts_count: number;
   last_posted_at: string | null;
   created_at: string;
-  media_format: string;
-  post_frequency: number;
-  marketing_strategy: string | null;
 }
 
 export default function AgentMarketingPanel() {
@@ -54,16 +51,10 @@ export default function AgentMarketingPanel() {
     web_source?: string;
   } | null>(null);
 
-  // Form state
+  // Form state — only name, url, description
   const [productName, setProductName] = useState('');
   const [affiliateUrl, setAffiliateUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [mediaFormats, setMediaFormats] = useState<string[]>(['image']);
-  const [marketingStrategy, setMarketingStrategy] = useState('');
-
-  // Global frequency
-  const [globalFrequency, setGlobalFrequency] = useState(4);
-  const [savingFrequency, setSavingFrequency] = useState(false);
 
   const analyzeSite = async () => {
     if (!affiliateUrl.trim()) {
@@ -126,14 +117,11 @@ export default function AgentMarketingPanel() {
 
       if (data?.description) {
         setDescription(data.description);
-        if (data.strategy) {
-          setMarketingStrategy(data.strategy);
-        }
         const sources = [];
         if (data.sources?.site) sources.push('site do produto');
         if (data.sources?.web) sources.push('pesquisa web');
         const sourceText = sources.length > 0 ? ` (baseado em: ${sources.join(' + ')})` : '';
-        toast.success(`Descrição e estratégia geradas!${sourceText} Revise e ajuste.`);
+        toast.success(`Descrição gerada!${sourceText} Revise e ajuste.`);
       }
     } catch (err: any) {
       toast.error('Erro ao gerar descrição: ' + err.message);
@@ -160,21 +148,6 @@ export default function AgentMarketingPanel() {
     }
   }, [currentWorkspace]);
 
-  // Load/save global affiliate frequency
-  useEffect(() => {
-    if (!currentWorkspace) return;
-    const saved = localStorage.getItem(`affiliate_freq_${currentWorkspace.id}`);
-    if (saved) setGlobalFrequency(parseInt(saved, 10) || 4);
-  }, [currentWorkspace]);
-
-  const updateGlobalFrequency = (val: number) => {
-    const clamped = Math.max(2, Math.min(10, val));
-    setGlobalFrequency(clamped);
-    if (currentWorkspace) {
-      localStorage.setItem(`affiliate_freq_${currentWorkspace.id}`, String(clamped));
-    }
-  };
-
   useEffect(() => {
     fetchLinks();
   }, [fetchLinks]);
@@ -183,8 +156,6 @@ export default function AgentMarketingPanel() {
     setProductName('');
     setAffiliateUrl('');
     setDescription('');
-    setMediaFormats(['image']);
-    setMarketingStrategy('');
     setSiteAnalysis('');
     setAnalysisSources(null);
     setEditingLink(null);
@@ -195,9 +166,6 @@ export default function AgentMarketingPanel() {
     setProductName(link.product_name);
     setAffiliateUrl(link.affiliate_url);
     setDescription(link.description || '');
-    const formats = link.media_format ? link.media_format.split(',') : ['image'];
-    setMediaFormats(formats);
-    setMarketingStrategy(link.marketing_strategy || '');
     setSiteAnalysis('');
     setAnalysisSources(null);
     setShowForm(true);
@@ -216,8 +184,6 @@ export default function AgentMarketingPanel() {
         product_name: productName.trim(),
         affiliate_url: affiliateUrl.trim(),
         description: description.trim() || null,
-        media_format: mediaFormats.join(','),
-        marketing_strategy: marketingStrategy.trim() || null,
       };
 
       if (editingLink) {
@@ -294,19 +260,6 @@ export default function AgentMarketingPanel() {
         </Button>
       </div>
 
-      {/* Global frequency control */}
-      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border/50">
-        <span className="text-xs text-muted-foreground">🔄 Frequência de marketing</span>
-        <div className="flex items-center gap-1.5">
-          <Button type="button" variant="outline" size="icon" className="h-5 w-5 text-[10px]"
-            onClick={() => updateGlobalFrequency(globalFrequency - 1)}>−</Button>
-          <span className="text-xs font-medium w-5 text-center">{globalFrequency}</span>
-          <Button type="button" variant="outline" size="icon" className="h-5 w-5 text-[10px]"
-            onClick={() => updateGlobalFrequency(globalFrequency + 1)}>+</Button>
-          <span className="text-[10px] text-muted-foreground ml-1">a cada {globalFrequency} posts</span>
-        </div>
-      </div>
-
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -346,16 +299,18 @@ export default function AgentMarketingPanel() {
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{link.description}</p>
                     )}
 
-                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                      {(link.media_format || 'image').split(',').map(f => (
-                        <Badge key={f} variant="outline" className="text-[10px] h-4 px-1.5">
-                          {f === 'reels' ? '🎬' : f === 'carousel' ? '📸' : '🖼️'} {f === 'reels' ? 'Reels' : f === 'carousel' ? 'Carrossel' : 'Imagem'}
-                        </Badge>
-                      ))}
-                      <span className="text-[10px] text-muted-foreground">·</span>
+                    <div className="flex items-center gap-3 mt-1.5">
                       <span className="text-[10px] text-muted-foreground">
-                        📊 {link.posts_count}
+                        📊 {link.posts_count} post(s)
                       </span>
+                      <a
+                        href={link.affiliate_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-primary truncate max-w-[200px] hover:underline"
+                      >
+                        {link.affiliate_url}
+                      </a>
                     </div>
                   </div>
 
@@ -478,49 +433,6 @@ export default function AgentMarketingPanel() {
                   : "Breve descrição do produto — ou clique em 'Gerar com IA'"
                 }
                 className="min-h-[60px] text-sm"
-              />
-            </div>
-
-            {/* Media Format - multi-select toggle */}
-            <div>
-              <Label className="text-xs">Formato de Mídia (selecione 1 ou mais)</Label>
-              <div className="flex gap-1.5 mt-1">
-                {[
-                  { value: 'image', label: '🖼️ Imagem' },
-                  { value: 'reels', label: '🎬 Reels' },
-                  { value: 'carousel', label: '📸 Carrossel' },
-                ].map((opt) => {
-                  const isSelected = mediaFormats.includes(opt.value);
-                  return (
-                    <Button
-                      key={opt.value}
-                      type="button"
-                      variant={isSelected ? 'default' : 'outline'}
-                      size="sm"
-                      className="h-6 text-[11px] flex-1 px-1"
-                      onClick={() => {
-                        if (isSelected && mediaFormats.length > 1) {
-                          setMediaFormats(mediaFormats.filter(f => f !== opt.value));
-                        } else if (!isSelected) {
-                          setMediaFormats([...mediaFormats, opt.value]);
-                        }
-                      }}
-                    >
-                      {opt.label}
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-xs">Estratégia (opcional)</Label>
-              <Textarea
-                value={marketingStrategy}
-                onChange={(e) => setMarketingStrategy(e.target.value)}
-                placeholder="Ex: Focar em produtividade, gatilho de escassez..."
-                className="min-h-[40px] text-xs mt-1"
-                rows={2}
               />
             </div>
           </div>

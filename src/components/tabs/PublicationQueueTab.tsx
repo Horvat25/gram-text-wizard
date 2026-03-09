@@ -34,7 +34,6 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
-import { useVideoRendering } from "@/contexts/VideoRenderingContext";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -187,6 +186,7 @@ const PublicationQueueTab = ({
   const viewDialogRef = useRef<HTMLDivElement | null>(null);
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
+  const [renderingPost, setRenderingPost] = useState<Post | null>(null);
 
   // When opening the preview, always start at the top so the close (X) is reachable on mobile.
   useEffect(() => {
@@ -198,7 +198,6 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
-  const { startRendering, refetchPendingVideos, isRendering, currentVideoId, currentStep, currentRenderProgress } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false; // Simplified - accounts managed in Settings
 
@@ -314,27 +313,6 @@ const PublicationQueueTab = ({
     }
   };
 
-  const handleRenderVideo = async (post: Post) => {
-    try {
-      await refetchPendingVideos();
-
-      if (!isRendering) {
-        startRendering();
-        toast.info("Renderização iniciada");
-        return;
-      }
-
-      if (currentVideoId === post.id) {
-        toast.info("Este vídeo já está em renderização");
-      } else {
-        toast.info("Já existe outra renderização em andamento");
-      }
-    } catch (err) {
-      console.error("Error starting render:", err);
-      toast.error("Erro ao iniciar renderização");
-    }
-  };
-
   const getStatusColor = (status: string, isOverdue: boolean = false) => {
     if (isOverdue) return "bg-destructive text-destructive-foreground";
     switch (status) {
@@ -351,7 +329,6 @@ const PublicationQueueTab = ({
     const isOverdue = post.scheduled_for ? isPast(parseISO(post.scheduled_for)) : false;
     const needsRendering = needsVideoRendering(post);
     const isReels = post.media_type === "reels" || post.media_type === "reel";
-    const isRenderingThisPost = isRendering && currentVideoId === post.id;
     
     return (
       <div className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${isOverdue ? 'border-destructive/50' : ''} ${needsRendering ? 'border-amber-500/50' : ''}`}>
@@ -369,12 +346,6 @@ const PublicationQueueTab = ({
             {needsRendering && (
               <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/30">
                 Aguardando renderização
-              </Badge>
-            )}
-            {isRenderingThisPost && (
-              <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
-                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                {currentStep === "video" ? `Renderizando ${Math.round(currentRenderProgress)}%` : "Processando"}
               </Badge>
             )}
             {post.post_type && !isReels && (
@@ -404,11 +375,8 @@ const PublicationQueueTab = ({
             <video
               src={post.video_url}
               className="w-full h-32 object-cover rounded-md"
-              controls
               muted
               playsInline
-              preload="metadata"
-              crossOrigin="anonymous"
             />
           </div>
         )}
@@ -436,18 +404,13 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => handleRenderVideo(post)}
-              disabled={isRendering && !isRenderingThisPost}
+              onClick={() => setRenderingPost(post)}
             >
-              {isRenderingThisPost ? (
-                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-              ) : (
-                <Film className="h-3 w-3 mr-1" />
-              )}
-              {isRenderingThisPost ? `Renderizando ${Math.round(currentRenderProgress)}%` : "Gerar Vídeo"}
+              <Film className="h-3 w-3 mr-1" />
+              Gerar Vídeo
             </Button>
           )}
-
+          
           <Button
             size="sm"
             variant="outline"
@@ -494,34 +457,24 @@ const PublicationQueueTab = ({
     <div className="space-y-6">
 
       {/* Timezone Info */}
-      <div className="flex flex-col gap-2 p-3 rounded-lg bg-muted/50 border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Globe className="h-4 w-4" />
-            <span>Fuso horário: <strong>Brasília (UTC-3)</strong></span>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleProcessScheduled}
-            disabled={isCheckingScheduler}
-          >
-            {isCheckingScheduler ? (
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4 mr-2" />
-            )}
-            Processar Agendados
-          </Button>
+      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Globe className="h-4 w-4" />
+          <span>Fuso horário: <strong>Brasília (UTC-3)</strong></span>
         </div>
-        {isRendering && (
-          <div className="text-xs text-primary flex items-center gap-2">
-            <RefreshCw className="h-3 w-3 animate-spin" />
-            <span>
-              Renderização em andamento ({currentStep}) — {Math.round(currentRenderProgress)}%
-            </span>
-          </div>
-        )}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleProcessScheduled}
+          disabled={isCheckingScheduler}
+        >
+          {isCheckingScheduler ? (
+            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4 mr-2" />
+          )}
+          Processar Agendados
+        </Button>
       </div>
 
       {/* Overdue Posts Alert */}
@@ -727,10 +680,6 @@ const PublicationQueueTab = ({
                 <video
                   src={viewingPost.video_url}
                   controls
-                  playsInline
-                  muted
-                  preload="auto"
-                  crossOrigin="anonymous"
                   className="w-full rounded-lg max-h-[400px]"
                 />
               )}

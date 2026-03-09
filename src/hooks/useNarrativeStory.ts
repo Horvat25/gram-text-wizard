@@ -36,9 +36,8 @@ interface UseNarrativeStoryOptions {
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  // Standard: 5 scenes (hook 2s, context 4s, explanation 4s, impact 4s, cta 3s) = 17s
-  const { segmentCount = 5, segmentDuration = 4, preferredVoice = "tech_male" } = options;
-  const SCENE_DURATIONS = [2, 4, 4, 4, 3];
+  // Default to tech_male (Antonio Neural) for professional technology content
+  const { segmentCount = 4, segmentDuration = 5, preferredVoice = "tech_male" } = options;
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
@@ -80,18 +79,21 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     toast.error(error);
   }, []);
 
-  // Step 1: Generate structured script with 5 scenes
+  // Step 1: Generate structured script with segments
   const generateScript = useCallback(async (topic: string) => {
     setState(prev => ({ ...prev, step: "script", progress: 5 }));
     
     try {
+      const totalDuration = segmentCount * segmentDuration;
+      const wordsPerSegment = Math.ceil(segmentDuration * 2.5); // ~2.5 words per second
+      
       const { data, error } = await supabase.functions.invoke("generate-story-script", {
         body: { 
           topic, 
-          segmentCount: 5,
-          wordsPerSegment: 8,
-          totalDuration: 17,
-          style: "informativo, envolvente, editorial provocativo",
+          segmentCount,
+          wordsPerSegment,
+          totalDuration,
+          style: "informativo, envolvente, com começo-meio-fim",
         },
       });
 
@@ -100,20 +102,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         throw new Error("Nenhum roteiro gerado");
       }
 
-      // Build segments with fixed scene durations
-      const sceneDurations = data.scene_durations || SCENE_DURATIONS;
+      // Build segments with timing
       let currentTime = 0;
-      const segments: StorySegment[] = data.segments.slice(0, 5).map((seg: any, index: number) => {
-        const dur = sceneDurations[index] ?? 4;
+      const segments: StorySegment[] = data.segments.map((seg: any, index: number) => {
         const segment: StorySegment = {
           id: `seg-${index}`,
           text: seg.text,
           imagePrompt: seg.imagePrompt,
           imageUrl: "",
-          duration: dur,
+          duration: segmentDuration,
           startTime: currentTime,
         };
-        currentTime += dur;
+        currentTime += segmentDuration;
         return segment;
       });
 
@@ -125,13 +125,13 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         progress: 15,
       }));
       
-      toast.success(`Roteiro: ${segments.length} cenas criadas (${currentTime}s)`);
+      toast.success(`Roteiro: ${segments.length} cenas criadas`);
       return segments;
     } catch (error: any) {
       setError(error.message || "Erro ao gerar roteiro");
       return null;
     }
-  }, [setError, SCENE_DURATIONS]);
+  }, [segmentCount, segmentDuration, setError]);
 
   // Step 2: Search for real images (Pexels > Unsplash > Firecrawl > AI)
   // TODAS as imagens são salvas no Storage antes de retornar (elimina CORS no render)
@@ -189,14 +189,13 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     // Filter segments that got images
     const validSegments = updatedSegments.filter(s => s.imageUrl);
     const failedCount = updatedSegments.length - validSegments.length;
-    const minimumSegmentsRequired = Math.max(2, Math.ceil(segments.length * 0.75));
     
-    if (validSegments.length < minimumSegmentsRequired) {
-      setError(`Renderização cancelada: apenas ${validSegments.length}/${segments.length} imagens válidas. Necessário no mínimo ${minimumSegmentsRequired} para manter padrão de Reels.`);
+    if (validSegments.length === 0) {
+      setError("Nenhuma imagem foi encontrada ou gerada. Verifique as API keys (Pexels/Unsplash).");
       return null;
     }
     
-    if (failedCount > 0) {
+    if (failedCount > 0 && validSegments.length >= 2) {
       toast.warning(`${failedCount} de ${updatedSegments.length} imagens falharam, continuando com ${validSegments.length} cenas`);
     }
 
@@ -571,11 +570,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         audioUrl: narrationUrl || undefined,
         ctaAudioUrl: ctaNarrationUrl || undefined,
         backgroundMusicUrl: backgroundMusicUrl || undefined,
-        segments: segments.map((seg, i) => ({
+        segments: segments.map(seg => ({
           imageUrl: seg.imageUrl,
           duration: seg.duration,
           text: seg.text,
-          scene: i === segments.length - 1 ? "cta" : ["hook", "context", "explanation", "impact", "cta"][i] || "scene",
         })),
         onProgress: (progress) => {
           // Map 0-100 progress to 82-95 range
@@ -665,35 +663,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log('[renderFromScript] 📰 Article image provided:', articleInfo.articleImageUrl.substring(0, 60));
     }
 
-    // Build segments with fixed scene durations (max 5 scenes)
+    // Build segments with timing from existing data
     let currentTime = 0;
-    const safeTitle = (title || "Reels").trim();
-    const limitedSegments = existingSegments.slice(0, 5);
-    const segments: StorySegment[] = limitedSegments.map((seg, index) => {
-      const safeText = typeof seg.text === "string" && seg.text.trim()
-        ? seg.text.trim()
-        : `${safeTitle} — cena ${index + 1}`;
-      const safeImagePrompt = typeof seg.imagePrompt === "string" && seg.imagePrompt.trim()
-        ? seg.imagePrompt.trim()
-        : safeText;
-
-      const dur = SCENE_DURATIONS[index] ?? 4;
+    const segments: StorySegment[] = existingSegments.map((seg, index) => {
       const segment: StorySegment = {
         id: `seg-${index}`,
-        text: safeText,
-        imagePrompt: safeImagePrompt,
+        text: seg.text,
+        imagePrompt: seg.imagePrompt,
         imageUrl: preExistingImageUrls?.[index] || "",
-        duration: dur,
+        duration: segmentDuration,
         startTime: currentTime,
       };
-      currentTime += dur;
+      currentTime += segmentDuration;
       return segment;
     });
 
     setState(prev => ({ 
       ...prev, 
       step: "script",
-      title: safeTitle,
+      title: title || "Reels",
       segments,
       totalDuration: currentTime,
       progress: 15,
@@ -701,28 +689,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    // Step 2: Images — only skip generation when pre-existing images are complete AND sufficiently distinct
+    // Step 2: Images — skip if ALL segments already have images from pre-existing data
     const allHaveImages = segments.every(s => !!s.imageUrl);
-    const preloadedUrls = segments.map(s => s.imageUrl).filter(Boolean) as string[];
-    const uniqueImageCount = new Set(preloadedUrls).size;
-    const minDistinctRequired = Math.max(2, Math.ceil(segments.length * 0.75));
-    const hasDistinctSet = uniqueImageCount >= minDistinctRequired;
-
     let segmentsWithImages: StorySegment[];
     
-    if (allHaveImages && hasDistinctSet) {
-      console.log('[renderFromScript] ✅ Reusing pre-existing images:', { total: preloadedUrls.length, unique: uniqueImageCount });
+    if (allHaveImages) {
+      console.log('[renderFromScript] ✅ All segments have pre-existing images, skipping image generation');
       toast.success(`📸 ${segments.length} imagens pré-existentes reutilizadas!`);
       setState(prev => ({ ...prev, step: "images", progress: 70 }));
       segmentsWithImages = segments;
     } else {
-      if (allHaveImages && !hasDistinctSet) {
-        console.warn('[renderFromScript] ⚠️ Pre-existing images are repetitive, regenerating full 4-scene set', { total: preloadedUrls.length, unique: uniqueImageCount });
-      }
-
-      // Force fresh generation for all scenes when image set is incomplete or repetitive
-      const segmentsNeedingImages = segments.map(s => ({ ...s, imageUrl: "" }));
-      const result = await generateImages(segmentsNeedingImages, safeTitle, articleInfo);
+      const result = await generateImages(segments, title, articleInfo);
       if (!result || abortRef.current) {
         setIsGenerating(false);
         return;

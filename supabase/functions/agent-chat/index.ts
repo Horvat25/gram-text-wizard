@@ -229,23 +229,22 @@ const AGENT_TOOLS = [
     }
   },
   {
-     type: "function",
+    type: "function",
     function: {
       name: "create_affiliate_post",
-      description: "💰 Cria post PERSUASIVO de marketing de afiliado. O link do produto é AUTOMATICAMENTE inserido na legenda — NÃO precisa incluir URL nos blocos. Foque em COPY DE ALTA CONVERSÃO: DOR → SOLUÇÃO → PROVA → CTA URGENTE. Use frameworks: AIDA, PAS, ou BAB.",
+      description: "💰 Cria um post de marketing promovendo um produto de afiliado cadastrado. Busca um link ativo do banco. Use quando o ciclo autônomo decidir intercalar marketing ou quando o usuário pedir.",
       parameters: {
         type: "object",
         properties: {
           affiliate_id: { type: "string", description: "ID do link de afiliado específico. Se vazio, escolhe automaticamente o menos promovido." },
-          headline_text: { type: "string", description: "Headline MAGNÉTICA (CAIXA ALTA, máx 2 linhas). Use gatilhos: escassez, curiosidade, transformação. Ex: 'ELE FATUROU R$47K EM 30 DIAS. A FERRAMENTA QUE NINGUÉM TE CONTOU.'" },
-          caption_hook: { type: "string", description: "OBRIGATÓRIO. Primeira frase que PARA O SCROLL. Pode ser: pergunta retórica, estatística chocante, ou afirmação polêmica. Ex: 'Você está perdendo dinheiro todo dia sem saber.'" },
-          caption_body: { type: "string", description: "OBRIGATÓRIO. 2-3 frases: identifique a DOR do público → apresente o produto como SOLUÇÃO → cite 1 benefício CONCRETO e mensurável. NÃO seja genérico." },
-          caption_cta: { type: "string", description: "OBRIGATÓRIO. Call-to-action com URGÊNCIA real. Ex: 'Vagas limitadas', 'Desconto por tempo limitado', 'Últimas unidades'. O link será adicionado AUTOMATICAMENTE após seu CTA." },
-          caption_social_proof: { type: "string", description: "OPCIONAL. Prova social: quantidade de usuários, avaliações, resultados de clientes. Ex: '+12.000 pessoas já usam'" },
+          headline_text: { type: "string", description: "Headline de marketing (CAIXA ALTA, máx 2 linhas). Estilo persuasivo com urgência ou benefício claro." },
+          caption_block1: { type: "string", description: "Bloco 1: Hook que gera curiosidade sobre o produto" },
+          caption_block2: { type: "string", description: "Bloco 2: Benefício principal e diferencial" },
+          caption_block3: { type: "string", description: "Bloco 3: CTA com link e urgência" },
           scheduled_for: { type: "string", description: "Data/hora para agendar (ISO 8601, horário Brasília)" },
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
         },
-        required: ["caption_hook", "caption_body", "caption_cta"]
+        required: []
       }
     }
   }
@@ -2466,90 +2465,45 @@ Posso buscar imagens na web e criar posts com elas, aplicando nossa marca.
   };
 }
 
-// Execute create_affiliate_post - Creates a HIGH-CONVERSION marketing post
+// Execute create_affiliate_post - Creates a marketing post promoting an affiliate product
 async function executeCreateAffiliatePost(supabase: any, userId: string, workspaceId: string, args: any) {
-  const { affiliate_id, headline_text, caption_hook, caption_body, caption_cta, caption_social_proof, scheduled_for, platforms,
-    // Legacy fallback fields
-    caption_block1, caption_block2, caption_block3 } = args;
+  const { affiliate_id, headline_text, caption_block1, caption_block2, caption_block3, scheduled_for, platforms } = args;
 
   try {
-    // Get affiliate link - specific one or round-robin rotation
-    let affiliate: any = null;
+    // Get affiliate link - specific one or least promoted active one
+    let query = supabase
+      .from('affiliate_links')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .eq('is_active', true);
 
-    // Validate affiliate_id is a proper UUID before querying
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const validAffiliateId = affiliate_id && uuidRegex.test(affiliate_id);
-
-    if (validAffiliateId) {
-      const { data, error } = await supabase
-        .from('affiliate_links')
-        .select('*')
-        .eq('id', affiliate_id)
-        .eq('workspace_id', workspaceId)
-        .eq('is_active', true)
-        .single();
-      if (!error && data) {
-        affiliate = data;
-      }
-      // If specific ID fails, fall through to round-robin
-    }
-    
-    if (!affiliate) {
-      const { data: allLinks, error: fetchError } = await supabase
-        .from('affiliate_links')
-        .select('*')
-        .eq('workspace_id', workspaceId)
-        .eq('is_active', true)
-        .order('last_posted_at', { ascending: true, nullsFirst: true });
-
-      if (fetchError) throw fetchError;
-      if (!allLinks || allLinks.length === 0) {
-        return { success: false, message: '❌ Nenhum link de afiliado ativo encontrado. Cadastre links na aba Marketing.' };
-      }
-      affiliate = allLinks[0];
+    if (affiliate_id) {
+      query = query.eq('id', affiliate_id);
+    } else {
+      query = query.order('posts_count', { ascending: true }).limit(1);
     }
 
-    if (!affiliate) {
-      return { success: false, message: '❌ Link de afiliado não encontrado.' };
+    const { data: affiliateLinks, error: fetchError } = await query;
+    if (fetchError) throw fetchError;
+
+    if (!affiliateLinks || affiliateLinks.length === 0) {
+      return { success: false, message: '❌ Nenhum link de afiliado ativo encontrado. Cadastre links na aba Marketing.' };
     }
 
-    // Build PROFESSIONAL caption - link is ALWAYS injected
-    const hook = caption_hook || caption_block1 || `🔥 Você ainda não conhece ${affiliate.product_name}? Está perdendo tempo.`;
-    const body = caption_body || caption_block2 || affiliate.description || `${affiliate.product_name} resolve o que ninguém mais resolve. Resultados reais, comprovados.`;
-    const cta = caption_cta || caption_block3 || `Não deixe pra depois — as melhores oportunidades não esperam.`;
-    const socialProof = caption_social_proof || '';
+    const affiliate = affiliateLinks[0];
 
-    // ALWAYS append affiliate link prominently — this is the money line
-    const captionParts = [
-      hook,
+    // Build caption with affiliate link
+    const caption = [
+      caption_block1 || `🔥 ${affiliate.product_name} - você precisa conhecer isso!`,
       '',
-      body,
-    ];
-    
-    if (socialProof) {
-      captionParts.push('', socialProof);
-    }
-    
-    captionParts.push(
+      caption_block2 || affiliate.description || 'Uma ferramenta que vai mudar seu jogo.',
       '',
-      cta,
+      caption_block3 || `👉 Link na bio ou acesse: ${affiliate.affiliate_url}`,
       '',
-      `🔗 Acesse agora: ${affiliate.affiliate_url}`,
-      '',
-      `👆 Link direto acima 👆`
-    );
+      `🔗 ${affiliate.affiliate_url}`
+    ].join('\n');
 
-    const caption = captionParts.join('\n');
-
-    // Generate contextual hashtags based on product category
-    const categoryTags: Record<string, string[]> = {
-      'tecnologia': ['#tech', '#ferramentas', '#produtividade'],
-      'saude': ['#saude', '#bemestar', '#qualidadedevida'],
-      'financas': ['#financas', '#investimentos', '#renda'],
-      'educacao': ['#educacao', '#cursos', '#conhecimento'],
-    };
-    const baseTags = categoryTags[(affiliate.category || '').toLowerCase()] || ['#recomendacao', '#dica'];
-    const hashtags = [...baseTags, '#linknalegenda', `#${affiliate.product_name.replace(/\s+/g, '').toLowerCase()}`];
+    const hashtags = ['#tech', '#ferramentas', '#produtividade', '#ia', '#recomendacao'];
 
     // Determine scheduling
     let scheduledFor: string | null = null;
@@ -2568,143 +2522,28 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
       postStatus = 'scheduled';
     }
 
-    // Determine media type from affiliate config
-    const formats = (affiliate.media_format || 'image').split(',').map((f: string) => f.trim().toLowerCase()).filter(Boolean);
-    const hasReels = formats.includes('reels');
-
-    // Senior choice: if reels is available for this affiliate, prioritize reels for richer marketing delivery
-    const chosenFormat = hasReels
-      ? 'reels'
-      : formats[(affiliate.posts_count || 0) % Math.max(1, formats.length)] || 'image';
-
-    const mediaType = chosenFormat === 'reels' ? 'reels' : chosenFormat === 'carousel' ? 'carousel' : 'image';
-
-    let thumbnailUrl: string | null = affiliate.image_url || null;
-    let carouselImages: string[] | null = null;
-    let overlayMetadata: any = {
-      type: 'affiliate_marketing',
-      affiliate_id: affiliate.id,
-      product_name: affiliate.product_name,
-      headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
-      theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral'],
-      marketing_strategy: affiliate.marketing_strategy || null
-    };
-
-    // Reels path: ensure 4-scene script + multi-image pack for cinematic render pipeline
-    if (mediaType === 'reels') {
-      const reelsTopic = `${affiliate.product_name} | ${affiliate.category || 'geral'} | oferta de afiliado`;
-      let reelScript: any = null;
-
-      try {
-        const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-          },
-          body: JSON.stringify({
-            topic: `${reelsTopic}. Gancho: ${hook}. Benefício: ${body}. CTA: ${cta}`,
-            segmentCount: 4,
-            wordsPerSegment: 14,
-            totalDuration: 24,
-            style: 'marketing persuasivo, storytelling, dor-solucao-beneficio-cta, tom profissional'
-          })
-        });
-
-        if (scriptResponse.ok) {
-          const data = await scriptResponse.json();
-          if (data?.segments?.length >= 3) {
-            const normalizedSegments = data.segments.slice(0, 4).map((s: any, i: number) => ({
-              text: s?.text || [hook, body, socialProof || 'Resultado prático para quem agir agora.', cta][i] || cta,
-              imagePrompt: s?.imagePrompt || `${affiliate.product_name} marketing high-tech profissional`,
-            }));
-            // Always keep 4 segments for stable cinematic pacing
-            while (normalizedSegments.length < 4) {
-              normalizedSegments.push({
-                text: [hook, body, socialProof || 'Resultado prático para quem agir agora.', cta][normalizedSegments.length] || cta,
-                imagePrompt: `${affiliate.product_name} marketing premium conversão alta`
-              });
-            }
-            reelScript = {
-              title: data?.title || `Oferta: ${affiliate.product_name}`,
-              segments: normalizedSegments,
-            };
-          }
-        }
-      } catch (scriptErr) {
-        console.warn('[AFFILIATE] Script generation failed, using local fallback:', scriptErr);
-      }
-
-      if (!reelScript) {
-        reelScript = {
-          title: `Oferta: ${affiliate.product_name}`,
-          segments: [
-            { text: hook, imagePrompt: `${affiliate.product_name} problema dor do público` },
-            { text: body, imagePrompt: `${affiliate.product_name} solução benefício transformação` },
-            { text: socialProof || `Pessoas já estão usando ${affiliate.product_name} para acelerar resultados.`, imagePrompt: `${affiliate.product_name} prova social resultados profissionais` },
-            { text: cta, imagePrompt: `${affiliate.product_name} call to action urgente conversão` },
-          ]
-        };
-      }
-
-      try {
-        const imagesResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-          },
-          body: JSON.stringify({
-            topic: reelsTopic,
-            segments: reelScript.segments,
-          })
-        });
-
-        if (imagesResponse.ok) {
-          const imagesData = await imagesResponse.json();
-          const resolvedImages = (imagesData?.images || [])
-            .map((img: any) => (typeof img === 'string' ? img : img?.imageUrl))
-            .filter((url: string | null) => typeof url === 'string' && !!url);
-
-          if (resolvedImages.length > 0) {
-            carouselImages = resolvedImages.slice(0, 4);
-            thumbnailUrl = carouselImages[0] || thumbnailUrl;
-          }
-        }
-      } catch (imagesErr) {
-        console.warn('[AFFILIATE] Image pack generation failed, renderer will fallback:', imagesErr);
-      }
-
-      overlayMetadata = {
-        ...overlayMetadata,
-        type: 'affiliate_marketing_reels',
-        topic: reelsTopic,
-        script: reelScript,
-        needs_processing: true,
-        created_by_agent: true,
-        publish_after_render: false,
-      };
-    }
-
     // Create the post
-    const postData: any = {
-      user_id: userId,
-      workspace_id: workspaceId,
-      caption,
-      hashtags,
-      status: postStatus,
-      scheduled_for: scheduledFor,
-      image_url: thumbnailUrl,
-      carousel_images: mediaType === 'reels' ? carouselImages : null,
-      post_type: 'marketing',
-      media_type: mediaType,
-      platforms: platforms || ['instagram'],
-      overlay_metadata: overlayMetadata
-    };
-
     const { data: post, error: postError } = await supabase
       .from('posts')
-      .insert(postData)
+      .insert({
+        user_id: userId,
+        workspace_id: workspaceId,
+        caption,
+        hashtags,
+        status: postStatus,
+        scheduled_for: scheduledFor,
+        image_url: affiliate.image_url || null,
+        post_type: 'marketing',
+        media_type: 'image',
+        platforms: platforms || ['instagram'],
+        overlay_metadata: {
+          type: 'affiliate_marketing',
+          affiliate_id: affiliate.id,
+          product_name: affiliate.product_name,
+          headline: headline_text || `${affiliate.product_name.toUpperCase()} - VOCÊ PRECISA DISSO`,
+          theme_tags: ['marketing', 'afiliado', affiliate.category || 'geral']
+        }
+      })
       .select()
       .single();
 
@@ -2726,7 +2565,7 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
 
     return {
       success: true,
-      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n🎬 Formato: ${mediaType === 'reels' ? `Reels cinematográfico (${carouselImages?.length || 0} imagens)` : mediaType}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
+      message: `💰 Post de marketing criado!\n\n📦 Produto: ${affiliate.product_name}\n📅 Agendado: ${schedFormatted}\n🔗 Link: ${affiliate.affiliate_url}\n📊 Total de posts deste produto: ${(affiliate.posts_count || 0) + 1}`,
       post_id: post.id
     };
   } catch (error: any) {
@@ -3108,17 +2947,12 @@ Quando usuário diz... | Você calcula...
 4. **NUNCA** mencione anos passados (2024, 2025)
 5. **TESTE MENTAL**: "Isso para o scroll?"
 
-## 💰 MARKETING DE AFILIADOS — COPY DE ALTA CONVERSÃO
-- REGRA: A cada ${4} posts normais de notícia, intercale 1 post de afiliado usando \`create_affiliate_post\`
-- O link do produto é inserido AUTOMATICAMENTE na legenda — NÃO inclua URLs nos campos de texto
-- Use frameworks de copywriting profissional: AIDA (Atenção→Interesse→Desejo→Ação) ou PAS (Problema→Agitação→Solução)
-- caption_hook: PARE O SCROLL. Pergunta retórica, dado chocante, ou declaração polêmica. NUNCA comece com "Olá" ou "Ei"
-- caption_body: Identifique a DOR → Apresente o produto como SOLUÇÃO → Cite benefício CONCRETO e mensurável
-- caption_cta: URGÊNCIA REAL — "vagas limitadas", "desconto expira", "últimas unidades". Seja específico
-- caption_social_proof: Se possível, adicione prova social ("+X usuários", "avaliação 4.9/5", "case de sucesso")
-- Headlines: TENSÃO + BENEFÍCIO. Ex: "ELE FATUROU R$47K EM 30 DIAS" não "Conheça essa ferramenta"
-- Se o link tem marketing_strategy definida, USE-A como guia para o tom e abordagem
-- NUNCA gere posts genéricos tipo "confira esse produto incrível" — isso NÃO vende
+## 💰 MARKETING DE AFILIADOS
+- Quando em modo autônomo, intercale 1 post de afiliado a cada 4 posts de notícia
+- Use \`create_affiliate_post\` para promover produtos cadastrados
+- O sistema escolhe automaticamente o produto menos promovido
+- Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
+- Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
 - NÃO force marketing se não houver links cadastrados
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;

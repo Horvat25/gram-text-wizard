@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { 
   MessageCircle, 
   Rss, 
-   
+  FileText, 
   Loader2,
   LayoutDashboard,
   Settings,
@@ -25,7 +25,7 @@ import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
 import AgentProactiveChat from './AgentProactiveChat';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
-
+import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
@@ -66,7 +66,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const [showAgentChat, setShowAgentChat] = useState(false); // Agent proactive chat
   const [showHistory, setShowHistory] = useState(false); // User command history
   const [showFeeds, setShowFeeds] = useState(false);
-  
+  const [showResponses, setShowResponses] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
 
@@ -218,7 +218,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     setShowAgentChat(false);
     setShowHistory(false);
     setShowFeeds(false);
-    
+    setShowResponses(false);
     setShowGrowth(false);
     setShowMarketing(false);
   };
@@ -228,7 +228,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       agentChat: showAgentChat,
       history: showHistory,
       feeds: showFeeds,
-      
+      responses: showResponses,
       growth: showGrowth,
       marketing: showMarketing,
     }[panel];
@@ -239,7 +239,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history': setShowHistory(true); break;
         case 'feeds': setShowFeeds(true); break;
-        
+        case 'responses': setShowResponses(true); break;
         case 'growth': setShowGrowth(true); break;
         case 'marketing': setShowMarketing(true); break;
       }
@@ -319,6 +319,19 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           >
             <Megaphone className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Marketing</span>
+          </Button>
+          
+          <Button
+            variant={showResponses ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showResponses && "neural-gradient border-0"
+            )}
+            onClick={() => togglePanel('responses')}
+          >
+            <FileText className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Respostas</span>
           </Button>
           
           {/* History - user command chat history */}
@@ -417,6 +430,10 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         </div>
       )}
       
+      <AgentResponsesPanel
+        isOpen={showResponses}
+        onClose={() => setShowResponses(false)}
+      />
       
       {/* Growth Dashboard Panel */}
       {showGrowth && (

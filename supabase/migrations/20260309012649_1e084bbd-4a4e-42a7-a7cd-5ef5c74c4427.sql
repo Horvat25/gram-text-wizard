@@ -1,1 +1,0 @@
-UPDATE posts SET status = 'draft', video_url = NULL, render_attempts = 0, last_render_error = NULL, error_message = NULL WHERE id = '67243083-19e3-4e84-8795-bf45a8e69ae2';
