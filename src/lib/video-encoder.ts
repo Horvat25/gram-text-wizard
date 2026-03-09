@@ -636,16 +636,16 @@ export async function generateVideoFromSegments(options: GenerateVideoOptions): 
       const isTransition = canTransition && secondsToEnd <= TRANSITION_SECONDS;
 
       if (!isTransition) {
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade);
+        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
       } else {
         const mix = clamp(1 - secondsToEnd / TRANSITION_SECONDS, 0, 1);
         const next = timeline[idx + 1];
         const nextImg = imageMap.get(next.segment.imageUrl) ?? null;
 
         ctx.globalAlpha = 1;
-        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade);
+        drawScene(ctx, currentImg, width, height, current.motion, localT, current.segment.text, ctaFade, boundedElapsed);
         ctx.globalAlpha = mix;
-        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade);
+        drawScene(ctx, nextImg, width, height, next.motion, clamp(mix * 0.18, 0, 0.18), next.segment.text, ctaFade, boundedElapsed);
         ctx.globalAlpha = 1;
       }
 
