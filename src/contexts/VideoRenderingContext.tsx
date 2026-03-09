@@ -60,6 +60,49 @@ export function useVideoRendering() {
 const MAX_RENDER_ATTEMPTS = 3;
 const POLL_INTERVAL_MS = 30_000;
 
+interface NormalizedScript {
+  title: string;
+  segments: Array<{ text: string; imagePrompt: string }>;
+}
+
+function normalizeScriptFromMetadata(
+  rawScript: any,
+  fallbackTitle: string,
+  fallbackText: string
+): NormalizedScript | null {
+  if (!rawScript || !Array.isArray(rawScript.segments)) return null;
+
+  const baseText = (fallbackText || fallbackTitle || 'Conteúdo').trim();
+  const normalized = rawScript.segments
+    .map((segment: any, index: number) => {
+      const text = typeof segment?.text === 'string' ? segment.text.trim() : '';
+      const imagePrompt = typeof segment?.imagePrompt === 'string' ? segment.imagePrompt.trim() : '';
+      const safeText = text || `${baseText} (${index + 1})`;
+      return {
+        text: safeText,
+        imagePrompt: imagePrompt || safeText,
+      };
+    })
+    .filter((segment: { imagePrompt: string }) => segment.imagePrompt.length > 0)
+    .slice(0, 4);
+
+  if (normalized.length === 0) return null;
+
+  while (normalized.length < 4) {
+    const last = normalized[normalized.length - 1];
+    normalized.push({
+      text: `${last.text} (continuação)`,
+      imagePrompt: last.imagePrompt,
+    });
+  }
+
+  const title = typeof rawScript.title === 'string' && rawScript.title.trim()
+    ? rawScript.title.trim()
+    : fallbackTitle;
+
+  return { title, segments: normalized };
+}
+
 interface VideoRenderingProviderProps {
   children: ReactNode;
 }
@@ -224,13 +267,19 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     try {
       const currentVideo = renderQueueRef.current.find(v => v.id === videoId);
       const videoTitle = currentVideo?.overlay_metadata?.script?.title || 'Vídeo';
+      const preservedOverlayMetadata = {
+        ...(currentVideo?.overlay_metadata || {}),
+        needs_processing: false,
+        render_status: 'completed',
+        rendered_at: new Date().toISOString(),
+      };
 
-      // Update post: save video, set scheduled, clear processing flag
+      // Update post: save video and preserve script/metadata for captions + auditability
       await supabase
         .from('posts')
         .update({
           video_url: videoUrl,
-          overlay_metadata: null,
+          overlay_metadata: preservedOverlayMetadata,
           status: 'scheduled',
           error_message: null,
           last_render_error: null,
@@ -358,11 +407,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       return;
     }
 
-    // Get script from overlay_metadata or generate one
-    let script = nextVideo.overlay_metadata?.script;
+    const fallbackTopic = nextVideo.overlay_metadata?.topic || nextVideo.caption || 'Reels';
+    let script = normalizeScriptFromMetadata(nextVideo.overlay_metadata?.script, fallbackTopic, fallbackTopic);
 
     if (!script?.segments?.length) {
-      const topic = nextVideo.overlay_metadata?.topic || nextVideo.caption;
+      const topic = fallbackTopic;
 
       if (!topic) {
         console.error('[AutoRender] No script or topic for video:', nextVideo.id);
@@ -387,7 +436,13 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           }
         });
 
-        if (scriptError || !scriptData?.segments?.length) {
+        const normalizedGeneratedScript = normalizeScriptFromMetadata(
+          { title: scriptData?.title || topic, segments: scriptData?.segments || [] },
+          scriptData?.title || topic,
+          topic,
+        );
+
+        if (scriptError || !normalizedGeneratedScript?.segments?.length) {
           const errMsg = scriptError?.message || 'Sem segmentos gerados';
           await handleVideoError(`Erro ao gerar script: ${errMsg}`);
           return;
@@ -399,12 +454,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           .update({
             overlay_metadata: {
               ...(nextVideo.overlay_metadata || {}),
-              script: { title: scriptData.title, segments: scriptData.segments }
+              script: normalizedGeneratedScript
             }
-          })
+          } as any)
           .eq('id', nextVideo.id);
 
-        script = { title: scriptData.title, segments: scriptData.segments };
+        script = normalizedGeneratedScript;
         console.log('[AutoRender] Script generated:', script.title);
       } catch (err: any) {
         await handleVideoError(`Erro ao gerar script: ${err.message}`);
