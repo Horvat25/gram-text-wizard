@@ -192,50 +192,40 @@ function drawCaption(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: nu
   if (!normalized) return;
   const clipped = normalized.length > 160 ? `${normalized.slice(0, 157)}…` : normalized;
 
-  // Large frosted glass panel at bottom area
-  const panelH = Math.round(canvasH * 0.26);
-  const panelY = Math.round(canvasH * 0.60);
+  // Solid dark panel at bottom for maximum readability
+  const panelH = Math.round(canvasH * 0.22);
+  const panelY = Math.round(canvasH * 0.72);
 
-  // Multi-stop gradient for depth
-  const grad = ctx.createLinearGradient(0, panelY, 0, panelY + panelH);
-  grad.addColorStop(0, "rgba(0,0,0,0.0)");
-  grad.addColorStop(0.15, "rgba(0,0,0,0.25)");
-  grad.addColorStop(0.5, "rgba(0,0,0,0.65)");
-  grad.addColorStop(1, "rgba(0,0,0,0.85)");
-  ctx.fillStyle = grad;
+  // Solid dark background - no subtle gradients that can be invisible
+  ctx.fillStyle = "rgba(0,0,0,0.82)";
   ctx.fillRect(0, panelY, canvasW, panelH);
 
-  // Accent line at top of panel
-  ctx.fillStyle = "rgba(139,92,246,0.6)";
-  ctx.fillRect(canvasW * 0.15, panelY + Math.round(panelH * 0.08), canvasW * 0.7, 3);
+  // Top border accent
+  ctx.fillStyle = "rgba(139,92,246,0.8)";
+  ctx.fillRect(0, panelY, canvasW, 4);
 
-  const maxTextW = canvasW - 140;
-  const fontSize = clamp(Math.round(canvasW * 0.052), 38, 62);
-  const lineHeight = Math.round(fontSize * 1.25);
+  const maxTextW = canvasW - 120;
+  const fontSize = clamp(Math.round(canvasW * 0.048), 36, 56);
+  const lineHeight = Math.round(fontSize * 1.3);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `900 ${fontSize}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  ctx.font = `bold ${fontSize}px Arial, Helvetica, sans-serif`;
 
   const lines = wrapLines(ctx, clipped, maxTextW).slice(0, 3);
   const blockH = lines.length * lineHeight;
-  const startY = panelY + panelH * 0.55 - blockH / 2 + lineHeight / 2;
+  const startY = panelY + panelH / 2 - blockH / 2 + lineHeight / 2;
 
-  // Draw each line with heavy outline + white fill + subtle shadow
   for (let i = 0; i < lines.length; i++) {
     const y = startY + i * lineHeight;
 
-    // Shadow pass
-    ctx.lineWidth = Math.max(10, Math.round(fontSize * 0.22));
-    ctx.strokeStyle = "rgba(0,0,0,0.9)";
-    ctx.strokeText(lines[i], canvasW / 2 + 2, y + 2);
-
-    // Outline pass
-    ctx.lineWidth = Math.max(8, Math.round(fontSize * 0.18));
-    ctx.strokeStyle = "rgba(0,0,0,0.95)";
+    // Strong black outline
+    ctx.lineWidth = Math.max(8, Math.round(fontSize * 0.2));
+    ctx.strokeStyle = "#000000";
+    ctx.lineJoin = "round";
     ctx.strokeText(lines[i], canvasW / 2, y);
 
-    // Fill with slight gradient feel
+    // White fill
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(lines[i], canvasW / 2, y);
   }
