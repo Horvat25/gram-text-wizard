@@ -664,10 +664,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log('[renderFromScript] 📰 Article image provided:', articleInfo.articleImageUrl.substring(0, 60));
     }
 
-    // Build segments with timing from existing data
+    // Build segments with fixed scene durations (max 5 scenes)
     let currentTime = 0;
     const safeTitle = (title || "Reels").trim();
-    const segments: StorySegment[] = existingSegments.map((seg, index) => {
+    const limitedSegments = existingSegments.slice(0, 5);
+    const segments: StorySegment[] = limitedSegments.map((seg, index) => {
       const safeText = typeof seg.text === "string" && seg.text.trim()
         ? seg.text.trim()
         : `${safeTitle} — cena ${index + 1}`;
@@ -675,15 +676,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         ? seg.imagePrompt.trim()
         : safeText;
 
+      const dur = SCENE_DURATIONS[index] ?? 4;
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: safeText,
         imagePrompt: safeImagePrompt,
         imageUrl: preExistingImageUrls?.[index] || "",
-        duration: segmentDuration,
+        duration: dur,
         startTime: currentTime,
       };
-      currentTime += segmentDuration;
+      currentTime += dur;
       return segment;
     });
 
