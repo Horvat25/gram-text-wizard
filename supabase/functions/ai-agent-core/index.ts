@@ -515,7 +515,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   
   // Check if weekly goals are met
   const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                     state.weeklyGoals.news + state.weeklyGoals.images;
+                     state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
                         state.weeklyProgress.news + state.weeklyProgress.images;
   
