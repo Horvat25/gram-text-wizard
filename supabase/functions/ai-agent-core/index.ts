@@ -13,6 +13,7 @@ interface ContentDistribution {
   carousels: number;
   news: number;
   images: number;
+  marketing: number;
 }
 
 interface ContentPlan {
