@@ -87,7 +87,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     carousels: context?.content_distribution_carousels || 3,
     news: context?.content_distribution_news || 12,
     images: context?.content_distribution_images || 7,
-    marketing: 2,
+    marketing: (context as any)?.content_distribution_marketing || 2,
   });
 
   // Sync local dist when context changes
@@ -98,10 +98,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         carousels: context.content_distribution_carousels || 3,
         news: context.content_distribution_news || 12,
         images: context.content_distribution_images || 7,
-        marketing: 2,
+        marketing: (context as any)?.content_distribution_marketing || 2,
       });
     }
-  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images]);
+  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images, (context as any)?.content_distribution_marketing]);
 
   const handleDistChange = async (type: keyof typeof localDist, delta: number) => {
     const newVal = Math.max(0, localDist[type] + delta);
