@@ -408,10 +408,11 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => setRenderingPost(post)}
+              disabled={isRendering}
+              onClick={() => renderVideo(post.id)}
             >
               <Film className="h-3 w-3 mr-1" />
-              Gerar Vídeo
+              {isRendering && currentVideoId === post.id ? 'Renderizando...' : 'Gerar Vídeo'}
             </Button>
           )}
           
