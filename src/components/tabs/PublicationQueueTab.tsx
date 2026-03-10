@@ -199,7 +199,7 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
-  const { renderQueue, isRendering, isPaused, currentStep, progress, completedCount, startRendering, pauseRendering, resumeRendering, stopRendering } = useVideoRendering();
+  const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false;
 
