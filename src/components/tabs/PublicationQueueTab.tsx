@@ -187,7 +187,7 @@ const PublicationQueueTab = ({
   const viewDialogRef = useRef<HTMLDivElement | null>(null);
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
-  const [renderingPost, setRenderingPost] = useState<Post | null>(null);
+  
 
   // When opening the preview, always start at the top so the close (X) is reachable on mobile.
   useEffect(() => {
@@ -199,7 +199,7 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
-  const { renderQueue, isRendering, isPaused, currentStep, progress, completedCount, startRendering, pauseRendering, resumeRendering, stopRendering } = useVideoRendering();
+  const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false;
 
@@ -270,8 +270,7 @@ const PublicationQueueTab = ({
     });
   }, [scheduledPosts]);
 
-  const queueCount = renderQueue.length;
-  const totalInBatch = completedCount + queueCount;
+  const pendingReelsCount = queuedPosts.filter(p => needsVideoRendering(p)).length;
 
   const handleReschedule = async () => {
     if (!reschedulePost || !newScheduleDate) return;
@@ -409,10 +408,11 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => setRenderingPost(post)}
+              disabled={isRendering}
+              onClick={() => renderVideo(post.id)}
             >
               <Film className="h-3 w-3 mr-1" />
-              Gerar Vídeo
+              {isRendering && currentVideoId === post.id ? 'Renderizando...' : 'Gerar Vídeo'}
             </Button>
           )}
           
@@ -482,57 +482,36 @@ const PublicationQueueTab = ({
         </Button>
       </div>
 
-      {/* Auto-Render Status Panel */}
-      <Card>
-        <CardContent className="pt-4 pb-4 space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Film className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium">Auto-renderização</p>
-                <p className="text-xs text-muted-foreground">
-                  {isRendering
-                    ? 'Renderização em andamento'
-                    : queueCount > 0
-                      ? `${queueCount} vídeo(s) aguardando`
-                      : 'Sem vídeos pendentes no momento'}
-                </p>
+      {/* Render Status (shown only when rendering) */}
+      {isRendering && (
+        <Card>
+          <CardContent className="pt-4 pb-4 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Film className="h-5 w-5 text-primary animate-pulse" />
+                <div>
+                  <p className="text-sm font-medium">Renderizando vídeo...</p>
+                  <p className="text-xs text-muted-foreground">{currentStep || 'Preparando...'}</p>
+                </div>
               </div>
+              <Button size="sm" variant="outline" onClick={cancelRendering} className="h-7 text-xs">
+                Cancelar
+              </Button>
             </div>
+            <Progress value={progress} className="h-2" />
+          </CardContent>
+        </Card>
+      )}
 
-            <div className="flex items-center gap-2">
-              {isRendering && (
-                <Button size="sm" variant="outline" onClick={stopRendering} className="h-7 text-xs">
-                  Parar
-                </Button>
-              )}
-              {isRendering && !isPaused && (
-                <Button size="sm" variant="outline" onClick={pauseRendering} className="h-7 text-xs">
-                  Pausar
-                </Button>
-              )}
-              {isPaused && queueCount > 0 && (
-                <Button size="sm" variant="outline" onClick={resumeRendering} className="h-7 text-xs">
-                  Retomar
-                </Button>
-              )}
-              {!isRendering && queueCount > 0 && !isPaused && (
-                <Button size="sm" onClick={startRendering} className="h-7 text-xs">
-                  <Film className="h-3 w-3 mr-1" />
-                  Iniciar
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <Progress value={isRendering ? progress : queueCount > 0 ? 5 : 0} className="h-2" />
-
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{isRendering ? `${currentStep || 'Preparando...'}${isPaused ? ' (pausado)' : ''}` : 'Aguardando novos vídeos'}</span>
-            <span>{totalInBatch > 0 ? `${completedCount}/${totalInBatch} concluídos` : '0/0 concluídos'}</span>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Pending reels info */}
+      {!isRendering && pendingReelsCount > 0 && (
+        <Alert>
+          <Film className="h-4 w-4" />
+          <AlertDescription>
+            <strong>{pendingReelsCount} reels</strong> aguardando renderização manual. Clique em "Gerar Vídeo" em cada post.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Overdue Posts Alert */}
       {overduePosts.length > 0 && (
