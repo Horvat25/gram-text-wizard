@@ -272,13 +272,14 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // ===== CONTENT DISTRIBUTION TRACKING =====
   // Weekly goals from context settings
-  // 💰 METAS REDUZIDAS: de 46 para 11 posts/semana (corte de 76% nos custos)
+  // 📈 META: ~28 posts/semana (4 posts/dia)
+  // Distribuição: 4 reels + 3 carrosséis + 12 notícias + 7 imagens + 2 marketing = 28
   const weeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 2,
-    carousels: context.content_distribution_carousels || 1,
-    news: context.content_distribution_news || 4,
-    images: context.content_distribution_images || 2,
-    marketing: 1, // 1 post de marketing por semana (intercalado a cada ~4 posts regulares)
+    videos: context.content_distribution_videos || 4,
+    carousels: context.content_distribution_carousels || 3,
+    news: context.content_distribution_news || 12,
+    images: context.content_distribution_images || 7,
+    marketing: 2, // 2 posts marketing por semana (intercalado a cada ~4 posts regulares)
   };
   
   // Count progress this week by media type
