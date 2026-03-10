@@ -578,7 +578,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     console.log('[AGENT] Meta semanal completa (modo fixo)!');
     return {
       decision: 'NO_POST',
-      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}`
+      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}, Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}`
     };
   }
   
