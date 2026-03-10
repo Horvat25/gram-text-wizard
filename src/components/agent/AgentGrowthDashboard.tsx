@@ -82,11 +82,11 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   // Local editable distribution state
   const [localDist, setLocalDist] = useState({
-    videos: context?.content_distribution_videos || 3,
-    carousels: context?.content_distribution_carousels || 2,
-    news: context?.content_distribution_news || 6,
-    images: context?.content_distribution_images || 3,
-    marketing: 1,
+    videos: context?.content_distribution_videos || 4,
+    carousels: context?.content_distribution_carousels || 3,
+    news: context?.content_distribution_news || 12,
+    images: context?.content_distribution_images || 7,
+    marketing: 2,
   });
 
   // Sync local dist when context changes
