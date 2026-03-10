@@ -2602,6 +2602,104 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
   }
 }
 
+// Create marketing video - automatically fetches affiliate link and creates narrated video
+async function executeCreateMarketingVideo(supabase: any, userId: string, workspaceId: string, args: any) {
+  try {
+    const { product_name, style, publish_now, platforms } = args;
+    
+    // 1. Fetch affiliate links
+    let query = supabase
+      .from('affiliate_links')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .eq('is_active', true)
+      .order('posts_count', { ascending: true });
+    
+    if (product_name) {
+      query = query.ilike('product_name', `%${product_name}%`);
+    }
+    
+    const { data: affiliateLinks, error: affErr } = await query.limit(5);
+    
+    if (affErr || !affiliateLinks || affiliateLinks.length === 0) {
+      return { 
+        success: false, 
+        message: '❌ Nenhum link de afiliado encontrado. Adicione produtos na aba Marketing primeiro!' 
+      };
+    }
+    
+    const selectedAffiliate = affiliateLinks[0];
+    console.log(`[MARKETING VIDEO] Afiliado selecionado: ${selectedAffiliate.product_name}`);
+    
+    // 2. Research product via Firecrawl
+    let productInfo = selectedAffiliate.description || selectedAffiliate.product_name;
+    try {
+      const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
+      if (firecrawlKey) {
+        const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `${selectedAffiliate.product_name} review benefícios vale a pena 2026`,
+            limit: 3
+          })
+        });
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          if (searchData.data && searchData.data.length > 0) {
+            productInfo = searchData.data.map((r: any) => r.markdown || r.description || '').join('\n').substring(0, 1500);
+            console.log('[MARKETING VIDEO] Pesquisa Firecrawl OK');
+          }
+        }
+      }
+    } catch (e) {
+      console.log('[MARKETING VIDEO] Firecrawl não disponível, usando descrição cadastrada');
+    }
+    
+    // 3. Create narrated video with affiliate context
+    const topic = `Review e apresentação do ${selectedAffiliate.product_name}: ${productInfo.substring(0, 300)}`;
+    const caption = `🔥 Você precisa conhecer o ${selectedAffiliate.product_name}!\n\n${selectedAffiliate.description || 'Uma ferramenta incrível que vai transformar sua produtividade.'}\n\n👇 Confira o link:\n🔗 ${selectedAffiliate.affiliate_url}\n\n#marketing #tecnologia #review #dicatech`;
+    
+    const videoResult = await executeCreateNarratedVideo(supabase, userId, workspaceId, {
+      topic,
+      caption,
+      hashtags: ['#marketing', '#tecnologia', '#review', '#dicatech', '#afiliado'],
+      publish_now: publish_now || false,
+      platforms: platforms || ['instagram'],
+      style: style || 'provocativo e persuasivo'
+    });
+    
+    // 4. Update affiliate stats
+    if (videoResult?.success) {
+      await supabase
+        .from('affiliate_links')
+        .update({ 
+          posts_count: (selectedAffiliate.posts_count || 0) + 1,
+          last_posted_at: new Date().toISOString()
+        })
+        .eq('id', selectedAffiliate.id);
+      
+      // Update post type to 'afiliado'
+      if (videoResult.postId) {
+        await supabase
+          .from('posts')
+          .update({ post_type: 'afiliado' })
+          .eq('id', videoResult.postId);
+      }
+    }
+    
+    return {
+      success: true,
+      message: `🎬💰 Vídeo de marketing criado para **${selectedAffiliate.product_name}**!\n\n📎 Link de afiliado incluído na legenda\n🔗 ${selectedAffiliate.affiliate_url}\n\n${videoResult?.message || 'Vídeo em processamento...'}`,
+      postId: videoResult?.postId,
+      affiliateProduct: selectedAffiliate.product_name
+    };
+  } catch (error: any) {
+    console.error('Error in executeCreateMarketingVideo:', error);
+    return { success: false, message: `❌ Erro ao criar vídeo de marketing: ${error.message}` };
+  }
+}
+
 // List affiliate links for the agent
 async function executeListAffiliateLinks(supabase: any, workspaceId: string) {
   try {
