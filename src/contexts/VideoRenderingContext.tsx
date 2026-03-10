@@ -55,7 +55,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   } = useNarrativeStory({
     brandName: brandSettings.brandName || 'NeuralUpdate',
     segmentCount: 4,
-    segmentDuration: 5,
+    segmentDuration: 4,       // Ritmo mais rápido (era 5s)
     preferredVoice: 'camila'
   });
 

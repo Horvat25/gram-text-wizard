@@ -2143,15 +2143,25 @@ async function processWorkspace(
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
       
-      // Send completion message - use ACTUAL post caption, not planned theme
+      // Send completion message with VIDEO-SPECIFIC notification
       const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
       const actualTheme = post?.caption?.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || decision.contentPlan.theme;
-      await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'created', {
-        type: mediaTypeName,
-        theme: actualTheme,
-        status: post?.status,
-        needsRender: isReels && !post?.video_url
-      }));
+      
+      if (isReels && !post?.video_url) {
+        // Send special video notification so user knows they need to render
+        await sendChatMessage(supabase, userId, 
+          `🎬 **Novo Reels criado!** "${actualTheme}"\n\n` +
+          `📌 Abra a aba **Fila** e clique em **"Gerar Vídeo"** para renderizar.\n` +
+          `O vídeo já tem ${post?.carousel_images?.length || 4} imagens IA e roteiro pronto!`
+        );
+      } else {
+        await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'created', {
+          type: mediaTypeName,
+          theme: actualTheme,
+          status: post?.status,
+          needsRender: false
+        }));
+      }
       
     } else if (decision.decision === 'NO_POST' || decision.decision === 'WAIT') {
       // Send waiting message
