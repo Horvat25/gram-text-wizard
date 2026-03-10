@@ -351,6 +351,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
+    7: { views: 2500, likes: 120, saves: 50, comments: 25 },
     30: { views: 10000, likes: 500, saves: 200, comments: 100 },
     60: { views: 25000, likes: 1200, saves: 500, comments: 250 },
     90: { views: 50000, likes: 2500, saves: 1000, comments: 500 },
