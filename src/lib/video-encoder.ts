@@ -367,6 +367,24 @@ function renderFrame(
   }
 }
 
+// ─── Safety constants ────────────────────────────────────────
+const MAX_TOTAL_DURATION = 90;    // Hard cap: 90 seconds max
+const MAX_SEGMENT_DURATION = 20;  // No single segment > 20s
+const MIN_SEGMENT_DURATION = 3;   // No segment < 3s
+const MAX_SEGMENTS = 10;          // Max 10 segments
+const RENDER_TIMEOUT_BUFFER = 10; // Extra seconds before force-stop
+
+function validateAndClampSegments(segments: VideoSegment[]): VideoSegment[] {
+  // Limit number of segments
+  const clamped = segments.slice(0, MAX_SEGMENTS);
+  
+  // Clamp each segment's duration
+  return clamped.map(seg => ({
+    ...seg,
+    duration: Math.max(MIN_SEGMENT_DURATION, Math.min(seg.duration, MAX_SEGMENT_DURATION)),
+  }));
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN: Generate video — robust requestAnimationFrame approach
 // ═══════════════════════════════════════════════════════════════
@@ -374,7 +392,7 @@ export async function generateVideoFromSegments(
   options: GenerateVideoOptions
 ): Promise<Blob> {
   const {
-    segments,
+    segments: rawSegments,
     width = 720,
     height = 1280,
     fps = 24,
@@ -383,6 +401,13 @@ export async function generateVideoFromSegments(
     backgroundMusicUrl,
     onProgress,
   } = options;
+
+  // ─── SAFETY: Validate & clamp segments ───────────────────
+  const segments = validateAndClampSegments(rawSegments);
+  
+  if (segments.length === 0) {
+    throw new Error('Nenhum segmento válido para renderizar');
+  }
 
   const BRAND = 'Neural Update';
   const CTA_MIN_DURATION = 4;
@@ -395,7 +420,6 @@ export async function generateVideoFromSegments(
 
   // ─── Audio setup ─────────────────────────────────────────
   const audioCtx = new AudioContext();
-  // CRITICAL: Resume AudioContext (browsers suspend it without user gesture)
   if (audioCtx.state === 'suspended') {
     await audioCtx.resume();
   }
@@ -415,11 +439,18 @@ export async function generateVideoFromSegments(
     music: musicBuf ? `${musicBuf.duration.toFixed(1)}s` : 'none',
   });
 
-  const CTA_DURATION = ctaBuf ? Math.max(CTA_MIN_DURATION, ctaBuf.duration + 1.5) : CTA_MIN_DURATION;
+  const CTA_DURATION = Math.min(ctaBuf ? Math.max(CTA_MIN_DURATION, ctaBuf.duration + 1.5) : CTA_MIN_DURATION, 8);
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
-  const totalDuration = contentDuration + CTA_DURATION;
+  
+  // ─── SAFETY: Hard cap total duration ─────────────────────
+  const rawTotal = contentDuration + CTA_DURATION;
+  const totalDuration = Math.min(rawTotal, MAX_TOTAL_DURATION);
+  
+  if (rawTotal > MAX_TOTAL_DURATION) {
+    console.warn(`[video-encoder] ⚠️ Duration clamped from ${rawTotal.toFixed(1)}s to ${MAX_TOTAL_DURATION}s`);
+  }
 
-  console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (content: ${contentDuration.toFixed(1)}s + CTA: ${CTA_DURATION.toFixed(1)}s)`);
+  console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (content: ${contentDuration.toFixed(1)}s + CTA: ${CTA_DURATION.toFixed(1)}s) | ${segments.length} segments`);
 
   // ─── Preload all images ──────────────────────────────────
   const images: HTMLImageElement[] = await Promise.all(
@@ -550,24 +581,38 @@ export async function generateVideoFromSegments(
     }
 
     // ─── Render loop using requestAnimationFrame ────────────
-    // This is the most reliable approach: the browser calls us when it's
-    // ready to paint, and captureStream(fps) auto-captures the canvas.
     const renderStartTime = performance.now();
     let lastProgressUpdate = 0;
     let stopped = false;
+
+    // ─── SAFETY: Hard timeout to prevent runaway renders ────
+    const hardTimeoutMs = (totalDuration + RENDER_TIMEOUT_BUFFER) * 1000;
+    const hardTimeout = setTimeout(() => {
+      if (!stopped) {
+        console.error(`[video-encoder] ⛔ HARD TIMEOUT after ${(totalDuration + RENDER_TIMEOUT_BUFFER).toFixed(0)}s — forcing stop`);
+        stopped = true;
+        try {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        } catch (e) {
+          console.error('[video-encoder] Error stopping after timeout:', e);
+        }
+      }
+    }, hardTimeoutMs);
 
     const tick = () => {
       if (stopped) return;
 
       const elapsed = (performance.now() - renderStartTime) / 1000;
 
+      // ─── SAFETY: Double-check elapsed doesn't exceed total ──
       if (elapsed >= totalDuration) {
-        // Final frame
         renderFrame(ctx, totalDuration - 0.001, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
         onProgress?.(100);
 
-        // Give MediaRecorder time to flush last data
         stopped = true;
+        clearTimeout(hardTimeout);
         setTimeout(() => {
           if (mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
@@ -576,13 +621,14 @@ export async function generateVideoFromSegments(
         return;
       }
 
-      // Render current frame
-      renderFrame(ctx, elapsed, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+      // Clamp elapsed to totalDuration for safety
+      const safeElapsed = Math.min(elapsed, totalDuration);
+      renderFrame(ctx, safeElapsed, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
 
       // Progress callback (throttled to ~4 updates/sec)
       const now = performance.now();
       if (now - lastProgressUpdate > 250) {
-        onProgress?.(Math.round((elapsed / totalDuration) * 100));
+        onProgress?.(Math.round((safeElapsed / totalDuration) * 100));
         lastProgressUpdate = now;
       }
 
