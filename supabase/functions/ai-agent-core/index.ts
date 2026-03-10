@@ -628,6 +628,7 @@ ${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
 - Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
+- Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}
 
 🎯 OBJETIVOS MACRO:
 - Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%)
