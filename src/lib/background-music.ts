@@ -57,10 +57,10 @@ export async function preloadTrack(track: MusicTrack): Promise<string> {
       // Slow detune for width
       osc.detune.setValueAtTime(Math.random() * 10 - 5, 0);
       
-      // Gentle volume envelope
-      const baseVol = 0.08 / config.freqs.length;
+      // Gentle volume envelope — louder base for more presence
+      const baseVol = 0.14 / config.freqs.length;
       gain.gain.setValueAtTime(0, 0);
-      gain.gain.linearRampToValueAtTime(baseVol, 3);
+      gain.gain.linearRampToValueAtTime(baseVol, 2);
       
       // Slow breathing effect
       for (let t = 3; t < duration - 2; t += 4 + Math.random() * 4) {
