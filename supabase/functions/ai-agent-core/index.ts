@@ -1872,10 +1872,10 @@ async function autoEvolveStrategy(
     console.log(`[AGENT] Distribution cap applied: max ${MAX_SLOTS}/${currentTotal} per type. Result:`, newDist);
     
     // Only update if distribution actually changed
-    const changed = newDist.videos !== (state.context?.content_distribution_videos || 3) ||
-      newDist.carousels !== (state.context?.content_distribution_carousels || 2) ||
-      newDist.news !== (state.context?.content_distribution_news || 4) ||
-      newDist.images !== (state.context?.content_distribution_images || 5);
+    const changed = newDist.videos !== (state.context?.content_distribution_videos || 2) ||
+      newDist.carousels !== (state.context?.content_distribution_carousels || 1) ||
+      newDist.news !== (state.context?.content_distribution_news || 5) ||
+      newDist.images !== (state.context?.content_distribution_images || 3);
     
     if (changed) {
       const { error } = await supabase
