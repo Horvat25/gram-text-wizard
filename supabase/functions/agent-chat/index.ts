@@ -258,6 +258,23 @@ const AGENT_TOOLS = [
         properties: {}
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_marketing_video",
+      description: "🎬💰 Cria um VÍDEO DE MARKETING promovendo um produto de afiliado cadastrado. Use SEMPRE que o usuário pedir: 'vídeo de marketing', 'reels de marketing', 'vídeo de afiliado', 'cria um vídeo de marketing'. Busca automaticamente o link de afiliado e cria o vídeo com o link na legenda.",
+      parameters: {
+        type: "object",
+        properties: {
+          product_name: { type: "string", description: "Nome do produto (opcional - se vazio, pega o menos promovido automaticamente)" },
+          style: { type: "string", description: "Estilo: impactante, educativo, provocativo, inspirador" },
+          publish_now: { type: "boolean", description: "Se true, publicar assim que o vídeo estiver pronto." },
+          platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
+        },
+        required: []
+      }
+    }
   }
 ];
 
