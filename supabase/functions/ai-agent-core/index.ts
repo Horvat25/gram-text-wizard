@@ -2360,7 +2360,8 @@ async function processWorkspace(
     // ETAPA 3 & 4: Execução (se decisão for POST)
     if (decision.decision === 'POST' && decision.contentPlan) {
       // Send creating message
-      const mediaTypeName = decision.contentPlan.mediaType === 'reels' ? 'Reels' : 
+      const mediaTypeName = decision.contentPlan.contentType === 'marketing' ? 'Marketing' :
+                            decision.contentPlan.mediaType === 'reels' ? 'Reels' : 
                             decision.contentPlan.mediaType === 'carousel' ? 'Carrossel' :
                             decision.contentPlan.mediaType === 'video' ? 'Vídeo' : 'Post';
       
