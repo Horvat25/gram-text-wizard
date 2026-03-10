@@ -274,18 +274,20 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Weekly goals from context settings
   // 💰 METAS REDUZIDAS: de 46 para 11 posts/semana (corte de 76% nos custos)
   const weeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 2,    // era 3→9, agora 2
-    carousels: context.content_distribution_carousels || 1, // era 2→6, agora 1
-    news: context.content_distribution_news || 5,        // era 4→17, agora 5
-    images: context.content_distribution_images || 3     // era 5→14, agora 3
+    videos: context.content_distribution_videos || 2,
+    carousels: context.content_distribution_carousels || 1,
+    news: context.content_distribution_news || 4,
+    images: context.content_distribution_images || 2,
+    marketing: 1, // 1 post de marketing por semana (intercalado a cada ~4 posts regulares)
   };
   
   // Count progress this week by media type
   const weeklyProgress: ContentDistribution = {
     videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
     carousels: postsThisWeek.filter((p: any) => p.media_type === 'carousel').length,
-    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia').length,
-    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia').length
+    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
+    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
+    marketing: postsThisWeek.filter((p: any) => p.post_type === 'afiliado').length,
   };
   
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
