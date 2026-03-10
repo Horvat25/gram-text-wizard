@@ -86,9 +86,9 @@ export async function preloadTrack(track: MusicTrack): Promise<string> {
     const subOsc = offline.createOscillator();
     const subGain = offline.createGain();
     subOsc.type = 'sine';
-    subOsc.frequency.value = config.freqs[0] / 2; // One octave below
+    subOsc.frequency.value = config.freqs[0] / 2;
     subGain.gain.setValueAtTime(0, 0);
-    subGain.gain.linearRampToValueAtTime(0.06, 2);
+    subGain.gain.linearRampToValueAtTime(0.10, 1.5);
     
     // Rhythmic pulse
     const pulseInterval = 60 / (config.tempo * 60); // BPM to seconds
