@@ -1812,24 +1812,64 @@ async function autoEvolveStrategy(
       return;
     }
     
-    // Each type gets at least 1 slot (minimum floor)
+    // BALANCED DISTRIBUTION: min 1 slot, max 50% of total per type
+    // This prevents any single type from dominating (e.g., 90% Reels)
     const MIN_SLOTS = 1;
-    const distributableSlots = currentTotal - (4 * MIN_SLOTS); // 4 types * min
+    const MAX_PERCENT = 0.50; // No type can exceed 50% of total
+    const MAX_SLOTS = Math.max(MIN_SLOTS + 1, Math.floor(currentTotal * MAX_PERCENT));
     
-    const newDist = {
+    const distributableSlots = currentTotal - (4 * MIN_SLOTS);
+    
+    const rawDist = {
       videos: MIN_SLOTS + Math.round((avgScores.video / totalScore) * distributableSlots),
       carousels: MIN_SLOTS + Math.round((avgScores.carousel / totalScore) * distributableSlots),
       news: MIN_SLOTS + Math.round((avgScores.news / totalScore) * distributableSlots),
       images: MIN_SLOTS + Math.round((avgScores.image / totalScore) * distributableSlots),
     };
     
+    // Apply cap: no type above MAX_SLOTS
+    const newDist = { ...rawDist };
+    let excess = 0;
+    const types = ['videos', 'carousels', 'news', 'images'] as const;
+    for (const t of types) {
+      if (newDist[t] > MAX_SLOTS) {
+        excess += newDist[t] - MAX_SLOTS;
+        newDist[t] = MAX_SLOTS;
+      }
+    }
+    
+    // Redistribute excess to types below cap, proportionally
+    if (excess > 0) {
+      const belowCap = types.filter(t => newDist[t] < MAX_SLOTS);
+      while (excess > 0 && belowCap.length > 0) {
+        for (const t of belowCap) {
+          if (excess <= 0) break;
+          if (newDist[t] < MAX_SLOTS) {
+            newDist[t]++;
+            excess--;
+          }
+        }
+        // Safety: avoid infinite loop if all at cap
+        if (belowCap.every(t => newDist[t] >= MAX_SLOTS)) break;
+      }
+    }
+    
     // Ensure total matches
     const newTotal = newDist.videos + newDist.carousels + newDist.news + newDist.images;
     if (newTotal !== currentTotal) {
-      // Adjust the highest type
-      const maxType = Object.entries(newDist).sort(([,a], [,b]) => b - a)[0][0] as keyof typeof newDist;
-      newDist[maxType] += currentTotal - newTotal;
+      // Adjust the highest type (but respect cap)
+      const sorted = [...types].sort((a, b) => newDist[b] - newDist[a]);
+      const diff = currentTotal - newTotal;
+      for (const t of diff > 0 ? sorted.reverse() : sorted) {
+        const canAdjust = diff > 0 ? (newDist[t] < MAX_SLOTS) : (newDist[t] > MIN_SLOTS);
+        if (canAdjust) {
+          newDist[t] += diff > 0 ? 1 : -1;
+          break;
+        }
+      }
     }
+    
+    console.log(`[AGENT] Distribution cap applied: max ${MAX_SLOTS}/${currentTotal} per type. Result:`, newDist);
     
     // Only update if distribution actually changed
     const changed = newDist.videos !== (state.context?.content_distribution_videos || 3) ||
