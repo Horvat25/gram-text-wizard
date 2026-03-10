@@ -1777,141 +1777,21 @@ Use emojis com moderação. ${plan.cta || ''}`
     hashtags,
     post_type: 'engajamento', // NOT 'noticia' — this is original content
     media_type: 'image',
-      platforms: plan.platforms || ['instagram'],
-      status: 'failed',
-      error_message: 'Sem notícias na biblioteca RSS. Adicione mais fontes RSS.',
-      ai_model_used: 'none'
-    }).select().single();
-    if (error) throw error;
-    return post;
-  }
-  
-  const rssItem = bestItem.item;
-  const selectedImage = rssItem.image_url;
-  const sourceUrl = rssItem.link;
-  const sourceDomain = rssItem.source_name || 'fonte';
-  
-  // Mark as used
-  await supabase.from('rss_items').update({ is_used: true }).eq('id', rssItem.id);
-  
-  console.log(`[AGENT] Usando notícia da biblioteca (score: ${bestItem.score}): ${rssItem.title}`);
-  
-  // Apply text overlay with fallback
-  let imageUrl = null;
-  if (selectedImage && rssItem.title) {
-    // Try overlay first
-    try {
-      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          imageUrl: selectedImage,
-          title: rssItem.title,
-          watermarkText: 'Neural Update',
-          generateHeadline: true
-        })
-      });
-      
-      if (overlayResponse.ok) {
-        const overlayResult = await overlayResponse.json();
-        imageUrl = overlayResult.publicUrl;
-      }
-    } catch (e) {
-      console.log('[AGENT] Overlay falhou para imagem:', e);
-    }
-    
-    // Fallback 1: watermark programático
-    if (!imageUrl) {
-      try {
-        const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            imageUrl: selectedImage,
-            watermarkText: 'Neural Update'
-          })
-        });
-        if (wmResponse.ok) {
-          const wmResult = await wmResponse.json();
-          imageUrl = wmResult.publicUrl;
-          console.log('[AGENT] Watermark programático aplicado ✅');
-        }
-      } catch (e) {
-        console.log('[AGENT] Watermark falhou:', e);
-      }
-    }
-    
-    // Fallback 2: upload original
-    if (!imageUrl) {
-      try {
-        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ imageUrl: selectedImage })
-        });
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          imageUrl = uploadResult.publicUrl;
-        }
-      } catch (e) {
-        console.log('[AGENT] Upload fallback falhou:', e);
-      }
-    }
-  }
-  
-  // Generate caption
-  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      topic: `${rssItem.title}. ${rssItem.description || ''}`,
-      postType: plan.format,
-      sourceUrl,
-      sourceName: sourceDomain,
-      customInstructions: `Tom: ${plan.tone}. CTA: ${plan.cta}. OBRIGATÓRIO ao final: 📰 Fonte: ${sourceDomain}`
-    })
-  });
-  
-  let caption = `📰 ${rssItem.title}`;
-  let hashtags: string[] = ['#tecnologia', '#ia', '#futuro', '#inovacao'];
-  
-  if (captionResponse.ok) {
-    const captionData = await captionResponse.json();
-    caption = captionData.caption || caption;
-    hashtags = captionData.hashtags || hashtags;
-  }
-  
-  // Ensure source attribution
-  if (!caption.includes('Fonte:') && sourceUrl) {
-    caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
-  }
-  
-  const canPublish = autoPublish && imageUrl;
-  const { data: post, error } = await supabase.from('posts').insert({
-    user_id: userId,
-    workspace_id: workspaceId,
-    caption,
-    hashtags,
-    post_type: 'noticia',
-    media_type: 'image',
     platforms: plan.platforms || ['instagram'],
     status: imageUrl ? (canPublish ? 'scheduled' : 'draft') : 'draft',
     scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: imageUrl,
     overlay_metadata: {
-      type: 'library_post',
-      source_url: sourceUrl,
-      source_domain: sourceDomain,
-      original_title: rssItem.title,
-      ranking_score: bestItem.score,
-      used_real_image: true,
-      text_applied_by_code: true
+      type: 'original_image',
+      inspiration_topic: inspirationTopic,
+      ai_generated_image: true,
+      created_by_agent: true
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Post de imagem (biblioteca) criado:', post.id);
+  console.log('[AGENT] Post de imagem ORIGINAL (IA) criado:', post.id);
   return post;
 }
 
