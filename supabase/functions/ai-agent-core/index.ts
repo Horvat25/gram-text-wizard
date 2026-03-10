@@ -678,11 +678,12 @@ Priorize temas que funcionaram bem no histórico. Responda em JSON: { "theme": "
   }
 
   // Return decision with content plan (no need for another AI call - we already decided based on distribution)
-  const remainingForType = {
+  const remainingForType: Record<ContentType, number> = {
     'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
     'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
     'news': state.weeklyGoals.news - state.weeklyProgress.news,
-    'image': state.weeklyGoals.images - state.weeklyProgress.images
+    'image': state.weeklyGoals.images - state.weeklyProgress.images,
+    'marketing': state.weeklyGoals.marketing - state.weeklyProgress.marketing,
   };
   
   return {
