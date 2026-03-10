@@ -1675,7 +1675,8 @@ OBRIGATÓRIO ao final:
   return post;
 }
 
-// Create IMAGE content - NOW USES LIBRARY (RSS) instead of AI generation
+// Create IMAGE content - USES AI-GENERATED IMAGE for original visual content
+// DIFERENTE de news: image posts são conteúdo ORIGINAL de reflexão/opinião com imagem IA
 async function createImageContent(
   supabase: any,
   plan: ContentPlan,
@@ -1685,20 +1686,97 @@ async function createImageContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando post de imagem (da biblioteca RSS):', plan.theme);
+  console.log('[AGENT] Criando post de IMAGEM ORIGINAL (IA):', plan.theme);
   
-  // Use RSS library to get content
+  // STEP 1: Get trending topic from RSS for inspiration (but NOT for image)
   const bestItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
   
-  if (!bestItem) {
-    console.log('[AGENT] ⚠️ Sem notícias na biblioteca para post de imagem!');
-    const { data: post, error } = await supabase.from('posts').insert({
-      user_id: userId,
-      workspace_id: workspaceId,
-      caption: '⚠️ Nenhuma notícia disponível na biblioteca',
-      hashtags: ['#tecnologia'],
-      post_type: plan.format,
-      media_type: 'image',
+  const inspirationTopic = bestItem ? bestItem.item.title : plan.theme;
+  const inspirationDesc = bestItem ? bestItem.item.description : '';
+  
+  // Mark RSS as used if we used it for inspiration
+  if (bestItem) {
+    await supabase.from('rss_items').update({ is_used: true }).eq('id', bestItem.item.id);
+  }
+  
+  // STEP 2: Generate AI image based on topic
+  let imageUrl = null;
+  try {
+    console.log('[AGENT] 🎨 Gerando imagem IA para post de reflexão...');
+    const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        prompt: `Imagem futurista e impactante sobre: ${inspirationTopic}. Estilo editorial tech, cores vibrantes, composição cinematográfica, sem texto na imagem`,
+        width: 1080,
+        height: 1080,
+      })
+    });
+    
+    if (imageResponse.ok) {
+      const imageResult = await imageResponse.json();
+      imageUrl = imageResult.publicUrl || imageResult.url || imageResult.image_url;
+      console.log('[AGENT] ✅ Imagem IA gerada:', imageUrl ? 'sim' : 'não');
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro ao gerar imagem IA:', e);
+  }
+  
+  // Fallback: use RSS image if AI generation failed
+  if (!imageUrl && bestItem?.item?.image_url) {
+    console.log('[AGENT] Fallback: usando imagem RSS');
+    try {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ imageUrl: bestItem.item.image_url })
+      });
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.publicUrl;
+      }
+    } catch (e) {
+      console.log('[AGENT] Upload fallback falhou:', e);
+    }
+  }
+  
+  // STEP 3: Generate OPINION/REFLECTION caption (NOT news format)
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: `${inspirationTopic}. ${inspirationDesc}`,
+      postType: 'engajamento',
+      customInstructions: `Este é um post de REFLEXÃO/OPINIÃO sobre tecnologia, NÃO uma notícia.
+      
+Estrutura:
+1. PROVOCAÇÃO - Uma afirmação forte ou pergunta provocativa sobre o tema
+2. CONTEXTO PESSOAL - Sua análise/opinião como especialista em tech
+3. CTA DE ENGAJAMENTO - Pergunta aberta para gerar discussão nos comentários
+
+Tom: ${plan.tone || 'provocativo e visionário'}
+NÃO inclua "Fonte:" ou links de artigos. Este é conteúdo ORIGINAL, não curadoria.
+Use emojis com moderação. ${plan.cta || ''}`
+    })
+  });
+  
+  let caption = `💡 ${inspirationTopic}`;
+  let hashtags: string[] = ['#tecnologia', '#reflexao', '#futuro', '#ia', '#inovacao'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
+  }
+  
+  const canPublish = autoPublish && imageUrl;
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    workspace_id: workspaceId,
+    caption,
+    hashtags,
+    post_type: 'engajamento', // NOT 'noticia' — this is original content
+    media_type: 'image',
       platforms: plan.platforms || ['instagram'],
       status: 'failed',
       error_message: 'Sem notícias na biblioteca RSS. Adicione mais fontes RSS.',
