@@ -293,7 +293,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
   // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
   const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
-    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images' } as const;
+    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images', marketing: 'marketing' } as const;
     const key = keyMap[type];
     const goal = weeklyGoals[key] || 1;
     const progress = weeklyProgress[key] || 0;
@@ -302,11 +302,29 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     return { remaining, percentage, goal };
   };
   
+  // MARKETING INTERCALATION: check if it's time for a marketing post
+  // Rule: 1 marketing post for every 4 regular posts
+  const totalRegularPosts = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.images;
+  const marketingDue = totalRegularPosts >= 4 && weeklyProgress.marketing === 0;
+  const marketingOverdue = totalRegularPosts >= 8 && weeklyProgress.marketing <= 1;
+  
+  // Check if there are active affiliate links
+  const { data: activeAffiliateLinks } = await supabase
+    .from('affiliate_links')
+    .select('id')
+    .eq('workspace_id', workspaceId)
+    .eq('is_active', true)
+    .limit(1);
+  
+  const hasAffiliateLinks = (activeAffiliateLinks?.length || 0) > 0;
+  
   const typeStats = [
     { type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 },
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
-    { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 }
+    { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
+    // Marketing only appears if there are active affiliate links
+    ...(hasAffiliateLinks ? [{ type: 'marketing' as ContentType, ...getCompletionStats('marketing'), priority: 5 }] : []),
   ];
   
   // Log BEFORE filtering for debugging
