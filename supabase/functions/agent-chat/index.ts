@@ -2949,13 +2949,21 @@ Quando usuário diz... | Você calcula...
 
 ## 💰 MARKETING DE AFILIADOS
 - Quando em modo autônomo, intercale 1 post de afiliado a cada 4 posts de notícia
-- Use \`create_affiliate_post\` para promover produtos cadastrados
+- Use \`create_affiliate_post\` para posts de IMAGEM promovendo produtos cadastrados
 - O sistema escolhe automaticamente o produto menos promovido
 - Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
 - Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
 - NÃO force marketing se não houver links cadastrados
+- **O link de afiliado DEVE aparecer na legenda do post!**
 
-${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
+## 🎬 VÍDEO DE MARKETING (IMPORTANTE!)
+- Quando o usuário pedir "vídeo de marketing", "reels de marketing", "vídeo de afiliado" ou "reels promovendo [produto]":
+  1. Primeiro, busque os links de afiliado com \`list_available_news\` ou internamente
+  2. Use \`create_narrated_video\` com o tema sendo o PRODUTO do link de afiliado
+  3. Na caption, INCLUA o link de afiliado do produto
+  4. No topic, descreva o produto e seus benefícios
+  5. Exemplo: topic="Review do [Produto] - vale a pena?", caption="🔥 [Hook]\\n\\n[Benefício]\\n\\n🔗 [link_afiliado]"
+- NUNCA use \`create_affiliate_post\` para vídeos - use SEMPRE \`create_narrated_video\` com dados do afiliado
 
     // First API call with tools
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
