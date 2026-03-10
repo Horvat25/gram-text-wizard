@@ -457,10 +457,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <StrategyBar icon={Video} label="Reels" percent={reelsPercent} color="bg-cyan-500" count={context?.content_distribution_videos || 3} />
-              <StrategyBar icon={LayoutGrid} label="Carrossel" percent={carouselPercent} color="bg-purple-500" count={context?.content_distribution_carousels || 2} />
-              <StrategyBar icon={Newspaper} label="Notícias" percent={newsPercent} color="bg-amber-500" count={context?.content_distribution_news || 4} />
-              <StrategyBar icon={ImageIcon} label="Imagens" percent={imagesPercent} color="bg-pink-500" count={context?.content_distribution_images || 5} />
+              <StrategyBar icon={Video} label="Reels" percent={reelsPercent} color="bg-cyan-500" count={context?.content_distribution_videos || 2} />
+              <StrategyBar icon={LayoutGrid} label="Carrossel" percent={carouselPercent} color="bg-purple-500" count={context?.content_distribution_carousels || 1} />
+              <StrategyBar icon={Newspaper} label="Notícias" percent={newsPercent} color="bg-amber-500" count={context?.content_distribution_news || 5} />
+              <StrategyBar icon={ImageIcon} label="Imagens" percent={imagesPercent} color="bg-pink-500" count={context?.content_distribution_images || 3} />
             </div>
             <div className="p-2.5 rounded-lg bg-muted/50 border border-border/50">
               <p className="text-[11px] text-muted-foreground leading-relaxed">
