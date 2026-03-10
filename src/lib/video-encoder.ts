@@ -591,7 +591,8 @@ export async function uploadVideoToStorage(
   supabaseClient: typeof supabase,
   bucket: string
 ): Promise<string> {
-  const fileName = `video_${Date.now()}.webm`;
+  const ext = videoBlob.type.includes('mp4') ? 'mp4' : 'webm';
+  const fileName = `video_${Date.now()}.${ext}`;
   const { data, error } = await supabaseClient.storage
     .from(bucket)
     .upload(fileName, videoBlob, {
