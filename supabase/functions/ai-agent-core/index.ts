@@ -6,13 +6,14 @@ const corsHeaders = {
 };
 
 // Content distribution types
-type ContentType = 'video' | 'carousel' | 'news' | 'image';
+type ContentType = 'video' | 'carousel' | 'news' | 'image' | 'marketing';
 
 interface ContentDistribution {
   videos: number;
   carousels: number;
   news: number;
   images: number;
+  marketing: number;
 }
 
 interface ContentPlan {
@@ -273,24 +274,26 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Weekly goals from context settings
   // 💰 METAS REDUZIDAS: de 46 para 11 posts/semana (corte de 76% nos custos)
   const weeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 2,    // era 3→9, agora 2
-    carousels: context.content_distribution_carousels || 1, // era 2→6, agora 1
-    news: context.content_distribution_news || 5,        // era 4→17, agora 5
-    images: context.content_distribution_images || 3     // era 5→14, agora 3
+    videos: context.content_distribution_videos || 2,
+    carousels: context.content_distribution_carousels || 1,
+    news: context.content_distribution_news || 4,
+    images: context.content_distribution_images || 2,
+    marketing: 1, // 1 post de marketing por semana (intercalado a cada ~4 posts regulares)
   };
   
   // Count progress this week by media type
   const weeklyProgress: ContentDistribution = {
     videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
     carousels: postsThisWeek.filter((p: any) => p.media_type === 'carousel').length,
-    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia').length,
-    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia').length
+    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
+    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
+    marketing: postsThisWeek.filter((p: any) => p.post_type === 'afiliado').length,
   };
   
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
   // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
   const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
-    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images' } as const;
+    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images', marketing: 'marketing' } as const;
     const key = keyMap[type];
     const goal = weeklyGoals[key] || 1;
     const progress = weeklyProgress[key] || 0;
@@ -299,11 +302,29 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     return { remaining, percentage, goal };
   };
   
+  // MARKETING INTERCALATION: check if it's time for a marketing post
+  // Rule: 1 marketing post for every 4 regular posts
+  const totalRegularPosts = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.images;
+  const marketingDue = totalRegularPosts >= 4 && weeklyProgress.marketing === 0;
+  const marketingOverdue = totalRegularPosts >= 8 && weeklyProgress.marketing <= 1;
+  
+  // Check if there are active affiliate links
+  const { data: activeAffiliateLinks } = await supabase
+    .from('affiliate_links')
+    .select('id')
+    .eq('workspace_id', workspaceId)
+    .eq('is_active', true)
+    .limit(1);
+  
+  const hasAffiliateLinks = (activeAffiliateLinks?.length || 0) > 0;
+  
   const typeStats = [
     { type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 },
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
-    { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 }
+    { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
+    // Marketing only appears if there are active affiliate links
+    ...(hasAffiliateLinks ? [{ type: 'marketing' as ContentType, ...getCompletionStats('marketing'), priority: 5 }] : []),
   ];
   
   // Log BEFORE filtering for debugging
@@ -326,7 +347,14 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     `${t.type}: ${Math.round(t.percentage)}% (${t.goal - t.remaining}/${t.goal})`
   ).join(', '));
   
-  const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  // MARKETING INTERCALATION: Force marketing if it's overdue
+  let nextContentType: ContentType | null;
+  if (hasAffiliateLinks && (marketingDue || marketingOverdue) && weeklyProgress.marketing < weeklyGoals.marketing) {
+    nextContentType = 'marketing';
+    console.log(`[AGENT] ⚡ MARKETING INTERCALATION: ${totalRegularPosts} regular posts done, forcing marketing post`);
+  } else {
+    nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  }
   console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
   
   // ===== 30-DAY HISTORICAL ANALYSIS (like a senior marketer would do) =====
@@ -436,9 +464,9 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   
   // Also check CONTENT distribution progress (how many posts done vs goal)
   const totalGoals = (state.weeklyGoals?.videos || 0) + (state.weeklyGoals?.carousels || 0) + 
-                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.images || 0);
+                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.images || 0) + (state.weeklyGoals?.marketing || 0);
   const totalProgress = (state.weeklyProgress?.videos || 0) + (state.weeklyProgress?.carousels || 0) + 
-                        (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.images || 0);
+                         (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.images || 0) + (state.weeklyProgress?.marketing || 0);
   const contentProgress = totalGoals > 0 ? (totalProgress / totalGoals) * 100 : 100;
   
   // Day of week (0=Sun, 6=Sat) - how many days left in the week
@@ -487,9 +515,9 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   
   // Check if weekly goals are met
   const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                     state.weeklyGoals.news + state.weeklyGoals.images;
+                     state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                        state.weeklyProgress.news + state.weeklyProgress.images;
+                     state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
   
   // Macro objectives info - use SYNCED data from agent_context
   const goalViews = state.context?.goal_weekly_views || 10000;
@@ -550,7 +578,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     console.log('[AGENT] Meta semanal completa (modo fixo)!');
     return {
       decision: 'NO_POST',
-      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}`
+      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}, Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}`
     };
   }
   
@@ -559,7 +587,8 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
     'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
-    'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' }
+    'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
+    'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
   };
   
   const selectedType = contentTypeMap[state.nextContentType];
@@ -599,6 +628,7 @@ ${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
 - Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
+- Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}
 
 🎯 OBJETIVOS MACRO:
 - Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%)
@@ -649,11 +679,12 @@ Priorize temas que funcionaram bem no histórico. Responda em JSON: { "theme": "
   }
 
   // Return decision with content plan (no need for another AI call - we already decided based on distribution)
-  const remainingForType = {
+  const remainingForType: Record<ContentType, number> = {
     'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
     'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
     'news': state.weeklyGoals.news - state.weeklyProgress.news,
-    'image': state.weeklyGoals.images - state.weeklyProgress.images
+    'image': state.weeklyGoals.images - state.weeklyProgress.images,
+    'marketing': state.weeklyGoals.marketing - state.weeklyProgress.marketing,
   };
   
   return {
@@ -733,6 +764,8 @@ async function executeContentPlan(
       return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'news':
       return createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+    case 'marketing':
+      return createMarketingContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'image':
     default:
       return createImageContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
@@ -1080,6 +1113,166 @@ async function createCarouselContent(
   
   if (error) throw error;
   console.log('[AGENT] Carrossel IA criado:', post.id, 'slides:', carouselImages.length);
+  return post;
+}
+
+// Create MARKETING content - uses affiliate_links table
+// Picks the affiliate with fewest recent posts and generates a promotional post
+async function createMarketingContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  workspaceId: string,
+  supabaseUrl: string,
+  headers: any,
+  autoPublish: boolean = false
+): Promise<any> {
+  console.log('[AGENT] Criando post de MARKETING/AFILIADO');
+  
+  // 1. Get active affiliate links, ordered by least recently posted
+  const { data: affiliateLinks, error: affErr } = await supabase
+    .from('affiliate_links')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_active', true)
+    .order('last_posted_at', { ascending: true, nullsFirst: true })
+    .limit(5);
+  
+  if (affErr || !affiliateLinks || affiliateLinks.length === 0) {
+    console.log('[AGENT] ⚠️ Nenhum link de afiliado ativo!');
+    return supabase.from('posts').insert({
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption: '⚠️ Nenhum link de afiliado ativo para criar post de marketing',
+      hashtags: ['#marketing'],
+      post_type: 'afiliado',
+      media_type: 'image',
+      platforms: plan.platforms || ['instagram'],
+      status: 'failed',
+      error_message: 'Sem links de afiliado ativos. Adicione produtos na aba Marketing.',
+      ai_model_used: 'none'
+    }).select().single().then((r: any) => r.data);
+  }
+  
+  // Pick the one with fewest posts (or never posted)
+  const selectedAffiliate = affiliateLinks[0];
+  console.log(`[AGENT] Afiliado selecionado: ${selectedAffiliate.product_name} (${selectedAffiliate.posts_count || 0} posts anteriores)`);
+  
+  // 2. Research the product via Firecrawl for accurate selling points
+  let productResearch = '';
+  try {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: `${selectedAffiliate.product_name} review análise vale a pena`,
+        limit: 3,
+        lang: 'pt-BR'
+      })
+    });
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      const articles = (searchResult.data || []).slice(0, 3);
+      productResearch = articles.map((a: any) => `${a.title}: ${a.description || ''}`).join('\n');
+      console.log(`[AGENT] Pesquisa do produto: ${articles.length} resultados`);
+    }
+  } catch (e) {
+    console.log('[AGENT] Pesquisa Firecrawl falhou, usando descrição do cadastro:', e);
+  }
+  
+  // 3. Generate caption with AI
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: selectedAffiliate.product_name,
+      postType: 'vendas',
+      customInstructions: `Este é um post de MARKETING/AFILIADO para o produto: ${selectedAffiliate.product_name}.
+Descrição do produto: ${selectedAffiliate.description || 'Sem descrição'}
+Estratégia: ${selectedAffiliate.marketing_strategy || 'Promover com naturalidade'}
+${productResearch ? `\nPesquisa web sobre o produto:\n${productResearch}` : ''}
+
+REGRAS:
+1. NÃO pareça um anúncio - seja autêntico e genuíno
+2. Conte uma experiência ou situação real onde o produto ajuda
+3. Use tom conversacional, como recomendação de amigo
+4. Inclua o link no final: ${selectedAffiliate.affiliate_url}
+5. Use emojis com moderação
+6. Máximo 3 parágrafos
+7. CTA natural no final (sem "clique aqui" genérico)`
+    })
+  });
+  
+  let caption = `🔥 ${selectedAffiliate.product_name}\n\n${selectedAffiliate.description || ''}\n\n🔗 ${selectedAffiliate.affiliate_url}`;
+  let hashtags: string[] = ['#recomendacao', '#tecnologia', '#review'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
+    // Ensure affiliate link is in caption
+    if (!caption.includes(selectedAffiliate.affiliate_url)) {
+      caption += `\n\n🔗 ${selectedAffiliate.affiliate_url}`;
+    }
+  }
+  
+  // 4. Get product image (use affiliate's image or generate)
+  let imageUrl = selectedAffiliate.image_url || null;
+  
+  // If affiliate has an image, upload it to storage
+  if (imageUrl) {
+    try {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ imageUrl })
+      });
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.publicUrl || imageUrl;
+      }
+    } catch (e) {
+      console.log('[AGENT] Upload de imagem do afiliado falhou:', e);
+    }
+  }
+  
+  // 5. Create the post
+  const canPublish = autoPublish && imageUrl;
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    workspace_id: workspaceId,
+    caption,
+    hashtags,
+    post_type: 'afiliado',
+    media_type: 'image',
+    platforms: plan.platforms || ['instagram'],
+    status: imageUrl ? (canPublish ? 'scheduled' : 'draft') : 'draft',
+    scheduled_for: canPublish ? new Date().toISOString() : null,
+    image_url: imageUrl,
+    overlay_metadata: {
+      type: 'marketing_affiliate',
+      affiliate_id: selectedAffiliate.id,
+      product_name: selectedAffiliate.product_name,
+      affiliate_url: selectedAffiliate.affiliate_url,
+      created_by_agent: true
+    },
+    ai_model_used: 'gemini-2.5-flash-lite'
+  }).select().single();
+  
+  if (error) throw error;
+  
+  // 6. Update affiliate link counters
+  await supabase
+    .from('affiliate_links')
+    .update({
+      posts_count: (selectedAffiliate.posts_count || 0) + 1,
+      last_posted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', selectedAffiliate.id);
+  
+  console.log(`[AGENT] ✅ Post de marketing criado: ${post.id} para ${selectedAffiliate.product_name}`);
   return post;
 }
 
@@ -1942,9 +2135,9 @@ async function generateInsightsAndAnalysis(
     
     // 2. Preparar dados de performance
     const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                          state.weeklyProgress.news + state.weeklyProgress.images;
+                          state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
     const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                       state.weeklyGoals.news + state.weeklyGoals.images;
+                       state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
     
     // 3. Gerar análise com IA
     const analysisPrompt = `Você é um analista de conteúdo digital. Analise os dados e gere insights curtos e acionáveis.
@@ -1957,6 +2150,7 @@ DADOS DE PERFORMANCE:
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
 - Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
+- Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}
 - Tipos que performam melhor: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
 - Temas recentes: ${state.saturatedTopics.join(', ') || 'variados'}
 
@@ -2168,7 +2362,8 @@ async function processWorkspace(
     // ETAPA 3 & 4: Execução (se decisão for POST)
     if (decision.decision === 'POST' && decision.contentPlan) {
       // Send creating message
-      const mediaTypeName = decision.contentPlan.mediaType === 'reels' ? 'Reels' : 
+      const mediaTypeName = decision.contentPlan.contentType === 'marketing' ? 'Marketing' :
+                            decision.contentPlan.mediaType === 'reels' ? 'Reels' : 
                             decision.contentPlan.mediaType === 'carousel' ? 'Carrossel' :
                             decision.contentPlan.mediaType === 'video' ? 'Vídeo' : 'Post';
       
@@ -2226,9 +2421,9 @@ async function processWorkspace(
     
     // Send final summary with stats
     const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                       state.weeklyGoals.news + state.weeklyGoals.images;
+                       state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
     const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                          state.weeklyProgress.news + state.weeklyProgress.images;
+                          state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
     
     await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'completed', {
       weeklyProgress: totalProgress,
@@ -2317,7 +2512,8 @@ function generateExecutionSummary(decision: AgentDecision, state: AgentState, po
     const actualTitle = actualCaption.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || 
                         decision.contentPlan?.theme || 'tendências';
     
-    const mediaTypeName = post.media_type === 'reels' ? 'Reels' : 
+    const mediaTypeName = post.post_type === 'afiliado' ? 'Marketing' :
+                          post.media_type === 'reels' ? 'Reels' : 
                           post.media_type === 'carousel' ? 'Carrossel' :
                           post.post_type === 'noticia' ? 'Notícia' : 'Post';
     
