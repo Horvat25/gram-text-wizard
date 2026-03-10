@@ -26,10 +26,10 @@ function easeInOutCubic(t: number): number {
 // ─── Ken Burns effect ────────────────────────────────────────
 function getKenBurns(segIndex: number, progress: number) {
   const patterns = [
-    { startScale: 1.0, endScale: 1.18, startX: 0, startY: 0, endX: -0.05, endY: -0.03 },
-    { startScale: 1.15, endScale: 1.0, startX: -0.05, startY: -0.02, endX: 0, endY: 0 },
-    { startScale: 1.0, endScale: 1.12, startX: 0.03, startY: 0, endX: -0.03, endY: -0.04 },
-    { startScale: 1.1, endScale: 1.0, startX: -0.03, startY: -0.03, endX: 0.02, endY: 0 },
+    { startScale: 1.0, endScale: 1.22, startX: 0, startY: 0, endX: -0.06, endY: -0.04 },
+    { startScale: 1.18, endScale: 1.0, startX: -0.06, startY: -0.03, endX: 0, endY: 0 },
+    { startScale: 1.0, endScale: 1.16, startX: 0.04, startY: 0, endX: -0.04, endY: -0.05 },
+    { startScale: 1.14, endScale: 1.0, startX: -0.04, startY: -0.04, endX: 0.03, endY: 0 },
   ];
   const p = patterns[segIndex % patterns.length];
   const t = easeInOutCubic(progress);
