@@ -2625,6 +2625,8 @@ async function executeTool(supabase: any, userId: string, workspaceId: string, t
       return executeExplainCapabilities();
     case 'create_affiliate_post':
       return executeCreateAffiliatePost(supabase, userId, workspaceId, args);
+    case 'list_affiliate_links':
+      return executeListAffiliateLinks(supabase, workspaceId);
     
     // Legacy tools (kept for backwards compatibility, but won't be suggested)
     case 'create_posts':
