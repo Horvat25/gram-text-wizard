@@ -261,6 +261,9 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const fetchSourceRankings = async () => {
     if (!currentWorkspace?.id) return;
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+    
     const { data: rssItems } = await supabase
       .from('rss_items')
       .select('source_name, used_in_post_id')
@@ -276,9 +279,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     const postIds = rssItems.map(r => r.used_in_post_id).filter(Boolean) as string[];
     const { data: posts } = await supabase
       .from('posts')
-      .select('id, reach, likes_count, comments_count, saves_count, shares_count')
+      .select('id, reach, likes_count, comments_count, saves_count, shares_count, published_at')
       .in('id', postIds)
-      .eq('status', 'published');
+      .eq('status', 'published')
+      .gte('published_at', since.toISOString());
 
     const postMap: Record<string, any> = {};
     (posts || []).forEach(p => { postMap[p.id] = p; });
