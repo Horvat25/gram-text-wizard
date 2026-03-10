@@ -895,6 +895,11 @@ async function createVideoContent(
   if (error) throw error;
   console.log('[AGENT] Post de vídeo criado:', post.id);
   
+  // Link RSS item to post
+  if ((plan as any)._rssItemId) {
+    await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', (plan as any)._rssItemId);
+  }
+  
   // STEP 4: Tentar renderização externa (se RENDER_SERVICE_URL configurado)
   if (images.length >= 2) {
     console.log('[AGENT] Solicitando renderização externa...');
