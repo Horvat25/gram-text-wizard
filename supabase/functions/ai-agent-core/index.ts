@@ -517,7 +517,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
                      state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                        state.weeklyProgress.news + state.weeklyProgress.images;
+                     state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
   
   // Macro objectives info - use SYNCED data from agent_context
   const goalViews = state.context?.goal_weekly_views || 10000;
