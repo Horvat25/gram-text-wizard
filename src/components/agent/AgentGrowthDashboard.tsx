@@ -322,15 +322,15 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
   // Content strategy
-  const totalContent = (context?.content_distribution_videos || 3) + 
-    (context?.content_distribution_carousels || 2) + 
-    (context?.content_distribution_news || 4) + 
-    (context?.content_distribution_images || 5);
+  const totalContent = (context?.content_distribution_videos || 2) + 
+    (context?.content_distribution_carousels || 1) + 
+    (context?.content_distribution_news || 5) + 
+    (context?.content_distribution_images || 3);
   
-  const reelsPercent = Math.round(((context?.content_distribution_videos || 3) / totalContent) * 100);
-  const carouselPercent = Math.round(((context?.content_distribution_carousels || 2) / totalContent) * 100);
-  const newsPercent = Math.round(((context?.content_distribution_news || 4) / totalContent) * 100);
-  const imagesPercent = Math.round(((context?.content_distribution_images || 5) / totalContent) * 100);
+  const reelsPercent = Math.round(((context?.content_distribution_videos || 2) / totalContent) * 100);
+  const carouselPercent = Math.round(((context?.content_distribution_carousels || 1) / totalContent) * 100);
+  const newsPercent = Math.round(((context?.content_distribution_news || 5) / totalContent) * 100);
+  const imagesPercent = Math.round(((context?.content_distribution_images || 3) / totalContent) * 100);
 
   // Best hashtags from top posts
   const hashtagMap: Record<string, number> = {};
@@ -457,10 +457,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <StrategyBar icon={Video} label="Reels" percent={reelsPercent} color="bg-cyan-500" count={context?.content_distribution_videos || 3} />
-              <StrategyBar icon={LayoutGrid} label="Carrossel" percent={carouselPercent} color="bg-purple-500" count={context?.content_distribution_carousels || 2} />
-              <StrategyBar icon={Newspaper} label="Notícias" percent={newsPercent} color="bg-amber-500" count={context?.content_distribution_news || 4} />
-              <StrategyBar icon={ImageIcon} label="Imagens" percent={imagesPercent} color="bg-pink-500" count={context?.content_distribution_images || 5} />
+              <StrategyBar icon={Video} label="Reels" percent={reelsPercent} color="bg-cyan-500" count={context?.content_distribution_videos || 2} />
+              <StrategyBar icon={LayoutGrid} label="Carrossel" percent={carouselPercent} color="bg-purple-500" count={context?.content_distribution_carousels || 1} />
+              <StrategyBar icon={Newspaper} label="Notícias" percent={newsPercent} color="bg-amber-500" count={context?.content_distribution_news || 5} />
+              <StrategyBar icon={ImageIcon} label="Imagens" percent={imagesPercent} color="bg-pink-500" count={context?.content_distribution_images || 3} />
             </div>
             <div className="p-2.5 rounded-lg bg-muted/50 border border-border/50">
               <p className="text-[11px] text-muted-foreground leading-relaxed">
