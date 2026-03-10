@@ -573,10 +573,12 @@ export async function generateVideoFromSegments(
       src.buffer = musicBuf;
       src.loop = true;
       const gain = audioCtx.createGain();
-      gain.gain.value = narrationBuf ? 0.12 : 0.35;
+      // Volume mais alto para trilha envolvente: 0.22 com narração, 0.45 sem
+      gain.gain.value = narrationBuf ? 0.22 : 0.45;
       src.connect(gain).connect(dest);
       src.start(audioStartTime);
-      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - 2);
+      // Fade out suave nos últimos 3 segundos
+      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - 3);
       gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
     }
 
