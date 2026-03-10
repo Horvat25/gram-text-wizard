@@ -413,11 +413,17 @@ export async function generateVideoFromSegments(
   combinedStream.addTrack(videoTrack);
   dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
 
-  // ─── MediaRecorder with codec fallback ───────────────────
-  let mimeType = 'video/webm;codecs=vp8,opus'; // VP8 is faster to encode than VP9
-  if (!MediaRecorder.isTypeSupported(mimeType)) {
-    mimeType = 'video/webm';
-  }
+  // ─── MediaRecorder with codec fallback (prefer MP4/H.264 for Instagram) ───
+  const codecPriority = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',  // H.264 Baseline + AAC
+    'video/mp4;codecs=avc1.42E01E',              // H.264 Baseline
+    'video/mp4',                                  // Generic MP4
+    'video/webm;codecs=vp8,opus',                // VP8 fallback
+    'video/webm',                                 // Generic WebM fallback
+  ];
+  let mimeType = codecPriority.find(m => MediaRecorder.isTypeSupported(m)) || 'video/webm';
+  const isMP4 = mimeType.startsWith('video/mp4');
+  console.log(`[VideoEncoder] Using codec: ${mimeType} (MP4: ${isMP4})`);
 
   const mediaRecorder = new MediaRecorder(combinedStream, {
     mimeType,
@@ -433,7 +439,8 @@ export async function generateVideoFromSegments(
   return new Promise(async (resolve) => {
     mediaRecorder.onstop = () => {
       audioCtx.close().catch(() => {});
-      resolve(new Blob(chunks, { type: 'video/webm' }));
+      const blobType = isMP4 ? 'video/mp4' : 'video/webm';
+      resolve(new Blob(chunks, { type: blobType }));
     };
 
     mediaRecorder.start(100);
@@ -584,7 +591,8 @@ export async function uploadVideoToStorage(
   supabaseClient: typeof supabase,
   bucket: string
 ): Promise<string> {
-  const fileName = `video_${Date.now()}.webm`;
+  const ext = videoBlob.type.includes('mp4') ? 'mp4' : 'webm';
+  const fileName = `video_${Date.now()}.${ext}`;
   const { data, error } = await supabaseClient.storage
     .from(bucket)
     .upload(fileName, videoBlob, {
