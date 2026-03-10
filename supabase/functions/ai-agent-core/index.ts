@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 // Content distribution types
-type ContentType = 'video' | 'carousel' | 'news' | 'image';
+type ContentType = 'video' | 'carousel' | 'news' | 'image' | 'marketing';
 
 interface ContentDistribution {
   videos: number;
