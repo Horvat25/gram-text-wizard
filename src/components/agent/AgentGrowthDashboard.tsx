@@ -443,7 +443,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           <KPICard icon={<Users className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
           <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} />
           <KPICard icon={<Bookmark className="h-4 w-4 text-amber-500" />} label="Salvamentos" value={formatNumber(totalSaves)} />
-          <KPICard icon={<Share2 className="h-4 w-4 text-purple-500" />} label="Compartilh." value={formatNumber(topPosts.reduce((s, p) => s + (p.shares_count || 0), 0))} />
+          <KPICard icon={<Share2 className="h-4 w-4 text-purple-500" />} label="Compartilh." value={formatNumber(summaryMetrics.shares)} />
         </div>
       </motion.div>
 
