@@ -247,6 +247,17 @@ const AGENT_TOOLS = [
         required: []
       }
     }
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_affiliate_links",
+      description: "📋 Lista os links de afiliado/marketing cadastrados. Use antes de criar vídeos ou posts de marketing para saber quais produtos estão disponíveis.",
+      parameters: {
+        type: "object",
+        properties: {}
+      }
+    }
   }
 ];
 
