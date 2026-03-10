@@ -322,15 +322,15 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
   // Content strategy
-  const totalContent = (context?.content_distribution_videos || 3) + 
-    (context?.content_distribution_carousels || 2) + 
-    (context?.content_distribution_news || 4) + 
-    (context?.content_distribution_images || 5);
+  const totalContent = (context?.content_distribution_videos || 2) + 
+    (context?.content_distribution_carousels || 1) + 
+    (context?.content_distribution_news || 5) + 
+    (context?.content_distribution_images || 3);
   
-  const reelsPercent = Math.round(((context?.content_distribution_videos || 3) / totalContent) * 100);
-  const carouselPercent = Math.round(((context?.content_distribution_carousels || 2) / totalContent) * 100);
-  const newsPercent = Math.round(((context?.content_distribution_news || 4) / totalContent) * 100);
-  const imagesPercent = Math.round(((context?.content_distribution_images || 5) / totalContent) * 100);
+  const reelsPercent = Math.round(((context?.content_distribution_videos || 2) / totalContent) * 100);
+  const carouselPercent = Math.round(((context?.content_distribution_carousels || 1) / totalContent) * 100);
+  const newsPercent = Math.round(((context?.content_distribution_news || 5) / totalContent) * 100);
+  const imagesPercent = Math.round(((context?.content_distribution_images || 3) / totalContent) * 100);
 
   // Best hashtags from top posts
   const hashtagMap: Record<string, number> = {};
