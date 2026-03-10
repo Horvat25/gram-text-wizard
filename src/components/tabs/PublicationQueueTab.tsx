@@ -270,8 +270,7 @@ const PublicationQueueTab = ({
     });
   }, [scheduledPosts]);
 
-  const queueCount = renderQueue.length;
-  const totalInBatch = completedCount + queueCount;
+  const pendingReelsCount = queuedPosts.filter(p => needsVideoRendering(p)).length;
 
   const handleReschedule = async () => {
     if (!reschedulePost || !newScheduleDate) return;
