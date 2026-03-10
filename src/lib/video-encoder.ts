@@ -413,11 +413,17 @@ export async function generateVideoFromSegments(
   combinedStream.addTrack(videoTrack);
   dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
 
-  // ─── MediaRecorder with codec fallback ───────────────────
-  let mimeType = 'video/webm;codecs=vp8,opus'; // VP8 is faster to encode than VP9
-  if (!MediaRecorder.isTypeSupported(mimeType)) {
-    mimeType = 'video/webm';
-  }
+  // ─── MediaRecorder with codec fallback (prefer MP4/H.264 for Instagram) ───
+  const codecPriority = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',  // H.264 Baseline + AAC
+    'video/mp4;codecs=avc1.42E01E',              // H.264 Baseline
+    'video/mp4',                                  // Generic MP4
+    'video/webm;codecs=vp8,opus',                // VP8 fallback
+    'video/webm',                                 // Generic WebM fallback
+  ];
+  let mimeType = codecPriority.find(m => MediaRecorder.isTypeSupported(m)) || 'video/webm';
+  const isMP4 = mimeType.startsWith('video/mp4');
+  console.log(`[VideoEncoder] Using codec: ${mimeType} (MP4: ${isMP4})`);
 
   const mediaRecorder = new MediaRecorder(combinedStream, {
     mimeType,
