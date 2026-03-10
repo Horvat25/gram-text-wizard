@@ -26,10 +26,10 @@ function easeInOutCubic(t: number): number {
 // ─── Ken Burns effect ────────────────────────────────────────
 function getKenBurns(segIndex: number, progress: number) {
   const patterns = [
-    { startScale: 1.0, endScale: 1.18, startX: 0, startY: 0, endX: -0.05, endY: -0.03 },
-    { startScale: 1.15, endScale: 1.0, startX: -0.05, startY: -0.02, endX: 0, endY: 0 },
-    { startScale: 1.0, endScale: 1.12, startX: 0.03, startY: 0, endX: -0.03, endY: -0.04 },
-    { startScale: 1.1, endScale: 1.0, startX: -0.03, startY: -0.03, endX: 0.02, endY: 0 },
+    { startScale: 1.0, endScale: 1.22, startX: 0, startY: 0, endX: -0.06, endY: -0.04 },
+    { startScale: 1.18, endScale: 1.0, startX: -0.06, startY: -0.03, endX: 0, endY: 0 },
+    { startScale: 1.0, endScale: 1.16, startX: 0.04, startY: 0, endX: -0.04, endY: -0.05 },
+    { startScale: 1.14, endScale: 1.0, startX: -0.04, startY: -0.04, endX: 0.03, endY: 0 },
   ];
   const p = patterns[segIndex % patterns.length];
   const t = easeInOutCubic(progress);
@@ -311,8 +311,8 @@ function renderFrame(
   brand: string,
   fps: number
 ) {
-  const TRANSITION_DURATION = 0.4;
-  const HOOK_DURATION = 3;
+  const TRANSITION_DURATION = 0.35;  // Transições mais rápidas
+  const HOOK_DURATION = 2.5;        // Hook mais curto e impactante
 
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = '#0B0F1A';
@@ -573,10 +573,12 @@ export async function generateVideoFromSegments(
       src.buffer = musicBuf;
       src.loop = true;
       const gain = audioCtx.createGain();
-      gain.gain.value = narrationBuf ? 0.12 : 0.35;
+      // Volume mais alto para trilha envolvente: 0.22 com narração, 0.45 sem
+      gain.gain.value = narrationBuf ? 0.22 : 0.45;
       src.connect(gain).connect(dest);
       src.start(audioStartTime);
-      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - 2);
+      // Fade out suave nos últimos 3 segundos
+      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - 3);
       gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
     }
 

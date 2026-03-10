@@ -821,7 +821,7 @@ async function createVideoContent(
   }
   
   // STEP 3: Criar post (status draft, sem video_url ainda)
-  // Build script segments for frontend rendering (AgentReelsRenderer needs this)
+  // Build script segments matching EXACTLY the format useNarrativeStory expects
   const scriptSegments = progressivePhases.map((phase, i) => ({
     text: phase.text,
     imagePrompt: phase.imagePrompt,
@@ -836,22 +836,19 @@ async function createVideoContent(
     media_type: 'reels',
     platforms: plan.platforms || ['instagram'],
     status: 'draft',
-    image_url: images[0] || null, // Thumbnail
-    carousel_images: images, // Todas as imagens para o slideshow
+    image_url: images[0] || null,
+    carousel_images: images,
     overlay_metadata: {
-      type: 'external_render_slideshow',
+      type: 'narrated_video',
       topic: articleTitle,
       script: {
         title: articleTitle,
         segments: scriptSegments,
+        segmentCount: 4,
+        totalDuration: 20,
       },
       article_url: rssArticle?.url || null,
       article_image_url: null,
-      images,
-      duration_per_image: 3,
-      resolution: '1080x1920',
-      platform: 'instagram_reels',
-      transition: 'fade',
       needs_processing: true,
       created_by_agent: true,
       publish_after_render: autoPublish
@@ -2146,15 +2143,25 @@ async function processWorkspace(
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
       
-      // Send completion message - use ACTUAL post caption, not planned theme
+      // Send completion message with VIDEO-SPECIFIC notification
       const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
       const actualTheme = post?.caption?.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || decision.contentPlan.theme;
-      await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'created', {
-        type: mediaTypeName,
-        theme: actualTheme,
-        status: post?.status,
-        needsRender: isReels && !post?.video_url
-      }));
+      
+      if (isReels && !post?.video_url) {
+        // Send special video notification so user knows they need to render
+        await sendChatMessage(supabase, userId, 
+          `🎬 **Novo Reels criado!** "${actualTheme}"\n\n` +
+          `📌 Abra a aba **Fila** e clique em **"Gerar Vídeo"** para renderizar.\n` +
+          `O vídeo já tem ${post?.carousel_images?.length || 4} imagens IA e roteiro pronto!`
+        );
+      } else {
+        await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'created', {
+          type: mediaTypeName,
+          theme: actualTheme,
+          status: post?.status,
+          needsRender: false
+        }));
+      }
       
     } else if (decision.decision === 'NO_POST' || decision.decision === 'WAIT') {
       // Send waiting message
