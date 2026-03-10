@@ -763,6 +763,8 @@ async function executeContentPlan(
       return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'news':
       return createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+    case 'marketing':
+      return createMarketingContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'image':
     default:
       return createImageContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
