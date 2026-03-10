@@ -1115,6 +1115,166 @@ async function createCarouselContent(
   return post;
 }
 
+// Create MARKETING content - uses affiliate_links table
+// Picks the affiliate with fewest recent posts and generates a promotional post
+async function createMarketingContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  workspaceId: string,
+  supabaseUrl: string,
+  headers: any,
+  autoPublish: boolean = false
+): Promise<any> {
+  console.log('[AGENT] Criando post de MARKETING/AFILIADO');
+  
+  // 1. Get active affiliate links, ordered by least recently posted
+  const { data: affiliateLinks, error: affErr } = await supabase
+    .from('affiliate_links')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_active', true)
+    .order('last_posted_at', { ascending: true, nullsFirst: true })
+    .limit(5);
+  
+  if (affErr || !affiliateLinks || affiliateLinks.length === 0) {
+    console.log('[AGENT] ⚠️ Nenhum link de afiliado ativo!');
+    return supabase.from('posts').insert({
+      user_id: userId,
+      workspace_id: workspaceId,
+      caption: '⚠️ Nenhum link de afiliado ativo para criar post de marketing',
+      hashtags: ['#marketing'],
+      post_type: 'afiliado',
+      media_type: 'image',
+      platforms: plan.platforms || ['instagram'],
+      status: 'failed',
+      error_message: 'Sem links de afiliado ativos. Adicione produtos na aba Marketing.',
+      ai_model_used: 'none'
+    }).select().single().then((r: any) => r.data);
+  }
+  
+  // Pick the one with fewest posts (or never posted)
+  const selectedAffiliate = affiliateLinks[0];
+  console.log(`[AGENT] Afiliado selecionado: ${selectedAffiliate.product_name} (${selectedAffiliate.posts_count || 0} posts anteriores)`);
+  
+  // 2. Research the product via Firecrawl for accurate selling points
+  let productResearch = '';
+  try {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: `${selectedAffiliate.product_name} review análise vale a pena`,
+        limit: 3,
+        lang: 'pt-BR'
+      })
+    });
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      const articles = (searchResult.data || []).slice(0, 3);
+      productResearch = articles.map((a: any) => `${a.title}: ${a.description || ''}`).join('\n');
+      console.log(`[AGENT] Pesquisa do produto: ${articles.length} resultados`);
+    }
+  } catch (e) {
+    console.log('[AGENT] Pesquisa Firecrawl falhou, usando descrição do cadastro:', e);
+  }
+  
+  // 3. Generate caption with AI
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      topic: selectedAffiliate.product_name,
+      postType: 'vendas',
+      customInstructions: `Este é um post de MARKETING/AFILIADO para o produto: ${selectedAffiliate.product_name}.
+Descrição do produto: ${selectedAffiliate.description || 'Sem descrição'}
+Estratégia: ${selectedAffiliate.marketing_strategy || 'Promover com naturalidade'}
+${productResearch ? `\nPesquisa web sobre o produto:\n${productResearch}` : ''}
+
+REGRAS:
+1. NÃO pareça um anúncio - seja autêntico e genuíno
+2. Conte uma experiência ou situação real onde o produto ajuda
+3. Use tom conversacional, como recomendação de amigo
+4. Inclua o link no final: ${selectedAffiliate.affiliate_url}
+5. Use emojis com moderação
+6. Máximo 3 parágrafos
+7. CTA natural no final (sem "clique aqui" genérico)`
+    })
+  });
+  
+  let caption = `🔥 ${selectedAffiliate.product_name}\n\n${selectedAffiliate.description || ''}\n\n🔗 ${selectedAffiliate.affiliate_url}`;
+  let hashtags: string[] = ['#recomendacao', '#tecnologia', '#review'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
+    // Ensure affiliate link is in caption
+    if (!caption.includes(selectedAffiliate.affiliate_url)) {
+      caption += `\n\n🔗 ${selectedAffiliate.affiliate_url}`;
+    }
+  }
+  
+  // 4. Get product image (use affiliate's image or generate)
+  let imageUrl = selectedAffiliate.image_url || null;
+  
+  // If affiliate has an image, upload it to storage
+  if (imageUrl) {
+    try {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ imageUrl })
+      });
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.publicUrl || imageUrl;
+      }
+    } catch (e) {
+      console.log('[AGENT] Upload de imagem do afiliado falhou:', e);
+    }
+  }
+  
+  // 5. Create the post
+  const canPublish = autoPublish && imageUrl;
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId,
+    workspace_id: workspaceId,
+    caption,
+    hashtags,
+    post_type: 'afiliado',
+    media_type: 'image',
+    platforms: plan.platforms || ['instagram'],
+    status: imageUrl ? (canPublish ? 'scheduled' : 'draft') : 'draft',
+    scheduled_for: canPublish ? new Date().toISOString() : null,
+    image_url: imageUrl,
+    overlay_metadata: {
+      type: 'marketing_affiliate',
+      affiliate_id: selectedAffiliate.id,
+      product_name: selectedAffiliate.product_name,
+      affiliate_url: selectedAffiliate.affiliate_url,
+      created_by_agent: true
+    },
+    ai_model_used: 'gemini-2.5-flash-lite'
+  }).select().single();
+  
+  if (error) throw error;
+  
+  // 6. Update affiliate link counters
+  await supabase
+    .from('affiliate_links')
+    .update({
+      posts_count: (selectedAffiliate.posts_count || 0) + 1,
+      last_posted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', selectedAffiliate.id);
+  
+  console.log(`[AGENT] ✅ Post de marketing criado: ${post.id} para ${selectedAffiliate.product_name}`);
+  return post;
+}
+
 // Calculate news ranking score (0-100) for RSS items
 // PRIORIZA conteúdo de TECNOLOGIA, IA, INOVAÇÃO - penaliza off-topic
 function calculateNewsRankingScore(item: any): number {
