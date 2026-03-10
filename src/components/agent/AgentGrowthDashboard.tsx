@@ -9,7 +9,7 @@ import {
   Video, Newspaper, Image as ImageIcon, LayoutGrid,
   Sparkles, BarChart3, ArrowUpRight, ArrowDownRight, Minus,
   Trophy, Heart, Bookmark, Share2, RefreshCw, MessageCircle, Loader2,
-  Hash, Globe,
+  Hash, Globe, Plus, Minus as MinusIcon, Megaphone,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
@@ -80,9 +80,47 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const [syncing, setSyncing] = useState(false);
   const { currentWorkspace } = useWorkspace();
 
+  // Local editable distribution state
+  const [localDist, setLocalDist] = useState({
+    videos: context?.content_distribution_videos || 3,
+    carousels: context?.content_distribution_carousels || 2,
+    news: context?.content_distribution_news || 6,
+    images: context?.content_distribution_images || 3,
+    marketing: 1,
+  });
+
+  // Sync local dist when context changes
+  useEffect(() => {
+    if (context) {
+      setLocalDist({
+        videos: context.content_distribution_videos || 3,
+        carousels: context.content_distribution_carousels || 2,
+        news: context.content_distribution_news || 6,
+        images: context.content_distribution_images || 3,
+        marketing: 1,
+      });
+    }
+  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images]);
+
+  const handleDistChange = async (type: keyof typeof localDist, delta: number) => {
+    const newVal = Math.max(0, localDist[type] + delta);
+    const newDist = { ...localDist, [type]: newVal };
+    setLocalDist(newDist);
+
+    if (type !== 'marketing' && onUpdate) {
+      const fieldMap: Record<string, string> = {
+        videos: 'content_distribution_videos',
+        carousels: 'content_distribution_carousels',
+        news: 'content_distribution_news',
+        images: 'content_distribution_images',
+      };
+      await onUpdate({ [fieldMap[type]]: newVal } as any);
+    }
+  };
+
   const periodLabel = `últimos ${period} dias`;
 
-  // Sync from Instagram — processa todos os lotes até concluir
+  // Sync from Instagram
   const handleSync = async () => {
     if (!currentWorkspace?.id) {
       toast.error('Selecione um workspace antes de sincronizar');
@@ -213,7 +251,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const fetchSourceRankings = async () => {
     if (!currentWorkspace?.id) return;
-    // Get rss_items that were used in posts
     const { data: rssItems } = await supabase
       .from('rss_items')
       .select('source_name, used_in_post_id')
@@ -226,7 +263,6 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       return;
     }
 
-    // Get the post IDs and fetch their metrics
     const postIds = rssItems.map(r => r.used_in_post_id).filter(Boolean) as string[];
     const { data: posts } = await supabase
       .from('posts')
@@ -234,11 +270,9 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       .in('id', postIds)
       .eq('status', 'published');
 
-    // Map post metrics by id
     const postMap: Record<string, any> = {};
     (posts || []).forEach(p => { postMap[p.id] = p; });
 
-    // Aggregate by source
     const sourceMap: Record<string, { count: number; reach: number; likes: number; saves: number; engagement: number }> = {};
     rssItems.forEach(item => {
       const post = postMap[item.used_in_post_id!];
@@ -294,7 +328,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     void refreshDashboardData();
   }, [currentWorkspace?.id, period]);
 
-  // Derived analytics from full published dataset in period
+  // Derived analytics
   const totalLikes = summaryMetrics.likes;
   const totalComments = summaryMetrics.comments;
   const totalSaves = summaryMetrics.saves;
@@ -302,13 +336,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalImpressions = summaryMetrics.impressions;
   const postLevelViews = summaryMetrics.views;
   
-  // Instagram Account Insights API has a practical 30-day reliable window for this endpoint.
-  // For 60/90d, use aggregated post metrics to avoid under-reporting.
   const accountViews = accountViewsLive || context?.current_weekly_views || 0;
   const totalViews = period === 30 && accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
-  // Period-based goals (scaled from monthly base)
   const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
     30: { views: 10000, likes: 500, saves: 200, comments: 100 },
     60: { views: 25000, likes: 1200, saves: 500, comments: 250 },
@@ -321,16 +352,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const savesProgress = goals.saves > 0 ? Math.min((totalSaves / goals.saves) * 100, 100) : 0;
   const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
-  // Content strategy
-  const totalContent = (context?.content_distribution_videos || 2) + 
-    (context?.content_distribution_carousels || 1) + 
-    (context?.content_distribution_news || 5) + 
-    (context?.content_distribution_images || 3);
+  // Content strategy with marketing
+  const totalContent = localDist.videos + localDist.carousels + localDist.news + localDist.images + localDist.marketing;
   
-  const reelsPercent = Math.round(((context?.content_distribution_videos || 2) / totalContent) * 100);
-  const carouselPercent = Math.round(((context?.content_distribution_carousels || 1) / totalContent) * 100);
-  const newsPercent = Math.round(((context?.content_distribution_news || 5) / totalContent) * 100);
-  const imagesPercent = Math.round(((context?.content_distribution_images || 3) / totalContent) * 100);
+  const getPercent = (val: number) => totalContent > 0 ? Math.round((val / totalContent) * 100) : 0;
 
   // Best hashtags from top posts
   const hashtagMap: Record<string, number> = {};
@@ -346,6 +371,8 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const getStrategyReason = () => {
     if (context?.success_patterns && context.success_patterns.length > 0) return context.success_patterns[0];
+    const reelsPercent = getPercent(localDist.videos);
+    const newsPercent = getPercent(localDist.news);
     if (reelsPercent >= 40) return 'Reels estão gerando maior alcance orgânico no momento.';
     if (newsPercent >= 40) return 'Conteúdo informativo está gerando mais salvamentos.';
     return 'Distribuição balanceada para maximizar diferentes métricas.';
@@ -422,7 +449,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 3. Progress — dynamic per period */}
+      {/* 3. Progress */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-2 pt-4">
@@ -440,7 +467,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 4. Strategy */}
+      {/* 4. Strategy with +/- controls and Marketing */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-2 pt-4">
@@ -448,6 +475,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
               <CardTitle className="flex items-center gap-2 text-base">
                 <Brain className="h-4 w-4 text-amber-500" />
                 Estratégia Atual
+                <Badge variant="secondary" className="text-[10px]">{totalContent}/sem</Badge>
               </CardTitle>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-muted-foreground">{isAutoStrategy ? 'Auto' : 'Manual'}</span>
@@ -457,10 +485,11 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <StrategyBar icon={Video} label="Reels" percent={reelsPercent} color="bg-cyan-500" count={context?.content_distribution_videos || 2} />
-              <StrategyBar icon={LayoutGrid} label="Carrossel" percent={carouselPercent} color="bg-purple-500" count={context?.content_distribution_carousels || 1} />
-              <StrategyBar icon={Newspaper} label="Notícias" percent={newsPercent} color="bg-amber-500" count={context?.content_distribution_news || 5} />
-              <StrategyBar icon={ImageIcon} label="Imagens" percent={imagesPercent} color="bg-pink-500" count={context?.content_distribution_images || 3} />
+              <StrategyBarEditable icon={Video} label="Reels" percent={getPercent(localDist.videos)} color="bg-cyan-500" count={localDist.videos} onIncrement={() => handleDistChange('videos', 1)} onDecrement={() => handleDistChange('videos', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={LayoutGrid} label="Carrossel" percent={getPercent(localDist.carousels)} color="bg-purple-500" count={localDist.carousels} onIncrement={() => handleDistChange('carousels', 1)} onDecrement={() => handleDistChange('carousels', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Newspaper} label="Notícias" percent={getPercent(localDist.news)} color="bg-amber-500" count={localDist.news} onIncrement={() => handleDistChange('news', 1)} onDecrement={() => handleDistChange('news', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={ImageIcon} label="Imagens" percent={getPercent(localDist.images)} color="bg-pink-500" count={localDist.images} onIncrement={() => handleDistChange('images', 1)} onDecrement={() => handleDistChange('images', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Megaphone} label="Marketing" percent={getPercent(localDist.marketing)} color="bg-emerald-500" count={localDist.marketing} onIncrement={() => handleDistChange('marketing', 1)} onDecrement={() => handleDistChange('marketing', -1)} disabled={isAutoStrategy} />
             </div>
             <div className="p-2.5 rounded-lg bg-muted/50 border border-border/50">
               <p className="text-[11px] text-muted-foreground leading-relaxed">
@@ -536,19 +565,23 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 6. Source Rankings */}
-      {sourceRankings.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
-          <Card className="border-border/50">
-            <CardHeader className="pb-2 pt-4">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Globe className="h-4 w-4 text-orange-500" />
-                Ranking de Fontes
-                <Badge variant="secondary" className="text-[10px]">{sourceRankings.length} sites</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1.5">
-              {sourceRankings.map((source, i) => {
+      {/* 6. Source Rankings — always show */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2 pt-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Globe className="h-4 w-4 text-orange-500" />
+              Ranking de Fontes
+              {sourceRankings.length > 0 && <Badge variant="secondary" className="text-[10px]">{sourceRankings.length} sites</Badge>}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1.5">
+            {sourceRankings.length === 0 ? (
+              <div className="p-3 rounded-lg bg-muted/30 border text-center">
+                <p className="text-xs text-muted-foreground">Nenhuma fonte com posts publicados ainda. O ranking aparece conforme os posts de cada fonte acumulam métricas.</p>
+              </div>
+            ) : (
+              sourceRankings.map((source, i) => {
                 const maxReach = sourceRankings[0]?.totalReach || 1;
                 const barWidth = Math.max((source.totalReach / maxReach) * 100, 8);
                 return (
@@ -583,11 +616,11 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                     </div>
                   </div>
                 );
-              })}
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+              })
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* 7. Best Hashtags */}
       {bestHashtags.length > 0 && (
@@ -662,8 +695,9 @@ function ProgressRow({ icon, label, current, goal, progress, prefix, suffix, dec
   );
 }
 
-function StrategyBar({ icon: Icon, label, percent, color, count }: {
+function StrategyBarEditable({ icon: Icon, label, percent, color, count, onIncrement, onDecrement, disabled }: {
   icon: any; label: string; percent: number; color: string; count: number;
+  onIncrement: () => void; onDecrement: () => void; disabled: boolean;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -672,8 +706,28 @@ function StrategyBar({ icon: Icon, label, percent, color, count }: {
       <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
         <div className={cn("h-full rounded-full transition-all", color)} style={{ width: `${percent}%` }} />
       </div>
-      <span className="text-xs font-mono w-10 text-right text-muted-foreground">{percent}%</span>
-      <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">{count}/sem</Badge>
+      <span className="text-xs font-mono w-8 text-right text-muted-foreground">{percent}%</span>
+      <div className="flex items-center gap-0.5">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-5 w-5"
+          onClick={onDecrement}
+          disabled={disabled || count <= 0}
+        >
+          <MinusIcon className="h-3 w-3" />
+        </Button>
+        <span className="text-xs font-mono w-4 text-center font-bold">{count}</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-5 w-5"
+          onClick={onIncrement}
+          disabled={disabled}
+        >
+          <Plus className="h-3 w-3" />
+        </Button>
+      </div>
     </div>
   );
 }

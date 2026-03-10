@@ -18,7 +18,6 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Get all workspaces with agent context
     const { data: contexts, error: ctxErr } = await supabase
       .from('agent_context')
       .select('*, workspaces!agent_context_workspace_id_fkey(name)')
@@ -34,8 +33,6 @@ serve(async (req) => {
     const now = new Date();
     const brasiliaHour = parseInt(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }));
     
-    // Only generate AI reports at 6h, 12h, 18h, 0h (4x/day)
-    // Other hours: save data-only report without AI call
     const aiReportHours = [0, 6, 12, 18];
     const shouldUseAI = aiReportHours.includes(brasiliaHour);
 
@@ -56,12 +53,20 @@ serve(async (req) => {
       const drafts = recentPosts?.filter(p => p.status === 'draft') || [];
       const totalPosts = published.length;
 
-      // Calculate engagement
       const totalLikes = published.reduce((s, p) => s + (p.likes_count || 0), 0);
       const totalComments = published.reduce((s, p) => s + (p.comments_count || 0), 0);
       const totalShares = published.reduce((s, p) => s + (p.shares_count || 0), 0);
       const totalSaves = published.reduce((s, p) => s + (p.saves_count || 0), 0);
       const totalReach = published.reduce((s, p) => s + (p.reach || 0), 0);
+
+      // Content type breakdown
+      const typeBreakdown = {
+        reels: published.filter(p => p.media_type === 'reels' || p.media_type === 'reel' || p.media_type === 'video').length,
+        carousels: published.filter(p => p.media_type === 'carousel').length,
+        news: published.filter(p => p.post_type === 'noticia' || p.post_type === 'curadoria').length,
+        images: published.filter(p => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'curadoria' && p.post_type !== 'afiliado').length,
+        marketing: published.filter(p => p.post_type === 'afiliado').length,
+      };
 
       // Check affiliate links
       const { data: affiliateLinks } = await supabase
@@ -70,7 +75,7 @@ serve(async (req) => {
         .eq('workspace_id', workspaceId)
         .eq('is_active', true);
 
-      // Check how many posts since last affiliate post
+      // Posts since last affiliate
       const { data: lastAffiliatePost } = await supabase
         .from('posts')
         .select('id, created_at')
@@ -87,29 +92,73 @@ serve(async (req) => {
         postsSinceLastAffiliate = afterAffiliate.length;
       }
 
-      // Goals progress
+      // Source rankings — which RSS sources perform best
+      const { data: rssItems } = await supabase
+        .from('rss_items')
+        .select('source_name, used_in_post_id')
+        .eq('workspace_id', workspaceId)
+        .eq('is_used', true)
+        .not('used_in_post_id', 'is', null);
+
+      let sourceRankingText = '';
+      if (rssItems && rssItems.length > 0) {
+        const postIds = rssItems.map(r => r.used_in_post_id).filter(Boolean) as string[];
+        const { data: sourcePosts } = await supabase
+          .from('posts')
+          .select('id, reach, likes_count, saves_count')
+          .in('id', postIds)
+          .eq('status', 'published');
+
+        const postMap: Record<string, any> = {};
+        (sourcePosts || []).forEach(p => { postMap[p.id] = p; });
+
+        const sourceMap: Record<string, { count: number; reach: number }> = {};
+        rssItems.forEach(item => {
+          const post = postMap[item.used_in_post_id!];
+          if (!post) return;
+          if (!sourceMap[item.source_name]) sourceMap[item.source_name] = { count: 0, reach: 0 };
+          sourceMap[item.source_name].count++;
+          sourceMap[item.source_name].reach += post.reach || 0;
+        });
+
+        const ranked = Object.entries(sourceMap)
+          .sort((a, b) => b[1].reach - a[1].reach)
+          .slice(0, 5);
+
+        if (ranked.length > 0) {
+          sourceRankingText = '\n\nRANKING DE FONTES (por alcance):\n' + ranked.map(([name, s], i) => 
+            `${i + 1}. ${name}: ${s.count} posts, ${s.reach.toLocaleString()} alcance`
+          ).join('\n');
+        }
+      }
+
+      // Goals
       const goalViews = ctx.goal_weekly_views || 10000;
       const goalFollowers = ctx.goal_weekly_followers || 100;
-      const goalEngagement = ctx.goal_weekly_engagement || 5;
       const currentViews = totalReach;
       const viewsProgress = Math.min(100, Math.round((currentViews / goalViews) * 100));
 
-      // Determine optimal posts/day based on goal progress
+      // Strategy config
+      const distVideos = ctx.content_distribution_videos || 3;
+      const distCarousels = ctx.content_distribution_carousels || 2;
+      const distNews = ctx.content_distribution_news || 6;
+      const distImages = ctx.content_distribution_images || 3;
+      const totalWeeklyGoal = distVideos + distCarousels + distNews + distImages + 1; // +1 marketing
+
       let recommendedPostsPerDay: number;
       if (viewsProgress >= 100) {
-        recommendedPostsPerDay = 1; // Maintenance
-      } else if (viewsProgress >= 70) {
         recommendedPostsPerDay = 2;
-      } else if (viewsProgress >= 40) {
+      } else if (viewsProgress >= 70) {
         recommendedPostsPerDay = 3;
+      } else if (viewsProgress >= 40) {
+        recommendedPostsPerDay = 4;
       } else {
-        recommendedPostsPerDay = 4; // Aggressive
+        recommendedPostsPerDay = 5;
       }
 
       let reportContent = '';
       
       if (shouldUseAI && LOVABLE_API_KEY) {
-        // AI report only 4x/day (0h, 6h, 12h, 18h)
         const reportPrompt = `Você é o social media do perfil de tecnologia. Faça um RELATÓRIO BREVE para o dono do perfil como um humano falaria com seu chefe.
 
 IMPORTANTE: O agente trabalha TODAS as prioridades simultaneamente:
@@ -119,27 +168,39 @@ IMPORTANTE: O agente trabalha TODAS as prioridades simultaneamente:
 - 🔗 Cliques / conversão
 
 DADOS DA SEMANA:
-- Posts publicados: ${totalPosts}
-- Agendados: ${scheduled.length}
-- Rascunhos: ${drafts.length}
+- Posts publicados: ${totalPosts} (meta semanal: ${totalWeeklyGoal})
+- Breakdown: ${typeBreakdown.reels} reels, ${typeBreakdown.carousels} carrosséis, ${typeBreakdown.news} notícias, ${typeBreakdown.images} imagens, ${typeBreakdown.marketing} marketing
+- Agendados: ${scheduled.length} | Rascunhos: ${drafts.length}
 - Curtidas: ${totalLikes} | Comentários: ${totalComments} | Shares: ${totalShares} | Saves: ${totalSaves}
 - Alcance total: ${totalReach}
 - Meta de views semanal: ${goalViews} (progresso: ${viewsProgress}%)
-- Meta de seguidores: ${goalFollowers}
 - Posts/dia recomendado: ${recommendedPostsPerDay}
+
+ESTRATÉGIA CONFIGURADA (posts/semana):
+- Reels: ${distVideos} | Carrosséis: ${distCarousels} | Notícias: ${distNews} | Imagens: ${distImages} | Marketing: 1
+- Total semanal: ${totalWeeklyGoal} posts
+
+PROGRESSO vs META:
+- Reels: ${typeBreakdown.reels}/${distVideos} | Carrosséis: ${typeBreakdown.carousels}/${distCarousels} | Notícias: ${typeBreakdown.news}/${distNews} | Imagens: ${typeBreakdown.images}/${distImages} | Marketing: ${typeBreakdown.marketing}/1
+
+AFILIADOS:
 - Links de afiliado ativos: ${affiliateLinks?.length || 0}
 - Posts desde último afiliado: ${postsSinceLastAffiliate}
 - Precisa postar afiliado? ${postsSinceLastAffiliate >= 4 && (affiliateLinks?.length || 0) > 0 ? 'SIM (já passou 4 posts)' : 'NÃO'}
+${sourceRankingText}
+
 - Hora atual Brasília: ${brasiliaHour}h
 
 REGRAS:
 1. Fale como HUMANO (social media falando pro chefe)
-2. Seja BREVE (máx 3-4 parágrafos)
+2. Seja BREVE (máx 4-5 parágrafos)
 3. Diga o que FEZ e o que VAI FAZER
-4. Explique como cada ação contribui para as 4 prioridades
-5. Se precisa postar afiliado, mencione
-6. Use emojis moderados
-7. Termine com o plano pras próximas horas`;
+4. ANALISE A ESTRATÉGIA ATUAL: compare a distribuição configurada com o que realmente foi postado e sugira ajustes se necessário
+5. Se algum tipo de conteúdo está abaixo da meta semanal, destaque e diga o que vai priorizar
+6. Comente sobre as fontes RSS que mais engajam e sugira priorizar ou diversificar
+7. Se precisa postar afiliado, mencione
+8. Use emojis moderados
+9. Termine com o plano pras próximas horas`;
 
         const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
           method: 'POST',
@@ -160,11 +221,9 @@ REGRAS:
       }
 
       if (!reportContent) {
-        // Data-only report (no AI cost) — used on non-report hours
-        reportContent = `📊 **Checkpoint ${brasiliaHour}h**\n\n📝 ${totalPosts} posts publicados | 📅 ${scheduled.length} agendados\n❤️ ${totalLikes} curtidas | 💬 ${totalComments} comentários | 🔄 ${totalShares} shares | 💾 ${totalSaves} saves\n👁️ Alcance: ${totalReach.toLocaleString()} (${viewsProgress}% da meta)\n📈 Recomendação: ${recommendedPostsPerDay} posts/dia`;
+        reportContent = `📊 **Checkpoint ${brasiliaHour}h**\n\n📝 ${totalPosts}/${totalWeeklyGoal} posts (${typeBreakdown.reels} reels, ${typeBreakdown.carousels} carrosséis, ${typeBreakdown.news} notícias, ${typeBreakdown.images} imagens, ${typeBreakdown.marketing} marketing)\n📅 ${scheduled.length} agendados\n❤️ ${totalLikes} curtidas | 💬 ${totalComments} comentários | 🔄 ${totalShares} shares | 💾 ${totalSaves} saves\n👁️ Alcance: ${totalReach.toLocaleString()} (${viewsProgress}% da meta)\n📈 Recomendação: ${recommendedPostsPerDay} posts/dia`;
       }
 
-      // Save proactive message
       await supabase
         .from('agent_proactive_messages')
         .insert({
@@ -173,15 +232,17 @@ REGRAS:
           message_type: 'report',
           metadata: {
             total_posts: totalPosts,
+            weekly_goal: totalWeeklyGoal,
+            type_breakdown: typeBreakdown,
             total_reach: totalReach,
             views_progress: viewsProgress,
             recommended_posts_per_day: recommendedPostsPerDay,
             needs_affiliate: postsSinceLastAffiliate >= 4 && (affiliateLinks?.length || 0) > 0,
-            posts_since_affiliate: postsSinceLastAffiliate
+            posts_since_affiliate: postsSinceLastAffiliate,
+            source_rankings: sourceRankingText,
           }
         });
 
-      // Update agent context with recommended posts/day
       await supabase
         .from('agent_context')
         .update({ 
@@ -191,7 +252,7 @@ REGRAS:
         })
         .eq('workspace_id', workspaceId);
 
-      console.log(`[Growth Report] Workspace ${workspaceId}: ${totalPosts} posts, ${viewsProgress}% progress, recommend ${recommendedPostsPerDay}/day`);
+      console.log(`[Growth Report] Workspace ${workspaceId}: ${totalPosts}/${totalWeeklyGoal} posts, ${viewsProgress}% progress, recommend ${recommendedPostsPerDay}/day`);
     }
 
     return new Response(JSON.stringify({ success: true, processed: contexts.length }), {
