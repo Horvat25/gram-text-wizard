@@ -2134,9 +2134,9 @@ async function generateInsightsAndAnalysis(
     
     // 2. Preparar dados de performance
     const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                          state.weeklyProgress.news + state.weeklyProgress.images;
+                          state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
     const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                       state.weeklyGoals.news + state.weeklyGoals.images;
+                       state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
     
     // 3. Gerar análise com IA
     const analysisPrompt = `Você é um analista de conteúdo digital. Analise os dados e gere insights curtos e acionáveis.
