@@ -2418,9 +2418,9 @@ async function processWorkspace(
     
     // Send final summary with stats
     const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                       state.weeklyGoals.news + state.weeklyGoals.images;
+                       state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
     const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                          state.weeklyProgress.news + state.weeklyProgress.images;
+                          state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
     
     await sendChatMessage(supabase, userId, getConversationalUpdate(agentName, 'completed', {
       weeklyProgress: totalProgress,
