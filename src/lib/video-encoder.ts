@@ -439,7 +439,8 @@ export async function generateVideoFromSegments(
   return new Promise(async (resolve) => {
     mediaRecorder.onstop = () => {
       audioCtx.close().catch(() => {});
-      resolve(new Blob(chunks, { type: 'video/webm' }));
+      const blobType = isMP4 ? 'video/mp4' : 'video/webm';
+      resolve(new Blob(chunks, { type: blobType }));
     };
 
     mediaRecorder.start(100);
