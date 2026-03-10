@@ -2149,6 +2149,7 @@ DADOS DE PERFORMANCE:
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
 - Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
+- Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}
 - Tipos que performam melhor: ${state.bestPerformingTypes.join(', ') || 'dados insuficientes'}
 - Temas recentes: ${state.saturatedTopics.join(', ') || 'variados'}
 
