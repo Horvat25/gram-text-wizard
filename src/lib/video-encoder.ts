@@ -342,8 +342,8 @@ export async function generateVideoFromSegments(
 
   const BRAND = 'Neural Update';
   const TRANSITION_DURATION = 0.4;
-  const CTA_DURATION = 4;
   const HOOK_DURATION = 3;
+  const CTA_MIN_DURATION = 4; // minimum CTA screen time
 
   // ─── Canvas setup ────────────────────────────────────────
   const canvas = document.createElement('canvas');
