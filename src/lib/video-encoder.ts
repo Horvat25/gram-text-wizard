@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import fixWebmDuration from 'fix-webm-duration';
 
 export interface VideoSegment {
   imageUrl: string;
@@ -49,10 +50,6 @@ function drawImageKenBurns(
   progress: number
 ) {
   const kb = getKenBurns(segIndex, progress);
-  const sw = width / kb.scale;
-  const sh = height / kb.scale;
-
-  // Scale image to cover canvas
   const imgRatio = img.width / img.height;
   const canvasRatio = width / height;
   let drawW: number, drawH: number;
@@ -63,23 +60,19 @@ function drawImageKenBurns(
     drawW = img.width;
     drawH = drawW / canvasRatio;
   }
-
   const sx = (img.width - drawW) / 2 + kb.x * drawW;
   const sy = (img.height - drawH) / 2 + kb.y * drawH;
-
   ctx.drawImage(img, sx, sy, drawW, drawH, 0, 0, width, height);
 }
 
 // ─── Draw cinematic gradient overlays ────────────────────────
 function drawGradientOverlays(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  // Top gradient (for branding area)
   const topGrad = ctx.createLinearGradient(0, 0, 0, height * 0.15);
   topGrad.addColorStop(0, 'rgba(11, 15, 26, 0.7)');
   topGrad.addColorStop(1, 'rgba(11, 15, 26, 0)');
   ctx.fillStyle = topGrad;
   ctx.fillRect(0, 0, width, height * 0.15);
 
-  // Bottom gradient (for captions)
   const botGrad = ctx.createLinearGradient(0, height * 0.65, 0, height);
   botGrad.addColorStop(0, 'rgba(11, 15, 26, 0)');
   botGrad.addColorStop(0.4, 'rgba(11, 15, 26, 0.5)');
@@ -110,19 +103,16 @@ function drawCaption(
   opacity: number
 ) {
   if (!text || opacity <= 0) return;
-
   ctx.save();
   ctx.globalAlpha = Math.min(1, opacity);
   ctx.font = 'bold 42px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
 
-  // Word wrap
   const maxWidth = width - 120;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
-
   for (const word of words) {
     const testLine = currentLine ? `${currentLine} ${word}` : word;
     if (ctx.measureText(testLine).width > maxWidth && currentLine) {
@@ -142,12 +132,12 @@ function drawCaption(
   ctx.fillStyle = 'rgba(11, 15, 26, 0.75)';
   const padding = 20;
   const bgWidth = Math.min(maxWidth + padding * 2, width - 60);
-  ctx.beginPath();
   const rx = width / 2 - bgWidth / 2;
   const ry = startY - padding;
   const rw = bgWidth;
   const rh = totalHeight + padding * 2;
   const radius = 16;
+  ctx.beginPath();
   ctx.moveTo(rx + radius, ry);
   ctx.lineTo(rx + rw - radius, ry);
   ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
@@ -160,18 +150,16 @@ function drawCaption(
   ctx.closePath();
   ctx.fill();
 
-  // Text with shadow
   ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
   ctx.shadowBlur = 6;
   ctx.fillStyle = '#FFFFFF';
-
   for (let i = 0; i < lines.length; i++) {
     ctx.fillText(lines[i], width / 2, startY + i * lineHeight);
   }
   ctx.restore();
 }
 
-// ─── Draw Hook flash effect (first 3 seconds) ───────────────
+// ─── Draw Hook flash effect ─────────────────────────────────
 function drawHookEffect(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -179,12 +167,9 @@ function drawHookEffect(
   hookProgress: number
 ) {
   if (hookProgress <= 0 || hookProgress >= 1) return;
-
-  // Flash effect: white flash that fades out
   const flashIntensity = hookProgress < 0.15
     ? hookProgress / 0.15
     : Math.max(0, 1 - (hookProgress - 0.15) / 0.3);
-
   if (flashIntensity > 0) {
     ctx.save();
     ctx.globalAlpha = flashIntensity * 0.3;
@@ -202,7 +187,6 @@ function drawCTAScreen(
   progress: number,
   brand: string
 ) {
-  // Background gradient
   const grad = ctx.createLinearGradient(0, 0, width, height);
   grad.addColorStop(0, '#0B0F1A');
   grad.addColorStop(0.5, '#1a1040');
@@ -210,7 +194,6 @@ function drawCTAScreen(
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
-  // Pulsing glow
   const pulse = 0.5 + 0.5 * Math.sin(progress * Math.PI * 4);
   ctx.save();
   const glowGrad = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 0.5);
@@ -222,7 +205,6 @@ function drawCTAScreen(
 
   const fadeIn = easeInOutCubic(Math.min(1, progress * 3));
 
-  // Brand name
   ctx.save();
   ctx.globalAlpha = fadeIn;
   ctx.font = 'bold 64px sans-serif';
@@ -233,7 +215,6 @@ function drawCTAScreen(
   ctx.fillText(brand, width / 2, height / 2 - 80);
   ctx.restore();
 
-  // Subtitle
   ctx.save();
   ctx.globalAlpha = fadeIn * 0.8;
   ctx.font = '32px sans-serif';
@@ -242,13 +223,10 @@ function drawCTAScreen(
   ctx.fillText('IA • Tecnologia • Futuro', width / 2, height / 2 - 20);
   ctx.restore();
 
-  // "SEGUIR AGORA" button
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  const btnW = 380;
-  const btnH = 70;
-  const btnX = width / 2 - btnW / 2;
-  const btnY = height / 2 + 40;
+  const btnW = 380, btnH = 70;
+  const btnX = width / 2 - btnW / 2, btnY = height / 2 + 40;
   const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
   btnGrad.addColorStop(0, '#7B2CFF');
   btnGrad.addColorStop(1, '#a855f7');
@@ -273,7 +251,7 @@ function drawCTAScreen(
   ctx.restore();
 }
 
-// ─── Crossfade transition helper ─────────────────────────────
+// ─── Crossfade ───────────────────────────────────────────────
 function drawCrossfade(
   ctx: CanvasRenderingContext2D,
   imgA: HTMLImageElement,
@@ -286,13 +264,10 @@ function drawCrossfade(
   progressA: number,
   progressB: number
 ) {
-  // Draw image A
   ctx.save();
   ctx.globalAlpha = 1 - blendProgress;
   drawImageKenBurns(ctx, imgA, width, height, segIndexA, progressA);
   ctx.restore();
-
-  // Draw image B
   ctx.save();
   ctx.globalAlpha = blendProgress;
   drawImageKenBurns(ctx, imgB, width, height, segIndexB, progressB);
@@ -323,17 +298,86 @@ async function loadAudioBuffer(
   }
 }
 
+// ─── Render a single frame at a given time ───────────────────
+function renderFrame(
+  ctx: CanvasRenderingContext2D,
+  currentTime: number,
+  segments: VideoSegment[],
+  images: HTMLImageElement[],
+  width: number,
+  height: number,
+  contentDuration: number,
+  ctaDuration: number,
+  brand: string,
+  fps: number
+) {
+  const TRANSITION_DURATION = 0.4;
+  const HOOK_DURATION = 3;
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = '#0B0F1A';
+  ctx.fillRect(0, 0, width, height);
+
+  if (currentTime < contentDuration) {
+    // ── CONTENT PHASE ──
+    let elapsed = 0;
+    let segIndex = 0;
+    for (let i = 0; i < segments.length; i++) {
+      if (currentTime < elapsed + segments[i].duration) {
+        segIndex = i;
+        break;
+      }
+      elapsed += segments[i].duration;
+    }
+
+    const segProgress = (currentTime - elapsed) / segments[segIndex].duration;
+    const transitionFrames = TRANSITION_DURATION * fps;
+    const segFrames = Math.round(segments[segIndex].duration * fps);
+    const frameInSeg = Math.round((currentTime - elapsed) * fps);
+    const isInTransition = segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
+
+    if (isInTransition) {
+      const transProgress = (frameInSeg - (segFrames - transitionFrames)) / transitionFrames;
+      const blendT = easeInOutCubic(Math.min(1, Math.max(0, transProgress)));
+      drawCrossfade(ctx, images[segIndex], images[segIndex + 1], width, height, blendT, segIndex, segIndex + 1, segProgress, 0);
+    } else {
+      drawImageKenBurns(ctx, images[segIndex], width, height, segIndex, segProgress);
+    }
+
+    drawGradientOverlays(ctx, width, height);
+
+    if (segIndex === 0 && currentTime < HOOK_DURATION) {
+      drawHookEffect(ctx, width, height, currentTime / HOOK_DURATION);
+    }
+
+    const captionText = segments[segIndex].text;
+    if (captionText) {
+      let captionOpacity = 1;
+      if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
+      if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
+      captionOpacity = Math.max(0, Math.min(1, captionOpacity));
+      drawCaption(ctx, captionText, width, height, captionOpacity);
+    }
+
+    drawWatermark(ctx, width, height, brand);
+  } else {
+    // ── CTA PHASE ──
+    const ctaProgress = (currentTime - contentDuration) / ctaDuration;
+    drawCTAScreen(ctx, width, height, ctaProgress, brand);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
-// MAIN: Generate video with transitions, audio, captions, CTA
+// MAIN: Generate video — robust requestAnimationFrame approach
 // ═══════════════════════════════════════════════════════════════
 export async function generateVideoFromSegments(
   options: GenerateVideoOptions
 ): Promise<Blob> {
   const {
     segments,
-    width = 720,   // 720p — fast enough for real-time Canvas rendering
-    height = 1280, // 9:16 vertical
-    fps = 24,      // Cinema standard — lighter than 30fps
+    width = 720,
+    height = 1280,
+    fps = 24,
     audioUrl,
     ctaAudioUrl,
     backgroundMusicUrl,
@@ -341,18 +385,21 @@ export async function generateVideoFromSegments(
   } = options;
 
   const BRAND = 'Neural Update';
-  const TRANSITION_DURATION = 0.4;
-  const HOOK_DURATION = 3;
-  const CTA_MIN_DURATION = 4; // minimum CTA screen time
+  const CTA_MIN_DURATION = 4;
 
   // ─── Canvas setup ────────────────────────────────────────
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d')!;
   canvas.width = width;
   canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
 
   // ─── Audio setup ─────────────────────────────────────────
   const audioCtx = new AudioContext();
+  // CRITICAL: Resume AudioContext (browsers suspend it without user gesture)
+  if (audioCtx.state === 'suspended') {
+    await audioCtx.resume();
+  }
+
   const dest = audioCtx.createMediaStreamDestination();
 
   // Load audio sources in parallel
@@ -368,15 +415,13 @@ export async function generateVideoFromSegments(
     music: musicBuf ? `${musicBuf.duration.toFixed(1)}s` : 'none',
   });
 
-  // Calculate CTA duration: match audio length or use minimum
   const CTA_DURATION = ctaBuf ? Math.max(CTA_MIN_DURATION, ctaBuf.duration + 1.5) : CTA_MIN_DURATION;
-  console.log('[video-encoder] CTA duration:', CTA_DURATION.toFixed(1), 's', ctaBuf ? `(audio: ${ctaBuf.duration.toFixed(1)}s)` : '(no audio)');
-
-  // Calculate total content duration (segments + CTA)
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
   const totalDuration = contentDuration + CTA_DURATION;
 
-  // ─── Preload all images BEFORE starting audio ────────────
+  console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (content: ${contentDuration.toFixed(1)}s + CTA: ${CTA_DURATION.toFixed(1)}s)`);
+
+  // ─── Preload all images ──────────────────────────────────
   const images: HTMLImageElement[] = await Promise.all(
     segments.map(seg =>
       new Promise<HTMLImageElement>((resolve) => {
@@ -384,18 +429,18 @@ export async function generateVideoFromSegments(
         img.crossOrigin = 'anonymous';
         img.onload = () => resolve(img);
         img.onerror = () => {
-          console.warn('[video-encoder] Image failed to load:', seg.imageUrl?.substring(0, 60));
-          const fallbackCanvas = document.createElement('canvas');
-          fallbackCanvas.width = width;
-          fallbackCanvas.height = height;
-          const fCtx = fallbackCanvas.getContext('2d')!;
+          console.warn('[video-encoder] Image failed:', seg.imageUrl?.substring(0, 60));
+          const fallback = document.createElement('canvas');
+          fallback.width = width;
+          fallback.height = height;
+          const fCtx = fallback.getContext('2d')!;
           const grad = fCtx.createLinearGradient(0, 0, width, height);
           grad.addColorStop(0, '#0B0F1A');
           grad.addColorStop(1, '#1a1040');
           fCtx.fillStyle = grad;
           fCtx.fillRect(0, 0, width, height);
           const fallbackImg = new Image();
-          fallbackImg.src = fallbackCanvas.toDataURL();
+          fallbackImg.src = fallback.toDataURL();
           fallbackImg.onload = () => resolve(fallbackImg);
         };
         img.src = seg.imageUrl;
@@ -403,31 +448,30 @@ export async function generateVideoFromSegments(
     )
   );
 
-  console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s video at ${fps}fps (${width}x${height})`);
+  console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s @ ${fps}fps (${width}x${height})`);
 
-  // ─── Combine video + audio streams ───────────────────────
-  // Use captureStream(0) for manual frame control — no framerate cap
-  const videoStream = canvas.captureStream(0);
-  const videoTrack = videoStream.getVideoTracks()[0] as any;
+  // ─── Stream setup ────────────────────────────────────────
+  // Use captureStream WITH fps — auto-captures frames as canvas updates
+  // This is far more reliable than captureStream(0) + manual requestFrame()
+  const videoStream = canvas.captureStream(fps);
   const combinedStream = new MediaStream();
-  combinedStream.addTrack(videoTrack);
+  videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
   dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
 
-  // ─── MediaRecorder with codec fallback (prefer MP4/H.264 for Instagram) ───
+  // ─── MediaRecorder with codec fallback ───────────────────
   const codecPriority = [
-    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',  // H.264 Baseline + AAC
-    'video/mp4;codecs=avc1.42E01E',              // H.264 Baseline
-    'video/mp4',                                  // Generic MP4
-    'video/webm;codecs=vp8,opus',                // VP8 fallback
-    'video/webm',                                 // Generic WebM fallback
+    'video/webm;codecs=vp8,opus',   // Most reliable across browsers
+    'video/webm;codecs=vp8',
+    'video/webm',
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+    'video/mp4',
   ];
-  let mimeType = codecPriority.find(m => MediaRecorder.isTypeSupported(m)) || 'video/webm';
-  const isMP4 = mimeType.startsWith('video/mp4');
-  console.log(`[VideoEncoder] Using codec: ${mimeType} (MP4: ${isMP4})`);
+  const mimeType = codecPriority.find(m => MediaRecorder.isTypeSupported(m)) || 'video/webm';
+  console.log(`[video-encoder] Codec: ${mimeType}`);
 
   const mediaRecorder = new MediaRecorder(combinedStream, {
     mimeType,
-    videoBitsPerSecond: 3_000_000, // 3Mbps — good quality for 720p
+    videoBitsPerSecond: 3_000_000,
   });
 
   const chunks: Blob[] = [];
@@ -435,20 +479,46 @@ export async function generateVideoFromSegments(
     if (e.data.size > 0) chunks.push(e.data);
   };
 
-  // ─── Render loop ─────────────────────────────────────────
-  return new Promise(async (resolve) => {
-    mediaRecorder.onstop = () => {
+  // ─── Start recording FIRST, then schedule audio + render ──
+  return new Promise<Blob>(async (resolve, reject) => {
+    mediaRecorder.onstop = async () => {
       audioCtx.close().catch(() => {});
-      const blobType = isMP4 ? 'video/mp4' : 'video/webm';
-      resolve(new Blob(chunks, { type: blobType }));
+
+      if (chunks.length === 0) {
+        reject(new Error('MediaRecorder produced no data'));
+        return;
+      }
+
+      let blob = new Blob(chunks, { type: mimeType });
+      console.log(`[video-encoder] Raw blob: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
+
+      // Fix WebM duration metadata (browsers don't set it correctly)
+      if (mimeType.includes('webm')) {
+        try {
+          blob = await fixWebmDuration(blob, totalDuration * 1000, { logger: false });
+          console.log('[video-encoder] WebM duration fixed');
+        } catch (e) {
+          console.warn('[video-encoder] fixWebmDuration failed, using raw blob:', e);
+        }
+      }
+
+      resolve(blob);
     };
 
-    mediaRecorder.start(100);
+    mediaRecorder.onerror = (e: any) => {
+      console.error('[video-encoder] MediaRecorder error:', e);
+      reject(new Error(`MediaRecorder error: ${e.error?.message || 'unknown'}`));
+    };
 
-    // Record the audioCtx time when we start — all audio is scheduled relative to this
+    // Start recording with frequent data collection
+    mediaRecorder.start(200);
+
+    // Small delay to ensure MediaRecorder is ready
+    await new Promise(r => setTimeout(r, 150));
+
+    // ─── Schedule ALL audio NOW ─────────────────────────────
     const audioStartTime = audioCtx.currentTime;
 
-    // Schedule narration audio NOW (right before render loop)
     if (narrationBuf) {
       const src = audioCtx.createBufferSource();
       src.buffer = narrationBuf;
@@ -458,7 +528,6 @@ export async function generateVideoFromSegments(
       src.start(audioStartTime);
     }
 
-    // Schedule CTA audio after content
     if (ctaBuf) {
       const src = audioCtx.createBufferSource();
       src.buffer = ctaBuf;
@@ -468,7 +537,6 @@ export async function generateVideoFromSegments(
       src.start(audioStartTime + contentDuration + 0.3);
     }
 
-    // Schedule background music
     if (musicBuf) {
       const src = audioCtx.createBufferSource();
       src.buffer = musicBuf;
@@ -481,107 +549,51 @@ export async function generateVideoFromSegments(
       gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
     }
 
-    const totalFrames = Math.round(totalDuration * fps);
-    const frameInterval = 1000 / fps; // ~41.6ms at 24fps
-    const wallStartTime = performance.now();
+    // ─── Render loop using requestAnimationFrame ────────────
+    // This is the most reliable approach: the browser calls us when it's
+    // ready to paint, and captureStream(fps) auto-captures the canvas.
+    const renderStartTime = performance.now();
+    let lastProgressUpdate = 0;
+    let stopped = false;
 
-    for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
-      const currentTime = frameIndex / fps;
+    const tick = () => {
+      if (stopped) return;
 
-      // ── Clear canvas ──
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = '#0B0F1A';
-      ctx.fillRect(0, 0, width, height);
+      const elapsed = (performance.now() - renderStartTime) / 1000;
 
-      if (currentTime < contentDuration) {
-        // ── CONTENT PHASE ──
-        let elapsed = 0;
-        let segIndex = 0;
-        for (let i = 0; i < segments.length; i++) {
-          if (currentTime < elapsed + segments[i].duration) {
-            segIndex = i;
-            break;
+      if (elapsed >= totalDuration) {
+        // Final frame
+        renderFrame(ctx, totalDuration - 0.001, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+        onProgress?.(100);
+
+        // Give MediaRecorder time to flush last data
+        stopped = true;
+        setTimeout(() => {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
           }
-          elapsed += segments[i].duration;
-        }
-
-        const segProgress = (currentTime - elapsed) / segments[segIndex].duration;
-        const transitionFrames = TRANSITION_DURATION * fps;
-        const segFrames = Math.round(segments[segIndex].duration * fps);
-        const frameInSeg = Math.round((currentTime - elapsed) * fps);
-
-        const isInTransition = segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
-
-        if (isInTransition) {
-          const transProgress = (frameInSeg - (segFrames - transitionFrames)) / transitionFrames;
-          const blendT = easeInOutCubic(Math.min(1, Math.max(0, transProgress)));
-          drawCrossfade(
-            ctx, images[segIndex], images[segIndex + 1],
-            width, height, blendT,
-            segIndex, segIndex + 1,
-            segProgress, 0
-          );
-        } else {
-          drawImageKenBurns(ctx, images[segIndex], width, height, segIndex, segProgress);
-        }
-
-        drawGradientOverlays(ctx, width, height);
-
-        if (segIndex === 0 && currentTime < HOOK_DURATION) {
-          drawHookEffect(ctx, width, height, currentTime / HOOK_DURATION);
-        }
-
-        const captionText = segments[segIndex].text;
-        if (captionText) {
-          let captionOpacity = 1;
-          if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
-          if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
-          captionOpacity = Math.max(0, Math.min(1, captionOpacity));
-          drawCaption(ctx, captionText, width, height, captionOpacity);
-        }
-
-        drawWatermark(ctx, width, height, BRAND);
-      } else {
-        // ── CTA PHASE ──
-        const ctaProgress = (currentTime - contentDuration) / CTA_DURATION;
-        drawCTAScreen(ctx, width, height, ctaProgress, BRAND);
+        }, 500);
+        return;
       }
 
-      // Request frame capture from the stream (manual mode with captureStream(0))
-      if (videoTrack.requestFrame) {
-        videoTrack.requestFrame();
-      }
+      // Render current frame
+      renderFrame(ctx, elapsed, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
 
-      // Progress callback
-      if (frameIndex % 6 === 0) { // Update every 6 frames (~4x/sec) to reduce overhead
-        onProgress?.(Math.round((frameIndex / totalFrames) * 100));
-      }
-
-      // ── Real-time sync: wait until the right wall-clock moment ──
-      // This ensures audio and video stay in sync
-      const expectedWallTime = wallStartTime + (frameIndex + 1) * frameInterval;
+      // Progress callback (throttled to ~4 updates/sec)
       const now = performance.now();
-      const delay = expectedWallTime - now;
-
-      if (delay > 2) {
-        // We're ahead of schedule — wait
-        await new Promise(r => setTimeout(r, delay));
-      } else if (delay < -frameInterval * 2) {
-        // We're more than 2 frames behind — skip frames to catch up
-        const framesToSkip = Math.min(3, Math.floor(-delay / frameInterval));
-        if (framesToSkip > 0) {
-          console.log(`[video-encoder] Skipping ${framesToSkip} frames to maintain sync (behind by ${(-delay).toFixed(0)}ms)`);
-          frameIndex += framesToSkip;
-        }
-        await new Promise(r => setTimeout(r, 1));
-      } else {
-        // We're slightly behind but within tolerance — yield briefly
-        await new Promise(r => setTimeout(r, 1));
+      if (now - lastProgressUpdate > 250) {
+        onProgress?.(Math.round((elapsed / totalDuration) * 100));
+        lastProgressUpdate = now;
       }
-    }
 
-    onProgress?.(100);
-    mediaRecorder.stop();
+      requestAnimationFrame(tick);
+    };
+
+    // Draw first frame immediately so MediaRecorder has content
+    renderFrame(ctx, 0, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+
+    // Start the render loop
+    requestAnimationFrame(tick);
   });
 }
 
