@@ -1798,11 +1798,11 @@ async function autoEvolveStrategy(
       return;
     }
     
-    // Get current totals
-    const currentTotal = (state.context?.content_distribution_videos || 3) +
-      (state.context?.content_distribution_carousels || 2) +
-      (state.context?.content_distribution_news || 4) +
-      (state.context?.content_distribution_images || 5);
+    // Get current totals — use balanced defaults matching weekly goals
+    const currentTotal = (state.context?.content_distribution_videos || 2) +
+      (state.context?.content_distribution_carousels || 1) +
+      (state.context?.content_distribution_news || 5) +
+      (state.context?.content_distribution_images || 3);
     
     // Calculate new distribution based on scores (weighted)
     const totalScore = Object.values(avgScores).reduce((a, b) => a + b, 0);
