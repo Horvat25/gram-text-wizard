@@ -62,7 +62,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_narrated_video",
-      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'stories', 'shorts'.",
+      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'stories', 'shorts'. TAMBÉM use para VÍDEOS DE MARKETING: quando o usuário pedir 'vídeo de marketing' ou 'reels de afiliado', busque os dados do produto no affiliate_links e use como topic.",
       parameters: {
         type: "object",
         properties: {
