@@ -347,7 +347,14 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     `${t.type}: ${Math.round(t.percentage)}% (${t.goal - t.remaining}/${t.goal})`
   ).join(', '));
   
-  const nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  // MARKETING INTERCALATION: Force marketing if it's overdue
+  let nextContentType: ContentType | null;
+  if (hasAffiliateLinks && (marketingDue || marketingOverdue) && weeklyProgress.marketing < weeklyGoals.marketing) {
+    nextContentType = 'marketing';
+    console.log(`[AGENT] ⚡ MARKETING INTERCALATION: ${totalRegularPosts} regular posts done, forcing marketing post`);
+  } else {
+    nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
+  }
   console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
   
   // ===== 30-DAY HISTORICAL ANALYSIS (like a senior marketer would do) =====
