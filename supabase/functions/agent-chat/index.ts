@@ -3116,13 +3116,11 @@ Quando usuário diz... | Você calcula...
 - **O link de afiliado DEVE aparecer na legenda do post!**
 
 ## 🎬 VÍDEO DE MARKETING (IMPORTANTE!)
-- Quando o usuário pedir "vídeo de marketing", "reels de marketing", "vídeo de afiliado" ou "reels promovendo [produto]":
-  1. Primeiro, busque os links de afiliado com \`list_available_news\` ou internamente
-  2. Use \`create_narrated_video\` com o tema sendo o PRODUTO do link de afiliado
-  3. Na caption, INCLUA o link de afiliado do produto
-  4. No topic, descreva o produto e seus benefícios
-  5. Exemplo: topic="Review do [Produto] - vale a pena?", caption="🔥 [Hook]\\n\\n[Benefício]\\n\\n🔗 [link_afiliado]"
-- NUNCA use \`create_affiliate_post\` para vídeos - use SEMPRE \`create_narrated_video\` com dados do afiliado
+- Quando o usuário pedir "vídeo de marketing", "reels de marketing", "vídeo de afiliado", "cria um vídeo de marketing":
+  1. Use DIRETAMENTE a tool \`create_marketing_video\` — ela busca automaticamente o link de afiliado e cria o vídeo
+  2. NÃO use \`create_narrated_video\` para marketing — use SEMPRE \`create_marketing_video\`
+  3. Se o usuário mencionar um produto específico, passe o nome no parâmetro \`product_name\`
+  4. O link de afiliado é incluído automaticamente na legenda
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
