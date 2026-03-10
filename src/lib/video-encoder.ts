@@ -331,9 +331,9 @@ export async function generateVideoFromSegments(
 ): Promise<Blob> {
   const {
     segments,
-    width = 1080,
-    height = 1920,
-    fps = 30,
+    width = 720,   // 720p — fast enough for real-time Canvas rendering
+    height = 1280, // 9:16 vertical
+    fps = 24,      // Cinema standard — lighter than 30fps
     audioUrl,
     ctaAudioUrl,
     backgroundMusicUrl,
@@ -341,9 +341,9 @@ export async function generateVideoFromSegments(
   } = options;
 
   const BRAND = 'Neural Update';
-  const TRANSITION_DURATION = 0.4; // seconds for crossfade
-  const CTA_DURATION = 4; // seconds for end CTA screen
-  const HOOK_DURATION = 3; // seconds for hook effect on first segment
+  const TRANSITION_DURATION = 0.4;
+  const CTA_DURATION = 4;
+  const HOOK_DURATION = 3;
 
   // ─── Canvas setup ────────────────────────────────────────
   const canvas = document.createElement('canvas');
@@ -372,66 +372,7 @@ export async function generateVideoFromSegments(
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
   const totalDuration = contentDuration + CTA_DURATION;
 
-  // Schedule narration audio
-  if (narrationBuf) {
-    const src = audioCtx.createBufferSource();
-    src.buffer = narrationBuf;
-    const gain = audioCtx.createGain();
-    gain.gain.value = 1.0;
-    src.connect(gain).connect(dest);
-    src.start(audioCtx.currentTime);
-  }
-
-  // Schedule CTA audio after content
-  if (ctaBuf) {
-    const src = audioCtx.createBufferSource();
-    src.buffer = ctaBuf;
-    const gain = audioCtx.createGain();
-    gain.gain.value = 0.9;
-    src.connect(gain).connect(dest);
-    src.start(audioCtx.currentTime + contentDuration + 0.3); // 300ms silence buffer
-  }
-
-  // Schedule background music (loop, lower volume)
-  if (musicBuf) {
-    const src = audioCtx.createBufferSource();
-    src.buffer = musicBuf;
-    src.loop = true;
-    const gain = audioCtx.createGain();
-    gain.gain.value = narrationBuf ? 0.12 : 0.35; // lower if narration exists
-    src.connect(gain).connect(dest);
-    src.start(audioCtx.currentTime);
-    // Fade out music at the end
-    gain.gain.setValueAtTime(gain.gain.value, audioCtx.currentTime + totalDuration - 2);
-    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + totalDuration);
-  }
-
-  // ─── Combine video + audio streams ───────────────────────
-  const videoStream = canvas.captureStream(fps);
-  const combinedStream = new MediaStream();
-  videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
-  dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
-
-  // ─── MediaRecorder with codec fallback ───────────────────
-  let mimeType = 'video/webm;codecs=vp9,opus';
-  if (!MediaRecorder.isTypeSupported(mimeType)) {
-    mimeType = 'video/webm;codecs=vp8,opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm';
-    }
-  }
-
-  const mediaRecorder = new MediaRecorder(combinedStream, {
-    mimeType,
-    videoBitsPerSecond: 5_000_000,
-  });
-
-  const chunks: Blob[] = [];
-  mediaRecorder.ondataavailable = (e) => {
-    if (e.data.size > 0) chunks.push(e.data);
-  };
-
-  // ─── Preload all images ──────────────────────────────────
+  // ─── Preload all images BEFORE starting audio ────────────
   const images: HTMLImageElement[] = await Promise.all(
     segments.map(seg =>
       new Promise<HTMLImageElement>((resolve) => {
@@ -440,7 +381,6 @@ export async function generateVideoFromSegments(
         img.onload = () => resolve(img);
         img.onerror = () => {
           console.warn('[video-encoder] Image failed to load:', seg.imageUrl?.substring(0, 60));
-          // Create fallback dark image
           const fallbackCanvas = document.createElement('canvas');
           fallbackCanvas.width = width;
           fallbackCanvas.height = height;
@@ -459,7 +399,31 @@ export async function generateVideoFromSegments(
     )
   );
 
-  console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s video at ${fps}fps`);
+  console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s video at ${fps}fps (${width}x${height})`);
+
+  // ─── Combine video + audio streams ───────────────────────
+  // Use captureStream(0) for manual frame control — no framerate cap
+  const videoStream = canvas.captureStream(0);
+  const videoTrack = videoStream.getVideoTracks()[0] as any;
+  const combinedStream = new MediaStream();
+  combinedStream.addTrack(videoTrack);
+  dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
+
+  // ─── MediaRecorder with codec fallback ───────────────────
+  let mimeType = 'video/webm;codecs=vp8,opus'; // VP8 is faster to encode than VP9
+  if (!MediaRecorder.isTypeSupported(mimeType)) {
+    mimeType = 'video/webm';
+  }
+
+  const mediaRecorder = new MediaRecorder(combinedStream, {
+    mimeType,
+    videoBitsPerSecond: 3_000_000, // 3Mbps — good quality for 720p
+  });
+
+  const chunks: Blob[] = [];
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) chunks.push(e.data);
+  };
 
   // ─── Render loop ─────────────────────────────────────────
   return new Promise(async (resolve) => {
@@ -468,10 +432,47 @@ export async function generateVideoFromSegments(
       resolve(new Blob(chunks, { type: 'video/webm' }));
     };
 
-    mediaRecorder.start(100); // collect data every 100ms
+    mediaRecorder.start(100);
+
+    // Record the audioCtx time when we start — all audio is scheduled relative to this
+    const audioStartTime = audioCtx.currentTime;
+
+    // Schedule narration audio NOW (right before render loop)
+    if (narrationBuf) {
+      const src = audioCtx.createBufferSource();
+      src.buffer = narrationBuf;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 1.0;
+      src.connect(gain).connect(dest);
+      src.start(audioStartTime);
+    }
+
+    // Schedule CTA audio after content
+    if (ctaBuf) {
+      const src = audioCtx.createBufferSource();
+      src.buffer = ctaBuf;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.9;
+      src.connect(gain).connect(dest);
+      src.start(audioStartTime + contentDuration + 0.3);
+    }
+
+    // Schedule background music
+    if (musicBuf) {
+      const src = audioCtx.createBufferSource();
+      src.buffer = musicBuf;
+      src.loop = true;
+      const gain = audioCtx.createGain();
+      gain.gain.value = narrationBuf ? 0.12 : 0.35;
+      src.connect(gain).connect(dest);
+      src.start(audioStartTime);
+      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - 2);
+      gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
+    }
 
     const totalFrames = Math.round(totalDuration * fps);
-    const startTime = performance.now();
+    const frameInterval = 1000 / fps; // ~41.6ms at 24fps
+    const wallStartTime = performance.now();
 
     for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
       const currentTime = frameIndex / fps;
@@ -482,9 +483,7 @@ export async function generateVideoFromSegments(
       ctx.fillRect(0, 0, width, height);
 
       if (currentTime < contentDuration) {
-        // ── CONTENT PHASE: segments with transitions ──
-
-        // Find current segment
+        // ── CONTENT PHASE ──
         let elapsed = 0;
         let segIndex = 0;
         for (let i = 0; i < segments.length; i++) {
@@ -500,7 +499,6 @@ export async function generateVideoFromSegments(
         const segFrames = Math.round(segments[segIndex].duration * fps);
         const frameInSeg = Math.round((currentTime - elapsed) * fps);
 
-        // Check if we're in a transition zone
         const isInTransition = segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
 
         if (isInTransition) {
@@ -516,27 +514,21 @@ export async function generateVideoFromSegments(
           drawImageKenBurns(ctx, images[segIndex], width, height, segIndex, segProgress);
         }
 
-        // Gradient overlays
         drawGradientOverlays(ctx, width, height);
 
-        // Hook effect (first segment, first 3s)
         if (segIndex === 0 && currentTime < HOOK_DURATION) {
           drawHookEffect(ctx, width, height, currentTime / HOOK_DURATION);
         }
 
-        // Animated caption with fade in/out
         const captionText = segments[segIndex].text;
         if (captionText) {
           let captionOpacity = 1;
-          // Fade in first 0.5s
           if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
-          // Fade out last 0.15
           if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
           captionOpacity = Math.max(0, Math.min(1, captionOpacity));
           drawCaption(ctx, captionText, width, height, captionOpacity);
         }
 
-        // Watermark
         drawWatermark(ctx, width, height, BRAND);
       } else {
         // ── CTA PHASE ──
@@ -544,16 +536,40 @@ export async function generateVideoFromSegments(
         drawCTAScreen(ctx, width, height, ctaProgress, BRAND);
       }
 
-      // Progress callback
-      onProgress?.(Math.round((frameIndex / totalFrames) * 100));
+      // Request frame capture from the stream (manual mode with captureStream(0))
+      if (videoTrack.requestFrame) {
+        videoTrack.requestFrame();
+      }
 
-      // Timing: sync with real time to keep audio alignment
-      const expectedTime = startTime + (frameIndex + 1) * (1000 / fps);
+      // Progress callback
+      if (frameIndex % 6 === 0) { // Update every 6 frames (~4x/sec) to reduce overhead
+        onProgress?.(Math.round((frameIndex / totalFrames) * 100));
+      }
+
+      // ── Real-time sync: wait until the right wall-clock moment ──
+      // This ensures audio and video stay in sync
+      const expectedWallTime = wallStartTime + (frameIndex + 1) * frameInterval;
       const now = performance.now();
-      const delay = Math.max(1, expectedTime - now);
-      await new Promise(r => setTimeout(r, delay));
+      const delay = expectedWallTime - now;
+
+      if (delay > 2) {
+        // We're ahead of schedule — wait
+        await new Promise(r => setTimeout(r, delay));
+      } else if (delay < -frameInterval * 2) {
+        // We're more than 2 frames behind — skip frames to catch up
+        const framesToSkip = Math.min(3, Math.floor(-delay / frameInterval));
+        if (framesToSkip > 0) {
+          console.log(`[video-encoder] Skipping ${framesToSkip} frames to maintain sync (behind by ${(-delay).toFixed(0)}ms)`);
+          frameIndex += framesToSkip;
+        }
+        await new Promise(r => setTimeout(r, 1));
+      } else {
+        // We're slightly behind but within tolerance — yield briefly
+        await new Promise(r => setTimeout(r, 1));
+      }
     }
 
+    onProgress?.(100);
     mediaRecorder.stop();
   });
 }
