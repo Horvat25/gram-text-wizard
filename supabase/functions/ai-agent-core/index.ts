@@ -735,8 +735,10 @@ async function executeContentPlan(
           // Update plan theme to match the actual news article
           plan.theme = bestItem.item.title;
           console.log(`[AGENT] Video usando artigo RSS: ${rssArticle.title}`);
-          // Mark as used so it won't be reused
+          // Mark as used so it won't be reused (post_id linked after creation)
           await supabase.from('rss_items').update({ is_used: true }).eq('id', bestItem.item.id);
+          // Store RSS item ID to link after post creation
+          (plan as any)._rssItemId = bestItem.item.id;
         }
       } catch (e) {
         console.log('[AGENT] Sem artigo RSS para video, usando tema genérico:', e);
