@@ -36,8 +36,8 @@ interface UseNarrativeStoryOptions {
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  // Default to tech_male (Antonio Neural) for professional technology content
-  const { segmentCount = 4, segmentDuration = 5, preferredVoice = "tech_male" } = options;
+  // Default to camila voice, faster-paced 4s segments for dynamic reels
+  const { segmentCount = 4, segmentDuration = 4, preferredVoice = "tech_male" } = options;
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
