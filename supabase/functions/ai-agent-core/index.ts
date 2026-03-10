@@ -2510,7 +2510,8 @@ function generateExecutionSummary(decision: AgentDecision, state: AgentState, po
     const actualTitle = actualCaption.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || 
                         decision.contentPlan?.theme || 'tendências';
     
-    const mediaTypeName = post.media_type === 'reels' ? 'Reels' : 
+    const mediaTypeName = post.post_type === 'afiliado' ? 'Marketing' :
+                          post.media_type === 'reels' ? 'Reels' : 
                           post.media_type === 'carousel' ? 'Carrossel' :
                           post.post_type === 'noticia' ? 'Notícia' : 'Post';
     
