@@ -279,7 +279,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     carousels: context.content_distribution_carousels || 3,
     news: context.content_distribution_news || 12,
     images: context.content_distribution_images || 7,
-    marketing: 2, // 2 posts marketing por semana (intercalado a cada ~4 posts regulares)
+    marketing: context.content_distribution_marketing || 2,
   };
   
   // Count progress this week by media type
