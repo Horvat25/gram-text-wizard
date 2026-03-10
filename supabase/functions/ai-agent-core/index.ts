@@ -1120,6 +1120,14 @@ async function createCarouselContent(
   }).select().single();
   
   if (error) throw error;
+  
+  // Link RSS items to post
+  if (post?.id) {
+    for (const { item } of selectedItems) {
+      await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', item.id);
+    }
+  }
+  
   console.log('[AGENT] Carrossel IA criado:', post.id, 'slides:', carouselImages.length);
   return post;
 }
