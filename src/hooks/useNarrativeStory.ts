@@ -564,9 +564,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       
       // Generate WebM video (reliable browser-native encoding)
       const videoBlob = await generateVideoFromSegments({
-        width: 1080,
-        height: 1920,
-        fps: 30,
+        width: 720,
+        height: 1280,
+        fps: 24,
         audioUrl: narrationUrl || undefined,
         ctaAudioUrl: ctaNarrationUrl || undefined,
         backgroundMusicUrl: backgroundMusicUrl || undefined,
