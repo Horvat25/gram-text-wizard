@@ -34,12 +34,12 @@ export async function preloadTrack(track: MusicTrack): Promise<string> {
     
     const mood = track.mood || 'ambient';
     
-    // Base frequencies for different moods (all in minor/cinematic keys)
+    // Base frequencies for different moods (cinematic keys for tech content)
     const moodConfig: Record<string, { freqs: number[]; tempo: number; filterFreq: number }> = {
-      epic: { freqs: [55, 82.41, 110, 130.81, 164.81], tempo: 0.8, filterFreq: 800 },
-      ambient: { freqs: [65.41, 82.41, 98, 130.81, 146.83], tempo: 0.3, filterFreq: 600 },
-      dramatic: { freqs: [55, 69.3, 82.41, 110, 138.59], tempo: 1.0, filterFreq: 1000 },
-      inspiring: { freqs: [73.42, 92.5, 110, 146.83, 174.61], tempo: 0.6, filterFreq: 900 },
+      epic: { freqs: [55, 82.41, 110, 130.81, 164.81, 220], tempo: 0.9, filterFreq: 1200 },
+      ambient: { freqs: [65.41, 82.41, 98, 130.81, 146.83, 196], tempo: 0.4, filterFreq: 900 },
+      dramatic: { freqs: [55, 69.3, 82.41, 110, 138.59, 220], tempo: 1.1, filterFreq: 1400 },
+      inspiring: { freqs: [73.42, 92.5, 110, 146.83, 174.61, 220], tempo: 0.7, filterFreq: 1100 },
     };
     
     const config = moodConfig[mood] || moodConfig.ambient;
