@@ -2585,6 +2585,35 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
   }
 }
 
+// List affiliate links for the agent
+async function executeListAffiliateLinks(supabase: any, workspaceId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('affiliate_links')
+      .select('id, product_name, affiliate_url, description, posts_count, is_active, media_format, last_posted_at')
+      .eq('workspace_id', workspaceId)
+      .eq('is_active', true)
+      .order('posts_count', { ascending: true });
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: true, message: '📋 Nenhum link de afiliado cadastrado. Adicione produtos na aba Marketing.', links: [] };
+    }
+
+    const linksList = data.map((l: any, i: number) => 
+      `${i + 1}. **${l.product_name}** (${l.posts_count || 0} posts) - ${l.affiliate_url}\n   ${l.description || 'Sem descrição'}`
+    ).join('\n');
+
+    return {
+      success: true,
+      message: `📋 **${data.length} links de afiliado ativos:**\n\n${linksList}`,
+      links: data
+    };
+  } catch (error: any) {
+    return { success: false, message: `❌ Erro: ${error.message}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
