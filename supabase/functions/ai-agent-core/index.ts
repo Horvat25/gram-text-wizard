@@ -735,8 +735,10 @@ async function executeContentPlan(
           // Update plan theme to match the actual news article
           plan.theme = bestItem.item.title;
           console.log(`[AGENT] Video usando artigo RSS: ${rssArticle.title}`);
-          // Mark as used so it won't be reused
+          // Mark as used so it won't be reused (post_id linked after creation)
           await supabase.from('rss_items').update({ is_used: true }).eq('id', bestItem.item.id);
+          // Store RSS item ID to link after post creation
+          (plan as any)._rssItemId = bestItem.item.id;
         }
       } catch (e) {
         console.log('[AGENT] Sem artigo RSS para video, usando tema genérico:', e);
@@ -892,6 +894,11 @@ async function createVideoContent(
   
   if (error) throw error;
   console.log('[AGENT] Post de vídeo criado:', post.id);
+  
+  // Link RSS item to post
+  if ((plan as any)._rssItemId) {
+    await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', (plan as any)._rssItemId);
+  }
   
   // STEP 4: Tentar renderização externa (se RENDER_SERVICE_URL configurado)
   if (images.length >= 2) {
@@ -1113,6 +1120,14 @@ async function createCarouselContent(
   }).select().single();
   
   if (error) throw error;
+  
+  // Link RSS items to post
+  if (post?.id) {
+    for (const { item } of selectedItems) {
+      await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', item.id);
+    }
+  }
+  
   console.log('[AGENT] Carrossel IA criado:', post.id, 'slides:', carouselImages.length);
   return post;
 }
@@ -1671,6 +1686,12 @@ OBRIGATÓRIO ao final:
   }).select().single();
   
   if (error) throw error;
+  
+  // Link RSS item to post for source ranking
+  if (post?.id && bestItem?.item?.id) {
+    await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', bestItem.item.id);
+  }
+  
   console.log('[AGENT] Post de notícia criado:', post.id, 'com imagem real:', !!imageUrl);
   return post;
 }
@@ -1791,6 +1812,12 @@ Use emojis com moderação. ${plan.cta || ''}`
   }).select().single();
   
   if (error) throw error;
+  
+  // Link RSS item to post for source ranking
+  if (post?.id && bestItem?.item?.id) {
+    await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', bestItem.item.id);
+  }
+  
   console.log('[AGENT] Post de imagem ORIGINAL (IA) criado:', post.id);
   return post;
 }
