@@ -342,8 +342,8 @@ export async function generateVideoFromSegments(
 
   const BRAND = 'Neural Update';
   const TRANSITION_DURATION = 0.4;
-  const CTA_DURATION = 4;
   const HOOK_DURATION = 3;
+  const CTA_MIN_DURATION = 4; // minimum CTA screen time
 
   // ─── Canvas setup ────────────────────────────────────────
   const canvas = document.createElement('canvas');
@@ -367,6 +367,10 @@ export async function generateVideoFromSegments(
     cta: ctaBuf ? `${ctaBuf.duration.toFixed(1)}s` : 'none',
     music: musicBuf ? `${musicBuf.duration.toFixed(1)}s` : 'none',
   });
+
+  // Calculate CTA duration: match audio length or use minimum
+  const CTA_DURATION = ctaBuf ? Math.max(CTA_MIN_DURATION, ctaBuf.duration + 1.5) : CTA_MIN_DURATION;
+  console.log('[video-encoder] CTA duration:', CTA_DURATION.toFixed(1), 's', ctaBuf ? `(audio: ${ctaBuf.duration.toFixed(1)}s)` : '(no audio)');
 
   // Calculate total content duration (segments + CTA)
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
