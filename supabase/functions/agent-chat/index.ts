@@ -2965,6 +2965,8 @@ Quando usuário diz... | Você calcula...
   5. Exemplo: topic="Review do [Produto] - vale a pena?", caption="🔥 [Hook]\\n\\n[Benefício]\\n\\n🔗 [link_afiliado]"
 - NUNCA use \`create_affiliate_post\` para vídeos - use SEMPRE \`create_narrated_video\` com dados do afiliado
 
+${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
+
     // First API call with tools
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
