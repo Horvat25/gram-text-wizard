@@ -272,13 +272,14 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // ===== CONTENT DISTRIBUTION TRACKING =====
   // Weekly goals from context settings
-  // 💰 METAS REDUZIDAS: de 46 para 11 posts/semana (corte de 76% nos custos)
+  // 📈 META: ~28 posts/semana (4 posts/dia)
+  // Distribuição: 4 reels + 3 carrosséis + 12 notícias + 7 imagens + 2 marketing = 28
   const weeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 2,
-    carousels: context.content_distribution_carousels || 1,
-    news: context.content_distribution_news || 4,
-    images: context.content_distribution_images || 2,
-    marketing: 1, // 1 post de marketing por semana (intercalado a cada ~4 posts regulares)
+    videos: context.content_distribution_videos || 4,
+    carousels: context.content_distribution_carousels || 3,
+    news: context.content_distribution_news || 12,
+    images: context.content_distribution_images || 7,
+    marketing: 2, // 2 posts marketing por semana (intercalado a cada ~4 posts regulares)
   };
   
   // Count progress this week by media type
@@ -1674,7 +1675,8 @@ OBRIGATÓRIO ao final:
   return post;
 }
 
-// Create IMAGE content - NOW USES LIBRARY (RSS) instead of AI generation
+// Create IMAGE content - USES AI-GENERATED IMAGE for original visual content
+// DIFERENTE de news: image posts são conteúdo ORIGINAL de reflexão/opinião com imagem IA
 async function createImageContent(
   supabase: any,
   plan: ContentPlan,
@@ -1684,127 +1686,87 @@ async function createImageContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando post de imagem (da biblioteca RSS):', plan.theme);
+  console.log('[AGENT] Criando post de IMAGEM ORIGINAL (IA):', plan.theme);
   
-  // Use RSS library to get content
+  // STEP 1: Get trending topic from RSS for inspiration (but NOT for image)
   const bestItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
   
-  if (!bestItem) {
-    console.log('[AGENT] ⚠️ Sem notícias na biblioteca para post de imagem!');
-    const { data: post, error } = await supabase.from('posts').insert({
-      user_id: userId,
-      workspace_id: workspaceId,
-      caption: '⚠️ Nenhuma notícia disponível na biblioteca',
-      hashtags: ['#tecnologia'],
-      post_type: plan.format,
-      media_type: 'image',
-      platforms: plan.platforms || ['instagram'],
-      status: 'failed',
-      error_message: 'Sem notícias na biblioteca RSS. Adicione mais fontes RSS.',
-      ai_model_used: 'none'
-    }).select().single();
-    if (error) throw error;
-    return post;
+  const inspirationTopic = bestItem ? bestItem.item.title : plan.theme;
+  const inspirationDesc = bestItem ? bestItem.item.description : '';
+  
+  // Mark RSS as used if we used it for inspiration
+  if (bestItem) {
+    await supabase.from('rss_items').update({ is_used: true }).eq('id', bestItem.item.id);
   }
   
-  const rssItem = bestItem.item;
-  const selectedImage = rssItem.image_url;
-  const sourceUrl = rssItem.link;
-  const sourceDomain = rssItem.source_name || 'fonte';
-  
-  // Mark as used
-  await supabase.from('rss_items').update({ is_used: true }).eq('id', rssItem.id);
-  
-  console.log(`[AGENT] Usando notícia da biblioteca (score: ${bestItem.score}): ${rssItem.title}`);
-  
-  // Apply text overlay with fallback
+  // STEP 2: Generate AI image based on topic
   let imageUrl = null;
-  if (selectedImage && rssItem.title) {
-    // Try overlay first
+  try {
+    console.log('[AGENT] 🎨 Gerando imagem IA para post de reflexão...');
+    const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        prompt: `Imagem futurista e impactante sobre: ${inspirationTopic}. Estilo editorial tech, cores vibrantes, composição cinematográfica, sem texto na imagem`,
+        width: 1080,
+        height: 1080,
+      })
+    });
+    
+    if (imageResponse.ok) {
+      const imageResult = await imageResponse.json();
+      imageUrl = imageResult.publicUrl || imageResult.url || imageResult.image_url;
+      console.log('[AGENT] ✅ Imagem IA gerada:', imageUrl ? 'sim' : 'não');
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro ao gerar imagem IA:', e);
+  }
+  
+  // Fallback: use RSS image if AI generation failed
+  if (!imageUrl && bestItem?.item?.image_url) {
+    console.log('[AGENT] Fallback: usando imagem RSS');
     try {
-      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          imageUrl: selectedImage,
-          title: rssItem.title,
-          watermarkText: 'Neural Update',
-          generateHeadline: true
-        })
+        body: JSON.stringify({ imageUrl: bestItem.item.image_url })
       });
-      
-      if (overlayResponse.ok) {
-        const overlayResult = await overlayResponse.json();
-        imageUrl = overlayResult.publicUrl;
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.publicUrl;
       }
     } catch (e) {
-      console.log('[AGENT] Overlay falhou para imagem:', e);
-    }
-    
-    // Fallback 1: watermark programático
-    if (!imageUrl) {
-      try {
-        const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            imageUrl: selectedImage,
-            watermarkText: 'Neural Update'
-          })
-        });
-        if (wmResponse.ok) {
-          const wmResult = await wmResponse.json();
-          imageUrl = wmResult.publicUrl;
-          console.log('[AGENT] Watermark programático aplicado ✅');
-        }
-      } catch (e) {
-        console.log('[AGENT] Watermark falhou:', e);
-      }
-    }
-    
-    // Fallback 2: upload original
-    if (!imageUrl) {
-      try {
-        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ imageUrl: selectedImage })
-        });
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          imageUrl = uploadResult.publicUrl;
-        }
-      } catch (e) {
-        console.log('[AGENT] Upload fallback falhou:', e);
-      }
+      console.log('[AGENT] Upload fallback falhou:', e);
     }
   }
   
-  // Generate caption
+  // STEP 3: Generate OPINION/REFLECTION caption (NOT news format)
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      topic: `${rssItem.title}. ${rssItem.description || ''}`,
-      postType: plan.format,
-      sourceUrl,
-      sourceName: sourceDomain,
-      customInstructions: `Tom: ${plan.tone}. CTA: ${plan.cta}. OBRIGATÓRIO ao final: 📰 Fonte: ${sourceDomain}`
+      topic: `${inspirationTopic}. ${inspirationDesc}`,
+      postType: 'engajamento',
+      customInstructions: `Este é um post de REFLEXÃO/OPINIÃO sobre tecnologia, NÃO uma notícia.
+      
+Estrutura:
+1. PROVOCAÇÃO - Uma afirmação forte ou pergunta provocativa sobre o tema
+2. CONTEXTO PESSOAL - Sua análise/opinião como especialista em tech
+3. CTA DE ENGAJAMENTO - Pergunta aberta para gerar discussão nos comentários
+
+Tom: ${plan.tone || 'provocativo e visionário'}
+NÃO inclua "Fonte:" ou links de artigos. Este é conteúdo ORIGINAL, não curadoria.
+Use emojis com moderação. ${plan.cta || ''}`
     })
   });
   
-  let caption = `📰 ${rssItem.title}`;
-  let hashtags: string[] = ['#tecnologia', '#ia', '#futuro', '#inovacao'];
+  let caption = `💡 ${inspirationTopic}`;
+  let hashtags: string[] = ['#tecnologia', '#reflexao', '#futuro', '#ia', '#inovacao'];
   
   if (captionResponse.ok) {
     const captionData = await captionResponse.json();
     caption = captionData.caption || caption;
     hashtags = captionData.hashtags || hashtags;
-  }
-  
-  // Ensure source attribution
-  if (!caption.includes('Fonte:') && sourceUrl) {
-    caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
   }
   
   const canPublish = autoPublish && imageUrl;
@@ -1813,26 +1775,23 @@ async function createImageContent(
     workspace_id: workspaceId,
     caption,
     hashtags,
-    post_type: 'noticia',
+    post_type: 'engajamento', // NOT 'noticia' — this is original content
     media_type: 'image',
     platforms: plan.platforms || ['instagram'],
     status: imageUrl ? (canPublish ? 'scheduled' : 'draft') : 'draft',
     scheduled_for: canPublish ? new Date().toISOString() : null,
     image_url: imageUrl,
     overlay_metadata: {
-      type: 'library_post',
-      source_url: sourceUrl,
-      source_domain: sourceDomain,
-      original_title: rssItem.title,
-      ranking_score: bestItem.score,
-      used_real_image: true,
-      text_applied_by_code: true
+      type: 'original_image',
+      inspiration_topic: inspirationTopic,
+      ai_generated_image: true,
+      created_by_agent: true
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
   
   if (error) throw error;
-  console.log('[AGENT] Post de imagem (biblioteca) criado:', post.id);
+  console.log('[AGENT] Post de imagem ORIGINAL (IA) criado:', post.id);
   return post;
 }
 
