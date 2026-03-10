@@ -368,6 +368,10 @@ export async function generateVideoFromSegments(
     music: musicBuf ? `${musicBuf.duration.toFixed(1)}s` : 'none',
   });
 
+  // Calculate CTA duration: match audio length or use minimum
+  const CTA_DURATION = ctaBuf ? Math.max(CTA_MIN_DURATION, ctaBuf.duration + 1.5) : CTA_MIN_DURATION;
+  console.log('[video-encoder] CTA duration:', CTA_DURATION.toFixed(1), 's', ctaBuf ? `(audio: ${ctaBuf.duration.toFixed(1)}s)` : '(no audio)');
+
   // Calculate total content duration (segments + CTA)
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
   const totalDuration = contentDuration + CTA_DURATION;
