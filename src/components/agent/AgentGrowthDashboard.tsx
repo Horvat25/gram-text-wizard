@@ -347,7 +347,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const postLevelViews = summaryMetrics.views;
   
   const accountViews = accountViewsLive || context?.current_weekly_views || 0;
-  const totalViews = period === 30 && accountViews > 0 ? accountViews : postLevelViews;
+  const totalViews = (period === 7 || period === 30) && accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
