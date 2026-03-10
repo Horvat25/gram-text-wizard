@@ -108,14 +108,23 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     const newDist = { ...localDist, [type]: newVal };
     setLocalDist(newDist);
 
-    if (type !== 'marketing' && onUpdate) {
+    if (onUpdate) {
       const fieldMap: Record<string, string> = {
         videos: 'content_distribution_videos',
         carousels: 'content_distribution_carousels',
         news: 'content_distribution_news',
         images: 'content_distribution_images',
+        marketing: 'content_distribution_marketing',
       };
-      await onUpdate({ [fieldMap[type]]: newVal } as any);
+      // For marketing, update directly via supabase since it's not in the typed interface yet
+      if (type === 'marketing' && currentWorkspace?.id) {
+        await supabase
+          .from('agent_context')
+          .update({ content_distribution_marketing: newVal } as any)
+          .eq('workspace_id', currentWorkspace.id);
+      } else {
+        await onUpdate({ [fieldMap[type]]: newVal } as any);
+      }
     }
   };
 
