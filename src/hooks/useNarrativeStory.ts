@@ -556,10 +556,31 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const segments = latestState.segments.length > 0 ? latestState.segments : segmentsInput;
     
     try {
-      const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
-      toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s)...`);
-      console.log("[generateVideo] Starting with", segments.length, "segments, total duration:", totalDuration);
-      console.log("[generateVideo] Segment durations:", segments.map(s => s.duration));
+      // ─── SAFETY: Validate before render ──────────────────
+      const MAX_TOTAL = 90;
+      const MAX_SEG = 20;
+      const MIN_SEG = 3;
+      
+      // Clamp segment durations
+      segments.forEach(seg => {
+        seg.duration = Math.max(MIN_SEG, Math.min(seg.duration, MAX_SEG));
+      });
+      
+      let totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
+      
+      // If still too long, proportionally shrink all segments
+      if (totalDuration > MAX_TOTAL) {
+        const ratio = MAX_TOTAL / totalDuration;
+        segments.forEach(seg => {
+          seg.duration = Math.max(MIN_SEG, seg.duration * ratio);
+        });
+        totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
+        console.warn(`[generateVideo] ⚠️ Durations scaled down to fit ${MAX_TOTAL}s cap. New total: ${totalDuration.toFixed(1)}s`);
+      }
+      
+      toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s, ${segments.length} cenas)...`);
+      console.log("[generateVideo] Starting with", segments.length, "segments, total duration:", totalDuration.toFixed(1));
+      console.log("[generateVideo] Segment durations:", segments.map(s => Number(s.duration.toFixed(1))));
       console.log("[generateVideo] Has CTA audio:", !!ctaNarrationUrl);
       
       // Generate WebM video (reliable browser-native encoding)

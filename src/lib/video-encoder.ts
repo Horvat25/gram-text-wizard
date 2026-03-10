@@ -581,24 +581,38 @@ export async function generateVideoFromSegments(
     }
 
     // ─── Render loop using requestAnimationFrame ────────────
-    // This is the most reliable approach: the browser calls us when it's
-    // ready to paint, and captureStream(fps) auto-captures the canvas.
     const renderStartTime = performance.now();
     let lastProgressUpdate = 0;
     let stopped = false;
+
+    // ─── SAFETY: Hard timeout to prevent runaway renders ────
+    const hardTimeoutMs = (totalDuration + RENDER_TIMEOUT_BUFFER) * 1000;
+    const hardTimeout = setTimeout(() => {
+      if (!stopped) {
+        console.error(`[video-encoder] ⛔ HARD TIMEOUT after ${(totalDuration + RENDER_TIMEOUT_BUFFER).toFixed(0)}s — forcing stop`);
+        stopped = true;
+        try {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        } catch (e) {
+          console.error('[video-encoder] Error stopping after timeout:', e);
+        }
+      }
+    }, hardTimeoutMs);
 
     const tick = () => {
       if (stopped) return;
 
       const elapsed = (performance.now() - renderStartTime) / 1000;
 
+      // ─── SAFETY: Double-check elapsed doesn't exceed total ──
       if (elapsed >= totalDuration) {
-        // Final frame
         renderFrame(ctx, totalDuration - 0.001, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
         onProgress?.(100);
 
-        // Give MediaRecorder time to flush last data
         stopped = true;
+        clearTimeout(hardTimeout);
         setTimeout(() => {
           if (mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
@@ -607,13 +621,14 @@ export async function generateVideoFromSegments(
         return;
       }
 
-      // Render current frame
-      renderFrame(ctx, elapsed, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+      // Clamp elapsed to totalDuration for safety
+      const safeElapsed = Math.min(elapsed, totalDuration);
+      renderFrame(ctx, safeElapsed, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
 
       // Progress callback (throttled to ~4 updates/sec)
       const now = performance.now();
       if (now - lastProgressUpdate > 250) {
-        onProgress?.(Math.round((elapsed / totalDuration) * 100));
+        onProgress?.(Math.round((safeElapsed / totalDuration) * 100));
         lastProgressUpdate = now;
       }
 
