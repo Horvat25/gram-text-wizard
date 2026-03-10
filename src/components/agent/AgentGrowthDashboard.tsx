@@ -31,6 +31,7 @@ const GOAL_OPTIONS = [
 ];
 
 const PERIOD_OPTIONS = [
+  { value: 7, label: '7d' },
   { value: 30, label: '30d' },
   { value: 60, label: '60d' },
   { value: 90, label: '90d' },
@@ -86,7 +87,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     carousels: context?.content_distribution_carousels || 3,
     news: context?.content_distribution_news || 12,
     images: context?.content_distribution_images || 7,
-    marketing: 2,
+    marketing: (context as any)?.content_distribution_marketing || 2,
   });
 
   // Sync local dist when context changes
@@ -97,24 +98,33 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         carousels: context.content_distribution_carousels || 3,
         news: context.content_distribution_news || 12,
         images: context.content_distribution_images || 7,
-        marketing: 2,
+        marketing: (context as any)?.content_distribution_marketing || 2,
       });
     }
-  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images]);
+  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images, (context as any)?.content_distribution_marketing]);
 
   const handleDistChange = async (type: keyof typeof localDist, delta: number) => {
     const newVal = Math.max(0, localDist[type] + delta);
     const newDist = { ...localDist, [type]: newVal };
     setLocalDist(newDist);
 
-    if (type !== 'marketing' && onUpdate) {
+    if (onUpdate) {
       const fieldMap: Record<string, string> = {
         videos: 'content_distribution_videos',
         carousels: 'content_distribution_carousels',
         news: 'content_distribution_news',
         images: 'content_distribution_images',
+        marketing: 'content_distribution_marketing',
       };
-      await onUpdate({ [fieldMap[type]]: newVal } as any);
+      // For marketing, update directly via supabase since it's not in the typed interface yet
+      if (type === 'marketing' && currentWorkspace?.id) {
+        await supabase
+          .from('agent_context')
+          .update({ content_distribution_marketing: newVal } as any)
+          .eq('workspace_id', currentWorkspace.id);
+      } else {
+        await onUpdate({ [fieldMap[type]]: newVal } as any);
+      }
     }
   };
 
@@ -251,6 +261,9 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const fetchSourceRankings = async () => {
     if (!currentWorkspace?.id) return;
+    const since = new Date();
+    since.setDate(since.getDate() - period);
+    
     const { data: rssItems } = await supabase
       .from('rss_items')
       .select('source_name, used_in_post_id')
@@ -266,9 +279,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     const postIds = rssItems.map(r => r.used_in_post_id).filter(Boolean) as string[];
     const { data: posts } = await supabase
       .from('posts')
-      .select('id, reach, likes_count, comments_count, saves_count, shares_count')
+      .select('id, reach, likes_count, comments_count, saves_count, shares_count, published_at')
       .in('id', postIds)
-      .eq('status', 'published');
+      .eq('status', 'published')
+      .gte('published_at', since.toISOString());
 
     const postMap: Record<string, any> = {};
     (posts || []).forEach(p => { postMap[p.id] = p; });
@@ -337,10 +351,11 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const postLevelViews = summaryMetrics.views;
   
   const accountViews = accountViewsLive || context?.current_weekly_views || 0;
-  const totalViews = period === 30 && accountViews > 0 ? accountViews : postLevelViews;
+  const totalViews = (period === 7 || period === 30) && accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
   const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
+    7: { views: 2500, likes: 120, saves: 50, comments: 25 },
     30: { views: 10000, likes: 500, saves: 200, comments: 100 },
     60: { views: 25000, likes: 1200, saves: 500, comments: 250 },
     90: { views: 50000, likes: 2500, saves: 1000, comments: 500 },

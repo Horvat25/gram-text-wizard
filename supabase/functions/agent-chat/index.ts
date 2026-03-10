@@ -62,7 +62,7 @@ const AGENT_TOOLS = [
     type: "function",
     function: {
       name: "create_narrated_video",
-      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'stories', 'shorts'.",
+      description: "🎬 OBRIGATÓRIO para VÍDEO, REELS ou conteúdo NARRADO! Cria vídeo com roteiro viral, múltiplas imagens cinematográficas e narração. Use SEMPRE que o usuário mencionar: 'vídeo', 'reels', 'reel', 'stories', 'shorts'. TAMBÉM use para VÍDEOS DE MARKETING: quando o usuário pedir 'vídeo de marketing' ou 'reels de afiliado', busque os dados do produto no affiliate_links e use como topic.",
       parameters: {
         type: "object",
         properties: {
@@ -245,6 +245,17 @@ const AGENT_TOOLS = [
           platforms: { type: "array", items: { type: "string" }, description: "Plataformas: instagram, tiktok" }
         },
         required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_affiliate_links",
+      description: "📋 Lista os links de afiliado/marketing cadastrados. Use antes de criar vídeos ou posts de marketing para saber quais produtos estão disponíveis.",
+      parameters: {
+        type: "object",
+        properties: {}
       }
     }
   }
@@ -2574,6 +2585,35 @@ async function executeCreateAffiliatePost(supabase: any, userId: string, workspa
   }
 }
 
+// List affiliate links for the agent
+async function executeListAffiliateLinks(supabase: any, workspaceId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('affiliate_links')
+      .select('id, product_name, affiliate_url, description, posts_count, is_active, media_format, last_posted_at')
+      .eq('workspace_id', workspaceId)
+      .eq('is_active', true)
+      .order('posts_count', { ascending: true });
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: true, message: '📋 Nenhum link de afiliado cadastrado. Adicione produtos na aba Marketing.', links: [] };
+    }
+
+    const linksList = data.map((l: any, i: number) => 
+      `${i + 1}. **${l.product_name}** (${l.posts_count || 0} posts) - ${l.affiliate_url}\n   ${l.description || 'Sem descrição'}`
+    ).join('\n');
+
+    return {
+      success: true,
+      message: `📋 **${data.length} links de afiliado ativos:**\n\n${linksList}`,
+      links: data
+    };
+  } catch (error: any) {
+    return { success: false, message: `❌ Erro: ${error.message}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
@@ -2614,6 +2654,8 @@ async function executeTool(supabase: any, userId: string, workspaceId: string, t
       return executeExplainCapabilities();
     case 'create_affiliate_post':
       return executeCreateAffiliatePost(supabase, userId, workspaceId, args);
+    case 'list_affiliate_links':
+      return executeListAffiliateLinks(supabase, workspaceId);
     
     // Legacy tools (kept for backwards compatibility, but won't be suggested)
     case 'create_posts':
@@ -2949,11 +2991,21 @@ Quando usuário diz... | Você calcula...
 
 ## 💰 MARKETING DE AFILIADOS
 - Quando em modo autônomo, intercale 1 post de afiliado a cada 4 posts de notícia
-- Use \`create_affiliate_post\` para promover produtos cadastrados
+- Use \`create_affiliate_post\` para posts de IMAGEM promovendo produtos cadastrados
 - O sistema escolhe automaticamente o produto menos promovido
 - Headlines de marketing: foco em BENEFÍCIO + URGÊNCIA
 - Legenda de afiliado: Hook curiosidade → Benefício → CTA com link
 - NÃO force marketing se não houver links cadastrados
+- **O link de afiliado DEVE aparecer na legenda do post!**
+
+## 🎬 VÍDEO DE MARKETING (IMPORTANTE!)
+- Quando o usuário pedir "vídeo de marketing", "reels de marketing", "vídeo de afiliado" ou "reels promovendo [produto]":
+  1. Primeiro, busque os links de afiliado com \`list_available_news\` ou internamente
+  2. Use \`create_narrated_video\` com o tema sendo o PRODUTO do link de afiliado
+  3. Na caption, INCLUA o link de afiliado do produto
+  4. No topic, descreva o produto e seus benefícios
+  5. Exemplo: topic="Review do [Produto] - vale a pena?", caption="🔥 [Hook]\\n\\n[Benefício]\\n\\n🔗 [link_afiliado]"
+- NUNCA use \`create_affiliate_post\` para vídeos - use SEMPRE \`create_narrated_video\` com dados do afiliado
 
 ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
