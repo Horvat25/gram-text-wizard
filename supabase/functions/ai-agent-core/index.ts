@@ -587,7 +587,8 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
     'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
-    'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' }
+    'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
+    'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
   };
   
   const selectedType = contentTypeMap[state.nextContentType];
