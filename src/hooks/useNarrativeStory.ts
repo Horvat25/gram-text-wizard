@@ -430,10 +430,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log("[TTS] Audio duration detected:", audioDuration, "seconds");
       console.log("[Music] Background music URL:", backgroundMusicUrl ? "Generated" : "None");
       
-      // 🔒 MIN 25s content, MAX 55s
-      const MIN_DURATION = 25;
-      const MAX_DURATION = 55;
-      const MIN_SEGMENT_DURATION = 5; // No segment shorter than 5s
+      // 🔒 MIN 18s content, MAX 45s — ritmo mais rápido para reels dinâmicos
+      const MIN_DURATION = 18;
+      const MAX_DURATION = 45;
+      const MIN_SEGMENT_DURATION = 4; // No segment shorter than 4s
       const rawDuration = audioDuration > 0 ? audioDuration : 0;
       const clampedDuration = Math.max(MIN_DURATION, Math.min(rawDuration, MAX_DURATION));
 

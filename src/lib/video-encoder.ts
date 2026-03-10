@@ -311,8 +311,8 @@ function renderFrame(
   brand: string,
   fps: number
 ) {
-  const TRANSITION_DURATION = 0.4;
-  const HOOK_DURATION = 3;
+  const TRANSITION_DURATION = 0.35;  // Transições mais rápidas
+  const HOOK_DURATION = 2.5;        // Hook mais curto e impactante
 
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = '#0B0F1A';
