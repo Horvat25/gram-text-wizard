@@ -1686,6 +1686,12 @@ OBRIGATÓRIO ao final:
   }).select().single();
   
   if (error) throw error;
+  
+  // Link RSS item to post for source ranking
+  if (post?.id && bestItem?.item?.id) {
+    await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', bestItem.item.id);
+  }
+  
   console.log('[AGENT] Post de notícia criado:', post.id, 'com imagem real:', !!imageUrl);
   return post;
 }
