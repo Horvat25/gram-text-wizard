@@ -599,32 +599,30 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   }
   
   // For ALL non-fixed goal types (macro, growth, reach, authority, conversion):
-  // Don't stop at weekly content goals - keep posting if macro objectives not met
-  if (!state.nextContentType && goalType !== 'fixed') {
-    // Check if macro objectives are met
-    const viewsMet = weeklyReach >= goalViews;
-    const engagementMet = currentEngagement >= goalEngagement;
-    
-    if (viewsMet && engagementMet) {
-      console.log('[AGENT] Objetivos macro alcançados!');
-      return {
-        decision: 'NO_POST',
-        reason: `🏆 Objetivos alcançados! Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()}, Engajamento: ${currentEngagement}%/${goalEngagement}%. Modo manutenção ativo.`
-      };
+  // NEVER fully stop posting - always maintain daily cadence
+  // The agent should keep posting as long as daily limit isn't reached
+  if (!state.nextContentType) {
+    if (goalType === 'fixed') {
+      // Fixed mode: strict weekly goals, but still maintain minimum 1 post/day
+      if (state.postsToday >= 1) {
+        console.log('[AGENT] Meta semanal completa (modo fixo) e já postou hoje');
+        return {
+          decision: 'NO_POST',
+          reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}, Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}`
+        };
+      }
     }
     
-    // Objectives NOT met - override nextContentType based on goal type
-    // For growth/reach: prioritize reels (higher reach potential)
-    // For authority/conversion: prioritize news (builds credibility)
-    const overrideType: ContentType = (goalType === 'growth' || goalType === 'reach') ? 'video' : 'news';
-    console.log(`[AGENT] Metas de tipo completas mas objetivos NÃO atingidos (${goalType}) - continuando com ${overrideType}`);
+    // Weekly content goals met - override with best-performing type to maintain cadence
+    // This ensures the agent NEVER stops posting during active hours if daily limit allows
+    const bestType = state.historical30d.bestMediaType;
+    const overrideType: ContentType = bestType === 'reels' ? 'video' 
+      : bestType === 'carousel' ? 'carousel'
+      : bestType === 'news' ? 'news'
+      : (goalType === 'growth' || goalType === 'reach') ? 'video' : 'news';
+    
+    console.log(`[AGENT] 🔄 Meta semanal atingida mas ainda dentro do limite diário (${state.postsToday}/${dynamicDailyLimit}) - continuando com ${overrideType} (melhor tipo: ${bestType || 'N/A'})`);
     state.nextContentType = overrideType;
-  } else if (!state.nextContentType) {
-    console.log('[AGENT] Meta semanal completa (modo fixo)!');
-    return {
-      decision: 'NO_POST',
-      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}, Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}`
-    };
   }
   
   // Determine content type and format based on distribution
