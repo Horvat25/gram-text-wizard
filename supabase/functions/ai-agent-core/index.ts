@@ -273,14 +273,35 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // ===== CONTENT DISTRIBUTION TRACKING =====
   // Weekly goals from context settings
   // 📈 META: ~28 posts/semana (4 posts/dia)
-  // Distribuição: 4 reels + 3 carrosséis + 12 notícias + 7 imagens + 2 marketing = 28
-  const weeklyGoals: ContentDistribution = {
+  const rawWeeklyGoals: ContentDistribution = {
     videos: context.content_distribution_videos || 4,
     carousels: context.content_distribution_carousels || 3,
     news: context.content_distribution_news || 12,
     images: context.content_distribution_images || 7,
     marketing: context.content_distribution_marketing || 2,
   };
+  
+  // PRORATE weekly goals based on remaining days in the week
+  // This prevents the agent from "thinking it's done" when configured mid-week
+  // e.g., if it's Wednesday (day 3), only 4 days remain (Wed-Sat), 
+  // so goals should be ~57% of full week
+  const dayOfWeekNow = todayBrasilia.getDay(); // 0=Sun
+  const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow); // includes today
+  const prorateFactor = daysRemainingInWeek / 7;
+  
+  // Only prorate if we're past Sunday (i.e., week already started)
+  // Use ceiling to ensure at least 1 of each type
+  const weeklyGoals: ContentDistribution = {
+    videos: dayOfWeekNow === 0 ? rawWeeklyGoals.videos : Math.max(1, Math.ceil(rawWeeklyGoals.videos * prorateFactor)),
+    carousels: dayOfWeekNow === 0 ? rawWeeklyGoals.carousels : Math.max(1, Math.ceil(rawWeeklyGoals.carousels * prorateFactor)),
+    news: dayOfWeekNow === 0 ? rawWeeklyGoals.news : Math.max(1, Math.ceil(rawWeeklyGoals.news * prorateFactor)),
+    images: dayOfWeekNow === 0 ? rawWeeklyGoals.images : Math.max(1, Math.ceil(rawWeeklyGoals.images * prorateFactor)),
+    marketing: dayOfWeekNow === 0 ? rawWeeklyGoals.marketing : Math.max(1, Math.ceil(rawWeeklyGoals.marketing * prorateFactor)),
+  };
+  
+  console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes), prorateFactor: ${prorateFactor.toFixed(2)}`);
+  console.log(`[AGENT] 📊 Goals raw: V${rawWeeklyGoals.videos} C${rawWeeklyGoals.carousels} N${rawWeeklyGoals.news} I${rawWeeklyGoals.images} M${rawWeeklyGoals.marketing}`);
+  console.log(`[AGENT] 📊 Goals prorated: V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   
   // Count progress this week by media type
   const weeklyProgress: ContentDistribution = {
