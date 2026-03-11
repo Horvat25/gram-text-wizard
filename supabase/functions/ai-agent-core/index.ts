@@ -273,14 +273,35 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // ===== CONTENT DISTRIBUTION TRACKING =====
   // Weekly goals from context settings
   // 📈 META: ~28 posts/semana (4 posts/dia)
-  // Distribuição: 4 reels + 3 carrosséis + 12 notícias + 7 imagens + 2 marketing = 28
-  const weeklyGoals: ContentDistribution = {
+  const rawWeeklyGoals: ContentDistribution = {
     videos: context.content_distribution_videos || 4,
     carousels: context.content_distribution_carousels || 3,
     news: context.content_distribution_news || 12,
     images: context.content_distribution_images || 7,
     marketing: context.content_distribution_marketing || 2,
   };
+  
+  // PRORATE weekly goals based on remaining days in the week
+  // This prevents the agent from "thinking it's done" when configured mid-week
+  // e.g., if it's Wednesday (day 3), only 4 days remain (Wed-Sat), 
+  // so goals should be ~57% of full week
+  const dayOfWeekNow = todayBrasilia.getDay(); // 0=Sun
+  const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow); // includes today
+  const prorateFactor = daysRemainingInWeek / 7;
+  
+  // Only prorate if we're past Sunday (i.e., week already started)
+  // Use ceiling to ensure at least 1 of each type
+  const weeklyGoals: ContentDistribution = {
+    videos: dayOfWeekNow === 0 ? rawWeeklyGoals.videos : Math.max(1, Math.ceil(rawWeeklyGoals.videos * prorateFactor)),
+    carousels: dayOfWeekNow === 0 ? rawWeeklyGoals.carousels : Math.max(1, Math.ceil(rawWeeklyGoals.carousels * prorateFactor)),
+    news: dayOfWeekNow === 0 ? rawWeeklyGoals.news : Math.max(1, Math.ceil(rawWeeklyGoals.news * prorateFactor)),
+    images: dayOfWeekNow === 0 ? rawWeeklyGoals.images : Math.max(1, Math.ceil(rawWeeklyGoals.images * prorateFactor)),
+    marketing: dayOfWeekNow === 0 ? rawWeeklyGoals.marketing : Math.max(1, Math.ceil(rawWeeklyGoals.marketing * prorateFactor)),
+  };
+  
+  console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes), prorateFactor: ${prorateFactor.toFixed(2)}`);
+  console.log(`[AGENT] 📊 Goals raw: V${rawWeeklyGoals.videos} C${rawWeeklyGoals.carousels} N${rawWeeklyGoals.news} I${rawWeeklyGoals.images} M${rawWeeklyGoals.marketing}`);
+  console.log(`[AGENT] 📊 Goals prorated: V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   
   // Count progress this week by media type
   const weeklyProgress: ContentDistribution = {
@@ -578,32 +599,30 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   }
   
   // For ALL non-fixed goal types (macro, growth, reach, authority, conversion):
-  // Don't stop at weekly content goals - keep posting if macro objectives not met
-  if (!state.nextContentType && goalType !== 'fixed') {
-    // Check if macro objectives are met
-    const viewsMet = weeklyReach >= goalViews;
-    const engagementMet = currentEngagement >= goalEngagement;
-    
-    if (viewsMet && engagementMet) {
-      console.log('[AGENT] Objetivos macro alcançados!');
-      return {
-        decision: 'NO_POST',
-        reason: `🏆 Objetivos alcançados! Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()}, Engajamento: ${currentEngagement}%/${goalEngagement}%. Modo manutenção ativo.`
-      };
+  // NEVER fully stop posting - always maintain daily cadence
+  // The agent should keep posting as long as daily limit isn't reached
+  if (!state.nextContentType) {
+    if (goalType === 'fixed') {
+      // Fixed mode: strict weekly goals, but still maintain minimum 1 post/day
+      if (state.postsToday >= 1) {
+        console.log('[AGENT] Meta semanal completa (modo fixo) e já postou hoje');
+        return {
+          decision: 'NO_POST',
+          reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}, Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}`
+        };
+      }
     }
     
-    // Objectives NOT met - override nextContentType based on goal type
-    // For growth/reach: prioritize reels (higher reach potential)
-    // For authority/conversion: prioritize news (builds credibility)
-    const overrideType: ContentType = (goalType === 'growth' || goalType === 'reach') ? 'video' : 'news';
-    console.log(`[AGENT] Metas de tipo completas mas objetivos NÃO atingidos (${goalType}) - continuando com ${overrideType}`);
+    // Weekly content goals met - override with best-performing type to maintain cadence
+    // This ensures the agent NEVER stops posting during active hours if daily limit allows
+    const bestType = state.historical30d.bestMediaType;
+    const overrideType: ContentType = bestType === 'reels' ? 'video' 
+      : bestType === 'carousel' ? 'carousel'
+      : bestType === 'news' ? 'news'
+      : (goalType === 'growth' || goalType === 'reach') ? 'video' : 'news';
+    
+    console.log(`[AGENT] 🔄 Meta semanal atingida mas ainda dentro do limite diário (${state.postsToday}/${dynamicDailyLimit}) - continuando com ${overrideType} (melhor tipo: ${bestType || 'N/A'})`);
     state.nextContentType = overrideType;
-  } else if (!state.nextContentType) {
-    console.log('[AGENT] Meta semanal completa (modo fixo)!');
-    return {
-      decision: 'NO_POST',
-      reason: `🏆 Meta semanal de ${totalGoals} posts alcançada! Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}, Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}, Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}, Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}, Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}`
-    };
   }
   
   // Determine content type and format based on distribution
