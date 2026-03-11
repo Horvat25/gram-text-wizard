@@ -507,6 +507,29 @@ function calculateDynamicDailyLimit(state: AgentState): number {
 async function makeStrategicDecision(state: AgentState, lovableApiKey: string): Promise<AgentDecision> {
   console.log('[AGENT] Etapa 2: Tomando decisão estratégica...');
   
+  // ===== PEAK HOURS GUARD (Brasília UTC-3) =====
+  // Only allow posting between 7h and 22h Brasília time
+  const now = new Date();
+  const brasiliaOffset = -3 * 60 * 60 * 1000;
+  const brasiliaTime = new Date(now.getTime() + brasiliaOffset);
+  const brasiliaHour = brasiliaTime.getUTCHours();
+  
+  // Peak/active hours: 7h-22h BRT
+  // Optimal peaks: 9h, 12h, 15h, 18h, 20h
+  const ACTIVE_START = 7;
+  const ACTIVE_END = 22;
+  
+  if (brasiliaHour < ACTIVE_START || brasiliaHour >= ACTIVE_END) {
+    console.log(`[AGENT] ⏰ Fora do horário ativo! Brasília: ${brasiliaHour}h (permitido: ${ACTIVE_START}h-${ACTIVE_END}h)`);
+    return {
+      decision: 'NO_POST',
+      reason: `🌙 Fora do horário de pico (${brasiliaHour}h BRT). O agente só posta entre ${ACTIVE_START}h e ${ACTIVE_END}h para maximizar o alcance. Próxima janela: ${brasiliaHour >= ACTIVE_END ? `${ACTIVE_START}h amanhã` : `${ACTIVE_START}h hoje`}.`,
+      hypothesis: 'Postar fora do horário ativo reduz significativamente o alcance e engajamento.'
+    };
+  }
+  
+  console.log(`[AGENT] ✅ Horário ativo: ${brasiliaHour}h BRT (janela ${ACTIVE_START}h-${ACTIVE_END}h)`);
+  
   const goalType = state.context?.goal_type || 'macro';
   const dynamicDailyLimit = calculateDynamicDailyLimit(state);
   const minHoursBetween = state.context?.min_hours_between_posts || 2;
