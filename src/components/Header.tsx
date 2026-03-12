@@ -1,4 +1,4 @@
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
@@ -17,7 +17,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 const Header = () => {
   const navigate = useNavigate();
   const { settings } = useBrandSettings();
-  const { currentWorkspace } = useWorkspace();
+  const { currentWorkspace, workspaces, selectWorkspaceById } = useWorkspace();
   const { user, signOut } = useAuth();
   
   const brandName = settings.brandName || "Agente IA Instagram";
@@ -31,9 +31,34 @@ const Header = () => {
   return (
     <header className="border-b border-border/30 bg-background/80 sticky top-0 z-50 backdrop-blur-md">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-2">
-        {/* Workspace name - Left side */}
+        {/* Workspace selector - Left side */}
         <div className="flex-shrink-0">
-          <span className="text-sm font-medium">{currentWorkspace?.name || brandName}</span>
+          {workspaces.length > 1 ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1 px-2 h-8 text-sm font-medium">
+                  {currentWorkspace?.name || brandName}
+                  <ChevronDown className="h-3 w-3 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {workspaces.map((ws) => (
+                  <DropdownMenuItem
+                    key={ws.id}
+                    onClick={() => {
+                      selectWorkspaceById(ws.id);
+                      toast.success(`Perfil: ${ws.name}`);
+                    }}
+                    className={ws.id === currentWorkspace?.id ? "bg-accent" : ""}
+                  >
+                    {ws.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <span className="text-sm font-medium">{currentWorkspace?.name || brandName}</span>
+          )}
         </div>
         
         {/* Right side controls */}
