@@ -281,28 +281,16 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     marketing: context.content_distribution_marketing || 2,
   };
   
-  // PRORATE weekly goals based on remaining days in the week
-  // This prevents the agent from "thinking it's done" when configured mid-week
-  // e.g., if it's Wednesday (day 3), only 4 days remain (Wed-Sat), 
-  // so goals should be ~57% of full week
+  // USE FULL WEEKLY GOALS - daily limit (4/day) is the primary control
+  // Prorating was causing the agent to stop posting mid-week because goals appeared "met"
+  // The daily limit already ensures we don't over-post on any given day
+  const weeklyGoals: ContentDistribution = { ...rawWeeklyGoals };
+  
   const dayOfWeekNow = todayBrasilia.getDay(); // 0=Sun
-  const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow); // includes today
-  const prorateFactor = daysRemainingInWeek / 7;
+  const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow);
   
-  // Only prorate if we're past Sunday (i.e., week already started)
-  // Use ceiling to ensure at least 1 of each type
-  const weeklyGoals: ContentDistribution = {
-    videos: dayOfWeekNow === 0 ? rawWeeklyGoals.videos : Math.max(1, Math.ceil(rawWeeklyGoals.videos * prorateFactor)),
-    carousels: dayOfWeekNow === 0 ? rawWeeklyGoals.carousels : Math.max(1, Math.ceil(rawWeeklyGoals.carousels * prorateFactor)),
-    news: dayOfWeekNow === 0 ? rawWeeklyGoals.news : Math.max(1, Math.ceil(rawWeeklyGoals.news * prorateFactor)),
-    images: dayOfWeekNow === 0 ? rawWeeklyGoals.images : Math.max(1, Math.ceil(rawWeeklyGoals.images * prorateFactor)),
-    marketing: dayOfWeekNow === 0 ? rawWeeklyGoals.marketing : Math.max(1, Math.ceil(rawWeeklyGoals.marketing * prorateFactor)),
-  };
-  
-  console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes), prorateFactor: ${prorateFactor.toFixed(2)}`);
-  console.log(`[AGENT] 📊 Goals raw: V${rawWeeklyGoals.videos} C${rawWeeklyGoals.carousels} N${rawWeeklyGoals.news} I${rawWeeklyGoals.images} M${rawWeeklyGoals.marketing}`);
-  console.log(`[AGENT] 📊 Goals prorated: V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
-  
+  console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes)`);
+  console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   // Count progress this week by media type
   const weeklyProgress: ContentDistribution = {
     videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
