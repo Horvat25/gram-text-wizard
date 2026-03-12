@@ -1905,22 +1905,37 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
     const ogImageUrl: string | null = newsItem.image_url || null;
 
     if (ogImageUrl) {
-      // Only reject tracking pixels and tiny icons, NOT content images
+      // Reject tracking pixels, tiny icons, and low-quality images
       const urlLower = ogImageUrl.toLowerCase();
-      const isTrackingPixel = ['1x1', 'pixel', 'tracking', 'favicon'].some(s => urlLower.includes(s));
+      const isTrackingPixel = ['1x1', 'pixel', 'tracking', 'favicon', 'icon', 'logo', 'badge'].some(s => urlLower.includes(s));
       
       if (!isTrackingPixel) {
-        rawImageUrl = ogImageUrl;
-        imageSource = 'rss-og';
-        console.log('[RSS_NEWS_POST] ✅ Using article og:image directly (from RSS library)');
+        // Validate image accessibility and minimum quality via HEAD request
+        try {
+          const headCheck = await fetch(ogImageUrl, { method: 'HEAD', headers: { 'User-Agent': 'Mozilla/5.0' } });
+          const contentType = headCheck.headers.get('content-type') || '';
+          const contentLength = parseInt(headCheck.headers.get('content-length') || '0', 10);
+          const isImage = contentType.startsWith('image/');
+          const isBigEnough = contentLength === 0 || contentLength > 15000; // >15KB (skip tiny thumbnails/icons)
+          
+          if (headCheck.ok && isImage && isBigEnough) {
+            rawImageUrl = ogImageUrl;
+            imageSource = 'rss-og';
+            console.log(`[RSS_NEWS_POST] ✅ og:image validated (${contentLength} bytes, ${contentType})`);
+          } else {
+            console.log(`[RSS_NEWS_POST] ⚠️ og:image rejected: ok=${headCheck.ok}, type=${contentType}, size=${contentLength}`);
+          }
+        } catch (headErr) {
+          console.log('[RSS_NEWS_POST] ⚠️ og:image HEAD check failed:', headErr);
+        }
       }
     }
 
-    // Only fallback to stock search if article has NO image at all
+    // Fallback to stock search if article image is missing or low quality
     if (!rawImageUrl) {
       const entities = extractEntitiesAgent(newsItem.title);
       const entityQuery = entities.slice(0, 3).join(' ') || topic_filter || newsItem.title;
-      console.log('[RSS_NEWS_POST] ⚠️ No article image — fallback search with entities:', entities);
+      console.log('[RSS_NEWS_POST] ⚠️ No valid article image — fallback search with entities:', entities);
       try {
         const imgSearchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
           method: 'POST',
@@ -1946,22 +1961,41 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
       }
     }
 
-    // 4. Apply headline overlay to the chosen image
+    // 4. Apply headline overlay via apply-text-overlay (burns headline server-side)
     let imageUrl: string | null = null;
 
     if (rawImageUrl) {
-      const watermarkResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
-        body: JSON.stringify({ imageUrl: rawImageUrl, watermarkText: 'Neural Update', headlineText: finalHeadline })
-      });
+      // PRIMARY: Use apply-text-overlay to burn headline onto image server-side
+      console.log('[RSS_NEWS_POST] 🔥 Applying headline overlay via apply-text-overlay...');
+      try {
+        const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+          body: JSON.stringify({ 
+            imageUrl: rawImageUrl, 
+            title: newsItem.title,
+            headlineText: finalHeadline, 
+            watermarkText: 'Neural Update',
+            generateHeadline: !headline_text // Only auto-generate if user didn't provide one
+          })
+        });
 
-      if (watermarkResponse.ok) {
-        const wmResult = await watermarkResponse.json();
-        imageUrl = wmResult.publicUrl || wmResult.url || wmResult.imageUrl;
-        console.log('[RSS_NEWS_POST] Headline overlay applied! Source:', imageSource);
-      } else {
-        // Fallback: upload original without headline
+        if (overlayResponse.ok) {
+          const overlayResult = await overlayResponse.json();
+          if (overlayResult.publicUrl) {
+            imageUrl = overlayResult.publicUrl;
+            console.log('[RSS_NEWS_POST] ✅ Headline burned onto image! hasOverlay:', overlayResult.hasOverlay);
+          }
+        } else {
+          console.warn('[RSS_NEWS_POST] ⚠️ apply-text-overlay failed:', overlayResponse.status);
+        }
+      } catch (overlayErr) {
+        console.warn('[RSS_NEWS_POST] ⚠️ apply-text-overlay error:', overlayErr);
+      }
+
+      // FALLBACK: If overlay failed, upload original image (better than nothing)
+      if (!imageUrl) {
+        console.log('[RSS_NEWS_POST] Fallback: uploading original image without headline...');
         const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
