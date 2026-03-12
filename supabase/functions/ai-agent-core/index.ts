@@ -1263,7 +1263,7 @@ REGRAS:
     }
   }
   
-  // 4. Get product image (use affiliate's image or generate)
+  // 4. Get product image (use affiliate's image, or generate via AI)
   let imageUrl = selectedAffiliate.image_url || null;
   
   // If affiliate has an image, upload it to storage
@@ -1280,6 +1280,63 @@ REGRAS:
       }
     } catch (e) {
       console.log('[AGENT] Upload de imagem do afiliado falhou:', e);
+      imageUrl = null; // Force AI generation
+    }
+  }
+  
+  // FALLBACK: Generate AI image if no product image exists
+  if (!imageUrl) {
+    console.log('[AGENT] 🎨 Gerando imagem AI para post de afiliado...');
+    try {
+      const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+      if (lovableApiKey) {
+        const imgResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${lovableApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-image",
+            modalities: ["image", "text"],
+            messages: [{
+              role: "user",
+              content: `Generate a professional Instagram marketing image (1080x1080) for the product: "${selectedAffiliate.product_name}".
+Description: ${selectedAffiliate.description || 'Technology product'}.
+Style: Modern, clean, tech aesthetic with dark gradient background. 
+Include the product name "${selectedAffiliate.product_name}" as prominent text.
+Professional marketing design, no stock photos of people.`
+            }]
+          }),
+        });
+
+        if (imgResponse.ok) {
+          const imgData = await imgResponse.json();
+          const generatedImgUrl = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+          
+          if (generatedImgUrl && generatedImgUrl.startsWith('data:image/')) {
+            // Upload base64 image to storage
+            const { encode, decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+            const b64 = generatedImgUrl.split('base64,')[1];
+            if (b64) {
+              const imageData = decode(b64);
+              const filename = `marketing-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+              
+              const { error: upErr } = await supabase.storage
+                .from('post-images')
+                .upload(filename, imageData, { contentType: 'image/jpeg', upsert: false });
+              
+              if (!upErr) {
+                const { data: { publicUrl } } = supabase.storage.from('post-images').getPublicUrl(filename);
+                imageUrl = publicUrl;
+                console.log('[AGENT] ✅ Imagem AI para afiliado gerada:', imageUrl);
+              }
+            }
+          }
+        }
+      }
+    } catch (imgErr) {
+      console.log('[AGENT] ⚠️ AI image generation failed for affiliate:', imgErr);
     }
   }
   
