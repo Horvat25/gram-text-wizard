@@ -281,28 +281,16 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     marketing: context.content_distribution_marketing || 2,
   };
   
-  // PRORATE weekly goals based on remaining days in the week
-  // This prevents the agent from "thinking it's done" when configured mid-week
-  // e.g., if it's Wednesday (day 3), only 4 days remain (Wed-Sat), 
-  // so goals should be ~57% of full week
+  // USE FULL WEEKLY GOALS - daily limit (4/day) is the primary control
+  // Prorating was causing the agent to stop posting mid-week because goals appeared "met"
+  // The daily limit already ensures we don't over-post on any given day
+  const weeklyGoals: ContentDistribution = { ...rawWeeklyGoals };
+  
   const dayOfWeekNow = todayBrasilia.getDay(); // 0=Sun
-  const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow); // includes today
-  const prorateFactor = daysRemainingInWeek / 7;
+  const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow);
   
-  // Only prorate if we're past Sunday (i.e., week already started)
-  // Use ceiling to ensure at least 1 of each type
-  const weeklyGoals: ContentDistribution = {
-    videos: dayOfWeekNow === 0 ? rawWeeklyGoals.videos : Math.max(1, Math.ceil(rawWeeklyGoals.videos * prorateFactor)),
-    carousels: dayOfWeekNow === 0 ? rawWeeklyGoals.carousels : Math.max(1, Math.ceil(rawWeeklyGoals.carousels * prorateFactor)),
-    news: dayOfWeekNow === 0 ? rawWeeklyGoals.news : Math.max(1, Math.ceil(rawWeeklyGoals.news * prorateFactor)),
-    images: dayOfWeekNow === 0 ? rawWeeklyGoals.images : Math.max(1, Math.ceil(rawWeeklyGoals.images * prorateFactor)),
-    marketing: dayOfWeekNow === 0 ? rawWeeklyGoals.marketing : Math.max(1, Math.ceil(rawWeeklyGoals.marketing * prorateFactor)),
-  };
-  
-  console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes), prorateFactor: ${prorateFactor.toFixed(2)}`);
-  console.log(`[AGENT] 📊 Goals raw: V${rawWeeklyGoals.videos} C${rawWeeklyGoals.carousels} N${rawWeeklyGoals.news} I${rawWeeklyGoals.images} M${rawWeeklyGoals.marketing}`);
-  console.log(`[AGENT] 📊 Goals prorated: V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
-  
+  console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes)`);
+  console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   // Count progress this week by media type
   const weeklyProgress: ContentDistribution = {
     videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
@@ -1275,7 +1263,7 @@ REGRAS:
     }
   }
   
-  // 4. Get product image (use affiliate's image or generate)
+  // 4. Get product image (use affiliate's image, or generate via AI)
   let imageUrl = selectedAffiliate.image_url || null;
   
   // If affiliate has an image, upload it to storage
@@ -1292,6 +1280,63 @@ REGRAS:
       }
     } catch (e) {
       console.log('[AGENT] Upload de imagem do afiliado falhou:', e);
+      imageUrl = null; // Force AI generation
+    }
+  }
+  
+  // FALLBACK: Generate AI image if no product image exists
+  if (!imageUrl) {
+    console.log('[AGENT] 🎨 Gerando imagem AI para post de afiliado...');
+    try {
+      const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+      if (lovableApiKey) {
+        const imgResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${lovableApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-image",
+            modalities: ["image", "text"],
+            messages: [{
+              role: "user",
+              content: `Generate a professional Instagram marketing image (1080x1080) for the product: "${selectedAffiliate.product_name}".
+Description: ${selectedAffiliate.description || 'Technology product'}.
+Style: Modern, clean, tech aesthetic with dark gradient background. 
+Include the product name "${selectedAffiliate.product_name}" as prominent text.
+Professional marketing design, no stock photos of people.`
+            }]
+          }),
+        });
+
+        if (imgResponse.ok) {
+          const imgData = await imgResponse.json();
+          const generatedImgUrl = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+          
+          if (generatedImgUrl && generatedImgUrl.startsWith('data:image/')) {
+            // Upload base64 image to storage
+            const { encode, decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+            const b64 = generatedImgUrl.split('base64,')[1];
+            if (b64) {
+              const imageData = decode(b64);
+              const filename = `marketing-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+              
+              const { error: upErr } = await supabase.storage
+                .from('post-images')
+                .upload(filename, imageData, { contentType: 'image/jpeg', upsert: false });
+              
+              if (!upErr) {
+                const { data: { publicUrl } } = supabase.storage.from('post-images').getPublicUrl(filename);
+                imageUrl = publicUrl;
+                console.log('[AGENT] ✅ Imagem AI para afiliado gerada:', imageUrl);
+              }
+            }
+          }
+        }
+      }
+    } catch (imgErr) {
+      console.log('[AGENT] ⚠️ AI image generation failed for affiliate:', imgErr);
     }
   }
   
