@@ -185,12 +185,21 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário
   const { data: todayPosts } = await supabase
     .from('posts')
-    .select('id, status')
+    .select('id, status, media_type, post_type')
     .eq('workspace_id', workspaceId)
     .gte('created_at', todayStartUTC.toISOString());
   
   const postsCreatedToday = (todayPosts || []).length;
-  console.log(`[AGENT] Posts criados HOJE: ${postsCreatedToday} (draft+scheduled+published)`);
+  
+  // Track which content types were already posted TODAY for diversity rotation
+  const todayContentTypes: ContentType[] = (todayPosts || []).map((p: any) => {
+    if (p.media_type === 'reels' || p.media_type === 'video') return 'video' as ContentType;
+    if (p.media_type === 'carousel') return 'carousel' as ContentType;
+    if (p.post_type === 'afiliado') return 'marketing' as ContentType;
+    if (p.post_type === 'noticia') return 'news' as ContentType;
+    return 'image' as ContentType;
+  });
+  console.log(`[AGENT] Posts criados HOJE: ${postsCreatedToday} (tipos: ${todayContentTypes.join(', ') || 'nenhum'})`);
   
   // Busca posts desta semana para tracking de distribuição
   const { data: weekPosts } = await supabase
@@ -344,17 +353,25 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const remainingTypes = typeStats.filter(t => t.remaining > 0);
   
-  // Sort: lowest completion % first, then highest priority as tiebreaker
-  // IMPORTANT: Use explicit number comparison to avoid JS sort instability
-  const remainingByType = remainingTypes.sort((a, b) => {
-    const pctDiff = a.percentage - b.percentage;
-    if (Math.abs(pctDiff) > 0.01) return pctDiff;
-    // Same percentage → higher priority first (video > carousel > news > image)
-    return b.priority - a.priority;
-  });
+  // DAILY DIVERSITY: Penalize types already posted today to force rotation
+  // If a type was posted today, add a penalty to its percentage so OTHER types get priority
+  const DAILY_REPEAT_PENALTY = 50; // 50% penalty per repeat today
+  const remainingByType = remainingTypes
+    .map(t => {
+      const timesPostedToday = todayContentTypes.filter(ct => ct === t.type).length;
+      const diversityPenalty = timesPostedToday * DAILY_REPEAT_PENALTY;
+      return { ...t, effectivePercentage: t.percentage + diversityPenalty, timesPostedToday };
+    })
+    .sort((a, b) => {
+      // Sort by effective percentage (includes diversity penalty)
+      const pctDiff = a.effectivePercentage - b.effectivePercentage;
+      if (Math.abs(pctDiff) > 0.01) return pctDiff;
+      // Same effective percentage → higher priority first
+      return b.priority - a.priority;
+    });
   
-  console.log('[AGENT] Content distribution AFTER sort:', remainingByType.map(t => 
-    `${t.type}: ${Math.round(t.percentage)}% (${t.goal - t.remaining}/${t.goal})`
+  console.log('[AGENT] Content distribution WITH diversity:', remainingByType.map(t => 
+    `${t.type}: ${Math.round(t.percentage)}% real + ${t.timesPostedToday}x today penalty = ${Math.round(t.effectivePercentage)}% effective (${t.goal - t.remaining}/${t.goal})`
   ).join(', '));
   
   // MARKETING INTERCALATION: Force marketing if it's overdue
@@ -363,6 +380,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     nextContentType = 'marketing';
     console.log(`[AGENT] ⚡ MARKETING INTERCALATION: ${totalRegularPosts} regular posts done, forcing marketing post`);
   } else {
+    // Pick the type with lowest EFFECTIVE percentage (considers both weekly progress AND daily diversity)
     nextContentType = remainingByType.length > 0 ? remainingByType[0].type : null;
   }
   console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
