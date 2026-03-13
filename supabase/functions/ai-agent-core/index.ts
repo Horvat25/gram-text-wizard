@@ -185,12 +185,21 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário
   const { data: todayPosts } = await supabase
     .from('posts')
-    .select('id, status')
+    .select('id, status, media_type, post_type')
     .eq('workspace_id', workspaceId)
     .gte('created_at', todayStartUTC.toISOString());
   
   const postsCreatedToday = (todayPosts || []).length;
-  console.log(`[AGENT] Posts criados HOJE: ${postsCreatedToday} (draft+scheduled+published)`);
+  
+  // Track which content types were already posted TODAY for diversity rotation
+  const todayContentTypes: ContentType[] = (todayPosts || []).map((p: any) => {
+    if (p.media_type === 'reels' || p.media_type === 'video') return 'video' as ContentType;
+    if (p.media_type === 'carousel') return 'carousel' as ContentType;
+    if (p.post_type === 'afiliado') return 'marketing' as ContentType;
+    if (p.post_type === 'noticia') return 'news' as ContentType;
+    return 'image' as ContentType;
+  });
+  console.log(`[AGENT] Posts criados HOJE: ${postsCreatedToday} (tipos: ${todayContentTypes.join(', ') || 'nenhum'})`);
   
   // Busca posts desta semana para tracking de distribuição
   const { data: weekPosts } = await supabase
