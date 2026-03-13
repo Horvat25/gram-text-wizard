@@ -996,7 +996,7 @@ async function createVideoContent(
   return post;
 }
 
-// Create CAROUSEL content - USES AI-GENERATED IMAGES for visual consistency
+// Create CAROUSEL content - ONE unified theme with 4 progressive educational slides
 async function createCarouselContent(
   supabase: any,
   plan: ContentPlan,
@@ -1006,9 +1006,11 @@ async function createCarouselContent(
   headers: any,
   autoPublish: boolean = false
 ): Promise<any> {
-  console.log('[AGENT] Criando carrossel (imagens IA):', plan.theme);
+  console.log('[AGENT] Criando carrossel EDUCACIONAL unificado:', plan.theme);
   
-  // Get top 4 RSS items for content/captions (but NOT for images)
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+  
+  // STEP 1: Pick the BEST single RSS article as the carousel theme
   const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   
   // Refresh RSS
@@ -1031,7 +1033,7 @@ async function createCarouselContent(
     .order('published_at', { ascending: false })
     .limit(20);
   
-  if (!rssItems || rssItems.length < 2) {
+  if (!rssItems || rssItems.length === 0) {
     console.log('[AGENT] ⚠️ Notícias insuficientes para carrossel');
     const { data: post, error } = await supabase.from('posts').insert({
       user_id: userId,
@@ -1042,49 +1044,119 @@ async function createCarouselContent(
       media_type: 'carousel',
       platforms: plan.platforms || ['instagram'],
       status: 'failed',
-      error_message: 'Menos de 2 notícias na biblioteca. Adicione mais fontes RSS.',
+      error_message: 'Sem notícias na biblioteca. Adicione mais fontes RSS.',
       ai_model_used: 'none'
     }).select().single();
     if (error) throw error;
     return post;
   }
   
-  // Score and rank, pick top 4
+  // Pick THE BEST single article as the unified theme
   const scored = rssItems.map((item: any) => ({
     item,
     score: calculateNewsRankingScore(item)
   })).sort((a: any, b: any) => b.score - a.score);
   
-  const selectedItems = scored.slice(0, Math.min(4, scored.length));
-  const titles: string[] = selectedItems.map((s: any) => s.item.title);
+  const bestArticle = scored[0].item;
+  console.log(`[AGENT] 📰 Tema único do carrossel: "${bestArticle.title}"`);
   
   // Mark as used
-  for (const { item } of selectedItems) {
-    await supabase.from('rss_items').update({ is_used: true }).eq('id', item.id);
+  await supabase.from('rss_items').update({ is_used: true }).eq('id', bestArticle.id);
+  
+  // STEP 2: Use AI to generate 4 PROGRESSIVE slides about this ONE topic
+  // Each slide builds on the previous one: Contexto → O que é → Impacto → O que fazer
+  let slideContents: { slideTitle: string; slideText: string; imagePrompt: string }[] = [];
+  
+  if (lovableApiKey) {
+    try {
+      const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram.
+
+TEMA DO CARROSSEL: "${bestArticle.title}"
+CONTEXTO: ${bestArticle.description || bestArticle.title}
+FONTE: ${bestArticle.source_name || 'Tech News'}
+
+Crie um carrossel EDUCACIONAL de 4 slides sobre esse ÚNICO tema. Cada slide deve aprofundar progressivamente:
+
+SLIDE 1 - HOOK: Título impactante que gera curiosidade. Deve fazer a pessoa parar de rolar o feed.
+SLIDE 2 - CONTEXTO: Explicação clara do que está acontecendo e por quê é importante.
+SLIDE 3 - IMPACTO: Como isso afeta a vida das pessoas, empresas ou o futuro.
+SLIDE 4 - AÇÃO: O que as pessoas devem saber/fazer. Conclusão forte com insight valioso.
+
+REGRAS:
+- Todos os 4 slides são sobre o MESMO tema, aprofundando progressivamente
+- slideTitle: máximo 8 palavras, impactante, em CAIXA ALTA
+- slideText: 2-3 frases curtas e diretas por slide (texto que aparece no slide)
+- imagePrompt: descrição visual para gerar imagem IA coerente com o slide (em inglês)
+- As 4 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, cores, ambiente)
+
+Responda em JSON:
+{
+  "slides": [
+    { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
+    { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
+    { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
+    { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." }
+  ]
+}`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'user', content: carouselPrompt }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const content = result.choices?.[0]?.message?.content;
+        if (content) {
+          const parsed = JSON.parse(content);
+          if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length >= 4) {
+            slideContents = parsed.slides.slice(0, 4);
+            console.log('[AGENT] ✅ 4 slides educacionais gerados pela IA');
+          }
+        }
+      }
+    } catch (e) {
+      console.log('[AGENT] Erro ao gerar slides com IA:', e);
+    }
   }
   
-  // Generate 4 AI images based on the selected news articles
-  // Uses search-images-for-video in AI GENERATION MODE
-  const carouselSceneDirections = [
-    'Hook visual forte — cena impactante, ambiente tecnológico, curiosidade imediata',
-    'Expansão — continuação direta, novos elementos de evolução, detalhes e interfaces',
-    'Impacto — escala e transformação, cena mais ampla e intensa',
-    'Conclusão — visão futurista, composição limpa e simbólica, encerramento forte',
-  ];
-  const segments = selectedItems.map((s: any, i: number) => ({
-    text: s.item.title,
-    imagePrompt: `${carouselSceneDirections[i] || carouselSceneDirections[0]} sobre: ${s.item.title}. ${s.item.description || ''}`,
-  }));
+  // Fallback if AI failed
+  if (slideContents.length < 4) {
+    const topic = bestArticle.title;
+    slideContents = [
+      { slideTitle: 'VOCÊ PRECISA SABER DISSO', slideText: topic, imagePrompt: `Dramatic tech scene, futuristic environment, strong visual hook about: ${topic}` },
+      { slideTitle: 'O QUE ESTÁ ACONTECENDO', slideText: bestArticle.description || topic, imagePrompt: `Informative tech visualization, data flows and connections about: ${topic}` },
+      { slideTitle: 'POR QUE ISSO IMPORTA', slideText: `O impacto dessa mudança vai além do que você imagina.`, imagePrompt: `Impact visualization, global scale technology transformation about: ${topic}` },
+      { slideTitle: 'O QUE VOCÊ DEVE FAZER', slideText: `Fique atento e se prepare para as mudanças que vêm por aí.`, imagePrompt: `Conclusion scene, person looking at future tech horizon, hopeful and determined about: ${topic}` },
+    ];
+  }
   
-  console.log('[AGENT] 🎨 Gerando 4 imagens IA para carrossel...');
+  // STEP 3: Generate 4 AI images with VISUAL CONSISTENCY
+  console.log('[AGENT] 🎨 Gerando 4 imagens IA com consistência visual...');
   const carouselImages: string[] = [];
+  
+  // Build segments for search-images-for-video (AI generation mode)
+  const segments = slideContents.map((slide, i) => ({
+    text: slide.slideTitle,
+    imagePrompt: `${slide.imagePrompt}. Style: dark tech aesthetic, neon accents, consistent color palette across all 4 slides. Slide ${i + 1} of 4. Square format 1080x1080. NO TEXT in image.`,
+  }));
   
   try {
     const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        topic: titles.join('; '),
+        topic: bestArticle.title,
         segments,
       })
     });
@@ -1098,67 +1170,137 @@ async function createCarouselContent(
             carouselImages.push(imgUrl);
           }
         }
-        console.log(`[AGENT] ✅ ${carouselImages.length} imagens IA para carrossel`);
+        console.log(`[AGENT] ✅ ${carouselImages.length} imagens IA consistentes para carrossel`);
       }
     }
   } catch (e) {
     console.log('[AGENT] Erro geração IA carrossel:', e);
   }
   
-  console.log(`[AGENT] Carrossel com ${carouselImages.length} slides (IA)`);
-  
-  // Generate caption
-  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      topic: `Resumo das principais notícias: ${titles.join('; ')}`,
-      postType: 'noticia',
-      customInstructions: `Este é um CARROSSEL com ${carouselImages.length} notícias. Faça um resumo envolvente.`
-    })
-  });
-  
-  let caption = `📰 As principais notícias de hoje`;
-  let hashtags: string[] = ['#carrossel', '#tecnologia', '#noticias', '#ia'];
-  
-  if (captionResponse.ok) {
-    const captionData = await captionResponse.json();
-    caption = captionData.caption || caption;
-    hashtags = captionData.hashtags || hashtags;
+  // STEP 4: Apply text overlays to each slide (headline burned into image)
+  const overlaidImages: string[] = [];
+  for (let i = 0; i < Math.min(carouselImages.length, slideContents.length); i++) {
+    try {
+      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          imageUrl: carouselImages[i],
+          headlineText: slideContents[i].slideTitle,
+          watermarkText: i === carouselImages.length - 1 ? 'Neural Update' : undefined, // Watermark only on last slide
+        })
+      });
+      
+      if (overlayResponse.ok) {
+        const overlayResult = await overlayResponse.json();
+        overlaidImages.push(overlayResult.publicUrl || carouselImages[i]);
+      } else {
+        overlaidImages.push(carouselImages[i]);
+      }
+    } catch (e) {
+      console.log(`[AGENT] Overlay slide ${i} falhou:`, e);
+      overlaidImages.push(carouselImages[i]);
+    }
   }
   
-  const canPublish = autoPublish && carouselImages.length >= 2;
+  // Use overlaid images if available, otherwise raw images
+  const finalImages = overlaidImages.length >= 2 ? overlaidImages : carouselImages;
+  
+  console.log(`[AGENT] Carrossel com ${finalImages.length} slides finais`);
+  
+  // STEP 5: Generate RICH educational caption
+  let caption = '';
+  let hashtags: string[] = ['#tecnologia', '#ia', '#inovacao', '#futuro', '#carrossel'];
+  
+  const captionPrompt = `Crie uma legenda RICA e EDUCACIONAL para um carrossel do Instagram sobre: "${bestArticle.title}"
+
+Os 4 slides do carrossel cobrem:
+1. ${slideContents[0]?.slideTitle}: ${slideContents[0]?.slideText}
+2. ${slideContents[1]?.slideTitle}: ${slideContents[1]?.slideText}
+3. ${slideContents[2]?.slideTitle}: ${slideContents[2]?.slideText}
+4. ${slideContents[3]?.slideTitle}: ${slideContents[3]?.slideText}
+
+ESTRUTURA DA LEGENDA (obrigatória):
+🔥 HOOK (1 linha): Frase impactante que complementa o slide 1 sem repetir
+📌 CONTEXTO (2-3 linhas): Explicação concisa do tema com dados ou fatos
+💡 INSIGHT VALIOSO (2-3 linhas): Análise profunda, opinião ou previsão que agrega valor real
+👉 CTA (1 linha): Pergunta que convida ao debate
+
+REGRAS:
+- Legenda com VALOR REAL, não genérica
+- Tom: especialista acessível, não robótico
+- Máximo 250 palavras
+- Use emojis com moderação (máx 5)
+- Inclua fonte: ${bestArticle.source_name || 'Tech News'}
+- Gere 8-12 hashtags relevantes
+
+Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
+
+  try {
+    const captionResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [{ role: 'user', content: captionPrompt }],
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (captionResponse.ok) {
+      const captionResult = await captionResponse.json();
+      const captionContent = captionResult.choices?.[0]?.message?.content;
+      if (captionContent) {
+        const parsed = JSON.parse(captionContent);
+        caption = parsed.caption || caption;
+        hashtags = parsed.hashtags || hashtags;
+      }
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro ao gerar legenda do carrossel:', e);
+  }
+  
+  // Fallback caption
+  if (!caption) {
+    caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente!`;
+  }
+  
+  const canPublish = autoPublish && finalImages.length >= 2;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
     caption,
     hashtags,
-    post_type: 'noticia',
+    post_type: 'educacional',
     media_type: 'carousel',
     platforms: plan.platforms || ['instagram'],
-    status: carouselImages.length >= 2 ? (canPublish ? 'scheduled' : 'draft') : 'failed',
+    status: finalImages.length >= 2 ? (canPublish ? 'scheduled' : 'draft') : 'failed',
     scheduled_for: canPublish ? new Date().toISOString() : null,
-    image_url: carouselImages[0] || null,
-    carousel_images: carouselImages,
+    image_url: finalImages[0] || null,
+    carousel_images: finalImages,
     overlay_metadata: {
-      type: 'ai_carousel',
-      titles,
-      ranking_scores: selectedItems.map((s: any) => s.score),
+      type: 'educational_carousel',
+      unified_theme: bestArticle.title,
+      source: bestArticle.source_name,
+      article_url: bestArticle.link,
+      slide_titles: slideContents.map(s => s.slideTitle),
       ai_generated: true,
+      has_text_overlay: overlaidImages.length > 0,
     },
-    ai_model_used: 'gemini-2.5-flash-image'
+    ai_model_used: 'gemini-2.5-flash'
   }).select().single();
   
   if (error) throw error;
   
-  // Link RSS items to post
+  // Link RSS item to post
   if (post?.id) {
-    for (const { item } of selectedItems) {
-      await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', item.id);
-    }
+    await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', bestArticle.id);
   }
   
-  console.log('[AGENT] Carrossel IA criado:', post.id, 'slides:', carouselImages.length);
+  console.log('[AGENT] ✅ Carrossel educacional unificado criado:', post.id, 'slides:', finalImages.length);
   return post;
 }
 
