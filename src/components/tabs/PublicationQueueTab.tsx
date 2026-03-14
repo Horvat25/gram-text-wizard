@@ -199,7 +199,7 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
-  const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering } = useVideoRendering();
+  const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering, autoRenderEnabled, autoRenderQueue, toggleAutoRender } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false;
 
@@ -408,11 +408,16 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              disabled={isRendering}
+              disabled={isRendering || autoRenderEnabled}
               onClick={() => renderVideo(post.id)}
+              title={autoRenderEnabled ? 'Desative o auto-render para renderizar manualmente' : undefined}
             >
               <Film className="h-3 w-3 mr-1" />
-              {isRendering && currentVideoId === post.id ? 'Renderizando...' : 'Gerar Vídeo'}
+              {isRendering && currentVideoId === post.id
+                ? 'Renderizando...'
+                : autoRenderEnabled
+                  ? '🤖 Auto'
+                  : 'Gerar Vídeo'}
             </Button>
           )}
           
@@ -503,12 +508,25 @@ const PublicationQueueTab = ({
         </Card>
       )}
 
-      {/* Pending reels info */}
-      {!isRendering && pendingReelsCount > 0 && (
-        <Alert>
+      {/* Auto-render toggle + pending reels */}
+      {pendingReelsCount > 0 && (
+        <Alert className={autoRenderEnabled ? 'border-primary/50 bg-primary/5' : ''}>
           <Film className="h-4 w-4" />
-          <AlertDescription>
-            <strong>{pendingReelsCount} reels</strong> aguardando renderização manual. Clique em "Gerar Vídeo" em cada post.
+          <AlertDescription className="flex items-center justify-between">
+            <span>
+              <strong>{pendingReelsCount} reels</strong> aguardando renderização.
+              {autoRenderEnabled && autoRenderQueue.length > 0 && (
+                <span className="text-primary ml-1">({autoRenderQueue.length} na fila auto)</span>
+              )}
+            </span>
+            <Button
+              size="sm"
+              variant={autoRenderEnabled ? "default" : "outline"}
+              onClick={toggleAutoRender}
+              className={autoRenderEnabled ? 'bg-primary hover:bg-primary/90' : ''}
+            >
+              {autoRenderEnabled ? '🤖 Auto: ON' : '🤖 Auto-Render'}
+            </Button>
           </AlertDescription>
         </Alert>
       )}
