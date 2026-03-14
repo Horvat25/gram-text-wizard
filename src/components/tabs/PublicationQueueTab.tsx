@@ -408,11 +408,16 @@ const PublicationQueueTab = ({
               size="sm"
               variant="default"
               className="bg-purple-600 hover:bg-purple-700"
-              disabled={isRendering}
+              disabled={isRendering || autoRenderEnabled}
               onClick={() => renderVideo(post.id)}
+              title={autoRenderEnabled ? 'Desative o auto-render para renderizar manualmente' : undefined}
             >
               <Film className="h-3 w-3 mr-1" />
-              {isRendering && currentVideoId === post.id ? 'Renderizando...' : 'Gerar Vídeo'}
+              {isRendering && currentVideoId === post.id
+                ? 'Renderizando...'
+                : autoRenderEnabled
+                  ? '🤖 Auto'
+                  : 'Gerar Vídeo'}
             </Button>
           )}
           
