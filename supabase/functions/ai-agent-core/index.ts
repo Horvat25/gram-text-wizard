@@ -182,14 +182,26 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const recentPosts = posts72h || [];
   
-  // Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário
+  // Contar posts criados HOJE para limite diário
+  // EXCLUIR draft reels (ficam presos sem renderização) para não desperdiçar slots
   const { data: todayPosts } = await supabase
     .from('posts')
     .select('id, status, media_type, post_type')
     .eq('workspace_id', workspaceId)
     .gte('created_at', todayStartUTC.toISOString());
   
-  const postsCreatedToday = (todayPosts || []).length;
+  // Only count posts that actually published/scheduled OR are publishable (non-reels drafts)
+  // Draft reels without video_url are stuck and should NOT consume daily quota
+  const postsCreatedToday = (todayPosts || []).filter((p: any) => {
+    // Published or scheduled = always count
+    if (p.status === 'published' || p.status === 'scheduled') return true;
+    // Failed posts = don't count (wasted)
+    if (p.status === 'failed') return false;
+    // Draft reels = don't count (stuck without render service)
+    if (p.status === 'draft' && (p.media_type === 'reels' || p.media_type === 'video')) return false;
+    // Other drafts (carousel, image, news) = count
+    return true;
+  }).length;
   
   // Track which content types were already posted TODAY for diversity rotation
   const todayContentTypes: ContentType[] = (todayPosts || []).map((p: any) => {
