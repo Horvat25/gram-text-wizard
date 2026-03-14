@@ -503,12 +503,25 @@ const PublicationQueueTab = ({
         </Card>
       )}
 
-      {/* Pending reels info */}
-      {!isRendering && pendingReelsCount > 0 && (
-        <Alert>
+      {/* Auto-render toggle + pending reels */}
+      {pendingReelsCount > 0 && (
+        <Alert className={autoRenderEnabled ? 'border-primary/50 bg-primary/5' : ''}>
           <Film className="h-4 w-4" />
-          <AlertDescription>
-            <strong>{pendingReelsCount} reels</strong> aguardando renderização manual. Clique em "Gerar Vídeo" em cada post.
+          <AlertDescription className="flex items-center justify-between">
+            <span>
+              <strong>{pendingReelsCount} reels</strong> aguardando renderização.
+              {autoRenderEnabled && autoRenderQueue.length > 0 && (
+                <span className="text-primary ml-1">({autoRenderQueue.length} na fila auto)</span>
+              )}
+            </span>
+            <Button
+              size="sm"
+              variant={autoRenderEnabled ? "default" : "outline"}
+              onClick={toggleAutoRender}
+              className={autoRenderEnabled ? 'bg-primary hover:bg-primary/90' : ''}
+            >
+              {autoRenderEnabled ? '🤖 Auto: ON' : '🤖 Auto-Render'}
+            </Button>
           </AlertDescription>
         </Alert>
       )}
