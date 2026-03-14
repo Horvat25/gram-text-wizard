@@ -313,12 +313,18 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes)`);
   console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   // Count progress this week by media type
+  // Exclude draft reels (stuck without render) from video progress to avoid false "goal met"
+  const publishableWeekPosts = postsThisWeek.filter((p: any) => {
+    if ((p.media_type === 'reels' || p.media_type === 'video') && p.status === 'draft') return false;
+    if (p.status === 'failed') return false;
+    return true;
+  });
   const weeklyProgress: ContentDistribution = {
-    videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
-    carousels: postsThisWeek.filter((p: any) => p.media_type === 'carousel').length,
-    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
-    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
-    marketing: postsThisWeek.filter((p: any) => p.post_type === 'afiliado').length,
+    videos: publishableWeekPosts.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
+    carousels: publishableWeekPosts.filter((p: any) => p.media_type === 'carousel').length,
+    news: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
+    images: publishableWeekPosts.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
+    marketing: publishableWeekPosts.filter((p: any) => p.post_type === 'afiliado').length,
   };
   
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
