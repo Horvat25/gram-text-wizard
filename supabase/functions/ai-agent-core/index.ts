@@ -182,14 +182,26 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const recentPosts = posts72h || [];
   
-  // Contar TODOS os posts criados HOJE (draft, scheduled, published) para limite diário
+  // Contar posts criados HOJE para limite diário
+  // EXCLUIR draft reels (ficam presos sem renderização) para não desperdiçar slots
   const { data: todayPosts } = await supabase
     .from('posts')
     .select('id, status, media_type, post_type')
     .eq('workspace_id', workspaceId)
     .gte('created_at', todayStartUTC.toISOString());
   
-  const postsCreatedToday = (todayPosts || []).length;
+  // Only count posts that actually published/scheduled OR are publishable (non-reels drafts)
+  // Draft reels without video_url are stuck and should NOT consume daily quota
+  const postsCreatedToday = (todayPosts || []).filter((p: any) => {
+    // Published or scheduled = always count
+    if (p.status === 'published' || p.status === 'scheduled') return true;
+    // Failed posts = don't count (wasted)
+    if (p.status === 'failed') return false;
+    // Draft reels = don't count (stuck without render service)
+    if (p.status === 'draft' && (p.media_type === 'reels' || p.media_type === 'video')) return false;
+    // Other drafts (carousel, image, news) = count
+    return true;
+  }).length;
   
   // Track which content types were already posted TODAY for diversity rotation
   const todayContentTypes: ContentType[] = (todayPosts || []).map((p: any) => {
@@ -301,12 +313,18 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes)`);
   console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   // Count progress this week by media type
+  // Exclude draft reels (stuck without render) from video progress to avoid false "goal met"
+  const publishableWeekPosts = postsThisWeek.filter((p: any) => {
+    if ((p.media_type === 'reels' || p.media_type === 'video') && p.status === 'draft') return false;
+    if (p.status === 'failed') return false;
+    return true;
+  });
   const weeklyProgress: ContentDistribution = {
-    videos: postsThisWeek.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
-    carousels: postsThisWeek.filter((p: any) => p.media_type === 'carousel').length,
-    news: postsThisWeek.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
-    images: postsThisWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
-    marketing: postsThisWeek.filter((p: any) => p.post_type === 'afiliado').length,
+    videos: publishableWeekPosts.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
+    carousels: publishableWeekPosts.filter((p: any) => p.media_type === 'carousel').length,
+    news: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
+    images: publishableWeekPosts.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
+    marketing: publishableWeekPosts.filter((p: any) => p.post_type === 'afiliado').length,
   };
   
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
@@ -337,8 +355,16 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const hasAffiliateLinks = (activeAffiliateLinks?.length || 0) > 0;
   
+  // Check if video rendering is available (RENDER_SERVICE_URL must be configured)
+  // Without it, reels get stuck as drafts and waste daily post slots
+  const renderServiceAvailable = !!Deno.env.get('RENDER_SERVICE_URL');
+  if (!renderServiceAvailable) {
+    console.log('[AGENT] ⚠️ RENDER_SERVICE_URL não configurado - tipo "video" desabilitado (reels ficam como drafts inúteis)');
+  }
+  
   const typeStats = [
-    { type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 },
+    // Only include video if render service is available
+    ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
