@@ -349,8 +349,16 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const hasAffiliateLinks = (activeAffiliateLinks?.length || 0) > 0;
   
+  // Check if video rendering is available (RENDER_SERVICE_URL must be configured)
+  // Without it, reels get stuck as drafts and waste daily post slots
+  const renderServiceAvailable = !!Deno.env.get('RENDER_SERVICE_URL');
+  if (!renderServiceAvailable) {
+    console.log('[AGENT] ⚠️ RENDER_SERVICE_URL não configurado - tipo "video" desabilitado (reels ficam como drafts inúteis)');
+  }
+  
   const typeStats = [
-    { type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 },
+    // Only include video if render service is available
+    ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
