@@ -25,7 +25,7 @@ import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
 import AgentProactiveChat from './AgentProactiveChat';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
-import AgentResponsesPanel from './AgentResponsesPanel';
+// AgentResponsesPanel merged into AgentProactiveChat
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
