@@ -66,7 +66,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
   const [showAgentChat, setShowAgentChat] = useState(false); // Agent proactive chat
   const [showHistory, setShowHistory] = useState(false); // User command history
   const [showFeeds, setShowFeeds] = useState(false);
-  const [showResponses, setShowResponses] = useState(false);
+  // showResponses removed - merged into agentChat panel
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
 
