@@ -1,9 +1,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
-  MessageCircle, 
   Rss, 
-  FileText, 
   Loader2,
   LayoutDashboard,
   Settings,
@@ -25,7 +23,6 @@ import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
 import AgentProactiveChat from './AgentProactiveChat';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
-import AgentResponsesPanel from './AgentResponsesPanel';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
@@ -62,11 +59,10 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     auto_post_enabled: false
   });
   
-  // Panel states
-  const [showAgentChat, setShowAgentChat] = useState(false); // Agent proactive chat
-  const [showHistory, setShowHistory] = useState(false); // User command history
+  // Panel states (Respostas merged into Agente)
+  const [showAgentChat, setShowAgentChat] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [showFeeds, setShowFeeds] = useState(false);
-  const [showResponses, setShowResponses] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
 
@@ -160,7 +156,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     saveMessage(userMessage);
     setIsLoading(true);
     
-    // Auto open history when sending a message
     if (!showHistory) setShowHistory(true);
 
     try {
@@ -178,10 +173,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         }
       });
 
-      if (error) {
-        console.error('agent-chat invoke error:', error);
-        throw error;
-      }
+      if (error) throw error;
       if (!data) throw new Error('Resposta vazia do servidor');
       if (data.error) throw new Error(data.error);
 
@@ -213,12 +205,10 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     }
   };
 
-  // Close other panels when opening one
   const closeAllPanels = () => {
     setShowAgentChat(false);
     setShowHistory(false);
     setShowFeeds(false);
-    setShowResponses(false);
     setShowGrowth(false);
     setShowMarketing(false);
   };
@@ -228,7 +218,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       agentChat: showAgentChat,
       history: showHistory,
       feeds: showFeeds,
-      responses: showResponses,
       growth: showGrowth,
       marketing: showMarketing,
     }[panel];
@@ -239,7 +228,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history': setShowHistory(true); break;
         case 'feeds': setShowFeeds(true); break;
-        case 'responses': setShowResponses(true); break;
         case 'growth': setShowGrowth(true); break;
         case 'marketing': setShowMarketing(true); break;
       }
@@ -268,7 +256,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
         {/* Left side tabs */}
         <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
-          {/* Agent Chat - proactive reports */}
+          {/* Agent - unified reports + responses */}
           <Button
             variant={showAgentChat ? "default" : "ghost"}
             size="sm"
@@ -319,19 +307,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           >
             <Megaphone className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Marketing</span>
-          </Button>
-          
-          <Button
-            variant={showResponses ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showResponses && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('responses')}
-          >
-            <FileText className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Respostas</span>
           </Button>
           
           {/* History - user command chat history */}
@@ -395,7 +370,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         placeholder="Peça algo ao agente..."
       />
       
-      {/* Agent Proactive Chat Panel */}
+      {/* Agent Unified Panel (Reports + Responses + Actions) */}
       <AgentProactiveChat
         isOpen={showAgentChat}
         onClose={() => setShowAgentChat(false)}
@@ -429,11 +404,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           </ScrollArea>
         </div>
       )}
-      
-      <AgentResponsesPanel
-        isOpen={showResponses}
-        onClose={() => setShowResponses(false)}
-      />
       
       {/* Growth Dashboard Panel */}
       {showGrowth && (
