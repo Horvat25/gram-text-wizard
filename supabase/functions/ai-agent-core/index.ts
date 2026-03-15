@@ -1781,6 +1781,61 @@ async function createNewsContent(
     }
   }
   
+  // ── AI COHERENCE CHECK: Verify og:image matches article content ──
+  if (selectedImage && selectedArticle?.title) {
+    console.log('[AGENT] 🧠 Running AI coherence check on RSS image...');
+    try {
+      const coherenceResponse = await fetch(`${supabaseUrl}/functions/v1/validate-image-coherence`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          headline: selectedArticle.title,
+          caption: selectedArticle.description || '',
+          articleTitle: selectedArticle.title,
+        })
+      });
+      if (coherenceResponse.ok) {
+        const coherenceResult = await coherenceResponse.json();
+        console.log(`[AGENT] 🧠 Coherence: ${coherenceResult.coherent} (${coherenceResult.confidence}) — ${coherenceResult.reason}`);
+        
+        if (!coherenceResult.coherent && coherenceResult.confidence >= 0.6) {
+          console.log('[AGENT] ⛔ RSS image REJECTED by AI coherence — will use fallback');
+          selectedImage = null; // Triggers fallback below
+        }
+      }
+    } catch (cohErr) {
+      console.warn('[AGENT] Coherence check failed (non-blocking):', cohErr);
+    }
+  }
+
+  // Fallback: if image was rejected by coherence check, search for a relevant stock image
+  if (!selectedImage && selectedArticle) {
+    console.log('[AGENT] 🔍 Searching for coherent fallback image...');
+    try {
+      const imgSearchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          articleTitle: selectedArticle.title,
+          articleDescription: selectedArticle.description || '',
+          articleUrl: selectedArticle.url,
+          useArticleMode: true,
+          skipWatermark: true,
+        })
+      });
+      if (imgSearchResponse.ok) {
+        const imgResult = await imgSearchResponse.json();
+        if (imgResult.images && imgResult.images.length > 0) {
+          selectedImage = imgResult.images[0].imageUrl;
+          console.log('[AGENT] ✅ Coherent fallback image from:', imgResult.images[0].source || 'stock');
+        }
+      }
+    } catch (e) {
+      console.warn('[AGENT] Fallback image search failed:', e);
+    }
+  }
+
   // STEP 3 & 4: Apply text overlay via CODE (not AI image generation)
   // The apply-text-overlay function:
   // - Downloads the real image
