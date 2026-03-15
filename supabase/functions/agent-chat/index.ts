@@ -1931,11 +1931,42 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
       }
     }
 
-    // Fallback to stock search if article image is missing or low quality
+    // ── AI COHERENCE CHECK: Validate if og:image matches the headline/title ──
+    if (rawImageUrl && imageSource === 'rss-og') {
+      console.log('[RSS_NEWS_POST] 🧠 Running AI coherence check on og:image...');
+      try {
+        const coherenceResponse = await fetch(`${supabaseUrl}/functions/v1/validate-image-coherence`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+          body: JSON.stringify({
+            imageUrl: rawImageUrl,
+            headline: headline_text || newsItem.title,
+            caption: caption_block1 || newsItem.description || '',
+            articleTitle: newsItem.title,
+          })
+        });
+        if (coherenceResponse.ok) {
+          const coherenceResult = await coherenceResponse.json();
+          console.log(`[RSS_NEWS_POST] 🧠 Coherence: ${coherenceResult.coherent} (${coherenceResult.confidence}) — ${coherenceResult.reason}`);
+          
+          // If image is incoherent with high confidence, reject it
+          if (!coherenceResult.coherent && coherenceResult.confidence >= 0.6) {
+            console.log('[RSS_NEWS_POST] ⛔ og:image REJECTED by AI coherence check — will use fallback');
+            rawImageUrl = null;
+            imageSource = 'coherence-rejected';
+          }
+        }
+      } catch (cohErr) {
+        console.warn('[RSS_NEWS_POST] Coherence check failed (non-blocking):', cohErr);
+      }
+    }
+
+    // Fallback to stock search if article image is missing, low quality, or INCOHERENT
     if (!rawImageUrl) {
       const entities = extractEntitiesAgent(newsItem.title);
       const entityQuery = entities.slice(0, 3).join(' ') || topic_filter || newsItem.title;
-      console.log('[RSS_NEWS_POST] ⚠️ No valid article image — fallback search with entities:', entities);
+      const fallbackReason = imageSource === 'coherence-rejected' ? 'AI coherence rejected og:image' : 'No valid article image';
+      console.log(`[RSS_NEWS_POST] ⚠️ ${fallbackReason} — fallback search with entities:`, entities);
       try {
         const imgSearchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
           method: 'POST',
@@ -1958,6 +1989,30 @@ async function executeCreateRssNewsPost(supabase: any, userId: string, workspace
         }
       } catch (e) {
         console.warn('[RSS_NEWS_POST] Image search failed:', e);
+      }
+
+      // LAST RESORT: If stock search also fails, generate with AI
+      if (!rawImageUrl) {
+        console.log('[RSS_NEWS_POST] 🤖 Last resort: generating image with AI...');
+        try {
+          const aiImageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+            body: JSON.stringify({
+              prompt: `Professional tech news photo about: ${newsItem.title}. Clean, editorial style, no text overlay. Square 1:1 for Instagram.`,
+              format: 'square',
+              model: 'gemini'
+            })
+          });
+          if (aiImageResponse.ok) {
+            const aiImgResult = await aiImageResponse.json();
+            rawImageUrl = aiImgResult.imageUrl;
+            imageSource = 'ai-generated';
+            console.log('[RSS_NEWS_POST] ✅ AI-generated fallback image');
+          }
+        } catch (aiErr) {
+          console.warn('[RSS_NEWS_POST] AI image generation failed:', aiErr);
+        }
       }
     }
 
