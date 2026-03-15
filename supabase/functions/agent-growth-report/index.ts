@@ -228,24 +228,30 @@ REGRAS:
         reportContent = `📊 **Checkpoint ${brasiliaHour}h**\n\n📝 ${totalPosts}/${totalWeeklyGoal} posts (${typeBreakdown.reels} reels, ${typeBreakdown.carousels} carrosséis, ${typeBreakdown.news} notícias, ${typeBreakdown.images} imagens, ${typeBreakdown.marketing} marketing)\n📅 ${scheduled.length} agendados\n❤️ ${totalLikes} curtidas | 💬 ${totalComments} comentários | 🔄 ${totalShares} shares | 💾 ${totalSaves} saves\n👁️ Alcance: ${totalReach.toLocaleString()} (${viewsProgress}% da meta)\n📈 Recomendação: ${recommendedPostsPerDay} posts/dia`;
       }
 
-      await supabase
-        .from('agent_proactive_messages')
-        .insert({
-          workspace_id: workspaceId,
-          content: reportContent,
-          message_type: 'report',
-          metadata: {
-            total_posts: totalPosts,
-            weekly_goal: totalWeeklyGoal,
-            type_breakdown: typeBreakdown,
-            total_reach: totalReach,
-            views_progress: viewsProgress,
-            recommended_posts_per_day: recommendedPostsPerDay,
-            needs_affiliate: postsSinceLastAffiliate >= 4 && (affiliateLinks?.length || 0) > 0,
-            posts_since_affiliate: postsSinceLastAffiliate,
-            source_rankings: sourceRankingText,
-          }
-        });
+      // Only save report to proactive_messages at 0h, 6h, 12h, 18h BRT
+      if (shouldGenerateReport) {
+        await supabase
+          .from('agent_proactive_messages')
+          .insert({
+            workspace_id: workspaceId,
+            content: reportContent,
+            message_type: 'report',
+            metadata: {
+              total_posts: totalPosts,
+              weekly_goal: totalWeeklyGoal,
+              type_breakdown: typeBreakdown,
+              total_reach: totalReach,
+              views_progress: viewsProgress,
+              recommended_posts_per_day: recommendedPostsPerDay,
+              needs_affiliate: postsSinceLastAffiliate >= 4 && (affiliateLinks?.length || 0) > 0,
+              posts_since_affiliate: postsSinceLastAffiliate,
+              source_rankings: sourceRankingText,
+            }
+          });
+        console.log(`[Growth Report] Report saved for workspace ${workspaceId} at ${brasiliaHour}h BRT`);
+      } else {
+        console.log(`[Growth Report] Skipping report save at ${brasiliaHour}h BRT (only at 0h, 6h, 12h, 18h)`);
+      }
 
       await supabase
         .from('agent_context')
