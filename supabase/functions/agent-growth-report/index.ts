@@ -35,6 +35,10 @@ serve(async (req) => {
     
     const aiReportHours = [0, 6, 12, 18];
     const shouldUseAI = aiReportHours.includes(brasiliaHour);
+    
+    // ONLY generate reports at 0h, 6h, 12h, 18h BRT (4x daily)
+    // Other hours: just update daily_post_limit silently
+    const shouldGenerateReport = aiReportHours.includes(brasiliaHour);
 
     for (const ctx of contexts) {
       const workspaceId = ctx.workspace_id;
