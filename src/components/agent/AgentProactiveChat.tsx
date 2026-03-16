@@ -178,12 +178,13 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: ptBR });
   };
 
-  const getDecisionIcon = (decision: string | null) => {
+  const getDecisionIcon = (decision: string | null, status?: string) => {
+    if (status === 'timed_out') return <Clock className="h-3.5 w-3.5 text-orange-500" />;
     switch (decision) {
       case 'POST': return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />;
       case 'NO_POST': return <XCircle className="h-3.5 w-3.5 text-amber-500" />;
       case 'WAIT': return <Pause className="h-3.5 w-3.5 text-blue-500" />;
-      default: return <Bot className="h-3.5 w-3.5" />;
+      default: return <Loader2 className="h-3.5 w-3.5 animate-spin" />;
     }
   };
 
