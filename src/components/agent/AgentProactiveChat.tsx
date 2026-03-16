@@ -254,11 +254,11 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
             className="w-full p-3 flex items-center justify-between bg-card hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-3">
-              {getDecisionIcon(report.decision)}
+              {getDecisionIcon(report.decision, report.status)}
               <div className="text-left">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs">
-                    {getDecisionLabel(report.decision)}
+                    {getDecisionLabel(report.decision, report.status)}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
                     {report.trigger === 'cron' ? '⏰ Auto' : '🖐️ Manual'}
