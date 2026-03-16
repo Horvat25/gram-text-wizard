@@ -160,6 +160,40 @@ serve(async (req) => {
 
       let reportContent = '';
       
+      // ===== WEB INTELLIGENCE: Search trending topics for report context =====
+      let webTrendsText = '';
+      const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
+      if (shouldUseAI && firecrawlKey) {
+        try {
+          const niche = ctx.industry_niche || 'tecnologia';
+          const [trendsRes, competitorRes] = await Promise.allSettled([
+            fetch('https://api.firecrawl.dev/v1/search', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: `trending ${niche} viral Instagram hoje`, limit: 5, lang: 'pt-BR', country: 'BR', tbs: 'qdr:d' })
+            }).then(r => r.json()),
+            fetch('https://api.firecrawl.dev/v1/search', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: `perfis ${niche} Instagram viral engajamento 2026`, limit: 3, lang: 'pt-BR', country: 'BR', tbs: 'qdr:w' })
+            }).then(r => r.json()),
+          ]);
+          
+          const trends = trendsRes.status === 'fulfilled' ? (trendsRes.value?.data || []).slice(0, 5).map((r: any) => r.title).filter(Boolean) : [];
+          const competitors = competitorRes.status === 'fulfilled' ? (competitorRes.value?.data || []).slice(0, 3).map((r: any) => r.title).filter(Boolean) : [];
+          
+          if (trends.length > 0) {
+            webTrendsText += `\n\n🌐 TENDÊNCIAS EM TEMPO REAL:\n${trends.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')}`;
+          }
+          if (competitors.length > 0) {
+            webTrendsText += `\n\n🔍 CONTEÚDO VIRAL NO NICHO:\n${competitors.map((c: string, i: number) => `${i + 1}. ${c}`).join('\n')}`;
+          }
+          console.log(`[Growth Report] Web intelligence: ${trends.length} trends, ${competitors.length} competitor insights`);
+        } catch (e) {
+          console.log('[Growth Report] Web intelligence failed (non-critical):', e);
+        }
+      }
+      
       if (shouldUseAI && LOVABLE_API_KEY) {
         const reportPrompt = `Você é o social media do perfil de tecnologia. Faça um RELATÓRIO BREVE para o dono do perfil como um humano falaria com seu chefe.
 
@@ -189,7 +223,7 @@ AFILIADOS:
 - Links de afiliado ativos: ${affiliateLinks?.length || 0}
 - Posts desde último afiliado: ${postsSinceLastAffiliate}
 - Precisa postar afiliado? ${postsSinceLastAffiliate >= 4 && (affiliateLinks?.length || 0) > 0 ? 'SIM (já passou 4 posts)' : 'NÃO'}
-${sourceRankingText}
+${sourceRankingText}${webTrendsText}
 
 - Hora atual Brasília: ${brasiliaHour}h
 
@@ -202,7 +236,9 @@ REGRAS:
 6. Comente sobre as fontes RSS que mais engajam e sugira priorizar ou diversificar
 7. Se precisa postar afiliado, mencione
 8. Use emojis moderados
-9. Termine com o plano pras próximas horas`;
+9. Se houver TENDÊNCIAS EM TEMPO REAL, sugira como aproveitar nos próximos posts
+10. Se houver CONTEÚDO VIRAL DE CONCORRENTES, analise o que podemos aprender
+11. Termine com o plano pras próximas horas`;
 
         const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
           method: 'POST',
