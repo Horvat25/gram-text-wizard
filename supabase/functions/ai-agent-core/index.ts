@@ -2550,6 +2550,23 @@ Deno.serve(async (req) => {
     if (trigger === 'cron' && !userId) {
       console.log('[AGENT] Trigger: CRON - Processando todos os workspaces ativos...');
       
+      // CLEANUP: Mark any stuck "running" reports older than 10 minutes as timed_out
+      const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const { data: stuckReports } = await supabase
+        .from('agent_execution_reports')
+        .update({
+          status: 'timed_out',
+          finished_at: new Date().toISOString(),
+          summary: '⏱️ Execução expirou (timeout). O agente tentará novamente no próximo ciclo.'
+        })
+        .eq('status', 'running')
+        .lt('started_at', tenMinAgo)
+        .select('id');
+      
+      if (stuckReports && stuckReports.length > 0) {
+        console.log(`[AGENT] Limpou ${stuckReports.length} relatórios travados como "running"`);
+      }
+      
       const { data: activeContexts } = await supabase
         .from('agent_context')
         .select('user_id, workspace_id')
@@ -2569,7 +2586,7 @@ Deno.serve(async (req) => {
         try {
           const result = await processWorkspace(supabase, ctx.user_id, ctx.workspace_id, lovableApiKey, supabaseUrl, 'cron');
           results.push({ workspaceId: ctx.workspace_id, userId: ctx.user_id, ...result });
-        } catch (e) {
+        } catch (e: any) {
           console.error(`[AGENT] Erro ao processar workspace ${ctx.workspace_id}:`, e);
           results.push({ workspaceId: ctx.workspace_id, userId: ctx.user_id, error: String(e) });
         }

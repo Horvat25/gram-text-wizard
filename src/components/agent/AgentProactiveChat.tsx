@@ -178,21 +178,23 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: ptBR });
   };
 
-  const getDecisionIcon = (decision: string | null) => {
+  const getDecisionIcon = (decision: string | null, status?: string) => {
+    if (status === 'timed_out') return <Clock className="h-3.5 w-3.5 text-orange-500" />;
     switch (decision) {
       case 'POST': return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />;
       case 'NO_POST': return <XCircle className="h-3.5 w-3.5 text-amber-500" />;
       case 'WAIT': return <Pause className="h-3.5 w-3.5 text-blue-500" />;
-      default: return <Bot className="h-3.5 w-3.5" />;
+      default: return <Loader2 className="h-3.5 w-3.5 animate-spin" />;
     }
   };
 
-  const getDecisionLabel = (decision: string | null) => {
+  const getDecisionLabel = (decision: string | null, status?: string) => {
+    if (status === 'timed_out') return 'Timeout';
     switch (decision) {
       case 'POST': return 'Publicou';
       case 'NO_POST': return 'Não Publicou';
       case 'WAIT': return 'Aguardou';
-      default: return 'Processando';
+      default: return status === 'running' ? 'Processando...' : 'Processando';
     }
   };
 
@@ -252,11 +254,11 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
             className="w-full p-3 flex items-center justify-between bg-card hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-3">
-              {getDecisionIcon(report.decision)}
+              {getDecisionIcon(report.decision, report.status)}
               <div className="text-left">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs">
-                    {getDecisionLabel(report.decision)}
+                    {getDecisionLabel(report.decision, report.status)}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
                     {report.trigger === 'cron' ? '⏰ Auto' : '🖐️ Manual'}
