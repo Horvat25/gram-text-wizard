@@ -685,7 +685,66 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   // For 'news' type: skip AI theme refinement - the RSS ranking already picks the best article
   // This saves 1 AI call per news post (significant cost reduction)
   if (state.nextContentType !== 'news') {
+    // ===== WEB INTELLIGENCE: Search trending topics & competitor viral content =====
+    let webTrends: string[] = [];
+    let competitorInsights: string[] = [];
+    const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
+    
+    if (firecrawlKey) {
+      const niche = state.context?.industry_niche || 'tecnologia';
+      const targetAudience = state.context?.target_audience || 'entusiastas de tecnologia';
+      
+      // Run both searches in parallel for speed
+      const [trendsResult, competitorResult] = await Promise.allSettled([
+        // 1. Search trending topics in the niche (last 24h)
+        fetch('https://api.firecrawl.dev/v1/search', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `trending ${niche} ${new Date().toISOString().slice(0, 10)} viral Instagram`,
+            limit: 5, lang: 'pt-BR', country: 'BR',
+            tbs: 'qdr:d',
+          })
+        }).then(r => r.json()),
+        // 2. Search viral competitor content in the niche
+        fetch('https://api.firecrawl.dev/v1/search', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `perfil Instagram ${niche} viral reels engajamento 2026`,
+            limit: 5, lang: 'pt-BR', country: 'BR',
+            tbs: 'qdr:w',
+          })
+        }).then(r => r.json()),
+      ]);
+      
+      if (trendsResult.status === 'fulfilled' && trendsResult.value?.data) {
+        webTrends = trendsResult.value.data
+          .slice(0, 5)
+          .map((r: any) => `${r.title || ''}: ${(r.description || '').substring(0, 100)}`)
+          .filter(Boolean);
+        console.log(`[AGENT] 🌐 Web trends found: ${webTrends.length}`);
+      }
+      
+      if (competitorResult.status === 'fulfilled' && competitorResult.value?.data) {
+        competitorInsights = competitorResult.value.data
+          .slice(0, 5)
+          .map((r: any) => r.title || r.description || '')
+          .filter(Boolean);
+        console.log(`[AGENT] 🔍 Competitor insights found: ${competitorInsights.length}`);
+      }
+    } else {
+      console.log('[AGENT] ⚠️ FIRECRAWL_API_KEY não configurada - sem pesquisa web');
+    }
+    
     const h = state.historical30d;
+    const webTrendsSection = webTrends.length > 0 
+      ? `\n🌐 TENDÊNCIAS EM TEMPO REAL (pesquisa web última 24h):\n${webTrends.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n` 
+      : '';
+    const competitorSection = competitorInsights.length > 0 
+      ? `\n🔍 CONTEÚDO VIRAL NO NICHO (análise de concorrentes):\n${competitorInsights.map((c, i) => `${i + 1}. ${c}`).join('\n')}\n` 
+      : '';
+    
     const systemPrompt = `Você é um diretor de marketing digital sênior especializado em growth hacking para Instagram.
 O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType.format}).
 
@@ -708,11 +767,17 @@ ${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()
 🎯 OBJETIVOS MACRO:
 - Views: ${weeklyReach.toLocaleString()}/${goalViews.toLocaleString()} (${Math.round((weeklyReach/goalViews)*100)}%)
 - Engajamento: ${currentEngagement}%/${goalEngagement}%
-
+${webTrendsSection}${competitorSection}
 INSIGHTS DO AGENTE: ${(state.context?.success_patterns || []).join(' | ') || 'Coletando dados...'}
 
-Com base nesses dados REAIS, sugira um tema ESPECÍFICO e atual que maximize o alcance para ${state.nextContentType}.
-Priorize temas que funcionaram bem no histórico. Responda em JSON: { "theme": "tema específico", "cta": "CTA do post", "tone": "tom sugerido" }`;
+REGRAS IMPORTANTES:
+1. Use as TENDÊNCIAS EM TEMPO REAL para escolher um tema que está bombando AGORA
+2. Analise o CONTEÚDO VIRAL DOS CONCORRENTES para identificar formatos e abordagens que estão funcionando
+3. Cruze os dados de performance do perfil (30 dias) com as tendências para encontrar o SWEET SPOT
+4. O tema deve ser ESPECÍFICO e ATUAL (mencione nomes, produtos, eventos reais)
+5. Priorize temas que combinem com o que já funcionou bem no histórico
+
+Responda em JSON: { "theme": "tema específico e atual", "cta": "CTA do post", "tone": "tom sugerido", "trend_source": "qual tendência inspirou" }`;
 
     try {
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -740,7 +805,10 @@ Priorize temas que funcionaram bem no histórico. Responda em JSON: { "theme": "
             contentPlan.theme = themeData.theme || contentPlan.theme;
             contentPlan.cta = themeData.cta || contentPlan.cta;
             contentPlan.tone = themeData.tone || contentPlan.tone;
-            console.log('[AGENT] Tema refinado pela IA:', contentPlan.theme);
+            console.log('[AGENT] 🧠 Tema refinado com Web Intelligence:', contentPlan.theme);
+            if (themeData.trend_source) {
+              console.log('[AGENT] 📡 Inspirado por tendência:', themeData.trend_source);
+            }
           } catch {
             console.log('[AGENT] Usando tema padrão');
           }
