@@ -187,12 +187,13 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     }
   };
 
-  const getDecisionLabel = (decision: string | null) => {
+  const getDecisionLabel = (decision: string | null, status?: string) => {
+    if (status === 'timed_out') return 'Timeout';
     switch (decision) {
       case 'POST': return 'Publicou';
       case 'NO_POST': return 'Não Publicou';
       case 'WAIT': return 'Aguardou';
-      default: return 'Processando';
+      default: return status === 'running' ? 'Processando...' : 'Processando';
     }
   };
 
