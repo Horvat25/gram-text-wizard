@@ -33,11 +33,9 @@ serve(async (req) => {
     const now = new Date();
     const brasiliaHour = parseInt(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }));
     
-    const aiReportHours = [0, 6, 12, 18];
+    // Generate reports 2x daily: 9h and 21h BRT
+    const aiReportHours = [9, 21];
     const shouldUseAI = aiReportHours.includes(brasiliaHour);
-    
-    // ONLY generate reports at 0h, 6h, 12h, 18h BRT (4x daily)
-    // Other hours: just update daily_post_limit silently
     const shouldGenerateReport = aiReportHours.includes(brasiliaHour);
 
     for (const ctx of contexts) {
