@@ -179,7 +179,7 @@ async function burnTextOnImage(
               },
               {
                 type: "text",
-                text: `Edit this image: add a text overlay on top. Keep the EXACT same photo, just overlay text.
+                text: `Edit this image: add a text overlay. Keep the EXACT same photo, just overlay text.
 
 HEADLINE (use EXACTLY this text, letter by letter):
 "${headline.toUpperCase()}"
@@ -187,13 +187,14 @@ HEADLINE (use EXACTLY this text, letter by letter):
 WATERMARK: "${watermark}"
 
 DESIGN:
-1. Dark gradient on BOTTOM 35% (transparent → black 80%)
-2. HEADLINE in BOLD WHITE large text, centered over gradient
-3. "${watermark}" small white text, TOP-RIGHT, 70% opacity
-4. Keep original photo unchanged above gradient
+1. Dark gradient covering the BOTTOM HALF of the image (transparent at 50% → black 85% at bottom)
+2. HEADLINE in BOLD YELLOW (#FFD700) large text, positioned at 60-70% height (NOT at the very bottom — leave 15% padding from bottom edge so Instagram 4:5 crop doesn't cut it)
+3. "${watermark}" small white text, TOP-RIGHT corner, 70% opacity
+4. Keep original photo unchanged above the gradient
 5. Professional Instagram news post style
-6. DO NOT change, translate, or modify the headline text
-7. Return ONLY the edited image`
+6. The headline must be FULLY VISIBLE and not touching any edge
+7. If headline is long (3+ lines), use slightly smaller font
+8. Return ONLY the edited image`
               }
             ]
           }
