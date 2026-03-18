@@ -341,16 +341,15 @@ async function generateFreshOverlayImage(
         messages: [
           {
             role: "user",
-            content: `Generate a professional tech news image for Instagram (1080x1080).
+            content: `Generate a professional tech news image for Instagram (1080x1350, portrait 4:5 ratio).
 
 Design:
 - Dark blue/purple gradient background with subtle tech grid pattern
-- Large bold white headline text centered: "${headline.toUpperCase()}"
-- Small "${watermark}" watermark text in top-right corner
+- Large bold YELLOW (#FFD700) headline text at 55-70% height: "${headline.toUpperCase()}"
+- Small "${watermark}" watermark text in top-right corner, white, 70% opacity
 - Professional, clean, modern design
-- No other text or decorations
-
-The headline MUST be readable and prominent. Tech news aesthetic.`
+- Leave 15% padding from bottom edge (Instagram crops the bottom)
+- The headline MUST be fully readable and prominent. Tech news aesthetic.`
           }
         ]
       }),
