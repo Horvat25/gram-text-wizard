@@ -1460,9 +1460,11 @@ async function createMarketingContent(
   const selectedAffiliate = affiliateLinks[0];
   console.log(`[AGENT] Afiliado selecionado: ${selectedAffiliate.product_name} (${selectedAffiliate.posts_count || 0} posts anteriores)`);
   
-  // 2. Research the product via Firecrawl for accurate selling points
+  // 2. Research the product via Firecrawl for accurate selling points (with timeout)
   let productResearch = '';
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
     const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
       method: 'POST',
       headers,
@@ -1470,8 +1472,10 @@ async function createMarketingContent(
         query: `${selectedAffiliate.product_name} review análise vale a pena`,
         limit: 3,
         lang: 'pt-BR'
-      })
+      }),
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     
     if (searchResponse.ok) {
       const searchResult = await searchResponse.json();
@@ -1479,8 +1483,8 @@ async function createMarketingContent(
       productResearch = articles.map((a: any) => `${a.title}: ${a.description || ''}`).join('\n');
       console.log(`[AGENT] Pesquisa do produto: ${articles.length} resultados`);
     }
-  } catch (e) {
-    console.log('[AGENT] Pesquisa Firecrawl falhou, usando descrição do cadastro:', e);
+  } catch (e: any) {
+    console.log(`[AGENT] Pesquisa Firecrawl falhou (${e.name || e.message}), usando descrição do cadastro`);
   }
   
   // 3. Generate caption with AI
