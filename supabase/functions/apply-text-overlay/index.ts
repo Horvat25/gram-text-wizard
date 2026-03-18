@@ -300,7 +300,7 @@ async function burnTextOnImageSimple(
             role: "user",
             content: [
               { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } },
-              { type: "text", text: `Add bold white text "${headline.toUpperCase()}" at the bottom of this image over a dark gradient. Add small "${watermark}" text top-right. Keep the photo unchanged. Return the edited image.` }
+              { type: "text", text: `Add bold yellow (#FFD700) text "${headline.toUpperCase()}" at 65% height of this image (NOT at the very bottom — leave padding). Dark gradient on lower half. Add small "${watermark}" text top-right. Keep the photo unchanged. Return the edited image.` }
             ]
           }
         ]
