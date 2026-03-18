@@ -1561,11 +1561,18 @@ REGRAS:
             modalities: ["image", "text"],
             messages: [{
               role: "user",
-              content: `Generate a professional Instagram marketing image (1080x1080) for the product: "${selectedAffiliate.product_name}".
-Description: ${selectedAffiliate.description || 'Technology product'}.
-Style: Modern, clean, tech aesthetic with dark gradient background. 
-Include the product name "${selectedAffiliate.product_name}" as prominent text.
-Professional marketing design, no stock photos of people.`
+              content: `Crie uma imagem profissional de marketing para Instagram (1080x1080) do produto: "${selectedAffiliate.product_name}".
+Descrição: ${selectedAffiliate.description || 'Produto de tecnologia'}.
+
+REGRAS OBRIGATÓRIAS:
+1. HEADLINE em PORTUGUÊS e CAIXA ALTA no topo da imagem (máx 6 palavras, ex: "TRANSFORME SUA PRODUTIVIDADE")
+2. Nome do produto "${selectedAffiliate.product_name}" em destaque
+3. Estilo: design de marketing premium, fundo escuro com gradiente, tipografia bold
+4. Visual persuasivo de vendas: mostre BENEFÍCIOS, não features
+5. Cores vibrantes de destaque (amarelo, azul, verde neon)
+6. NÃO use fotos de pessoas, NÃO use texto em inglês
+7. Inclua um CTA visual sutil (seta, botão, ícone de link)
+8. Identidade visual: marca d'água "Neural Update" pequena no canto inferior`
             }]
           }),
         });
