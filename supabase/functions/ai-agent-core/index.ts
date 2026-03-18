@@ -692,43 +692,45 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     
     if (firecrawlKey) {
       const niche = state.context?.industry_niche || 'tecnologia';
-      const targetAudience = state.context?.target_audience || 'entusiastas de tecnologia';
       
-      // Run both searches in parallel for speed
+      // ⏱️ TIMEOUT: 6 seconds max for web searches to prevent edge function timeout
+      const firecrawlTimeout = 6000;
+      const makeFirecrawlSearch = async (query: string) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), firecrawlTimeout);
+        try {
+          const r = await fetch('https://api.firecrawl.dev/v1/search', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, limit: 3, lang: 'pt-BR', country: 'BR' }),
+            signal: controller.signal,
+          });
+          clearTimeout(timer);
+          return await r.json();
+        } catch (e: any) {
+          clearTimeout(timer);
+          console.log(`[AGENT] ⏱️ Firecrawl timeout/error: ${e.name || e.message}`);
+          return null;
+        }
+      };
+      
+      // Run both searches in parallel with timeout
       const [trendsResult, competitorResult] = await Promise.allSettled([
-        // 1. Search trending topics in the niche (last 24h)
-        fetch('https://api.firecrawl.dev/v1/search', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `trending ${niche} ${new Date().toISOString().slice(0, 10)} viral Instagram`,
-            limit: 5, lang: 'pt-BR', country: 'BR',
-            tbs: 'qdr:d',
-          })
-        }).then(r => r.json()),
-        // 2. Search viral competitor content in the niche
-        fetch('https://api.firecrawl.dev/v1/search', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `perfil Instagram ${niche} viral reels engajamento 2026`,
-            limit: 5, lang: 'pt-BR', country: 'BR',
-            tbs: 'qdr:w',
-          })
-        }).then(r => r.json()),
+        makeFirecrawlSearch(`trending ${niche} ${new Date().toISOString().slice(0, 10)} viral Instagram`),
+        makeFirecrawlSearch(`perfil Instagram ${niche} viral reels engajamento 2026`),
       ]);
       
       if (trendsResult.status === 'fulfilled' && trendsResult.value?.data) {
         webTrends = trendsResult.value.data
-          .slice(0, 5)
-          .map((r: any) => `${r.title || ''}: ${(r.description || '').substring(0, 100)}`)
+          .slice(0, 3)
+          .map((r: any) => `${r.title || ''}: ${(r.description || '').substring(0, 80)}`)
           .filter(Boolean);
         console.log(`[AGENT] 🌐 Web trends found: ${webTrends.length}`);
       }
       
       if (competitorResult.status === 'fulfilled' && competitorResult.value?.data) {
         competitorInsights = competitorResult.value.data
-          .slice(0, 5)
+          .slice(0, 3)
           .map((r: any) => r.title || r.description || '')
           .filter(Boolean);
         console.log(`[AGENT] 🔍 Competitor insights found: ${competitorInsights.length}`);
@@ -1458,9 +1460,11 @@ async function createMarketingContent(
   const selectedAffiliate = affiliateLinks[0];
   console.log(`[AGENT] Afiliado selecionado: ${selectedAffiliate.product_name} (${selectedAffiliate.posts_count || 0} posts anteriores)`);
   
-  // 2. Research the product via Firecrawl for accurate selling points
+  // 2. Research the product via Firecrawl for accurate selling points (with timeout)
   let productResearch = '';
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
     const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
       method: 'POST',
       headers,
@@ -1468,8 +1472,10 @@ async function createMarketingContent(
         query: `${selectedAffiliate.product_name} review análise vale a pena`,
         limit: 3,
         lang: 'pt-BR'
-      })
+      }),
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     
     if (searchResponse.ok) {
       const searchResult = await searchResponse.json();
@@ -1477,8 +1483,8 @@ async function createMarketingContent(
       productResearch = articles.map((a: any) => `${a.title}: ${a.description || ''}`).join('\n');
       console.log(`[AGENT] Pesquisa do produto: ${articles.length} resultados`);
     }
-  } catch (e) {
-    console.log('[AGENT] Pesquisa Firecrawl falhou, usando descrição do cadastro:', e);
+  } catch (e: any) {
+    console.log(`[AGENT] Pesquisa Firecrawl falhou (${e.name || e.message}), usando descrição do cadastro`);
   }
   
   // 3. Generate caption with AI
@@ -1555,11 +1561,18 @@ REGRAS:
             modalities: ["image", "text"],
             messages: [{
               role: "user",
-              content: `Generate a professional Instagram marketing image (1080x1080) for the product: "${selectedAffiliate.product_name}".
-Description: ${selectedAffiliate.description || 'Technology product'}.
-Style: Modern, clean, tech aesthetic with dark gradient background. 
-Include the product name "${selectedAffiliate.product_name}" as prominent text.
-Professional marketing design, no stock photos of people.`
+              content: `Crie uma imagem profissional de marketing para Instagram (1080x1080) do produto: "${selectedAffiliate.product_name}".
+Descrição: ${selectedAffiliate.description || 'Produto de tecnologia'}.
+
+REGRAS OBRIGATÓRIAS:
+1. HEADLINE em PORTUGUÊS e CAIXA ALTA no topo da imagem (máx 6 palavras, ex: "TRANSFORME SUA PRODUTIVIDADE")
+2. Nome do produto "${selectedAffiliate.product_name}" em destaque
+3. Estilo: design de marketing premium, fundo escuro com gradiente, tipografia bold
+4. Visual persuasivo de vendas: mostre BENEFÍCIOS, não features
+5. Cores vibrantes de destaque (amarelo, azul, verde neon)
+6. NÃO use fotos de pessoas, NÃO use texto em inglês
+7. Inclua um CTA visual sutil (seta, botão, ícone de link)
+8. Identidade visual: marca d'água "Neural Update" pequena no canto inferior`
             }]
           }),
         });
@@ -2497,22 +2510,26 @@ async function generateInsightsAndAnalysis(
     
     let aiNews: string[] = [];
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
       const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          query: 'inteligência artificial novidades tecnologia 2025',
-          limit: 5,
+          query: 'inteligência artificial novidades tecnologia 2026',
+          limit: 3,
           lang: 'pt-BR'
-        })
+        }),
+        signal: controller.signal,
       });
+      clearTimeout(timer);
       
       if (searchResponse.ok) {
         const searchResult = await searchResponse.json();
         aiNews = (searchResult.data || []).slice(0, 3).map((a: any) => a.title || a.url).filter(Boolean);
       }
-    } catch (e) {
-      console.log('[AGENT] Erro ao buscar notícias:', e);
+    } catch (e: any) {
+      console.log(`[AGENT] Erro ao buscar notícias (${e.name || e.message})`);
     }
     
     // 2. Preparar dados de performance
