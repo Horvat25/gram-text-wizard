@@ -179,7 +179,7 @@ async function burnTextOnImage(
               },
               {
                 type: "text",
-                text: `Edit this image: add a text overlay on top. Keep the EXACT same photo, just overlay text.
+                text: `Edit this image: add a text overlay. Keep the EXACT same photo, just overlay text.
 
 HEADLINE (use EXACTLY this text, letter by letter):
 "${headline.toUpperCase()}"
@@ -187,13 +187,14 @@ HEADLINE (use EXACTLY this text, letter by letter):
 WATERMARK: "${watermark}"
 
 DESIGN:
-1. Dark gradient on BOTTOM 35% (transparent → black 80%)
-2. HEADLINE in BOLD WHITE large text, centered over gradient
-3. "${watermark}" small white text, TOP-RIGHT, 70% opacity
-4. Keep original photo unchanged above gradient
+1. Dark gradient covering the BOTTOM HALF of the image (transparent at 50% → black 85% at bottom)
+2. HEADLINE in BOLD YELLOW (#FFD700) large text, positioned at 60-70% height (NOT at the very bottom — leave 15% padding from bottom edge so Instagram 4:5 crop doesn't cut it)
+3. "${watermark}" small white text, TOP-RIGHT corner, 70% opacity
+4. Keep original photo unchanged above the gradient
 5. Professional Instagram news post style
-6. DO NOT change, translate, or modify the headline text
-7. Return ONLY the edited image`
+6. The headline must be FULLY VISIBLE and not touching any edge
+7. If headline is long (3+ lines), use slightly smaller font
+8. Return ONLY the edited image`
               }
             ]
           }
@@ -299,7 +300,7 @@ async function burnTextOnImageSimple(
             role: "user",
             content: [
               { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } },
-              { type: "text", text: `Add bold white text "${headline.toUpperCase()}" at the bottom of this image over a dark gradient. Add small "${watermark}" text top-right. Keep the photo unchanged. Return the edited image.` }
+              { type: "text", text: `Add bold yellow (#FFD700) text "${headline.toUpperCase()}" at 65% height of this image (NOT at the very bottom — leave padding). Dark gradient on lower half. Add small "${watermark}" text top-right. Keep the photo unchanged. Return the edited image.` }
             ]
           }
         ]
@@ -340,16 +341,15 @@ async function generateFreshOverlayImage(
         messages: [
           {
             role: "user",
-            content: `Generate a professional tech news image for Instagram (1080x1080).
+            content: `Generate a professional tech news image for Instagram (1080x1350, portrait 4:5 ratio).
 
 Design:
 - Dark blue/purple gradient background with subtle tech grid pattern
-- Large bold white headline text centered: "${headline.toUpperCase()}"
-- Small "${watermark}" watermark text in top-right corner
+- Large bold YELLOW (#FFD700) headline text at 55-70% height: "${headline.toUpperCase()}"
+- Small "${watermark}" watermark text in top-right corner, white, 70% opacity
 - Professional, clean, modern design
-- No other text or decorations
-
-The headline MUST be readable and prominent. Tech news aesthetic.`
+- Leave 15% padding from bottom edge (Instagram crops the bottom)
+- The headline MUST be fully readable and prominent. Tech news aesthetic.`
           }
         ]
       }),
