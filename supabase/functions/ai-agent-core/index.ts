@@ -2510,22 +2510,26 @@ async function generateInsightsAndAnalysis(
     
     let aiNews: string[] = [];
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
       const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          query: 'inteligência artificial novidades tecnologia 2025',
-          limit: 5,
+          query: 'inteligência artificial novidades tecnologia 2026',
+          limit: 3,
           lang: 'pt-BR'
-        })
+        }),
+        signal: controller.signal,
       });
+      clearTimeout(timer);
       
       if (searchResponse.ok) {
         const searchResult = await searchResponse.json();
         aiNews = (searchResult.data || []).slice(0, 3).map((a: any) => a.title || a.url).filter(Boolean);
       }
-    } catch (e) {
-      console.log('[AGENT] Erro ao buscar notícias:', e);
+    } catch (e: any) {
+      console.log(`[AGENT] Erro ao buscar notícias (${e.name || e.message})`);
     }
     
     // 2. Preparar dados de performance
