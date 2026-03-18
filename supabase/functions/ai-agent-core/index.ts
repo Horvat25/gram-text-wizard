@@ -692,43 +692,45 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     
     if (firecrawlKey) {
       const niche = state.context?.industry_niche || 'tecnologia';
-      const targetAudience = state.context?.target_audience || 'entusiastas de tecnologia';
       
-      // Run both searches in parallel for speed
+      // ⏱️ TIMEOUT: 6 seconds max for web searches to prevent edge function timeout
+      const firecrawlTimeout = 6000;
+      const makeFirecrawlSearch = async (query: string) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), firecrawlTimeout);
+        try {
+          const r = await fetch('https://api.firecrawl.dev/v1/search', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, limit: 3, lang: 'pt-BR', country: 'BR' }),
+            signal: controller.signal,
+          });
+          clearTimeout(timer);
+          return await r.json();
+        } catch (e: any) {
+          clearTimeout(timer);
+          console.log(`[AGENT] ⏱️ Firecrawl timeout/error: ${e.name || e.message}`);
+          return null;
+        }
+      };
+      
+      // Run both searches in parallel with timeout
       const [trendsResult, competitorResult] = await Promise.allSettled([
-        // 1. Search trending topics in the niche (last 24h)
-        fetch('https://api.firecrawl.dev/v1/search', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `trending ${niche} ${new Date().toISOString().slice(0, 10)} viral Instagram`,
-            limit: 5, lang: 'pt-BR', country: 'BR',
-            tbs: 'qdr:d',
-          })
-        }).then(r => r.json()),
-        // 2. Search viral competitor content in the niche
-        fetch('https://api.firecrawl.dev/v1/search', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${firecrawlKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `perfil Instagram ${niche} viral reels engajamento 2026`,
-            limit: 5, lang: 'pt-BR', country: 'BR',
-            tbs: 'qdr:w',
-          })
-        }).then(r => r.json()),
+        makeFirecrawlSearch(`trending ${niche} ${new Date().toISOString().slice(0, 10)} viral Instagram`),
+        makeFirecrawlSearch(`perfil Instagram ${niche} viral reels engajamento 2026`),
       ]);
       
       if (trendsResult.status === 'fulfilled' && trendsResult.value?.data) {
         webTrends = trendsResult.value.data
-          .slice(0, 5)
-          .map((r: any) => `${r.title || ''}: ${(r.description || '').substring(0, 100)}`)
+          .slice(0, 3)
+          .map((r: any) => `${r.title || ''}: ${(r.description || '').substring(0, 80)}`)
           .filter(Boolean);
         console.log(`[AGENT] 🌐 Web trends found: ${webTrends.length}`);
       }
       
       if (competitorResult.status === 'fulfilled' && competitorResult.value?.data) {
         competitorInsights = competitorResult.value.data
-          .slice(0, 5)
+          .slice(0, 3)
           .map((r: any) => r.title || r.description || '')
           .filter(Boolean);
         console.log(`[AGENT] 🔍 Competitor insights found: ${competitorInsights.length}`);
