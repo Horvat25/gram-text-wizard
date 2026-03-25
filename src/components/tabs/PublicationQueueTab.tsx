@@ -199,7 +199,7 @@ const PublicationQueueTab = ({
   }, [viewingPost]);
   
   const { currentWorkspace } = useWorkspace();
-  const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering, autoRenderEnabled, autoRenderQueue, toggleAutoRender } = useVideoRendering();
+  const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering, autoRenderEnabled, autoRenderQueue, autoRenderProgress, toggleAutoRender } = useVideoRendering();
   const [loadingAccounts] = useState(false);
   const hasConnectedAccount = false;
 
@@ -509,24 +509,42 @@ const PublicationQueueTab = ({
       )}
 
       {/* Auto-render toggle + pending reels */}
-      {pendingReelsCount > 0 && (
+      {(pendingReelsCount > 0 || autoRenderEnabled) && (
         <Alert className={autoRenderEnabled ? 'border-primary/50 bg-primary/5' : ''}>
           <Film className="h-4 w-4" />
-          <AlertDescription className="flex items-center justify-between">
-            <span>
-              <strong>{pendingReelsCount} reels</strong> aguardando renderização.
-              {autoRenderEnabled && autoRenderQueue.length > 0 && (
-                <span className="text-primary ml-1">({autoRenderQueue.length} na fila auto)</span>
-              )}
-            </span>
-            <Button
-              size="sm"
-              variant={autoRenderEnabled ? "default" : "outline"}
-              onClick={toggleAutoRender}
-              className={autoRenderEnabled ? 'bg-primary hover:bg-primary/90' : ''}
-            >
-              {autoRenderEnabled ? '🤖 Auto: ON' : '🤖 Auto-Render'}
-            </Button>
+          <AlertDescription className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span>
+                {autoRenderEnabled && autoRenderProgress.total > 0 ? (
+                  <>
+                    <strong>🤖 Auto-Render:</strong> {autoRenderProgress.current}/{autoRenderProgress.total} concluídos
+                    {autoRenderQueue.length > 0 && (
+                      <span className="text-primary ml-1">({autoRenderQueue.length} restantes)</span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <strong>{pendingReelsCount} reels</strong> aguardando renderização.
+                  </>
+                )}
+              </span>
+              <Button
+                size="sm"
+                variant={autoRenderEnabled ? "default" : "outline"}
+                onClick={toggleAutoRender}
+                className={autoRenderEnabled ? 'bg-primary hover:bg-primary/90' : ''}
+              >
+                {autoRenderEnabled ? '🤖 Auto: ON' : '🤖 Auto-Render'}
+              </Button>
+            </div>
+            {autoRenderEnabled && autoRenderProgress.total > 0 && (
+              <div className="space-y-1">
+                <Progress value={(autoRenderProgress.current / autoRenderProgress.total) * 100} className="h-1.5" />
+                <p className="text-xs text-muted-foreground">
+                  Mantenha o app aberto. Vídeos serão agendados nos melhores horários dos próximos dias.
+                </p>
+              </div>
+            )}
           </AlertDescription>
         </Alert>
       )}

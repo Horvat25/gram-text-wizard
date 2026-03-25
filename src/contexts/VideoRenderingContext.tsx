@@ -13,6 +13,13 @@ const MAX_RENDER_ATTEMPTS = 3;
 // Optimal posting times in Brasília (UTC-3)
 const OPTIMAL_HOURS_BRT = [9, 12, 15, 18, 20];
 const MIN_GAP_HOURS = 2;
+const MAX_POSTS_PER_DAY = 4;
+const SCHEDULE_LOOK_AHEAD_DAYS = 7;
+
+// Delay between auto-renders to let the system breathe
+const AUTO_RENDER_DELAY_MS = 5000;
+// Periodic watchdog interval to recover from stuck states
+const WATCHDOG_INTERVAL_MS = 30000;
 
 interface VideoRenderingContextType {
   isRendering: boolean;
@@ -22,6 +29,7 @@ interface VideoRenderingContextType {
   progress: number;
   autoRenderEnabled: boolean;
   autoRenderQueue: string[];
+  autoRenderProgress: { current: number; total: number };
   renderVideo: (postId: string) => Promise<void>;
   cancelRendering: () => void;
   toggleAutoRender: () => void;
@@ -41,22 +49,42 @@ export function useVideoRendering() {
 async function findOptimalScheduleTime(workspaceId: string): Promise<string> {
   const now = new Date();
   
-  // Get existing scheduled posts for the next 3 days
-  const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+  // Get existing scheduled/published posts for the look-ahead window
+  const endDate = new Date(now.getTime() + SCHEDULE_LOOK_AHEAD_DAYS * 24 * 60 * 60 * 1000);
   const { data: existingPosts } = await supabase
     .from('posts')
-    .select('scheduled_for')
+    .select('scheduled_for, published_at, status')
     .eq('workspace_id', workspaceId)
-    .eq('status', 'scheduled')
+    .or('status.eq.scheduled,status.eq.published')
     .gte('scheduled_for', now.toISOString())
-    .lte('scheduled_for', threeDaysLater.toISOString());
+    .lte('scheduled_for', endDate.toISOString());
 
   const takenSlots = (existingPosts || [])
     .map(p => p.scheduled_for ? new Date(p.scheduled_for).getTime() : 0)
     .filter(Boolean);
 
-  // Try slots for the next 3 days
-  for (let dayOffset = 0; dayOffset < 3; dayOffset++) {
+  // Count posts per day (Brasília timezone)
+  const postsByDay: Record<string, number> = {};
+  for (const slot of takenSlots) {
+    const dayKey = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(new Date(slot));
+    postsByDay[dayKey] = (postsByDay[dayKey] || 0) + 1;
+  }
+
+  // Try slots for the look-ahead window
+  for (let dayOffset = 0; dayOffset < SCHEDULE_LOOK_AHEAD_DAYS; dayOffset++) {
+    const dayDate = new Date(now);
+    dayDate.setDate(dayDate.getDate() + dayOffset);
+    const dayKey = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(dayDate);
+
+    // Skip days that already have MAX_POSTS_PER_DAY
+    if ((postsByDay[dayKey] || 0) >= MAX_POSTS_PER_DAY) continue;
+
     for (const hour of OPTIMAL_HOURS_BRT) {
       // Create date in BRT (UTC-3)
       const candidate = new Date(now);
@@ -64,8 +92,8 @@ async function findOptimalScheduleTime(workspaceId: string): Promise<string> {
       // Set UTC hour = BRT hour + 3
       candidate.setUTCHours(hour + 3, 0, 0, 0);
 
-      // Must be in the future (at least 5 min from now)
-      if (candidate.getTime() < now.getTime() + 5 * 60 * 1000) continue;
+      // Must be in the future (at least 10 min from now)
+      if (candidate.getTime() < now.getTime() + 10 * 60 * 1000) continue;
 
       // Check minimum gap from existing slots
       const tooClose = takenSlots.some(
@@ -73,12 +101,19 @@ async function findOptimalScheduleTime(workspaceId: string): Promise<string> {
       );
       if (tooClose) continue;
 
+      // Reserve this slot for future calls in the same batch
+      takenSlots.push(candidate.getTime());
+      postsByDay[dayKey] = (postsByDay[dayKey] || 0) + 1;
+
       return candidate.toISOString();
     }
   }
 
-  // Fallback: 30 minutes from now
-  return new Date(now.getTime() + 30 * 60 * 1000).toISOString();
+  // Fallback: tomorrow at 9h BRT
+  const fallback = new Date(now);
+  fallback.setDate(fallback.getDate() + 1);
+  fallback.setUTCHours(12, 0, 0, 0); // 9h BRT = 12h UTC
+  return fallback.toISOString();
 }
 
 function formatBRTTime(isoString: string): string {
@@ -110,8 +145,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   // Auto-render state
   const [autoRenderEnabled, setAutoRenderEnabled] = useState(false);
   const [autoRenderQueue, setAutoRenderQueue] = useState<string[]>([]);
+  const [autoRenderProgress, setAutoRenderProgress] = useState({ current: 0, total: 0 });
   const autoRenderEnabledRef = useRef(false);
   const processingAutoRef = useRef(false);
+  const autoRenderTotalRef = useRef(0);
+  const autoRenderCurrentRef = useRef(0);
+  const watchdogRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     currentVideoIdRef.current = currentVideoId;
@@ -175,12 +214,16 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         .eq('id', videoId);
 
       const timeStr = formatBRTTime(scheduledFor);
+      autoRenderCurrentRef.current += 1;
+      setAutoRenderProgress({ current: autoRenderCurrentRef.current, total: autoRenderTotalRef.current });
+
+      const remaining = autoRenderTotalRef.current - autoRenderCurrentRef.current;
       notify(
         '🎬 Vídeo Renderizado!',
-        `Agendado para ${timeStr} (Brasília). Abra a fila para revisar.`,
+        `Agendado para ${timeStr} (Brasília).${remaining > 0 ? ` Faltam ${remaining} vídeo(s).` : ' Todos os vídeos foram processados! 🎉'}`,
         'video-rendered'
       );
-      console.log(`[Render] ✅ Video ${videoId} complete → scheduled for ${timeStr}`);
+      console.log(`[Render] ✅ Video ${videoId} complete → scheduled for ${timeStr} (${autoRenderCurrentRef.current}/${autoRenderTotalRef.current})`);
     } catch (err: any) {
       console.error('[Render] Error completing video:', err);
       toast.error('Erro ao salvar vídeo renderizado');
@@ -191,7 +234,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       reset();
       // Process next in auto-render queue
       if (autoRenderEnabledRef.current) {
-        setTimeout(() => processAutoQueue(), 3000);
+        setTimeout(() => processAutoQueue(), AUTO_RENDER_DELAY_MS);
       }
     }
   };
@@ -223,7 +266,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       if (isFinal) {
         toast.error(`❌ Render falhou permanentemente (${attempts}x): ${errorMsg.substring(0, 80)}`);
       } else {
-        toast.warning(`⚠️ Render falhou (tentativa ${attempts}/${MAX_RENDER_ATTEMPTS})`);
+        toast.warning(`⚠️ Render falhou (tentativa ${attempts}/${MAX_RENDER_ATTEMPTS}). Tentando próximo...`);
       }
     } catch (err) {
       console.error('[Render] Error updating failed video:', err);
@@ -233,9 +276,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     setIsRendering(false);
     renderLockRef.current = false;
     reset();
-    // Continue auto-queue even after error
+    // Continue auto-queue even after error (skip to next)
     if (autoRenderEnabledRef.current) {
-      setTimeout(() => processAutoQueue(), 5000);
+      setTimeout(() => processAutoQueue(), AUTO_RENDER_DELAY_MS);
     }
   };
 
@@ -271,6 +314,10 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         renderLockRef.current = false;
         setIsRendering(false);
         setCurrentVideoId(null);
+        // Move to next in auto queue
+        if (autoRenderEnabledRef.current) {
+          setTimeout(() => processAutoQueue(), 2000);
+        }
         return;
       }
 
@@ -284,6 +331,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           renderLockRef.current = false;
           setIsRendering(false);
           setCurrentVideoId(null);
+          if (autoRenderEnabledRef.current) {
+            setTimeout(() => processAutoQueue(), 2000);
+          }
           return;
         }
 
@@ -333,11 +383,13 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
 
   // ─── Auto-render queue processing ─────────────────
   const processAutoQueue = useCallback(async () => {
-    if (!autoRenderEnabledRef.current || renderLockRef.current || processingAutoRef.current) return;
+    if (!autoRenderEnabledRef.current || renderLockRef.current || processingAutoRef.current) {
+      console.log(`[AutoRender] Skip: enabled=${autoRenderEnabledRef.current} locked=${renderLockRef.current} processing=${processingAutoRef.current}`);
+      return;
+    }
     processingAutoRef.current = true;
 
     try {
-      // Find pending reels (draft, media_type=reels, no video_url)
       const workspaceId = currentWorkspace?.id;
       if (!workspaceId) { processingAutoRef.current = false; return; }
 
@@ -350,31 +402,51 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         .is('video_url', null)
         .lt('render_attempts', MAX_RENDER_ATTEMPTS)
         .order('created_at', { ascending: true })
-        .limit(10);
+        .limit(20);
 
       const pending = pendingReels || [];
       setAutoRenderQueue(pending.map(p => p.id));
 
       if (pending.length === 0) {
-        console.log('[AutoRender] No pending reels found');
+        console.log('[AutoRender] ✅ No more pending reels. Auto-render complete!');
+        
+        if (autoRenderCurrentRef.current > 0) {
+          notify(
+            '🎉 Auto-Render Concluído!',
+            `${autoRenderCurrentRef.current} vídeo(s) renderizados e agendados com sucesso.`,
+            'auto-render-complete'
+          );
+        }
+        
+        // Auto-disable when done
+        setAutoRenderEnabled(false);
+        autoRenderEnabledRef.current = false;
+        autoRenderCurrentRef.current = 0;
+        autoRenderTotalRef.current = 0;
+        setAutoRenderProgress({ current: 0, total: 0 });
         processingAutoRef.current = false;
         return;
       }
 
+      // Set total on first run
+      if (autoRenderTotalRef.current === 0) {
+        autoRenderTotalRef.current = pending.length;
+        autoRenderCurrentRef.current = 0;
+        setAutoRenderProgress({ current: 0, total: pending.length });
+      }
+
       const next = pending[0];
-      console.log(`[AutoRender] 🤖 Auto-rendering ${pending.length} pending reels. Starting: ${next.id}`);
-      
-      notify(
-        '🤖 Auto-Render Iniciado',
-        `Renderizando ${pending.length} vídeo(s) automaticamente...`,
-        'auto-render-start'
-      );
+      console.log(`[AutoRender] 🤖 Processing ${autoRenderCurrentRef.current + 1}/${autoRenderTotalRef.current}: ${next.id}`);
 
       processingAutoRef.current = false;
       await renderVideo(next.id);
     } catch (err) {
       console.error('[AutoRender] Error:', err);
       processingAutoRef.current = false;
+      // Retry after delay
+      if (autoRenderEnabledRef.current) {
+        setTimeout(() => processAutoQueue(), 10000);
+      }
     }
   }, [renderVideo, currentWorkspace?.id, notify]);
 
@@ -383,16 +455,42 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     setAutoRenderEnabled(prev => {
       const next = !prev;
       if (next) {
-        toast.success('🤖 Auto-render ATIVADO! Vídeos serão renderizados automaticamente.');
-        // Start processing immediately
+        autoRenderCurrentRef.current = 0;
+        autoRenderTotalRef.current = 0;
+        toast.success('🤖 Auto-render ATIVADO! Mantenha o app aberto. Vídeos serão renderizados e agendados automaticamente.');
         setTimeout(() => processAutoQueue(), 1000);
       } else {
         toast.info('Auto-render desativado.');
         setAutoRenderQueue([]);
+        autoRenderCurrentRef.current = 0;
+        autoRenderTotalRef.current = 0;
+        setAutoRenderProgress({ current: 0, total: 0 });
       }
       return next;
     });
   }, [processAutoQueue]);
+
+  // ─── Watchdog: recover from stuck states ─────────
+  useEffect(() => {
+    if (autoRenderEnabled) {
+      watchdogRef.current = setInterval(() => {
+        if (!autoRenderEnabledRef.current) return;
+        
+        // If not rendering and not processing, try to process queue
+        if (!renderLockRef.current && !processingAutoRef.current) {
+          console.log('[AutoRender] 🔧 Watchdog: no active render detected, restarting queue...');
+          processAutoQueue();
+        }
+      }, WATCHDOG_INTERVAL_MS);
+    }
+
+    return () => {
+      if (watchdogRef.current) {
+        clearInterval(watchdogRef.current);
+        watchdogRef.current = null;
+      }
+    };
+  }, [autoRenderEnabled, processAutoQueue]);
 
   // ─── Watch for new draft reels via Realtime ─────────
   useEffect(() => {
@@ -415,7 +513,8 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           
           if (needsRender && autoRenderEnabledRef.current) {
             console.log('[AutoRender] New reel detected, queuing:', post.id);
-            // Small delay to let the DB settle
+            autoRenderTotalRef.current += 1;
+            setAutoRenderProgress(p => ({ ...p, total: autoRenderTotalRef.current }));
             setTimeout(() => processAutoQueue(), 5000);
           }
         }
@@ -434,6 +533,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     setIsRendering(false);
     setCurrentVideoId(null);
     renderLockRef.current = false;
+    processingAutoRef.current = false;
     reset();
     toast.info('Renderização cancelada');
   }, [reset]);
@@ -446,6 +546,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     progress: Math.max(0, Math.min(100, state.progress || 0)),
     autoRenderEnabled,
     autoRenderQueue,
+    autoRenderProgress,
     renderVideo,
     cancelRendering,
     toggleAutoRender,
