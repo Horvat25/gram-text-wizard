@@ -321,6 +321,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { toast.error('Você precisa estar logado'); setConnectingTikTok(false); return; }
+      localStorage.removeItem('tiktok_oauth_result');
       localStorage.setItem('tiktok_oauth_user_id', user.id);
       if (currentWorkspace?.id) localStorage.setItem('tiktok_oauth_workspace_id', currentWorkspace.id);
       const redirectUri = `${window.location.origin}/tiktok-callback`;
@@ -328,7 +329,11 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
       if (error) throw error;
       sessionStorage.setItem('tiktok_oauth_state', data.state);
       const popup = window.open(data.authUrl, 'tiktok_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
-      if (!popup) { toast.error('Permita popups.'); setConnectingTikTok(false); return; }
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        toast.info('Redirecionando para o TikTok...');
+        window.location.href = data.authUrl;
+        return;
+      }
       const checkPopup = setInterval(() => {
         const r = localStorage.getItem('tiktok_oauth_result');
         if (r) { clearInterval(checkPopup); localStorage.removeItem('tiktok_oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('TikTok conectado!'); fetchTkAccounts(); } else { toast.error(res.error); } setConnectingTikTok(false); }
