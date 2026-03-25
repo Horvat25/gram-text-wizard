@@ -1,87 +1,93 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { handleOAuthCallback } from "@/lib/instagram-api";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
+import { toast } from "sonner";
 
 const InstagramCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState("Processando autorização do Instagram...");
 
   useEffect(() => {
-    const code = searchParams.get("code");
-    const error = searchParams.get("error");
-    const errorDescription = searchParams.get("error_description");
+    const processCallback = async () => {
+      const code = searchParams.get("code");
+      const error = searchParams.get("error");
+      const errorDescription = searchParams.get("error_description");
 
-    if (error) {
-      setStatus("error");
-      setErrorMessage(errorDescription || error);
-      return;
-    }
-
-    if (!code) {
-      setStatus("error");
-      setErrorMessage("Código de autorização não encontrado");
-      return;
-    }
-
-    // Get Instagram App credentials from localStorage
-    const appId = localStorage.getItem("instagram_app_id");
-    const appSecret = localStorage.getItem("instagram_app_secret");
-
-    if (!appId || !appSecret) {
-      setStatus("error");
-      setErrorMessage("Credenciais do app não configuradas. Configure primeiro nas Settings.");
-      return;
-    }
-
-    const redirectUri = `${window.location.origin}/instagram/callback`;
-
-    // Process OAuth callback
-    handleOAuthCallback(code, appId, appSecret, redirectUri)
-      .then((result) => {
-        if (result.success) {
-          setStatus("success");
-          setTimeout(() => {
-            navigate("/settings");
-          }, 2000);
-        } else {
-          setStatus("error");
-          setErrorMessage(result.error || "Erro ao conectar com Instagram");
-        }
-      })
-      .catch((error) => {
+      if (error) {
+        const msg = errorDescription || error;
         setStatus("error");
-        setErrorMessage(error.message);
-      });
+        setMessage(msg);
+        toast.error(msg);
+        return;
+      }
+
+      if (!code) {
+        setStatus("error");
+        setMessage("Código de autorização não encontrado");
+        return;
+      }
+
+      try {
+        const publishedOrigin = 'https://gram-text-wizard.lovable.app';
+        const redirectUri = `${publishedOrigin}/instagram/callback`;
+        const { data: { user } } = await supabase.auth.getUser();
+
+        const { data, error: callbackError } = await supabase.functions.invoke('oauth-callback', {
+          body: { code, redirectUri, userId: user?.id }
+        });
+
+        if (callbackError) throw callbackError;
+        if (!data?.success) throw new Error(data?.error || 'Falha ao processar autorização');
+
+        localStorage.setItem('oauth_result', JSON.stringify({
+          success: true,
+          accounts: data.accounts,
+        }));
+
+        setStatus("success");
+        setMessage(`${data.accounts?.length || 1} conta(s) do Instagram conectada(s)!`);
+        toast.success(`${data.accounts?.length || 1} conta(s) do Instagram conectada(s)!`);
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } catch (err: any) {
+        console.error("Instagram callback error:", err);
+        localStorage.setItem('oauth_result', JSON.stringify({
+          success: false,
+          error: err.message,
+        }));
+        setStatus("error");
+        setMessage(err.message || "Erro ao conectar Instagram");
+        toast.error(err.message || "Erro ao conectar Instagram");
+      }
+    };
+
+    processCallback();
   }, [searchParams, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto mt-12">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {status === "loading" && <Loader2 className="h-5 w-5 animate-spin" />}
-                {status === "success" && <CheckCircle2 className="h-5 w-5 text-green-500" />}
-                {status === "error" && <XCircle className="h-5 w-5 text-red-500" />}
-                
-                {status === "loading" && "Conectando..."}
-                {status === "success" && "Conectado!"}
-                {status === "error" && "Erro na Conexão"}
+                {status === "success" && <CheckCircle2 className="h-5 w-5 text-primary" />}
+                {status === "error" && <XCircle className="h-5 w-5 text-destructive" />}
+                {status === "loading" && "Conectando Instagram..."}
+                {status === "success" && "Instagram conectado"}
+                {status === "error" && "Erro na conexão"}
               </CardTitle>
-              <CardDescription>
-                {status === "loading" && "Processando autorização do Instagram..."}
-                {status === "success" && "Sua conta Instagram foi conectada com sucesso!"}
-                {status === "error" && "Não foi possível conectar sua conta"}
-              </CardDescription>
+              <CardDescription>{message}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {status === "loading" && (
@@ -89,24 +95,15 @@ const InstagramCallback = () => {
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 </div>
               )}
-              
+
               {status === "success" && (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground">
-                    Redirecionando para Settings...
-                  </p>
-                </div>
+                <p className="text-sm text-muted-foreground text-center">Redirecionando...</p>
               )}
-              
+
               {status === "error" && (
-                <div className="space-y-4">
-                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                    <p className="text-sm text-destructive">{errorMessage}</p>
-                  </div>
-                  <Button onClick={() => navigate("/settings")} className="w-full">
-                    Voltar para Settings
-                  </Button>
-                </div>
+                <Button onClick={() => navigate("/")} className="w-full" variant="outline">
+                  Voltar
+                </Button>
               )}
             </CardContent>
           </Card>

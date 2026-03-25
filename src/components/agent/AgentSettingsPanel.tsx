@@ -301,14 +301,14 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const startOAuth = async () => {
     setConnecting(true);
     try {
-      // Always use published URL for OAuth redirect to avoid preview/iframe blocking
+      // Use dedicated Instagram callback route on the published app
       const publishedOrigin = 'https://gram-text-wizard.lovable.app';
-      const redirectUri = `${publishedOrigin}/`;
+      const redirectUri = `${publishedOrigin}/instagram/callback`;
       const { data, error } = await supabase.functions.invoke('start-oauth', { body: { redirectUri } });
       if (error) throw error;
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
-      // Always redirect in same tab for Instagram (popups get blocked)
+      // Always redirect in same tab for Instagram
       window.location.href = data.authUrl;
     } catch (e: any) { toast.error(e.message); setConnecting(false); }
   };
