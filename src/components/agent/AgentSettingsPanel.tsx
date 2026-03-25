@@ -747,6 +747,123 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                       </div>
                     </motion.div>
                   )}
+
+                  {/* CONNECTIONS Section — Instagram, TikTok, Voice */}
+                  {activeSection === 'connections' && (
+                    <motion.div 
+                      key="connections"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="space-y-5"
+                    >
+                      {/* Instagram */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Instagram className="h-3.5 w-3.5" /> Instagram
+                        </Label>
+                        {igAccounts.length > 0 ? (
+                          <div className="space-y-2">
+                            {igAccounts.map(acc => (
+                              <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                                    <Instagram className="w-4 h-4 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium">@{acc.username || 'Conectado'}</p>
+                                    <Badge variant={getIgTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
+                                      {getIgTokenStatus(acc.expires_at) === 'active' ? `Ativo (${getIgDaysUntilExpiry(acc.expires_at)}d)` : 'Expirado'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectIg(acc.id)}>
+                                  Desconectar
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <Button onClick={startOAuth} disabled={connecting} className="w-full gap-2" variant="outline">
+                            {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            Conectar Instagram
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* TikTok */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Video className="h-3.5 w-3.5" /> TikTok
+                        </Label>
+                        {tiktokAccounts.length > 0 ? (
+                          <div className="space-y-2">
+                            {tiktokAccounts.map(acc => (
+                              <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
+                                    <Video className="w-4 h-4 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium">@{acc.username || acc.display_name || 'TikTok'}</p>
+                                    <Badge variant={getTkTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
+                                      {getTkTokenStatus(acc.expires_at) === 'active' ? 'Ativo' : 'Expirado'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectTk(acc.id)}>
+                                  Desconectar
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <Button onClick={startTikTokOAuth} disabled={connectingTikTok} className="w-full gap-2" variant="outline">
+                            {connectingTikTok ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            Conectar TikTok
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Voice Selection */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Mic className="h-3.5 w-3.5" /> Voz para Narração
+                        </Label>
+                        <div className="space-y-2">
+                          {VOICE_OPTIONS.map(voice => {
+                            const isSelected = selectedVoice === voice.id;
+                            return (
+                              <div
+                                key={voice.id}
+                                className={cn(
+                                  "flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all",
+                                  isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                                )}
+                                onClick={() => handleVoiceSelect(voice.id)}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isSelected ? "bg-primary/20" : "bg-muted")}>
+                                    <Mic className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">{voice.name}</span>
+                                    <p className="text-[10px] text-muted-foreground">{voice.gender} · {voice.description}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={(e) => { e.stopPropagation(); testVoice(voice.id); }} disabled={testingVoice === voice.id}>
+                                    {testingVoice === voice.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
+                                  </Button>
+                                  {isSelected && <CheckCircle className="w-4 h-4 text-primary" />}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </AnimatePresence>
               </div>
             </ScrollArea>
