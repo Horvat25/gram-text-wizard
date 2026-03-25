@@ -83,9 +83,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   // Local editable distribution state
   const [localDist, setLocalDist] = useState({
-    videos: context?.content_distribution_videos || 4,
+    videos: context?.content_distribution_videos || 3,
     carousels: context?.content_distribution_carousels || 3,
-    news: context?.content_distribution_news || 12,
+    news: context?.content_distribution_news || 8,
+    news_videos: context?.content_distribution_news_video || 2,
     images: context?.content_distribution_images || 7,
     marketing: (context as any)?.content_distribution_marketing || 2,
   });
@@ -94,14 +95,15 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   useEffect(() => {
     if (context) {
       setLocalDist({
-        videos: context.content_distribution_videos || 4,
+        videos: context.content_distribution_videos || 3,
         carousels: context.content_distribution_carousels || 3,
-        news: context.content_distribution_news || 12,
+        news: context.content_distribution_news || 8,
+        news_videos: context.content_distribution_news_video || 2,
         images: context.content_distribution_images || 7,
         marketing: (context as any)?.content_distribution_marketing || 2,
       });
     }
-  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images, (context as any)?.content_distribution_marketing]);
+  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_news_video, context?.content_distribution_images, (context as any)?.content_distribution_marketing]);
 
   const handleDistChange = async (type: keyof typeof localDist, delta: number) => {
     const newVal = Math.max(0, localDist[type] + delta);
@@ -113,6 +115,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         videos: 'content_distribution_videos',
         carousels: 'content_distribution_carousels',
         news: 'content_distribution_news',
+        news_videos: 'content_distribution_news_video',
         images: 'content_distribution_images',
         marketing: 'content_distribution_marketing',
       };
@@ -368,7 +371,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
   // Content strategy with marketing
-  const totalContent = localDist.videos + localDist.carousels + localDist.news + localDist.images + localDist.marketing;
+  const totalContent = localDist.videos + localDist.news_videos + localDist.carousels + localDist.news + localDist.images + localDist.marketing;
   
   const getPercent = (val: number) => totalContent > 0 ? Math.round((val / totalContent) * 100) : 0;
 
@@ -509,9 +512,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <StrategyBarEditable icon={Video} label="Reels" percent={getPercent(localDist.videos)} color="bg-cyan-500" count={localDist.videos} onIncrement={() => handleDistChange('videos', 1)} onDecrement={() => handleDistChange('videos', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Video} label="Reels Criativos" percent={getPercent(localDist.videos)} color="bg-cyan-500" count={localDist.videos} onIncrement={() => handleDistChange('videos', 1)} onDecrement={() => handleDistChange('videos', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Newspaper} label="Reels Notícia" percent={getPercent(localDist.news_videos)} color="bg-orange-500" count={localDist.news_videos} onIncrement={() => handleDistChange('news_videos', 1)} onDecrement={() => handleDistChange('news_videos', -1)} disabled={isAutoStrategy} />
               <StrategyBarEditable icon={LayoutGrid} label="Carrossel" percent={getPercent(localDist.carousels)} color="bg-purple-500" count={localDist.carousels} onIncrement={() => handleDistChange('carousels', 1)} onDecrement={() => handleDistChange('carousels', -1)} disabled={isAutoStrategy} />
-              <StrategyBarEditable icon={Newspaper} label="Notícias" percent={getPercent(localDist.news)} color="bg-amber-500" count={localDist.news} onIncrement={() => handleDistChange('news', 1)} onDecrement={() => handleDistChange('news', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Newspaper} label="Notícias (Imagem)" percent={getPercent(localDist.news)} color="bg-amber-500" count={localDist.news} onIncrement={() => handleDistChange('news', 1)} onDecrement={() => handleDistChange('news', -1)} disabled={isAutoStrategy} />
               <StrategyBarEditable icon={ImageIcon} label="Imagens" percent={getPercent(localDist.images)} color="bg-pink-500" count={localDist.images} onIncrement={() => handleDistChange('images', 1)} onDecrement={() => handleDistChange('images', -1)} disabled={isAutoStrategy} />
               <StrategyBarEditable icon={Megaphone} label="Marketing" percent={getPercent(localDist.marketing)} color="bg-emerald-500" count={localDist.marketing} onIncrement={() => handleDistChange('marketing', 1)} onDecrement={() => handleDistChange('marketing', -1)} disabled={isAutoStrategy} />
             </div>

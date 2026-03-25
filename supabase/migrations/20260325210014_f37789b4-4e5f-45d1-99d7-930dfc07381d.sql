@@ -1,0 +1,1 @@
+ALTER TABLE public.agent_context ADD COLUMN IF NOT EXISTS content_distribution_news_video integer DEFAULT 2;

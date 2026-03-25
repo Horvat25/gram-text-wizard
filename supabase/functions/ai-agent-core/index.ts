@@ -6,12 +6,13 @@ const corsHeaders = {
 };
 
 // Content distribution types
-type ContentType = 'video' | 'carousel' | 'news' | 'image' | 'marketing';
+type ContentType = 'video' | 'carousel' | 'news' | 'news_video' | 'image' | 'marketing';
 
 interface ContentDistribution {
   videos: number;
   carousels: number;
   news: number;
+  news_videos: number;
   images: number;
   marketing: number;
 }
@@ -205,6 +206,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // Track which content types were already posted TODAY for diversity rotation
   const todayContentTypes: ContentType[] = (todayPosts || []).map((p: any) => {
+    if ((p.media_type === 'reels' || p.media_type === 'video') && p.post_type === 'noticia') return 'news_video' as ContentType;
     if (p.media_type === 'reels' || p.media_type === 'video') return 'video' as ContentType;
     if (p.media_type === 'carousel') return 'carousel' as ContentType;
     if (p.post_type === 'afiliado') return 'marketing' as ContentType;
@@ -295,9 +297,10 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Weekly goals from context settings
   // 📈 META: ~28 posts/semana (4 posts/dia)
   const rawWeeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 4,
+    videos: context.content_distribution_videos || 3,
     carousels: context.content_distribution_carousels || 3,
-    news: context.content_distribution_news || 12,
+    news: context.content_distribution_news || 8,
+    news_videos: context.content_distribution_news_video || 2,
     images: context.content_distribution_images || 7,
     marketing: context.content_distribution_marketing || 2,
   };
@@ -311,7 +314,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow);
   
   console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes)`);
-  console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
+  console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} NV${weeklyGoals.news_videos} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   // Count progress this week by media type
   // Exclude draft reels (stuck without render) from video progress to avoid false "goal met"
   const publishableWeekPosts = postsThisWeek.filter((p: any) => {
@@ -320,9 +323,10 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     return true;
   });
   const weeklyProgress: ContentDistribution = {
-    videos: publishableWeekPosts.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
+    videos: publishableWeekPosts.filter((p: any) => (p.media_type === 'reels' || p.media_type === 'video') && p.post_type !== 'noticia').length,
     carousels: publishableWeekPosts.filter((p: any) => p.media_type === 'carousel').length,
-    news: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
+    news: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel' && p.media_type !== 'reels' && p.media_type !== 'video').length,
+    news_videos: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && (p.media_type === 'reels' || p.media_type === 'video')).length,
     images: publishableWeekPosts.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
     marketing: publishableWeekPosts.filter((p: any) => p.post_type === 'afiliado').length,
   };
@@ -330,7 +334,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
   // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
   const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
-    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images', marketing: 'marketing' } as const;
+    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', news_video: 'news_videos', image: 'images', marketing: 'marketing' } as const;
     const key = keyMap[type];
     const goal = weeklyGoals[key] || 1;
     const progress = weeklyProgress[key] || 0;
@@ -341,7 +345,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // MARKETING INTERCALATION: check if it's time for a marketing post
   // Rule: 1 marketing post for every 4 regular posts
-  const totalRegularPosts = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.images;
+  const totalRegularPosts = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.news_videos + weeklyProgress.images;
   const marketingDue = totalRegularPosts >= 4 && weeklyProgress.marketing === 0;
   const marketingOverdue = totalRegularPosts >= 8 && weeklyProgress.marketing <= 1;
   
@@ -363,8 +367,10 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   }
   
   const typeStats = [
-    // Only include video if render service is available
+    // Creative video (AI themes) - only if render service is available
     ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
+    // News video (RSS broadcast Reels) - also needs render service
+    ...(renderServiceAvailable ? [{ type: 'news_video' as ContentType, ...getCompletionStats('news_video'), priority: 3.5 }] : []),
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
@@ -518,9 +524,9 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   
   // Also check CONTENT distribution progress (how many posts done vs goal)
   const totalGoals = (state.weeklyGoals?.videos || 0) + (state.weeklyGoals?.carousels || 0) + 
-                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.images || 0) + (state.weeklyGoals?.marketing || 0);
+                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.news_videos || 0) + (state.weeklyGoals?.images || 0) + (state.weeklyGoals?.marketing || 0);
   const totalProgress = (state.weeklyProgress?.videos || 0) + (state.weeklyProgress?.carousels || 0) + 
-                         (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.images || 0) + (state.weeklyProgress?.marketing || 0);
+                         (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.news_videos || 0) + (state.weeklyProgress?.images || 0) + (state.weeklyProgress?.marketing || 0);
   const contentProgress = totalGoals > 0 ? (totalProgress / totalGoals) * 100 : 100;
   
   // Day of week (0=Sun, 6=Sat) - how many days left in the week
@@ -592,9 +598,9 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   
   // Check if weekly goals are met
   const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                     state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
+                     state.weeklyGoals.news + state.weeklyGoals.news_videos + state.weeklyGoals.images + state.weeklyGoals.marketing;
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                     state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
+                     state.weeklyProgress.news + state.weeklyProgress.news_videos + state.weeklyProgress.images + state.weeklyProgress.marketing;
   
   // Macro objectives info - use SYNCED data from agent_context
   const goalViews = state.context?.goal_weekly_views || 10000;
@@ -662,6 +668,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
     'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
+    'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
     'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
     'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
   };
@@ -684,7 +691,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   
   // For 'news' type: skip AI theme refinement - the RSS ranking already picks the best article
   // This saves 1 AI call per news post (significant cost reduction)
-  if (state.nextContentType !== 'news') {
+  if (state.nextContentType !== 'news' && state.nextContentType !== 'news_video') {
     // ===== WEB INTELLIGENCE: Search trending topics & competitor viral content =====
     let webTrends: string[] = [];
     let competitorInsights: string[] = [];
@@ -760,9 +767,10 @@ O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType
 ${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()}): "${h.topPostCaption}..."` : ''}
 
 📈 PROGRESSO SEMANAL:
-- Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
+- Vídeos Criativos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
+- Vídeos Notícia: ${state.weeklyProgress.news_videos}/${state.weeklyGoals.news_videos}
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
-- Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
+- Notícias (imagem): ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
 - Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}
 
@@ -828,6 +836,7 @@ Responda em JSON: { "theme": "tema específico e atual", "cta": "CTA do post", "
     'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
     'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
     'news': state.weeklyGoals.news - state.weeklyProgress.news,
+    'news_video': state.weeklyGoals.news_videos - state.weeklyProgress.news_videos,
     'image': state.weeklyGoals.images - state.weeklyProgress.images,
     'marketing': state.weeklyGoals.marketing - state.weeklyProgress.marketing,
   };
@@ -865,35 +874,12 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video': {
-      // VIDEO content CAN use RSS news articles as source for professional news-broadcast Reels
-      // The video will have editorial narration style, with article URL ONLY in caption (never in video)
-      console.log(`[AGENT] 🎬 Creating video Reel...`);
+      // CREATIVE VIDEO: AI-generated themes from internet trends (NEVER uses RSS)
+      console.log(`[AGENT] 🎬 Creating CREATIVE video Reel (AI-generated theme)...`);
       try {
-        // Try to find a good RSS article for news-broadcast style Reel
-        let rssArticle: { url: string; title: string; description?: string } | undefined;
-        let rssItemId: string | undefined;
-        
-        const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
-        if (bestRssItem && bestRssItem.score >= 40) {
-          rssArticle = {
-            url: bestRssItem.item.link,
-            title: bestRssItem.item.title,
-            description: bestRssItem.item.description || '',
-          };
-          rssItemId = bestRssItem.item.id;
-          // Mark as used
-          await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
-          plan.theme = bestRssItem.item.title;
-          (plan as any)._rssItemId = rssItemId;
-          console.log(`[AGENT] 📰 News-broadcast Reel from RSS: "${rssArticle.title}" (score: ${bestRssItem.score})`);
-        } else {
-          console.log(`[AGENT] 🎨 No suitable RSS article - using AI-generated theme for Reel`);
-        }
-        
-        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
       } catch (videoError: any) {
         console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
-        // Don't silently fail - create a draft with error info
         const { data: fallbackPost } = await supabase.from('posts').insert({
           user_id: userId,
           workspace_id: workspaceId,
@@ -904,6 +890,45 @@ async function executeContentPlan(
           platforms: plan.platforms || ['instagram'],
           status: 'failed',
           error_message: `Erro na criação de vídeo: ${videoError?.message || 'Unknown error'}`,
+          ai_model_used: 'none'
+        }).select().single();
+        return fallbackPost;
+      }
+    }
+    case 'news_video': {
+      // NEWS VIDEO: RSS news-broadcast style Reels (editorial telejornal)
+      console.log(`[AGENT] 📺 Creating NEWS BROADCAST video Reel...`);
+      try {
+        const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
+        if (!bestRssItem || bestRssItem.score < 30) {
+          console.log('[AGENT] ⚠️ No suitable RSS article for news_video - skipping');
+          // Fallback: create as regular news image instead
+          return await createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+        }
+        
+        const rssArticle = {
+          url: bestRssItem.item.link,
+          title: bestRssItem.item.title,
+          description: bestRssItem.item.description || '',
+        };
+        await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
+        plan.theme = bestRssItem.item.title;
+        (plan as any)._rssItemId = bestRssItem.item.id;
+        console.log(`[AGENT] 📰 News-broadcast Reel: "${rssArticle.title}" (score: ${bestRssItem.score})`);
+        
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+      } catch (videoError: any) {
+        console.error('[AGENT] ❌ NEWS VIDEO CREATION FAILED:', videoError?.message || videoError);
+        const { data: fallbackPost } = await supabase.from('posts').insert({
+          user_id: userId,
+          workspace_id: workspaceId,
+          caption: `📺 ${plan.theme}`,
+          hashtags: ['#tecnologia', '#reels', '#noticias'],
+          post_type: 'noticia',
+          media_type: 'reels',
+          platforms: plan.platforms || ['instagram'],
+          status: 'failed',
+          error_message: `Erro na criação de vídeo notícia: ${videoError?.message || 'Unknown error'}`,
           ai_model_used: 'none'
         }).select().single();
         return fallbackPost;
