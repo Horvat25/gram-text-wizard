@@ -130,7 +130,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const periodLabel = `últimos ${period} dias`;
 
-  // Sync from Instagram
+  // Sync from Instagram — always uses 90 days to cover all period tabs
   const handleSync = async () => {
     if (!currentWorkspace?.id) {
       toast.error('Selecione um workspace antes de sincronizar');
@@ -153,7 +153,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           body: {
             offset,
             batch_size: 50,
-            period_days: period,
+            period_days: 90, // Always sync max range so all tabs are up to date
             workspace_id: currentWorkspace.id,
           },
         });
@@ -403,20 +403,21 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     <div className="space-y-4 pb-4">
       {/* 0. Sync Bar */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">Crescimento & Analytics</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex gap-0.5 flex-1 sm:flex-initial">
               {PERIOD_OPTIONS.map(p => (
                 <Button
                   key={p.value}
                   variant={period === p.value ? "default" : "ghost"}
                   size="sm"
-                  className="h-6 text-[10px] px-2"
+                  className="h-7 text-xs px-2.5 flex-1 sm:flex-initial"
                   onClick={() => setPeriod(p.value)}
+                  disabled={syncing}
                 >
                   {p.label}
                 </Button>
@@ -425,20 +426,28 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
             <Button
               variant="outline"
               size="sm"
-              className="h-7 gap-1 text-[10px]"
+              className="h-7 gap-1 text-xs shrink-0"
               onClick={handleSync}
               disabled={syncing}
             >
               {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-              Sincronizar
+              {syncing ? 'Sincronizando...' : 'Sincronizar'}
             </Button>
           </div>
         </div>
+        {syncing && (
+          <div className="mt-2 p-2 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <Loader2 className="h-3 w-3 animate-spin text-primary" />
+              Sincronizando todas as métricas do Instagram (90 dias). Aguarde...
+            </p>
+          </div>
+        )}
       </motion.div>
 
       {/* 1. KPI Cards */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           <KPICard icon={<Eye className="h-4 w-4 text-blue-500" />} label="Visualizações" value={formatNumber(totalViews)} sub={periodLabel} />
           <KPICard icon={<Users className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
           <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} />
@@ -559,13 +568,13 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                       {post.image_url && <img src={post.image_url} alt="" className="w-8 h-8 rounded object-cover shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-medium line-clamp-1">{post.caption}</p>
-                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {((post.impressions || post.reach || 0)).toLocaleString()} views</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {((post.impressions || post.reach || 0)).toLocaleString()}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}</span>
                         </div>
-                        <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
                           <Badge variant="outline" className="text-[8px] h-3.5 px-1">{mediaLabel}</Badge>
                           <span className="text-[9px] text-emerald-500 font-medium">{engRate}% eng</span>
                           {post.published_at && <span className="text-[9px] text-muted-foreground/60">{new Date(post.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>}
@@ -715,14 +724,14 @@ function StrategyBarEditable({ icon: Icon, label, percent, color, count, onIncre
   onIncrement: () => void; onDecrement: () => void; disabled: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-      <span className="text-xs w-16 shrink-0">{label}</span>
-      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+      <span className="text-[11px] sm:text-xs w-14 sm:w-16 shrink-0 truncate">{label}</span>
+      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden min-w-0">
         <div className={cn("h-full rounded-full transition-all", color)} style={{ width: `${percent}%` }} />
       </div>
-      <span className="text-xs font-mono w-8 text-right text-muted-foreground">{percent}%</span>
-      <div className="flex items-center gap-0.5">
+      <span className="text-[10px] sm:text-xs font-mono w-7 sm:w-8 text-right text-muted-foreground shrink-0">{percent}%</span>
+      <div className="flex items-center gap-0 shrink-0">
         <Button
           variant="ghost"
           size="icon"
