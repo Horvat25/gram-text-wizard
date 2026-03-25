@@ -1010,15 +1010,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 Salvar DNA
               </Button>
-              
-              <Button 
-                variant="ghost" 
-                className="w-full gap-2 text-muted-foreground hover:text-destructive text-xs"
-                onClick={handleClearChat}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Limpar Histórico do Chat
-              </Button>
             </div>
           </>
         )}
