@@ -524,9 +524,9 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   
   // Also check CONTENT distribution progress (how many posts done vs goal)
   const totalGoals = (state.weeklyGoals?.videos || 0) + (state.weeklyGoals?.carousels || 0) + 
-                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.images || 0) + (state.weeklyGoals?.marketing || 0);
+                     (state.weeklyGoals?.news || 0) + (state.weeklyGoals?.news_videos || 0) + (state.weeklyGoals?.images || 0) + (state.weeklyGoals?.marketing || 0);
   const totalProgress = (state.weeklyProgress?.videos || 0) + (state.weeklyProgress?.carousels || 0) + 
-                         (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.images || 0) + (state.weeklyProgress?.marketing || 0);
+                         (state.weeklyProgress?.news || 0) + (state.weeklyProgress?.news_videos || 0) + (state.weeklyProgress?.images || 0) + (state.weeklyProgress?.marketing || 0);
   const contentProgress = totalGoals > 0 ? (totalProgress / totalGoals) * 100 : 100;
   
   // Day of week (0=Sun, 6=Sat) - how many days left in the week
