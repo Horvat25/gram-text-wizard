@@ -59,11 +59,7 @@ const App = () => (
                   <Index />
                 </ProtectedRoute>
               } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              } />
+              <Route path="/settings" element={<Navigate to="/" replace />} />
               <Route path="/instagram/callback" element={<InstagramCallback />} />
               <Route path="/tiktok-callback" element={<TikTokCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
