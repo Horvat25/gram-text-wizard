@@ -41,6 +41,35 @@ const TikTokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const PlatformToggle = ({ selected, onSelect }: { selected: Platform; onSelect: (p: Platform) => void }) => (
+  <div className="flex items-center bg-muted/50 rounded-md p-0.5">
+    <button
+      onClick={() => onSelect("instagram")}
+      className={cn(
+        "p-1 rounded transition-all",
+        selected === "instagram" 
+          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      title="Instagram"
+    >
+      <Instagram className="h-3.5 w-3.5" />
+    </button>
+    <button
+      onClick={() => onSelect("tiktok")}
+      className={cn(
+        "p-1 rounded transition-all",
+        selected === "tiktok" 
+          ? "bg-gradient-to-r from-cyan-500 to-pink-500 text-white shadow-sm" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      title="TikTok"
+    >
+      <TikTokIcon className="h-3.5 w-3.5" />
+    </button>
+  </div>
+);
+
 interface AgentConfig {
   agent_name: string;
   agent_avatar_url: string | null;
@@ -292,211 +321,202 @@ export default function AgentGenieView() {
   }
 
   return (
-    <div className="h-full flex flex-col relative overflow-hidden bg-background">
-      {/* 3D Background */}
-      <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
-        <AgentGenie3D isProcessing={isLoading} />
-      </Suspense>
-      
-      {/* Top Bar */}
-      <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
-        {/* Left side tabs */}
-        <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
-          <Button
-            variant={showAgentChat ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showAgentChat && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('agentChat')}
-          >
-            <Bot className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Agente</span>
-          </Button>
+    <div className="h-full">
+    {selectedPlatform === "tiktok" ? (
+      <div className="h-full flex flex-col relative overflow-hidden bg-background">
+        {/* Top Bar */}
+        <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
+          <h2 className="font-semibold text-sm text-foreground">TikTok</h2>
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
+              {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </Button>
+          </div>
+        </header>
+        
+        {/* TikTok Content */}
+        <ScrollArea className="flex-1">
+          <div className="p-4 max-w-2xl mx-auto">
+            <TikTokContentCreation />
+          </div>
+        </ScrollArea>
+      </div>
+    ) : (
+      /* Instagram / Agent View */
+      <div className="h-full flex flex-col relative overflow-hidden bg-background">
+        {/* 3D Background */}
+        <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
+          <AgentGenie3D isProcessing={isLoading} />
+        </Suspense>
+        
+        {/* Top Bar */}
+        <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
+          {/* Left side tabs */}
+          <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
+            <Button
+              variant={showAgentChat ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showAgentChat && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('agentChat')}
+            >
+              <Bot className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Agente</span>
+            </Button>
+            
+            <Button
+              variant={showQueue ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showQueue && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('queue')}
+            >
+              <CalendarDays className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Fila</span>
+            </Button>
+            
+            <Button
+              variant={showFeeds ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showFeeds && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('feeds')}
+            >
+              <Rss className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Fontes</span>
+            </Button>
+            
+            <Button
+              variant={showGrowth ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showGrowth && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('growth')}
+            >
+              <TrendingUp className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Crescimento</span>
+            </Button>
+            
+            <Button
+              variant={showMarketing ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showMarketing && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('marketing')}
+            >
+              <Megaphone className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Marketing</span>
+            </Button>
+            
+            <Button
+              variant={showHistory ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showHistory && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('history')}
+            >
+              <History className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Chat</span>
+            </Button>
+            
+            <Button
+              variant={showPostHistory ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showPostHistory && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('postHistory')}
+            >
+              <History className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Posts</span>
+            </Button>
+          </div>
           
-          <Button
-            variant={showQueue ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showQueue && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('queue')}
-          >
-            <CalendarDays className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Fila</span>
-          </Button>
-          
-          <Button
-            variant={showFeeds ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showFeeds && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('feeds')}
-          >
-            <Rss className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Fontes</span>
-          </Button>
-          
-          <Button
-            variant={showGrowth ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showGrowth && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('growth')}
-          >
-            <TrendingUp className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Crescimento</span>
-          </Button>
-          
-          <Button
-            variant={showMarketing ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showMarketing && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('marketing')}
-          >
-            <Megaphone className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Marketing</span>
-          </Button>
-          
-          <Button
-            variant={showHistory ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showHistory && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('history')}
-          >
-            <History className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Chat</span>
-          </Button>
-          
-          <Button
-            variant={showPostHistory ? "default" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-              showPostHistory && "neural-gradient border-0"
-            )}
-            onClick={() => togglePanel('postHistory')}
-          >
-            <History className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Posts</span>
-          </Button>
+          {/* Right side */}
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
+
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
+              {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </Button>
+
+            <AgentSettingsPanel 
+              trigger={
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <Settings className="h-3.5 w-3.5" />
+                </Button>
+              }
+              onConfigChange={(config) => {
+                setAgentConfig(prev => ({
+                  ...prev,
+                  agent_name: config.agent_name,
+                  agent_avatar_url: config.agent_avatar_url,
+                  auto_post_enabled: config.auto_post_enabled
+                }));
+              }}
+            />
+          </div>
+        </header>
+        
+        {/* Center Area - 3D Genie Display */}
+        <div className="flex-1 relative z-10 flex items-center justify-center">
+          <div className="absolute bottom-4 text-center">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent">
+              {agentConfig.agent_name}
+            </h2>
+          </div>
         </div>
         
-        {/* Right side */}
-        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-          {/* Platform toggle - small */}
-          <div className="flex items-center bg-muted/50 rounded-md p-0.5">
-            <button
-              onClick={() => setSelectedPlatform("instagram")}
-              className={cn(
-                "p-1 rounded transition-all",
-                selectedPlatform === "instagram" 
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              title="Instagram"
-            >
-              <Instagram className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => setSelectedPlatform("tiktok")}
-              className={cn(
-                "p-1 rounded transition-all",
-                selectedPlatform === "tiktok" 
-                  ? "bg-gradient-to-r from-cyan-500 to-pink-500 text-white shadow-sm" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              title="TikTok"
-            >
-              <TikTokIcon className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {/* Dark mode toggle */}
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
-            {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-          </Button>
-
-          <AgentSettingsPanel 
-            trigger={
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Settings className="h-3.5 w-3.5" />
-              </Button>
-            }
-            onConfigChange={(config) => {
-              setAgentConfig(prev => ({
-                ...prev,
-                agent_name: config.agent_name,
-                agent_avatar_url: config.agent_avatar_url,
-                auto_post_enabled: config.auto_post_enabled
-              }));
-            }}
-          />
-        </div>
-      </header>
-      
-      {/* Center Area - 3D Genie Display */}
-      <div className="flex-1 relative z-10 flex items-center justify-center">
-        <div className="absolute bottom-4 text-center">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent">
-            {agentConfig.agent_name}
-          </h2>
-        </div>
-      </div>
-      
-      {/* Minimal Chat Input */}
-      <AgentMinimalChat 
-        onSend={sendMessage}
-        isLoading={isLoading}
-        placeholder="Peça algo ao agente..."
-      />
-      
-      {/* Agent Unified Panel (Reports + Responses + Actions) */}
-      <AgentProactiveChat
-        isOpen={showAgentChat}
-        onClose={() => setShowAgentChat(false)}
-        agentName={agentConfig.agent_name}
-        agentAvatar={agentConfig.agent_avatar_url}
-      />
-      
-      {/* User Command History Panel */}
-      <AgentChatPanel
-        isOpen={showHistory}
-        onClose={() => setShowHistory(false)}
-        messages={messages}
-        agentName={agentConfig.agent_name}
-        agentAvatar={agentConfig.agent_avatar_url}
-      />
-      
-      {/* Queue Panel */}
-      {showQueue && (
-        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-2xl mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-semibold text-sm">Fila — {selectedPlatform === 'tiktok' ? 'TikTok' : 'Instagram'}</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedPlatform === "tiktok" ? "Conteúdo do TikTok" : "Posts agendados e rascunhos"}
-                  </p>
+        {/* Minimal Chat Input */}
+        <AgentMinimalChat 
+          onSend={sendMessage}
+          isLoading={isLoading}
+          placeholder="Peça algo ao agente..."
+        />
+        
+        {/* Agent Unified Panel */}
+        <AgentProactiveChat
+          isOpen={showAgentChat}
+          onClose={() => setShowAgentChat(false)}
+          agentName={agentConfig.agent_name}
+          agentAvatar={agentConfig.agent_avatar_url}
+        />
+        
+        {/* User Command History Panel */}
+        <AgentChatPanel
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+          messages={messages}
+          agentName={agentConfig.agent_name}
+          agentAvatar={agentConfig.agent_avatar_url}
+        />
+        
+        {/* Queue Panel */}
+        {showQueue && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Fila — Instagram</h2>
+                    <p className="text-xs text-muted-foreground">Posts agendados e rascunhos</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowQueue(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowQueue(false)} className="h-7 w-7 p-0">✕</Button>
-              </div>
-              {selectedPlatform === "tiktok" ? (
-                <TikTokContentCreation />
-              ) : (
                 <PublicationQueueTab
                   posts={posts}
                   onPublish={publishPost}
@@ -504,76 +524,77 @@ export default function AgentGenieView() {
                   onDelete={deletePost}
                   onUpdate={updatePost}
                 />
-              )}
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-      
-      {/* Post History Panel */}
-      {showPostHistory && (
-        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-2xl mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-semibold text-sm">Histórico — {selectedPlatform === 'tiktok' ? 'TikTok' : 'Instagram'}</h2>
-                  <p className="text-xs text-muted-foreground">Calendário de posts publicados</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowPostHistory(false)} className="h-7 w-7 p-0">✕</Button>
               </div>
-              <PostHistoryTab platform={selectedPlatform} />
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-      
-      {/* Feeds Sources Panel */}
-      {showFeeds && (
-        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-lg mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-semibold text-sm">Fontes de Conteúdo</h2>
-                  <p className="text-xs text-muted-foreground">Sites que o agente usa para buscar notícias</p>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* Post History Panel */}
+        {showPostHistory && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Histórico — Instagram</h2>
+                    <p className="text-xs text-muted-foreground">Calendário de posts publicados</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowPostHistory(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowFeeds(false)} className="h-7 w-7 p-0">✕</Button>
+                <PostHistoryTab platform="instagram" />
               </div>
-              <CustomFeedsManager />
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-      
-      {/* Growth Dashboard Panel */}
-      {showGrowth && (
-        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-lg mx-auto">
-              <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-      
-      {/* Marketing Panel */}
-      {showMarketing && (
-        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-lg mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-semibold text-sm">Marketing & Afiliados</h2>
-                  <p className="text-xs text-muted-foreground">Links que o agente promove automaticamente</p>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* Feeds Sources Panel */}
+        {showFeeds && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-lg mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Fontes de Conteúdo</h2>
+                    <p className="text-xs text-muted-foreground">Sites que o agente usa para buscar notícias</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowFeeds(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
+                <CustomFeedsManager />
               </div>
-              <AgentMarketingPanel />
-            </div>
-          </ScrollArea>
-        </div>
-      )}
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* Growth Dashboard Panel */}
+        {showGrowth && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-lg mx-auto">
+                <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* Marketing Panel */}
+        {showMarketing && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-lg mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Marketing & Afiliados</h2>
+                    <p className="text-xs text-muted-foreground">Links que o agente promove automaticamente</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <AgentMarketingPanel />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+      </div>
+    )}
     </div>
   );
 }
