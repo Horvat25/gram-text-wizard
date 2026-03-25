@@ -326,6 +326,7 @@ export default function AgentGenieView() {
                 }));
               }}
             />
+          </div>
         </header>
         
         {/* TikTok Content */}
