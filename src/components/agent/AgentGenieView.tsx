@@ -157,23 +157,37 @@ export default function AgentGenieView() {
     
     setIsLoadingHistory(true);
     try {
-      const { data, error } = await supabase
-        .from('agent_chat_messages')
-        .select('*')
-        .eq('workspace_id', currentWorkspace.id)
-        .order('created_at', { ascending: true })
-        .limit(50);
+      // Load both platforms in parallel
+      const [igResult, tkResult] = await Promise.all([
+        supabase
+          .from('agent_chat_messages')
+          .select('*')
+          .eq('workspace_id', currentWorkspace.id)
+          .eq('platform', 'instagram')
+          .order('created_at', { ascending: true })
+          .limit(50),
+        supabase
+          .from('agent_chat_messages')
+          .select('*')
+          .eq('workspace_id', currentWorkspace.id)
+          .eq('platform', 'tiktok')
+          .order('created_at', { ascending: true })
+          .limit(50),
+      ]);
 
-      if (error) throw error;
+      const mapMsg = (m: any): Message => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        timestamp: new Date(m.created_at),
+        actions: Array.isArray(m.actions) ? m.actions : []
+      });
 
-      if (data && data.length > 0) {
-        setMessages(data.map((m: any) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          timestamp: new Date(m.created_at),
-          actions: Array.isArray(m.actions) ? m.actions : []
-        })));
+      if (igResult.data && igResult.data.length > 0) {
+        setIgMessages(igResult.data.map(mapMsg));
+      }
+      if (tkResult.data && tkResult.data.length > 0) {
+        setTkMessages(tkResult.data.map(mapMsg));
       }
     } catch (error) {
       console.error('Error loading chat history:', error);
@@ -182,7 +196,7 @@ export default function AgentGenieView() {
     }
   };
 
-  const saveMessage = async (message: Message) => {
+  const saveMessage = async (message: Message, platform: string) => {
     if (!user || !currentWorkspace) return;
     
     try {
@@ -193,7 +207,8 @@ export default function AgentGenieView() {
           workspace_id: currentWorkspace.id,
           role: message.role,
           content: message.content,
-          actions: message.actions ? JSON.parse(JSON.stringify(message.actions)) : null
+          actions: message.actions ? JSON.parse(JSON.stringify(message.actions)) : null,
+          platform,
         } as any);
     } catch (error) {
       console.error('Error saving message:', error);
