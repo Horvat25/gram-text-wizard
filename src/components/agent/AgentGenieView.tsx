@@ -320,9 +320,54 @@ export default function AgentGenieView() {
     <div className="h-full">
     {selectedPlatform === "tiktok" ? (
       <div className="h-full flex flex-col relative overflow-hidden bg-background">
+        {/* 3D Background */}
+        <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
+          <AgentGenie3D isProcessing={isLoading} />
+        </Suspense>
+        
         {/* Top Bar */}
         <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
-          <h2 className="font-semibold text-sm text-foreground">TikTok</h2>
+          <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
+            <Button
+              variant={showTikTokCreate ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showTikTokCreate && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
+              )}
+              onClick={() => togglePanel('tiktokCreate')}
+            >
+              <Film className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Criar</span>
+            </Button>
+            
+            <Button
+              variant={showTikTokQueue ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showTikTokQueue && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
+              )}
+              onClick={() => togglePanel('tiktokQueue')}
+            >
+              <CalendarDays className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Fila</span>
+            </Button>
+            
+            <Button
+              variant={showTikTokHistory ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showTikTokHistory && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
+              )}
+              onClick={() => togglePanel('tiktokHistory')}
+            >
+              <History className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Posts</span>
+            </Button>
+          </div>
+          
           <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
             <AgentSettingsPanel 
@@ -343,12 +388,99 @@ export default function AgentGenieView() {
           </div>
         </header>
         
-        {/* TikTok Content */}
-        <ScrollArea className="flex-1">
-          <div className="p-4 max-w-2xl mx-auto">
-            <TikTokContentCreation />
+        {/* Center Area - 3D Genie Display */}
+        <div className="flex-1 relative z-10 flex items-center justify-center">
+          <div className="absolute bottom-4 text-center">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              {agentConfig.agent_name}
+            </h2>
+            <p className="text-xs text-muted-foreground">TikTok</p>
           </div>
-        </ScrollArea>
+        </div>
+        
+        {/* Minimal Chat Input */}
+        <AgentMinimalChat 
+          onSend={sendMessage}
+          isLoading={isLoading}
+          placeholder="Peça ao agente para criar vídeos..."
+        />
+
+        {/* Agent Unified Panel */}
+        <AgentProactiveChat
+          isOpen={showAgentChat}
+          onClose={() => setShowAgentChat(false)}
+          agentName={agentConfig.agent_name}
+          agentAvatar={agentConfig.agent_avatar_url}
+        />
+        
+        {/* Chat History */}
+        <AgentChatPanel
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+          messages={messages}
+          agentName={agentConfig.agent_name}
+          agentAvatar={agentConfig.agent_avatar_url}
+        />
+        
+        {/* TikTok Create Panel */}
+        {showTikTokCreate && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Criar Vídeo — TikTok</h2>
+                    <p className="text-xs text-muted-foreground">Produza vídeos com IA para o TikTok</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowTikTokCreate(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <TikTokContentCreation />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* TikTok Queue Panel */}
+        {showTikTokQueue && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Fila — TikTok</h2>
+                    <p className="text-xs text-muted-foreground">Vídeos agendados e rascunhos</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowTikTokQueue(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <PublicationQueueTab
+                  posts={posts.filter(p => p.platforms?.includes('tiktok'))}
+                  onPublish={publishPost}
+                  onReschedule={reschedulePost}
+                  onDelete={deletePost}
+                  onUpdate={updatePost}
+                />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* TikTok Post History Panel */}
+        {showTikTokHistory && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Histórico — TikTok</h2>
+                    <p className="text-xs text-muted-foreground">Vídeos publicados</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowTikTokHistory(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <PostHistoryTab platform="tiktok" />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
       </div>
     ) : (
       /* Instagram / Agent View */
