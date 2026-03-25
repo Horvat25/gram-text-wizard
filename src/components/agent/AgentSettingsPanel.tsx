@@ -835,14 +835,20 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                           <div className="space-y-2">
                             {igAccounts.map(acc => (
                               <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
-                                    <Instagram className="w-4 h-4 text-white" />
-                                  </div>
+                                <div className="flex items-center gap-3">
+                                  {acc.profile_picture_url ? (
+                                    <img src={acc.profile_picture_url} alt={acc.username || ''} className="w-10 h-10 rounded-full object-cover border-2 border-primary/30" />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                                      <Instagram className="w-5 h-5 text-white" />
+                                    </div>
+                                  )}
                                   <div>
                                     <p className="text-sm font-medium">@{acc.username || 'Conectado'}</p>
                                     <Badge variant={getIgTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
-                                      {getIgTokenStatus(acc.expires_at) === 'active' ? `Ativo (${getIgDaysUntilExpiry(acc.expires_at)}d)` : 'Expirado'}
+                                      {getIgTokenStatus(acc.expires_at) === 'active' 
+                                        ? `✅ Ativo (${getIgDaysUntilExpiry(acc.expires_at)}d)` 
+                                        : '❌ Expirado'}
                                     </Badge>
                                   </div>
                                 </div>
@@ -869,14 +875,18 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                           <div className="space-y-2">
                             {tiktokAccounts.map(acc => (
                               <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
-                                    <Video className="w-4 h-4 text-white" />
-                                  </div>
+                                <div className="flex items-center gap-3">
+                                  {acc.avatar_url ? (
+                                    <img src={acc.avatar_url} alt={acc.username || acc.display_name || ''} className="w-10 h-10 rounded-full object-cover border-2 border-cyan-500/30" />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
+                                      <Video className="w-5 h-5 text-white" />
+                                    </div>
+                                  )}
                                   <div>
                                     <p className="text-sm font-medium">@{acc.username || acc.display_name || 'TikTok'}</p>
                                     <Badge variant={getTkTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
-                                      {getTkTokenStatus(acc.expires_at) === 'active' ? 'Ativo' : 'Expirado'}
+                                      {getTkTokenStatus(acc.expires_at) === 'active' ? '✅ Ativo' : '❌ Expirado'}
                                     </Badge>
                                   </div>
                                 </div>
