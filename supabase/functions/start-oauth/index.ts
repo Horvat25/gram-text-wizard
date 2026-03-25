@@ -13,14 +13,9 @@ serve(async (req) => {
 
   try {
     const FACEBOOK_APP_ID = Deno.env.get('FACEBOOK_APP_ID');
-    const FACEBOOK_CONFIG_ID = Deno.env.get('FACEBOOK_CONFIG_ID');
     
     if (!FACEBOOK_APP_ID) {
       throw new Error('FACEBOOK_APP_ID not configured');
-    }
-
-    if (!FACEBOOK_CONFIG_ID) {
-      throw new Error('FACEBOOK_CONFIG_ID not configured - required for Login for Business');
     }
 
     const { redirectUri } = await req.json();
@@ -32,17 +27,24 @@ serve(async (req) => {
     // Generate state for CSRF protection
     const state = crypto.randomUUID();
 
-    // Use Facebook Login for Business with config_id
-    // The config_id contains all the permissions and linked assets
+    // Use standard Facebook Login with explicit scopes (no config_id needed)
+    const scopes = [
+      'public_profile',
+      'pages_show_list',
+      'pages_read_engagement',
+      'instagram_basic',
+      'instagram_content_publish',
+      'instagram_manage_insights'
+    ].join(',');
+
     const authUrl = new URL('https://www.facebook.com/v18.0/dialog/oauth');
     authUrl.searchParams.set('client_id', FACEBOOK_APP_ID);
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('config_id', FACEBOOK_CONFIG_ID);
+    authUrl.searchParams.set('scope', scopes);
     authUrl.searchParams.set('state', state);
 
-    console.log('Generated Facebook Login for Business OAuth URL');
-    console.log('Config ID:', FACEBOOK_CONFIG_ID);
+    console.log('Generated standard Facebook OAuth URL');
     console.log('Redirect URI:', redirectUri);
 
     return new Response(
