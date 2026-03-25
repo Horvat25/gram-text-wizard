@@ -105,6 +105,7 @@ const Settings = () => {
     error: tiktokError, 
     fetchAccounts: fetchTikTokAccounts, 
     disconnectAccount: disconnectTikTok,
+    refreshToken: refreshTikTokToken,
     getTokenStatus: getTikTokTokenStatus,
     getDaysUntilExpiry: getTikTokDaysUntilExpiry
   } = useTikTokAccounts();
