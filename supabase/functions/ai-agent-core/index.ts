@@ -865,12 +865,32 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video': {
-      // VIDEO content should NOT use RSS news articles
-      // News articles are for the 'news' content type (static image posts)
-      // Reels should use original AI-generated themes, NOT repackaged news
-      console.log(`[AGENT] 🎬 Creating video from AI theme (NOT from RSS news)`);
+      // VIDEO content CAN use RSS news articles as source for professional news-broadcast Reels
+      // The video will have editorial narration style, with article URL ONLY in caption (never in video)
+      console.log(`[AGENT] 🎬 Creating video Reel...`);
       try {
-        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+        // Try to find a good RSS article for news-broadcast style Reel
+        let rssArticle: { url: string; title: string; description?: string } | undefined;
+        let rssItemId: string | undefined;
+        
+        const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
+        if (bestRssItem && bestRssItem.score >= 40) {
+          rssArticle = {
+            url: bestRssItem.item.link,
+            title: bestRssItem.item.title,
+            description: bestRssItem.item.description || '',
+          };
+          rssItemId = bestRssItem.item.id;
+          // Mark as used
+          await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
+          plan.theme = bestRssItem.item.title;
+          (plan as any)._rssItemId = rssItemId;
+          console.log(`[AGENT] 📰 News-broadcast Reel from RSS: "${rssArticle.title}" (score: ${bestRssItem.score})`);
+        } else {
+          console.log(`[AGENT] 🎨 No suitable RSS article - using AI-generated theme for Reel`);
+        }
+        
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
       } catch (videoError: any) {
         console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
         // Don't silently fail - create a draft with error info
