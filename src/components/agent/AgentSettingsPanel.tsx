@@ -120,7 +120,7 @@ const HASHTAG_STRATEGIES = [
   { value: 'aggressive', label: 'Full Force', count: '10-15', description: 'Máxima descobribilidade' },
 ];
 
-export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat }: AgentSettingsPanelProps) {
+export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat, activePlatform = 'instagram' }: AgentSettingsPanelProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { accounts: igAccounts, fetchAccounts: fetchIgAccounts, disconnectAccount: disconnectIg, getTokenStatus: getIgTokenStatus, getDaysUntilExpiry: getIgDaysUntilExpiry } = useInstagramAccounts();
