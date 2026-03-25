@@ -97,7 +97,8 @@ export default function AgentGenieView() {
     updatePost,
   } = usePosts();
   
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [igMessages, setIgMessages] = useState<Message[]>([]);
+  const [tkMessages, setTkMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [agentConfig, setAgentConfig] = useState<AgentConfig>({ 
