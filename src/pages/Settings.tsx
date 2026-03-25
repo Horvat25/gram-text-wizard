@@ -344,7 +344,7 @@ const Settings = () => {
       const redirectUri = `${window.location.origin}/tiktok-callback`;
       
       const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', {
-        body: { redirectUri }
+        body: { redirectUri, userId: user.id }
       });
 
       if (error) throw error;
