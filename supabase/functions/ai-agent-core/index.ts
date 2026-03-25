@@ -6,12 +6,13 @@ const corsHeaders = {
 };
 
 // Content distribution types
-type ContentType = 'video' | 'carousel' | 'news' | 'image' | 'marketing';
+type ContentType = 'video' | 'carousel' | 'news' | 'news_video' | 'image' | 'marketing';
 
 interface ContentDistribution {
   videos: number;
   carousels: number;
   news: number;
+  news_videos: number;
   images: number;
   marketing: number;
 }
@@ -205,6 +206,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // Track which content types were already posted TODAY for diversity rotation
   const todayContentTypes: ContentType[] = (todayPosts || []).map((p: any) => {
+    if ((p.media_type === 'reels' || p.media_type === 'video') && p.post_type === 'noticia') return 'news_video' as ContentType;
     if (p.media_type === 'reels' || p.media_type === 'video') return 'video' as ContentType;
     if (p.media_type === 'carousel') return 'carousel' as ContentType;
     if (p.post_type === 'afiliado') return 'marketing' as ContentType;
@@ -295,9 +297,10 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Weekly goals from context settings
   // 📈 META: ~28 posts/semana (4 posts/dia)
   const rawWeeklyGoals: ContentDistribution = {
-    videos: context.content_distribution_videos || 4,
+    videos: context.content_distribution_videos || 3,
     carousels: context.content_distribution_carousels || 3,
-    news: context.content_distribution_news || 12,
+    news: context.content_distribution_news || 8,
+    news_videos: context.content_distribution_news_video || 2,
     images: context.content_distribution_images || 7,
     marketing: context.content_distribution_marketing || 2,
   };
@@ -311,7 +314,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   const daysRemainingInWeek = Math.max(1, 7 - dayOfWeekNow);
   
   console.log(`[AGENT] 📅 Dia da semana: ${dayOfWeekNow} (${daysRemainingInWeek} dias restantes)`);
-  console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
+  console.log(`[AGENT] 📊 Goals (full week): V${weeklyGoals.videos} C${weeklyGoals.carousels} N${weeklyGoals.news} NV${weeklyGoals.news_videos} I${weeklyGoals.images} M${weeklyGoals.marketing}`);
   // Count progress this week by media type
   // Exclude draft reels (stuck without render) from video progress to avoid false "goal met"
   const publishableWeekPosts = postsThisWeek.filter((p: any) => {
@@ -320,9 +323,10 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
     return true;
   });
   const weeklyProgress: ContentDistribution = {
-    videos: publishableWeekPosts.filter((p: any) => p.media_type === 'reels' || p.media_type === 'video').length,
+    videos: publishableWeekPosts.filter((p: any) => (p.media_type === 'reels' || p.media_type === 'video') && p.post_type !== 'noticia').length,
     carousels: publishableWeekPosts.filter((p: any) => p.media_type === 'carousel').length,
-    news: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel').length,
+    news: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel' && p.media_type !== 'reels' && p.media_type !== 'video').length,
+    news_videos: publishableWeekPosts.filter((p: any) => p.post_type === 'noticia' && (p.media_type === 'reels' || p.media_type === 'video')).length,
     images: publishableWeekPosts.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
     marketing: publishableWeekPosts.filter((p: any) => p.post_type === 'afiliado').length,
   };
@@ -330,7 +334,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
   // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
   const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
-    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', image: 'images', marketing: 'marketing' } as const;
+    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', news_video: 'news_videos', image: 'images', marketing: 'marketing' } as const;
     const key = keyMap[type];
     const goal = weeklyGoals[key] || 1;
     const progress = weeklyProgress[key] || 0;
@@ -363,8 +367,10 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   }
   
   const typeStats = [
-    // Only include video if render service is available
+    // Creative video (AI themes) - only if render service is available
     ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
+    // News video (RSS broadcast Reels) - also needs render service
+    ...(renderServiceAvailable ? [{ type: 'news_video' as ContentType, ...getCompletionStats('news_video'), priority: 3.5 }] : []),
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
