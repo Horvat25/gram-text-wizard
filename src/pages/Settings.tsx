@@ -341,7 +341,10 @@ const Settings = () => {
         return;
       }
       
-      // Store userId and workspaceId in localStorage so the popup can access it
+      // Clear any stale OAuth results from previous attempts
+      localStorage.removeItem('tiktok_oauth_result');
+      
+      // Store userId and workspaceId in localStorage so the popup/redirect can access it
       localStorage.setItem('tiktok_oauth_user_id', user.id);
       if (currentWorkspace?.id) localStorage.setItem('tiktok_oauth_workspace_id', currentWorkspace.id);
       
@@ -355,15 +358,17 @@ const Settings = () => {
 
       sessionStorage.setItem('tiktok_oauth_state', data.state);
       
+      // Try popup first, fallback to redirect if blocked
       const popup = window.open(
         data.authUrl,
         'tiktok_oauth',
         'width=600,height=700,scrollbars=yes,resizable=yes'
       );
       
-      if (!popup) {
-        toast.error('Por favor, permita popups para este site e tente novamente.');
-        setConnectingTikTok(false);
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        // Popup was blocked — redirect in same tab
+        toast.info('Redirecionando para o TikTok...');
+        window.location.href = data.authUrl;
         return;
       }
       
