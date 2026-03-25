@@ -83,9 +83,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   // Local editable distribution state
   const [localDist, setLocalDist] = useState({
-    videos: context?.content_distribution_videos || 4,
+    videos: context?.content_distribution_videos || 3,
     carousels: context?.content_distribution_carousels || 3,
-    news: context?.content_distribution_news || 12,
+    news: context?.content_distribution_news || 8,
+    news_videos: context?.content_distribution_news_video || 2,
     images: context?.content_distribution_images || 7,
     marketing: (context as any)?.content_distribution_marketing || 2,
   });
@@ -94,14 +95,15 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   useEffect(() => {
     if (context) {
       setLocalDist({
-        videos: context.content_distribution_videos || 4,
+        videos: context.content_distribution_videos || 3,
         carousels: context.content_distribution_carousels || 3,
-        news: context.content_distribution_news || 12,
+        news: context.content_distribution_news || 8,
+        news_videos: context.content_distribution_news_video || 2,
         images: context.content_distribution_images || 7,
         marketing: (context as any)?.content_distribution_marketing || 2,
       });
     }
-  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_images, (context as any)?.content_distribution_marketing]);
+  }, [context?.content_distribution_videos, context?.content_distribution_carousels, context?.content_distribution_news, context?.content_distribution_news_video, context?.content_distribution_images, (context as any)?.content_distribution_marketing]);
 
   const handleDistChange = async (type: keyof typeof localDist, delta: number) => {
     const newVal = Math.max(0, localDist[type] + delta);
@@ -113,6 +115,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         videos: 'content_distribution_videos',
         carousels: 'content_distribution_carousels',
         news: 'content_distribution_news',
+        news_videos: 'content_distribution_news_video',
         images: 'content_distribution_images',
         marketing: 'content_distribution_marketing',
       };
