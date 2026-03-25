@@ -403,20 +403,21 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
     <div className="space-y-4 pb-4">
       {/* 0. Sync Bar */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">Crescimento & Analytics</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex gap-0.5 flex-1 sm:flex-initial">
               {PERIOD_OPTIONS.map(p => (
                 <Button
                   key={p.value}
                   variant={period === p.value ? "default" : "ghost"}
                   size="sm"
-                  className="h-6 text-[10px] px-2"
+                  className="h-7 text-xs px-2.5 flex-1 sm:flex-initial"
                   onClick={() => setPeriod(p.value)}
+                  disabled={syncing}
                 >
                   {p.label}
                 </Button>
@@ -425,20 +426,28 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
             <Button
               variant="outline"
               size="sm"
-              className="h-7 gap-1 text-[10px]"
+              className="h-7 gap-1 text-xs shrink-0"
               onClick={handleSync}
               disabled={syncing}
             >
               {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-              Sincronizar
+              {syncing ? 'Sincronizando...' : 'Sincronizar'}
             </Button>
           </div>
         </div>
+        {syncing && (
+          <div className="mt-2 p-2 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <Loader2 className="h-3 w-3 animate-spin text-primary" />
+              Sincronizando todas as métricas do Instagram (90 dias). Aguarde...
+            </p>
+          </div>
+        )}
       </motion.div>
 
       {/* 1. KPI Cards */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           <KPICard icon={<Eye className="h-4 w-4 text-blue-500" />} label="Visualizações" value={formatNumber(totalViews)} sub={periodLabel} />
           <KPICard icon={<Users className="h-4 w-4 text-emerald-500" />} label="Alcance" value={formatNumber(totalReach)} sub={`${avgEngRate.toFixed(1)}% eng`} />
           <KPICard icon={<Heart className="h-4 w-4 text-red-500" />} label="Curtidas" value={formatNumber(totalLikes)} />
