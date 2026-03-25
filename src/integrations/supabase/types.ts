@@ -131,6 +131,7 @@ export type Database = {
           content_distribution_images: number | null
           content_distribution_marketing: number | null
           content_distribution_news: number | null
+          content_distribution_news_video: number | null
           content_distribution_videos: number | null
           content_focus: string[] | null
           current_weekly_engagement: number | null
@@ -173,6 +174,7 @@ export type Database = {
           content_distribution_images?: number | null
           content_distribution_marketing?: number | null
           content_distribution_news?: number | null
+          content_distribution_news_video?: number | null
           content_distribution_videos?: number | null
           content_focus?: string[] | null
           current_weekly_engagement?: number | null
@@ -215,6 +217,7 @@ export type Database = {
           content_distribution_images?: number | null
           content_distribution_marketing?: number | null
           content_distribution_news?: number | null
+          content_distribution_news_video?: number | null
           content_distribution_videos?: number | null
           content_focus?: string[] | null
           current_weekly_engagement?: number | null
