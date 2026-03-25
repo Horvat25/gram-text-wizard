@@ -32,10 +32,11 @@ export function useTikTokAccounts() {
     setIsLoading(true);
     setError(null);
     try {
+      // Query by workspace_id first, fallback to user_id for accounts without workspace
       const { data, error: fetchError } = await supabase
         .from('tiktok_accounts')
         .select('*')
-        .eq('workspace_id', currentWorkspace.id);
+        .or(`workspace_id.eq.${currentWorkspace.id},and(workspace_id.is.null,user_id.eq.${user.id})`);
 
       if (fetchError) throw fetchError;
       setAccounts(data || []);
