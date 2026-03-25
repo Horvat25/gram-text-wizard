@@ -598,9 +598,9 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   
   // Check if weekly goals are met
   const totalGoals = state.weeklyGoals.videos + state.weeklyGoals.carousels + 
-                     state.weeklyGoals.news + state.weeklyGoals.images + state.weeklyGoals.marketing;
+                     state.weeklyGoals.news + state.weeklyGoals.news_videos + state.weeklyGoals.images + state.weeklyGoals.marketing;
   const totalProgress = state.weeklyProgress.videos + state.weeklyProgress.carousels + 
-                     state.weeklyProgress.news + state.weeklyProgress.images + state.weeklyProgress.marketing;
+                     state.weeklyProgress.news + state.weeklyProgress.news_videos + state.weeklyProgress.images + state.weeklyProgress.marketing;
   
   // Macro objectives info - use SYNCED data from agent_context
   const goalViews = state.context?.goal_weekly_views || 10000;
@@ -668,6 +668,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
     'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
+    'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
     'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
     'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
   };
@@ -766,9 +767,10 @@ O agente precisa criar um ${state.nextContentType.toUpperCase()} (${selectedType
 ${h.topPostCaption ? `- Post de maior alcance (${h.topPostReach.toLocaleString()}): "${h.topPostCaption}..."` : ''}
 
 📈 PROGRESSO SEMANAL:
-- Vídeos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
+- Vídeos Criativos: ${state.weeklyProgress.videos}/${state.weeklyGoals.videos}
+- Vídeos Notícia: ${state.weeklyProgress.news_videos}/${state.weeklyGoals.news_videos}
 - Carrosséis: ${state.weeklyProgress.carousels}/${state.weeklyGoals.carousels}
-- Notícias: ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
+- Notícias (imagem): ${state.weeklyProgress.news}/${state.weeklyGoals.news}  
 - Imagens: ${state.weeklyProgress.images}/${state.weeklyGoals.images}
 - Marketing: ${state.weeklyProgress.marketing}/${state.weeklyGoals.marketing}
 
@@ -834,6 +836,7 @@ Responda em JSON: { "theme": "tema específico e atual", "cta": "CTA do post", "
     'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
     'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
     'news': state.weeklyGoals.news - state.weeklyProgress.news,
+    'news_video': state.weeklyGoals.news_videos - state.weeklyProgress.news_videos,
     'image': state.weeklyGoals.images - state.weeklyProgress.images,
     'marketing': state.weeklyGoals.marketing - state.weeklyProgress.marketing,
   };
@@ -871,35 +874,12 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video': {
-      // VIDEO content CAN use RSS news articles as source for professional news-broadcast Reels
-      // The video will have editorial narration style, with article URL ONLY in caption (never in video)
-      console.log(`[AGENT] 🎬 Creating video Reel...`);
+      // CREATIVE VIDEO: AI-generated themes from internet trends (NEVER uses RSS)
+      console.log(`[AGENT] 🎬 Creating CREATIVE video Reel (AI-generated theme)...`);
       try {
-        // Try to find a good RSS article for news-broadcast style Reel
-        let rssArticle: { url: string; title: string; description?: string } | undefined;
-        let rssItemId: string | undefined;
-        
-        const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
-        if (bestRssItem && bestRssItem.score >= 40) {
-          rssArticle = {
-            url: bestRssItem.item.link,
-            title: bestRssItem.item.title,
-            description: bestRssItem.item.description || '',
-          };
-          rssItemId = bestRssItem.item.id;
-          // Mark as used
-          await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
-          plan.theme = bestRssItem.item.title;
-          (plan as any)._rssItemId = rssItemId;
-          console.log(`[AGENT] 📰 News-broadcast Reel from RSS: "${rssArticle.title}" (score: ${bestRssItem.score})`);
-        } else {
-          console.log(`[AGENT] 🎨 No suitable RSS article - using AI-generated theme for Reel`);
-        }
-        
-        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
       } catch (videoError: any) {
         console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
-        // Don't silently fail - create a draft with error info
         const { data: fallbackPost } = await supabase.from('posts').insert({
           user_id: userId,
           workspace_id: workspaceId,
@@ -910,6 +890,45 @@ async function executeContentPlan(
           platforms: plan.platforms || ['instagram'],
           status: 'failed',
           error_message: `Erro na criação de vídeo: ${videoError?.message || 'Unknown error'}`,
+          ai_model_used: 'none'
+        }).select().single();
+        return fallbackPost;
+      }
+    }
+    case 'news_video': {
+      // NEWS VIDEO: RSS news-broadcast style Reels (editorial telejornal)
+      console.log(`[AGENT] 📺 Creating NEWS BROADCAST video Reel...`);
+      try {
+        const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
+        if (!bestRssItem || bestRssItem.score < 30) {
+          console.log('[AGENT] ⚠️ No suitable RSS article for news_video - skipping');
+          // Fallback: create as regular news image instead
+          return await createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+        }
+        
+        const rssArticle = {
+          url: bestRssItem.item.link,
+          title: bestRssItem.item.title,
+          description: bestRssItem.item.description || '',
+        };
+        await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
+        plan.theme = bestRssItem.item.title;
+        (plan as any)._rssItemId = bestRssItem.item.id;
+        console.log(`[AGENT] 📰 News-broadcast Reel: "${rssArticle.title}" (score: ${bestRssItem.score})`);
+        
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+      } catch (videoError: any) {
+        console.error('[AGENT] ❌ NEWS VIDEO CREATION FAILED:', videoError?.message || videoError);
+        const { data: fallbackPost } = await supabase.from('posts').insert({
+          user_id: userId,
+          workspace_id: workspaceId,
+          caption: `📺 ${plan.theme}`,
+          hashtags: ['#tecnologia', '#reels', '#noticias'],
+          post_type: 'noticia',
+          media_type: 'reels',
+          platforms: plan.platforms || ['instagram'],
+          status: 'failed',
+          error_message: `Erro na criação de vídeo notícia: ${videoError?.message || 'Unknown error'}`,
           ai_model_used: 'none'
         }).select().single();
         return fallbackPost;
