@@ -3,21 +3,24 @@ import { Button } from '@/components/ui/button';
 import { 
   Rss, 
   Loader2,
-  LayoutDashboard,
   Settings,
   TrendingUp,
   Megaphone,
   Bot,
-  History
+  History,
+  CalendarDays,
+  Instagram,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useAgentContext } from '@/hooks/useAgentContext';
+import { usePosts } from '@/hooks/usePosts';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-// Lazy load 3D component to avoid SSR issues
 import AgentGenie3D from './AgentGenie3D';
 import AgentMinimalChat from './AgentMinimalChat';
 import AgentChatPanel from './AgentChatPanel';
@@ -26,6 +29,17 @@ import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
+import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
+import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
+import TikTokContentCreation from '@/components/TikTokContentCreation';
+import { Platform } from '@/components/PlatformSelector';
+
+// Small TikTok icon
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+  </svg>
+);
 
 interface AgentConfig {
   agent_name: string;
@@ -41,14 +55,18 @@ interface Message {
   actions?: any[];
 }
 
-interface AgentGenieViewProps {
-  onNavigate?: (tab: string) => void;
-}
-
-export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
+export default function AgentGenieView() {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { context: agentCtx, updateContext } = useAgentContext();
+  
+  const {
+    posts,
+    publishPost,
+    reschedulePost,
+    deletePost,
+    updatePost,
+  } = usePosts();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,12 +77,22 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     auto_post_enabled: false
   });
   
-  // Panel states (Respostas merged into Agente)
+  // Platform toggle
+  const [selectedPlatform, setSelectedPlatform] = useState<Platform>("instagram");
+  
+  // Dark mode
+  const [darkMode, setDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+  
+  // Panel states
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showFeeds, setShowFeeds] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
+  const [showPostHistory, setShowPostHistory] = useState(false);
 
   useEffect(() => {
     if (user && currentWorkspace) {
@@ -205,31 +233,49 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
     }
   };
 
+  const toggleDarkMode = () => {
+    const newVal = !darkMode;
+    setDarkMode(newVal);
+    if (newVal) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
   const closeAllPanels = () => {
     setShowAgentChat(false);
     setShowHistory(false);
     setShowFeeds(false);
     setShowGrowth(false);
     setShowMarketing(false);
+    setShowQueue(false);
+    setShowPostHistory(false);
   };
 
   const togglePanel = (panel: string) => {
-    const isCurrentlyOpen = {
+    const isCurrentlyOpen: Record<string, boolean> = {
       agentChat: showAgentChat,
       history: showHistory,
       feeds: showFeeds,
       growth: showGrowth,
       marketing: showMarketing,
-    }[panel];
+      queue: showQueue,
+      postHistory: showPostHistory,
+    };
 
     closeAllPanels();
-    if (!isCurrentlyOpen) {
+    if (!isCurrentlyOpen[panel]) {
       switch (panel) {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history': setShowHistory(true); break;
         case 'feeds': setShowFeeds(true); break;
         case 'growth': setShowGrowth(true); break;
         case 'marketing': setShowMarketing(true); break;
+        case 'queue': setShowQueue(true); break;
+        case 'postHistory': setShowPostHistory(true); break;
       }
     }
   };
@@ -256,7 +302,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
       <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
         {/* Left side tabs */}
         <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
-          {/* Agent - unified reports + responses */}
           <Button
             variant={showAgentChat ? "default" : "ghost"}
             size="sm"
@@ -268,6 +313,19 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
           >
             <Bot className="h-3 w-3" />
             <span className="hidden xs:inline sm:inline">Agente</span>
+          </Button>
+          
+          <Button
+            variant={showQueue ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showQueue && "neural-gradient border-0"
+            )}
+            onClick={() => togglePanel('queue')}
+          >
+            <CalendarDays className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Fila</span>
           </Button>
           
           <Button
@@ -309,7 +367,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
             <span className="hidden xs:inline sm:inline">Marketing</span>
           </Button>
           
-          {/* History - user command chat history */}
           <Button
             variant={showHistory ? "default" : "ghost"}
             size="sm"
@@ -320,12 +377,58 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
             onClick={() => togglePanel('history')}
           >
             <History className="h-3 w-3" />
-            <span className="hidden xs:inline sm:inline">Histórico</span>
+            <span className="hidden xs:inline sm:inline">Chat</span>
+          </Button>
+          
+          <Button
+            variant={showPostHistory ? "default" : "ghost"}
+            size="sm"
+            className={cn(
+              "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+              showPostHistory && "neural-gradient border-0"
+            )}
+            onClick={() => togglePanel('postHistory')}
+          >
+            <History className="h-3 w-3" />
+            <span className="hidden xs:inline sm:inline">Posts</span>
           </Button>
         </div>
         
         {/* Right side */}
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+          {/* Platform toggle - small */}
+          <div className="flex items-center bg-muted/50 rounded-md p-0.5">
+            <button
+              onClick={() => setSelectedPlatform("instagram")}
+              className={cn(
+                "p-1 rounded transition-all",
+                selectedPlatform === "instagram" 
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Instagram"
+            >
+              <Instagram className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setSelectedPlatform("tiktok")}
+              className={cn(
+                "p-1 rounded transition-all",
+                selectedPlatform === "tiktok" 
+                  ? "bg-gradient-to-r from-cyan-500 to-pink-500 text-white shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="TikTok"
+            >
+              <TikTokIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {/* Dark mode toggle */}
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
+            {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+          </Button>
+
           <AgentSettingsPanel 
             trigger={
               <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -341,16 +444,6 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
               }));
             }}
           />
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs"
-            onClick={() => onNavigate?.('dashboard')}
-          >
-            <LayoutDashboard className="h-3 w-3" />
-            <span className="hidden sm:inline">Dashboard</span>
-          </Button>
         </div>
       </header>
       
@@ -363,7 +456,7 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         </div>
       </div>
       
-      {/* Minimal Chat Input - for user commands */}
+      {/* Minimal Chat Input */}
       <AgentMinimalChat 
         onSend={sendMessage}
         isLoading={isLoading}
@@ -386,6 +479,54 @@ export default function AgentGenieView({ onNavigate }: AgentGenieViewProps) {
         agentName={agentConfig.agent_name}
         agentAvatar={agentConfig.agent_avatar_url}
       />
+      
+      {/* Queue Panel */}
+      {showQueue && (
+        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-2xl mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="font-semibold text-sm">Fila de Publicação</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedPlatform === "tiktok" ? "Conteúdo do TikTok" : "Posts agendados e rascunhos"}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowQueue(false)} className="h-7 w-7 p-0">✕</Button>
+              </div>
+              {selectedPlatform === "tiktok" ? (
+                <TikTokContentCreation />
+              ) : (
+                <PublicationQueueTab
+                  posts={posts}
+                  onPublish={publishPost}
+                  onReschedule={reschedulePost}
+                  onDelete={deletePost}
+                  onUpdate={updatePost}
+                />
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+      
+      {/* Post History Panel */}
+      {showPostHistory && (
+        <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-2xl mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="font-semibold text-sm">Histórico de Publicações</h2>
+                  <p className="text-xs text-muted-foreground">Calendário de posts publicados</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowPostHistory(false)} className="h-7 w-7 p-0">✕</Button>
+              </div>
+              <PostHistoryTab />
+            </div>
+          </ScrollArea>
+        </div>
+      )}
       
       {/* Feeds Sources Panel */}
       {showFeeds && (
