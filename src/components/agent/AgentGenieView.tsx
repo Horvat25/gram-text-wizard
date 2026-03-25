@@ -419,33 +419,7 @@ export default function AgentGenieView() {
           
           {/* Right side */}
           <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-            {/* Platform toggle */}
-            <div className="flex items-center bg-muted/50 rounded-md p-0.5">
-              <button
-                onClick={() => setSelectedPlatform("instagram")}
-                className={cn(
-                  "p-1 rounded transition-all",
-                  selectedPlatform === "instagram" 
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                title="Instagram"
-              >
-                <Instagram className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => setSelectedPlatform("tiktok")}
-                className={cn(
-                  "p-1 rounded transition-all",
-                  selectedPlatform === "tiktok" 
-                    ? "bg-gradient-to-r from-cyan-500 to-pink-500 text-white shadow-sm" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                title="TikTok"
-              >
-                <TikTokIcon className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
 
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
               {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
