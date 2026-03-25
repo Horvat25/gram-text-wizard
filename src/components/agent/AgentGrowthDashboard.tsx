@@ -130,7 +130,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
 
   const periodLabel = `últimos ${period} dias`;
 
-  // Sync from Instagram
+  // Sync from Instagram — always uses 90 days to cover all period tabs
   const handleSync = async () => {
     if (!currentWorkspace?.id) {
       toast.error('Selecione um workspace antes de sincronizar');
@@ -153,7 +153,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           body: {
             offset,
             batch_size: 50,
-            period_days: period,
+            period_days: 90, // Always sync max range so all tabs are up to date
             workspace_id: currentWorkspace.id,
           },
         });
