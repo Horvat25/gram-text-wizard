@@ -218,6 +218,10 @@ export default function AgentGenieView() {
   const sendMessage = async (content: string) => {
     if (!content.trim() || !user || !currentWorkspace) return;
 
+    const platform = selectedPlatform;
+    const setMsgs = platform === 'tiktok' ? setTkMessages : setIgMessages;
+    const msgs = platform === 'tiktok' ? tkMessages : igMessages;
+
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -225,14 +229,14 @@ export default function AgentGenieView() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    saveMessage(userMessage);
+    setMsgs(prev => [...prev, userMessage]);
+    saveMessage(userMessage, platform);
     setIsLoading(true);
     
     if (!showHistory) setShowHistory(true);
 
     try {
-      const chatMessages = messages
+      const chatMessages = msgs
         .slice(-20)
         .map(m => ({ role: m.role, content: m.content }));
       
@@ -242,7 +246,8 @@ export default function AgentGenieView() {
         body: { 
           messages: chatMessages,
           userId: user.id,
-          workspaceId: currentWorkspace?.id
+          workspaceId: currentWorkspace?.id,
+          platform,
         }
       });
 
@@ -261,8 +266,8 @@ export default function AgentGenieView() {
         actions: executedActions
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
-      saveMessage(assistantMessage);
+      setMsgs(prev => [...prev, assistantMessage]);
+      saveMessage(assistantMessage, platform);
     } catch (error) {
       console.error('Error sending message to agent:', error);
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -272,7 +277,7 @@ export default function AgentGenieView() {
         content: `❌ Erro: ${errorMsg}. Tente novamente.`,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMsgs(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
