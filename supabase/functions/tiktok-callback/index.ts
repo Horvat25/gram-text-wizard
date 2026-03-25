@@ -26,7 +26,7 @@ serve(async (req) => {
       );
     }
 
-    const { code, redirectUri, userId } = await req.json();
+    const { code, redirectUri, userId, workspaceId } = await req.json();
 
     if (!code || !redirectUri || !userId) {
       return new Response(
@@ -97,6 +97,18 @@ serve(async (req) => {
     // Save to database
     const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
 
+    // Get workspace_id from user's workspace membership if not provided
+    let resolvedWorkspaceId = workspaceId;
+    if (!resolvedWorkspaceId) {
+      const { data: memberData } = await supabase
+        .from('workspace_members')
+        .select('workspace_id')
+        .eq('user_id', userId)
+        .limit(1)
+        .single();
+      resolvedWorkspaceId = memberData?.workspace_id || null;
+    }
+
     const { data, error } = await supabase
       .from('tiktok_accounts')
       .upsert({
@@ -108,6 +120,7 @@ serve(async (req) => {
         access_token: access_token,
         refresh_token: refresh_token,
         expires_at: expiresAt,
+        workspace_id: resolvedWorkspaceId,
         connected_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }, {

@@ -37,6 +37,7 @@ import { useTikTokAccounts } from "@/hooks/useTikTokAccounts";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 // AI Settings Types
 interface AISettings {
@@ -96,6 +97,7 @@ const Settings = () => {
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
   
   const { settings, updateSettings } = useBrandSettings();
+  const { currentWorkspace } = useWorkspace();
   const { accounts, loading: loadingAccounts, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry } = useInstagramAccounts();
   const { 
     accounts: tiktokAccounts, 
@@ -338,8 +340,9 @@ const Settings = () => {
         return;
       }
       
-      // Store userId in localStorage so the popup can access it
+      // Store userId and workspaceId in localStorage so the popup can access it
       localStorage.setItem('tiktok_oauth_user_id', user.id);
+      if (currentWorkspace?.id) localStorage.setItem('tiktok_oauth_workspace_id', currentWorkspace.id);
       
       const redirectUri = `${window.location.origin}/tiktok-callback`;
       
