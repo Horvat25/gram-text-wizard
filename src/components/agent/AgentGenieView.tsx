@@ -292,7 +292,7 @@ export default function AgentGenieView() {
   }
 
   return (
-    {/* TikTok Full View */}
+    <div className="h-full">
     {selectedPlatform === "tiktok" ? (
       <div className="h-full flex flex-col relative overflow-hidden bg-background">
         {/* Top Bar */}
