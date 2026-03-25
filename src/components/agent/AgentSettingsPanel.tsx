@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,6 +49,9 @@ import {
   Play,
   CheckCircle,
   AlertCircle,
+  Moon,
+  Sun,
+  Sliders,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -127,7 +130,8 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice' | 'connections'>('dna');
+  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice' | 'connections' | 'general'>('dna');
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [connecting, setConnecting] = useState(false);
   const [connectingTikTok, setConnectingTikTok] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState("camila");
@@ -356,7 +360,68 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
     { id: 'niche' as const, label: 'Nicho', icon: Target },
     { id: 'voice' as const, label: 'Voz', icon: Palette },
     { id: 'connections' as const, label: 'Contas', icon: Link2 },
+    { id: 'general' as const, label: 'Geral', icon: Sliders },
   ];
+
+  const toggleDarkMode = () => {
+    const newVal = !darkMode;
+    setDarkMode(newVal);
+    if (newVal) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
+  const runCleanup = async () => {
+    if (!user || !currentWorkspace) return;
+    try {
+      // Delete chat messages older than 30 days
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      await supabase
+        .from('agent_chat_messages')
+        .delete()
+        .eq('workspace_id', currentWorkspace.id)
+        .lt('created_at', thirtyDaysAgo);
+
+      // Delete execution reports older than 30 days  
+      const { data: oldReports } = await supabase
+        .from('agent_execution_reports')
+        .select('id')
+        .eq('workspace_id', currentWorkspace.id)
+        .lt('created_at', thirtyDaysAgo);
+      
+      // Delete old proactive messages older than 30 days
+      await supabase
+        .from('agent_proactive_messages')
+        .delete()
+        .eq('workspace_id', currentWorkspace.id)
+        .lt('created_at', thirtyDaysAgo);
+
+      // Keep only last 200 chat messages
+      const { data: chatMessages } = await supabase
+        .from('agent_chat_messages')
+        .select('id, created_at')
+        .eq('workspace_id', currentWorkspace.id)
+        .order('created_at', { ascending: false });
+
+      if (chatMessages && chatMessages.length > 200) {
+        const idsToDelete = chatMessages.slice(200).map(m => m.id);
+        await supabase
+          .from('agent_chat_messages')
+          .delete()
+          .in('id', idsToDelete);
+      }
+
+      toast.success('Limpeza concluída! Dados antigos removidos.');
+      onClearChat?.();
+    } catch (error) {
+      console.error('Cleanup error:', error);
+      toast.error('Erro na limpeza');
+    }
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -860,6 +925,73 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                               </div>
                             );
                           })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* General Section */}
+                  {activeSection === 'general' && (
+                    <motion.div 
+                      key="general"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="space-y-5"
+                    >
+                      {/* Dark Mode */}
+                      <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Aparência</Label>
+                        <div 
+                          className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/30 cursor-pointer transition-all"
+                          onClick={toggleDarkMode}
+                        >
+                          <div className="flex items-center gap-3">
+                            {darkMode ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-amber-500" />}
+                            <div>
+                              <p className="text-sm font-medium">{darkMode ? 'Modo Escuro' : 'Modo Claro'}</p>
+                              <p className="text-xs text-muted-foreground">Toque para alternar</p>
+                            </div>
+                          </div>
+                          <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+                        </div>
+                      </div>
+
+                      {/* Auto Cleanup */}
+                      <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Manutenção</Label>
+                        <div className="space-y-3">
+                          <div className="p-3 rounded-lg border border-border space-y-2">
+                            <p className="text-sm font-medium">Auto-limpeza de dados</p>
+                            <p className="text-xs text-muted-foreground">
+                              Remove mensagens do chat, relatórios e notificações com mais de 30 dias. Mantém no máximo 200 mensagens recentes.
+                            </p>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="gap-2 w-full"
+                              onClick={runCleanup}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Executar Limpeza Agora
+                            </Button>
+                          </div>
+
+                          <div className="p-3 rounded-lg border border-destructive/30 space-y-2">
+                            <p className="text-sm font-medium text-destructive">Limpar todo o histórico</p>
+                            <p className="text-xs text-muted-foreground">
+                              Remove todas as mensagens do chat com o agente.
+                            </p>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="gap-2 w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={handleClearChat}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Limpar Tudo
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </motion.div>

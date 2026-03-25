@@ -10,8 +10,6 @@ import {
   History,
   CalendarDays,
   Instagram,
-  Moon,
-  Sun,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -108,11 +106,6 @@ export default function AgentGenieView() {
   
   // Platform toggle
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>("instagram");
-  
-  // Dark mode
-  const [darkMode, setDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark');
-  });
   
   // Panel states
   const [showAgentChat, setShowAgentChat] = useState(false);
@@ -262,17 +255,6 @@ export default function AgentGenieView() {
     }
   };
 
-  const toggleDarkMode = () => {
-    const newVal = !darkMode;
-    setDarkMode(newVal);
-    if (newVal) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
 
   const closeAllPanels = () => {
     setShowAgentChat(false);
@@ -329,10 +311,21 @@ export default function AgentGenieView() {
           <h2 className="font-semibold text-sm text-foreground">TikTok</h2>
           <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
-              {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            </Button>
-          </div>
+            <AgentSettingsPanel 
+              trigger={
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <Settings className="h-3.5 w-3.5" />
+                </Button>
+              }
+              onConfigChange={(config) => {
+                setAgentConfig(prev => ({
+                  ...prev,
+                  agent_name: config.agent_name,
+                  agent_avatar_url: config.agent_avatar_url,
+                  auto_post_enabled: config.auto_post_enabled
+                }));
+              }}
+            />
         </header>
         
         {/* TikTok Content */}
@@ -449,10 +442,6 @@ export default function AgentGenieView() {
           {/* Right side */}
           <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
-
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggleDarkMode} title={darkMode ? "Modo claro" : "Modo escuro"}>
-              {darkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            </Button>
 
             <AgentSettingsPanel 
               trigger={
