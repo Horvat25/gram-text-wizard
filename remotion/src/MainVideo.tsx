@@ -315,7 +315,7 @@ export const MainVideo = () => {
       {SCREENS.map((screen, i) => (
         <Sequence
           key={i}
-          from={INTRO_DURATION + i * (SCENE_DURATION - TRANSITION)}
+          from={INTRO_DURATION + i * SCENE_DURATION}
           durationInFrames={SCENE_DURATION}
         >
           <Scene screenFile={screen.file} label={screen.label} subLabel={screen.subLabel} />
@@ -324,7 +324,7 @@ export const MainVideo = () => {
 
       {/* Outro */}
       <Sequence
-        from={INTRO_DURATION + SCREENS.length * (SCENE_DURATION - TRANSITION)}
+        from={INTRO_DURATION + SCREENS.length * SCENE_DURATION}
         durationInFrames={OUTRO_DURATION}
       >
         <OutroScene />
