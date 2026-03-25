@@ -85,6 +85,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          platform: string
           role: string
           user_id: string
           workspace_id: string | null
@@ -94,6 +95,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          platform?: string
           role: string
           user_id: string
           workspace_id?: string | null
@@ -103,6 +105,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          platform?: string
           role?: string
           user_id?: string
           workspace_id?: string | null

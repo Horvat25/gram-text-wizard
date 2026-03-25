@@ -97,7 +97,8 @@ export default function AgentGenieView() {
     updatePost,
   } = usePosts();
   
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [igMessages, setIgMessages] = useState<Message[]>([]);
+  const [tkMessages, setTkMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [agentConfig, setAgentConfig] = useState<AgentConfig>({ 
@@ -156,23 +157,37 @@ export default function AgentGenieView() {
     
     setIsLoadingHistory(true);
     try {
-      const { data, error } = await supabase
-        .from('agent_chat_messages')
-        .select('*')
-        .eq('workspace_id', currentWorkspace.id)
-        .order('created_at', { ascending: true })
-        .limit(50);
+      // Load both platforms in parallel
+      const [igResult, tkResult] = await Promise.all([
+        supabase
+          .from('agent_chat_messages')
+          .select('*')
+          .eq('workspace_id', currentWorkspace.id)
+          .eq('platform', 'instagram')
+          .order('created_at', { ascending: true })
+          .limit(50),
+        supabase
+          .from('agent_chat_messages')
+          .select('*')
+          .eq('workspace_id', currentWorkspace.id)
+          .eq('platform', 'tiktok')
+          .order('created_at', { ascending: true })
+          .limit(50),
+      ]);
 
-      if (error) throw error;
+      const mapMsg = (m: any): Message => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        timestamp: new Date(m.created_at),
+        actions: Array.isArray(m.actions) ? m.actions : []
+      });
 
-      if (data && data.length > 0) {
-        setMessages(data.map((m: any) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          timestamp: new Date(m.created_at),
-          actions: Array.isArray(m.actions) ? m.actions : []
-        })));
+      if (igResult.data && igResult.data.length > 0) {
+        setIgMessages(igResult.data.map(mapMsg));
+      }
+      if (tkResult.data && tkResult.data.length > 0) {
+        setTkMessages(tkResult.data.map(mapMsg));
       }
     } catch (error) {
       console.error('Error loading chat history:', error);
@@ -181,7 +196,7 @@ export default function AgentGenieView() {
     }
   };
 
-  const saveMessage = async (message: Message) => {
+  const saveMessage = async (message: Message, platform: string) => {
     if (!user || !currentWorkspace) return;
     
     try {
@@ -192,7 +207,8 @@ export default function AgentGenieView() {
           workspace_id: currentWorkspace.id,
           role: message.role,
           content: message.content,
-          actions: message.actions ? JSON.parse(JSON.stringify(message.actions)) : null
+          actions: message.actions ? JSON.parse(JSON.stringify(message.actions)) : null,
+          platform,
         } as any);
     } catch (error) {
       console.error('Error saving message:', error);
@@ -202,6 +218,10 @@ export default function AgentGenieView() {
   const sendMessage = async (content: string) => {
     if (!content.trim() || !user || !currentWorkspace) return;
 
+    const platform = selectedPlatform;
+    const setMsgs = platform === 'tiktok' ? setTkMessages : setIgMessages;
+    const msgs = platform === 'tiktok' ? tkMessages : igMessages;
+
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -209,14 +229,14 @@ export default function AgentGenieView() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    saveMessage(userMessage);
+    setMsgs(prev => [...prev, userMessage]);
+    saveMessage(userMessage, platform);
     setIsLoading(true);
     
     if (!showHistory) setShowHistory(true);
 
     try {
-      const chatMessages = messages
+      const chatMessages = msgs
         .slice(-20)
         .map(m => ({ role: m.role, content: m.content }));
       
@@ -226,7 +246,8 @@ export default function AgentGenieView() {
         body: { 
           messages: chatMessages,
           userId: user.id,
-          workspaceId: currentWorkspace?.id
+          workspaceId: currentWorkspace?.id,
+          platform,
         }
       });
 
@@ -245,8 +266,8 @@ export default function AgentGenieView() {
         actions: executedActions
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
-      saveMessage(assistantMessage);
+      setMsgs(prev => [...prev, assistantMessage]);
+      saveMessage(assistantMessage, platform);
     } catch (error) {
       console.error('Error sending message to agent:', error);
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -256,7 +277,7 @@ export default function AgentGenieView() {
         content: `❌ Erro: ${errorMsg}. Tente novamente.`,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMsgs(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -432,7 +453,7 @@ export default function AgentGenieView() {
         <AgentChatPanel
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
-          messages={messages}
+          messages={tkMessages}
           agentName={agentConfig.agent_name}
           agentAvatar={agentConfig.agent_avatar_url}
         />
@@ -651,7 +672,7 @@ export default function AgentGenieView() {
         <AgentChatPanel
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
-          messages={messages}
+          messages={igMessages}
           agentName={agentConfig.agent_name}
           agentAvatar={agentConfig.agent_avatar_url}
         />
