@@ -284,9 +284,10 @@ const Settings = () => {
         'width=600,height=700,scrollbars=yes,resizable=yes'
       );
       
-      if (!popup) {
-        toast.error('Por favor, permita popups para este site e tente novamente.');
-        setConnecting(false);
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        // Popup blocked — redirect in same tab
+        toast.info('Redirecionando para o Instagram...');
+        window.location.href = data.authUrl;
         return;
       }
       

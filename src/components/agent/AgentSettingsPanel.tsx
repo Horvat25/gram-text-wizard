@@ -306,7 +306,11 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
       const popup = window.open(data.authUrl, 'instagram_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
-      if (!popup) { toast.error('Permita popups para este site.'); setConnecting(false); return; }
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        toast.info('Redirecionando para o Instagram...');
+        window.location.href = data.authUrl;
+        return;
+      }
       const checkPopup = setInterval(() => {
         const r = localStorage.getItem('oauth_result');
         if (r) { clearInterval(checkPopup); localStorage.removeItem('oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('Instagram conectado!'); fetchIgAccounts(); } else { toast.error(res.error); } setConnecting(false); }
