@@ -253,7 +253,6 @@ serve(async (req) => {
             message: `Publicado (simulação - ${reason})`,
           });
           console.log(`✅ Post ${post.id} publicado (simulação)`);
-          }
         }
       } catch (postError: any) {
         console.error(`❌ Erro ao publicar post ${post.id}:`, postError);
