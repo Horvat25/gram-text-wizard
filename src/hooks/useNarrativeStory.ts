@@ -357,51 +357,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return null;
     };
     
-    // Generate background music - ElevenLabs Music API (best) → MusicGen → procedural fallback
+    // Generate background music - MusicGen (free) → procedural fallback
     const generateBackgroundMusic = async (mood?: string): Promise<string> => {
       if (abortRef.current) return "";
       
-      // 🎵 Try ElevenLabs Music API FIRST (high-quality, you have the API key)
-      try {
-        console.log("[Music] 🎵 Trying ElevenLabs Music API...");
-        const musicPrompt = mood === 'epic' 
-          ? "Epic cinematic technology background music, dramatic orchestral with electronic elements, inspiring and powerful"
-          : mood === 'dramatic'
-          ? "Dramatic dark technology background music, tense cinematic score with deep bass and suspenseful atmosphere"
-          : mood === 'inspiring'
-          ? "Inspiring uplifting technology background music, motivational with subtle electronic beats and warm synths"
-          : "Ambient technology background music, modern electronic with subtle beats, professional and clean for social media content";
-        
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-music`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            },
-            body: JSON.stringify({ prompt: musicPrompt, duration: 30 }),
-          }
-        );
-        
-        if (response.ok) {
-          const audioBlob = await response.blob();
-          if (audioBlob.size > 1000) {
-            const musicUrl = URL.createObjectURL(audioBlob);
-            console.log("[Music] ✅ ElevenLabs Music success!", (audioBlob.size / 1024).toFixed(1), "KB");
-            toast.success("🎵 Trilha sonora profissional gerada (ElevenLabs)");
-            return musicUrl;
-          }
-        }
-        console.log("[Music] ElevenLabs Music failed:", response.status);
-      } catch (e) {
-        console.warn("[Music] ElevenLabs Music error:", e);
-      }
-      
-      if (abortRef.current) return "";
-      
-      // 🎵 Fallback: MusicGen (Hugging Face)
+      // 🎵 Try MusicGen FIRST (Hugging Face - FREE)
       try {
         console.log("[Music] 🎵 Trying MusicGen (Hugging Face)...");
         const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
@@ -415,6 +375,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (!musicResult.error && isValidAudio && !hasFallbackFlag) {
           const format = musicResult.data?.format || "wav";
           console.log("[Music] ✅ MusicGen success!");
+          toast.success("🎵 Trilha AI gerada (MusicGen)");
           return `data:audio/${format};base64,${audioContent}`;
         }
         console.log("[Music] MusicGen failed:", musicResult.data?.error || "unavailable");
@@ -422,7 +383,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.warn("[Music] MusicGen error:", e);
       }
       
-      // 🎵 Last fallback: procedural Web Audio API
+      if (abortRef.current) return "";
+      
+      // 🎵 Fallback: procedural Web Audio API (always works, free)
       try {
         console.log("[Music] Loading procedural background music...");
         const track = getRandomTrack(mood);
