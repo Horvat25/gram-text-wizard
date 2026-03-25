@@ -512,9 +512,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <StrategyBarEditable icon={Video} label="Reels" percent={getPercent(localDist.videos)} color="bg-cyan-500" count={localDist.videos} onIncrement={() => handleDistChange('videos', 1)} onDecrement={() => handleDistChange('videos', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Video} label="Reels Criativos" percent={getPercent(localDist.videos)} color="bg-cyan-500" count={localDist.videos} onIncrement={() => handleDistChange('videos', 1)} onDecrement={() => handleDistChange('videos', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Newspaper} label="Reels Notícia" percent={getPercent(localDist.news_videos)} color="bg-orange-500" count={localDist.news_videos} onIncrement={() => handleDistChange('news_videos', 1)} onDecrement={() => handleDistChange('news_videos', -1)} disabled={isAutoStrategy} />
               <StrategyBarEditable icon={LayoutGrid} label="Carrossel" percent={getPercent(localDist.carousels)} color="bg-purple-500" count={localDist.carousels} onIncrement={() => handleDistChange('carousels', 1)} onDecrement={() => handleDistChange('carousels', -1)} disabled={isAutoStrategy} />
-              <StrategyBarEditable icon={Newspaper} label="Notícias" percent={getPercent(localDist.news)} color="bg-amber-500" count={localDist.news} onIncrement={() => handleDistChange('news', 1)} onDecrement={() => handleDistChange('news', -1)} disabled={isAutoStrategy} />
+              <StrategyBarEditable icon={Newspaper} label="Notícias (Imagem)" percent={getPercent(localDist.news)} color="bg-amber-500" count={localDist.news} onIncrement={() => handleDistChange('news', 1)} onDecrement={() => handleDistChange('news', -1)} disabled={isAutoStrategy} />
               <StrategyBarEditable icon={ImageIcon} label="Imagens" percent={getPercent(localDist.images)} color="bg-pink-500" count={localDist.images} onIncrement={() => handleDistChange('images', 1)} onDecrement={() => handleDistChange('images', -1)} disabled={isAutoStrategy} />
               <StrategyBarEditable icon={Megaphone} label="Marketing" percent={getPercent(localDist.marketing)} color="bg-emerald-500" count={localDist.marketing} onIncrement={() => handleDistChange('marketing', 1)} onDecrement={() => handleDistChange('marketing', -1)} disabled={isAutoStrategy} />
             </div>
