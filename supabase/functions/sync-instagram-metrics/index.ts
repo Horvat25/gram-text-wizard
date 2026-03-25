@@ -138,14 +138,20 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const mediaId = post.instagram_post_id;
   const isReels = post.media_type === "reels" || post.media_type === "reel";
 
-  // Fetch basic metrics + insights with fallback by media type
+  // Fetch basic metrics + insights with multiple fallback strategies
+  // For Reels: ig_reels_aggregated_all_plays_count is the "views" users see on Instagram
+  // For other media: impressions is the views count
   const primaryInsightMetrics = isReels
-    ? "reach,saved,shares,views"
+    ? "reach,saved,shares,ig_reels_aggregated_all_plays_count"
     : "impressions,reach,saved";
 
   const fallbackInsightMetrics = isReels
     ? "reach,saved,shares,plays"
     : "reach,saved,views";
+
+  const lastFallbackMetrics = isReels
+    ? "reach,saved,shares,views"
+    : "reach,saved";
 
   const [metricsRes, primaryInsightsRes] = await Promise.all([
     fetch(`https://graph.facebook.com/v21.0/${mediaId}?fields=like_count,comments_count&access_token=${accessToken}`),
@@ -153,13 +159,26 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   ]);
 
   let insightsRes = primaryInsightsRes;
+  // Try fallback chain if primary fails
   if (insightsRes && !insightsRes.ok) {
+    try { await insightsRes.text(); } catch {}
     const fallbackRes = await fetch(
       `https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${fallbackInsightMetrics}&access_token=${accessToken}`
     ).catch(() => null);
 
     if (fallbackRes?.ok) {
       insightsRes = fallbackRes;
+    } else {
+      if (fallbackRes) { try { await fallbackRes.text(); } catch {} }
+      // Last resort fallback
+      const lastRes = await fetch(
+        `https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${lastFallbackMetrics}&access_token=${accessToken}`
+      ).catch(() => null);
+      if (lastRes?.ok) {
+        insightsRes = lastRes;
+      } else if (lastRes) {
+        try { await lastRes.text(); } catch {}
+      }
     }
   }
 
