@@ -267,7 +267,9 @@ const Settings = () => {
   const startOAuth = async () => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}/`;
+      // Always use published URL for OAuth redirect to avoid preview/iframe blocking
+      const publishedOrigin = 'https://gram-text-wizard.lovable.app';
+      const redirectUri = `${publishedOrigin}/`;
       
       const { data, error } = await supabase.functions.invoke('start-oauth', {
         body: { redirectUri }
@@ -278,51 +280,8 @@ const Settings = () => {
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
       
-      const popup = window.open(
-        data.authUrl,
-        'instagram_oauth',
-        'width=600,height=700,scrollbars=yes,resizable=yes'
-      );
-      
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        // Popup blocked — redirect in same tab
-        toast.info('Redirecionando para o Instagram...');
-        window.location.href = data.authUrl;
-        return;
-      }
-      
-      const checkPopup = setInterval(() => {
-        const oauthResult = localStorage.getItem('oauth_result');
-        
-        if (oauthResult) {
-          clearInterval(checkPopup);
-          localStorage.removeItem('oauth_result');
-          
-          const result = JSON.parse(oauthResult);
-          if (result.success) {
-            toast.success(`${result.accounts?.length || 1} conta(s) conectada(s)!`);
-            fetchAccounts();
-          } else {
-            toast.error(result.error || 'Falha ao processar a autorização');
-          }
-          setConnecting(false);
-        }
-        
-        try {
-          if (popup.closed) {
-            clearInterval(checkPopup);
-            setConnecting(false);
-            fetchAccounts();
-          }
-        } catch {
-          // Cross-origin access error
-        }
-      }, 500);
-      
-      setTimeout(() => {
-        clearInterval(checkPopup);
-        setConnecting(false);
-      }, 300000);
+      // Always redirect in same tab for Instagram (popups get blocked by browsers)
+      window.location.href = data.authUrl;
       
     } catch (error: any) {
       console.error('Start OAuth error:', error);
