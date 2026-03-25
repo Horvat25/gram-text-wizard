@@ -865,12 +865,32 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video': {
-      // VIDEO content should NOT use RSS news articles
-      // News articles are for the 'news' content type (static image posts)
-      // Reels should use original AI-generated themes, NOT repackaged news
-      console.log(`[AGENT] 🎬 Creating video from AI theme (NOT from RSS news)`);
+      // VIDEO content CAN use RSS news articles as source for professional news-broadcast Reels
+      // The video will have editorial narration style, with article URL ONLY in caption (never in video)
+      console.log(`[AGENT] 🎬 Creating video Reel...`);
       try {
-        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+        // Try to find a good RSS article for news-broadcast style Reel
+        let rssArticle: { url: string; title: string; description?: string } | undefined;
+        let rssItemId: string | undefined;
+        
+        const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
+        if (bestRssItem && bestRssItem.score >= 40) {
+          rssArticle = {
+            url: bestRssItem.item.link,
+            title: bestRssItem.item.title,
+            description: bestRssItem.item.description || '',
+          };
+          rssItemId = bestRssItem.item.id;
+          // Mark as used
+          await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
+          plan.theme = bestRssItem.item.title;
+          (plan as any)._rssItemId = rssItemId;
+          console.log(`[AGENT] 📰 News-broadcast Reel from RSS: "${rssArticle.title}" (score: ${bestRssItem.score})`);
+        } else {
+          console.log(`[AGENT] 🎨 No suitable RSS article - using AI-generated theme for Reel`);
+        }
+        
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
       } catch (videoError: any) {
         console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
         // Don't silently fail - create a draft with error info
@@ -914,24 +934,93 @@ async function createVideoContent(
   rssArticle?: { url: string; title: string; description?: string } // Optional RSS article context
 ): Promise<any> {
   console.log('[AGENT] Criando vídeo/reels:', plan.theme);
+  const isNewsBroadcast = !!rssArticle;
   
   const images: string[] = [];
   const titles: string[] = [];
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
-  // STEP 1: Generate 4 AI images via Gemini Flash Image
-  // Uses search-images-for-video in AI GENERATION MODE (no articleUrl/useArticleMode)
-  // This ensures visual consistency and relevance instead of random stock photos
   const articleTitle = rssArticle?.title || plan.theme;
   const articleDesc = rssArticle?.description || '';
   
-  // Build 4 progressive segments with Neural Update visual identity
-  const progressivePhases = [
-    { text: `Contexto e cenário: ${articleTitle}`, imagePrompt: `Hook visual forte — cena impactante que introduza ${articleTitle}, ambiente tecnológico, sensação de novidade e descoberta, curiosidade imediata` },
-    { text: `Desenvolvimento: ${articleDesc || articleTitle}`, imagePrompt: `Expansão do tema — continuação direta, mesmo universo visual, novos elementos de evolução sobre ${articleTitle}, detalhes, interfaces, dados visuais` },
-    { text: `Impacto e consequências de ${articleTitle}`, imagePrompt: `Consequência e escala — impacto de ${articleTitle} no mundo/mercado, cena maior e mais intensa, transformação, poder` },
-    { text: `Conclusão e futuro: ${articleTitle}`, imagePrompt: `Visão futura — projeção futurista sobre ${articleTitle}, composição limpa e simbólica, reflexão, encerramento forte` },
-  ];
+  // STEP 1: Generate broadcast-style narration script via AI
+  // News Reels get editorial broadcast narration; regular Reels get storytelling
+  let scriptSegments: { text: string; imagePrompt: string }[] = [];
   
+  if (isNewsBroadcast && lovableApiKey) {
+    console.log('[AGENT] 📺 Generating NEWS BROADCAST script for Reel...');
+    try {
+      const broadcastPrompt = `Você é um roteirista de telejornal de tecnologia para Reels do Instagram.
+Crie um roteiro de narração editorial para um Reel de ~25 segundos sobre esta notícia:
+
+TÍTULO: ${articleTitle}
+CONTEXTO: ${articleDesc}
+
+ESTRUTURA OBRIGATÓRIA (4 cenas):
+1. HOOK (3-4s): Frase provocativa de abertura. Deve prender atenção instantaneamente. Ex: "A guerra da IA acaba de mudar de patamar."
+2. CONTEXTO (6-8s): Explique o que aconteceu de forma concisa e direta. Como um âncora de TV.
+3. ANÁLISE (6-8s): POR QUE isso é importante. Qual o impacto real. Defenda uma tese clara.
+4. CONCLUSÃO (4-5s): Frase de encerramento forte. Provocativa. Sem CTA genérico.
+
+REGRAS CRÍTICAS:
+- TOM: Jornalístico editorial, como um âncora inteligente (não robótico, não YouTuber)
+- JAMAIS mencione URLs, links, sites ou "acesse"
+- JAMAIS diga "clique", "comente", "compartilhe", "link na bio"
+- Cada segmento deve ter entre 15 e 40 palavras (para narração natural)
+- Use linguagem PT-BR formal mas acessível
+- Mencione nomes reais (empresas, pessoas, produtos)
+- imagePrompt: descrição visual cinematográfica em inglês para cada cena
+
+Responda em JSON:
+{
+  "segments": [
+    { "text": "narração em português", "imagePrompt": "visual description in english" },
+    { "text": "...", "imagePrompt": "..." },
+    { "text": "...", "imagePrompt": "..." },
+    { "text": "...", "imagePrompt": "..." }
+  ]
+}`;
+
+      const scriptResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [{ role: 'user', content: broadcastPrompt }],
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (scriptResponse.ok) {
+        const scriptResult = await scriptResponse.json();
+        const content = scriptResult.choices?.[0]?.message?.content;
+        if (content) {
+          const parsed = JSON.parse(content);
+          if (parsed.segments && Array.isArray(parsed.segments) && parsed.segments.length >= 4) {
+            scriptSegments = parsed.segments.slice(0, 4);
+            console.log('[AGENT] ✅ News broadcast script generated (4 segments)');
+          }
+        }
+      }
+    } catch (e) {
+      console.log('[AGENT] Error generating broadcast script:', e);
+    }
+  }
+  
+  // Fallback: use standard progressive phases
+  if (scriptSegments.length < 4) {
+    scriptSegments = [
+      { text: isNewsBroadcast ? `Atenção: ${articleTitle}` : `Contexto e cenário: ${articleTitle}`, imagePrompt: `Hook visual forte — cena impactante que introduza ${articleTitle}, ambiente tecnológico, sensação de novidade e descoberta, curiosidade imediata` },
+      { text: isNewsBroadcast ? `O que está acontecendo: ${articleDesc || articleTitle}` : `Desenvolvimento: ${articleDesc || articleTitle}`, imagePrompt: `Expansão do tema — continuação direta, mesmo universo visual, novos elementos de evolução sobre ${articleTitle}, detalhes, interfaces, dados visuais` },
+      { text: `Impacto e consequências de ${articleTitle}`, imagePrompt: `Consequência e escala — impacto de ${articleTitle} no mundo/mercado, cena maior e mais intensa, transformação, poder` },
+      { text: `Conclusão e futuro: ${articleTitle}`, imagePrompt: `Visão futura — projeção futurista sobre ${articleTitle}, composição limpa e simbólica, reflexão, encerramento forte` },
+    ];
+  }
+
+  // STEP 2: Generate 4 AI images
   console.log('[AGENT] 🎨 AI GENERATION MODE: Gerando 4 imagens por IA para vídeo');
   try {
     const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
@@ -939,7 +1028,7 @@ async function createVideoContent(
       headers,
       body: JSON.stringify({
         topic: articleTitle,
-        segments: progressivePhases,
+        segments: scriptSegments,
       })
     });
 
@@ -953,7 +1042,7 @@ async function createVideoContent(
             titles.push(articleTitle);
           }
         }
-        console.log(`[AGENT] ✅ ${images.length} imagens IA geradas (stats: ${JSON.stringify(searchResult.stats)})`);
+        console.log(`[AGENT] ✅ ${images.length} imagens IA geradas`);
       }
     }
   } catch (e) {
@@ -962,14 +1051,27 @@ async function createVideoContent(
 
   console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
   
-  // STEP 2: Gerar caption
+  // STEP 3: Generate caption (with URL for news, without URL in video)
+  const captionInstructions = isNewsBroadcast
+    ? `Este é um REELS de notícia estilo telejornal. 
+Estrutura da legenda:
+1. HOOK curto (1 frase impactante)
+2. CONTEXTO (2-3 frases sobre a notícia)
+3. OPINIÃO (sua análise)
+4. Fonte e link no final
+
+OBRIGATÓRIO ao final:
+📰 Fonte: ${rssArticle ? new URL(rssArticle.url).hostname.replace('www.', '') : 'Tech News'}
+🔗 ${rssArticle?.url || ''}`
+    : `Este é um REELS/vídeo curto. ${plan.cta}`;
+  
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
       topic: plan.theme,
-      postType: 'entretenimento',
-      customInstructions: `Este é um REELS/vídeo curto. ${plan.cta}`
+      postType: isNewsBroadcast ? 'noticia' : 'entretenimento',
+      customInstructions: captionInstructions
     })
   });
   
@@ -982,19 +1084,22 @@ async function createVideoContent(
     hashtags = captionData.hashtags || hashtags;
   }
   
-  // STEP 3: Criar post (status draft, sem video_url ainda)
-  // Build script segments matching EXACTLY the format useNarrativeStory expects
-  const scriptSegments = progressivePhases.map((phase, i) => ({
-    text: phase.text,
-    imagePrompt: phase.imagePrompt,
-  }));
-
+  // Ensure news Reels have source URL in caption
+  if (isNewsBroadcast && rssArticle?.url) {
+    const hasSource = caption.includes('Fonte:') || caption.includes('🔗');
+    if (!hasSource) {
+      const sourceDomain = new URL(rssArticle.url).hostname.replace('www.', '');
+      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${rssArticle.url}`;
+    }
+  }
+  
+  // STEP 4: Create post
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
     caption,
     hashtags,
-    post_type: 'entretenimento',
+    post_type: isNewsBroadcast ? 'noticia' : 'entretenimento',
     media_type: 'reels',
     platforms: plan.platforms || ['instagram'],
     status: 'draft',
@@ -1007,10 +1112,11 @@ async function createVideoContent(
         title: articleTitle,
         segments: scriptSegments,
         segmentCount: 4,
-        totalDuration: 20,
+        totalDuration: 25,
       },
       article_url: rssArticle?.url || null,
       article_image_url: null,
+      is_news_broadcast: isNewsBroadcast,
       needs_processing: true,
       created_by_agent: true,
       publish_after_render: autoPublish
