@@ -491,7 +491,7 @@ export default function AgentGenieView() {
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => setShowTikTokGrowth(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
-                <AgentGrowthDashboard platform="tiktok" />
+                <TikTokGrowthDashboard />
               </div>
             </ScrollArea>
           </div>
