@@ -453,7 +453,7 @@ export default function AgentGenieView() {
         <AgentChatPanel
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
-          messages={messages}
+          messages={tkMessages}
           agentName={agentConfig.agent_name}
           agentAvatar={agentConfig.agent_avatar_url}
         />
@@ -672,7 +672,7 @@ export default function AgentGenieView() {
         <AgentChatPanel
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
-          messages={messages}
+          messages={igMessages}
           agentName={agentConfig.agent_name}
           agentAvatar={agentConfig.agent_avatar_url}
         />
