@@ -259,31 +259,62 @@ serve(async (req) => {
             }
           }
         } else {
-          // Simulation mode
-          const reason = !hasConnectedAccount 
-            ? "Nenhuma conta Instagram conectada" 
-            : "Post sem mídia";
-          console.log(`⚠️ Modo simulação para post ${post.id}: ${reason}`);
+          // No Instagram account or no media — check if TikTok-only
+          const postPlatforms = post.platforms as string[] || [];
+          
+          if (hasTikTokAccount && postPlatforms.includes('tiktok') && post.video_url) {
+            // TikTok-only post
+            console.log(`🎵 Post TikTok-only ${post.id}, publicando no TikTok...`);
+            try {
+              const tiktokResponse = await fetch(`${supabaseUrl}/functions/v1/publish-to-tiktok`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${supabaseKey}`,
+                },
+                body: JSON.stringify({ postId: post.id }),
+              });
+              const tiktokData = await tiktokResponse.json();
+              if (tiktokData.success) {
+                console.log(`🎵 TikTok: ${tiktokData.message}`);
+                results.push({ postId: post.id, success: true, message: `TikTok: ${tiktokData.message}` });
+              } else {
+                console.warn(`⚠️ TikTok falhou: ${tiktokData.error}`);
+                await supabase.from("posts").update({ status: "failed", error_message: `TikTok: ${tiktokData.error}` }).eq("id", post.id);
+                results.push({ postId: post.id, success: false, error: `TikTok: ${tiktokData.error}` });
+              }
+            } catch (tiktokErr: any) {
+              console.warn(`⚠️ TikTok erro: ${tiktokErr.message}`);
+              await supabase.from("posts").update({ status: "failed", error_message: tiktokErr.message }).eq("id", post.id);
+              results.push({ postId: post.id, success: false, error: tiktokErr.message });
+            }
+          } else {
+            // Simulation mode
+            const reason = !hasConnectedAccount 
+              ? "Nenhuma conta Instagram conectada" 
+              : "Post sem mídia";
+            console.log(`⚠️ Modo simulação para post ${post.id}: ${reason}`);
 
-          await supabase
-            .from("posts")
-            .update({
-              status: "published",
-              published_at: new Date().toISOString(),
-              likes_count: 0,
-              comments_count: 0,
-              saves_count: 0,
-              reach: 0,
-            })
-            .eq("id", post.id);
+            await supabase
+              .from("posts")
+              .update({
+                status: "published",
+                published_at: new Date().toISOString(),
+                likes_count: 0,
+                comments_count: 0,
+                saves_count: 0,
+                reach: 0,
+              })
+              .eq("id", post.id);
 
-          results.push({
-            postId: post.id,
-            success: true,
-            simulated: true,
-            message: `Publicado (simulação - ${reason})`,
-          });
-          console.log(`✅ Post ${post.id} publicado (simulação)`);
+            results.push({
+              postId: post.id,
+              success: true,
+              simulated: true,
+              message: `Publicado (simulação - ${reason})`,
+            });
+            console.log(`✅ Post ${post.id} publicado (simulação)`);
+          }
         }
       } catch (postError: any) {
         console.error(`❌ Erro ao publicar post ${post.id}:`, postError);
