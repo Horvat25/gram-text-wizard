@@ -371,7 +371,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const commentsProgress = goals.comments > 0 ? Math.min((totalComments / goals.comments) * 100, 100) : 0;
 
   // Content strategy with marketing
-  const totalContent = localDist.videos + localDist.carousels + localDist.news + localDist.images + localDist.marketing;
+  const totalContent = localDist.videos + localDist.news_videos + localDist.carousels + localDist.news + localDist.images + localDist.marketing;
   
   const getPercent = (val: number) => totalContent > 0 ? Math.round((val / totalContent) * 100) : 0;
 
