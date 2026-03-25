@@ -357,9 +357,51 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return null;
     };
     
-    // Generate background music - try MusicGen (HuggingFace) first, then fallback to royalty-free tracks
+    // Generate background music - ElevenLabs Music API (best) → MusicGen → procedural fallback
     const generateBackgroundMusic = async (mood?: string): Promise<string> => {
-      // 🎵 Try MusicGen first (Hugging Face - FREE AI-generated music)
+      if (abortRef.current) return "";
+      
+      // 🎵 Try ElevenLabs Music API FIRST (high-quality, you have the API key)
+      try {
+        console.log("[Music] 🎵 Trying ElevenLabs Music API...");
+        const musicPrompt = mood === 'epic' 
+          ? "Epic cinematic technology background music, dramatic orchestral with electronic elements, inspiring and powerful"
+          : mood === 'dramatic'
+          ? "Dramatic dark technology background music, tense cinematic score with deep bass and suspenseful atmosphere"
+          : mood === 'inspiring'
+          ? "Inspiring uplifting technology background music, motivational with subtle electronic beats and warm synths"
+          : "Ambient technology background music, modern electronic with subtle beats, professional and clean for social media content";
+        
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-music`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: JSON.stringify({ prompt: musicPrompt, duration: 30 }),
+          }
+        );
+        
+        if (response.ok) {
+          const audioBlob = await response.blob();
+          if (audioBlob.size > 1000) {
+            const musicUrl = URL.createObjectURL(audioBlob);
+            console.log("[Music] ✅ ElevenLabs Music success!", (audioBlob.size / 1024).toFixed(1), "KB");
+            toast.success("🎵 Trilha sonora profissional gerada (ElevenLabs)");
+            return musicUrl;
+          }
+        }
+        console.log("[Music] ElevenLabs Music failed:", response.status);
+      } catch (e) {
+        console.warn("[Music] ElevenLabs Music error:", e);
+      }
+      
+      if (abortRef.current) return "";
+      
+      // 🎵 Fallback: MusicGen (Hugging Face)
       try {
         console.log("[Music] 🎵 Trying MusicGen (Hugging Face)...");
         const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
@@ -372,30 +414,28 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         
         if (!musicResult.error && isValidAudio && !hasFallbackFlag) {
           const format = musicResult.data?.format || "wav";
-          console.log("[Music] ✅ MusicGen success! Generated AI music");
-          toast.success(`🎵 Trilha AI gerada (MusicGen)`);
+          console.log("[Music] ✅ MusicGen success!");
           return `data:audio/${format};base64,${audioContent}`;
         }
-        
-        console.log("[Music] MusicGen failed or loading:", musicResult.data?.error || "Using fallback");
+        console.log("[Music] MusicGen failed:", musicResult.data?.error || "unavailable");
       } catch (e) {
         console.warn("[Music] MusicGen error:", e);
       }
       
-      // 🎵 Fallback to royalty-free tracks from library
+      // 🎵 Last fallback: procedural Web Audio API
       try {
-        console.log("[Music] Loading royalty-free background music...");
-        const track = getRandomTrack();
-        console.log("[Music] Selected track:", track.name, "-", track.mood);
-        
+        console.log("[Music] Loading procedural background music...");
+        const track = getRandomTrack(mood);
         const musicUrl = await preloadTrack(track);
-        console.log("[Music] ✅ Background music ready:", track.name);
-        toast.success(`🎵 Trilha: ${track.name}`);
-        return musicUrl;
+        if (musicUrl) {
+          console.log("[Music] ✅ Procedural music ready:", track.name);
+          return musicUrl;
+        }
       } catch (e) {
-        console.warn("[Music] Error loading background music:", e);
-        return "";
+        console.warn("[Music] Procedural music error:", e);
       }
+      
+      return "";
     };
     
     try {
