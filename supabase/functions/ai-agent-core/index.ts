@@ -865,30 +865,12 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video': {
-      // For video content, fetch the best RSS item to use as article context
-      // This enables intelligent real-image curation instead of generic stock photos
-      let rssArticle: { url: string; title: string; description?: string } | undefined;
+      // VIDEO content should NOT use RSS news articles
+      // News articles are for the 'news' content type (static image posts)
+      // Reels should use original AI-generated themes, NOT repackaged news
+      console.log(`[AGENT] 🎬 Creating video from AI theme (NOT from RSS news)`);
       try {
-        const bestItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
-        if (bestItem?.item) {
-          rssArticle = {
-            url: bestItem.item.link,
-            title: bestItem.item.title,
-            description: bestItem.item.description || '',
-          };
-          // Update plan theme to match the actual news article
-          plan.theme = bestItem.item.title;
-          console.log(`[AGENT] Video usando artigo RSS: ${rssArticle.title}`);
-          // Mark as used so it won't be reused (post_id linked after creation)
-          await supabase.from('rss_items').update({ is_used: true }).eq('id', bestItem.item.id);
-          // Store RSS item ID to link after post creation
-          (plan as any)._rssItemId = bestItem.item.id;
-        }
-      } catch (e) {
-        console.log('[AGENT] Sem artigo RSS para video, usando tema genérico:', e);
-      }
-      try {
-        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
       } catch (videoError: any) {
         console.error('[AGENT] ❌ VIDEO CREATION FAILED:', videoError?.message || videoError);
         // Don't silently fail - create a draft with error info
