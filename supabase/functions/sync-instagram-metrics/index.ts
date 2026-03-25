@@ -138,14 +138,20 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   const mediaId = post.instagram_post_id;
   const isReels = post.media_type === "reels" || post.media_type === "reel";
 
-  // Fetch basic metrics + insights with fallback by media type
+  // Fetch basic metrics + insights with multiple fallback strategies
+  // For Reels: ig_reels_aggregated_all_plays_count is the "views" users see on Instagram
+  // For other media: impressions is the views count
   const primaryInsightMetrics = isReels
-    ? "reach,saved,shares,views"
+    ? "reach,saved,shares,ig_reels_aggregated_all_plays_count"
     : "impressions,reach,saved";
 
   const fallbackInsightMetrics = isReels
     ? "reach,saved,shares,plays"
     : "reach,saved,views";
+
+  const lastFallbackMetrics = isReels
+    ? "reach,saved,shares,views"
+    : "reach,saved";
 
   const [metricsRes, primaryInsightsRes] = await Promise.all([
     fetch(`https://graph.facebook.com/v21.0/${mediaId}?fields=like_count,comments_count&access_token=${accessToken}`),
@@ -153,13 +159,26 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
   ]);
 
   let insightsRes = primaryInsightsRes;
+  // Try fallback chain if primary fails
   if (insightsRes && !insightsRes.ok) {
+    try { await insightsRes.text(); } catch {}
     const fallbackRes = await fetch(
       `https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${fallbackInsightMetrics}&access_token=${accessToken}`
     ).catch(() => null);
 
     if (fallbackRes?.ok) {
       insightsRes = fallbackRes;
+    } else {
+      if (fallbackRes) { try { await fallbackRes.text(); } catch {} }
+      // Last resort fallback
+      const lastRes = await fetch(
+        `https://graph.facebook.com/v21.0/${mediaId}/insights?metric=${lastFallbackMetrics}&access_token=${accessToken}`
+      ).catch(() => null);
+      if (lastRes?.ok) {
+        insightsRes = lastRes;
+      } else if (lastRes) {
+        try { await lastRes.text(); } catch {}
+      }
     }
   }
 
@@ -184,26 +203,32 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 
   if (insightsRes && insightsRes.ok) {
     const insightsData = await insightsRes.json();
+    const metricNames = (insightsData.data || []).map((m: any) => m.name).join(', ');
+    console.log(`📊 ${mediaId} (${isReels ? 'reels' : 'post'}): metrics found: [${metricNames}]`);
+    
     for (const insight of insightsData.data || []) {
       const rawValue = insight.values?.[0]?.value;
       const value = typeof rawValue === 'number' ? rawValue : Number(rawValue) || 0;
 
       switch (insight.name) {
         case "reach":
-          reach = value;
+          reach = Math.max(reach, value);
           break;
         case "saved":
-          saves = value;
+          saves = Math.max(saves, value);
           break;
         case "impressions":
         case "views":
-          impressions = value;
+          impressions = Math.max(impressions, value);
+          break;
+        case "ig_reels_aggregated_all_plays_count":
+        case "plays":
+          // This is the actual "views" count users see on Instagram for Reels
+          impressions = Math.max(impressions, value);
+          console.log(`🎬 Reels plays for ${mediaId}: ${value}`);
           break;
         case "shares":
-          shares = value;
-          break;
-        case "plays":
-          if (value > impressions) impressions = value;
+          shares = Math.max(shares, value);
           break;
       }
     }
@@ -218,6 +243,7 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 
   const minReach = likes + comments + saves;
   const finalReach = Math.max(reach, minReach, post.reach || 0);
+  const finalImpressions = Math.max(impressions, post.impressions || 0);
 
   const { error } = await supabase
     .from("posts")
@@ -226,7 +252,7 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
       comments_count: comments,
       saves_count: saves,
       reach: finalReach,
-      impressions,
+      impressions: finalImpressions,
       shares_count: shares,
       last_metrics_sync: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -234,9 +260,7 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
     .eq("id", post.id);
 
   if (error) return { action: 'error', message: error.message };
-  if (likes > 0 || comments > 0) {
-    console.log(`✅ ${post.id}: ${likes}❤️ ${comments}💬 ${saves}🔖 ${finalReach}👁️ ${impressions}📺`);
-  }
+  console.log(`✅ ${post.id}: ${likes}❤️ ${comments}💬 ${saves}🔖 ${finalReach}👁️ ${finalImpressions}📺 ${shares}🔄`);
   return { action: 'updated' };
 }
 
