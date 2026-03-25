@@ -407,6 +407,7 @@ export default function AgentGenieView() {
           <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
             <AgentSettingsPanel 
+              activePlatform={selectedPlatform}
               trigger={
                 <Button variant="ghost" size="icon" className="h-7 w-7">
                   <Settings className="h-3.5 w-3.5" />
@@ -627,6 +628,7 @@ export default function AgentGenieView() {
             <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
 
             <AgentSettingsPanel 
+              activePlatform={selectedPlatform}
               trigger={
                 <Button variant="ghost" size="icon" className="h-7 w-7">
                   <Settings className="h-3.5 w-3.5" />

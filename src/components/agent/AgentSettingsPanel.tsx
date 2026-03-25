@@ -301,23 +301,15 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const startOAuth = async () => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}/`;
+      // Always use published URL for OAuth redirect to avoid preview/iframe blocking
+      const publishedOrigin = 'https://gram-text-wizard.lovable.app';
+      const redirectUri = `${publishedOrigin}/`;
       const { data, error } = await supabase.functions.invoke('start-oauth', { body: { redirectUri } });
       if (error) throw error;
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
-      const popup = window.open(data.authUrl, 'instagram_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        toast.info('Redirecionando para o Instagram...');
-        window.location.href = data.authUrl;
-        return;
-      }
-      const checkPopup = setInterval(() => {
-        const r = localStorage.getItem('oauth_result');
-        if (r) { clearInterval(checkPopup); localStorage.removeItem('oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('Instagram conectado!'); fetchIgAccounts(); } else { toast.error(res.error); } setConnecting(false); }
-        try { if (popup.closed) { clearInterval(checkPopup); setConnecting(false); fetchIgAccounts(); } } catch {}
-      }, 500);
-      setTimeout(() => { clearInterval(checkPopup); setConnecting(false); }, 300000);
+      // Always redirect in same tab for Instagram (popups get blocked)
+      window.location.href = data.authUrl;
     } catch (e: any) { toast.error(e.message); setConnecting(false); }
   };
 
