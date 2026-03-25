@@ -313,30 +313,7 @@ const TikTokContentCreation = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-black/5 via-[#25F4EE]/10 to-[#FE2C55]/10">
-          <TabsTrigger value="create" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#25F4EE]/20 data-[state=active]:to-[#FE2C55]/20">
-            <Sparkles className="h-4 w-4" />
-            <span>Criar</span>
-          </TabsTrigger>
-          <TabsTrigger value="queue" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#25F4EE]/20 data-[state=active]:to-[#FE2C55]/20">
-            <Calendar className="h-4 w-4" />
-            <span>Fila</span>
-            {scheduledPosts.length > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">
-                {scheduledPosts.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#25F4EE]/20 data-[state=active]:to-[#FE2C55]/20">
-            <BarChart3 className="h-4 w-4" />
-            <span>Analytics</span>
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Create Tab */}
-        <TabsContent value="create" className="mt-4">
-          <Card className="overflow-hidden border-2 border-[#25F4EE]/20">
+      <Card className="overflow-hidden border-2 border-[#25F4EE]/20">
             <CardHeader className="pb-3 bg-gradient-to-r from-black/5 via-[#25F4EE]/10 to-[#FE2C55]/10">
               <CardTitle className="flex items-center gap-2 text-base">
                 <TikTokIcon className="h-5 w-5" />
