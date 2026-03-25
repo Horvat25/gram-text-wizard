@@ -724,14 +724,14 @@ function StrategyBarEditable({ icon: Icon, label, percent, color, count, onIncre
   onIncrement: () => void; onDecrement: () => void; disabled: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-      <span className="text-xs w-16 shrink-0">{label}</span>
-      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+      <span className="text-[11px] sm:text-xs w-14 sm:w-16 shrink-0 truncate">{label}</span>
+      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden min-w-0">
         <div className={cn("h-full rounded-full transition-all", color)} style={{ width: `${percent}%` }} />
       </div>
-      <span className="text-xs font-mono w-8 text-right text-muted-foreground">{percent}%</span>
-      <div className="flex items-center gap-0.5">
+      <span className="text-[10px] sm:text-xs font-mono w-7 sm:w-8 text-right text-muted-foreground shrink-0">{percent}%</span>
+      <div className="flex items-center gap-0 shrink-0">
         <Button
           variant="ghost"
           size="icon"
