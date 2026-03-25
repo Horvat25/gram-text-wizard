@@ -245,15 +245,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio - 100% FREE pipeline: Edge TTS (Microsoft Neural) → Lovable TTS → Free TTS
+  // Step 3: Generate narration audio - PER-SEGMENT for perfect sync
+  // Each segment gets its own TTS call → exact duration → image changes only when narration ends
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
-    if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "" };
+    if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "", segmentDurations: [] as number[] };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
     
-    // Combine all segment texts for full narration
     const fullScript = segments.map(s => s.text).join(" ");
     
-    // CTA script
     const ctaTexts = [
       "E aí, curtiu? Então segue a gente pra não perder nenhuma novidade!",
       "Gostou do conteúdo? Segue pra ficar por dentro das últimas notícias!",
@@ -264,248 +263,238 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let narrationUrl = "";
     let ctaNarrationUrl = "";
     let backgroundMusicUrl = "";
+    const segmentDurations: number[] = [];
     
-    // Helper to try TTS providers in quality order:
-    // 1️⃣ ElevenLabs (best quality, via edge-tts function)
-    // 2️⃣ Edge TTS - Microsoft FranciscaNeural (free, very natural)  
-    // 3️⃣ Lovable TTS (StreamElements/Polly)
-    // 4️⃣ Free TTS (Google - last resort)
+    // TTS provider hierarchy (same as before)
     const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
       if (abortRef.current) return null;
       
-      // 1️⃣ Edge TTS function (has ElevenLabs → FranciscaNeural → Google → TikTok internally)
+      // 1️⃣ Edge TTS (ElevenLabs → FranciscaNeural → Google internally)
       try {
-        console.log(`[TTS] 1️⃣ Trying Edge TTS (ElevenLabs → FranciscaNeural)...`);
         const edgeResult = await supabase.functions.invoke("edge-tts", {
           body: { text, voice: preferredVoice },
         });
-        
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          const provider = edgeResult.data.provider || "Microsoft Neural";
-          console.log(`[TTS] ✅ Success! Provider: ${provider}`);
           return { 
             url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider
+            provider: edgeResult.data.provider || "Microsoft Neural"
           };
         }
-        console.log("[TTS] ⚠️ Edge TTS failed:", edgeResult.data?.error || edgeResult.error);
-      } catch (e) {
-        console.error("[TTS] ❌ Edge TTS error:", e);
-      }
+      } catch (e) { console.warn("[TTS] Edge TTS error:", e); }
       
       if (abortRef.current) return null;
       
-      // 2️⃣ Hugging Face Bark TTS (neural but truncates long text - use as fallback only)
+      // 2️⃣ Lovable TTS (Polly)
       try {
-        console.log(`[TTS] 2️⃣ Trying HF Bark TTS...`);
-        const barkResult = await supabase.functions.invoke("huggingface-bark-tts", {
-          body: { text, voice: preferredVoice, language: "pt-BR" },
-        });
-        
-        const audioContent = barkResult.data?.audioContent;
-        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-        const hasFallbackFlag = barkResult.data?.fallback === true;
-        
-        if (!barkResult.error && isValidAudio && !hasFallbackFlag) {
-          const format = barkResult.data?.format || "wav";
-          console.log(`[TTS] ✅ Bark success! Size: ${audioContent.length} chars`);
-          return { 
-            url: `data:audio/${format};base64,${audioContent}`,
-            provider: "Bark"
-          };
-        }
-      } catch (e) {
-        console.log("[TTS] Bark failed:", e);
-      }
-      
-      if (abortRef.current) return null;
-      
-      // 3️⃣ Lovable TTS (StreamElements/Polly)
-      try {
-        console.log(`[TTS] 3️⃣ Trying Lovable TTS (Polly)...`);
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
           body: { text, voice: preferredVoice },
         });
-        
         if (!lovableResult.error && lovableResult.data?.audioContent && !lovableResult.data?.error) {
-          return { 
-            url: `data:audio/mp3;base64,${lovableResult.data.audioContent}`,
-            provider: "Polly"
-          };
+          return { url: `data:audio/mp3;base64,${lovableResult.data.audioContent}`, provider: "Polly" };
         }
-      } catch (e) {
-        console.log("[TTS] Lovable TTS failed:", e);
-      }
+      } catch (e) { console.warn("[TTS] Lovable TTS failed:", e); }
       
-      // 4️⃣ Free TTS (Google Translate - robotic but always works)
+      // 3️⃣ Free TTS (Google)
       try {
-        console.log("[TTS] 4️⃣ Last resort: Free TTS (Google)...");
         const freeResult = await supabase.functions.invoke("free-tts", {
           body: { text, language: "pt-BR" },
         });
-        
         if (!freeResult.error && freeResult.data?.audioContent && !freeResult.data?.error) {
-          return { 
-            url: `data:audio/mp3;base64,${freeResult.data.audioContent}`,
-            provider: "Google"
-          };
+          return { url: `data:audio/mp3;base64,${freeResult.data.audioContent}`, provider: "Google" };
         }
-      } catch {
-        // Silent fail
-      }
+      } catch { /* Silent */ }
       
       return null;
     };
     
-    // Generate background music - MusicGen (free) → procedural fallback
+    // Background music: ElevenLabs Music (best) → MusicGen (free) → Procedural
     const generateBackgroundMusic = async (mood?: string): Promise<string> => {
       if (abortRef.current) return "";
       
-      // 🎵 Try MusicGen FIRST (Hugging Face - FREE)
+      // 1️⃣ ElevenLabs Music (professional quality)
       try {
-        console.log("[Music] 🎵 Trying MusicGen (Hugging Face)...");
-        const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
-          body: { mood: mood || "technology", duration: 15 },
+        console.log("[Music] 🎵 Trying ElevenLabs Music...");
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        
+        const moodPrompts: Record<string, string> = {
+          epic: "Cinematic epic orchestral background music for tech news video, dramatic strings and brass, building intensity, modern and powerful",
+          dramatic: "Dark dramatic electronic background music for technology news broadcast, tense atmosphere, pulsing synths, suspenseful",
+          inspiring: "Uplifting inspiring electronic background music for technology innovation video, positive energy, modern synths, motivational",
+          ambient: "Atmospheric ambient electronic background music for tech review video, subtle and modern, clean production",
+          technology: "Modern electronic background music for technology news video, professional and engaging, subtle beats, clean synths",
+        };
+        
+        const musicPrompt = moodPrompts[mood || 'technology'] || moodPrompts.technology;
+        
+        const response = await fetch(`${supabaseUrl}/functions/v1/elevenlabs-music`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({ prompt: musicPrompt, duration: 30 }),
         });
         
-        const audioContent = musicResult.data?.audioContent;
-        const isValidAudio = typeof audioContent === 'string' && audioContent.length > 100;
-        const hasFallbackFlag = musicResult.data?.fallback === true;
-        
-        if (!musicResult.error && isValidAudio && !hasFallbackFlag) {
-          const format = musicResult.data?.format || "wav";
-          console.log("[Music] ✅ MusicGen success!");
-          toast.success("🎵 Trilha AI gerada (MusicGen)");
-          return `data:audio/${format};base64,${audioContent}`;
+        if (response.ok) {
+          const contentType = response.headers.get("content-type") || "";
+          if (contentType.includes("audio")) {
+            const audioBlob = await response.blob();
+            const musicUrl = URL.createObjectURL(audioBlob);
+            console.log("[Music] ✅ ElevenLabs Music generated!");
+            toast.success("🎵 Trilha sonora profissional gerada!");
+            return musicUrl;
+          }
         }
-        console.log("[Music] MusicGen failed:", musicResult.data?.error || "unavailable");
+        console.log("[Music] ElevenLabs Music failed:", response.status);
       } catch (e) {
-        console.warn("[Music] MusicGen error:", e);
+        console.warn("[Music] ElevenLabs Music error:", e);
       }
       
       if (abortRef.current) return "";
       
-      // 🎵 Fallback: procedural Web Audio API (always works, free)
+      // 2️⃣ MusicGen (HuggingFace - free)
       try {
-        console.log("[Music] Loading procedural background music...");
+        console.log("[Music] 🎵 Trying MusicGen...");
+        const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
+          body: { mood: mood || "technology", duration: 15 },
+        });
+        const audioContent = musicResult.data?.audioContent;
+        if (!musicResult.error && typeof audioContent === 'string' && audioContent.length > 100 && !musicResult.data?.fallback) {
+          const format = musicResult.data?.format || "wav";
+          console.log("[Music] ✅ MusicGen success!");
+          return `data:audio/${format};base64,${audioContent}`;
+        }
+      } catch (e) { console.warn("[Music] MusicGen error:", e); }
+      
+      if (abortRef.current) return "";
+      
+      // 3️⃣ Procedural Web Audio (always works)
+      try {
+        console.log("[Music] Loading procedural music...");
         const track = getRandomTrack(mood);
         const musicUrl = await preloadTrack(track);
-        if (musicUrl) {
-          console.log("[Music] ✅ Procedural music ready:", track.name);
-          return musicUrl;
-        }
-      } catch (e) {
-        console.warn("[Music] Procedural music error:", e);
-      }
+        if (musicUrl) return musicUrl;
+      } catch (e) { console.warn("[Music] Procedural error:", e); }
       
       return "";
     };
     
     try {
-      // Generate narration
-      console.log("[TTS] Starting narration generation...");
-      const narrationResult = await tryCloudTTS(fullScript);
-      narrationUrl = narrationResult?.url || "";
+      // ═══ PER-SEGMENT TTS: Generate audio for each segment separately ═══
+      // This ensures EXACT sync between narration and image transitions
+      console.log("[TTS] 🎯 Generating PER-SEGMENT narration for perfect sync...");
+      
+      const segmentAudioUrls: string[] = [];
+      let ttsProvider = "";
+      
+      for (let i = 0; i < segments.length; i++) {
+        if (abortRef.current) break;
+        console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
+        
+        const result = await tryCloudTTS(segments[i].text);
+        if (result) {
+          segmentAudioUrls.push(result.url);
+          if (!ttsProvider) ttsProvider = result.provider;
+          
+          // Measure exact duration of this segment's audio
+          const duration = await getAudioDuration(result.url);
+          // Use audio duration if available, otherwise estimate from text
+          const segDuration = duration > 0 ? duration : Math.max(4, segments[i].text.split(/\s+/).length / 2.5);
+          segmentDurations.push(segDuration);
+          console.log(`[TTS] Segment ${i + 1} duration: ${segDuration.toFixed(1)}s`);
+        } else {
+          // Fallback: estimate duration from word count
+          const estimated = Math.max(4, segments[i].text.split(/\s+/).length / 2.5);
+          segmentDurations.push(estimated);
+          segmentAudioUrls.push("");
+        }
+      }
+      
+      console.log(`[TTS] ✅ Per-segment TTS complete! Provider: ${ttsProvider}`);
+      console.log(`[TTS] Segment durations: ${segmentDurations.map(d => d.toFixed(1) + 's').join(', ')}`);
+      
+      // Concatenate segment audio into single narration (using AudioContext)
+      if (segmentAudioUrls.some(url => url)) {
+        try {
+          const offlineCtx = new AudioContext();
+          const buffers: (AudioBuffer | null)[] = [];
+          
+          for (const url of segmentAudioUrls) {
+            if (!url) {
+              buffers.push(null);
+              continue;
+            }
+            try {
+              let arrayBuffer: ArrayBuffer;
+              if (url.startsWith('data:')) {
+                const base64 = url.split(',')[1];
+                const binary = atob(base64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                arrayBuffer = bytes.buffer;
+              } else {
+                const resp = await fetch(url);
+                arrayBuffer = await resp.arrayBuffer();
+              }
+              const buf = await offlineCtx.decodeAudioData(arrayBuffer);
+              buffers.push(buf);
+            } catch (e) {
+              console.warn("[TTS] Failed to decode segment audio:", e);
+              buffers.push(null);
+            }
+          }
+          
+          // Calculate total duration and render concatenated audio
+          const totalNarrationDuration = segmentDurations.reduce((a, b) => a + b, 0);
+          const sampleRate = buffers.find(b => b)?.sampleRate || 44100;
+          const numChannels = buffers.find(b => b)?.numberOfChannels || 1;
+          const offline = new OfflineAudioContext(numChannels, Math.ceil(sampleRate * totalNarrationDuration), sampleRate);
+          
+          let offset = 0;
+          for (let i = 0; i < buffers.length; i++) {
+            if (buffers[i]) {
+              const src = offline.createBufferSource();
+              src.buffer = buffers[i]!;
+              src.connect(offline.destination);
+              src.start(offset);
+            }
+            offset += segmentDurations[i];
+          }
+          
+          const renderedBuffer = await offline.startRendering();
+          
+          // Convert to WAV blob
+          const wavBlob = audioBufferToWavBlob(renderedBuffer);
+          narrationUrl = URL.createObjectURL(wavBlob);
+          console.log(`[TTS] 🎵 Concatenated narration: ${totalNarrationDuration.toFixed(1)}s`);
+          
+          offlineCtx.close().catch(() => {});
+        } catch (e) {
+          console.warn("[TTS] Concatenation failed, using first segment:", e);
+          narrationUrl = segmentAudioUrls.find(url => url) || "";
+        }
+      }
       
       // Generate CTA narration
       if (narrationUrl) {
-        console.log(`[TTS] Main narration generated with provider: ${narrationResult?.provider}`);
-        
+        console.log(`[TTS] Generating CTA narration...`);
         const ctaResult = await tryCloudTTS(ctaScript);
         ctaNarrationUrl = ctaResult?.url || "";
       }
       
-      // Generate background music (in parallel with duration detection) - uses royalty-free tracks
-      const [audioDuration, musicUrl] = await Promise.all([
-        narrationUrl ? getAudioDuration(narrationUrl) : Promise.resolve(0),
-        generateBackgroundMusic(),
-      ]);
+      // Generate background music in parallel with nothing (music is last)
+      backgroundMusicUrl = await generateBackgroundMusic();
+      console.log("[Music] Background music:", backgroundMusicUrl ? "✅ Generated" : "❌ None");
       
-      backgroundMusicUrl = musicUrl;
-      console.log("[TTS] Audio duration detected:", audioDuration, "seconds");
-      console.log("[Music] Background music URL:", backgroundMusicUrl ? "Generated" : "None");
-      
-      // 🔒 MIN 18s content, MAX 45s — ritmo mais rápido para reels dinâmicos
-      const MIN_DURATION = 18;
-      const MAX_DURATION = 45;
-      const MIN_SEGMENT_DURATION = 4; // No segment shorter than 4s
-      const rawDuration = audioDuration > 0 ? audioDuration : 0;
-      const clampedDuration = Math.max(MIN_DURATION, Math.min(rawDuration, MAX_DURATION));
-
-      if (clampedDuration > 0) {
-        // Distribute duration PROPORTIONALLY by word count
-        const wordCounts = segments.map(s => s.text.split(/\s+/).length);
-        const totalWords = wordCounts.reduce((a, b) => a + b, 0);
-        
-        // First pass: calculate proportional durations
-        let rawDurations = wordCounts.map(wc => {
-          const proportion = totalWords > 0 ? wc / totalWords : 1 / segments.length;
-          return clampedDuration * proportion;
-        });
-        
-        // Second pass: enforce minimum 5s per segment, redistribute excess
-        let deficit = 0;
-        rawDurations = rawDurations.map(d => {
-          if (d < MIN_SEGMENT_DURATION) {
-            deficit += MIN_SEGMENT_DURATION - d;
-            return MIN_SEGMENT_DURATION;
-          }
-          return d;
-        });
-        
-        // Redistribute deficit from longer segments proportionally
-        if (deficit > 0) {
-          const longSegments = rawDurations.filter(d => d > MIN_SEGMENT_DURATION);
-          const totalLong = longSegments.reduce((a, b) => a + b, 0);
-          rawDurations = rawDurations.map(d => {
-            if (d > MIN_SEGMENT_DURATION && totalLong > 0) {
-              return d - (deficit * (d / totalLong));
-            }
-            return d;
-          });
-        }
-        
-        setState(prev => {
-          let currentTime = 0;
-          const updatedSegments = prev.segments.map((seg, i) => {
-            const segDuration = Math.max(MIN_SEGMENT_DURATION, rawDurations[i] || MIN_SEGMENT_DURATION);
-            const updated = { ...seg, duration: segDuration, startTime: currentTime };
-            currentTime += segDuration;
-            return updated;
-          });
-          return { 
-            ...prev, 
-            segments: updatedSegments,
-            totalDuration: currentTime,
-            narrationUrl, 
-            ctaNarrationUrl,
-            backgroundMusicUrl,
-            progress: 80 
-          };
-        });
-        
-        return { narrationUrl, ctaNarrationUrl, backgroundMusicUrl, fullScript };
-      }
-      
-      if (!narrationUrl) {
-        // Cloud TTS unavailable - warn user
-        console.warn("[TTS] All TTS providers failed! Video will be generated without audio.");
-        toast.warning("⚠️ Narração não disponível - vídeo será gerado sem áudio", {
-          description: "Verifique os logs do console para detalhes"
-        });
-      }
-      
-      // Estimate duration based on text length — MIN 25s, MAX 55s, MIN 5s per segment
-      const MIN_SEG_DUR = 5;
-      const estimatedDuration = Math.max(25, Math.min(estimateSpeechDuration(fullScript), 55));
-      const wordCounts = segments.map(s => s.text.split(/\s+/).length);
-      const totalWords = wordCounts.reduce((a, b) => a + b, 0);
+      // Update segment durations based on actual audio measurements
+      const MIN_SEGMENT_DURATION = 4;
       
       setState(prev => {
         let currentTime = 0;
         const updatedSegments = prev.segments.map((seg, i) => {
-          const proportion = totalWords > 0 ? wordCounts[i] / totalWords : 1 / segments.length;
-          const segDuration = Math.max(MIN_SEG_DUR, estimatedDuration * proportion);
+          const segDuration = Math.max(MIN_SEGMENT_DURATION, segmentDurations[i] || MIN_SEGMENT_DURATION);
           const updated = { ...seg, duration: segDuration, startTime: currentTime };
           currentTime += segDuration;
           return updated;
@@ -514,19 +503,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           ...prev, 
           segments: updatedSegments,
           totalDuration: currentTime,
-          narrationUrl: narrationUrl || "", 
-          ctaNarrationUrl: ctaNarrationUrl || "",
+          narrationUrl, 
+          ctaNarrationUrl,
           backgroundMusicUrl,
           progress: 80 
         };
       });
       
-      // Return script for reference
-      return { narrationUrl: narrationUrl || "", ctaNarrationUrl: ctaNarrationUrl || "", backgroundMusicUrl, fullScript };
+      return { narrationUrl, ctaNarrationUrl, backgroundMusicUrl, fullScript, segmentDurations };
     } catch (error: any) {
       console.warn("TTS error:", error);
       setState(prev => ({ ...prev, progress: 80 }));
-      return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript };
+      return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript, segmentDurations: [] as number[] };
     }
   }, [getAudioDuration, preferredVoice]);
 
