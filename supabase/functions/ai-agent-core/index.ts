@@ -691,7 +691,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   
   // For 'news' type: skip AI theme refinement - the RSS ranking already picks the best article
   // This saves 1 AI call per news post (significant cost reduction)
-  if (state.nextContentType !== 'news') {
+  if (state.nextContentType !== 'news' && state.nextContentType !== 'news_video') {
     // ===== WEB INTELLIGENCE: Search trending topics & competitor viral content =====
     let webTrends: string[] = [];
     let competitorInsights: string[] = [];
