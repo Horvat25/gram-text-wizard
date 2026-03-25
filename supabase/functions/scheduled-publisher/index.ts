@@ -76,6 +76,15 @@ serve(async (req) => {
       .limit(1);
 
     const hasConnectedAccount = !accountError && accounts && accounts.length > 0;
+
+    // Check for TikTok accounts
+    const { data: tiktokAccounts, error: tiktokError } = await supabase
+      .from("tiktok_accounts")
+      .select("*")
+      .limit(1);
+
+    const hasTikTokAccount = !tiktokError && tiktokAccounts && tiktokAccounts.length > 0;
+
     const results = [];
 
     for (const post of scheduledPosts) {
