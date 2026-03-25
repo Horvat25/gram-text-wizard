@@ -61,12 +61,17 @@ const TikTokCallback = () => {
       }
 
       try {
+        // Get workspaceId from localStorage
+        const workspaceId = localStorage.getItem('tiktok_oauth_workspace_id');
+        localStorage.removeItem('tiktok_oauth_workspace_id');
+        
         const redirectUri = `${window.location.origin}/tiktok-callback`;
         const { data, error: callbackError } = await supabase.functions.invoke("tiktok-callback", {
           body: {
             code,
             redirectUri,
             userId,
+            workspaceId,
           },
         });
 
