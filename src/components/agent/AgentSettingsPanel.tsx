@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { 
   Sheet,
   SheetContent,
@@ -42,10 +41,21 @@ import {
   Layers,
   Crown,
   Fingerprint,
+  Link2,
+  Plus,
+  RefreshCw,
+  Video,
+  Mic,
+  Play,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useInstagramAccounts } from '@/hooks/useInstagramAccounts';
+import { useTikTokAccounts } from '@/hooks/useTikTokAccounts';
+import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
