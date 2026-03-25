@@ -27,85 +27,162 @@ export async function preloadTrack(track: MusicTrack): Promise<string> {
   if (!track.url || track.url !== '__procedural__') return '';
   
   try {
-    // Generate ambient music procedurally using AudioContext
-    const duration = 60; // 60 seconds of music
+    const duration = 60;
     const sampleRate = 44100;
     const offline = new OfflineAudioContext(2, sampleRate * duration, sampleRate);
     
     const mood = track.mood || 'ambient';
     
-    // Base frequencies for different moods (cinematic keys for tech content)
-    const moodConfig: Record<string, { freqs: number[]; tempo: number; filterFreq: number }> = {
-      epic: { freqs: [55, 82.41, 110, 130.81, 164.81, 220], tempo: 0.9, filterFreq: 1200 },
-      ambient: { freqs: [65.41, 82.41, 98, 130.81, 146.83, 196], tempo: 0.4, filterFreq: 900 },
-      dramatic: { freqs: [55, 69.3, 82.41, 110, 138.59, 220], tempo: 1.1, filterFreq: 1400 },
-      inspiring: { freqs: [73.42, 92.5, 110, 146.83, 174.61, 220], tempo: 0.7, filterFreq: 1100 },
+    // Cinematic chord progressions (minor keys for tech/dramatic feel)
+    const moodConfig: Record<string, { 
+      chords: number[][]; tempo: number; filterFreq: number; 
+      padVolume: number; bassVolume: number; arpVolume: number;
+    }> = {
+      epic: { 
+        chords: [[55, 65.41, 82.41, 110], [61.74, 73.42, 92.5, 123.47], [49, 58.27, 73.42, 98], [55, 69.3, 82.41, 110]],
+        tempo: 0.9, filterFreq: 1400, padVolume: 0.08, bassVolume: 0.07, arpVolume: 0.04
+      },
+      ambient: { 
+        chords: [[65.41, 82.41, 98, 130.81], [73.42, 87.31, 110, 146.83], [55, 65.41, 82.41, 110], [61.74, 73.42, 92.5, 123.47]],
+        tempo: 0.4, filterFreq: 1000, padVolume: 0.07, bassVolume: 0.05, arpVolume: 0.03
+      },
+      dramatic: { 
+        chords: [[55, 65.41, 82.41, 110], [49, 61.74, 73.42, 98], [58.27, 69.3, 87.31, 116.54], [55, 69.3, 82.41, 110]],
+        tempo: 1.0, filterFreq: 1600, padVolume: 0.09, bassVolume: 0.08, arpVolume: 0.05
+      },
+      inspiring: { 
+        chords: [[73.42, 92.5, 110, 146.83], [82.41, 98, 123.47, 164.81], [65.41, 82.41, 98, 130.81], [73.42, 87.31, 110, 146.83]],
+        tempo: 0.7, filterFreq: 1200, padVolume: 0.08, bassVolume: 0.06, arpVolume: 0.04
+      },
     };
     
     const config = moodConfig[mood] || moodConfig.ambient;
+    const chordDuration = 8; // seconds per chord
     
-    // Create deep pad layers with slow LFO modulation
-    for (let i = 0; i < config.freqs.length; i++) {
+    // ═══ LAYER 1: Warm evolving pad (main harmonic body) ═══
+    for (let chordIdx = 0; chordIdx < Math.ceil(duration / chordDuration); chordIdx++) {
+      const chord = config.chords[chordIdx % config.chords.length];
+      const chordStart = chordIdx * chordDuration;
+      
+      for (let noteIdx = 0; noteIdx < chord.length; noteIdx++) {
+        const osc = offline.createOscillator();
+        const gain = offline.createGain();
+        const filter = offline.createBiquadFilter();
+        const panner = offline.createStereoPanner();
+        
+        // Mix sine and triangle for warmth
+        osc.type = noteIdx < 2 ? 'sine' : 'triangle';
+        osc.frequency.value = chord[noteIdx];
+        // Slight detune for chorus/width effect
+        osc.detune.value = (noteIdx - 1.5) * 4;
+        
+        // Smooth fade in/out per chord
+        const vol = config.padVolume / chord.length;
+        gain.gain.setValueAtTime(0, chordStart);
+        gain.gain.linearRampToValueAtTime(vol, chordStart + 1.5);
+        gain.gain.setValueAtTime(vol, chordStart + chordDuration - 2);
+        gain.gain.linearRampToValueAtTime(0, chordStart + chordDuration);
+        
+        // Slow filter sweep for movement
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(config.filterFreq * 0.5, chordStart);
+        filter.frequency.linearRampToValueAtTime(config.filterFreq, chordStart + chordDuration * 0.6);
+        filter.frequency.linearRampToValueAtTime(config.filterFreq * 0.7, chordStart + chordDuration);
+        filter.Q.value = 0.5;
+        
+        // Stereo spread
+        panner.pan.value = (noteIdx / (chord.length - 1)) * 1.4 - 0.7;
+        
+        osc.connect(filter).connect(gain).connect(panner).connect(offline.destination);
+        osc.start(chordStart);
+        osc.stop(Math.min(chordStart + chordDuration + 0.1, duration));
+      }
+    }
+    
+    // ═══ LAYER 2: Deep sub-bass with rhythmic pulse ═══
+    for (let chordIdx = 0; chordIdx < Math.ceil(duration / chordDuration); chordIdx++) {
+      const chord = config.chords[chordIdx % config.chords.length];
+      const chordStart = chordIdx * chordDuration;
+      const bassFreq = chord[0] / 2; // One octave below root
+      
       const osc = offline.createOscillator();
       const gain = offline.createGain();
       const filter = offline.createBiquadFilter();
-      const panner = offline.createStereoPanner();
       
-      osc.type = i < 2 ? 'sine' : 'triangle';
-      osc.frequency.value = config.freqs[i];
+      osc.type = 'sine';
+      osc.frequency.value = bassFreq;
       
-      // Slow detune for width
-      osc.detune.setValueAtTime(Math.random() * 10 - 5, 0);
-      
-      // Gentle volume envelope — louder base for more presence
-      const baseVol = 0.14 / config.freqs.length;
-      gain.gain.setValueAtTime(0, 0);
-      gain.gain.linearRampToValueAtTime(baseVol, 2);
-      
-      // Slow breathing effect
-      for (let t = 3; t < duration - 2; t += 4 + Math.random() * 4) {
-        const variation = baseVol * (0.6 + Math.random() * 0.4);
-        gain.gain.linearRampToValueAtTime(variation, t);
-      }
-      gain.gain.linearRampToValueAtTime(0, duration);
-      
-      // Low-pass filter for warmth
       filter.type = 'lowpass';
-      filter.frequency.value = config.filterFreq * (0.5 + i * 0.2);
-      filter.Q.value = 0.7;
+      filter.frequency.value = 120;
+      filter.Q.value = 1.0;
       
-      // Stereo spread
-      panner.pan.value = (i / config.freqs.length) * 1.6 - 0.8;
+      // Gentle rhythmic pulse
+      const pulseRate = config.tempo * 2;
+      for (let t = chordStart; t < chordStart + chordDuration && t < duration; t += pulseRate) {
+        gain.gain.setValueAtTime(config.bassVolume * 0.3, t);
+        gain.gain.linearRampToValueAtTime(config.bassVolume, t + 0.1);
+        gain.gain.exponentialRampToValueAtTime(config.bassVolume * 0.4, t + pulseRate * 0.8);
+      }
       
-      osc.connect(filter).connect(gain).connect(panner).connect(offline.destination);
-      osc.start(0);
-      osc.stop(duration);
+      // Fade at chord boundaries
+      gain.gain.setValueAtTime(0, chordStart);
+      gain.gain.linearRampToValueAtTime(config.bassVolume * 0.5, chordStart + 0.5);
+      
+      osc.connect(filter).connect(gain).connect(offline.destination);
+      osc.start(chordStart);
+      osc.stop(Math.min(chordStart + chordDuration + 0.1, duration));
     }
     
-    // Add subtle sub-bass pulse
-    const subOsc = offline.createOscillator();
-    const subGain = offline.createGain();
-    subOsc.type = 'sine';
-    subOsc.frequency.value = config.freqs[0] / 2;
-    subGain.gain.setValueAtTime(0, 0);
-    subGain.gain.linearRampToValueAtTime(0.10, 1.5);
-    
-    // Rhythmic pulse
-    const pulseInterval = 60 / (config.tempo * 60); // BPM to seconds
-    for (let t = 2; t < duration - 2; t += pulseInterval) {
-      subGain.gain.setValueAtTime(0.06, t);
-      subGain.gain.exponentialRampToValueAtTime(0.02, t + pulseInterval * 0.7);
+    // ═══ LAYER 3: Subtle arpeggiated high notes (shimmer) ═══
+    for (let chordIdx = 0; chordIdx < Math.ceil(duration / chordDuration); chordIdx++) {
+      const chord = config.chords[chordIdx % config.chords.length];
+      const chordStart = chordIdx * chordDuration;
+      
+      // Play higher octave notes in sequence
+      const arpNotes = chord.map(f => f * 2); // One octave up
+      const noteInterval = chordDuration / (arpNotes.length * 2);
+      
+      for (let i = 0; i < arpNotes.length * 2; i++) {
+        const noteStart = chordStart + i * noteInterval + 2; // Start arp after 2s
+        if (noteStart >= duration - 1) break;
+        
+        const osc = offline.createOscillator();
+        const gain = offline.createGain();
+        const filter = offline.createBiquadFilter();
+        const panner = offline.createStereoPanner();
+        
+        osc.type = 'sine';
+        osc.frequency.value = arpNotes[i % arpNotes.length];
+        
+        // Short, bell-like envelope
+        const noteDur = noteInterval * 1.5;
+        gain.gain.setValueAtTime(0, noteStart);
+        gain.gain.linearRampToValueAtTime(config.arpVolume, noteStart + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, noteStart + noteDur);
+        
+        filter.type = 'lowpass';
+        filter.frequency.value = config.filterFreq * 1.5;
+        filter.Q.value = 0.3;
+        
+        // Alternate stereo
+        panner.pan.value = (i % 2 === 0) ? -0.5 : 0.5;
+        
+        osc.connect(filter).connect(gain).connect(panner).connect(offline.destination);
+        osc.start(noteStart);
+        osc.stop(Math.min(noteStart + noteDur + 0.1, duration));
+      }
     }
-    subGain.gain.linearRampToValueAtTime(0, duration);
     
-    subOsc.connect(subGain).connect(offline.destination);
-    subOsc.start(0);
-    subOsc.stop(duration);
+    // ═══ GLOBAL: Fade in/out ═══
+    const masterGain = offline.createGain();
+    masterGain.gain.setValueAtTime(0, 0);
+    masterGain.gain.linearRampToValueAtTime(1, 2);
+    masterGain.gain.setValueAtTime(1, duration - 3);
+    masterGain.gain.linearRampToValueAtTime(0, duration);
+    // Note: masterGain not connected to individual nodes since they connect directly
+    // The fade is handled per-layer above
     
-    // Render to buffer
     const renderedBuffer = await offline.startRendering();
-    
-    // Convert to WAV data URL
     const wavBlob = audioBufferToWav(renderedBuffer);
     return URL.createObjectURL(wavBlob);
     
@@ -115,19 +192,17 @@ export async function preloadTrack(track: MusicTrack): Promise<string> {
   }
 }
 
-// Convert AudioBuffer to WAV Blob
 function audioBufferToWav(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels;
   const sampleRate = buffer.sampleRate;
   const length = buffer.length;
-  const bytesPerSample = 2; // 16-bit
+  const bytesPerSample = 2;
   const blockAlign = numChannels * bytesPerSample;
   const dataSize = length * blockAlign;
   const headerSize = 44;
   const arrayBuffer = new ArrayBuffer(headerSize + dataSize);
   const view = new DataView(arrayBuffer);
   
-  // WAV header
   const writeString = (offset: number, str: string) => {
     for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
   };
@@ -136,17 +211,16 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   view.setUint32(4, 36 + dataSize, true);
   writeString(8, 'WAVE');
   writeString(12, 'fmt ');
-  view.setUint32(16, 16, true); // chunk size
-  view.setUint16(20, 1, true); // PCM
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
   view.setUint32(28, sampleRate * blockAlign, true);
   view.setUint16(32, blockAlign, true);
-  view.setUint16(34, 16, true); // bits per sample
+  view.setUint16(34, 16, true);
   writeString(36, 'data');
   view.setUint32(40, dataSize, true);
   
-  // Interleave channels and write samples
   const channels = [];
   for (let ch = 0; ch < numChannels; ch++) {
     channels.push(buffer.getChannelData(ch));
