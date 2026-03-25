@@ -331,6 +331,16 @@ const Settings = () => {
   const startTikTokOAuth = async () => {
     setConnectingTikTok(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Você precisa estar logado');
+        setConnectingTikTok(false);
+        return;
+      }
+      
+      // Store userId in localStorage so the popup can access it
+      localStorage.setItem('tiktok_oauth_user_id', user.id);
+      
       const redirectUri = `${window.location.origin}/tiktok-callback`;
       
       const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', {
