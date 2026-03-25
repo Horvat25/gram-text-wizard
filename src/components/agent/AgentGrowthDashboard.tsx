@@ -19,8 +19,9 @@ import { useWorkspace } from '@/hooks/useWorkspace';
 import { toast } from 'sonner';
 
 interface AgentGrowthDashboardProps {
-  context: AgentContext | null;
+  context?: AgentContext | null;
   onUpdate?: (updates: Partial<AgentContext>) => Promise<void>;
+  platform?: string;
 }
 
 const GOAL_OPTIONS = [
