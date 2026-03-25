@@ -17,91 +17,75 @@ const TikTokCallback = () => {
       const error = searchParams.get("error");
       const errorDescription = searchParams.get("error_description");
 
-      if (error) {
+      const finishWithError = (message: string) => {
         setStatus("error");
-        setMessage(errorDescription || error || "Autorização cancelada");
-        
-        // Notify parent window
+        setMessage(message);
         if (window.opener) {
-          localStorage.setItem("tiktok_oauth_result", JSON.stringify({
-            success: false,
-            error: errorDescription || error
-          }));
-          setTimeout(() => window.close(), 2000);
+          localStorage.setItem("tiktok_oauth_result", JSON.stringify({ success: false, error: message }));
+          setTimeout(() => window.close(), 3000);
         }
+      };
+
+      if (error) {
+        finishWithError(errorDescription || error || "Autorização cancelada");
         return;
       }
 
       if (!code) {
-        setStatus("error");
-        setMessage("Código de autorização não encontrado");
+        finishWithError("Código de autorização não encontrado");
         return;
       }
 
-      // Verify state
-      const savedState = sessionStorage.getItem("tiktok_oauth_state");
-      if (state !== savedState) {
-        console.warn("State mismatch - possible CSRF attack");
+      let userId: string | null = null;
+      try {
+        if (state) {
+          const parsedState = JSON.parse(atob(state));
+          userId = parsedState?.userId ?? null;
+        }
+      } catch (decodeError) {
+        console.warn("Failed to decode TikTok OAuth state:", decodeError);
+      }
+
+      if (!userId) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          userId = user?.id ?? localStorage.getItem("tiktok_oauth_user_id");
+        } catch (authError) {
+          console.warn("Failed to read auth session in TikTok callback:", authError);
+        }
+      }
+
+      if (!userId) {
+        finishWithError("Você precisa estar logado para conectar o TikTok");
+        return;
       }
 
       try {
-        // Try to get user from auth session first, then fallback to localStorage
-        let userId: string | null = null;
-        
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          userId = user.id;
-        } else {
-          // Popup doesn't share session - get userId from localStorage (set by parent)
-          userId = localStorage.getItem('tiktok_oauth_user_id');
-          localStorage.removeItem('tiktok_oauth_user_id');
-        }
-        
-        if (!userId) {
-          throw new Error("Você precisa estar logado para conectar o TikTok");
-        }
-
         const redirectUri = `${window.location.origin}/tiktok-callback`;
-
-        // Exchange code for token
         const { data, error: callbackError } = await supabase.functions.invoke("tiktok-callback", {
           body: {
             code,
             redirectUri,
-            userId
-          }
+            userId,
+          },
         });
 
         if (callbackError) throw callbackError;
+        if (!data.success) throw new Error(data.error || "Falha ao conectar conta");
 
-        if (data.success) {
-          setStatus("success");
-          setMessage(`Conta @${data.account?.username || "TikTok"} conectada com sucesso!`);
-          
-          // Notify parent window
-          if (window.opener) {
-            localStorage.setItem("tiktok_oauth_result", JSON.stringify({
-              success: true,
-              account: data.account
-            }));
-            setTimeout(() => window.close(), 2000);
-          }
-        } else {
-          throw new Error(data.error || "Falha ao conectar conta");
+        setStatus("success");
+        setMessage(`Conta @${data.account?.username || "TikTok"} conectada com sucesso!`);
+
+        if (window.opener) {
+          localStorage.setItem("tiktok_oauth_result", JSON.stringify({
+            success: true,
+            account: data.account,
+          }));
+          setTimeout(() => window.close(), 2000);
         }
       } catch (err: any) {
         console.error("TikTok callback error:", err);
-        setStatus("error");
-        setMessage(err.message || "Erro ao processar autorização");
-        
-        // Notify parent window
-        if (window.opener) {
-          localStorage.setItem("tiktok_oauth_result", JSON.stringify({
-            success: false,
-            error: err.message
-          }));
-          setTimeout(() => window.close(), 3000);
-        }
+        finishWithError(err.message || "Erro ao processar autorização");
       }
     };
 

@@ -22,7 +22,7 @@ serve(async (req) => {
       );
     }
 
-    const { redirectUri } = await req.json();
+    const { redirectUri, userId } = await req.json();
 
     if (!redirectUri) {
       return new Response(
@@ -31,8 +31,19 @@ serve(async (req) => {
       );
     }
 
-    // Generate state for CSRF protection
-    const state = crypto.randomUUID();
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: 'Missing userId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Generate state with nonce + userId so callback works even without popup auth session
+    const statePayload = {
+      nonce: crypto.randomUUID(),
+      userId,
+    };
+    const state = btoa(JSON.stringify(statePayload));
 
     // TikTok OAuth authorization URL
     // Scopes for Sandbox/unaudited apps:

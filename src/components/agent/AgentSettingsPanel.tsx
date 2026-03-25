@@ -323,7 +323,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
       if (!user) { toast.error('Você precisa estar logado'); setConnectingTikTok(false); return; }
       localStorage.setItem('tiktok_oauth_user_id', user.id);
       const redirectUri = `${window.location.origin}/tiktok-callback`;
-      const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', { body: { redirectUri } });
+      const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', { body: { redirectUri, userId: user.id } });
       if (error) throw error;
       sessionStorage.setItem('tiktok_oauth_state', data.state);
       const popup = window.open(data.authUrl, 'tiktok_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
