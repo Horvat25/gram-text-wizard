@@ -118,9 +118,9 @@ export default function AgentGenieView() {
   const [showPostHistory, setShowPostHistory] = useState(false);
   
   // TikTok panel states
-  const [showTikTokQueue, setShowTikTokQueue] = useState(false);
-  const [showTikTokHistory, setShowTikTokHistory] = useState(false);
-  const [showTikTokCreate, setShowTikTokCreate] = useState(false);
+    const [showTikTokQueue, setShowTikTokQueue] = useState(false);
+    const [showTikTokHistory, setShowTikTokHistory] = useState(false);
+    const [showTikTokGrowth, setShowTikTokGrowth] = useState(false);
 
   useEffect(() => {
     if (user && currentWorkspace) {
@@ -272,7 +272,7 @@ export default function AgentGenieView() {
     setShowPostHistory(false);
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
-    setShowTikTokCreate(false);
+    setShowTikTokGrowth(false);
   };
 
   const togglePanel = (panel: string) => {
@@ -286,7 +286,7 @@ export default function AgentGenieView() {
       postHistory: showPostHistory,
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
-      tiktokCreate: showTikTokCreate,
+      tiktokGrowth: showTikTokGrowth,
     };
 
     closeAllPanels();
@@ -301,7 +301,7 @@ export default function AgentGenieView() {
         case 'postHistory': setShowPostHistory(true); break;
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
-        case 'tiktokCreate': setShowTikTokCreate(true); break;
+        case 'tiktokGrowth': setShowTikTokGrowth(true); break;
       }
     }
   };
@@ -330,19 +330,6 @@ export default function AgentGenieView() {
         <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
           <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
             <Button
-              variant={showTikTokCreate ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showTikTokCreate && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
-              )}
-              onClick={() => togglePanel('tiktokCreate')}
-            >
-              <Film className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Criar</span>
-            </Button>
-            
-            <Button
               variant={showTikTokQueue ? "default" : "ghost"}
               size="sm"
               className={cn(
@@ -366,6 +353,19 @@ export default function AgentGenieView() {
             >
               <History className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Posts</span>
+            </Button>
+            
+            <Button
+              variant={showTikTokGrowth ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showTikTokGrowth && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
+              )}
+              onClick={() => togglePanel('tiktokGrowth')}
+            >
+              <TrendingUp className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Crescimento</span>
             </Button>
           </div>
           
@@ -423,24 +423,6 @@ export default function AgentGenieView() {
           agentAvatar={agentConfig.agent_avatar_url}
         />
         
-        {/* TikTok Create Panel */}
-        {showTikTokCreate && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-2xl mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Criar Vídeo — TikTok</h2>
-                    <p className="text-xs text-muted-foreground">Produza vídeos com IA para o TikTok</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowTikTokCreate(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <TikTokContentCreation />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-        
         {/* TikTok Queue Panel */}
         {showTikTokQueue && (
           <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
@@ -478,6 +460,24 @@ export default function AgentGenieView() {
                   <Button variant="ghost" size="sm" onClick={() => setShowTikTokHistory(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
                 <PostHistoryTab platform="tiktok" />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* TikTok Growth Panel */}
+        {showTikTokGrowth && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Crescimento — TikTok</h2>
+                    <p className="text-xs text-muted-foreground">Métricas e estratégia de crescimento</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowTikTokGrowth(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <AgentGrowthDashboard platform="tiktok" />
               </div>
             </ScrollArea>
           </div>
