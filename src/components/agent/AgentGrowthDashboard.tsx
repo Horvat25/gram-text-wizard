@@ -568,13 +568,13 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
                       {post.image_url && <img src={post.image_url} alt="" className="w-8 h-8 rounded object-cover shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-medium line-clamp-1">{post.caption}</p>
-                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {((post.impressions || post.reach || 0)).toLocaleString()} views</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="h-2.5 w-2.5" /> {((post.impressions || post.reach || 0)).toLocaleString()}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Heart className="h-2.5 w-2.5" /> {(post.likes_count || 0).toLocaleString()}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Bookmark className="h-2.5 w-2.5" /> {post.saves_count || 0}</span>
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Share2 className="h-2.5 w-2.5" /> {post.shares_count || 0}</span>
                         </div>
-                        <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
                           <Badge variant="outline" className="text-[8px] h-3.5 px-1">{mediaLabel}</Badge>
                           <span className="text-[9px] text-emerald-500 font-medium">{engRate}% eng</span>
                           {post.published_at && <span className="text-[9px] text-muted-foreground/60">{new Date(post.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>}
