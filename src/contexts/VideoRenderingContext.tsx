@@ -530,12 +530,31 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
   }, [user, currentWorkspace?.id, autoRenderEnabled, processAutoQueue]);
 
   const cancelRendering = useCallback(() => {
+    console.log('[AutoRender] ❌ Cancel requested by user');
+    // Disable auto-render first to prevent watchdog from restarting
+    setAutoRenderEnabled(false);
+    autoRenderEnabledRef.current = false;
+    
+    // Clear all state
     setIsRendering(false);
     setCurrentVideoId(null);
     renderLockRef.current = false;
     processingAutoRef.current = false;
+    autoRenderCurrentRef.current = 0;
+    autoRenderTotalRef.current = 0;
+    setAutoRenderQueue([]);
+    setAutoRenderProgress({ current: 0, total: 0 });
+    
+    // Reset the narrative story hook (sets abortRef = true)
     reset();
-    toast.info('Renderização cancelada');
+    
+    // Clear watchdog
+    if (watchdogRef.current) {
+      clearInterval(watchdogRef.current);
+      watchdogRef.current = null;
+    }
+    
+    toast.info('Renderização e auto-render cancelados');
   }, [reset]);
 
   const value: VideoRenderingContextType = {
