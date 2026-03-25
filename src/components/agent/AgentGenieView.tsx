@@ -41,6 +41,35 @@ const TikTokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const PlatformToggle = ({ selected, onSelect }: { selected: Platform; onSelect: (p: Platform) => void }) => (
+  <div className="flex items-center bg-muted/50 rounded-md p-0.5">
+    <button
+      onClick={() => onSelect("instagram")}
+      className={cn(
+        "p-1 rounded transition-all",
+        selected === "instagram" 
+          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      title="Instagram"
+    >
+      <Instagram className="h-3.5 w-3.5" />
+    </button>
+    <button
+      onClick={() => onSelect("tiktok")}
+      className={cn(
+        "p-1 rounded transition-all",
+        selected === "tiktok" 
+          ? "bg-gradient-to-r from-cyan-500 to-pink-500 text-white shadow-sm" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      title="TikTok"
+    >
+      <TikTokIcon className="h-3.5 w-3.5" />
+    </button>
+  </div>
+);
+
 interface AgentConfig {
   agent_name: string;
   agent_avatar_url: string | null;
