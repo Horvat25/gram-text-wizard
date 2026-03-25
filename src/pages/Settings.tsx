@@ -105,6 +105,7 @@ const Settings = () => {
     error: tiktokError, 
     fetchAccounts: fetchTikTokAccounts, 
     disconnectAccount: disconnectTikTok,
+    refreshToken: refreshTikTokToken,
     getTokenStatus: getTikTokTokenStatus,
     getDaysUntilExpiry: getTikTokDaysUntilExpiry
   } = useTikTokAccounts();
@@ -1068,14 +1069,35 @@ const Settings = () => {
                                 )}
                               </p>
                             </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => disconnectTikTok(account.id)}
-                              className="text-destructive hover:bg-destructive/10"
-                            >
-                              Desconectar
-                            </Button>
+                            <div className="flex gap-2">
+                              {getTikTokTokenStatus(account.expires_at) !== 'active' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={async () => {
+                                    toast.loading('Renovando token...', { id: 'refresh-tk' });
+                                    const ok = await refreshTikTokToken(account.id);
+                                    if (ok) {
+                                      toast.success('Token renovado com sucesso!', { id: 'refresh-tk' });
+                                    } else {
+                                      toast.error('Falha ao renovar. Reconecte sua conta.', { id: 'refresh-tk' });
+                                    }
+                                  }}
+                                  className="text-amber-500 hover:bg-amber-500/10"
+                                >
+                                  <RefreshCw className="w-4 h-4 mr-1" />
+                                  Renovar
+                                </Button>
+                              )}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => disconnectTikTok(account.id)}
+                                className="text-destructive hover:bg-destructive/10"
+                              >
+                                Desconectar
+                              </Button>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
