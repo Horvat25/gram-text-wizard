@@ -45,9 +45,19 @@ const TikTokCallback = () => {
       }
 
       try {
-        // Get current user
+        // Try to get user from auth session first, then fallback to localStorage
+        let userId: string | null = null;
+        
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        if (user) {
+          userId = user.id;
+        } else {
+          // Popup doesn't share session - get userId from localStorage (set by parent)
+          userId = localStorage.getItem('tiktok_oauth_user_id');
+          localStorage.removeItem('tiktok_oauth_user_id');
+        }
+        
+        if (!userId) {
           throw new Error("Você precisa estar logado para conectar o TikTok");
         }
 
@@ -58,7 +68,7 @@ const TikTokCallback = () => {
           body: {
             code,
             redirectUri,
-            userId: user.id
+            userId
           }
         });
 
