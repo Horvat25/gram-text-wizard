@@ -119,11 +119,19 @@ const HASHTAG_STRATEGIES = [
 export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat }: AgentSettingsPanelProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
+  const { accounts: igAccounts, fetchAccounts: fetchIgAccounts, disconnectAccount: disconnectIg, getTokenStatus: getIgTokenStatus, getDaysUntilExpiry: getIgDaysUntilExpiry } = useInstagramAccounts();
+  const { accounts: tiktokAccounts, fetchAccounts: fetchTkAccounts, disconnectAccount: disconnectTk, getTokenStatus: getTkTokenStatus, getDaysUntilExpiry: getTkDaysUntilExpiry } = useTikTokAccounts();
+  const { settings: brandSettings, updateSettings: updateBrandSettings } = useBrandSettings();
+  
   const [context, setContext] = useState<AgentContext | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice'>('dna');
+  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice' | 'connections'>('dna');
+  const [connecting, setConnecting] = useState(false);
+  const [connectingTikTok, setConnectingTikTok] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState("camila");
+  const [testingVoice, setTestingVoice] = useState<string | null>(null);
   
   const [config, setConfig] = useState({
     agent_name: 'Agente IA',
