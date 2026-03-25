@@ -64,6 +64,22 @@ export function useTikTokAccounts() {
     }
   };
 
+  const refreshToken = async (accountId: string) => {
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('refresh-tiktok-token', {
+        body: { accountId },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+      // Reload accounts to get updated expiry
+      await fetchAccounts();
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      return false;
+    }
+  };
+
   const getTokenStatus = (expiresAt: string | null): 'active' | 'expiring' | 'expired' => {
     if (!expiresAt) return 'active';
     const now = new Date();
@@ -81,5 +97,5 @@ export function useTikTokAccounts() {
     return Math.max(0, Math.floor((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
   };
 
-  return { accounts, isLoading, error, fetchAccounts, disconnectAccount, getTokenStatus, getDaysUntilExpiry };
+  return { accounts, isLoading, error, fetchAccounts, disconnectAccount, refreshToken, getTokenStatus, getDaysUntilExpiry };
 }
