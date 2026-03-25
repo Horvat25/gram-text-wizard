@@ -68,6 +68,7 @@ interface AgentSettingsPanelProps {
   trigger?: React.ReactNode;
   onConfigChange?: (config: any) => void;
   onClearChat?: () => void;
+  activePlatform?: 'instagram' | 'tiktok';
 }
 
 const PERSONALITY_ARCHETYPES = [
