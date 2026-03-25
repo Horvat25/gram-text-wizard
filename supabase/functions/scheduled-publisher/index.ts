@@ -232,6 +232,32 @@ serve(async (req) => {
             message: `${typeLabel} publicado no Instagram @${account.username}`,
           });
           console.log(`🎉 Post ${post.id} publicado com sucesso no Instagram!`);
+
+          // ── TIKTOK PUBLISHING (after Instagram) ──
+          const postPlatforms = post.platforms as string[] || [];
+          if (hasTikTokAccount && postPlatforms.includes('tiktok') && post.video_url) {
+            console.log(`🎵 Publicando também no TikTok...`);
+            try {
+              const tiktokResponse = await fetch(`${supabaseUrl}/functions/v1/publish-to-tiktok`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${supabaseKey}`,
+                },
+                body: JSON.stringify({ postId: post.id }),
+              });
+              const tiktokData = await tiktokResponse.json();
+              if (tiktokData.success) {
+                console.log(`🎵 TikTok: ${tiktokData.message}`);
+                results[results.length - 1].tiktok = tiktokData.message;
+              } else {
+                console.warn(`⚠️ TikTok falhou: ${tiktokData.error}`);
+                results[results.length - 1].tiktokError = tiktokData.error;
+              }
+            } catch (tiktokErr: any) {
+              console.warn(`⚠️ TikTok erro: ${tiktokErr.message}`);
+            }
+          }
         } else {
           // Simulation mode
           const reason = !hasConnectedAccount 
