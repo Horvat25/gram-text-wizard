@@ -243,17 +243,9 @@ const TikTokContentCreation = () => {
 
     const platforms = getSelectedPlatforms();
     
-    // Validate accounts
-    if (publishToTikTok && !hasTikTokAccount) {
+    // Validate TikTok account
+    if (!hasTikTokAccount) {
       toast.error("Conecte uma conta TikTok nas configurações");
-      return;
-    }
-    if (publishToInstagram && !hasInstagramAccount) {
-      toast.error("Conecte uma conta Instagram nas configurações");
-      return;
-    }
-    if (platforms.length === 0) {
-      toast.error("Selecione pelo menos uma plataforma");
       return;
     }
 
