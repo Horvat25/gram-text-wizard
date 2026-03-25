@@ -39,6 +39,8 @@ interface PublishedPost {
   hashtags: string[] | null;
   image_url: string | null;
   instagram_post_id: string | null;
+  tiktok_post_id: string | null;
+  platforms: string[] | null;
   published_at: string | null;
   likes_count: number | null;
   comments_count: number | null;
@@ -49,7 +51,11 @@ interface PublishedPost {
 
 type ViewMode = 'daily' | 'weekly' | 'monthly';
 
-export function PostHistoryTab() {
+interface PostHistoryTabProps {
+  platform?: 'instagram' | 'tiktok';
+}
+
+export function PostHistoryTab({ platform = 'instagram' }: PostHistoryTabProps) {
   const [posts, setPosts] = useState<PublishedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
@@ -59,12 +65,20 @@ export function PostHistoryTab() {
   const fetchPublishedPosts = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('posts')
         .select('*')
         .eq('status', 'published')
         .order('published_at', { ascending: false });
 
+      // Filter by platform
+      if (platform === 'tiktok') {
+        query = query.not('tiktok_post_id', 'is', null);
+      } else {
+        query = query.not('instagram_post_id', 'is', null);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setPosts(data || []);
     } catch (error) {
@@ -147,7 +161,7 @@ export function PostHistoryTab() {
 
   useEffect(() => {
     fetchPublishedPosts();
-  }, []);
+  }, [platform]);
 
   // Get posts for a specific day
   const getPostsForDay = (date: Date) => {
@@ -237,19 +251,21 @@ export function PostHistoryTab() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h2 className="text-2xl font-bold neural-gradient-text">Histórico de Publicações</h2>
+      <h2 className="text-2xl font-bold neural-gradient-text">Histórico de Publicações</h2>
           <p className="text-muted-foreground text-sm">
-            {posts.length} post{posts.length !== 1 ? 's' : ''} publicado{posts.length !== 1 ? 's' : ''}
+            {posts.length} post{posts.length !== 1 ? 's' : ''} no {platform === 'tiktok' ? 'TikTok' : 'Instagram'}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={syncWithInstagram} disabled={loading} className="border-primary/30 hover:bg-primary/10">
-          {loading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
-          )}
-          Sincronizar com Instagram
-        </Button>
+        {platform === 'instagram' && (
+          <Button variant="outline" size="sm" onClick={syncWithInstagram} disabled={loading} className="border-primary/30 hover:bg-primary/10">
+            {loading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Sincronizar com Instagram
+          </Button>
+        )}
       </div>
 
       {/* View Mode Toggle + Navigation */}
@@ -399,7 +415,7 @@ export function PostHistoryTab() {
                     </span>
                   )}
                 </div>
-                {selectedPost.instagram_post_id && (
+                {selectedPost.instagram_post_id && platform === 'instagram' && (
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -408,6 +424,9 @@ export function PostHistoryTab() {
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Ver no Instagram
                   </Button>
+                )}
+                {selectedPost.tiktok_post_id && platform === 'tiktok' && (
+                  <Badge variant="secondary">TikTok</Badge>
                 )}
               </div>
             </div>

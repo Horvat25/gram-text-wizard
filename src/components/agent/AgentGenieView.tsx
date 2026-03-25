@@ -487,7 +487,7 @@ export default function AgentGenieView() {
             <div className="p-4 max-w-2xl mx-auto">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="font-semibold text-sm">Fila de Publicação</h2>
+                  <h2 className="font-semibold text-sm">Fila — {selectedPlatform === 'tiktok' ? 'TikTok' : 'Instagram'}</h2>
                   <p className="text-xs text-muted-foreground">
                     {selectedPlatform === "tiktok" ? "Conteúdo do TikTok" : "Posts agendados e rascunhos"}
                   </p>
@@ -517,12 +517,12 @@ export default function AgentGenieView() {
             <div className="p-4 max-w-2xl mx-auto">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="font-semibold text-sm">Histórico de Publicações</h2>
+                  <h2 className="font-semibold text-sm">Histórico — {selectedPlatform === 'tiktok' ? 'TikTok' : 'Instagram'}</h2>
                   <p className="text-xs text-muted-foreground">Calendário de posts publicados</p>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setShowPostHistory(false)} className="h-7 w-7 p-0">✕</Button>
               </div>
-              <PostHistoryTab />
+              <PostHistoryTab platform={selectedPlatform} />
             </div>
           </ScrollArea>
         </div>
