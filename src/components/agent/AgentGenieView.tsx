@@ -115,6 +115,11 @@ export default function AgentGenieView() {
   const [showMarketing, setShowMarketing] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
+  
+  // TikTok panel states
+  const [showTikTokQueue, setShowTikTokQueue] = useState(false);
+  const [showTikTokHistory, setShowTikTokHistory] = useState(false);
+  const [showTikTokCreate, setShowTikTokCreate] = useState(false);
 
   useEffect(() => {
     if (user && currentWorkspace) {
@@ -264,6 +269,9 @@ export default function AgentGenieView() {
     setShowMarketing(false);
     setShowQueue(false);
     setShowPostHistory(false);
+    setShowTikTokQueue(false);
+    setShowTikTokHistory(false);
+    setShowTikTokCreate(false);
   };
 
   const togglePanel = (panel: string) => {
@@ -275,6 +283,9 @@ export default function AgentGenieView() {
       marketing: showMarketing,
       queue: showQueue,
       postHistory: showPostHistory,
+      tiktokQueue: showTikTokQueue,
+      tiktokHistory: showTikTokHistory,
+      tiktokCreate: showTikTokCreate,
     };
 
     closeAllPanels();
@@ -287,6 +298,9 @@ export default function AgentGenieView() {
         case 'marketing': setShowMarketing(true); break;
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
+        case 'tiktokQueue': setShowTikTokQueue(true); break;
+        case 'tiktokHistory': setShowTikTokHistory(true); break;
+        case 'tiktokCreate': setShowTikTokCreate(true); break;
       }
     }
   };
