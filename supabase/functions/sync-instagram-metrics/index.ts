@@ -203,26 +203,32 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 
   if (insightsRes && insightsRes.ok) {
     const insightsData = await insightsRes.json();
+    const metricNames = (insightsData.data || []).map((m: any) => m.name).join(', ');
+    console.log(`📊 ${mediaId} (${isReels ? 'reels' : 'post'}): metrics found: [${metricNames}]`);
+    
     for (const insight of insightsData.data || []) {
       const rawValue = insight.values?.[0]?.value;
       const value = typeof rawValue === 'number' ? rawValue : Number(rawValue) || 0;
 
       switch (insight.name) {
         case "reach":
-          reach = value;
+          reach = Math.max(reach, value);
           break;
         case "saved":
-          saves = value;
+          saves = Math.max(saves, value);
           break;
         case "impressions":
         case "views":
-          impressions = value;
+          impressions = Math.max(impressions, value);
+          break;
+        case "ig_reels_aggregated_all_plays_count":
+        case "plays":
+          // This is the actual "views" count users see on Instagram for Reels
+          impressions = Math.max(impressions, value);
+          console.log(`🎬 Reels plays for ${mediaId}: ${value}`);
           break;
         case "shares":
-          shares = value;
-          break;
-        case "plays":
-          if (value > impressions) impressions = value;
+          shares = Math.max(shares, value);
           break;
       }
     }
@@ -237,6 +243,7 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
 
   const minReach = likes + comments + saves;
   const finalReach = Math.max(reach, minReach, post.reach || 0);
+  const finalImpressions = Math.max(impressions, post.impressions || 0);
 
   const { error } = await supabase
     .from("posts")
@@ -245,7 +252,7 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
       comments_count: comments,
       saves_count: saves,
       reach: finalReach,
-      impressions,
+      impressions: finalImpressions,
       shares_count: shares,
       last_metrics_sync: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -253,9 +260,7 @@ async function syncSinglePost(supabase: any, post: any, accessToken: string): Pr
     .eq("id", post.id);
 
   if (error) return { action: 'error', message: error.message };
-  if (likes > 0 || comments > 0) {
-    console.log(`✅ ${post.id}: ${likes}❤️ ${comments}💬 ${saves}🔖 ${finalReach}👁️ ${impressions}📺`);
-  }
+  console.log(`✅ ${post.id}: ${likes}❤️ ${comments}💬 ${saves}🔖 ${finalReach}👁️ ${finalImpressions}📺 ${shares}🔄`);
   return { action: 'updated' };
 }
 
