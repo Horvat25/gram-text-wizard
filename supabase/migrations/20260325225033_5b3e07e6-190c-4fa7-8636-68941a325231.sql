@@ -1,0 +1,1 @@
+ALTER TABLE public.agent_chat_messages ADD COLUMN platform text NOT NULL DEFAULT 'instagram';
