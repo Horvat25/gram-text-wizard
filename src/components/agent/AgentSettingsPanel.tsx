@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { 
   Sheet,
   SheetContent,
@@ -42,10 +41,21 @@ import {
   Layers,
   Crown,
   Fingerprint,
+  Link2,
+  Plus,
+  RefreshCw,
+  Video,
+  Mic,
+  Play,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useInstagramAccounts } from '@/hooks/useInstagramAccounts';
+import { useTikTokAccounts } from '@/hooks/useTikTokAccounts';
+import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgentContext } from '@/hooks/useAgentContext';
@@ -109,11 +119,19 @@ const HASHTAG_STRATEGIES = [
 export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat }: AgentSettingsPanelProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
+  const { accounts: igAccounts, fetchAccounts: fetchIgAccounts, disconnectAccount: disconnectIg, getTokenStatus: getIgTokenStatus, getDaysUntilExpiry: getIgDaysUntilExpiry } = useInstagramAccounts();
+  const { accounts: tiktokAccounts, fetchAccounts: fetchTkAccounts, disconnectAccount: disconnectTk, getTokenStatus: getTkTokenStatus, getDaysUntilExpiry: getTkDaysUntilExpiry } = useTikTokAccounts();
+  const { settings: brandSettings, updateSettings: updateBrandSettings } = useBrandSettings();
+  
   const [context, setContext] = useState<AgentContext | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice'>('dna');
+  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice' | 'connections'>('dna');
+  const [connecting, setConnecting] = useState(false);
+  const [connectingTikTok, setConnectingTikTok] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState("camila");
+  const [testingVoice, setTestingVoice] = useState<string | null>(null);
   
   const [config, setConfig] = useState({
     agent_name: 'Agente IA',
@@ -268,10 +286,76 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
     setConfig(c => ({ ...c, avoid_topics: c.avoid_topics.filter(t => t !== topic) }));
   };
 
+  const VOICE_OPTIONS = [
+    { id: 'camila', name: 'Camila', gender: 'Feminino', description: 'Calorosa e profissional' },
+    { id: 'vitoria', name: 'Vitória', gender: 'Feminino', description: 'Suave e gentil' },
+    { id: 'thiago', name: 'Thiago', gender: 'Masculino', description: 'Dinâmica e envolvente' },
+    { id: 'ricardo', name: 'Ricardo', gender: 'Masculino', description: 'Grave e autoritária' },
+  ];
+
+  const startOAuth = async () => {
+    setConnecting(true);
+    try {
+      const redirectUri = `${window.location.origin}/`;
+      const { data, error } = await supabase.functions.invoke('start-oauth', { body: { redirectUri } });
+      if (error) throw error;
+      sessionStorage.setItem('oauth_state', data.state);
+      localStorage.removeItem('oauth_result');
+      const popup = window.open(data.authUrl, 'instagram_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
+      if (!popup) { toast.error('Permita popups para este site.'); setConnecting(false); return; }
+      const checkPopup = setInterval(() => {
+        const r = localStorage.getItem('oauth_result');
+        if (r) { clearInterval(checkPopup); localStorage.removeItem('oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('Instagram conectado!'); fetchIgAccounts(); } else { toast.error(res.error); } setConnecting(false); }
+        try { if (popup.closed) { clearInterval(checkPopup); setConnecting(false); fetchIgAccounts(); } } catch {}
+      }, 500);
+      setTimeout(() => { clearInterval(checkPopup); setConnecting(false); }, 300000);
+    } catch (e: any) { toast.error(e.message); setConnecting(false); }
+  };
+
+  const startTikTokOAuth = async () => {
+    setConnectingTikTok(true);
+    try {
+      const redirectUri = `${window.location.origin}/tiktok-callback`;
+      const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', { body: { redirectUri } });
+      if (error) throw error;
+      sessionStorage.setItem('tiktok_oauth_state', data.state);
+      const popup = window.open(data.authUrl, 'tiktok_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
+      if (!popup) { toast.error('Permita popups.'); setConnectingTikTok(false); return; }
+      const checkPopup = setInterval(() => {
+        const r = localStorage.getItem('tiktok_oauth_result');
+        if (r) { clearInterval(checkPopup); localStorage.removeItem('tiktok_oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('TikTok conectado!'); fetchTkAccounts(); } else { toast.error(res.error); } setConnectingTikTok(false); }
+        try { if (popup.closed) { clearInterval(checkPopup); setConnectingTikTok(false); fetchTkAccounts(); } } catch {}
+      }, 500);
+      setTimeout(() => { clearInterval(checkPopup); setConnectingTikTok(false); }, 300000);
+    } catch (e: any) { toast.error(e.message); setConnectingTikTok(false); }
+  };
+
+  const handleVoiceSelect = (voiceId: string) => {
+    setSelectedVoice(voiceId);
+    updateBrandSettings({ preferredVoice: voiceId });
+    toast.success(`Voz "${VOICE_OPTIONS.find(v => v.id === voiceId)?.name}" selecionada!`);
+  };
+
+  const testVoice = async (voiceId: string) => {
+    setTestingVoice(voiceId);
+    try {
+      const { data, error } = await supabase.functions.invoke('lovable-tts', { body: { text: 'Olá! Esta é uma demonstração da voz neural.', voice: voiceId } });
+      if (error) throw error;
+      if (!data?.audioContent) throw new Error('Sem áudio');
+      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+      audio.onended = () => setTestingVoice(null);
+      audio.onerror = () => setTestingVoice(null);
+      await audio.play();
+    } catch (e: any) { toast.error(e.message); setTestingVoice(null); }
+  };
+
+  useEffect(() => { setSelectedVoice(brandSettings.preferredVoice || 'camila'); }, [brandSettings]);
+
   const sections = [
     { id: 'dna' as const, label: 'DNA', icon: Fingerprint },
     { id: 'niche' as const, label: 'Nicho', icon: Target },
     { id: 'voice' as const, label: 'Voz', icon: Palette },
+    { id: 'connections' as const, label: 'Contas', icon: Link2 },
   ];
 
   return (
@@ -657,6 +741,123 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                                 <span className={cn("text-sm font-medium", isSelected && "text-primary")}>{level.label}</span>
                                 <span className="text-[10px] text-muted-foreground">{level.preview}</span>
                               </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* CONNECTIONS Section — Instagram, TikTok, Voice */}
+                  {activeSection === 'connections' && (
+                    <motion.div 
+                      key="connections"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="space-y-5"
+                    >
+                      {/* Instagram */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Instagram className="h-3.5 w-3.5" /> Instagram
+                        </Label>
+                        {igAccounts.length > 0 ? (
+                          <div className="space-y-2">
+                            {igAccounts.map(acc => (
+                              <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                                    <Instagram className="w-4 h-4 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium">@{acc.username || 'Conectado'}</p>
+                                    <Badge variant={getIgTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
+                                      {getIgTokenStatus(acc.expires_at) === 'active' ? `Ativo (${getIgDaysUntilExpiry(acc.expires_at)}d)` : 'Expirado'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectIg(acc.id)}>
+                                  Desconectar
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <Button onClick={startOAuth} disabled={connecting} className="w-full gap-2" variant="outline">
+                            {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            Conectar Instagram
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* TikTok */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Video className="h-3.5 w-3.5" /> TikTok
+                        </Label>
+                        {tiktokAccounts.length > 0 ? (
+                          <div className="space-y-2">
+                            {tiktokAccounts.map(acc => (
+                              <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
+                                    <Video className="w-4 h-4 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium">@{acc.username || acc.display_name || 'TikTok'}</p>
+                                    <Badge variant={getTkTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
+                                      {getTkTokenStatus(acc.expires_at) === 'active' ? 'Ativo' : 'Expirado'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectTk(acc.id)}>
+                                  Desconectar
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <Button onClick={startTikTokOAuth} disabled={connectingTikTok} className="w-full gap-2" variant="outline">
+                            {connectingTikTok ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            Conectar TikTok
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Voice Selection */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Mic className="h-3.5 w-3.5" /> Voz para Narração
+                        </Label>
+                        <div className="space-y-2">
+                          {VOICE_OPTIONS.map(voice => {
+                            const isSelected = selectedVoice === voice.id;
+                            return (
+                              <div
+                                key={voice.id}
+                                className={cn(
+                                  "flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all",
+                                  isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                                )}
+                                onClick={() => handleVoiceSelect(voice.id)}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isSelected ? "bg-primary/20" : "bg-muted")}>
+                                    <Mic className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium">{voice.name}</span>
+                                    <p className="text-[10px] text-muted-foreground">{voice.gender} · {voice.description}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={(e) => { e.stopPropagation(); testVoice(voice.id); }} disabled={testingVoice === voice.id}>
+                                    {testingVoice === voice.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
+                                  </Button>
+                                  {isSelected && <CheckCircle className="w-4 h-4 text-primary" />}
+                                </div>
+                              </div>
                             );
                           })}
                         </div>
