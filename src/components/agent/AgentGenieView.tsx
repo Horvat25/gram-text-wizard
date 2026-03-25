@@ -28,6 +28,7 @@ import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
+import TikTokGrowthDashboard from './TikTokGrowthDashboard';
 import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
 import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
