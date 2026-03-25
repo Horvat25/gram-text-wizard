@@ -68,6 +68,7 @@ interface AgentSettingsPanelProps {
   trigger?: React.ReactNode;
   onConfigChange?: (config: any) => void;
   onClearChat?: () => void;
+  activePlatform?: 'instagram' | 'tiktok';
 }
 
 const PERSONALITY_ARCHETYPES = [
@@ -119,7 +120,7 @@ const HASHTAG_STRATEGIES = [
   { value: 'aggressive', label: 'Full Force', count: '10-15', description: 'Máxima descobribilidade' },
 ];
 
-export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat }: AgentSettingsPanelProps) {
+export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat, activePlatform = 'instagram' }: AgentSettingsPanelProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { accounts: igAccounts, fetchAccounts: fetchIgAccounts, disconnectAccount: disconnectIg, getTokenStatus: getIgTokenStatus, getDaysUntilExpiry: getIgDaysUntilExpiry } = useInstagramAccounts();
@@ -300,23 +301,15 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const startOAuth = async () => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}/`;
+      // Always use published URL for OAuth redirect to avoid preview/iframe blocking
+      const publishedOrigin = 'https://gram-text-wizard.lovable.app';
+      const redirectUri = `${publishedOrigin}/`;
       const { data, error } = await supabase.functions.invoke('start-oauth', { body: { redirectUri } });
       if (error) throw error;
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
-      const popup = window.open(data.authUrl, 'instagram_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        toast.info('Redirecionando para o Instagram...');
-        window.location.href = data.authUrl;
-        return;
-      }
-      const checkPopup = setInterval(() => {
-        const r = localStorage.getItem('oauth_result');
-        if (r) { clearInterval(checkPopup); localStorage.removeItem('oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('Instagram conectado!'); fetchIgAccounts(); } else { toast.error(res.error); } setConnecting(false); }
-        try { if (popup.closed) { clearInterval(checkPopup); setConnecting(false); fetchIgAccounts(); } } catch {}
-      }, 500);
-      setTimeout(() => { clearInterval(checkPopup); setConnecting(false); }, 300000);
+      // Always redirect in same tab for Instagram (popups get blocked)
+      window.location.href = data.authUrl;
     } catch (e: any) { toast.error(e.message); setConnecting(false); }
   };
 
@@ -835,83 +828,86 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                       exit={{ opacity: 0, y: -8 }}
                       className="space-y-5"
                     >
-                      {/* Instagram */}
-                      <div className="space-y-3">
-                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                          <Instagram className="h-3.5 w-3.5" /> Instagram
-                        </Label>
-                        {igAccounts.length > 0 ? (
-                          <div className="space-y-2">
-                            {igAccounts.map(acc => (
-                              <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
-                                <div className="flex items-center gap-3">
-                                  {acc.profile_picture_url ? (
-                                    <img src={acc.profile_picture_url} alt={acc.username || ''} className="w-10 h-10 rounded-full object-cover border-2 border-primary/30" />
-                                  ) : (
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
-                                      <Instagram className="w-5 h-5 text-white" />
+                      {/* Show only the platform matching activePlatform */}
+                      {activePlatform === 'instagram' && (
+                        <div className="space-y-3">
+                          <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                            <Instagram className="h-3.5 w-3.5" /> Instagram
+                          </Label>
+                          {igAccounts.length > 0 ? (
+                            <div className="space-y-2">
+                              {igAccounts.map(acc => (
+                                <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
+                                  <div className="flex items-center gap-3">
+                                    {acc.profile_picture_url ? (
+                                      <img src={acc.profile_picture_url} alt={acc.username || ''} className="w-10 h-10 rounded-full object-cover border-2 border-primary/30" />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                                        <Instagram className="w-5 h-5 text-white" />
+                                      </div>
+                                    )}
+                                    <div>
+                                      <p className="text-sm font-medium">@{acc.username || 'Conectado'}</p>
+                                      <Badge variant={getIgTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
+                                        {getIgTokenStatus(acc.expires_at) === 'active' 
+                                          ? `✅ Ativo (${getIgDaysUntilExpiry(acc.expires_at)}d)` 
+                                          : '❌ Expirado'}
+                                      </Badge>
                                     </div>
-                                  )}
-                                  <div>
-                                    <p className="text-sm font-medium">@{acc.username || 'Conectado'}</p>
-                                    <Badge variant={getIgTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
-                                      {getIgTokenStatus(acc.expires_at) === 'active' 
-                                        ? `✅ Ativo (${getIgDaysUntilExpiry(acc.expires_at)}d)` 
-                                        : '❌ Expirado'}
-                                    </Badge>
                                   </div>
+                                  <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectIg(acc.id)}>
+                                    Desconectar
+                                  </Button>
                                 </div>
-                                <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectIg(acc.id)}>
-                                  Desconectar
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <Button onClick={startOAuth} disabled={connecting} className="w-full gap-2" variant="outline">
-                            {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                            Conectar Instagram
-                          </Button>
-                        )}
-                      </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <Button onClick={startOAuth} disabled={connecting} className="w-full gap-2" variant="outline">
+                              {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                              Conectar Instagram
+                            </Button>
+                          )}
+                        </div>
+                      )}
 
-                      {/* TikTok */}
-                      <div className="space-y-3">
-                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                          <Video className="h-3.5 w-3.5" /> TikTok
-                        </Label>
-                        {tiktokAccounts.length > 0 ? (
-                          <div className="space-y-2">
-                            {tiktokAccounts.map(acc => (
-                              <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
-                                <div className="flex items-center gap-3">
-                                  {acc.avatar_url ? (
-                                    <img src={acc.avatar_url} alt={acc.username || acc.display_name || ''} className="w-10 h-10 rounded-full object-cover border-2 border-cyan-500/30" />
-                                  ) : (
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
-                                      <Video className="w-5 h-5 text-white" />
+                      {activePlatform === 'tiktok' && (
+                        <div className="space-y-3">
+                          <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                            <Video className="h-3.5 w-3.5" /> TikTok
+                          </Label>
+                          {tiktokAccounts.length > 0 ? (
+                            <div className="space-y-2">
+                              {tiktokAccounts.map(acc => (
+                                <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
+                                  <div className="flex items-center gap-3">
+                                    {acc.avatar_url ? (
+                                      <img src={acc.avatar_url} alt={acc.username || acc.display_name || ''} className="w-10 h-10 rounded-full object-cover border-2 border-cyan-500/30" />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
+                                        <Video className="w-5 h-5 text-white" />
+                                      </div>
+                                    )}
+                                    <div>
+                                      <p className="text-sm font-medium">@{acc.username || acc.display_name || 'TikTok'}</p>
+                                      <Badge variant={getTkTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
+                                        {getTkTokenStatus(acc.expires_at) === 'active' ? '✅ Ativo' : '❌ Expirado'}
+                                      </Badge>
                                     </div>
-                                  )}
-                                  <div>
-                                    <p className="text-sm font-medium">@{acc.username || acc.display_name || 'TikTok'}</p>
-                                    <Badge variant={getTkTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
-                                      {getTkTokenStatus(acc.expires_at) === 'active' ? '✅ Ativo' : '❌ Expirado'}
-                                    </Badge>
                                   </div>
+                                  <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectTk(acc.id)}>
+                                    Desconectar
+                                  </Button>
                                 </div>
-                                <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectTk(acc.id)}>
-                                  Desconectar
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <Button onClick={startTikTokOAuth} disabled={connectingTikTok} className="w-full gap-2" variant="outline">
-                            {connectingTikTok ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                            Conectar TikTok
-                          </Button>
-                        )}
-                      </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <Button onClick={startTikTokOAuth} disabled={connectingTikTok} className="w-full gap-2" variant="outline">
+                              {connectingTikTok ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                              Conectar TikTok
+                            </Button>
+                          )}
+                        </div>
+                      )}
 
                       {/* Voice Selection */}
                       <div className="space-y-3">
