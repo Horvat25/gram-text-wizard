@@ -345,7 +345,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   // MARKETING INTERCALATION: check if it's time for a marketing post
   // Rule: 1 marketing post for every 4 regular posts
-  const totalRegularPosts = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.images;
+  const totalRegularPosts = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.news_videos + weeklyProgress.images;
   const marketingDue = totalRegularPosts >= 4 && weeklyProgress.marketing === 0;
   const marketingOverdue = totalRegularPosts >= 8 && weeklyProgress.marketing <= 1;
   
