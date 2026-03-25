@@ -550,6 +550,12 @@ export async function generateVideoFromSegments(
     // ─── Schedule ALL audio NOW ─────────────────────────────
     const audioStartTime = audioCtx.currentTime;
 
+    // Calculate when narration actually ends (use buffer duration, not contentDuration)
+    // This prevents CTA from overlapping with narration
+    const narrationEndTime = narrationBuf 
+      ? Math.max(contentDuration, narrationBuf.duration) 
+      : contentDuration;
+
     if (narrationBuf) {
       const src = audioCtx.createBufferSource();
       src.buffer = narrationBuf;
@@ -565,7 +571,9 @@ export async function generateVideoFromSegments(
       const gain = audioCtx.createGain();
       gain.gain.value = 0.9;
       src.connect(gain).connect(dest);
-      src.start(audioStartTime + contentDuration + 0.3);
+      // Start CTA after narration finishes (not after contentDuration)
+      // Add 0.5s gap for clean transition
+      src.start(audioStartTime + narrationEndTime + 0.5);
     }
 
     if (musicBuf) {
