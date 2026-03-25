@@ -28,6 +28,7 @@ import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
 import AgentMarketingPanel from './AgentMarketingPanel';
+import TikTokGrowthDashboard from './TikTokGrowthDashboard';
 import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
 import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
@@ -330,6 +331,19 @@ export default function AgentGenieView() {
         <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1">
           <div className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar">
             <Button
+              variant={showHistory ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showHistory && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
+              )}
+              onClick={() => togglePanel('history')}
+            >
+              <Bot className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Chat</span>
+            </Button>
+            
+            <Button
               variant={showTikTokQueue ? "default" : "ghost"}
               size="sm"
               className={cn(
@@ -477,7 +491,7 @@ export default function AgentGenieView() {
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => setShowTikTokGrowth(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
-                <AgentGrowthDashboard platform="tiktok" />
+                <TikTokGrowthDashboard />
               </div>
             </ScrollArea>
           </div>
