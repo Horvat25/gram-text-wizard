@@ -286,10 +286,76 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
     setConfig(c => ({ ...c, avoid_topics: c.avoid_topics.filter(t => t !== topic) }));
   };
 
+  const VOICE_OPTIONS = [
+    { id: 'camila', name: 'Camila', gender: 'Feminino', description: 'Calorosa e profissional' },
+    { id: 'vitoria', name: 'Vitória', gender: 'Feminino', description: 'Suave e gentil' },
+    { id: 'thiago', name: 'Thiago', gender: 'Masculino', description: 'Dinâmica e envolvente' },
+    { id: 'ricardo', name: 'Ricardo', gender: 'Masculino', description: 'Grave e autoritária' },
+  ];
+
+  const startOAuth = async () => {
+    setConnecting(true);
+    try {
+      const redirectUri = `${window.location.origin}/`;
+      const { data, error } = await supabase.functions.invoke('start-oauth', { body: { redirectUri } });
+      if (error) throw error;
+      sessionStorage.setItem('oauth_state', data.state);
+      localStorage.removeItem('oauth_result');
+      const popup = window.open(data.authUrl, 'instagram_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
+      if (!popup) { toast.error('Permita popups para este site.'); setConnecting(false); return; }
+      const checkPopup = setInterval(() => {
+        const r = localStorage.getItem('oauth_result');
+        if (r) { clearInterval(checkPopup); localStorage.removeItem('oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('Instagram conectado!'); fetchIgAccounts(); } else { toast.error(res.error); } setConnecting(false); }
+        try { if (popup.closed) { clearInterval(checkPopup); setConnecting(false); fetchIgAccounts(); } } catch {}
+      }, 500);
+      setTimeout(() => { clearInterval(checkPopup); setConnecting(false); }, 300000);
+    } catch (e: any) { toast.error(e.message); setConnecting(false); }
+  };
+
+  const startTikTokOAuth = async () => {
+    setConnectingTikTok(true);
+    try {
+      const redirectUri = `${window.location.origin}/tiktok-callback`;
+      const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', { body: { redirectUri } });
+      if (error) throw error;
+      sessionStorage.setItem('tiktok_oauth_state', data.state);
+      const popup = window.open(data.authUrl, 'tiktok_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
+      if (!popup) { toast.error('Permita popups.'); setConnectingTikTok(false); return; }
+      const checkPopup = setInterval(() => {
+        const r = localStorage.getItem('tiktok_oauth_result');
+        if (r) { clearInterval(checkPopup); localStorage.removeItem('tiktok_oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('TikTok conectado!'); fetchTkAccounts(); } else { toast.error(res.error); } setConnectingTikTok(false); }
+        try { if (popup.closed) { clearInterval(checkPopup); setConnectingTikTok(false); fetchTkAccounts(); } } catch {}
+      }, 500);
+      setTimeout(() => { clearInterval(checkPopup); setConnectingTikTok(false); }, 300000);
+    } catch (e: any) { toast.error(e.message); setConnectingTikTok(false); }
+  };
+
+  const handleVoiceSelect = (voiceId: string) => {
+    setSelectedVoice(voiceId);
+    updateBrandSettings({ preferredVoice: voiceId });
+    toast.success(`Voz "${VOICE_OPTIONS.find(v => v.id === voiceId)?.name}" selecionada!`);
+  };
+
+  const testVoice = async (voiceId: string) => {
+    setTestingVoice(voiceId);
+    try {
+      const { data, error } = await supabase.functions.invoke('lovable-tts', { body: { text: 'Olá! Esta é uma demonstração da voz neural.', voice: voiceId } });
+      if (error) throw error;
+      if (!data?.audioContent) throw new Error('Sem áudio');
+      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+      audio.onended = () => setTestingVoice(null);
+      audio.onerror = () => setTestingVoice(null);
+      await audio.play();
+    } catch (e: any) { toast.error(e.message); setTestingVoice(null); }
+  };
+
+  useEffect(() => { setSelectedVoice(brandSettings.preferredVoice || 'camila'); }, [brandSettings]);
+
   const sections = [
     { id: 'dna' as const, label: 'DNA', icon: Fingerprint },
     { id: 'niche' as const, label: 'Nicho', icon: Target },
     { id: 'voice' as const, label: 'Voz', icon: Palette },
+    { id: 'connections' as const, label: 'Contas', icon: Link2 },
   ];
 
   return (
