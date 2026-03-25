@@ -110,9 +110,8 @@ const TikTokContentCreation = () => {
   const [selectedDuration, setSelectedDuration] = useState(1); // Index of DURATION_PRESETS (default: ~30s)
   const currentPreset = DURATION_PRESETS[selectedDuration];
   
-  // Platform selection for multiplatform publishing
-  const [publishToTikTok, setPublishToTikTok] = useState(true);
-  const [publishToInstagram, setPublishToInstagram] = useState(false);
+   // TikTok only - no cross-platform publishing
+  const [publishToTikTok] = useState(true);
 
   const hasTikTokAccount = tiktokAccounts.length > 0;
   const hasInstagramAccount = instagramAccounts.length > 0;
@@ -180,13 +179,8 @@ const TikTokContentCreation = () => {
     }
   };
 
-  // Determine which platforms to save/publish to
-  const getSelectedPlatforms = (): string[] => {
-    const platforms: string[] = [];
-    if (publishToTikTok) platforms.push('tiktok');
-    if (publishToInstagram) platforms.push('instagram');
-    return platforms.length > 0 ? platforms : ['tiktok']; // Default to tiktok
-  };
+  // Always TikTok only
+  const getSelectedPlatforms = (): string[] => ['tiktok'];
 
   const savePost = async (status: "draft" | "scheduled") => {
     if (!generatedVideoUrl) {
@@ -293,18 +287,6 @@ const TikTokContentCreation = () => {
         );
       }
       
-      // Publish to Instagram
-      if (publishToInstagram && hasInstagramAccount) {
-        publishPromises.push(
-          supabase.functions.invoke("publish-post", {
-            body: { postId: post.id },
-          }).then(({ data, error }) => {
-            if (error) throw error;
-            if (data?.error) throw new Error(data.error);
-            return { platform: 'instagram', success: true };
-          }).catch(err => ({ platform: 'instagram', success: false, error: err.message }))
-        );
-      }
 
       const results = await Promise.all(publishPromises);
       
@@ -497,41 +479,15 @@ const TikTokContentCreation = () => {
                   </div>
                   
                   {/* Platform Selection */}
-                  <div className="space-y-3 p-3 rounded-lg border border-[#25F4EE]/20 bg-gradient-to-r from-black/5 to-[#25F4EE]/5">
-                    <Label className="text-xs font-medium">Publicar em:</Label>
-                    <div className="flex gap-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="tiktok" 
-                          checked={publishToTikTok}
-                          onCheckedChange={(checked) => setPublishToTikTok(checked === true)}
-                        />
-                        <label htmlFor="tiktok" className="text-sm flex items-center gap-1.5 cursor-pointer">
-                          <TikTokIcon className="h-4 w-4" />
-                          TikTok
-                          {hasTikTokAccount && <Check className="h-3 w-3 text-green-500" />}
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="instagram" 
-                          checked={publishToInstagram}
-                          onCheckedChange={(checked) => setPublishToInstagram(checked === true)}
-                        />
-                        <label htmlFor="instagram" className="text-sm flex items-center gap-1.5 cursor-pointer">
-                          <Instagram className="h-4 w-4" />
-                          Instagram
-                          {hasInstagramAccount && <Check className="h-3 w-3 text-green-500" />}
-                        </label>
-                      </div>
-                    </div>
-                    {(!hasTikTokAccount || !hasInstagramAccount) && (
-                      <p className="text-[10px] text-muted-foreground">
-                        {!hasTikTokAccount && !hasInstagramAccount 
-                          ? "Conecte suas contas nas configurações"
-                          : !hasTikTokAccount 
-                            ? "TikTok não conectado" 
-                            : "Instagram não conectado"}
+                  <div className="p-3 rounded-lg border border-[#25F4EE]/20 bg-gradient-to-r from-black/5 to-[#25F4EE]/5">
+                    <Label className="text-xs font-medium flex items-center gap-1.5">
+                      <TikTokIcon className="h-4 w-4" />
+                      Publicar no TikTok
+                      {hasTikTokAccount && <Check className="h-3 w-3 text-green-500" />}
+                    </Label>
+                    {!hasTikTokAccount && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Conecte sua conta TikTok nas configurações
                       </p>
                     )}
                   </div>
@@ -575,10 +531,10 @@ const TikTokContentCreation = () => {
                       <Button
                         onClick={publishDirectly}
                         className="bg-gradient-to-r from-[#25F4EE] to-[#FE2C55] hover:opacity-90"
-                        disabled={isSaving || (!publishToTikTok && !publishToInstagram)}
+                        disabled={isSaving || !hasTikTokAccount}
                       >
                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                        {publishToTikTok && publishToInstagram ? "Publicar nos 2" : "Publicar"}
+                        Publicar no TikTok
                       </Button>
                     )}
                   </div>
