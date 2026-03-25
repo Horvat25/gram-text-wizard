@@ -17,8 +17,7 @@ const SCREENS = [
   { file: "screen-queue.png", label: "5. Schedule & Publish", subLabel: "Auto-publish to TikTok via Content Posting API" },
 ];
 
-const SCENE_DURATION = 75; // 2.5s each
-const TRANSITION = 15;
+const SCENE_DURATION = 72; // 2.4s each
 
 function Scene({ screenFile, label, subLabel }: { screenFile: string; label: string; subLabel: string }) {
   const frame = useCurrentFrame();
