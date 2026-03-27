@@ -99,7 +99,7 @@ serve(async (req) => {
       return kws.some((kw) => hay.includes(kw));
     };
 
-    const callModel = async (systemPrompt: string, userPrompt: string) => {
+    const callModel = async (systemPrompt: string, userPrompt: string, attempt = 1): Promise<any> => {
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -112,6 +112,7 @@ serve(async (req) => {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
+          response_format: { type: "json_object" },
         }),
       });
 
@@ -131,7 +132,11 @@ serve(async (req) => {
       try {
         parsed = JSON.parse(content);
       } catch {
-        console.error("Failed to parse AI response:", content);
+        console.error("Failed to parse AI response (attempt", attempt, "):", content.substring(0, 200));
+        if (attempt < 2) {
+          console.log("Retrying with explicit JSON instruction...");
+          return callModel(systemPrompt, userPrompt + "\n\nIMPORTANTE: Responda SOMENTE com JSON válido, sem texto adicional.", attempt + 1);
+        }
         throw new Error("Resposta da IA inválida");
       }
 
