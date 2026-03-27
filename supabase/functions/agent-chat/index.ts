@@ -1125,15 +1125,16 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     if (!script || !script.segments || script.segments.length === 0) {
       console.log('[VIDEO] Using LOCAL script fallback for topic:', topic);
       const topicClean = topic.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').trim();
+      const shortTopic = topicClean.length > 50 ? topicClean.substring(0, 50).replace(/\s\S*$/, '') : topicClean;
       script = {
-        title: `${topicClean}: O Que Você Precisa Saber`,
+        title: `${shortTopic}: O Que Você Precisa Saber`,
         segments: [
-          { text: `${topicClean} está mudando tudo que conhecemos sobre tecnologia.`, imagePrompt: `${topicClean} futuristic technology concept` },
-          { text: `Especialistas apontam avanços impressionantes nessa área.`, imagePrompt: `${topicClean} innovation breakthrough` },
-          { text: `As implicações para o futuro são enormes e irreversíveis.`, imagePrompt: `${topicClean} future impact society` },
-          { text: `Fique por dentro. Siga Neural Update para mais.`, imagePrompt: `technology news social media follow` },
+          { text: `Algo grande está acontecendo no mundo da tecnologia. E tem tudo a ver com ${shortTopic}.`, imagePrompt: `futuristic technology dramatic reveal, neon lights, dark background` },
+          { text: `Especialistas estão chamando isso de um dos avanços mais significativos dos últimos anos.`, imagePrompt: `innovation breakthrough laboratory, scientists, holographic displays` },
+          { text: `O impacto disso vai muito além do que você imagina. Empresas, carreiras e mercados inteiros estão sendo transformados.`, imagePrompt: `global market transformation, city skyline, dramatic scale visualization` },
+          { text: `A grande questão não é se isso vai acontecer. É se você vai estar preparado quando acontecer.`, imagePrompt: `future vision forward-looking, person silhouette facing horizon, dramatic lighting` },
         ],
-        totalDuration: 20,
+        totalDuration: 25,
         _fallback: true,
       };
     }

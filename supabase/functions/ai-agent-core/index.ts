@@ -1035,14 +1035,26 @@ Responda em JSON:
     }
   }
   
-  // Fallback: use standard progressive phases
+  // Fallback: generate meaningful narration segments (NOT raw topic text)
   if (scriptSegments.length < 4) {
-    scriptSegments = [
-      { text: isNewsBroadcast ? `Atenção: ${articleTitle}` : `Contexto e cenário: ${articleTitle}`, imagePrompt: `Hook visual forte — cena impactante que introduza ${articleTitle}, ambiente tecnológico, sensação de novidade e descoberta, curiosidade imediata` },
-      { text: isNewsBroadcast ? `O que está acontecendo: ${articleDesc || articleTitle}` : `Desenvolvimento: ${articleDesc || articleTitle}`, imagePrompt: `Expansão do tema — continuação direta, mesmo universo visual, novos elementos de evolução sobre ${articleTitle}, detalhes, interfaces, dados visuais` },
-      { text: `Impacto e consequências de ${articleTitle}`, imagePrompt: `Consequência e escala — impacto de ${articleTitle} no mundo/mercado, cena maior e mais intensa, transformação, poder` },
-      { text: `Conclusão e futuro: ${articleTitle}`, imagePrompt: `Visão futura — projeção futurista sobre ${articleTitle}, composição limpa e simbólica, reflexão, encerramento forte` },
-    ];
+    // Extract a clean, short topic name for narration
+    const shortTopic = articleTitle.length > 60 ? articleTitle.substring(0, 60).replace(/\s\S*$/, '') : articleTitle;
+    
+    if (isNewsBroadcast) {
+      scriptSegments = [
+        { text: `Atenção para esta notícia que pode mudar o cenário da tecnologia.`, imagePrompt: `Breaking news technology announcement, dramatic lighting, screens showing data` },
+        { text: `${shortTopic}. Essa é a novidade que está movimentando o mercado agora.`, imagePrompt: `Technology innovation concept, futuristic interfaces, dynamic composition` },
+        { text: `As consequências dessa mudança vão afetar milhões de pessoas nos próximos meses.`, imagePrompt: `Global impact visualization, world map with connections, dramatic scale` },
+        { text: `O futuro da tecnologia está sendo escrito agora. E você precisa acompanhar.`, imagePrompt: `Futuristic cityscape, forward-looking composition, clean and symbolic` },
+      ];
+    } else {
+      scriptSegments = [
+        { text: `Você precisa saber o que está acontecendo com ${shortTopic}.`, imagePrompt: `Hook visual forte, impactful tech scene, curiosity and discovery` },
+        { text: `Especialistas estão chamando isso de revolução silenciosa na tecnologia.`, imagePrompt: `Innovation breakthrough concept, futuristic lab, progress visualization` },
+        { text: `O impacto disso é maior do que parece e vai transformar o mercado inteiro.`, imagePrompt: `Market transformation, dramatic scale, power and change visualization` },
+        { text: `A grande questão não é se isso vai acontecer. É se você vai estar preparado.`, imagePrompt: `Future vision, clean symbolic composition, thought-provoking ending` },
+      ];
+    }
   }
 
   // STEP 2: Generate 4 AI images
