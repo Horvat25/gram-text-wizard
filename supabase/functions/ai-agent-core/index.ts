@@ -542,24 +542,28 @@ function calculateDynamicDailyLimit(state: AgentState): number {
   console.log(`[AGENT] Dynamic limit calc: views ${currentWeeklyViews}/${goalViews} (${Math.round(viewsProgress)}%), engagement ${currentWeeklyEngagement}%/${goalEngagement}% (${Math.round(engagementProgress)}%), content ${totalProgress}/${totalGoals} (${Math.round(contentProgress)}%)`);
   console.log(`[AGENT] MIN progress: ${Math.round(minProgress)}%, days left: ${daysLeftInWeek}, goalType: ${goalType}`);
   
+  // MINIMUM 4 posts/day ALWAYS - the user explicitly wants consistent daily output
+  // Even when all weekly goals are met, maintain at least 4 posts/day
+  const MINIMUM_DAILY_POSTS = 4;
+  
   // Dynamic daily limit based on how far behind we are
   let dynamicLimit: number;
   if (minProgress >= 100) {
-    // ALL goals met - maintenance mode
-    dynamicLimit = 1;
+    // ALL goals met - still maintain minimum cadence
+    dynamicLimit = MINIMUM_DAILY_POSTS;
   } else if (minProgress >= 70) {
-    dynamicLimit = 2;
+    dynamicLimit = MINIMUM_DAILY_POSTS;
   } else if (minProgress >= 40) {
-    dynamicLimit = 3;
+    dynamicLimit = MINIMUM_DAILY_POSTS;
   } else {
     // Far behind - maximum effort
-    dynamicLimit = daysLeftInWeek <= 2 ? 5 : 4;
+    dynamicLimit = daysLeftInWeek <= 2 ? 5 : MINIMUM_DAILY_POSTS;
   }
   
-  console.log(`[AGENT] ➡️ Dynamic daily limit: ${dynamicLimit} (minProgress=${Math.round(minProgress)}%)`);
+  console.log(`[AGENT] ➡️ Dynamic daily limit: ${dynamicLimit} (minProgress=${Math.round(minProgress)}%, MIN=${MINIMUM_DAILY_POSTS})`);
   
-  // Hard cap at 5 posts/day to avoid spam
-  return Math.min(5, dynamicLimit);
+  // Hard cap at 5 posts/day to avoid spam, floor at MINIMUM_DAILY_POSTS
+  return Math.max(MINIMUM_DAILY_POSTS, Math.min(5, dynamicLimit));
 }
 
 // ETAPA 2: DECISÃO ESTRATÉGICA
