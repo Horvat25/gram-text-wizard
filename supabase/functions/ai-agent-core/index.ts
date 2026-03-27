@@ -1023,10 +1023,23 @@ Responda em JSON:
         const scriptResult = await scriptResponse.json();
         const content = scriptResult.choices?.[0]?.message?.content;
         if (content) {
-          const parsed = JSON.parse(content);
-          if (parsed.segments && Array.isArray(parsed.segments) && parsed.segments.length >= 4) {
-            scriptSegments = parsed.segments.slice(0, 4);
-            console.log('[AGENT] ✅ News broadcast script generated (4 segments)');
+          try {
+            const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            const parsed = JSON.parse(cleanContent);
+            if (parsed.segments && Array.isArray(parsed.segments) && parsed.segments.length >= 4) {
+              // Validate each segment has actual text (not just topic repetition)
+              const validSegments = parsed.segments.filter((s: any) => 
+                s.text && typeof s.text === 'string' && s.text.length > 10
+              );
+              if (validSegments.length >= 4) {
+                scriptSegments = validSegments.slice(0, 4);
+                console.log('[AGENT] ✅ News broadcast script generated (4 segments)');
+              } else {
+                console.log('[AGENT] ⚠️ Script segments too short or invalid, using fallback');
+              }
+            }
+          } catch (parseErr) {
+            console.log('[AGENT] ⚠️ Failed to parse broadcast script JSON:', parseErr);
           }
         }
       }
