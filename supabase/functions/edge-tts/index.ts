@@ -23,7 +23,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice } = await req.json();
+    const { text, voice, forceElevenLabs, skipElevenLabs } = await req.json();
 
     if (!text || text.trim().length === 0) {
       return new Response(
@@ -33,14 +33,14 @@ serve(async (req) => {
     }
 
     const cleanedText = prepareTextForTTS(text);
-    console.log(`[TTS] Request: ${cleanedText.length} chars`);
+    console.log(`[TTS] Request: ${cleanedText.length} chars, forceElevenLabs=${!!forceElevenLabs}, skipElevenLabs=${!!skipElevenLabs}`);
 
     let audioData: Uint8Array | null = null;
     let usedProvider = "unknown";
 
-    // 1️⃣ ElevenLabs (melhor qualidade)
+    // 1️⃣ ElevenLabs (melhor qualidade) - skip if skipElevenLabs flag is set
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
-    if (ELEVENLABS_API_KEY) {
+    if (ELEVENLABS_API_KEY && !skipElevenLabs) {
       try {
         console.log("[TTS] 1️⃣ Tentando ElevenLabs...");
         audioData = await generateElevenLabs(cleanedText, ELEVENLABS_API_KEY);
@@ -48,6 +48,10 @@ serve(async (req) => {
         console.log(`[TTS] ✅ ElevenLabs sucesso! ${(audioData.length / 1024).toFixed(1)}KB`);
       } catch (e: any) {
         console.warn(`[TTS] ElevenLabs falhou: ${e.message}`);
+        // If forceElevenLabs was requested and it failed, return error to let client handle
+        if (forceElevenLabs) {
+          console.warn(`[TTS] ⚠️ forceElevenLabs requested but failed, falling back`);
+        }
       }
     }
 

@@ -305,26 +305,36 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let backgroundMusicUrl = "";
     const segmentDurations: number[] = [];
     
-    // TTS provider hierarchy (same as before)
-    const tryCloudTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
+    // TTS provider hierarchy
+    // NARRATION: ElevenLabs ONLY (premium voice) — fallback to Edge TTS only if ElevenLabs unavailable
+    const tryNarrationTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
       if (abortRef.current) return null;
       
-      // 1️⃣ Edge TTS (ElevenLabs → FranciscaNeural → Google internally)
+      // 1️⃣ ElevenLabs via edge-tts (primary — premium voice for narration)
       try {
         const edgeResult = await supabase.functions.invoke("edge-tts", {
-          body: { text, voice: preferredVoice },
+          body: { text, voice: preferredVoice, forceElevenLabs: true },
         });
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
+          const provider = edgeResult.data.provider || "unknown";
+          if (provider.toLowerCase().includes('elevenlabs') || provider.toLowerCase().includes('eleven')) {
+            return { 
+              url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
+              provider
+            };
+          }
+          // ElevenLabs was requested but got fallback — still use it but log
+          console.warn(`[TTS] Requested ElevenLabs but got ${provider}, using anyway`);
           return { 
             url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider: edgeResult.data.provider || "Microsoft Neural"
+            provider
           };
         }
       } catch (e) { console.warn("[TTS] Edge TTS error:", e); }
       
       if (abortRef.current) return null;
       
-      // 2️⃣ Lovable TTS (Polly)
+      // 2️⃣ Lovable TTS fallback (only if ElevenLabs completely fails)
       try {
         const lovableResult = await supabase.functions.invoke("lovable-tts", {
           body: { text, voice: preferredVoice },
@@ -334,7 +344,27 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
       } catch (e) { console.warn("[TTS] Lovable TTS failed:", e); }
       
-      // 3️⃣ Free TTS (Google)
+      return null;
+    };
+
+    // CTA: Edge TTS Neural voice (free, different voice for variety)
+    const tryCTATTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
+      if (abortRef.current) return null;
+      
+      // Use Edge TTS directly for CTA (neural voice, not ElevenLabs)
+      try {
+        const edgeResult = await supabase.functions.invoke("edge-tts", {
+          body: { text, voice: "cta_neural", skipElevenLabs: true },
+        });
+        if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
+          return { 
+            url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
+            provider: edgeResult.data.provider || "Edge TTS"
+          };
+        }
+      } catch (e) { console.warn("[TTS] CTA TTS error:", e); }
+      
+      // Fallback: free TTS
       try {
         const freeResult = await supabase.functions.invoke("free-tts", {
           body: { text, language: "pt-BR" },
@@ -433,7 +463,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (abortRef.current) break;
         console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
         
-        const result = await tryCloudTTS(segments[i].text);
+        const result = await tryNarrationTTS(segments[i].text);
         if (result) {
           segmentAudioUrls.push(result.url);
           if (!ttsProvider) ttsProvider = result.provider;
@@ -520,7 +550,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       // Generate CTA narration
       if (narrationUrl) {
         console.log(`[TTS] Generating CTA narration...`);
-        const ctaResult = await tryCloudTTS(ctaScript);
+        const ctaResult = await tryCTATTS(ctaScript);
         ctaNarrationUrl = ctaResult?.url || "";
       }
       

@@ -76,7 +76,35 @@ function calculateEngagement(post: any): number {
   return (total / reach) * 100;
 }
 
-// Send conversational chat message to user
+// Helper: Review text with review-portuguese to fix spelling errors
+async function reviewText(
+  text: string, 
+  type: 'headline' | 'caption' | 'script' | 'cta' | 'general',
+  supabaseUrl: string,
+  headers: any,
+  context?: string
+): Promise<string> {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text, type, context })
+    });
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success && result.corrected) {
+        if (result.wasModified) {
+          console.log(`[AGENT] 📝 Texto revisado (${type}): "${text.substring(0, 30)}..." → "${result.corrected.substring(0, 30)}..."`);
+        }
+        return result.corrected;
+      }
+    }
+  } catch (e) {
+    console.warn('[AGENT] review-portuguese falhou (não-bloqueante):', e);
+  }
+  return text;
+}
+
 async function sendChatMessage(supabase: any, userId: string, message: string): Promise<void> {
   try {
     await supabase.from('agent_chat_messages').insert({
@@ -1137,8 +1165,8 @@ OBRIGATÓRIO ao final:
     caption = captionData.caption || caption;
     hashtags = captionData.hashtags || hashtags;
   }
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
   
-  // Ensure news Reels have source URL in caption
   if (isNewsBroadcast && rssArticle?.url) {
     const hasSource = caption.includes('Fonte:') || caption.includes('🔗');
     if (!hasSource) {
@@ -1524,6 +1552,9 @@ Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
     caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente!`;
   }
   
+  // Review caption for spelling
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  
   const canPublish = autoPublish && finalImages.length >= 2;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
@@ -1664,6 +1695,31 @@ REGRAS:
       caption += `\n\n🔗 ${selectedAffiliate.affiliate_url}`;
     }
   }
+
+  // 3.5 REVIEW caption with review-portuguese to fix spelling errors
+  try {
+    console.log('[AGENT] 📝 Revisando caption de marketing com review-portuguese...');
+    const reviewResponse = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        text: caption,
+        type: 'caption',
+        context: `Post de marketing para o produto "${selectedAffiliate.product_name}". Mantenha o link ${selectedAffiliate.affiliate_url} intacto.`
+      })
+    });
+    if (reviewResponse.ok) {
+      const reviewResult = await reviewResponse.json();
+      if (reviewResult.success && reviewResult.corrected) {
+        if (reviewResult.wasModified) {
+          console.log(`[AGENT] ✅ Caption revisada: "${caption.substring(0, 40)}..." → "${reviewResult.corrected.substring(0, 40)}..."`);
+        }
+        caption = reviewResult.corrected;
+      }
+    }
+  } catch (e) {
+    console.warn('[AGENT] Review-portuguese falhou (não-bloqueante):', e);
+  }
   
   // 4. Get product image (use affiliate's image, or generate via AI)
   let imageUrl = selectedAffiliate.image_url || null;
@@ -1686,9 +1742,10 @@ REGRAS:
     }
   }
   
-  // FALLBACK: Generate AI image if no product image exists
+  // FALLBACK: Generate AI image WITHOUT TEXT, then apply text overlay programmatically
+  // This prevents spelling errors from AI-generated text in images
   if (!imageUrl) {
-    console.log('[AGENT] 🎨 Gerando imagem AI para post de afiliado...');
+    console.log('[AGENT] 🎨 Gerando imagem AI para post de afiliado (SEM TEXTO)...');
     try {
       const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
       if (lovableApiKey) {
@@ -1703,18 +1760,17 @@ REGRAS:
             modalities: ["image", "text"],
             messages: [{
               role: "user",
-              content: `Crie uma imagem profissional de marketing para Instagram (1080x1080) do produto: "${selectedAffiliate.product_name}".
+              content: `Crie uma imagem profissional de marketing para Instagram (1080x1080) para o produto: "${selectedAffiliate.product_name}".
 Descrição: ${selectedAffiliate.description || 'Produto de tecnologia'}.
 
 REGRAS OBRIGATÓRIAS:
-1. HEADLINE em PORTUGUÊS e CAIXA ALTA no topo da imagem (máx 6 palavras, ex: "TRANSFORME SUA PRODUTIVIDADE")
-2. Nome do produto "${selectedAffiliate.product_name}" em destaque
-3. Estilo: design de marketing premium, fundo escuro com gradiente, tipografia bold
-4. Visual persuasivo de vendas: mostre BENEFÍCIOS, não features
-5. Cores vibrantes de destaque (amarelo, azul, verde neon)
-6. NÃO use fotos de pessoas, NÃO use texto em inglês
-7. Inclua um CTA visual sutil (seta, botão, ícone de link)
-8. Identidade visual: marca d'água "Neural Update" pequena no canto inferior`
+1. ⛔ NÃO INCLUA NENHUM TEXTO NA IMAGEM ⛔ - Sem palavras, letras, números ou símbolos escritos
+2. Estilo: design de marketing premium, fundo escuro com gradiente tecnológico
+3. Visual persuasivo: mostre o conceito do produto com ícones e elementos gráficos
+4. Cores vibrantes de destaque (amarelo, azul, verde neon) sobre fundo escuro
+5. NÃO use fotos de pessoas
+6. Composição limpa com espaço para texto ser adicionado depois
+7. Estética moderna, futurista, profissional`
             }]
           }),
         });
@@ -1724,12 +1780,11 @@ REGRAS OBRIGATÓRIAS:
           const generatedImgUrl = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
           
           if (generatedImgUrl && generatedImgUrl.startsWith('data:image/')) {
-            // Upload base64 image to storage
-            const { encode, decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
+            const { decode } = await import("https://deno.land/std@0.168.0/encoding/base64.ts");
             const b64 = generatedImgUrl.split('base64,')[1];
             if (b64) {
               const imageData = decode(b64);
-              const filename = `marketing-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+              const filename = `marketing-base-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
               
               const { error: upErr } = await supabase.storage
                 .from('post-images')
@@ -1737,8 +1792,34 @@ REGRAS OBRIGATÓRIAS:
               
               if (!upErr) {
                 const { data: { publicUrl } } = supabase.storage.from('post-images').getPublicUrl(filename);
-                imageUrl = publicUrl;
-                console.log('[AGENT] ✅ Imagem AI para afiliado gerada:', imageUrl);
+                const baseImageUrl = publicUrl;
+                console.log('[AGENT] ✅ Imagem base gerada (sem texto):', baseImageUrl);
+                
+                // Apply text overlay programmatically (review-portuguese built-in)
+                try {
+                  const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                      imageUrl: baseImageUrl,
+                      title: selectedAffiliate.product_name,
+                      watermarkText: 'Neural Update',
+                      generateHeadline: true,
+                      context: `Marketing do produto "${selectedAffiliate.product_name}". ${selectedAffiliate.description || ''}`
+                    })
+                  });
+                  
+                  if (overlayResponse.ok) {
+                    const overlayResult = await overlayResponse.json();
+                    imageUrl = overlayResult.publicUrl || baseImageUrl;
+                    console.log('[AGENT] ✅ Overlay de marketing com headline aplicado:', overlayResult.headline);
+                  } else {
+                    imageUrl = baseImageUrl;
+                  }
+                } catch (overlayErr) {
+                  console.warn('[AGENT] Overlay falhou, usando imagem base:', overlayErr);
+                  imageUrl = baseImageUrl;
+                }
               }
             }
           }
@@ -2201,8 +2282,8 @@ OBRIGATÓRIO ao final:
     caption = captionData.caption || caption;
     hashtags = captionData.hashtags || hashtags;
   }
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
   
-  // ALWAYS ensure source is in caption for news posts
   const hasSourceInCaption = caption.includes('Fonte:') || caption.includes('🔗');
   if (!hasSourceInCaption && selectedArticle) {
     if (sourceUrl) {
@@ -2341,7 +2422,9 @@ Use emojis com moderação. ${plan.cta || ''}`
     hashtags = captionData.hashtags || hashtags;
   }
   
-  const canPublish = autoPublish && imageUrl;
+  // Review caption for spelling
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
