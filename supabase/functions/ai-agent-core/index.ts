@@ -76,7 +76,35 @@ function calculateEngagement(post: any): number {
   return (total / reach) * 100;
 }
 
-// Send conversational chat message to user
+// Helper: Review text with review-portuguese to fix spelling errors
+async function reviewText(
+  text: string, 
+  type: 'headline' | 'caption' | 'script' | 'cta' | 'general',
+  supabaseUrl: string,
+  headers: any,
+  context?: string
+): Promise<string> {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text, type, context })
+    });
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success && result.corrected) {
+        if (result.wasModified) {
+          console.log(`[AGENT] 📝 Texto revisado (${type}): "${text.substring(0, 30)}..." → "${result.corrected.substring(0, 30)}..."`);
+        }
+        return result.corrected;
+      }
+    }
+  } catch (e) {
+    console.warn('[AGENT] review-portuguese falhou (não-bloqueante):', e);
+  }
+  return text;
+}
+
 async function sendChatMessage(supabase: any, userId: string, message: string): Promise<void> {
   try {
     await supabase.from('agent_chat_messages').insert({
