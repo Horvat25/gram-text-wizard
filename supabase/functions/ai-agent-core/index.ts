@@ -2419,7 +2419,9 @@ Use emojis com moderação. ${plan.cta || ''}`
     hashtags = captionData.hashtags || hashtags;
   }
   
-  const canPublish = autoPublish && imageUrl;
+  // Review caption for spelling
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
