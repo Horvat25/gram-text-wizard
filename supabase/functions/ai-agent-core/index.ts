@@ -1552,6 +1552,9 @@ Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
     caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente!`;
   }
   
+  // Review caption for spelling
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  
   const canPublish = autoPublish && finalImages.length >= 2;
   const { data: post, error } = await supabase.from('posts').insert({
     user_id: userId,
