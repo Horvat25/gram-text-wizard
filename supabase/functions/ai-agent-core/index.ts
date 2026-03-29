@@ -1165,8 +1165,8 @@ OBRIGATÓRIO ao final:
     caption = captionData.caption || caption;
     hashtags = captionData.hashtags || hashtags;
   }
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
   
-  // Ensure news Reels have source URL in caption
   if (isNewsBroadcast && rssArticle?.url) {
     const hasSource = caption.includes('Fonte:') || caption.includes('🔗');
     if (!hasSource) {
@@ -2279,8 +2279,8 @@ OBRIGATÓRIO ao final:
     caption = captionData.caption || caption;
     hashtags = captionData.hashtags || hashtags;
   }
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers);
   
-  // ALWAYS ensure source is in caption for news posts
   const hasSourceInCaption = caption.includes('Fonte:') || caption.includes('🔗');
   if (!hasSourceInCaption && selectedArticle) {
     if (sourceUrl) {
