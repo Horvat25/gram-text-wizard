@@ -463,7 +463,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (abortRef.current) break;
         console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
         
-        const result = await tryCloudTTS(segments[i].text);
+        const result = await tryNarrationTTS(segments[i].text);
         if (result) {
           segmentAudioUrls.push(result.url);
           if (!ttsProvider) ttsProvider = result.provider;
@@ -550,7 +550,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       // Generate CTA narration
       if (narrationUrl) {
         console.log(`[TTS] Generating CTA narration...`);
-        const ctaResult = await tryCloudTTS(ctaScript);
+        const ctaResult = await tryCTATTS(ctaScript);
         ctaNarrationUrl = ctaResult?.url || "";
       }
       
