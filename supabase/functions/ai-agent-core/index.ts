@@ -1916,6 +1916,30 @@ function calculateNewsRankingScore(item: any): number {
   const generalTechMatches = generalTechKeywords.filter(kw => combined.includes(kw));
   score += Math.min(15, generalTechMatches.length * 5);
   
+  // ===== PENALTY: Promotional/sales content (BLOCK - score = 0) =====
+  const promoKeywords = [
+    'promoção', 'promocao', 'desconto', 'oferta', 'cupom', 'cupon',
+    'black friday', 'liquidação', 'liquidacao', 'cashback', 'frete grátis', 'frete gratis',
+    'compre', 'comprar', 'preço', 'preco', 'barato', 'mais barato',
+    'r$', 'reais', 'parcela', 'parcelado', 'à vista', 'a vista',
+    'por apenas', 'por só', 'por somente', 'economize', 'economia de',
+    'melhor preço', 'menor preço', 'vale a pena comprar', 'onde comprar',
+    'link de compra', 'compre agora', 'aproveite', 'imperdível', 'imperdivel',
+    'produto em', 'celular em promoção', 'smartphone em promoção',
+    'confira o preço', 'review compra', 'unboxing', 'hands-on',
+    'ficha técnica', 'ficha tecnica', 'especificações técnicas',
+    'comparativo de preço', 'custo-benefício', 'custo beneficio',
+    'amazon prime day', 'prime day', 'shopee', 'mercado livre', 'aliexpress',
+    'magazine luiza', 'magalu', 'americanas', 'casas bahia', 'kabum',
+    'em oferta', 'saiu mais barato', 'caiu o preço', 'caiu de preço'
+  ];
+  const promoMatches = promoKeywords.filter(kw => combined.includes(kw));
+  if (promoMatches.length > 0) {
+    score = 0; // BLOCK promotional content entirely
+    console.log(`[AGENT] 🚫 BLOCKED promotional content: "${titleLower.substring(0, 60)}" (matches: ${promoMatches.join(', ')})`);
+    return 0;
+  }
+
   // ===== PENALTY: Non-tech content (HEAVY penalty) =====
   const nonTechKeywords = [
     'novela', 'bbb', 'big brother', 'reality show', 'celebridade', 'fofoca',
@@ -1929,10 +1953,9 @@ function calculateNewsRankingScore(item: any): number {
   ];
   const nonTechMatches = nonTechKeywords.filter(kw => combined.includes(kw));
   if (nonTechMatches.length > 0) {
-    // Heavy penalty: -30 per match, but check if it's also tech-related
     const isAlsoTech = coreTechMatches.length > 0 || bigTechMatches.length > 0;
     if (!isAlsoTech) {
-      score -= nonTechMatches.length * 30; // Strong penalty for pure non-tech
+      score -= nonTechMatches.length * 30;
       console.log(`[AGENT] ⚠️ Non-tech penalty for: "${titleLower.substring(0, 50)}" (-${nonTechMatches.length * 30}pts)`);
     }
   }
