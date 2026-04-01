@@ -368,10 +368,10 @@ function renderFrame(
 }
 
 // ─── Safety constants ────────────────────────────────────────
-const MAX_TOTAL_DURATION = 90;    // Hard cap: 90 seconds max
-const MAX_SEGMENT_DURATION = 20;  // No single segment > 20s
+const MAX_TOTAL_DURATION = 35;    // Hard cap: 35 seconds (ideal Reels length)
+const MAX_SEGMENT_DURATION = 7;   // No single segment > 7s (forces transitions)
 const MIN_SEGMENT_DURATION = 3;   // No segment < 3s
-const MAX_SEGMENTS = 10;          // Max 10 segments
+const MAX_SEGMENTS = 6;           // Max 6 segments
 const RENDER_TIMEOUT_BUFFER = 10; // Extra seconds before force-stop
 
 function validateAndClampSegments(segments: VideoSegment[]): VideoSegment[] {
@@ -590,16 +590,18 @@ export async function generateVideoFromSegments(
       gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
     }
 
-    // ─── Render loop using requestAnimationFrame ────────────
-    const renderStartTime = performance.now();
-    let lastProgressUpdate = 0;
+    // ─── Render loop — FRAME-COUNTED (not wall-clock) ──────────
+    // Using frame counter ensures transitions happen correctly
+    // even if requestAnimationFrame drifts or pauses
+    const totalFrames = Math.ceil(totalDuration * fps);
+    let currentFrame = 0;
     let stopped = false;
 
     // ─── SAFETY: Hard timeout to prevent runaway renders ────
     const hardTimeoutMs = (totalDuration + RENDER_TIMEOUT_BUFFER) * 1000;
     const hardTimeout = setTimeout(() => {
       if (!stopped) {
-        console.error(`[video-encoder] ⛔ HARD TIMEOUT after ${(totalDuration + RENDER_TIMEOUT_BUFFER).toFixed(0)}s — forcing stop`);
+        console.error(`[video-encoder] ⛔ HARD TIMEOUT — forcing stop`);
         stopped = true;
         try {
           if (mediaRecorder.state === 'recording') {
@@ -614,10 +616,7 @@ export async function generateVideoFromSegments(
     const tick = () => {
       if (stopped) return;
 
-      const elapsed = (performance.now() - renderStartTime) / 1000;
-
-      // ─── SAFETY: Double-check elapsed doesn't exceed total ──
-      if (elapsed >= totalDuration) {
+      if (currentFrame >= totalFrames) {
         renderFrame(ctx, totalDuration - 0.001, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
         onProgress?.(100);
 
@@ -631,15 +630,15 @@ export async function generateVideoFromSegments(
         return;
       }
 
-      // Clamp elapsed to totalDuration for safety
-      const safeElapsed = Math.min(elapsed, totalDuration);
-      renderFrame(ctx, safeElapsed, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+      // Calculate time from frame number (deterministic, no drift)
+      const currentTime = currentFrame / fps;
+      renderFrame(ctx, currentTime, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
 
-      // Progress callback (throttled to ~4 updates/sec)
-      const now = performance.now();
-      if (now - lastProgressUpdate > 250) {
-        onProgress?.(Math.round((safeElapsed / totalDuration) * 100));
-        lastProgressUpdate = now;
+      currentFrame++;
+
+      // Progress callback (every ~12 frames = ~2x per second)
+      if (currentFrame % 12 === 0) {
+        onProgress?.(Math.round((currentFrame / totalFrames) * 100));
       }
 
       requestAnimationFrame(tick);
