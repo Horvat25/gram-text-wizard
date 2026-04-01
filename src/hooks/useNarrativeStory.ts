@@ -610,8 +610,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     try {
       // ─── SAFETY: Validate before render ──────────────────
-      const MAX_TOTAL = 90;
-      const MAX_SEG = 20;
+      const MAX_TOTAL = 35;
+      const MAX_SEG = 7;
       const MIN_SEG = 3;
       
       // Clamp segment durations

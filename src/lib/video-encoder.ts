@@ -368,10 +368,10 @@ function renderFrame(
 }
 
 // ─── Safety constants ────────────────────────────────────────
-const MAX_TOTAL_DURATION = 90;    // Hard cap: 90 seconds max
-const MAX_SEGMENT_DURATION = 20;  // No single segment > 20s
+const MAX_TOTAL_DURATION = 35;    // Hard cap: 35 seconds (ideal Reels length)
+const MAX_SEGMENT_DURATION = 7;   // No single segment > 7s (forces transitions)
 const MIN_SEGMENT_DURATION = 3;   // No segment < 3s
-const MAX_SEGMENTS = 10;          // Max 10 segments
+const MAX_SEGMENTS = 6;           // Max 6 segments
 const RENDER_TIMEOUT_BUFFER = 10; // Extra seconds before force-stop
 
 function validateAndClampSegments(segments: VideoSegment[]): VideoSegment[] {
