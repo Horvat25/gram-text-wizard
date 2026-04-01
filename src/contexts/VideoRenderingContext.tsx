@@ -343,7 +343,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           body: {
             topic,
             segmentCount: 4,
-            wordsPerSegment: 12,
+            wordsPerSegment: 10,
             totalDuration: 20,
             style: 'informativo, envolvente, com começo-meio-fim',
             brandName: brandSettings.brandName || 'Neural Update'

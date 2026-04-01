@@ -1105,9 +1105,9 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         body: JSON.stringify({
           topic,
           segmentCount: 4,
-          wordsPerSegment: 12,
+          wordsPerSegment: 10,
           totalDuration: 20,
-          style: style || 'impactante e provocativo'
+          style: 'informativo, envolvente, com começo-meio-fim'
         })
       });
       
