@@ -2416,6 +2416,56 @@ async function createImageContent(
     }
   }
   
+  // STEP 2.5: Apply headline overlay to image (same as news posts)
+  // Posts inspired by RSS topics should have the yellow headline for brand consistency
+  if (imageUrl && inspirationTopic) {
+    console.log('[AGENT] 🔥 Aplicando headline overlay no post de imagem...');
+    try {
+      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          imageUrl,
+          title: inspirationTopic,
+          watermarkText: 'Neural Update',
+          generateHeadline: true
+        })
+      });
+      
+      if (overlayResponse.ok) {
+        const overlayResult = await overlayResponse.json();
+        if (overlayResult.hasOverlay) {
+          imageUrl = overlayResult.publicUrl;
+          console.log('[AGENT] ✅ Headline overlay aplicado em post de imagem:', overlayResult.headline);
+        } else {
+          console.log('[AGENT] ⚠️ Overlay retornou sem headline, tentando add-watermark...');
+          try {
+            const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                imageUrl,
+                watermarkText: 'Neural Update',
+                headlineText: overlayResult.headline || inspirationTopic
+              })
+            });
+            if (wmResponse.ok) {
+              const wmResult = await wmResponse.json();
+              if (wmResult.publicUrl) {
+                imageUrl = wmResult.publicUrl;
+                console.log('[AGENT] ✅ Headline via add-watermark aplicada');
+              }
+            }
+          } catch (wmErr) {
+            console.log('[AGENT] add-watermark falhou:', wmErr);
+          }
+        }
+      }
+    } catch (overlayErr) {
+      console.log('[AGENT] Erro ao aplicar headline overlay em imagem:', overlayErr);
+    }
+  }
+  
   // STEP 3: Generate OPINION/REFLECTION caption (NOT news format)
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
@@ -2465,7 +2515,8 @@ Use emojis com moderação. ${plan.cta || ''}`
       type: 'original_image',
       inspiration_topic: inspirationTopic,
       ai_generated_image: true,
-      created_by_agent: true
+      created_by_agent: true,
+      text_applied_by_code: true
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
