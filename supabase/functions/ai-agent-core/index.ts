@@ -2515,7 +2515,8 @@ Use emojis com moderação. ${plan.cta || ''}`
       type: 'original_image',
       inspiration_topic: inspirationTopic,
       ai_generated_image: true,
-      created_by_agent: true
+      created_by_agent: true,
+      text_applied_by_code: true
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
