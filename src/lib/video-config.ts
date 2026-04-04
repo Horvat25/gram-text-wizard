@@ -25,11 +25,11 @@ export const VIDEO_CONFIG = {
   /** Duração mínima de um segmento (segundos) — áudio mais curto usa este piso */
   MIN_SEGMENT_DURATION: 3,
   /** Duração máxima de um segmento (segundos) — proteção contra TTS travado */
-  MAX_SEGMENT_DURATION: 12,
+  MAX_SEGMENT_DURATION: 18,
   /** Máximo de segmentos por vídeo */
   MAX_SEGMENTS: 6,
   /** Duração total máxima do vídeo (conteúdo + CTA) */
-  MAX_TOTAL_DURATION: 45,
+  MAX_TOTAL_DURATION: 60,
   /** Buffer extra de timeout para renderização (segundos) */
   RENDER_TIMEOUT_BUFFER: 10,
 
