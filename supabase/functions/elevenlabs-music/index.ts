@@ -15,13 +15,9 @@ serve(async (req) => {
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
+      console.warn("[ElevenLabs Music] No API key configured, returning fallback");
       return new Response(
-        JSON.stringify({
-          error: "ELEVENLABS_API_KEY not configured",
-          fallback: true,
-          provider: "elevenlabs-music",
-          status: 500,
-        }),
+        JSON.stringify({ fallback: true, provider: "elevenlabs-music", reason: "no_api_key" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -49,24 +45,13 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      let providerMessage = "";
-
-      try {
-        const parsedError = JSON.parse(errorText);
-        providerMessage = parsedError?.detail?.message || "";
-      } catch {
-        providerMessage = errorText;
-      }
-
-      console.error(`[ElevenLabs Music] Error ${response.status}: ${errorText.substring(0, 200)}`);
+      console.error(`[ElevenLabs Music] Upstream ${response.status}: ${errorText.substring(0, 200)}`);
+      // Always return 200 + JSON so client falls through gracefully
       return new Response(
         JSON.stringify({
-          error: `ElevenLabs Music API error: ${response.status}`,
-          message: providerMessage || undefined,
           fallback: true,
           provider: "elevenlabs-music",
-          status: response.status,
-          planRequired: response.status === 402,
+          reason: response.status === 402 ? "paid_plan_required" : `upstream_${response.status}`,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -76,16 +61,14 @@ serve(async (req) => {
     console.log(`[ElevenLabs Music] ✅ Generated ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
 
     return new Response(audioBuffer, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "audio/mpeg",
-      },
+      headers: { ...corsHeaders, "Content-Type": "audio/mpeg" },
     });
   } catch (error: any) {
     console.error("[ElevenLabs Music] Error:", error.message);
+    // Return fallback JSON, never a 500 that would crash the client
     return new Response(
-      JSON.stringify({ error: error.message || "Failed to generate music" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ fallback: true, provider: "elevenlabs-music", reason: "exception" }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
