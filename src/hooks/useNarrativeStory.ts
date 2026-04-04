@@ -580,14 +580,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     try {
       // ─── SAFETY: Validate before render ──────────────────
-      const MAX_TOTAL = 35;
-      const MAX_SEG = 7;
+      // Do NOT clamp segment durations below their audio duration!
+      // The audio duration IS the segment duration — this is what guarantees sync.
+      const MAX_TOTAL = 45; // Allow longer total since segments are audio-driven
       const MIN_SEG = 3;
-      
-      // Clamp segment durations
-      segments.forEach(seg => {
-        seg.duration = Math.max(MIN_SEG, Math.min(seg.duration, MAX_SEG));
-      });
       
       let totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
       
