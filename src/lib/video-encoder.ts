@@ -369,7 +369,7 @@ function renderFrame(
     drawWatermark(ctx, width, height, brand);
   } else {
     // ── CTA PHASE ──
-    const ctaProgress = (currentTime - contentDuration) / ctaDuration;
+    const ctaProgress = (currentTime - ctaStartTime) / ctaDuration;
     drawCTAScreen(ctx, width, height, ctaProgress, brand);
   }
 }

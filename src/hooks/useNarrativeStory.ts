@@ -333,7 +333,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       body: Record<string, unknown>,
       provider: string,
     ): Promise<{ audioUrl: string | null; provider: string }> => {
-      if (abortRef.current) return null;
+      if (abortRef.current) return { audioUrl: null, provider };
       
       try {
         const result = await supabase.functions.invoke(functionName, {
