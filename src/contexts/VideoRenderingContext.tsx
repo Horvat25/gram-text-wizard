@@ -6,6 +6,7 @@ import { useNarrativeStory } from '@/hooks/useNarrativeStory';
 import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { unlockAudio } from '@/lib/audio-unlock';
+import { VIDEO_CONFIG } from '@/lib/video-config';
 import { toast } from 'sonner';
 
 const MAX_RENDER_ATTEMPTS = 3;
