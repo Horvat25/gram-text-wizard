@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode, type Context } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -36,7 +36,17 @@ interface VideoRenderingContextType {
   toggleAutoRender: () => void;
 }
 
-const VideoRenderingContext = createContext<VideoRenderingContextType | null>(null);
+type VideoRenderingContextGlobal = typeof globalThis & {
+  __lovableVideoRenderingContext__?: Context<VideoRenderingContextType | null>;
+};
+
+const videoRenderingContextGlobal = globalThis as VideoRenderingContextGlobal;
+
+const VideoRenderingContext =
+  videoRenderingContextGlobal.__lovableVideoRenderingContext__ ??
+  (videoRenderingContextGlobal.__lovableVideoRenderingContext__ = createContext<VideoRenderingContextType | null>(null));
+
+VideoRenderingContext.displayName = 'VideoRenderingContext';
 
 export function useVideoRendering() {
   const context = useContext(VideoRenderingContext);
