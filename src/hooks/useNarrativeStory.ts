@@ -2,8 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
-import { initFFmpeg, convertWebMToMP4 } from "@/lib/video-converter";
-import { estimateSpeechDuration } from "@/lib/browser-tts";
+import { VIDEO_CONFIG } from "@/lib/video-config";
 import { getRandomTrack, preloadTrack } from "@/lib/background-music";
 
 // Helper to convert AudioBuffer to WAV Blob for concatenated narration
@@ -51,8 +50,8 @@ export interface StorySegment {
   text: string;
   imageUrl: string;
   imagePrompt: string;
-  duration: number; // in seconds
-  startTime: number; // in seconds
+  duration: number;
+  startTime: number;
 }
 
 export interface NarrativeStoryState {
@@ -76,8 +75,10 @@ interface UseNarrativeStoryOptions {
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  // Default to camila voice, faster-paced 4s segments for dynamic reels
-  const { segmentCount = 4, segmentDuration = 4, preferredVoice = "tech_male" } = options;
+  const { 
+    segmentCount = VIDEO_CONFIG.SEGMENT_COUNT, 
+    segmentDuration = VIDEO_CONFIG.SEGMENT_DURATION_BASE,
+  } = options;
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
@@ -119,21 +120,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     toast.error(error);
   }, []);
 
-  // Step 1: Generate structured script with segments
+  // ═══ Step 1: Generate structured script ═══
   const generateScript = useCallback(async (topic: string) => {
     setState(prev => ({ ...prev, step: "script", progress: 5 }));
     
     try {
       const totalDuration = segmentCount * segmentDuration;
-      const wordsPerSegment = Math.ceil(segmentDuration * 2.5); // ~2.5 words per second
       
       const { data, error } = await supabase.functions.invoke("generate-story-script", {
         body: { 
           topic, 
           segmentCount,
-          wordsPerSegment,
+          wordsPerSegment: VIDEO_CONFIG.WORDS_PER_SEGMENT,
           totalDuration,
-          style: "informativo, envolvente, com começo-meio-fim",
+          style: VIDEO_CONFIG.SCRIPT_STYLE,
         },
       });
 
@@ -142,7 +142,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         throw new Error("Nenhum roteiro gerado");
       }
 
-      // Build segments with timing
       let currentTime = 0;
       const segments: StorySegment[] = data.segments.map((seg: any, index: number) => {
         const segment: StorySegment = {
@@ -173,14 +172,11 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, [segmentCount, segmentDuration, setError]);
 
-  // Step 2: Search for real images (Pexels > Unsplash > Firecrawl > AI)
-  // TODAS as imagens são salvas no Storage antes de retornar (elimina CORS no render)
+  // ═══ Step 2: Search/generate images ═══
   const generateImages = useCallback(async (segments: StorySegment[], topic?: string, articleInfo?: { articleUrl?: string; articleImageUrl?: string }) => {
     setState(prev => ({ ...prev, step: "images", progress: 20 }));
     
     const updatedSegments = [...segments];
-    
-    console.log('[IMAGES] 🎨 Gerando imagens via IA para vídeo/carrossel...');
     
     try {
       const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
@@ -190,30 +186,18 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
       });
       
-      if (searchError) {
-        console.error('[IMAGES] Search error:', searchError);
-        throw new Error(searchError.message || 'Erro na busca de imagens');
-      }
+      if (searchError) throw new Error(searchError.message || 'Erro na busca de imagens');
 
       if (searchResult?.success && searchResult.images?.length > 0) {
-        const images = searchResult.images;
-        const stats = searchResult.stats || {};
-        
-        console.log(`[IMAGES] ✅ ${images.length} imagens encontradas!`);
-        console.log(`[IMAGES] Stats: Pexels=${stats.pexels||0} Unsplash=${stats.unsplash||0} Firecrawl=${stats.firecrawl||0} AI=${stats.ai||0}`);
-        
-        // Assign images to segments (all are already in Storage = no CORS issues)
-        images.forEach((img: any, index: number) => {
+        searchResult.images.forEach((img: any, index: number) => {
           if (index < updatedSegments.length) {
             const imageUrl = typeof img === 'string' ? img : img.imageUrl;
             if (imageUrl) {
               updatedSegments[index] = { ...updatedSegments[index], imageUrl };
-              console.log(`[IMAGES] Segment ${index + 1}: ${typeof img === 'object' ? img.source : 'storage'}`);
             }
           }
         });
         
-        // Store used image IDs for repetition control
         if (searchResult.imageIds?.length > 0) {
           try {
             const stored = JSON.parse(localStorage.getItem('usedImageIds') || '[]');
@@ -226,20 +210,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.warn('[IMAGES] Search failed:', e);
     }
 
-    // Filter segments that got images
     const validSegments = updatedSegments.filter(s => s.imageUrl);
-    const failedCount = updatedSegments.length - validSegments.length;
     
     if (validSegments.length === 0) {
-      setError("Nenhuma imagem foi encontrada ou gerada. Verifique as API keys (Pexels/Unsplash).");
+      setError("Nenhuma imagem foi encontrada ou gerada.");
       return null;
     }
     
-    if (failedCount > 0 && validSegments.length >= 2) {
-      toast.warning(`${failedCount} de ${updatedSegments.length} imagens falharam, continuando com ${validSegments.length} cenas`);
+    if (validSegments.length < updatedSegments.length && validSegments.length >= 2) {
+      toast.warning(`${updatedSegments.length - validSegments.length} imagens falharam, continuando com ${validSegments.length}`);
     }
 
-    // Recalculate timings
     let currentTime = 0;
     validSegments.forEach(seg => {
       seg.startTime = currentTime;
@@ -253,31 +234,28 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       progress: 70,
     }));
 
-    const stats = { total: validSegments.length };
-    toast.success(`📸 ${validSegments.length} imagens prontas (todas no storage)!`);
+    toast.success(`📸 ${validSegments.length} imagens prontas!`);
     return validSegments;
   }, [setError]);
 
-  // Helper to get audio duration from URL
+  // Helper to get exact audio duration
   const getAudioDuration = useCallback((audioUrl: string): Promise<number> => {
     return new Promise((resolve) => {
       const audio = new Audio();
       audio.preload = "metadata";
       
       const timeout = setTimeout(() => {
-        console.warn("[getAudioDuration] Timeout, using estimate");
+        console.warn("[getAudioDuration] Timeout");
         resolve(0);
       }, 10000);
       
       audio.onloadedmetadata = () => {
         clearTimeout(timeout);
-        console.log("[getAudioDuration] Audio duration:", audio.duration, "seconds");
         resolve(audio.duration);
       };
       
       audio.onerror = () => {
         clearTimeout(timeout);
-        console.warn("[getAudioDuration] Error loading audio");
         resolve(0);
       };
       
@@ -285,8 +263,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // Step 3: Generate narration audio - PER-SEGMENT for perfect sync
-  // Each segment gets its own TTS call → exact duration → image changes only when narration ends
+  // ═══ Step 3: Generate per-segment narration — ElevenLabs Sarah ONLY ═══
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "", segmentDurations: [] as number[] };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -305,67 +282,37 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let backgroundMusicUrl = "";
     const segmentDurations: number[] = [];
     
-    // TTS: ElevenLabs Sarah ONLY — zero fallbacks
-    const tryNarrationTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
+    // ─── TTS: ElevenLabs Sarah ONLY — zero fallbacks ───────
+    const callElevenLabsTTS = async (text: string): Promise<string | null> => {
       if (abortRef.current) return null;
       
       try {
-        const edgeResult = await supabase.functions.invoke("edge-tts", {
+        const result = await supabase.functions.invoke("edge-tts", {
           body: { text },
         });
-        if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          return { 
-            url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider: edgeResult.data.provider || "ElevenLabs Neural"
-          };
+        if (!result.error && result.data?.audioContent && !result.data?.error) {
+          return `data:audio/mp3;base64,${result.data.audioContent}`;
         }
-        // If ElevenLabs returned an error message, surface it
-        if (edgeResult.data?.error) {
-          console.error(`[TTS] ElevenLabs error: ${edgeResult.data.error}`);
+        if (result.data?.error) {
+          console.error(`[TTS] ElevenLabs error: ${result.data.error}`);
         }
-      } catch (e) { console.error("[TTS] ElevenLabs Sarah failed:", e); }
-      
-      return null;
-    };
-
-    // CTA: Also ElevenLabs Sarah — same voice, no fallbacks
-    const tryCTATTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
-      if (abortRef.current) return null;
-      
-      try {
-        const edgeResult = await supabase.functions.invoke("edge-tts", {
-          body: { text },
-        });
-        if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          return { 
-            url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider: edgeResult.data.provider || "ElevenLabs Neural"
-          };
-        }
-      } catch (e) { console.error("[TTS] CTA ElevenLabs failed:", e); }
+      } catch (e) { 
+        console.error("[TTS] ElevenLabs Sarah failed:", e); 
+      }
       
       return null;
     };
     
-    // Background music: ElevenLabs Music (best) → MusicGen (free) → Procedural
+    // ─── Background music: ElevenLabs Music → MusicGen → Procedural ───
     const generateBackgroundMusic = async (mood?: string): Promise<string> => {
       if (abortRef.current) return "";
       
-      // 1️⃣ ElevenLabs Music (professional quality)
+      // 1️⃣ ElevenLabs Music
       try {
-        console.log("[Music] 🎵 Trying ElevenLabs Music...");
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         
-        const moodPrompts: Record<string, string> = {
-          epic: "Cinematic epic orchestral background music for tech news video, dramatic strings and brass, building intensity, modern and powerful",
-          dramatic: "Dark dramatic electronic background music for technology news broadcast, tense atmosphere, pulsing synths, suspenseful",
-          inspiring: "Uplifting inspiring electronic background music for technology innovation video, positive energy, modern synths, motivational",
-          ambient: "Atmospheric ambient electronic background music for tech review video, subtle and modern, clean production",
-          technology: "Modern electronic background music for technology news video, professional and engaging, subtle beats, clean synths",
-        };
-        
-        const musicPrompt = moodPrompts[mood || 'technology'] || moodPrompts.technology;
+        const musicPrompt = "Modern electronic background music for technology news video, professional and engaging, subtle beats, clean synths, cinematic feel";
         
         const response = await fetch(`${supabaseUrl}/functions/v1/elevenlabs-music`, {
           method: "POST",
@@ -381,22 +328,19 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const contentType = response.headers.get("content-type") || "";
           if (contentType.includes("audio")) {
             const audioBlob = await response.blob();
-            const musicUrl = URL.createObjectURL(audioBlob);
             console.log("[Music] ✅ ElevenLabs Music generated!");
             toast.success("🎵 Trilha sonora profissional gerada!");
-            return musicUrl;
+            return URL.createObjectURL(audioBlob);
           }
         }
-        console.log("[Music] ElevenLabs Music failed:", response.status);
       } catch (e) {
         console.warn("[Music] ElevenLabs Music error:", e);
       }
       
       if (abortRef.current) return "";
       
-      // 2️⃣ MusicGen (HuggingFace - free)
+      // 2️⃣ MusicGen (HuggingFace)
       try {
-        console.log("[Music] 🎵 Trying MusicGen...");
         const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
           body: { mood: mood || "technology", duration: 15 },
         });
@@ -412,7 +356,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       
       // 3️⃣ Procedural Web Audio (always works)
       try {
-        console.log("[Music] Loading procedural music...");
         const track = getRandomTrack(mood);
         const musicUrl = await preloadTrack(track);
         if (musicUrl) return musicUrl;
@@ -422,50 +365,44 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     };
     
     try {
-      // ═══ PER-SEGMENT TTS: Generate audio for each segment separately ═══
-      // This ensures EXACT sync between narration and image transitions
-      console.log("[TTS] 🎯 Generating PER-SEGMENT narration for perfect sync...");
+      // ═══ PER-SEGMENT TTS → exact duration → perfect sync ═══
+      console.log("[TTS] 🎯 Generating PER-SEGMENT narration (ElevenLabs Sarah)...");
       
       const segmentAudioUrls: string[] = [];
-      let ttsProvider = "";
       
       for (let i = 0; i < segments.length; i++) {
         if (abortRef.current) break;
         console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
         
-        const result = await tryNarrationTTS(segments[i].text);
-        if (result) {
-          segmentAudioUrls.push(result.url);
-          if (!ttsProvider) ttsProvider = result.provider;
+        const audioUrl = await callElevenLabsTTS(segments[i].text);
+        if (audioUrl) {
+          segmentAudioUrls.push(audioUrl);
           
-          // Measure exact duration of this segment's audio
-          const duration = await getAudioDuration(result.url);
-          // Use audio duration if available, otherwise estimate from text
-          const segDuration = duration > 0 ? duration : Math.max(4, segments[i].text.split(/\s+/).length / 2.5);
+          // ★ KEY: Measure EXACT audio duration — this becomes the segment duration
+          const duration = await getAudioDuration(audioUrl);
+          const segDuration = duration > 0 
+            ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, duration + 0.3) // +0.3s breathing room
+            : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.5);
           segmentDurations.push(segDuration);
-          console.log(`[TTS] Segment ${i + 1} duration: ${segDuration.toFixed(1)}s`);
+          console.log(`[TTS] Segment ${i + 1}: audio=${duration.toFixed(1)}s → visual=${segDuration.toFixed(1)}s`);
         } else {
-          // Fallback: estimate duration from word count
-          const estimated = Math.max(4, segments[i].text.split(/\s+/).length / 2.5);
+          // No audio — estimate from word count
+          const estimated = Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.5);
           segmentDurations.push(estimated);
           segmentAudioUrls.push("");
         }
       }
       
-      console.log(`[TTS] ✅ Per-segment TTS complete! Provider: ${ttsProvider}`);
-      console.log(`[TTS] Segment durations: ${segmentDurations.map(d => d.toFixed(1) + 's').join(', ')}`);
+      console.log(`[TTS] ✅ Per-segment durations: ${segmentDurations.map(d => d.toFixed(1) + 's').join(', ')}`);
       
-      // Concatenate segment audio into single narration (using AudioContext)
+      // ─── Concatenate segment audios into single narration ───
       if (segmentAudioUrls.some(url => url)) {
         try {
           const offlineCtx = new AudioContext();
           const buffers: (AudioBuffer | null)[] = [];
           
           for (const url of segmentAudioUrls) {
-            if (!url) {
-              buffers.push(null);
-              continue;
-            }
+            if (!url) { buffers.push(null); continue; }
             try {
               let arrayBuffer: ArrayBuffer;
               if (url.startsWith('data:')) {
@@ -478,34 +415,30 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
                 const resp = await fetch(url);
                 arrayBuffer = await resp.arrayBuffer();
               }
-              const buf = await offlineCtx.decodeAudioData(arrayBuffer);
-              buffers.push(buf);
+              buffers.push(await offlineCtx.decodeAudioData(arrayBuffer));
             } catch (e) {
               console.warn("[TTS] Failed to decode segment audio:", e);
               buffers.push(null);
             }
           }
           
-          // Calculate total duration and render concatenated audio
           const totalNarrationDuration = segmentDurations.reduce((a, b) => a + b, 0);
           const sampleRate = buffers.find(b => b)?.sampleRate || 44100;
           const numChannels = buffers.find(b => b)?.numberOfChannels || 1;
           const offline = new OfflineAudioContext(numChannels, Math.ceil(sampleRate * totalNarrationDuration), sampleRate);
           
-          let offset = 0;
+          let audioOffset = 0;
           for (let i = 0; i < buffers.length; i++) {
             if (buffers[i]) {
               const src = offline.createBufferSource();
               src.buffer = buffers[i]!;
               src.connect(offline.destination);
-              src.start(offset);
+              src.start(audioOffset);
             }
-            offset += segmentDurations[i];
+            audioOffset += segmentDurations[i];
           }
           
           const renderedBuffer = await offline.startRendering();
-          
-          // Convert to WAV blob
           const wavBlob = audioBufferToWavBlob(renderedBuffer);
           narrationUrl = URL.createObjectURL(wavBlob);
           console.log(`[TTS] 🎵 Concatenated narration: ${totalNarrationDuration.toFixed(1)}s`);
@@ -517,24 +450,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
       }
       
-      // Generate CTA narration
+      // ─── CTA narration (also ElevenLabs Sarah) ───
       if (narrationUrl) {
-        console.log(`[TTS] Generating CTA narration...`);
-        const ctaResult = await tryCTATTS(ctaScript);
-        ctaNarrationUrl = ctaResult?.url || "";
+        const ctaUrl = await callElevenLabsTTS(ctaScript);
+        ctaNarrationUrl = ctaUrl || "";
       }
       
-      // Generate background music in parallel with nothing (music is last)
+      // ─── Background music ───
       backgroundMusicUrl = await generateBackgroundMusic();
-      console.log("[Music] Background music:", backgroundMusicUrl ? "✅ Generated" : "❌ None");
       
-      // Update segment durations based on actual audio measurements
-      const MIN_SEGMENT_DURATION = 4;
-      
+      // ─── Update segment durations in state ───
       setState(prev => {
         let currentTime = 0;
         const updatedSegments = prev.segments.map((seg, i) => {
-          const segDuration = Math.max(MIN_SEGMENT_DURATION, segmentDurations[i] || MIN_SEGMENT_DURATION);
+          const segDuration = segmentDurations[i] || VIDEO_CONFIG.SEGMENT_DURATION_BASE;
           const updated = { ...seg, duration: segDuration, startTime: currentTime };
           currentTime += segDuration;
           return updated;
@@ -556,9 +485,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       setState(prev => ({ ...prev, progress: 80 }));
       return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript, segmentDurations: [] as number[] };
     }
-  }, [getAudioDuration, preferredVoice]);
+  }, [getAudioDuration]);
 
-  // Step 4: Generate video from images (WebM - reliable browser encoding)
+  // ═══ Step 4: Generate video ═══
   const generateVideo = useCallback(async (
     segmentsInput: StorySegment[], 
     narrationUrl: string,
@@ -567,7 +496,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
   ) => {
     if (abortRef.current) return null;
     
-    // Get the latest segments from state (with updated durations from audio)
+    // Get latest segments (with audio-driven durations)
     const latestState = await new Promise<NarrativeStoryState>(resolve => {
       setState(prev => {
         resolve(prev);
@@ -575,38 +504,28 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       });
     });
     
-    // Use segments from state if they have updated durations
     const segments = latestState.segments.length > 0 ? latestState.segments : segmentsInput;
     
     try {
-      // ─── SAFETY: Validate before render ──────────────────
-      // Do NOT clamp segment durations below their audio duration!
-      // The audio duration IS the segment duration — this is what guarantees sync.
-      const MAX_TOTAL = 45; // Allow longer total since segments are audio-driven
-      const MIN_SEG = 3;
-      
+      // ─── Duration validation (audio-driven, no arbitrary clamping) ───
       let totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
       
-      // If still too long, proportionally shrink all segments
-      if (totalDuration > MAX_TOTAL) {
-        const ratio = MAX_TOTAL / totalDuration;
+      if (totalDuration > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
+        const ratio = VIDEO_CONFIG.MAX_TOTAL_DURATION / totalDuration;
         segments.forEach(seg => {
-          seg.duration = Math.max(MIN_SEG, seg.duration * ratio);
+          seg.duration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, seg.duration * ratio);
         });
         totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
-        console.warn(`[generateVideo] ⚠️ Durations scaled down to fit ${MAX_TOTAL}s cap. New total: ${totalDuration.toFixed(1)}s`);
+        console.warn(`[generateVideo] ⚠️ Scaled to ${totalDuration.toFixed(1)}s`);
       }
       
       toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s, ${segments.length} cenas)...`);
-      console.log("[generateVideo] Starting with", segments.length, "segments, total duration:", totalDuration.toFixed(1));
       console.log("[generateVideo] Segment durations:", segments.map(s => Number(s.duration.toFixed(1))));
-      console.log("[generateVideo] Has CTA audio:", !!ctaNarrationUrl);
       
-      // Generate WebM video (reliable browser-native encoding)
       const videoBlob = await generateVideoFromSegments({
-        width: 720,
-        height: 1280,
-        fps: 24,
+        width: VIDEO_CONFIG.WIDTH,
+        height: VIDEO_CONFIG.HEIGHT,
+        fps: VIDEO_CONFIG.FPS,
         audioUrl: narrationUrl || undefined,
         ctaAudioUrl: ctaNarrationUrl || undefined,
         backgroundMusicUrl: backgroundMusicUrl || undefined,
@@ -616,20 +535,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           text: seg.text,
         })),
         onProgress: (progress) => {
-          // Map 0-100 progress to 82-95 range
-          const mappedProgress = 82 + Math.floor(progress * 0.13);
-          setState(prev => ({ ...prev, progress: mappedProgress }));
+          setState(prev => ({ ...prev, progress: 82 + Math.floor(progress * 0.13) }));
         },
       });
       
-      console.log("[generateVideo] WebM generated, size:", (videoBlob.size / 1024 / 1024).toFixed(2), "MB");
+      console.log("[generateVideo] WebM:", (videoBlob.size / 1024 / 1024).toFixed(2), "MB");
       setState(prev => ({ ...prev, progress: 96 }));
       
-      // Upload the video
       toast.info("Enviando vídeo...");
       const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos");
-      
-      console.log("[generateVideo] Upload complete:", videoUrl);
       
       setState(prev => ({ 
         ...prev, 
@@ -647,34 +561,21 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, [setError]);
 
-  // Full pipeline - generates new script from topic
+  // ═══ Full pipeline ═══
   const generateStory = useCallback(async (topic: string) => {
     abortRef.current = false;
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
-    // Step 1: Script
     const segments = await generateScript(topic);
-    if (!segments || abortRef.current) {
-      setIsGenerating(false);
-      return;
-    }
+    if (!segments || abortRef.current) { setIsGenerating(false); return; }
 
-    // Step 2: Images (busca da web primeiro, IA como fallback)
     const segmentsWithImages = await generateImages(segments, topic);
-    if (!segmentsWithImages || abortRef.current) {
-      setIsGenerating(false);
-      return;
-    }
+    if (!segmentsWithImages || abortRef.current) { setIsGenerating(false); return; }
 
-    // Step 3: Audio (main + CTA)
     const audioResult = await generateAudio(segmentsWithImages);
-    if (abortRef.current) {
-      setIsGenerating(false);
-      return;
-    }
+    if (abortRef.current) { setIsGenerating(false); return; }
 
-    // Step 4: Video
     await generateVideo(
       segmentsWithImages, 
       audioResult?.narrationUrl || "", 
@@ -684,7 +585,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(false);
   }, [generateScript, generateImages, generateAudio, generateVideo]);
 
-  // Render from existing script - uses pre-generated segments instead of generating new ones
+  // ═══ Render from existing script ═══
   const renderFromScript = useCallback(async (
     existingSegments: Array<{ text: string; imagePrompt: string }>, 
     title?: string, 
@@ -695,15 +596,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
-    console.log('[renderFromScript] Using existing script with', existingSegments.length, 'segments');
-    if (preExistingImageUrls?.length) {
-      console.log('[renderFromScript] 🖼️ Pre-existing images provided:', preExistingImageUrls.length);
-    }
-    if (articleInfo?.articleImageUrl) {
-      console.log('[renderFromScript] 📰 Article image provided:', articleInfo.articleImageUrl.substring(0, 60));
-    }
-
-    // Build segments with timing from existing data
     let currentTime = 0;
     const segments: StorySegment[] = existingSegments.map((seg, index) => {
       const segment: StorySegment = {
@@ -729,32 +621,21 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    // Step 2: Images — skip if ALL segments already have images from pre-existing data
     const allHaveImages = segments.every(s => !!s.imageUrl);
     let segmentsWithImages: StorySegment[];
     
     if (allHaveImages) {
-      console.log('[renderFromScript] ✅ All segments have pre-existing images, skipping image generation');
-      toast.success(`📸 ${segments.length} imagens pré-existentes reutilizadas!`);
       setState(prev => ({ ...prev, step: "images", progress: 70 }));
       segmentsWithImages = segments;
     } else {
       const result = await generateImages(segments, title, articleInfo);
-      if (!result || abortRef.current) {
-        setIsGenerating(false);
-        return;
-      }
+      if (!result || abortRef.current) { setIsGenerating(false); return; }
       segmentsWithImages = result;
     }
 
-    // Step 3: Audio (main + CTA)
     const audioResult = await generateAudio(segmentsWithImages);
-    if (abortRef.current) {
-      setIsGenerating(false);
-      return;
-    }
+    if (abortRef.current) { setIsGenerating(false); return; }
 
-    // Step 4: Video
     await generateVideo(
       segmentsWithImages, 
       audioResult?.narrationUrl || "", 

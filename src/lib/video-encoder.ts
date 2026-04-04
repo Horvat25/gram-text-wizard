@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import fixWebmDuration from 'fix-webm-duration';
+import { VIDEO_CONFIG } from './video-config';
 
 export interface VideoSegment {
   imageUrl: string;
@@ -88,7 +89,7 @@ function drawWatermark(ctx: CanvasRenderingContext2D, width: number, height: num
   ctx.font = 'bold 28px sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'right';
-  ctx.shadowColor = 'rgba(123, 44, 255, 0.5)';
+  ctx.shadowColor = `rgba(123, 44, 255, 0.5)`;
   ctx.shadowBlur = 12;
   ctx.fillText(brand, width - 40, height - 40);
   ctx.restore();
@@ -188,9 +189,9 @@ function drawCTAScreen(
   brand: string
 ) {
   const grad = ctx.createLinearGradient(0, 0, width, height);
-  grad.addColorStop(0, '#0B0F1A');
-  grad.addColorStop(0.5, '#1a1040');
-  grad.addColorStop(1, '#0B0F1A');
+  grad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_BG);
+  grad.addColorStop(0.5, VIDEO_CONFIG.BRAND_COLOR_BG_DARK);
+  grad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_BG);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
@@ -220,7 +221,7 @@ function drawCTAScreen(
   ctx.font = '32px sans-serif';
   ctx.fillStyle = '#A78BFA';
   ctx.textAlign = 'center';
-  ctx.fillText('IA • Tecnologia • Futuro', width / 2, height / 2 - 20);
+  ctx.fillText(VIDEO_CONFIG.BRAND_SUBTITLE, width / 2, height / 2 - 20);
   ctx.restore();
 
   ctx.save();
@@ -228,8 +229,8 @@ function drawCTAScreen(
   const btnW = 380, btnH = 70;
   const btnX = width / 2 - btnW / 2, btnY = height / 2 + 40;
   const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
-  btnGrad.addColorStop(0, '#7B2CFF');
-  btnGrad.addColorStop(1, '#a855f7');
+  btnGrad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_PRIMARY);
+  btnGrad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_ACCENT);
   ctx.fillStyle = btnGrad;
   ctx.beginPath();
   const br = 35;
@@ -311,11 +312,8 @@ function renderFrame(
   brand: string,
   fps: number
 ) {
-  const TRANSITION_DURATION = 0.35;  // Transições mais rápidas
-  const HOOK_DURATION = 2.5;        // Hook mais curto e impactante
-
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = '#0B0F1A';
+  ctx.fillStyle = VIDEO_CONFIG.BRAND_COLOR_BG;
   ctx.fillRect(0, 0, width, height);
 
   if (currentTime < contentDuration) {
@@ -331,7 +329,7 @@ function renderFrame(
     }
 
     const segProgress = (currentTime - elapsed) / segments[segIndex].duration;
-    const transitionFrames = TRANSITION_DURATION * fps;
+    const transitionFrames = VIDEO_CONFIG.TRANSITION_DURATION * fps;
     const segFrames = Math.round(segments[segIndex].duration * fps);
     const frameInSeg = Math.round((currentTime - elapsed) * fps);
     const isInTransition = segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
@@ -346,8 +344,8 @@ function renderFrame(
 
     drawGradientOverlays(ctx, width, height);
 
-    if (segIndex === 0 && currentTime < HOOK_DURATION) {
-      drawHookEffect(ctx, width, height, currentTime / HOOK_DURATION);
+    if (segIndex === 0 && currentTime < VIDEO_CONFIG.HOOK_DURATION) {
+      drawHookEffect(ctx, width, height, currentTime / VIDEO_CONFIG.HOOK_DURATION);
     }
 
     const captionText = segments[segIndex].text;
@@ -367,50 +365,39 @@ function renderFrame(
   }
 }
 
-// ─── Safety constants ────────────────────────────────────────
-const MAX_TOTAL_DURATION = 45;    // Allow longer for audio-driven segments
-const MAX_SEGMENT_DURATION = 15;  // Don't clamp below audio duration
-const MIN_SEGMENT_DURATION = 3;   // No segment < 3s
-const MAX_SEGMENTS = 6;           // Max 6 segments
-const RENDER_TIMEOUT_BUFFER = 10; // Extra seconds before force-stop
-
+// ─── Validate and clamp segments ─────────────────────────────
 function validateAndClampSegments(segments: VideoSegment[]): VideoSegment[] {
-  // Limit number of segments
-  const clamped = segments.slice(0, MAX_SEGMENTS);
-  
-  // Clamp each segment's duration
+  const clamped = segments.slice(0, VIDEO_CONFIG.MAX_SEGMENTS);
   return clamped.map(seg => ({
     ...seg,
-    duration: Math.max(MIN_SEGMENT_DURATION, Math.min(seg.duration, MAX_SEGMENT_DURATION)),
+    duration: Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, Math.min(seg.duration, VIDEO_CONFIG.MAX_SEGMENT_DURATION)),
   }));
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN: Generate video — robust requestAnimationFrame approach
+// MAIN: Generate video — deterministic frame-counted approach
 // ═══════════════════════════════════════════════════════════════
 export async function generateVideoFromSegments(
   options: GenerateVideoOptions
 ): Promise<Blob> {
   const {
     segments: rawSegments,
-    width = 720,
-    height = 1280,
-    fps = 24,
+    width = VIDEO_CONFIG.WIDTH,
+    height = VIDEO_CONFIG.HEIGHT,
+    fps = VIDEO_CONFIG.FPS,
     audioUrl,
     ctaAudioUrl,
     backgroundMusicUrl,
     onProgress,
   } = options;
 
-  // ─── SAFETY: Validate & clamp segments ───────────────────
   const segments = validateAndClampSegments(rawSegments);
   
   if (segments.length === 0) {
     throw new Error('Nenhum segmento válido para renderizar');
   }
 
-  const BRAND = 'Neural Update';
-  const CTA_MIN_DURATION = 4;
+  const BRAND = VIDEO_CONFIG.BRAND_NAME;
 
   // ─── Canvas setup ────────────────────────────────────────
   const canvas = document.createElement('canvas');
@@ -426,7 +413,6 @@ export async function generateVideoFromSegments(
 
   const dest = audioCtx.createMediaStreamDestination();
 
-  // Load audio sources in parallel
   const [narrationBuf, ctaBuf, musicBuf] = await Promise.all([
     audioUrl ? loadAudioBuffer(audioCtx, audioUrl) : Promise.resolve(null),
     ctaAudioUrl ? loadAudioBuffer(audioCtx, ctaAudioUrl) : Promise.resolve(null),
@@ -439,15 +425,17 @@ export async function generateVideoFromSegments(
     music: musicBuf ? `${musicBuf.duration.toFixed(1)}s` : 'none',
   });
 
-  const CTA_DURATION = Math.min(ctaBuf ? Math.max(CTA_MIN_DURATION, ctaBuf.duration + 1.5) : CTA_MIN_DURATION, 8);
+  const CTA_DURATION = Math.min(
+    ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 1.5) : VIDEO_CONFIG.CTA_MIN_DURATION, 
+    VIDEO_CONFIG.CTA_MAX_DURATION
+  );
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
   
-  // ─── SAFETY: Hard cap total duration ─────────────────────
   const rawTotal = contentDuration + CTA_DURATION;
-  const totalDuration = Math.min(rawTotal, MAX_TOTAL_DURATION);
+  const totalDuration = Math.min(rawTotal, VIDEO_CONFIG.MAX_TOTAL_DURATION);
   
-  if (rawTotal > MAX_TOTAL_DURATION) {
-    console.warn(`[video-encoder] ⚠️ Duration clamped from ${rawTotal.toFixed(1)}s to ${MAX_TOTAL_DURATION}s`);
+  if (rawTotal > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
+    console.warn(`[video-encoder] ⚠️ Duration clamped from ${rawTotal.toFixed(1)}s to ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s`);
   }
 
   console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (content: ${contentDuration.toFixed(1)}s + CTA: ${CTA_DURATION.toFixed(1)}s) | ${segments.length} segments`);
@@ -466,8 +454,8 @@ export async function generateVideoFromSegments(
           fallback.height = height;
           const fCtx = fallback.getContext('2d')!;
           const grad = fCtx.createLinearGradient(0, 0, width, height);
-          grad.addColorStop(0, '#0B0F1A');
-          grad.addColorStop(1, '#1a1040');
+          grad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_BG);
+          grad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_BG_DARK);
           fCtx.fillStyle = grad;
           fCtx.fillRect(0, 0, width, height);
           const fallbackImg = new Image();
@@ -482,8 +470,6 @@ export async function generateVideoFromSegments(
   console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s @ ${fps}fps (${width}x${height})`);
 
   // ─── Stream setup ────────────────────────────────────────
-  // Use captureStream WITH fps — auto-captures frames as canvas updates
-  // This is far more reliable than captureStream(0) + manual requestFrame()
   const videoStream = canvas.captureStream(fps);
   const combinedStream = new MediaStream();
   videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
@@ -491,7 +477,7 @@ export async function generateVideoFromSegments(
 
   // ─── MediaRecorder with codec fallback ───────────────────
   const codecPriority = [
-    'video/webm;codecs=vp8,opus',   // Most reliable across browsers
+    'video/webm;codecs=vp8,opus',
     'video/webm;codecs=vp8',
     'video/webm',
     'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
@@ -502,7 +488,7 @@ export async function generateVideoFromSegments(
 
   const mediaRecorder = new MediaRecorder(combinedStream, {
     mimeType,
-    videoBitsPerSecond: 3_000_000,
+    videoBitsPerSecond: VIDEO_CONFIG.VIDEO_BITRATE,
   });
 
   const chunks: Blob[] = [];
@@ -510,7 +496,7 @@ export async function generateVideoFromSegments(
     if (e.data.size > 0) chunks.push(e.data);
   };
 
-  // ─── Start recording FIRST, then schedule audio + render ──
+  // ─── Start recording, schedule audio, render frames ──────
   return new Promise<Blob>(async (resolve, reject) => {
     mediaRecorder.onstop = async () => {
       audioCtx.close().catch(() => {});
@@ -523,7 +509,6 @@ export async function generateVideoFromSegments(
       let blob = new Blob(chunks, { type: mimeType });
       console.log(`[video-encoder] Raw blob: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
 
-      // Fix WebM duration metadata (browsers don't set it correctly)
       if (mimeType.includes('webm')) {
         try {
           blob = await fixWebmDuration(blob, totalDuration * 1000, { logger: false });
@@ -541,17 +526,11 @@ export async function generateVideoFromSegments(
       reject(new Error(`MediaRecorder error: ${e.error?.message || 'unknown'}`));
     };
 
-    // Start recording with frequent data collection
     mediaRecorder.start(200);
-
-    // Small delay to ensure MediaRecorder is ready
     await new Promise(r => setTimeout(r, 150));
 
     // ─── Schedule ALL audio NOW ─────────────────────────────
     const audioStartTime = audioCtx.currentTime;
-
-    // Calculate when narration actually ends (use buffer duration, not contentDuration)
-    // This prevents CTA from overlapping with narration
     const narrationEndTime = narrationBuf 
       ? Math.max(contentDuration, narrationBuf.duration) 
       : contentDuration;
@@ -560,7 +539,7 @@ export async function generateVideoFromSegments(
       const src = audioCtx.createBufferSource();
       src.buffer = narrationBuf;
       const gain = audioCtx.createGain();
-      gain.gain.value = 1.0;
+      gain.gain.value = VIDEO_CONFIG.NARRATION_VOLUME;
       src.connect(gain).connect(dest);
       src.start(audioStartTime);
     }
@@ -569,11 +548,9 @@ export async function generateVideoFromSegments(
       const src = audioCtx.createBufferSource();
       src.buffer = ctaBuf;
       const gain = audioCtx.createGain();
-      gain.gain.value = 0.9;
+      gain.gain.value = VIDEO_CONFIG.CTA_VOLUME;
       src.connect(gain).connect(dest);
-      // Start CTA after narration finishes (not after contentDuration)
-      // Add 0.5s gap for clean transition
-      src.start(audioStartTime + narrationEndTime + 0.5);
+      src.start(audioStartTime + narrationEndTime + VIDEO_CONFIG.NARRATION_CTA_GAP);
     }
 
     if (musicBuf) {
@@ -581,32 +558,27 @@ export async function generateVideoFromSegments(
       src.buffer = musicBuf;
       src.loop = true;
       const gain = audioCtx.createGain();
-      // Volume mais alto para trilha envolvente: 0.22 com narração, 0.45 sem
-      gain.gain.value = narrationBuf ? 0.22 : 0.45;
+      gain.gain.value = narrationBuf 
+        ? VIDEO_CONFIG.MUSIC_VOLUME_WITH_NARRATION 
+        : VIDEO_CONFIG.MUSIC_VOLUME_WITHOUT_NARRATION;
       src.connect(gain).connect(dest);
       src.start(audioStartTime);
-      // Fade out suave nos últimos 3 segundos
-      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - 3);
+      gain.gain.setValueAtTime(gain.gain.value, audioStartTime + totalDuration - VIDEO_CONFIG.MUSIC_FADEOUT_SECONDS);
       gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
     }
 
-    // ─── Render loop — FRAME-COUNTED (not wall-clock) ──────────
-    // Using frame counter ensures transitions happen correctly
-    // even if requestAnimationFrame drifts or pauses
+    // ─── Render loop — FRAME-COUNTED (deterministic) ────────
     const totalFrames = Math.ceil(totalDuration * fps);
     let currentFrame = 0;
     let stopped = false;
 
-    // ─── SAFETY: Hard timeout to prevent runaway renders ────
-    const hardTimeoutMs = (totalDuration + RENDER_TIMEOUT_BUFFER) * 1000;
+    const hardTimeoutMs = (totalDuration + VIDEO_CONFIG.RENDER_TIMEOUT_BUFFER) * 1000;
     const hardTimeout = setTimeout(() => {
       if (!stopped) {
         console.error(`[video-encoder] ⛔ HARD TIMEOUT — forcing stop`);
         stopped = true;
         try {
-          if (mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-          }
+          if (mediaRecorder.state === 'recording') mediaRecorder.stop();
         } catch (e) {
           console.error('[video-encoder] Error stopping after timeout:', e);
         }
@@ -619,24 +591,18 @@ export async function generateVideoFromSegments(
       if (currentFrame >= totalFrames) {
         renderFrame(ctx, totalDuration - 0.001, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
         onProgress?.(100);
-
         stopped = true;
         clearTimeout(hardTimeout);
         setTimeout(() => {
-          if (mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-          }
+          if (mediaRecorder.state === 'recording') mediaRecorder.stop();
         }, 500);
         return;
       }
 
-      // Calculate time from frame number (deterministic, no drift)
       const currentTime = currentFrame / fps;
       renderFrame(ctx, currentTime, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
-
       currentFrame++;
 
-      // Progress callback (every ~12 frames = ~2x per second)
       if (currentFrame % 12 === 0) {
         onProgress?.(Math.round((currentFrame / totalFrames) * 100));
       }
@@ -644,10 +610,7 @@ export async function generateVideoFromSegments(
       requestAnimationFrame(tick);
     };
 
-    // Draw first frame immediately so MediaRecorder has content
     renderFrame(ctx, 0, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
-
-    // Start the render loop
     requestAnimationFrame(tick);
   });
 }

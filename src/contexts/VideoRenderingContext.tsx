@@ -6,6 +6,7 @@ import { useNarrativeStory } from '@/hooks/useNarrativeStory';
 import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { unlockAudio } from '@/lib/audio-unlock';
+import { VIDEO_CONFIG } from '@/lib/video-config';
 import { toast } from 'sonner';
 
 const MAX_RENDER_ATTEMPTS = 3;
@@ -166,10 +167,9 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     renderFromScript,
     reset
   } = useNarrativeStory({
-    brandName: brandSettings.brandName || 'NeuralUpdate',
-    segmentCount: 4,
-    segmentDuration: 4,
-    preferredVoice: 'camila'
+    brandName: brandSettings.brandName || VIDEO_CONFIG.BRAND_NAME,
+    segmentCount: VIDEO_CONFIG.SEGMENT_COUNT,
+    segmentDuration: VIDEO_CONFIG.SEGMENT_DURATION_BASE,
   });
 
   // ─── Notify helper ─────────────────────────────────────
@@ -342,11 +342,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         const { data: scriptData, error: scriptError } = await supabase.functions.invoke('generate-story-script', {
           body: {
             topic,
-            segmentCount: 4,
-            wordsPerSegment: 10,
-            totalDuration: 20,
-            style: 'informativo, envolvente, com começo-meio-fim',
-            brandName: brandSettings.brandName || 'Neural Update'
+            segmentCount: VIDEO_CONFIG.SEGMENT_COUNT,
+            wordsPerSegment: VIDEO_CONFIG.WORDS_PER_SEGMENT,
+            totalDuration: VIDEO_CONFIG.SEGMENT_COUNT * VIDEO_CONFIG.SEGMENT_DURATION_BASE,
+            style: VIDEO_CONFIG.SCRIPT_STYLE,
+            brandName: brandSettings.brandName || VIDEO_CONFIG.BRAND_NAME
           }
         });
 
