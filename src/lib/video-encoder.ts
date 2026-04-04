@@ -365,17 +365,19 @@ function renderFrame(
   }
 }
 
-// ─── Validate and clamp segments ─────────────────────────────
-function validateAndClampSegments(segments: VideoSegment[]): VideoSegment[] {
-  const clamped = segments.slice(0, VIDEO_CONFIG.MAX_SEGMENTS);
-  return clamped.map(seg => ({
+// ─── Validate segments without changing audio-driven timing ─────────────
+function validateSegments(segments: VideoSegment[]): VideoSegment[] {
+  const limited = segments.slice(0, VIDEO_CONFIG.MAX_SEGMENTS);
+  return limited.map(seg => ({
     ...seg,
-    duration: Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, Math.min(seg.duration, VIDEO_CONFIG.MAX_SEGMENT_DURATION)),
+    duration: Number.isFinite(seg.duration)
+      ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, seg.duration)
+      : VIDEO_CONFIG.MIN_SEGMENT_DURATION,
   }));
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN: Generate video — deterministic frame-counted approach
+// MAIN: Generate video — time-locked to real elapsed audio time
 // ═══════════════════════════════════════════════════════════════
 export async function generateVideoFromSegments(
   options: GenerateVideoOptions
@@ -391,21 +393,23 @@ export async function generateVideoFromSegments(
     onProgress,
   } = options;
 
-  const segments = validateAndClampSegments(rawSegments);
-  
+  const segments = validateSegments(rawSegments);
+
   if (segments.length === 0) {
     throw new Error('Nenhum segmento válido para renderizar');
   }
 
+  if (segments.some(seg => !seg.imageUrl)) {
+    throw new Error('Uma ou mais cenas estão sem imagem');
+  }
+
   const BRAND = VIDEO_CONFIG.BRAND_NAME;
 
-  // ─── Canvas setup ────────────────────────────────────────
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d')!;
 
-  // ─── Audio setup ─────────────────────────────────────────
   const audioCtx = new AudioContext();
   if (audioCtx.state === 'suspended') {
     await audioCtx.resume();
@@ -426,21 +430,19 @@ export async function generateVideoFromSegments(
   });
 
   const CTA_DURATION = Math.min(
-    ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 1.5) : VIDEO_CONFIG.CTA_MIN_DURATION, 
+    ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 1.5) : VIDEO_CONFIG.CTA_MIN_DURATION,
     VIDEO_CONFIG.CTA_MAX_DURATION
   );
   const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
-  
   const rawTotal = contentDuration + CTA_DURATION;
   const totalDuration = Math.min(rawTotal, VIDEO_CONFIG.MAX_TOTAL_DURATION);
-  
+
   if (rawTotal > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
-    console.warn(`[video-encoder] ⚠️ Duration clamped from ${rawTotal.toFixed(1)}s to ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s`);
+    console.warn(`[video-encoder] ⚠️ Duration trimmed to ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s at encoder boundary`);
   }
 
   console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (content: ${contentDuration.toFixed(1)}s + CTA: ${CTA_DURATION.toFixed(1)}s) | ${segments.length} segments`);
 
-  // ─── Preload all images ──────────────────────────────────
   const images: HTMLImageElement[] = await Promise.all(
     segments.map(seg =>
       new Promise<HTMLImageElement>((resolve) => {
@@ -469,13 +471,13 @@ export async function generateVideoFromSegments(
 
   console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s @ ${fps}fps (${width}x${height})`);
 
-  // ─── Stream setup ────────────────────────────────────────
+  renderFrame(ctx, 0, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+
   const videoStream = canvas.captureStream(fps);
   const combinedStream = new MediaStream();
   videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
   dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
 
-  // ─── MediaRecorder with codec fallback ───────────────────
   const codecPriority = [
     'video/webm;codecs=vp8,opus',
     'video/webm;codecs=vp8',
@@ -496,8 +498,7 @@ export async function generateVideoFromSegments(
     if (e.data.size > 0) chunks.push(e.data);
   };
 
-  // ─── Start recording, schedule audio, render frames ──────
-  return new Promise<Blob>(async (resolve, reject) => {
+  return new Promise<Blob>((resolve, reject) => {
     mediaRecorder.onstop = async () => {
       audioCtx.close().catch(() => {});
 
@@ -526,13 +527,17 @@ export async function generateVideoFromSegments(
       reject(new Error(`MediaRecorder error: ${e.error?.message || 'unknown'}`));
     };
 
-    mediaRecorder.start(200);
-    await new Promise(r => setTimeout(r, 150));
+    const startDelayMs = 80;
+    const frameIntervalMs = 1000 / fps;
+    let lastRenderedAt = -Infinity;
+    let lastProgress = -1;
+    let stopped = false;
 
-    // ─── Schedule ALL audio NOW ─────────────────────────────
-    const audioStartTime = audioCtx.currentTime;
-    const narrationEndTime = narrationBuf 
-      ? Math.max(contentDuration, narrationBuf.duration) 
+    mediaRecorder.start(200);
+
+    const audioStartTime = audioCtx.currentTime + startDelayMs / 1000;
+    const narrationEndTime = narrationBuf
+      ? Math.max(contentDuration, narrationBuf.duration)
       : contentDuration;
 
     if (narrationBuf) {
@@ -558,8 +563,8 @@ export async function generateVideoFromSegments(
       src.buffer = musicBuf;
       src.loop = true;
       const gain = audioCtx.createGain();
-      gain.gain.value = narrationBuf 
-        ? VIDEO_CONFIG.MUSIC_VOLUME_WITH_NARRATION 
+      gain.gain.value = narrationBuf
+        ? VIDEO_CONFIG.MUSIC_VOLUME_WITH_NARRATION
         : VIDEO_CONFIG.MUSIC_VOLUME_WITHOUT_NARRATION;
       src.connect(gain).connect(dest);
       src.start(audioStartTime);
@@ -567,15 +572,11 @@ export async function generateVideoFromSegments(
       gain.gain.linearRampToValueAtTime(0, audioStartTime + totalDuration);
     }
 
-    // ─── Render loop — FRAME-COUNTED (deterministic) ────────
-    const totalFrames = Math.ceil(totalDuration * fps);
-    let currentFrame = 0;
-    let stopped = false;
-
+    const startWallClock = performance.now() + startDelayMs;
     const hardTimeoutMs = (totalDuration + VIDEO_CONFIG.RENDER_TIMEOUT_BUFFER) * 1000;
     const hardTimeout = setTimeout(() => {
       if (!stopped) {
-        console.error(`[video-encoder] ⛔ HARD TIMEOUT — forcing stop`);
+        console.error('[video-encoder] ⛔ HARD TIMEOUT — forcing stop');
         stopped = true;
         try {
           if (mediaRecorder.state === 'recording') mediaRecorder.stop();
@@ -585,32 +586,35 @@ export async function generateVideoFromSegments(
       }
     }, hardTimeoutMs);
 
-    const tick = () => {
+    const tick = (now: number) => {
       if (stopped) return;
 
-      if (currentFrame >= totalFrames) {
-        renderFrame(ctx, totalDuration - 0.001, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
-        onProgress?.(100);
+      const elapsed = Math.max(0, (now - startWallClock) / 1000);
+      const renderTime = Math.min(totalDuration, elapsed);
+
+      if (now - lastRenderedAt >= frameIntervalMs - 1 || renderTime >= totalDuration) {
+        renderFrame(ctx, renderTime, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+        lastRenderedAt = now;
+
+        const progress = Math.min(100, Math.round((renderTime / totalDuration) * 100));
+        if (progress !== lastProgress) {
+          lastProgress = progress;
+          onProgress?.(progress);
+        }
+      }
+
+      if (elapsed >= totalDuration) {
         stopped = true;
         clearTimeout(hardTimeout);
         setTimeout(() => {
           if (mediaRecorder.state === 'recording') mediaRecorder.stop();
-        }, 500);
+        }, 250);
         return;
-      }
-
-      const currentTime = currentFrame / fps;
-      renderFrame(ctx, currentTime, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
-      currentFrame++;
-
-      if (currentFrame % 12 === 0) {
-        onProgress?.(Math.round((currentFrame / totalFrames) * 100));
       }
 
       requestAnimationFrame(tick);
     };
 
-    renderFrame(ctx, 0, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
     requestAnimationFrame(tick);
   });
 }

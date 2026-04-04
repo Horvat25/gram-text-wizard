@@ -15,7 +15,7 @@ export const VIDEO_CONFIG = {
   // ─── Estrutura do Script ────────────────────────────
   /** Número de segmentos (cenas) por vídeo */
   SEGMENT_COUNT: 4,
-  /** Duração base de cada segmento em segundos (usado como estimativa inicial; 
+  /** Duração base de cada segmento em segundos (usado como estimativa inicial;
    *  a duração REAL é definida pelo áudio após TTS) */
   SEGMENT_DURATION_BASE: 4,
   /** Palavras por segmento (controla o tamanho do texto gerado pela IA) */
@@ -24,12 +24,12 @@ export const VIDEO_CONFIG = {
   // ─── Limites de Segurança ──────────────────────────
   /** Duração mínima de um segmento (segundos) — áudio mais curto usa este piso */
   MIN_SEGMENT_DURATION: 3,
-  /** Duração máxima de um segmento (segundos) — proteção contra TTS travado */
-  MAX_SEGMENT_DURATION: 18,
+  /** Duração máxima esperada de um segmento para Reels curtos */
+  MAX_SEGMENT_DURATION: 7,
   /** Máximo de segmentos por vídeo */
   MAX_SEGMENTS: 6,
   /** Duração total máxima do vídeo (conteúdo + CTA) */
-  MAX_TOTAL_DURATION: 60,
+  MAX_TOTAL_DURATION: 35,
   /** Buffer extra de timeout para renderização (segundos) */
   RENDER_TIMEOUT_BUFFER: 10,
 
@@ -48,7 +48,7 @@ export const VIDEO_CONFIG = {
   /** Duração mínima do CTA (segundos) */
   CTA_MIN_DURATION: 4,
   /** Duração máxima do CTA (segundos) */
-  CTA_MAX_DURATION: 8,
+  CTA_MAX_DURATION: 7,
 
   // ─── Áudio ────────────────────────────────────────
   /** Volume da narração principal (0-1) */
