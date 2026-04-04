@@ -75,10 +75,13 @@ interface UseNarrativeStoryOptions {
 }
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
-  const { 
-    segmentCount = VIDEO_CONFIG.SEGMENT_COUNT, 
-    segmentDuration = VIDEO_CONFIG.SEGMENT_DURATION_BASE,
-  } = options;
+  const requestedSegmentCount = options.segmentCount ?? VIDEO_CONFIG.SEGMENT_COUNT;
+  const requestedSegmentDuration = options.segmentDuration ?? VIDEO_CONFIG.SEGMENT_DURATION_BASE;
+  const segmentCount = Math.min(requestedSegmentCount, VIDEO_CONFIG.SEGMENT_COUNT);
+  const segmentDuration = Math.min(
+    Math.max(requestedSegmentDuration, VIDEO_CONFIG.MIN_SEGMENT_DURATION),
+    VIDEO_CONFIG.MAX_SEGMENT_DURATION,
+  );
   
   const [state, setState] = useState<NarrativeStoryState>({
     step: "idle",
@@ -142,8 +145,13 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         throw new Error("Nenhum roteiro gerado");
       }
 
+      const scriptSegments = data.segments.slice(0, segmentCount);
+      if (scriptSegments.length < segmentCount) {
+        throw new Error(`O roteiro retornou ${scriptSegments.length} cena(s), mas o vídeo precisa de ${segmentCount}.`);
+      }
+
       let currentTime = 0;
-      const segments: StorySegment[] = data.segments.map((seg: any, index: number) => {
+      const segments: StorySegment[] = scriptSegments.map((seg: any, index: number) => {
         const segment: StorySegment = {
           id: `seg-${index}`,
           text: seg.text,
@@ -176,7 +184,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
   const generateImages = useCallback(async (segments: StorySegment[], topic?: string, articleInfo?: { articleUrl?: string; articleImageUrl?: string }) => {
     setState(prev => ({ ...prev, step: "images", progress: 20 }));
     
-    const updatedSegments = [...segments];
+    const updatedSegments = segments.map(segment => ({ ...segment }));
     
     try {
       const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
@@ -210,32 +218,68 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.warn('[IMAGES] Search failed:', e);
     }
 
-    const validSegments = updatedSegments.filter(s => s.imageUrl);
-    
-    if (validSegments.length === 0) {
-      setError("Nenhuma imagem foi encontrada ou gerada.");
-      return null;
+    const missingImageIndexes = updatedSegments
+      .map((segment, index) => (!segment.imageUrl ? index : -1))
+      .filter(index => index >= 0);
+
+    if (missingImageIndexes.length > 0) {
+      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem após busca principal, acionando fallback por cena...`);
+
+      const fallbackResults = await Promise.all(
+        missingImageIndexes.map(async (index) => {
+          const segment = updatedSegments[index];
+          const prompt = segment.imagePrompt || segment.text || topic || "tecnologia";
+
+          try {
+            const { data, error } = await supabase.functions.invoke("generate-image", {
+              body: {
+                prompt: `${prompt}. Vertical 9:16, cinematográfico, fotorrealista, coerente com notícia de tecnologia, sem texto.`,
+                format: "portrait",
+                applyWatermark: true,
+              },
+            });
+
+            if (error) throw error;
+            return { index, imageUrl: data?.imageUrl || "" };
+          } catch (error) {
+            console.error(`[IMAGES] Fallback falhou para cena ${index + 1}:`, error);
+            return { index, imageUrl: "" };
+          }
+        })
+      );
+
+      fallbackResults.forEach(({ index, imageUrl }) => {
+        if (imageUrl) {
+          updatedSegments[index] = { ...updatedSegments[index], imageUrl };
+        }
+      });
     }
-    
-    if (validSegments.length < updatedSegments.length && validSegments.length >= 2) {
-      toast.warning(`${updatedSegments.length - validSegments.length} imagens falharam, continuando com ${validSegments.length}`);
+
+    const unresolvedImages = updatedSegments
+      .map((segment, index) => (!segment.imageUrl ? index + 1 : null))
+      .filter((index): index is number => index !== null);
+
+    if (unresolvedImages.length > 0) {
+      setError(`Não consegui preparar as imagens das cenas ${unresolvedImages.join(", ")}. O vídeo foi cancelado para não sair quebrado.`);
+      return null;
     }
 
     let currentTime = 0;
-    validSegments.forEach(seg => {
-      seg.startTime = currentTime;
-      currentTime += seg.duration;
+    const finalizedSegments = updatedSegments.map(segment => {
+      const updatedSegment = { ...segment, startTime: currentTime };
+      currentTime += segment.duration;
+      return updatedSegment;
     });
 
     setState(prev => ({ 
       ...prev, 
-      segments: validSegments,
+      segments: finalizedSegments,
       totalDuration: currentTime,
       progress: 70,
     }));
 
-    toast.success(`📸 ${validSegments.length} imagens prontas!`);
-    return validSegments;
+    toast.success(`📸 ${finalizedSegments.length} imagens prontas!`);
+    return finalizedSegments;
   }, [setError]);
 
   // Helper to get exact audio duration
@@ -263,7 +307,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
-  // ═══ Step 3: Generate per-segment narration — ElevenLabs Sarah ONLY ═══
+  // ═══ Step 3: Generate per-segment narration — ElevenLabs first, with safe fallbacks ═══
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "", segmentDurations: [] as number[] };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -282,25 +326,56 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let backgroundMusicUrl = "";
     const segmentDurations: number[] = [];
     
-    // ─── TTS: ElevenLabs Sarah ONLY — zero fallbacks ───────
-    const callElevenLabsTTS = async (text: string): Promise<string | null> => {
-      if (abortRef.current) return null;
+    const buildAudioDataUrl = (audioContent: string, format = "mp3") => `data:audio/${format};base64,${audioContent}`;
+
+    const invokeTTS = async (
+      functionName: string,
+      body: Record<string, unknown>,
+      provider: string,
+    ): Promise<{ audioUrl: string | null; provider: string }> => {
+      if (abortRef.current) return { audioUrl: null, provider };
       
       try {
-        const result = await supabase.functions.invoke("edge-tts", {
-          body: { text },
+        const result = await supabase.functions.invoke(functionName, {
+          body,
         });
+
         if (!result.error && result.data?.audioContent && !result.data?.error) {
-          return `data:audio/mp3;base64,${result.data.audioContent}`;
+          return {
+            audioUrl: buildAudioDataUrl(result.data.audioContent, result.data.format || "mp3"),
+            provider,
+          };
         }
+
         if (result.data?.error) {
-          console.error(`[TTS] ElevenLabs error: ${result.data.error}`);
+          console.error(`[TTS] ${provider} error: ${result.data.error}`);
+        }
+        if (result.error) {
+          console.error(`[TTS] ${provider} invoke error: ${result.error.message}`);
         }
       } catch (e) { 
-        console.error("[TTS] ElevenLabs Sarah failed:", e); 
+        console.error(`[TTS] ${provider} failed:`, e); 
       }
       
-      return null;
+      return { audioUrl: null, provider };
+    };
+
+    const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
+      let result = await invokeTTS("edge-tts", { text }, "elevenlabs");
+      if (result.audioUrl) return result;
+
+      console.warn("[TTS] ElevenLabs falhou, repetindo uma vez antes do fallback...");
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      result = await invokeTTS("edge-tts", { text }, "elevenlabs-retry");
+      if (result.audioUrl) return result;
+
+      result = await invokeTTS("lovable-tts", { text, voice: "camila" }, "lovable-tts");
+      if (result.audioUrl) return result;
+
+      result = await invokeTTS("free-tts", { text, language: "pt-BR" }, "free-tts");
+      if (result.audioUrl) return result;
+
+      return { audioUrl: null, provider: "none" };
     };
     
     // ─── Background music: ElevenLabs Music → MusicGen → Procedural ───
@@ -369,7 +444,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     try {
       // ═══ PER-SEGMENT TTS → exact duration → perfect sync ═══
-      console.log("[TTS] 🎯 Generating PER-SEGMENT narration (ElevenLabs Sarah)...");
+      console.log("[TTS] 🎯 Generating PER-SEGMENT narration with protected fallback chain...");
       
       const segmentAudioUrls: string[] = [];
       
@@ -377,32 +452,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (abortRef.current) break;
         console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
         
-        // Retry once on failure (ElevenLabs can have intermittent 401s)
-        let audioUrl = await callElevenLabsTTS(segments[i].text);
+        const { audioUrl, provider } = await callNarrationTTS(segments[i].text);
         if (!audioUrl) {
-          console.warn(`[TTS] Segment ${i + 1} failed, retrying once...`);
-          await new Promise(r => setTimeout(r, 1500));
-          audioUrl = await callElevenLabsTTS(segments[i].text);
+          throw new Error(`Falha na narração da cena ${i + 1}. Nenhum provedor de voz respondeu com áudio válido.`);
         }
-        
-        if (audioUrl) {
-          segmentAudioUrls.push(audioUrl);
-          
-          // ★ KEY: Measure EXACT audio duration — this becomes the segment duration
-          const duration = await getAudioDuration(audioUrl);
-          const segDuration = duration > 0 
-            ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, duration + 0.3) // +0.3s breathing room
-            : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.0); // ~2 words/sec for PT-BR
-          segmentDurations.push(segDuration);
-          console.log(`[TTS] Segment ${i + 1}: audio=${duration.toFixed(1)}s → visual=${segDuration.toFixed(1)}s`);
-        } else {
-          // No audio — estimate from word count (~2 words/sec for Portuguese narration)
-          const wordCount = segments[i].text.split(/\s+/).length;
-          const estimated = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, wordCount / 2.0);
-          segmentDurations.push(estimated);
-          segmentAudioUrls.push("");
-          console.warn(`[TTS] Segment ${i + 1}: NO AUDIO, estimated ${estimated.toFixed(1)}s from ${wordCount} words`);
-        }
+
+        segmentAudioUrls.push(audioUrl);
+
+        // ★ KEY: Measure EXACT audio duration — this becomes the segment duration
+        const duration = await getAudioDuration(audioUrl);
+        const segDuration = duration > 0 
+          ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, duration + 0.3) // +0.3s breathing room
+          : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.0); // ~2 words/sec for PT-BR
+        segmentDurations.push(segDuration);
+        console.log(`[TTS] Segment ${i + 1}: provider=${provider} | audio=${duration.toFixed(1)}s → visual=${segDuration.toFixed(1)}s`);
       }
       
       console.log(`[TTS] ✅ Per-segment durations: ${segmentDurations.map(d => d.toFixed(1) + 's').join(', ')}`);
@@ -413,8 +476,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const offlineCtx = new AudioContext();
           const buffers: (AudioBuffer | null)[] = [];
           
-          for (const url of segmentAudioUrls) {
-            if (!url) { buffers.push(null); continue; }
+           for (let i = 0; i < segmentAudioUrls.length; i++) {
+             const url = segmentAudioUrls[i];
             try {
               let arrayBuffer: ArrayBuffer;
               if (url.startsWith('data:')) {
@@ -434,15 +497,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
               // This catches cases where getAudioDuration returned 0 but buffer is valid
               if (decoded.duration > 0) {
                 const correctedDuration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, decoded.duration + 0.3);
-                const idx = buffers.length - 1;
+                 const idx = buffers.length - 1;
                 if (Math.abs(correctedDuration - segmentDurations[idx]) > 0.5) {
                   console.log(`[TTS] ⚡ Reconciled seg ${idx + 1}: ${segmentDurations[idx].toFixed(1)}s → ${correctedDuration.toFixed(1)}s (from decoded buffer)`);
                   segmentDurations[idx] = correctedDuration;
                 }
               }
             } catch (e) {
-              console.warn("[TTS] Failed to decode segment audio:", e);
-              buffers.push(null);
+               console.error(`[TTS] Failed to decode segment audio ${i + 1}:`, e);
+               throw new Error(`Falha ao processar o áudio da cena ${i + 1}. O vídeo foi cancelado para não sair com silêncio.`);
             }
           }
           
@@ -475,9 +538,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       }
       
       // ─── CTA narration (also ElevenLabs Sarah) ───
-      if (narrationUrl) {
-        const ctaUrl = await callElevenLabsTTS(ctaScript);
-        ctaNarrationUrl = ctaUrl || "";
+       if (narrationUrl) {
+         const { audioUrl: ctaUrl } = await callNarrationTTS(ctaScript);
+         ctaNarrationUrl = ctaUrl || "";
       }
       
       // ─── Background music ───
@@ -531,16 +594,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const segments = latestState.segments.length > 0 ? latestState.segments : segmentsInput;
     
     try {
-      // ─── Duration validation (audio-driven, no arbitrary clamping) ───
-      let totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
-      
+      if (!narrationUrl) {
+        throw new Error("A narração não ficou pronta. O vídeo foi cancelado para evitar descompasso.");
+      }
+
+      if (segments.length > VIDEO_CONFIG.MAX_SEGMENTS) {
+        throw new Error(`Esse formato aceita no máximo ${VIDEO_CONFIG.MAX_SEGMENTS} cenas.`);
+      }
+
+      const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0) + VIDEO_CONFIG.CTA_MAX_DURATION;
       if (totalDuration > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
-        const ratio = VIDEO_CONFIG.MAX_TOTAL_DURATION / totalDuration;
-        segments.forEach(seg => {
-          seg.duration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, seg.duration * ratio);
-        });
-        totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
-        console.warn(`[generateVideo] ⚠️ Scaled to ${totalDuration.toFixed(1)}s`);
+        throw new Error(`O roteiro ficou longo demais para o formato atual. Use o preset de ~20s ou ~30s.`);
       }
       
       toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s, ${segments.length} cenas)...`);
@@ -620,8 +684,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
+    const normalizedScript = existingSegments.slice(0, segmentCount);
     let currentTime = 0;
-    const segments: StorySegment[] = existingSegments.map((seg, index) => {
+    const segments: StorySegment[] = normalizedScript.map((seg, index) => {
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: seg.text,

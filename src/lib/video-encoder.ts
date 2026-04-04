@@ -307,7 +307,8 @@ function renderFrame(
   images: HTMLImageElement[],
   width: number,
   height: number,
-  contentDuration: number,
+  visualContentDuration: number,
+  ctaStartTime: number,
   ctaDuration: number,
   brand: string,
   fps: number
@@ -316,23 +317,29 @@ function renderFrame(
   ctx.fillStyle = VIDEO_CONFIG.BRAND_COLOR_BG;
   ctx.fillRect(0, 0, width, height);
 
-  if (currentTime < contentDuration) {
+  if (currentTime < ctaStartTime) {
     // ── CONTENT PHASE ──
+    const clampedContentTime = Math.min(
+      currentTime,
+      Math.max(visualContentDuration - 0.001, 0)
+    );
     let elapsed = 0;
-    let segIndex = 0;
+    let segIndex = segments.length - 1;
     for (let i = 0; i < segments.length; i++) {
-      if (currentTime < elapsed + segments[i].duration) {
+      if (clampedContentTime < elapsed + segments[i].duration || i === segments.length - 1) {
         segIndex = i;
         break;
       }
       elapsed += segments[i].duration;
     }
 
-    const segProgress = (currentTime - elapsed) / segments[segIndex].duration;
+    const safeDuration = Math.max(segments[segIndex].duration, 0.001);
+    const segProgress = Math.min(1, Math.max(0, (clampedContentTime - elapsed) / safeDuration));
     const transitionFrames = VIDEO_CONFIG.TRANSITION_DURATION * fps;
-    const segFrames = Math.round(segments[segIndex].duration * fps);
-    const frameInSeg = Math.round((currentTime - elapsed) * fps);
-    const isInTransition = segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
+    const segFrames = Math.round(safeDuration * fps);
+    const frameInSeg = Math.round(Math.max(0, clampedContentTime - elapsed) * fps);
+    const isHoldingLastFrame = currentTime > visualContentDuration;
+    const isInTransition = !isHoldingLastFrame && segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
 
     if (isInTransition) {
       const transProgress = (frameInSeg - (segFrames - transitionFrames)) / transitionFrames;
@@ -350,9 +357,11 @@ function renderFrame(
 
     const captionText = segments[segIndex].text;
     if (captionText) {
-      let captionOpacity = 1;
-      if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
-      if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
+      let captionOpacity = isHoldingLastFrame ? 1 : 1;
+      if (!isHoldingLastFrame) {
+        if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
+        if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
+      }
       captionOpacity = Math.max(0, Math.min(1, captionOpacity));
       drawCaption(ctx, captionText, width, height, captionOpacity);
     }
@@ -360,15 +369,18 @@ function renderFrame(
     drawWatermark(ctx, width, height, brand);
   } else {
     // ── CTA PHASE ──
-    const ctaProgress = (currentTime - contentDuration) / ctaDuration;
+    const ctaProgress = (currentTime - ctaStartTime) / ctaDuration;
     drawCTAScreen(ctx, width, height, ctaProgress, brand);
   }
 }
 
 // ─── Validate segments without changing audio-driven timing ─────────────
 function validateSegments(segments: VideoSegment[]): VideoSegment[] {
-  const limited = segments.slice(0, VIDEO_CONFIG.MAX_SEGMENTS);
-  return limited.map(seg => ({
+  if (segments.length > VIDEO_CONFIG.MAX_SEGMENTS) {
+    throw new Error(`O render suporta no máximo ${VIDEO_CONFIG.MAX_SEGMENTS} cenas.`);
+  }
+
+  return segments.map(seg => ({
     ...seg,
     duration: Number.isFinite(seg.duration)
       ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, seg.duration)
@@ -433,15 +445,18 @@ export async function generateVideoFromSegments(
     ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 1.5) : VIDEO_CONFIG.CTA_MIN_DURATION,
     VIDEO_CONFIG.CTA_MAX_DURATION
   );
-  const contentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
-  const rawTotal = contentDuration + CTA_DURATION;
-  const totalDuration = Math.min(rawTotal, VIDEO_CONFIG.MAX_TOTAL_DURATION);
+  const visualContentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
+  const narrationDuration = narrationBuf ? Math.max(visualContentDuration, narrationBuf.duration) : visualContentDuration;
+  const ctaStartTime = narrationDuration + VIDEO_CONFIG.NARRATION_CTA_GAP;
+  const rawTotal = ctaStartTime + CTA_DURATION;
 
   if (rawTotal > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
-    console.warn(`[video-encoder] ⚠️ Duration trimmed to ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s at encoder boundary`);
+    throw new Error(`Duração final de ${rawTotal.toFixed(1)}s excede o limite seguro de ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s.`);
   }
 
-  console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (content: ${contentDuration.toFixed(1)}s + CTA: ${CTA_DURATION.toFixed(1)}s) | ${segments.length} segments`);
+  const totalDuration = rawTotal;
+
+  console.log(`[video-encoder] Total: ${totalDuration.toFixed(1)}s (visual: ${visualContentDuration.toFixed(1)}s | narration: ${narrationDuration.toFixed(1)}s | CTA: ${CTA_DURATION.toFixed(1)}s) | ${segments.length} segments`);
 
   const images: HTMLImageElement[] = await Promise.all(
     segments.map(seg =>
@@ -471,7 +486,7 @@ export async function generateVideoFromSegments(
 
   console.log(`[video-encoder] ${images.length} images loaded, rendering ${totalDuration.toFixed(1)}s @ ${fps}fps (${width}x${height})`);
 
-  renderFrame(ctx, 0, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+  renderFrame(ctx, 0, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
 
   const videoStream = canvas.captureStream(fps);
   const combinedStream = new MediaStream();
@@ -537,8 +552,8 @@ export async function generateVideoFromSegments(
 
     const audioStartTime = audioCtx.currentTime + startDelayMs / 1000;
     const narrationEndTime = narrationBuf
-      ? Math.max(contentDuration, narrationBuf.duration)
-      : contentDuration;
+      ? Math.max(visualContentDuration, narrationBuf.duration)
+      : visualContentDuration;
 
     if (narrationBuf) {
       const src = audioCtx.createBufferSource();
@@ -593,7 +608,7 @@ export async function generateVideoFromSegments(
       const renderTime = Math.min(totalDuration, elapsed);
 
       if (now - lastRenderedAt >= frameIntervalMs - 1 || renderTime >= totalDuration) {
-        renderFrame(ctx, renderTime, segments, images, width, height, contentDuration, CTA_DURATION, BRAND, fps);
+        renderFrame(ctx, renderTime, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
         lastRenderedAt = now;
 
         const progress = Math.min(100, Math.round((renderTime / totalDuration) * 100));

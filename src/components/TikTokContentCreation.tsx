@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { format, addMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { unlockAudio } from "@/lib/audio-unlock";
+import { VIDEO_CONFIG } from "@/lib/video-config";
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -87,10 +88,8 @@ const getMinScheduleDatetime = (): string => {
 
 // Duration presets for video generation
 const DURATION_PRESETS = [
-  { label: "~15s", description: "Rápido", segments: 3, duration: 5, icon: Zap },
-  { label: "~30s", description: "Ideal", segments: 4, duration: 7, icon: Timer },
-  { label: "~60s", description: "Deep", segments: 6, duration: 10, icon: Film },
-  { label: "~90s", description: "Story", segments: 8, duration: 11, icon: FileText },
+  { label: "~20s", description: "4 cenas", segments: VIDEO_CONFIG.SEGMENT_COUNT, duration: 4, icon: Zap },
+  { label: "~30s", description: "4 cenas", segments: VIDEO_CONFIG.SEGMENT_COUNT, duration: VIDEO_CONFIG.MAX_SEGMENT_DURATION, icon: Timer },
 ];
 
 const TikTokContentCreation = () => {
