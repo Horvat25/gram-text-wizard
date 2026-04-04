@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useWorkspace } from "@/hooks/useWorkspace";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -179,7 +178,6 @@ const PublicationQueueTab = ({
   onPublish,
   onReschedule,
   onDelete,
-  onUpdate,
 }: PublicationQueueTabProps) => {
   const [reschedulePost, setReschedulePost] = useState<Post | null>(null);
   const [newScheduleDate, setNewScheduleDate] = useState("");
@@ -198,36 +196,13 @@ const PublicationQueueTab = ({
     });
   }, [viewingPost]);
   
-  useWorkspace();
   const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering } = useVideoRendering();
-  const [loadingAccounts] = useState(false);
-  const hasConnectedAccount = false;
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
     const isReels = post.media_type === "reels" || post.media_type === "reel";
     const hasNoVideo = !post.video_url;
     return isReels && hasNoVideo;
-  };
-
-  // Get script data from overlay_metadata for reels that need rendering
-  // Falls back to extracting from caption if no script metadata exists
-  const getReelsScript = (post: Post) => {
-    if (post.overlay_metadata?.script) {
-      return {
-        title: post.overlay_metadata.script.title || post.overlay_metadata.topic || "Reels",
-        segments: post.overlay_metadata.script.segments || [],
-        topic: post.overlay_metadata.topic || "",
-      };
-    }
-    
-    // Fallback: extract topic from first line of caption
-    const firstLine = (post.caption || "").split("\n")[0].replace(/[🤖🔥💡🎬✨🚀]/g, "").trim();
-    return {
-      title: firstLine || "Reels",
-      segments: [],
-      topic: firstLine || "tecnologia",
-    };
   };
 
   // Filter scheduled and draft posts
@@ -342,13 +317,13 @@ const PublicationQueueTab = ({
               {isOverdue ? "Atrasado" : post.status === "scheduled" ? "Agendado" : "Rascunho"}
             </Badge>
             {isReels && (
-              <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-600 border-purple-500/30">
+              <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
                 <Film className="h-3 w-3 mr-1" />
                 Reels
               </Badge>
             )}
             {needsRendering && (
-              <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/30">
+              <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/30">
                 Aguardando renderização
               </Badge>
             )}
@@ -407,7 +382,6 @@ const PublicationQueueTab = ({
             <Button
               size="sm"
               variant="default"
-              className="bg-purple-600 hover:bg-purple-700"
               disabled={isRendering}
               onClick={() => renderVideo(post.id)}
             >
