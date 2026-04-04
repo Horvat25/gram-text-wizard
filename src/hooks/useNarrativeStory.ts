@@ -377,7 +377,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (abortRef.current) break;
         console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
         
-        const audioUrl = await callElevenLabsTTS(segments[i].text);
+        // Retry once on failure (ElevenLabs can have intermittent 401s)
+        let audioUrl = await callElevenLabsTTS(segments[i].text);
+        if (!audioUrl) {
+          console.warn(`[TTS] Segment ${i + 1} failed, retrying once...`);
+          await new Promise(r => setTimeout(r, 1500));
+          audioUrl = await callElevenLabsTTS(segments[i].text);
+        }
+        
         if (audioUrl) {
           segmentAudioUrls.push(audioUrl);
           
@@ -385,14 +392,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const duration = await getAudioDuration(audioUrl);
           const segDuration = duration > 0 
             ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, duration + 0.3) // +0.3s breathing room
-            : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.5);
+            : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.0); // ~2 words/sec for PT-BR
           segmentDurations.push(segDuration);
           console.log(`[TTS] Segment ${i + 1}: audio=${duration.toFixed(1)}s → visual=${segDuration.toFixed(1)}s`);
         } else {
-          // No audio — estimate from word count
-          const estimated = Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, segments[i].text.split(/\s+/).length / 2.5);
+          // No audio — estimate from word count (~2 words/sec for Portuguese narration)
+          const wordCount = segments[i].text.split(/\s+/).length;
+          const estimated = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, wordCount / 2.0);
           segmentDurations.push(estimated);
           segmentAudioUrls.push("");
+          console.warn(`[TTS] Segment ${i + 1}: NO AUDIO, estimated ${estimated.toFixed(1)}s from ${wordCount} words`);
         }
       }
       
@@ -418,7 +427,19 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
                 const resp = await fetch(url);
                 arrayBuffer = await resp.arrayBuffer();
               }
-              buffers.push(await offlineCtx.decodeAudioData(arrayBuffer));
+              const decoded = await offlineCtx.decodeAudioData(arrayBuffer);
+              buffers.push(decoded);
+              
+              // ★ RECONCILE: Use decoded buffer duration as ground truth
+              // This catches cases where getAudioDuration returned 0 but buffer is valid
+              if (decoded.duration > 0) {
+                const correctedDuration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, decoded.duration + 0.3);
+                const idx = buffers.length - 1;
+                if (Math.abs(correctedDuration - segmentDurations[idx]) > 0.5) {
+                  console.log(`[TTS] ⚡ Reconciled seg ${idx + 1}: ${segmentDurations[idx].toFixed(1)}s → ${correctedDuration.toFixed(1)}s (from decoded buffer)`);
+                  segmentDurations[idx] = correctedDuration;
+                }
+              }
             } catch (e) {
               console.warn("[TTS] Failed to decode segment audio:", e);
               buffers.push(null);
@@ -444,7 +465,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const renderedBuffer = await offline.startRendering();
           const wavBlob = audioBufferToWavBlob(renderedBuffer);
           narrationUrl = URL.createObjectURL(wavBlob);
-          console.log(`[TTS] 🎵 Concatenated narration: ${totalNarrationDuration.toFixed(1)}s`);
+          console.log(`[TTS] 🎵 Concatenated narration: ${totalNarrationDuration.toFixed(1)}s (reconciled durations)`);
           
           offlineCtx.close().catch(() => {});
         } catch (e) {
