@@ -29,7 +29,7 @@ export const VIDEO_CONFIG = {
   /** Máximo de segmentos por vídeo */
   MAX_SEGMENTS: 6,
   /** Duração total máxima do vídeo (conteúdo + CTA) */
-  MAX_TOTAL_DURATION: 45,
+  MAX_TOTAL_DURATION: 60,
   /** Buffer extra de timeout para renderização (segundos) */
   RENDER_TIMEOUT_BUFFER: 10,
 
