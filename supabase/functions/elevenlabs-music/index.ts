@@ -16,8 +16,13 @@ serve(async (req) => {
 
     if (!ELEVENLABS_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "ELEVENLABS_API_KEY not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: "ELEVENLABS_API_KEY not configured",
+          fallback: true,
+          provider: "elevenlabs-music",
+          status: 500,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -44,10 +49,26 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let providerMessage = "";
+
+      try {
+        const parsedError = JSON.parse(errorText);
+        providerMessage = parsedError?.detail?.message || "";
+      } catch {
+        providerMessage = errorText;
+      }
+
       console.error(`[ElevenLabs Music] Error ${response.status}: ${errorText.substring(0, 200)}`);
       return new Response(
-        JSON.stringify({ error: `ElevenLabs Music API error: ${response.status}` }),
-        { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: `ElevenLabs Music API error: ${response.status}`,
+          message: providerMessage || undefined,
+          fallback: true,
+          provider: "elevenlabs-music",
+          status: response.status,
+          planRequired: response.status === 402,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
