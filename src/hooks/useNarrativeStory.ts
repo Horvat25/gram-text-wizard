@@ -305,74 +305,44 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     let backgroundMusicUrl = "";
     const segmentDurations: number[] = [];
     
-    // TTS provider hierarchy
-    // NARRATION: ElevenLabs ONLY (premium voice) — fallback to Edge TTS only if ElevenLabs unavailable
+    // TTS: ElevenLabs Sarah ONLY — zero fallbacks
     const tryNarrationTTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
       if (abortRef.current) return null;
       
-      // 1️⃣ ElevenLabs via edge-tts (primary — premium voice for narration)
       try {
         const edgeResult = await supabase.functions.invoke("edge-tts", {
-          body: { text, voice: preferredVoice, forceElevenLabs: true },
+          body: { text },
         });
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
-          const provider = edgeResult.data.provider || "unknown";
-          if (provider.toLowerCase().includes('elevenlabs') || provider.toLowerCase().includes('eleven')) {
-            return { 
-              url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-              provider
-            };
-          }
-          // ElevenLabs was requested but got fallback — still use it but log
-          console.warn(`[TTS] Requested ElevenLabs but got ${provider}, using anyway`);
           return { 
             url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider
+            provider: edgeResult.data.provider || "ElevenLabs Neural"
           };
         }
-      } catch (e) { console.warn("[TTS] Edge TTS error:", e); }
-      
-      if (abortRef.current) return null;
-      
-      // 2️⃣ Lovable TTS fallback (only if ElevenLabs completely fails)
-      try {
-        const lovableResult = await supabase.functions.invoke("lovable-tts", {
-          body: { text, voice: preferredVoice },
-        });
-        if (!lovableResult.error && lovableResult.data?.audioContent && !lovableResult.data?.error) {
-          return { url: `data:audio/mp3;base64,${lovableResult.data.audioContent}`, provider: "Polly" };
+        // If ElevenLabs returned an error message, surface it
+        if (edgeResult.data?.error) {
+          console.error(`[TTS] ElevenLabs error: ${edgeResult.data.error}`);
         }
-      } catch (e) { console.warn("[TTS] Lovable TTS failed:", e); }
+      } catch (e) { console.error("[TTS] ElevenLabs Sarah failed:", e); }
       
       return null;
     };
 
-    // CTA: Edge TTS Neural voice (free, different voice for variety)
+    // CTA: Also ElevenLabs Sarah — same voice, no fallbacks
     const tryCTATTS = async (text: string): Promise<{ url: string; provider: string } | null> => {
       if (abortRef.current) return null;
       
-      // Use Edge TTS directly for CTA (neural voice, not ElevenLabs)
       try {
         const edgeResult = await supabase.functions.invoke("edge-tts", {
-          body: { text, voice: "cta_neural", skipElevenLabs: true },
+          body: { text },
         });
         if (!edgeResult.error && edgeResult.data?.audioContent && !edgeResult.data?.error) {
           return { 
             url: `data:audio/mp3;base64,${edgeResult.data.audioContent}`,
-            provider: edgeResult.data.provider || "Edge TTS"
+            provider: edgeResult.data.provider || "ElevenLabs Neural"
           };
         }
-      } catch (e) { console.warn("[TTS] CTA TTS error:", e); }
-      
-      // Fallback: free TTS
-      try {
-        const freeResult = await supabase.functions.invoke("free-tts", {
-          body: { text, language: "pt-BR" },
-        });
-        if (!freeResult.error && freeResult.data?.audioContent && !freeResult.data?.error) {
-          return { url: `data:audio/mp3;base64,${freeResult.data.audioContent}`, provider: "Google" };
-        }
-      } catch { /* Silent */ }
+      } catch (e) { console.error("[TTS] CTA ElevenLabs failed:", e); }
       
       return null;
     };
