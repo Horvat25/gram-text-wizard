@@ -342,11 +342,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         const { data: scriptData, error: scriptError } = await supabase.functions.invoke('generate-story-script', {
           body: {
             topic,
-            segmentCount: 4,
-            wordsPerSegment: 10,
-            totalDuration: 20,
-            style: 'informativo, envolvente, com começo-meio-fim',
-            brandName: brandSettings.brandName || 'Neural Update'
+            segmentCount: VIDEO_CONFIG.SEGMENT_COUNT,
+            wordsPerSegment: VIDEO_CONFIG.WORDS_PER_SEGMENT,
+            totalDuration: VIDEO_CONFIG.SEGMENT_COUNT * VIDEO_CONFIG.SEGMENT_DURATION_BASE,
+            style: VIDEO_CONFIG.SCRIPT_STYLE,
+            brandName: brandSettings.brandName || VIDEO_CONFIG.BRAND_NAME
           }
         });
 
