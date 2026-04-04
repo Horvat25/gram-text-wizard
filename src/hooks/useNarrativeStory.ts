@@ -333,6 +333,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
             return URL.createObjectURL(audioBlob);
           }
         }
+        // Consume response body to prevent resource leaks
+        await response.text().catch(() => {});
+        console.warn(`[Music] ElevenLabs Music unavailable (${response.status}), trying fallback...`);
       } catch (e) {
         console.warn("[Music] ElevenLabs Music error:", e);
       }
