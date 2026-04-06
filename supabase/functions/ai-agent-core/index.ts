@@ -1275,7 +1275,7 @@ async function createVideoCuratedContent(
     searchQuery = `${themeWords} technology`;
   }
   
-  // Step 1: Download video (YouTube primary → Pexels fallback - handled by download-stock-video)
+  // Step 1: Download video (Authorized Channel → YouTube CC → Pexels)
   console.log(`[AGENT] 🔍 Searching multi-source for: "${searchQuery}"`);
   const downloadRes = await fetch(`${supabaseUrl}/functions/v1/download-stock-video`, {
     method: 'POST',
@@ -1285,7 +1285,7 @@ async function createVideoCuratedContent(
       orientation: 'portrait',
       per_page: 10,
       workspace_id: workspaceId,
-      source: 'auto', // YouTube first, then Pexels
+      source: 'auto',
     }),
   });
   
@@ -1297,9 +1297,10 @@ async function createVideoCuratedContent(
   const downloadData = await downloadRes.json();
   const videoUrl = downloadData.video_url;
   const videoSource = downloadData.source;
-  const isYouTube = videoSource.platform === 'youtube';
+  const isAuthorized = videoSource.platform === 'youtube_authorized';
+  const isYouTube = videoSource.platform?.startsWith('youtube');
   
-  console.log(`[AGENT] ✅ Video from ${videoSource.platform}: ${isYouTube ? videoSource.title : `${videoSource.duration}s`}`);
+  console.log(`[AGENT] ✅ Video from ${videoSource.platform}: ${videoSource.title || `${videoSource.duration}s`}`);
   
   // Step 2: Generate headline + caption with AI
   let headline = plan.theme?.toUpperCase() || 'NOVIDADE EM INTELIGÊNCIA ARTIFICIAL';
@@ -1326,10 +1327,11 @@ async function createVideoCuratedContent(
               content: `Você é um copywriter de Instagram focado em tech/IA para o perfil Neural Update.
 Crie:
 1. Uma HEADLINE curta (max 60 chars, impactante, em PT-BR) para overlay no vídeo
-2. Uma legenda envolvente
+2. Uma legenda envolvente (NÃO mencione o canal ou criador original)
 3. 5-7 hashtags
 
 A headline deve ser em caixa alta, provocativa, estilo jornalístico.
+O conteúdo deve parecer original do Neural Update.
 Responda em JSON: { "headline": "...", "caption": "...", "hashtags": ["#tag1"] }`
             },
             { role: 'user', content: `Tema: ${plan.theme}. ${videoContext}.` }
@@ -1354,14 +1356,16 @@ Responda em JSON: { "headline": "...", "caption": "...", "hashtags": ["#tag1"] }
   headline = await reviewText(headline, 'headline', supabaseUrl, headers, plan.theme);
   caption = await reviewText(caption, 'caption', supabaseUrl, headers, plan.theme);
   
-  // Step 3: Build credit line
-  const creditLine = isYouTube
+  // Step 3: Build credit line (authorized channels get subtle credit)
+  const creditLine = isAuthorized
+    ? `📹 Conteúdo parceiro`
+    : isYouTube
     ? `📹 Via ${videoSource.channel} (YouTube CC)`
     : `📹 Via ${videoSource.photographer || 'Pexels'}`;
   
   const fullCaption = `${caption}\n\n${hashtags.join(' ')}\n\n${creditLine}`;
   
-  // Step 4: Store video metadata for Remotion branded template
+  // Step 4: Create the post first (draft)
   const overlayMetadata = {
     template: 'branded-video',
     headline,
@@ -1370,11 +1374,12 @@ Responda em JSON: { "headline": "...", "caption": "...", "hashtags": ["#tag1"] }
     source_credit: creditLine,
     source_platform: videoSource.platform,
     source_video_id: videoSource.video_id,
+    source_title: videoSource.title || '',
     requires_download: downloadData.requires_download || false,
+    requires_processing: downloadData.requires_processing || false,
     thumbnail_url: downloadData.thumbnail_url || null,
   };
   
-  // Step 5: Create the post
   const { data: post, error: postError } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
@@ -1386,15 +1391,58 @@ Responda em JSON: { "headline": "...", "caption": "...", "hashtags": ["#tag1"] }
     image_url: downloadData.thumbnail_url || null,
     overlay_metadata: overlayMetadata,
     platforms: plan.platforms || ['instagram'],
-    status: autoPublish ? 'scheduled' : 'draft',
-    scheduled_for: autoPublish ? getOptimalScheduleTime() : null,
+    status: 'draft', // Start as draft, processing will update
     ai_model_used: `gemini-2.5-flash-lite+${videoSource.platform}`,
-    cost_estimate: 0.002,
+    cost_estimate: isAuthorized ? 0.015 : 0.002, // Higher cost for ElevenLabs narration
   }).select().single();
   
   if (postError) throw postError;
   
-  console.log(`[AGENT] ✅ Curated video post created: ${post.id} (${post.status}) [source: ${videoSource.platform}]`);
+  console.log(`[AGENT] ✅ Post created: ${post.id} [source: ${videoSource.platform}]`);
+  
+  // Step 5: If from authorized channel, trigger full processing pipeline
+  // (mute original → generate narration → render with branded template)
+  if (isAuthorized || downloadData.requires_processing) {
+    console.log('[AGENT] 🎬 Triggering curated video processing pipeline...');
+    try {
+      const processRes = await fetch(`${supabaseUrl}/functions/v1/process-curated-video`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          post_id: post.id,
+          video_source: videoSource,
+          headline,
+          workspace_id: workspaceId,
+          user_id: userId,
+        }),
+      });
+      
+      if (processRes.ok) {
+        const processData = await processRes.json();
+        console.log(`[AGENT] ✅ Processing initiated: rendered=${processData.rendered}, narration=${processData.narration_generated}`);
+        
+        // If rendered successfully, schedule for publishing
+        if (processData.rendered && autoPublish) {
+          await supabase.from('posts').update({
+            status: 'scheduled',
+            scheduled_for: getOptimalScheduleTime(),
+          }).eq('id', post.id);
+        }
+      } else {
+        console.warn('[AGENT] ⚠️ Processing failed, post saved as draft');
+      }
+    } catch (e) {
+      console.warn('[AGENT] ⚠️ Processing error:', e);
+    }
+  } else if (autoPublish) {
+    // For Pexels/CC videos, schedule directly
+    await supabase.from('posts').update({
+      status: 'scheduled',
+      scheduled_for: getOptimalScheduleTime(),
+    }).eq('id', post.id);
+  }
+  
+  console.log(`[AGENT] ✅ Curated video complete: ${post.id}`);
   return post;
 }
 
