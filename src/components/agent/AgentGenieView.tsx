@@ -674,9 +674,27 @@ export default function AgentGenieView() {
             </ScrollArea>
           </div>
         )}
-        
-        
-        
+        {/* Growth Dashboard Panel */}
+        {showGrowth && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Crescimento — Instagram</h2>
+                    <p className="text-xs text-muted-foreground">Analytics e estratégia de conteúdo</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowGrowth(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <AgentGrowthDashboard 
+                  context={agentCtx}
+                  onUpdate={updateContext}
+                  platform="instagram"
+                />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
         
         
         {/* Content Test Panel */}
