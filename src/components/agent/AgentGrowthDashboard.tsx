@@ -157,12 +157,36 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           body: {
             offset,
             batch_size: 50,
-            period_days: 90, // Always sync max range so all tabs are up to date
+            period_days: 90,
             workspace_id: currentWorkspace.id,
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          // Extract the real error message from the edge function response
+          let errorMsg = 'Erro ao sincronizar';
+          if (typeof error === 'object' && error !== null) {
+            // FunctionsHttpError includes context with the response body
+            if (error.context) {
+              try {
+                const body = await error.context.json();
+                errorMsg = body?.error || body?.message || error.message || errorMsg;
+              } catch {
+                errorMsg = error.message || errorMsg;
+              }
+            } else {
+              errorMsg = error.message || errorMsg;
+            }
+          } else if (typeof error === 'string') {
+            errorMsg = error;
+          }
+          throw new Error(errorMsg);
+        }
+
+        // Check if data itself contains an error (non-2xx returned as data in some SDK versions)
+        if (data?.error) {
+          throw new Error(data.error);
+        }
 
         totalUpdated += data?.updated || 0;
         totalDeleted += data?.deleted || 0;
@@ -197,7 +221,9 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       ]);
     } catch (e: any) {
       toast.dismiss('sync-ig');
-      toast.error(e.message || 'Erro ao sincronizar');
+      const msg = e?.message || 'Erro ao sincronizar';
+      console.error('[Sync] Error details:', e);
+      toast.error(msg);
     } finally {
       setSyncing(false);
     }

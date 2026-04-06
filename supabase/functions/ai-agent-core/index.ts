@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 // Content distribution types
-type ContentType = 'video' | 'carousel' | 'news' | 'news_video' | 'image' | 'marketing';
+type ContentType = 'video' | 'carousel' | 'news' | 'news_video' | 'image' | 'marketing' | 'video_curated';
 
 interface ContentDistribution {
   videos: number;
@@ -362,7 +362,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
   // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
   const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
-    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', news_video: 'news_videos', image: 'images', marketing: 'marketing' } as const;
+    const keyMap = { video: 'videos', video_curated: 'videos', carousel: 'carousels', news: 'news', news_video: 'news_videos', image: 'images', marketing: 'marketing' } as const;
     const key = keyMap[type];
     const goal = weeklyGoals[key] || 1;
     const progress = weeklyProgress[key] || 0;
@@ -397,6 +397,8 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   const typeStats = [
     // Creative video (AI themes) - only if render service is available
     ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
+    // Curated video (Pexels stock) - available even without render service
+    ...(!renderServiceAvailable ? [{ type: 'video_curated' as ContentType, ...getCompletionStats('video_curated'), priority: 3.8 }] : []),
     // News video (RSS broadcast Reels) - also needs render service
     ...(renderServiceAvailable ? [{ type: 'news_video' as ContentType, ...getCompletionStats('news_video'), priority: 3.5 }] : []),
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
@@ -698,6 +700,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   // Determine content type and format based on distribution
   const contentTypeMap: Record<ContentType, { mediaType: string; format: string; theme: string }> = {
     'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
+    'video_curated': { mediaType: 'reels', format: 'noticia', theme: 'vídeo curado sobre IA e tecnologia' },
     'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
     'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
@@ -866,6 +869,7 @@ Responda em JSON: { "theme": "tema específico e atual", "cta": "CTA do post", "
   // Return decision with content plan (no need for another AI call - we already decided based on distribution)
   const remainingForType: Record<ContentType, number> = {
     'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
+    'video_curated': state.weeklyGoals.videos - state.weeklyProgress.videos,
     'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
     'news': state.weeklyGoals.news - state.weeklyProgress.news,
     'news_video': state.weeklyGoals.news_videos - state.weeklyProgress.news_videos,
@@ -964,6 +968,17 @@ async function executeContentPlan(
           ai_model_used: 'none'
         }).select().single();
         return fallbackPost;
+      }
+    }
+    case 'video_curated': {
+      // CURATED VIDEO: Download stock video from Pexels + branded template
+      console.log(`[AGENT] 🎥 Creating CURATED video from Pexels stock...`);
+      try {
+        return await createVideoCuratedContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+      } catch (curatedError: any) {
+        console.error('[AGENT] ❌ CURATED VIDEO FAILED:', curatedError?.message || curatedError);
+        // Fallback to image post
+        return await createImageContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
       }
     }
     case 'carousel':
@@ -1237,6 +1252,154 @@ OBRIGATÓRIO ao final:
   }
   
   return post;
+}
+
+// Create VIDEO CURATED content - Download stock video from Pexels + branded post
+async function createVideoCuratedContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  workspaceId: string,
+  supabaseUrl: string,
+  headers: any,
+  autoPublish: boolean = false
+): Promise<any> {
+  console.log('[AGENT] 🎥 Criando vídeo curado:', plan.theme);
+  
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+  
+  // Search queries for Pexels based on theme
+  const searchQueries = [
+    'artificial intelligence technology',
+    'robot futuristic',
+    'digital technology innovation',
+    'neural network data',
+    'tech startup coding',
+  ];
+  
+  // Pick a random query variation based on theme
+  const queryIndex = Math.floor(Math.random() * searchQueries.length);
+  let searchQuery = searchQueries[queryIndex];
+  
+  // If we have a specific theme from AI, extract key terms
+  if (plan.theme && plan.theme.length > 10) {
+    // Use first 3 words of theme as search
+    const themeWords = plan.theme.split(' ').slice(0, 3).join(' ');
+    searchQuery = `${themeWords} technology`;
+  }
+  
+  // Step 1: Download stock video from Pexels
+  console.log(`[AGENT] 🔍 Searching Pexels for: "${searchQuery}"`);
+  const downloadRes = await fetch(`${supabaseUrl}/functions/v1/download-stock-video`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      query: searchQuery,
+      orientation: 'portrait',
+      per_page: 10,
+      workspace_id: workspaceId,
+    }),
+  });
+  
+  if (!downloadRes.ok) {
+    const errData = await downloadRes.json().catch(() => ({}));
+    throw new Error(`Pexels download failed: ${errData?.error || downloadRes.statusText}`);
+  }
+  
+  const downloadData = await downloadRes.json();
+  const videoUrl = downloadData.video_url;
+  const videoSource = downloadData.source;
+  
+  console.log(`[AGENT] ✅ Video downloaded: ${videoSource.duration}s from ${videoSource.photographer}`);
+  
+  // Step 2: Generate caption with AI
+  let caption = `🎬 ${plan.theme}\n\n#tecnologia #ia #futuro #neuralupdate`;
+  let hashtags = ['#tecnologia', '#ia', '#futuro', '#neuralupdate', '#inteligenciaartificial'];
+  
+  if (lovableApiKey) {
+    try {
+      const captionRes = await fetch('https://api.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${lovableApiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash-lite',
+          messages: [
+            {
+              role: 'system',
+              content: `Você é um copywriter de Instagram focado em tech/IA. Crie uma legenda curta e envolvente para um Reels de vídeo sobre tecnologia.
+A legenda deve ter:
+- Até 150 caracteres na primeira linha (gancho)
+- 2-3 frases de contexto
+- 5-7 hashtags relevantes
+- Tom profissional mas acessível
+- Emojis moderados
+
+Responda em JSON: { "caption": "...", "hashtags": ["#tag1", "#tag2"] }`
+            },
+            { role: 'user', content: `Tema do vídeo: ${plan.theme}. Vídeo de stock sobre ${searchQuery}.` }
+          ],
+          response_format: { type: 'json_object' }
+        }),
+      });
+      
+      if (captionRes.ok) {
+        const captionData = await captionRes.json();
+        const parsed = JSON.parse(captionData.choices?.[0]?.message?.content || '{}');
+        if (parsed.caption) caption = parsed.caption;
+        if (parsed.hashtags) hashtags = parsed.hashtags;
+      }
+    } catch (e) {
+      console.warn('[AGENT] Caption generation failed (using default):', e);
+    }
+  }
+  
+  // Review text
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers, plan.theme);
+  
+  // Step 3: Create the post with video_url
+  const fullCaption = `${caption}\n\n${hashtags.join(' ')}\n\n📹 Via ${videoSource.photographer} (Pexels)`;
+  
+  const { data: post, error: postError } = await supabase.from('posts').insert({
+    user_id: userId,
+    workspace_id: workspaceId,
+    caption: fullCaption,
+    hashtags,
+    post_type: 'entretenimento',
+    media_type: 'reels',
+    video_url: videoUrl,
+    platforms: plan.platforms || ['instagram'],
+    status: autoPublish ? 'scheduled' : 'draft',
+    scheduled_for: autoPublish ? getOptimalScheduleTime() : null,
+    ai_model_used: 'gemini-2.5-flash-lite+pexels-stock',
+    cost_estimate: 0.001, // Very low cost - only caption generation
+  }).select().single();
+  
+  if (postError) throw postError;
+  
+  console.log(`[AGENT] ✅ Curated video post created: ${post.id} (${post.status})`);
+  return post;
+}
+
+function getOptimalScheduleTime(): string {
+  const now = new Date();
+  const brasiliaOffset = -3 * 60 * 60 * 1000;
+  const brasiliaTime = new Date(now.getTime() + brasiliaOffset);
+  const hour = brasiliaTime.getHours();
+  
+  // Schedule for next optimal posting window
+  const optimalHours = [8, 12, 17, 20];
+  let nextHour = optimalHours.find(h => h > hour) || optimalHours[0];
+  
+  const scheduled = new Date(brasiliaTime);
+  if (nextHour <= hour) {
+    scheduled.setDate(scheduled.getDate() + 1);
+  }
+  scheduled.setHours(nextHour, Math.floor(Math.random() * 30), 0, 0);
+  
+  return new Date(scheduled.getTime() - brasiliaOffset).toISOString();
 }
 
 // Create CAROUSEL content - ONE unified theme with 4 progressive educational slides
