@@ -689,14 +689,7 @@ export default function AgentGenieView() {
           agentAvatar={agentConfig.agent_avatar_url}
         />
         
-        {/* User Command History Panel */}
-        <AgentChatPanel
-          isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
-          messages={igMessages}
-          agentName={agentConfig.agent_name}
-          agentAvatar={agentConfig.agent_avatar_url}
-        />
+        {/* Chat history moved into Agente panel */}
         
         {/* Queue Panel */}
         {showQueue && (
