@@ -88,7 +88,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'reports' | 'actions'>('all');
+  const [filter, setFilter] = useState<'all' | 'reports' | 'actions' | 'chat'>('all');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
