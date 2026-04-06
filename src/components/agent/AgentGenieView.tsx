@@ -553,44 +553,7 @@ export default function AgentGenieView() {
               <span className="hidden xs:inline sm:inline">Fila</span>
             </Button>
             
-            <Button
-              variant={showFeeds ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showFeeds && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('feeds')}
-            >
-              <Rss className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Fontes</span>
-            </Button>
             
-            <Button
-              variant={showGrowth ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showGrowth && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('growth')}
-            >
-              <TrendingUp className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Crescimento</span>
-            </Button>
-            
-            <Button
-              variant={showMarketing ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showMarketing && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('marketing')}
-            >
-              <Megaphone className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Marketing</span>
-            </Button>
             
             
             
@@ -725,52 +688,7 @@ export default function AgentGenieView() {
           </div>
         )}
         
-        {/* Feeds Sources Panel */}
-        {showFeeds && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-lg mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Fontes de Conteúdo</h2>
-                    <p className="text-xs text-muted-foreground">Sites que o agente usa para buscar notícias</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowFeeds(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <CustomFeedsManager />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
         
-        {/* Growth Dashboard Panel */}
-        {showGrowth && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-lg mx-auto">
-                <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-        
-        {/* Marketing Panel */}
-        {showMarketing && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-lg mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Marketing & Afiliados</h2>
-                    <p className="text-xs text-muted-foreground">Links que o agente promove automaticamente</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <AgentMarketingPanel />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
         
         {/* Video Clips Panel */}
         {showVideoClips && (
