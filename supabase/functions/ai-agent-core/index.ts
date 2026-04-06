@@ -1268,28 +1268,15 @@ async function createVideoCuratedContent(
   
   const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
   
-  // Search queries for Pexels based on theme
-  const searchQueries = [
-    'artificial intelligence technology',
-    'robot futuristic',
-    'digital technology innovation',
-    'neural network data',
-    'tech startup coding',
-  ];
-  
-  // Pick a random query variation based on theme
-  const queryIndex = Math.floor(Math.random() * searchQueries.length);
-  let searchQuery = searchQueries[queryIndex];
-  
-  // If we have a specific theme from AI, extract key terms
+  // Build search query from theme
+  let searchQuery = 'artificial intelligence technology';
   if (plan.theme && plan.theme.length > 10) {
-    // Use first 3 words of theme as search
-    const themeWords = plan.theme.split(' ').slice(0, 3).join(' ');
+    const themeWords = plan.theme.split(' ').slice(0, 4).join(' ');
     searchQuery = `${themeWords} technology`;
   }
   
-  // Step 1: Download stock video from Pexels
-  console.log(`[AGENT] 🔍 Searching Pexels for: "${searchQuery}"`);
+  // Step 1: Download video (YouTube primary → Pexels fallback - handled by download-stock-video)
+  console.log(`[AGENT] 🔍 Searching multi-source for: "${searchQuery}"`);
   const downloadRes = await fetch(`${supabaseUrl}/functions/v1/download-stock-video`, {
     method: 'POST',
     headers,
@@ -1298,26 +1285,33 @@ async function createVideoCuratedContent(
       orientation: 'portrait',
       per_page: 10,
       workspace_id: workspaceId,
+      source: 'auto', // YouTube first, then Pexels
     }),
   });
   
   if (!downloadRes.ok) {
     const errData = await downloadRes.json().catch(() => ({}));
-    throw new Error(`Pexels download failed: ${errData?.error || downloadRes.statusText}`);
+    throw new Error(`Video download failed: ${errData?.error || downloadRes.statusText}`);
   }
   
   const downloadData = await downloadRes.json();
   const videoUrl = downloadData.video_url;
   const videoSource = downloadData.source;
+  const isYouTube = videoSource.platform === 'youtube';
   
-  console.log(`[AGENT] ✅ Video downloaded: ${videoSource.duration}s from ${videoSource.photographer}`);
+  console.log(`[AGENT] ✅ Video from ${videoSource.platform}: ${isYouTube ? videoSource.title : `${videoSource.duration}s`}`);
   
-  // Step 2: Generate caption with AI
+  // Step 2: Generate headline + caption with AI
+  let headline = plan.theme?.toUpperCase() || 'NOVIDADE EM INTELIGÊNCIA ARTIFICIAL';
   let caption = `🎬 ${plan.theme}\n\n#tecnologia #ia #futuro #neuralupdate`;
   let hashtags = ['#tecnologia', '#ia', '#futuro', '#neuralupdate', '#inteligenciaartificial'];
   
   if (lovableApiKey) {
     try {
+      const videoContext = isYouTube 
+        ? `Vídeo do YouTube: "${videoSource.title}" do canal ${videoSource.channel}`
+        : `Vídeo stock sobre ${searchQuery}`;
+        
       const captionRes = await fetch('https://api.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -1329,17 +1323,16 @@ async function createVideoCuratedContent(
           messages: [
             {
               role: 'system',
-              content: `Você é um copywriter de Instagram focado em tech/IA. Crie uma legenda curta e envolvente para um Reels de vídeo sobre tecnologia.
-A legenda deve ter:
-- Até 150 caracteres na primeira linha (gancho)
-- 2-3 frases de contexto
-- 5-7 hashtags relevantes
-- Tom profissional mas acessível
-- Emojis moderados
+              content: `Você é um copywriter de Instagram focado em tech/IA para o perfil Neural Update.
+Crie:
+1. Uma HEADLINE curta (max 60 chars, impactante, em PT-BR) para overlay no vídeo
+2. Uma legenda envolvente
+3. 5-7 hashtags
 
-Responda em JSON: { "caption": "...", "hashtags": ["#tag1", "#tag2"] }`
+A headline deve ser em caixa alta, provocativa, estilo jornalístico.
+Responda em JSON: { "headline": "...", "caption": "...", "hashtags": ["#tag1"] }`
             },
-            { role: 'user', content: `Tema do vídeo: ${plan.theme}. Vídeo de stock sobre ${searchQuery}.` }
+            { role: 'user', content: `Tema: ${plan.theme}. ${videoContext}.` }
           ],
           response_format: { type: 'json_object' }
         }),
@@ -1348,6 +1341,7 @@ Responda em JSON: { "caption": "...", "hashtags": ["#tag1", "#tag2"] }`
       if (captionRes.ok) {
         const captionData = await captionRes.json();
         const parsed = JSON.parse(captionData.choices?.[0]?.message?.content || '{}');
+        if (parsed.headline) headline = parsed.headline.toUpperCase();
         if (parsed.caption) caption = parsed.caption;
         if (parsed.hashtags) hashtags = parsed.hashtags;
       }
@@ -1356,12 +1350,31 @@ Responda em JSON: { "caption": "...", "hashtags": ["#tag1", "#tag2"] }`
     }
   }
   
-  // Review text
+  // Review texts
+  headline = await reviewText(headline, 'headline', supabaseUrl, headers, plan.theme);
   caption = await reviewText(caption, 'caption', supabaseUrl, headers, plan.theme);
   
-  // Step 3: Create the post with video_url
-  const fullCaption = `${caption}\n\n${hashtags.join(' ')}\n\n📹 Via ${videoSource.photographer} (Pexels)`;
+  // Step 3: Build credit line
+  const creditLine = isYouTube
+    ? `📹 Via ${videoSource.channel} (YouTube CC)`
+    : `📹 Via ${videoSource.photographer || 'Pexels'}`;
   
+  const fullCaption = `${caption}\n\n${hashtags.join(' ')}\n\n${creditLine}`;
+  
+  // Step 4: Store video metadata for Remotion branded template
+  const overlayMetadata = {
+    template: 'branded-video',
+    headline,
+    handle: '@neuralupdate',
+    tagline: 'IA • Tecnologia • Futuro',
+    source_credit: creditLine,
+    source_platform: videoSource.platform,
+    source_video_id: videoSource.video_id,
+    requires_download: downloadData.requires_download || false,
+    thumbnail_url: downloadData.thumbnail_url || null,
+  };
+  
+  // Step 5: Create the post
   const { data: post, error: postError } = await supabase.from('posts').insert({
     user_id: userId,
     workspace_id: workspaceId,
@@ -1370,16 +1383,18 @@ Responda em JSON: { "caption": "...", "hashtags": ["#tag1", "#tag2"] }`
     post_type: 'entretenimento',
     media_type: 'reels',
     video_url: videoUrl,
+    image_url: downloadData.thumbnail_url || null,
+    overlay_metadata: overlayMetadata,
     platforms: plan.platforms || ['instagram'],
     status: autoPublish ? 'scheduled' : 'draft',
     scheduled_for: autoPublish ? getOptimalScheduleTime() : null,
-    ai_model_used: 'gemini-2.5-flash-lite+pexels-stock',
-    cost_estimate: 0.001, // Very low cost - only caption generation
+    ai_model_used: `gemini-2.5-flash-lite+${videoSource.platform}`,
+    cost_estimate: 0.002,
   }).select().single();
   
   if (postError) throw postError;
   
-  console.log(`[AGENT] ✅ Curated video post created: ${post.id} (${post.status})`);
+  console.log(`[AGENT] ✅ Curated video post created: ${post.id} (${post.status}) [source: ${videoSource.platform}]`);
   return post;
 }
 
