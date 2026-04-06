@@ -102,33 +102,40 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       setTimeout(() => {
         if (scrollRef.current) {
           const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-          if (viewport) viewport.scrollTop = 0;
+          if (viewport) {
+            // For chat filter, scroll to bottom; for others, scroll to top
+            if (filter === 'chat') {
+              viewport.scrollTop = viewport.scrollHeight;
+            } else {
+              viewport.scrollTop = 0;
+            }
+          }
         }
-      }, 100);
+      }, 150);
     }
-  }, [isOpen]);
+  }, [isOpen, filter]);
 
   const loadAll = async () => {
     if (!currentWorkspace || !user) return;
     setIsLoading(true);
     try {
-      // Fetch proactive messages (reports)
+      // Fetch proactive messages (reports) — last 10
       const { data: messages } = await supabase
         .from('agent_proactive_messages')
         .select('*')
         .eq('workspace_id', currentWorkspace.id)
         .order('created_at', { ascending: false })
-        .limit(30);
+        .limit(10);
 
-      // Fetch execution reports
+      // Fetch execution reports — last 10
       const { data: execReports } = await supabase
         .from('agent_execution_reports')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(30);
+        .limit(10);
 
-      // Fetch chat actions
+      // Fetch chat actions — last 10
       const { data: chatData } = await supabase
         .from('agent_chat_messages')
         .select('*')
@@ -136,15 +143,15 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
         .eq('role', 'assistant')
         .not('actions', 'is', null)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(10);
 
-      // Fetch all chat messages (for history tab)
+      // Fetch chat messages (for history tab) — last 20 (10 conversations ~= 20 msgs)
       const { data: allChatMsgs } = await supabase
         .from('agent_chat_messages')
         .select('id, role, content, created_at')
         .eq('workspace_id', currentWorkspace.id)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(20);
 
       const items: TimelineItem[] = [];
 
