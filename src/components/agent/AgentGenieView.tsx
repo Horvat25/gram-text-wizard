@@ -33,6 +33,7 @@ import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
 import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
 import VideoClipsTab from '@/components/tabs/VideoClipsTab';
+import ContentTestTab from '@/components/tabs/ContentTestTab';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
