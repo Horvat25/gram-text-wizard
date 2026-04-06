@@ -224,9 +224,10 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
   };
 
   const filteredTimeline = timeline.filter(item => {
-    if (filter === 'all') return true;
+    if (filter === 'all') return item.type !== 'chat';
     if (filter === 'reports') return item.type === 'report';
     if (filter === 'actions') return item.type === 'execution' || item.type === 'action';
+    if (filter === 'chat') return item.type === 'chat';
     return true;
   });
 
