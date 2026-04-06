@@ -64,6 +64,7 @@ export default function VideoClipsTab() {
   const [clips, setClips] = useState<ClipPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [renderingClipId, setRenderingClipId] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<string>('realidade-impressionante');
   const [customSource, setCustomSource] = useState('');
   const [expandedClipId, setExpandedClipId] = useState<string | null>(null);
@@ -159,13 +160,13 @@ export default function VideoClipsTab() {
     if (!user || !currentWorkspace || !activeSource) return;
 
     setIsGenerating(true);
-    toast.info(`Buscando o último vídeo de ${activeSourceLabel} e criando 5 cortes...`);
+    toast.info(`Buscando o último vídeo de ${activeSourceLabel} e criando 1 corte...`);
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-batch-clips', {
         body: {
           workspace_id: currentWorkspace.id,
-          clips_count: 5,
+          clips_count: 1,
           source_profile: activeSource,
           source_label: activeSourceLabel,
         },
@@ -175,11 +176,11 @@ export default function VideoClipsTab() {
       if (data?.error) throw new Error(data.error);
 
       setLastGeneratedSource(data?.source_video ?? null);
-      toast.success(`${data.clips_created} cortes criados de "${data.source_video?.title}"`);
+      toast.success(`Corte criado de "${data.source_video?.title}"`);
       await loadClips();
     } catch (e: any) {
       console.error('Error generating clips:', e);
-      toast.error(e.message || 'Erro ao gerar cortes');
+      toast.error(e.message || 'Erro ao gerar corte');
     } finally {
       setIsGenerating(false);
     }
@@ -223,6 +224,66 @@ export default function VideoClipsTab() {
     }
   };
 
+  const renderClip = async (clipId: string) => {
+    if (renderingClipId) {
+      toast.warning('Já existe uma renderização em andamento.');
+      return;
+    }
+
+    setRenderingClipId(clipId);
+    toast.info('Processando clip: gerando narração e preparando vídeo...');
+
+    try {
+      const clip = clips.find((c) => c.id === clipId);
+      if (!clip) throw new Error('Clip não encontrado');
+
+      const meta = (clip.overlay_metadata as any) || {};
+      const sourceVideo = meta?.source_video || {};
+
+      const { data, error } = await supabase.functions.invoke('process-curated-video', {
+        body: {
+          post_id: clipId,
+          video_source: {
+            youtube_url: sourceVideo.youtube_url,
+            video_id: sourceVideo.video_id,
+            title: sourceVideo.title,
+            description: '',
+            channel: sourceVideo.channel,
+            duration: sourceVideo.duration,
+            thumbnail: sourceVideo.thumbnail,
+            platform: 'youtube_authorized',
+          },
+          headline: meta?.headline || '',
+          workspace_id: currentWorkspace?.id,
+          user_id: user?.id,
+          clip_script: {
+            angle: meta?.angle || '',
+            headline: meta?.headline || '',
+            narration: typeof meta?.narration === 'string' ? meta.narration : meta?.narration?.script || '',
+            segments: Array.isArray(meta?.segments) ? meta.segments : (meta?.narration?.segments || []),
+            source_profile: meta?.source_profile,
+            source_label: meta?.source_label,
+          },
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(
+        data?.narration_generated
+          ? '✅ Narração gerada e clip processado!'
+          : '✅ Clip processado (sem narração).',
+      );
+      await loadClips();
+    } catch (e: any) {
+      console.error('Error rendering clip:', e);
+      toast.error(e.message || 'Erro ao processar clip');
+    } finally {
+      setRenderingClipId(null);
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const map: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
       draft: { label: 'Rascunho', variant: 'secondary' },
@@ -261,7 +322,7 @@ export default function VideoClipsTab() {
             <div>
               <h2 className="font-semibold text-sm">Clips por fonte</h2>
               <p className="text-xs text-muted-foreground">
-                Escolha um perfil do YouTube e gere 5 cortes do vídeo mais recente.
+                Escolha um perfil do YouTube e gere 1 corte do vídeo mais recente.
               </p>
             </div>
           </div>
@@ -320,7 +381,7 @@ export default function VideoClipsTab() {
                 ) : (
                   <Sparkles className="mr-1 h-3 w-3" />
                 )}
-                Gerar 5 clips
+                Gerar 1 clip
               </Button>
             </div>
           </div>
@@ -359,9 +420,9 @@ export default function VideoClipsTab() {
           <CardContent className="flex items-center gap-3 py-3">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <div>
-              <p className="text-sm font-medium">Gerando os cortes...</p>
+              <p className="text-sm font-medium">Gerando o corte...</p>
               <p className="text-xs text-muted-foreground">
-                Indo até a fonte, pegando o último vídeo e montando os roteiros.
+                Indo até a fonte, pegando o último vídeo e montando o roteiro.
               </p>
             </div>
           </CardContent>
@@ -380,7 +441,7 @@ export default function VideoClipsTab() {
             <Film className="mb-3 h-10 w-10 text-muted-foreground/50" />
             <p className="text-sm font-medium">Nenhum clip gerado ainda</p>
             <p className="mb-4 mt-1 text-xs text-muted-foreground">
-              Escolha uma fonte e gere 5 cortes para analisar o roteiro antes de publicar.
+              Escolha uma fonte e gere 1 corte para analisar o roteiro antes de processar.
             </p>
           </CardContent>
         </Card>
@@ -481,26 +542,44 @@ export default function VideoClipsTab() {
                             </div>
 
                             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                              <Button
-                                variant="default"
-                                size="sm"
-                                className="h-6 px-2 text-[10px] neural-gradient border-0"
-                                onClick={() => scheduleClip(clip.id)}
-                              >
-                                <CalendarDays className="mr-1 h-2.5 w-2.5" />
-                                Colocar na fila
-                              </Button>
+                              {!clip.video_url && clip.status === 'draft' && (
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  className="h-6 px-2 text-[10px] neural-gradient border-0"
+                                  onClick={() => renderClip(clip.id)}
+                                  disabled={renderingClipId === clip.id}
+                                >
+                                  {renderingClipId === clip.id ? (
+                                    <Loader2 className="mr-1 h-2.5 w-2.5 animate-spin" />
+                                  ) : (
+                                    <Play className="mr-1 h-2.5 w-2.5" />
+                                  )}
+                                  {renderingClipId === clip.id ? 'Processando...' : 'Processar clip'}
+                                </Button>
+                              )}
 
                               {clip.video_url && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-6 px-2 text-[10px]"
-                                  onClick={() => window.open(clip.video_url!, '_blank')}
-                                >
-                                  <Eye className="mr-1 h-2.5 w-2.5" />
-                                  Ver vídeo
-                                </Button>
+                                <>
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="h-6 px-2 text-[10px] neural-gradient border-0"
+                                    onClick={() => scheduleClip(clip.id)}
+                                  >
+                                    <CalendarDays className="mr-1 h-2.5 w-2.5" />
+                                    Agendar
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 px-2 text-[10px]"
+                                    onClick={() => window.open(clip.video_url!, '_blank')}
+                                  >
+                                    <Eye className="mr-1 h-2.5 w-2.5" />
+                                    Ver vídeo
+                                  </Button>
+                                </>
                               )}
 
                               <Button
