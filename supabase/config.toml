@@ -110,3 +110,6 @@ verify_jwt = false
 
 [functions.apply-text-overlay]
 verify_jwt = false
+
+[functions.download-stock-video]
+verify_jwt = false
