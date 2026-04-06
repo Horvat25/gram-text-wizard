@@ -96,6 +96,10 @@ const Settings = () => {
   const [isSavingAI, setIsSavingAI] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState("camila");
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
+  const [autoCleanup, setAutoCleanup] = useState(() => {
+    return localStorage.getItem('auto_cleanup_enabled') === 'true';
+  });
+  const [clearingHistory, setClearingHistory] = useState(false);
   
   const { settings, updateSettings } = useBrandSettings();
   const { currentWorkspace } = useWorkspace();
