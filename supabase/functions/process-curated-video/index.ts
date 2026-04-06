@@ -102,6 +102,7 @@ serve(async (req) => {
       headline,
       workspace_id,
       user_id,
+      clip_script,
     } = await req.json();
 
     if (!post_id || !video_source || !workspace_id) {
@@ -141,12 +142,14 @@ serve(async (req) => {
     // =========================================
     // Step 2: Generate narration script
     // =========================================
-    let narrationScript = "";
-    let narrationHeadline = headline || "";
-    let segments: Array<{ text: string; duration: number }> = [];
+    let narrationScript = clip_script?.narration || "";
+    let narrationHeadline = clip_script?.headline || headline || "";
+    let segments: Array<{ text: string; duration: number }> = Array.isArray(clip_script?.segments)
+      ? clip_script.segments
+      : [];
     let ctaText = "Siga o Neural Update para mais novidades de tecnologia e inteligência artificial!";
 
-    if (lovableApiKey) {
+    if (!narrationScript && lovableApiKey) {
       console.log("[process-curated-video] 📝 Generating script with research context...");
       try {
         const scriptRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

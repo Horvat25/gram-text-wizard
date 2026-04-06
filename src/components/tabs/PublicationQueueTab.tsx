@@ -719,6 +719,43 @@ const PublicationQueueTab = ({
               )}
               
               <p className="text-sm whitespace-pre-wrap">{viewingPost.caption}</p>
+              {(() => {
+                const metadata = (viewingPost.overlay_metadata as any) || {};
+                const scriptText = typeof metadata?.narration?.script === "string"
+                  ? metadata.narration.script
+                  : typeof metadata?.narration === "string"
+                    ? metadata.narration
+                    : "";
+                const segments = Array.isArray(metadata?.narration?.segments)
+                  ? metadata.narration.segments
+                  : Array.isArray(metadata?.segments)
+                    ? metadata.segments
+                    : [];
+
+                if (!scriptText && segments.length === 0) return null;
+
+                return (
+                  <div className="space-y-3 rounded-lg bg-muted/50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Roteiro
+                    </p>
+                    {scriptText && <p className="text-sm whitespace-pre-wrap">{scriptText}</p>}
+                    {segments.length > 0 && (
+                      <div className="space-y-2">
+                        {segments.map((segment: any, index: number) => (
+                          <div key={`view-script-${index}`} className="rounded-md border bg-background p-2">
+                            <div className="mb-1 flex items-center justify-between text-[10px] text-muted-foreground">
+                              <span>Bloco {index + 1}</span>
+                              <span>{segment?.duration || 0}s</span>
+                            </div>
+                            <p className="text-xs whitespace-pre-wrap">{segment?.text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               {viewingPost.hashtags && viewingPost.hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {viewingPost.hashtags.map((tag, i) => (
