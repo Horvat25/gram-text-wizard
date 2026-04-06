@@ -224,6 +224,66 @@ export default function VideoClipsTab() {
     }
   };
 
+  const renderClip = async (clipId: string) => {
+    if (renderingClipId) {
+      toast.warning('Já existe uma renderização em andamento.');
+      return;
+    }
+
+    setRenderingClipId(clipId);
+    toast.info('Processando clip: gerando narração e preparando vídeo...');
+
+    try {
+      const clip = clips.find((c) => c.id === clipId);
+      if (!clip) throw new Error('Clip não encontrado');
+
+      const meta = (clip.overlay_metadata as any) || {};
+      const sourceVideo = meta?.source_video || {};
+
+      const { data, error } = await supabase.functions.invoke('process-curated-video', {
+        body: {
+          post_id: clipId,
+          video_source: {
+            youtube_url: sourceVideo.youtube_url,
+            video_id: sourceVideo.video_id,
+            title: sourceVideo.title,
+            description: '',
+            channel: sourceVideo.channel,
+            duration: sourceVideo.duration,
+            thumbnail: sourceVideo.thumbnail,
+            platform: 'youtube_authorized',
+          },
+          headline: meta?.headline || '',
+          workspace_id: currentWorkspace?.id,
+          user_id: user?.id,
+          clip_script: {
+            angle: meta?.angle || '',
+            headline: meta?.headline || '',
+            narration: typeof meta?.narration === 'string' ? meta.narration : meta?.narration?.script || '',
+            segments: Array.isArray(meta?.segments) ? meta.segments : (meta?.narration?.segments || []),
+            source_profile: meta?.source_profile,
+            source_label: meta?.source_label,
+          },
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(
+        data?.narration_generated
+          ? '✅ Narração gerada e clip processado!'
+          : '✅ Clip processado (sem narração).',
+      );
+      await loadClips();
+    } catch (e: any) {
+      console.error('Error rendering clip:', e);
+      toast.error(e.message || 'Erro ao processar clip');
+    } finally {
+      setRenderingClipId(null);
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const map: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
       draft: { label: 'Rascunho', variant: 'secondary' },
