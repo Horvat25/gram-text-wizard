@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
   CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb, 
-  Zap, Clock, Pause
+  Zap, Clock, Pause, User, MessageSquare
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -48,10 +48,18 @@ interface ChatAction {
   actions: Array<{ tool: string; success: boolean; message: string }>;
 }
 
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
 type TimelineItem = 
   | { type: 'report'; data: ProactiveMessage; date: Date }
   | { type: 'execution'; data: ExecutionReport; date: Date }
-  | { type: 'action'; data: ChatAction; date: Date };
+  | { type: 'action'; data: ChatAction; date: Date }
+  | { type: 'chat'; data: ChatMessage; date: Date };
 
 interface AgentProactiveChatProps {
   isOpen: boolean;
