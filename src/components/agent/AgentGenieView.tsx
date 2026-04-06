@@ -116,9 +116,7 @@ export default function AgentGenieView() {
   // Panel states
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [showHistory] = useState(false); // kept for closeAllPanels compat
-  const [showFeeds, setShowFeeds] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
-  const [showMarketing, setShowMarketing] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
   const [showVideoClips, setShowVideoClips] = useState(false);
@@ -291,10 +289,7 @@ export default function AgentGenieView() {
 
   const closeAllPanels = () => {
     setShowAgentChat(false);
-    
-    setShowFeeds(false);
     setShowGrowth(false);
-    setShowMarketing(false);
     setShowQueue(false);
     setShowPostHistory(false);
     setShowVideoClips(false);
@@ -308,9 +303,7 @@ export default function AgentGenieView() {
     const isCurrentlyOpen: Record<string, boolean> = {
       agentChat: showAgentChat,
       history: showHistory,
-      feeds: showFeeds,
       growth: showGrowth,
-      marketing: showMarketing,
       queue: showQueue,
       postHistory: showPostHistory,
       videoClips: showVideoClips,
@@ -325,9 +318,8 @@ export default function AgentGenieView() {
       switch (panel) {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history':  break;
-        case 'feeds': setShowFeeds(true); break;
         case 'growth': setShowGrowth(true); break;
-        case 'marketing': setShowMarketing(true); break;
+        
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
         case 'videoClips': setShowVideoClips(true); break;
