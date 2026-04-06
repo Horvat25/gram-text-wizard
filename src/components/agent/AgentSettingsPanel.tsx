@@ -478,14 +478,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                 <AnimatePresence mode="wait">
 
 
-                    <motion.div 
-                      key="dna"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      className="space-y-5"
-                    >
-                      {/* Agent Name */}
                       <div className="space-y-2">
                         <Label className="text-xs uppercase tracking-wider text-muted-foreground">Nome do Agente</Label>
                         <Input
