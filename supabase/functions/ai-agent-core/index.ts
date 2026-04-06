@@ -705,7 +705,8 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
     'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
     'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
-    'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
+    'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' },
+    'marketing_video': { mediaType: 'reels', format: 'vendas', theme: 'produto afiliado VSL' }
   };
   
   const selectedType = contentTypeMap[state.nextContentType];
