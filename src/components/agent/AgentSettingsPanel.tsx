@@ -131,7 +131,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<'dna' | 'niche' | 'voice' | 'connections' | 'general'>('dna');
+  const [activeSection, setActiveSection] = useState<'connections' | 'general'>('connections');
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [connecting, setConnecting] = useState(false);
   const [connectingTikTok, setConnectingTikTok] = useState(false);
@@ -362,9 +362,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   useEffect(() => { setSelectedVoice(brandSettings.preferredVoice || 'camila'); }, [brandSettings]);
 
   const sections = [
-    { id: 'dna' as const, label: 'DNA', icon: Fingerprint },
-    { id: 'niche' as const, label: 'Nicho', icon: Target },
-    { id: 'voice' as const, label: 'Voz', icon: Palette },
     { id: 'connections' as const, label: 'Contas', icon: Link2 },
     { id: 'general' as const, label: 'Geral', icon: Sliders },
   ];
