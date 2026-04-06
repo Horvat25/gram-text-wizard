@@ -3189,7 +3189,7 @@ Deno.serve(async (req) => {
       );
     }
     
-    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType);
+    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType, skipLimitCheck);
     
     console.log('[AGENT] ===== CICLO FINALIZADO =====');
     return new Response(
@@ -3215,9 +3215,10 @@ async function processWorkspace(
   lovableApiKey: string,
   supabaseUrl: string,
   trigger: string = 'manual',
-  forceContentType: ContentType | null = null
+  forceContentType: ContentType | null = null,
+  skipLimitCheck: boolean = false
 ): Promise<any> {
-  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId})`);
+  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId}, skipLimits: ${skipLimitCheck})`);
   
   // Get agent name for conversational messages
   const { data: contextData } = await supabase
@@ -3261,7 +3262,38 @@ async function processWorkspace(
     }));
     
     // ETAPA 2: Decisão
-    const decision = await makeStrategicDecision(state, lovableApiKey);
+    let decision: AgentDecision;
+    if (skipLimitCheck && forceContentType) {
+      // Skip all checks for test mode - go straight to POST
+      const contentTypeMap: Record<string, { mediaType: string; format: string; theme: string }> = {
+        'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
+        'video_curated': { mediaType: 'reels', format: 'noticia', theme: 'vídeo curado sobre IA e tecnologia' },
+        'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
+        'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
+        'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
+        'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
+        'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
+      };
+      const selected = contentTypeMap[forceContentType] || contentTypeMap['image'];
+      decision = {
+        decision: 'POST',
+        reason: `Teste forçado: ${forceContentType}`,
+        contentPlan: {
+          theme: selected.theme,
+          format: selected.format as any,
+          mediaType: selected.mediaType as any,
+          cta: 'Comente sua opinião!',
+          tone: 'profissional e envolvente',
+          objective: 'engajamento',
+          platforms: state.context?.preferred_platforms || ['instagram'],
+          contentType: forceContentType,
+        },
+        hypothesis: `Teste de ${forceContentType}`,
+        expectedEngagement: 5,
+      };
+    } else {
+      decision = await makeStrategicDecision(state, lovableApiKey);
+    }
     
     let post = null;
     
