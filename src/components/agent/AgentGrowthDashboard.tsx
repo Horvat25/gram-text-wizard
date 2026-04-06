@@ -153,39 +153,64 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
       const allErrors: string[] = [];
 
       while (hasMore && guard < 100) {
-        const { data, error } = await supabase.functions.invoke('sync-instagram-metrics', {
-          body: {
-            offset,
-            batch_size: 50,
-            period_days: 90,
-            workspace_id: currentWorkspace.id,
-          },
-        });
+        let data: any = null;
+        let lastError: string | null = null;
 
-        if (error) {
-          // Extract the real error message from the edge function response
+        // Retry up to 2 times per batch to handle transient timeouts
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const res = await supabase.functions.invoke('sync-instagram-metrics', {
+            body: {
+              offset,
+              batch_size: 25, // Smaller batches to avoid timeout
+              period_days: 90,
+              workspace_id: currentWorkspace.id,
+            },
+          });
+
+          if (!res.error) {
+            data = res.data;
+            lastError = null;
+            break;
+          }
+
+          // Extract error message
           let errorMsg = 'Erro ao sincronizar';
-          if (typeof error === 'object' && error !== null) {
-            // FunctionsHttpError includes context with the response body
-            if (error.context) {
+          if (typeof res.error === 'object' && res.error !== null) {
+            if (res.error.context) {
               try {
-                const body = await error.context.json();
-                errorMsg = body?.error || body?.message || error.message || errorMsg;
+                const body = await res.error.context.json();
+                errorMsg = body?.error || body?.message || res.error.message || errorMsg;
               } catch {
-                errorMsg = error.message || errorMsg;
+                errorMsg = res.error.message || errorMsg;
               }
             } else {
-              errorMsg = error.message || errorMsg;
+              errorMsg = res.error.message || errorMsg;
             }
-          } else if (typeof error === 'string') {
-            errorMsg = error;
+          } else if (typeof res.error === 'string') {
+            errorMsg = res.error;
           }
-          throw new Error(errorMsg);
+
+          lastError = errorMsg;
+          console.warn(`[Sync] Attempt ${attempt + 1} failed: ${errorMsg}, retrying...`);
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
-        // Check if data itself contains an error (non-2xx returned as data in some SDK versions)
+        // If both attempts failed, log warning but continue with what we have
+        if (lastError && !data) {
+          console.warn(`[Sync] Batch at offset ${offset} failed after retries: ${lastError}`);
+          allErrors.push(lastError);
+          // Skip this batch and try next
+          offset += 25;
+          guard++;
+          continue;
+        }
+
+        // Check if data itself contains an error
         if (data?.error) {
-          throw new Error(data.error);
+          allErrors.push(data.error);
+          offset += 25;
+          guard++;
+          continue;
         }
 
         totalUpdated += data?.updated || 0;
@@ -193,7 +218,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
 
         hasMore = Boolean(data?.has_more);
-        offset = data?.next_offset ?? offset + 50;
+        offset = data?.next_offset ?? offset + 25;
         guard += 1;
 
         if (hasMore) {
