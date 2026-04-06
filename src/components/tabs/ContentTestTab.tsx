@@ -7,6 +7,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Image as ImageIcon,
   Film,
   Layers,
@@ -27,6 +32,7 @@ import {
   Rss,
   ArrowLeft,
   RefreshCw,
+  Maximize2,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -204,22 +210,39 @@ function TestDetailView({
                 post.carousel_images.length > 0 && (
                   <div className="grid grid-cols-2 gap-1">
                     {post.carousel_images.slice(0, 4).map((img: string, i: number) => (
-                      <img
-                        key={`c-${i}`}
-                        src={img}
-                        alt={`Slide ${i + 1}`}
-                        className="aspect-square w-full rounded-md object-cover"
-                      />
+                      <div key={`c-${i}`} className="relative group">
+                        <img
+                          src={img}
+                          alt={`Slide ${i + 1}`}
+                          className="aspect-square w-full rounded-md object-cover cursor-pointer"
+                          onClick={() => setExpandedImage(img)}
+                        />
+                        <button
+                          onClick={() => setExpandedImage(img)}
+                          className="absolute top-1 right-1 p-1 rounded-md bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Maximize2 className="h-3 w-3" />
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
 
               {!post.video_url && !post.carousel_images?.length && post.image_url && (
-                <img
-                  src={post.image_url}
-                  alt="Preview"
-                  className="w-full rounded-lg aspect-square object-cover"
-                />
+                <div className="relative group">
+                  <img
+                    src={post.image_url}
+                    alt="Preview"
+                    className="w-full rounded-lg aspect-square object-cover cursor-pointer"
+                    onClick={() => setExpandedImage(post.image_url)}
+                  />
+                  <button
+                    onClick={() => setExpandedImage(post.image_url)}
+                    className="absolute top-2 right-2 p-1.5 rounded-md bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Maximize2 className="h-4 w-4" />
+                  </button>
+                </div>
               )}
 
               {/* Meta info */}
