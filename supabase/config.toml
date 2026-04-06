@@ -116,3 +116,6 @@ verify_jwt = false
 
 [functions.search-youtube-videos]
 verify_jwt = false
+
+[functions.process-curated-video]
+verify_jwt = false
