@@ -359,52 +359,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                       exit={{ opacity: 0, y: -8 }}
                       className="space-y-5"
                     >
-                      {/* Platforms */}
-                      <div className="space-y-3">
-                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Plataformas</Label>
-                        <div className="flex gap-2">
-                          {[
-                            { id: 'instagram', label: 'Instagram', icon: Instagram },
-                            { id: 'tiktok', label: 'TikTok', icon: Music2 },
-                          ].map(p => (
-                            <Button
-                              key={p.id}
-                              variant={config.preferred_platforms.includes(p.id) ? 'default' : 'outline'}
-                              className={cn(
-                                "flex-1 gap-2",
-                                config.preferred_platforms.includes(p.id) && "neural-gradient border-0"
-                              )}
-                              onClick={() => togglePlatform(p.id)}
-                            >
-                              <p.icon className="h-4 w-4" />
-                              {p.label}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Auto Mode */}
-                      <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "p-2 rounded-lg transition-colors",
-                            config.auto_post_enabled ? "bg-primary/20" : "bg-muted"
-                          )}>
-                            <Zap className={cn("h-5 w-5", config.auto_post_enabled ? "text-primary" : "text-muted-foreground")} />
-                          </div>
-                          <div>
-                            <span className="font-medium text-sm">Piloto Automático</span>
-                            <p className="text-[11px] text-muted-foreground">Publica sozinho nas plataformas ativas</p>
-                          </div>
-                        </div>
-                        <Switch 
-                          checked={config.auto_post_enabled}
-                          onCheckedChange={(checked) => setConfig(c => ({ ...c, auto_post_enabled: checked }))}
-                        />
-                      </div>
-
                       {/* Instagram Account */}
-                      {activePlatform === 'instagram' && (
                         <div className="space-y-3">
                           <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                             <Instagram className="h-3.5 w-3.5" /> Instagram
@@ -443,9 +398,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                             </Button>
                           )}
                         </div>
-                      )}
 
-                      {activePlatform === 'tiktok' && (
                         <div className="space-y-3">
                           <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                             <Video className="h-3.5 w-3.5" /> TikTok
@@ -482,45 +435,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                             </Button>
                           )}
                         </div>
-                      )}
-
-                      {/* Voice Selection */}
-                      <div className="space-y-3">
-                        <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                          <Mic className="h-3.5 w-3.5" /> Voz para Narração
-                        </Label>
-                        <div className="space-y-2">
-                          {VOICE_OPTIONS.map(voice => {
-                            const isSelected = selectedVoice === voice.id;
-                            return (
-                              <div
-                                key={voice.id}
-                                className={cn(
-                                  "flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all",
-                                  isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
-                                )}
-                                onClick={() => handleVoiceSelect(voice.id)}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isSelected ? "bg-primary/20" : "bg-muted")}>
-                                    <Mic className="w-4 h-4" />
-                                  </div>
-                                  <div>
-                                    <span className="text-sm font-medium">{voice.name}</span>
-                                    <p className="text-[10px] text-muted-foreground">{voice.gender} · {voice.description}</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={(e) => { e.stopPropagation(); testVoice(voice.id); }} disabled={testingVoice === voice.id}>
-                                    {testingVoice === voice.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
-                                  </Button>
-                                  {isSelected && <CheckCircle className="w-4 h-4 text-primary" />}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
                     </motion.div>
                   )}
 
