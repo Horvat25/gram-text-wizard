@@ -26,7 +26,7 @@ serve(async (req) => {
       throw new Error('Supabase credentials not configured');
     }
 
-    const { code, redirectUri, userId } = await req.json();
+    const { code, redirectUri, userId, workspaceId } = await req.json();
 
     if (!code) {
       throw new Error('Authorization code is required');

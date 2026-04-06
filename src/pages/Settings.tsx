@@ -269,7 +269,6 @@ const Settings = () => {
   const startOAuth = async () => {
     setConnecting(true);
     try {
-      // Use dedicated Instagram callback route on the published app
       const publishedOrigin = 'https://gram-text-wizard.lovable.app';
       const redirectUri = `${publishedOrigin}/instagram/callback`;
       
@@ -281,6 +280,10 @@ const Settings = () => {
 
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
+      // Store workspace_id so the callback page can send it to the edge function
+      if (currentWorkspace?.id) {
+        localStorage.setItem('oauth_workspace_id', currentWorkspace.id);
+      }
       
       // Always redirect in same tab for Instagram
       window.location.href = data.authUrl;

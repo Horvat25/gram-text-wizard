@@ -38,8 +38,11 @@ const InstagramCallback = () => {
         const redirectUri = `${publishedOrigin}/instagram/callback`;
         const { data: { user } } = await supabase.auth.getUser();
 
+        // Get workspace_id from localStorage (set before OAuth redirect)
+        const workspaceId = localStorage.getItem('oauth_workspace_id');
+
         const { data, error: callbackError } = await supabase.functions.invoke('oauth-callback', {
-          body: { code, redirectUri, userId: user?.id }
+          body: { code, redirectUri, userId: user?.id, workspaceId }
         });
 
         if (callbackError) throw callbackError;
