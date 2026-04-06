@@ -362,7 +362,7 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   // Determine next content type based on COMPLETION PERCENTAGE (lower = higher priority)
   // This ensures diversity: a type with 0/2 (0%) gets priority over 13/14 (93%)
   const getCompletionStats = (type: ContentType): { remaining: number; percentage: number; goal: number } => {
-    const keyMap = { video: 'videos', carousel: 'carousels', news: 'news', news_video: 'news_videos', image: 'images', marketing: 'marketing' } as const;
+    const keyMap = { video: 'videos', video_curated: 'videos', carousel: 'carousels', news: 'news', news_video: 'news_videos', image: 'images', marketing: 'marketing' } as const;
     const key = keyMap[type];
     const goal = weeklyGoals[key] || 1;
     const progress = weeklyProgress[key] || 0;
@@ -397,6 +397,8 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   const typeStats = [
     // Creative video (AI themes) - only if render service is available
     ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
+    // Curated video (Pexels stock) - available even without render service
+    ...(!renderServiceAvailable ? [{ type: 'video_curated' as ContentType, ...getCompletionStats('video_curated'), priority: 3.8 }] : []),
     // News video (RSS broadcast Reels) - also needs render service
     ...(renderServiceAvailable ? [{ type: 'news_video' as ContentType, ...getCompletionStats('news_video'), priority: 3.5 }] : []),
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
