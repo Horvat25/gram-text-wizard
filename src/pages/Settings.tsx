@@ -1146,6 +1146,10 @@ const Settings = () => {
                 </div>
               )}
             </TabsContent>
+            {/* AI Costs Tab */}
+            <TabsContent value="ai-costs">
+              <AICostsTab />
+            </TabsContent>
           </Tabs>
         </div>
       </main>
