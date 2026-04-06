@@ -1,0 +1,2 @@
+ALTER TABLE public.posts DROP CONSTRAINT posts_status_check;
+ALTER TABLE public.posts ADD CONSTRAINT posts_status_check CHECK (status = ANY (ARRAY['draft', 'scheduled', 'published', 'failed', 'generating']));
