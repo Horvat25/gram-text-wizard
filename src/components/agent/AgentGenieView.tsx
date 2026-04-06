@@ -21,12 +21,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 import AgentGenie3D from './AgentGenie3D';
 import AgentMinimalChat from './AgentMinimalChat';
-import AgentChatPanel from './AgentChatPanel';
 import AgentProactiveChat from './AgentProactiveChat';
-import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
-import AgentMarketingPanel from './AgentMarketingPanel';
+
 import TikTokGrowthDashboard from './TikTokGrowthDashboard';
 import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
 import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
