@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 // Content distribution types
-type ContentType = 'video' | 'carousel' | 'news' | 'news_video' | 'image' | 'marketing';
+type ContentType = 'video' | 'carousel' | 'news' | 'news_video' | 'image' | 'marketing' | 'video_curated';
 
 interface ContentDistribution {
   videos: number;
@@ -698,6 +698,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
   // Determine content type and format based on distribution
   const contentTypeMap: Record<ContentType, { mediaType: string; format: string; theme: string }> = {
     'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
+    'video_curated': { mediaType: 'reels', format: 'noticia', theme: 'vídeo curado sobre IA e tecnologia' },
     'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
     'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
@@ -964,6 +965,17 @@ async function executeContentPlan(
           ai_model_used: 'none'
         }).select().single();
         return fallbackPost;
+      }
+    }
+    case 'video_curated': {
+      // CURATED VIDEO: Download stock video from Pexels + branded template
+      console.log(`[AGENT] 🎥 Creating CURATED video from Pexels stock...`);
+      try {
+        return await createVideoCuratedContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+      } catch (curatedError: any) {
+        console.error('[AGENT] ❌ CURATED VIDEO FAILED:', curatedError?.message || curatedError);
+        // Fallback to image post
+        return await createImageContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
       }
     }
     case 'carousel':
