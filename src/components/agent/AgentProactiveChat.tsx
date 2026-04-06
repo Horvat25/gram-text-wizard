@@ -441,6 +441,41 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       );
     }
 
+    if (item.type === 'chat') {
+      const msg = item.data as ChatMessage;
+      return (
+        <motion.div
+          key={`chat-${msg.id}`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn("flex gap-3", msg.role === 'user' ? "flex-row-reverse" : "")}
+        >
+          <Avatar className="h-7 w-7 shrink-0">
+            {msg.role === 'assistant' ? (
+              <>
+                <AvatarImage src={agentAvatar || undefined} />
+                <AvatarFallback className="neural-gradient text-primary-foreground text-xs">
+                  <Bot className="h-3 w-3" />
+                </AvatarFallback>
+              </>
+            ) : (
+              <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                <User className="h-3 w-3" />
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className={cn(
+            "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm",
+            msg.role === 'user'
+              ? "bg-primary text-primary-foreground rounded-br-sm"
+              : "bg-muted rounded-bl-sm"
+          )}>
+            {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
+          </div>
+        </motion.div>
+      );
+    }
+
     return null;
   };
 
