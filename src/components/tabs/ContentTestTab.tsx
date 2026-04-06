@@ -203,6 +203,9 @@ export default function ContentTestTab() {
         </p>
       </div>
 
+      {/* Cost summary panel */}
+      <CostSummaryPanel />
+
       <div className="space-y-3">
         {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color }) => {
           const isGenerating = generating === type;
