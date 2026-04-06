@@ -542,26 +542,44 @@ export default function VideoClipsTab() {
                             </div>
 
                             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                              <Button
-                                variant="default"
-                                size="sm"
-                                className="h-6 px-2 text-[10px] neural-gradient border-0"
-                                onClick={() => scheduleClip(clip.id)}
-                              >
-                                <CalendarDays className="mr-1 h-2.5 w-2.5" />
-                                Colocar na fila
-                              </Button>
+                              {!clip.video_url && clip.status === 'draft' && (
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  className="h-6 px-2 text-[10px] neural-gradient border-0"
+                                  onClick={() => renderClip(clip.id)}
+                                  disabled={renderingClipId === clip.id}
+                                >
+                                  {renderingClipId === clip.id ? (
+                                    <Loader2 className="mr-1 h-2.5 w-2.5 animate-spin" />
+                                  ) : (
+                                    <Play className="mr-1 h-2.5 w-2.5" />
+                                  )}
+                                  {renderingClipId === clip.id ? 'Processando...' : 'Processar clip'}
+                                </Button>
+                              )}
 
                               {clip.video_url && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-6 px-2 text-[10px]"
-                                  onClick={() => window.open(clip.video_url!, '_blank')}
-                                >
-                                  <Eye className="mr-1 h-2.5 w-2.5" />
-                                  Ver vídeo
-                                </Button>
+                                <>
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="h-6 px-2 text-[10px] neural-gradient border-0"
+                                    onClick={() => scheduleClip(clip.id)}
+                                  >
+                                    <CalendarDays className="mr-1 h-2.5 w-2.5" />
+                                    Agendar
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 px-2 text-[10px]"
+                                    onClick={() => window.open(clip.video_url!, '_blank')}
+                                  >
+                                    <Eye className="mr-1 h-2.5 w-2.5" />
+                                    Ver vídeo
+                                  </Button>
+                                </>
                               )}
 
                               <Button
