@@ -185,7 +185,7 @@ function TestDetailView({
       )}
 
       {/* Content preview: side-by-side for image types, stacked for video */}
-      {post && post.status !== 'failed' && (
+      {post && post.status !== 'failed' && post.status !== 'generating' && (
         <>
           {/* Side-by-side layout: media + caption */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
