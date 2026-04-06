@@ -933,13 +933,12 @@ async function executeContentPlan(
       }
     }
     case 'news_video': {
-      // NEWS VIDEO: RSS news-broadcast style Reels (editorial telejornal)
-      console.log(`[AGENT] 📺 Creating NEWS BROADCAST video Reel...`);
+      // NEWS VIDEO: Pipeline Neural Update automatizado via brand-news-video
+      console.log(`[AGENT] 📺 Creating NEWS BROADCAST video Reel (Neural Update pipeline)...`);
       try {
         const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
         if (!bestRssItem || bestRssItem.score < 30) {
           console.log('[AGENT] ⚠️ No suitable RSS article for news_video - skipping');
-          // Fallback: create as regular news image instead
           return await createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
         }
         
@@ -952,8 +951,87 @@ async function executeContentPlan(
         plan.theme = bestRssItem.item.title;
         (plan as any)._rssItemId = bestRssItem.item.id;
         console.log(`[AGENT] 📰 News-broadcast Reel: "${rssArticle.title}" (score: ${bestRssItem.score})`);
+
+        // Generate caption first
+        const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            topic: rssArticle.title,
+            postType: 'noticia',
+            customInstructions: `REELS de notícia estilo telejornal. 
+1. HOOK curto (1 frase impactante)
+2. CONTEXTO (2-3 frases)
+3. OPINIÃO (sua análise)
+4. Fonte no final:
+📰 Fonte: ${new URL(rssArticle.url).hostname.replace('www.', '')}
+🔗 ${rssArticle.url}`
+          })
+        });
         
-        return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish, rssArticle);
+        let caption = `📺 ${rssArticle.title}`;
+        let hashtags: string[] = ['#tecnologia', '#reels', '#noticias', '#ia'];
+        if (captionResponse.ok) {
+          const captionData = await captionResponse.json();
+          caption = captionData.caption || caption;
+          hashtags = captionData.hashtags || hashtags;
+        }
+        caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+
+        // Ensure source link is present
+        if (!caption.includes('Fonte:') && !caption.includes('🔗')) {
+          caption += `\n\n📰 Fonte: ${new URL(rssArticle.url).hostname.replace('www.', '')}\n🔗 ${rssArticle.url}`;
+        }
+
+        // Create post first
+        const { data: post, error } = await supabase.from('posts').insert({
+          user_id: userId,
+          workspace_id: workspaceId,
+          caption,
+          hashtags,
+          post_type: 'noticia',
+          media_type: 'reels',
+          platforms: plan.platforms || ['instagram'],
+          status: 'draft',
+          overlay_metadata: {
+            type: 'narrated_video',
+            pipeline: 'brand-news-video',
+            render_status: 'queued',
+            topic: rssArticle.title,
+            article_url: rssArticle.url,
+            is_news_broadcast: true,
+            created_by_agent: true,
+          },
+          ai_model_used: 'gemini-2.5-flash'
+        }).select().single();
+        
+        if (error) throw error;
+
+        // Link RSS item
+        if ((plan as any)._rssItemId) {
+          await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', (plan as any)._rssItemId);
+        }
+
+        // Trigger brand-news-video pipeline (fire-and-forget for long processing)
+        console.log(`[AGENT] 🚀 Disparando pipeline Neural Update para post ${post.id}...`);
+        fetch(`${supabaseUrl}/functions/v1/brand-news-video`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            postId: post.id,
+            title: rssArticle.title,
+            description: rssArticle.description,
+            workspaceId,
+            userId,
+            articleUrl: rssArticle.url,
+          }),
+        }).then(res => {
+          console.log(`[AGENT] brand-news-video response: ${res.status}`);
+        }).catch(err => {
+          console.error(`[AGENT] brand-news-video error:`, err);
+        });
+
+        return post;
       } catch (videoError: any) {
         console.error('[AGENT] ❌ NEWS VIDEO CREATION FAILED:', videoError?.message || videoError);
         const { data: fallbackPost } = await supabase.from('posts').insert({
