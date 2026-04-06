@@ -38,6 +38,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentMarketingPanel from '@/components/agent/AgentMarketingPanel';
+import VideoClipsTab from '@/components/tabs/VideoClipsTab';
 
 interface TestResult {
   post: any;
