@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const validTypes = ["image", "carousel", "news", "video", "news_video"];
+    const validTypes = ["image", "carousel", "news", "video", "news_video", "marketing_image", "marketing_video"];
     if (!validTypes.includes(content_type)) {
       return new Response(
         JSON.stringify({ error: `Tipo inválido. Use: ${validTypes.join(", ")}` }),

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Image as ImageIcon,
   Film,
@@ -9,12 +10,14 @@ import {
   Newspaper,
   Tv,
   Loader2,
-  Eye,
   CalendarDays,
   Trash2,
   ChevronDown,
   Sparkles,
   AlertCircle,
+  Megaphone,
+  Video,
+  MessageSquare,
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,6 +67,20 @@ const CONTENT_TYPES = [
     description: 'Vídeo estilo telejornal a partir de RSS',
     color: 'from-emerald-500 to-green-600',
   },
+  {
+    type: 'marketing_image',
+    label: 'Marketing Imagem',
+    icon: Megaphone,
+    description: 'Post de marketing com imagem do produto + link afiliado',
+    color: 'from-yellow-500 to-amber-600',
+  },
+  {
+    type: 'marketing_video',
+    label: 'Marketing Vídeo',
+    icon: Video,
+    description: 'VSL / Reels de marketing com narração + link afiliado',
+    color: 'from-red-500 to-pink-600',
+  },
 ] as const;
 
 export default function ContentTestTab() {
@@ -72,6 +89,8 @@ export default function ContentTestTab() {
   const [generating, setGenerating] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, TestResult>>({});
   const [expandedType, setExpandedType] = useState<string | null>(null);
+  const [deleteReason, setDeleteReason] = useState<Record<string, string>>({});
+  const [showDeleteReason, setShowDeleteReason] = useState<string | null>(null);
 
   const generateTest = async (contentType: string) => {
     if (!user || !currentWorkspace) return;
@@ -98,6 +117,7 @@ export default function ContentTestTab() {
         },
       }));
 
+      setExpandedType(contentType);
       toast.success(`Teste de ${contentType} criado!`);
     } catch (e: any) {
       console.error(`Error generating ${contentType}:`, e);
@@ -134,7 +154,21 @@ export default function ContentTestTab() {
   };
 
   const deletePost = async (postId: string, contentType: string) => {
+    const reason = deleteReason[contentType]?.trim() || '';
+
     try {
+      // If there's a reason, save it as a note on agent_decisions for future learning
+      if (reason) {
+        await supabase.from('agent_decisions').insert({
+          user_id: user!.id,
+          workspace_id: currentWorkspace!.id,
+          post_id: postId,
+          decision: 'test_rejected',
+          decision_reason: reason,
+          learning: `Teste de ${contentType} rejeitado: ${reason}`,
+        });
+      }
+
       const { error } = await supabase.from('posts').delete().eq('id', postId);
       if (error) throw error;
 
@@ -143,8 +177,14 @@ export default function ContentTestTab() {
         delete copy[contentType];
         return copy;
       });
+      setShowDeleteReason(null);
+      setDeleteReason((prev) => {
+        const copy = { ...prev };
+        delete copy[contentType];
+        return copy;
+      });
 
-      toast.success('Post de teste removido');
+      toast.success(reason ? 'Post removido — motivo salvo para melhorar' : 'Post de teste removido');
     } catch (e) {
       toast.error('Erro ao deletar');
     }
@@ -168,10 +208,12 @@ export default function ContentTestTab() {
           const result = results[type];
           const post = result?.post;
           const isExpanded = expandedType === type;
+          const isShowingDeleteReason = showDeleteReason === type;
 
           return (
             <Card key={type} className="overflow-hidden">
               <CardContent className="p-0">
+                {/* Header row */}
                 <div className="flex items-center gap-3 p-3">
                   <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-white', color)}>
                     <Icon className="h-5 w-5" />
@@ -184,8 +226,11 @@ export default function ContentTestTab() {
 
                   <div className="flex items-center gap-1.5">
                     {post && (
-                      <Badge variant={post.status === 'failed' ? 'destructive' : 'secondary'} className="text-[10px]">
-                        {post.status === 'draft' ? 'OK' : post.status === 'failed' ? 'Erro' : post.status}
+                      <Badge
+                        variant={post.status === 'failed' ? 'destructive' : post.status === 'scheduled' ? 'default' : 'secondary'}
+                        className="text-[10px]"
+                      >
+                        {post.status === 'draft' ? '✓ OK' : post.status === 'failed' ? 'Erro' : post.status === 'scheduled' ? 'Agendado' : post.status}
                       </Badge>
                     )}
                     <Button
@@ -204,19 +249,53 @@ export default function ContentTestTab() {
                   </div>
                 </div>
 
+                {/* Inline mini preview (always visible when result exists) */}
+                {post && !isExpanded && (
+                  <div
+                    className="flex cursor-pointer items-center gap-3 border-t bg-muted/20 px-3 py-2"
+                    onClick={() => setExpandedType(type)}
+                  >
+                    {/* Thumbnail */}
+                    {post.image_url && (
+                      <img
+                        src={post.image_url}
+                        alt="Preview"
+                        className="h-12 w-12 shrink-0 rounded-md object-cover"
+                      />
+                    )}
+                    {!post.image_url && post.carousel_images?.[0] && (
+                      <img
+                        src={post.carousel_images[0]}
+                        alt="Preview"
+                        className="h-12 w-12 shrink-0 rounded-md object-cover"
+                      />
+                    )}
+
+                    <p className="line-clamp-2 flex-1 text-[11px] text-muted-foreground">
+                      {post.caption?.substring(0, 120)}...
+                    </p>
+
+                    <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  </div>
+                )}
+
+                {/* Expanded result */}
                 {post && (
                   <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedType(open ? type : null)}>
-                    <div className="border-t px-3 py-2">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-7 w-full justify-between px-2 text-xs">
-                          <span>Ver resultado</span>
-                          <ChevronDown className={cn('h-3 w-3 transition-transform', isExpanded && 'rotate-180')} />
-                        </Button>
-                      </CollapsibleTrigger>
-                    </div>
+                    {isExpanded && (
+                      <div className="border-t px-3 py-1.5">
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-7 w-full justify-between px-2 text-xs">
+                            <span>Resultado</span>
+                            <ChevronDown className="h-3 w-3 rotate-180 transition-transform" />
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
+                    )}
 
                     <CollapsibleContent className="border-t bg-muted/30 p-3">
                       <div className="space-y-3">
+                        {/* Error */}
                         {post.status === 'failed' && (
                           <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-2">
                             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
@@ -224,7 +303,7 @@ export default function ContentTestTab() {
                           </div>
                         )}
 
-                        {/* Media preview */}
+                        {/* Video preview */}
                         {post.video_url && (
                           <video
                             src={post.video_url}
@@ -234,25 +313,27 @@ export default function ContentTestTab() {
                           />
                         )}
 
+                        {/* Carousel preview */}
                         {!post.video_url && post.carousel_images && post.carousel_images.length > 0 && (
                           <div className="grid grid-cols-2 gap-1.5">
-                            {post.carousel_images.slice(0, 4).map((img: string, i: number) => (
+                            {post.carousel_images.slice(0, 8).map((img: string, i: number) => (
                               <img
                                 key={`carousel-${type}-${i}`}
                                 src={img}
                                 alt={`Slide ${i + 1}`}
-                                className="aspect-square w-full rounded-md object-cover"
+                                className="aspect-[4/5] w-full rounded-md object-cover"
                               />
                             ))}
                           </div>
                         )}
 
+                        {/* Single image preview */}
                         {!post.video_url && !post.carousel_images?.length && post.image_url && (
                           <img
                             src={post.image_url}
                             alt="Preview"
                             className="w-full rounded-lg object-cover"
-                            style={{ maxHeight: 300 }}
+                            style={{ maxHeight: 320 }}
                           />
                         )}
 
@@ -273,7 +354,7 @@ export default function ContentTestTab() {
                           </div>
                         )}
 
-                        {/* Script / overlay metadata for reels */}
+                        {/* Script / overlay metadata */}
                         {post.overlay_metadata && (
                           <div className="space-y-2">
                             {post.overlay_metadata.script?.segments && (
@@ -296,7 +377,7 @@ export default function ContentTestTab() {
                           </div>
                         )}
 
-                        {/* Post info */}
+                        {/* Meta info */}
                         <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
                           <span>Tipo: {post.media_type}</span>
                           <span>•</span>
@@ -314,33 +395,56 @@ export default function ContentTestTab() {
                           {post.status === 'draft' && (
                             <Button
                               size="sm"
-                              className="h-6 px-2 text-[10px] neural-gradient border-0"
+                              className="h-7 px-3 text-[11px] neural-gradient border-0"
                               onClick={() => schedulePost(post.id, type)}
                             >
-                              <CalendarDays className="mr-1 h-2.5 w-2.5" />
-                              Agendar
+                              <CalendarDays className="mr-1 h-3 w-3" />
+                              Agendar (1h)
                             </Button>
                           )}
-                          {(post.video_url || post.image_url) && (
+
+                          {!isShowingDeleteReason ? (
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
-                              className="h-6 px-2 text-[10px]"
-                              onClick={() => window.open(post.video_url || post.image_url, '_blank')}
+                              className="h-7 px-3 text-[11px] text-destructive hover:text-destructive"
+                              onClick={() => setShowDeleteReason(type)}
                             >
-                              <Eye className="mr-1 h-2.5 w-2.5" />
-                              Abrir
+                              <Trash2 className="mr-1 h-3 w-3" />
+                              Excluir
                             </Button>
+                          ) : (
+                            <div className="flex w-full items-center gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-2">
+                              <MessageSquare className="h-4 w-4 shrink-0 text-destructive" />
+                              <Input
+                                placeholder="O que ficou ruim? (opcional)"
+                                value={deleteReason[type] || ''}
+                                onChange={(e) =>
+                                  setDeleteReason((prev) => ({ ...prev, [type]: e.target.value }))
+                                }
+                                className="h-7 flex-1 text-xs"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') deletePost(post.id, type);
+                                }}
+                              />
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                className="h-7 px-2 text-[10px]"
+                                onClick={() => deletePost(post.id, type)}
+                              >
+                                Confirmar
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-[10px]"
+                                onClick={() => setShowDeleteReason(null)}
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2 text-[10px] text-destructive hover:text-destructive"
-                            onClick={() => deletePost(post.id, type)}
-                          >
-                            <Trash2 className="mr-1 h-2.5 w-2.5" />
-                            Excluir
-                          </Button>
                         </div>
                       </div>
                     </CollapsibleContent>
