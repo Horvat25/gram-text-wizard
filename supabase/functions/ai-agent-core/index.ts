@@ -985,8 +985,28 @@ async function executeContentPlan(
       return createCarouselContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
     case 'news':
       return createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
-    case 'marketing':
-      return createMarketingContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+    case 'marketing': {
+      // Check if the selected affiliate prefers video format
+      const serviceRoleKeyMkt = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const headersMkt = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKeyMkt}` };
+      
+      // Check preferred format from affiliate link
+      const { data: affLinks } = await supabase
+        .from('affiliate_links')
+        .select('media_format')
+        .eq('workspace_id', workspaceId)
+        .eq('is_active', true)
+        .order('last_posted_at', { ascending: true, nullsFirst: true })
+        .limit(1);
+      
+      const preferredFormat = affLinks?.[0]?.media_format || 'image';
+      
+      if (preferredFormat === 'video' || plan.mediaType === 'reels') {
+        console.log('[AGENT] 🎬 Marketing: formato VÍDEO selecionado');
+        return createMarketingVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headersMkt, autoPublish);
+      }
+      return createMarketingContent(supabase, plan, userId, workspaceId, supabaseUrl, headersMkt, autoPublish);
+    }
     case 'image':
     default:
       return createImageContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
