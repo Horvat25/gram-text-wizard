@@ -645,6 +645,19 @@ export default function AgentGenieView() {
               <Film className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Clips</span>
             </Button>
+            
+            <Button
+              variant={showContentTest ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showContentTest && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('contentTest')}
+            >
+              <FlaskConical className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Teste</span>
+            </Button>
           </div>
           
           {/* Right side */}
