@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import CostSummaryPanel from './CostSummaryPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -201,6 +202,9 @@ export default function ContentTestTab() {
           Gere 1 exemplo de cada tipo para conferir qualidade, legenda, imagem e roteiro.
         </p>
       </div>
+
+      {/* Cost summary panel */}
+      <CostSummaryPanel />
 
       <div className="space-y-3">
         {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color }) => {
