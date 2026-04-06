@@ -200,7 +200,7 @@ Deno.serve(async (req) => {
 
     const {
       workspace_id,
-      clips_count = 5,
+      clips_count = 1,
       source_profile,
       source_label,
     } = await req.json();
@@ -219,7 +219,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const safeClipsCount = Math.min(8, Math.max(1, Number(clips_count) || 5));
+    const safeClipsCount = Math.min(5, Math.max(1, Number(clips_count) || 1));
 
     console.log(`[batch-clips] Resolving source profile: ${source_profile}`);
     const resolvedChannel = await resolveChannel(youtubeApiKey, source_profile);
