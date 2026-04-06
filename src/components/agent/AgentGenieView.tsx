@@ -115,7 +115,7 @@ export default function AgentGenieView() {
   
   // Panel states
   const [showAgentChat, setShowAgentChat] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory] = useState(false); // kept for closeAllPanels compat
   const [showFeeds, setShowFeeds] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
@@ -238,7 +238,7 @@ export default function AgentGenieView() {
     saveMessage(userMessage, platform);
     setIsLoading(true);
     
-    if (!showHistory) setShowHistory(true);
+    if (!showHistory) 
 
     try {
       const chatMessages = msgs
@@ -291,7 +291,7 @@ export default function AgentGenieView() {
 
   const closeAllPanels = () => {
     setShowAgentChat(false);
-    setShowHistory(false);
+    
     setShowFeeds(false);
     setShowGrowth(false);
     setShowMarketing(false);
@@ -324,7 +324,7 @@ export default function AgentGenieView() {
     if (!isCurrentlyOpen[panel]) {
       switch (panel) {
         case 'agentChat': setShowAgentChat(true); break;
-        case 'history': setShowHistory(true); break;
+        case 'history':  break;
         case 'feeds': setShowFeeds(true); break;
         case 'growth': setShowGrowth(true); break;
         case 'marketing': setShowMarketing(true); break;
@@ -461,14 +461,7 @@ export default function AgentGenieView() {
           agentAvatar={agentConfig.agent_avatar_url}
         />
         
-        {/* Chat History */}
-        <AgentChatPanel
-          isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
-          messages={tkMessages}
-          agentName={agentConfig.agent_name}
-          agentAvatar={agentConfig.agent_avatar_url}
-        />
+        {/* Chat history moved into Agente panel */}
         
         {/* TikTok Queue Panel */}
         {showTikTokQueue && (
@@ -607,18 +600,7 @@ export default function AgentGenieView() {
               <span className="hidden xs:inline sm:inline">Marketing</span>
             </Button>
             
-            <Button
-              variant={showHistory ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showHistory && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('history')}
-            >
-              <History className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Chat</span>
-            </Button>
+            
             
             <Button
               variant={showPostHistory ? "default" : "ghost"}
@@ -707,14 +689,7 @@ export default function AgentGenieView() {
           agentAvatar={agentConfig.agent_avatar_url}
         />
         
-        {/* User Command History Panel */}
-        <AgentChatPanel
-          isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
-          messages={igMessages}
-          agentName={agentConfig.agent_name}
-          agentAvatar={agentConfig.agent_avatar_url}
-        />
+        {/* Chat history moved into Agente panel */}
         
         {/* Queue Panel */}
         {showQueue && (

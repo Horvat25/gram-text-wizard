@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
   CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb, 
-  Zap, Clock, Pause
+  Zap, Clock, Pause, User, MessageSquare
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -48,10 +48,18 @@ interface ChatAction {
   actions: Array<{ tool: string; success: boolean; message: string }>;
 }
 
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
 type TimelineItem = 
   | { type: 'report'; data: ProactiveMessage; date: Date }
   | { type: 'execution'; data: ExecutionReport; date: Date }
-  | { type: 'action'; data: ChatAction; date: Date };
+  | { type: 'action'; data: ChatAction; date: Date }
+  | { type: 'chat'; data: ChatMessage; date: Date };
 
 interface AgentProactiveChatProps {
   isOpen: boolean;
@@ -80,7 +88,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'reports' | 'actions'>('all');
+  const [filter, setFilter] = useState<'all' | 'reports' | 'actions' | 'chat'>('all');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -130,6 +138,14 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
         .order('created_at', { ascending: false })
         .limit(20);
 
+      // Fetch all chat messages (for history tab)
+      const { data: allChatMsgs } = await supabase
+        .from('agent_chat_messages')
+        .select('id, role, content, created_at')
+        .eq('workspace_id', currentWorkspace.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
       const items: TimelineItem[] = [];
 
       (messages || []).forEach((m: any) => {
@@ -149,6 +165,15 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
             date: new Date(m.created_at),
           });
         });
+
+      // Add chat messages as timeline items
+      (allChatMsgs || []).forEach((m: any) => {
+        items.push({
+          type: 'chat',
+          data: { id: m.id, role: m.role, content: m.content, created_at: m.created_at },
+          date: new Date(m.created_at),
+        });
+      });
 
       items.sort((a, b) => b.date.getTime() - a.date.getTime());
       setTimeline(items);
@@ -199,9 +224,10 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
   };
 
   const filteredTimeline = timeline.filter(item => {
-    if (filter === 'all') return true;
+    if (filter === 'all') return item.type !== 'chat';
     if (filter === 'reports') return item.type === 'report';
     if (filter === 'actions') return item.type === 'execution' || item.type === 'action';
+    if (filter === 'chat') return item.type === 'chat';
     return true;
   });
 
@@ -415,6 +441,41 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       );
     }
 
+    if (item.type === 'chat') {
+      const msg = item.data as ChatMessage;
+      return (
+        <motion.div
+          key={`chat-${msg.id}`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn("flex gap-3", msg.role === 'user' ? "flex-row-reverse" : "")}
+        >
+          <Avatar className="h-7 w-7 shrink-0">
+            {msg.role === 'assistant' ? (
+              <>
+                <AvatarImage src={agentAvatar || undefined} />
+                <AvatarFallback className="neural-gradient text-primary-foreground text-xs">
+                  <Bot className="h-3 w-3" />
+                </AvatarFallback>
+              </>
+            ) : (
+              <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                <User className="h-3 w-3" />
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className={cn(
+            "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm",
+            msg.role === 'user'
+              ? "bg-primary text-primary-foreground rounded-br-sm"
+              : "bg-muted rounded-bl-sm"
+          )}>
+            {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
+          </div>
+        </motion.div>
+      );
+    }
+
     return null;
   };
 
@@ -454,7 +515,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1 px-3 py-2 border-b border-border/30">
-            {(['all', 'reports', 'actions'] as const).map((f) => (
+            {(['all', 'reports', 'actions', 'chat'] as const).map((f) => (
               <Button
                 key={f}
                 variant={filter === f ? "default" : "ghost"}
@@ -465,7 +526,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
                 )}
                 onClick={() => setFilter(f)}
               >
-                {f === 'all' ? 'Tudo' : f === 'reports' ? '📊 Relatórios' : '⚡ Ações'}
+                {f === 'all' ? 'Tudo' : f === 'reports' ? '📊 Relatórios' : f === 'actions' ? '⚡ Ações' : '💬 Histórico'}
               </Button>
             ))}
             <span className="text-[10px] text-muted-foreground ml-auto">
