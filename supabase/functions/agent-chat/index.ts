@@ -1106,8 +1106,8 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
           topic,
           segmentCount: 4,
           wordsPerSegment: 10,
-          totalDuration: 20,
-          style: 'informativo, envolvente, com começo-meio-fim'
+          totalDuration: 16,
+          style: 'editorial opinativo, defenda uma tese, impacto real'
         })
       });
       
@@ -1125,16 +1125,16 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     if (!script || !script.segments || script.segments.length === 0) {
       console.log('[VIDEO] Using LOCAL script fallback for topic:', topic);
       const topicClean = topic.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').trim();
-      const shortTopic = topicClean.length > 50 ? topicClean.substring(0, 50).replace(/\s\S*$/, '') : topicClean;
+      const shortTopic = topicClean.length > 40 ? topicClean.substring(0, 40).replace(/\s\S*$/, '') : topicClean;
       script = {
-        title: `${shortTopic}: O Que Você Precisa Saber`,
+        title: `${shortTopic}: O Futuro Chegou`,
         segments: [
-          { text: `Algo grande está acontecendo no mundo da tecnologia. E tem tudo a ver com ${shortTopic}.`, imagePrompt: `futuristic technology dramatic reveal, neon lights, dark background` },
-          { text: `Especialistas estão chamando isso de um dos avanços mais significativos dos últimos anos.`, imagePrompt: `innovation breakthrough laboratory, scientists, holographic displays` },
-          { text: `O impacto disso vai muito além do que você imagina. Empresas, carreiras e mercados inteiros estão sendo transformados.`, imagePrompt: `global market transformation, city skyline, dramatic scale visualization` },
-          { text: `A grande questão não é se isso vai acontecer. É se você vai estar preparado quando acontecer.`, imagePrompt: `future vision forward-looking, person silhouette facing horizon, dramatic lighting` },
+          { text: `Isso vai mudar tudo sobre ${shortTopic}.`, imagePrompt: `futuristic technology dramatic reveal, cinematic dark background, neon accents` },
+          { text: `Especialistas confirmam: é real e irreversível.`, imagePrompt: `innovation breakthrough, holographic displays, laboratory environment` },
+          { text: `Empresas inteiras já estão sendo transformadas.`, imagePrompt: `global market transformation, dramatic city skyline, data visualization` },
+          { text: `A pergunta é: você está preparado?`, imagePrompt: `future vision, person silhouette facing horizon, dramatic golden hour lighting` },
         ],
-        totalDuration: 25,
+        totalDuration: 16,
         _fallback: true,
       };
     }
@@ -1178,11 +1178,11 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
       hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
       post_type: 'entretenimento',
       platforms: platforms || ['instagram', 'tiktok'],
-      status: scheduledForUTC ? 'scheduled' : 'draft',
+      // CRITICAL: Always start as draft - video MUST be rendered before publishing
+      status: 'draft',
       scheduled_for: scheduledForUTC,
       media_type: 'reels',
-      image_url: thumbnailUrl, // Thumbnail for preview
-      // Store script data in overlay_metadata for frontend processing
+      image_url: thumbnailUrl,
       overlay_metadata: {
         type: 'narrated_video',
         script: script,
@@ -1193,6 +1193,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         needs_processing: true,
         created_by_agent: true,
         publish_after_render: publish_now === true,
+        requested_schedule: scheduledForUTC,
       }
     };
     
