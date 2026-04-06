@@ -119,6 +119,7 @@ export default function AgentGenieView() {
   const [showMarketing, setShowMarketing] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
+  const [showVideoClips, setShowVideoClips] = useState(false);
   
   // TikTok panel states
     const [showTikTokQueue, setShowTikTokQueue] = useState(false);
@@ -293,6 +294,7 @@ export default function AgentGenieView() {
     setShowMarketing(false);
     setShowQueue(false);
     setShowPostHistory(false);
+    setShowVideoClips(false);
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
     setShowTikTokGrowth(false);
@@ -307,6 +309,7 @@ export default function AgentGenieView() {
       marketing: showMarketing,
       queue: showQueue,
       postHistory: showPostHistory,
+      videoClips: showVideoClips,
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
       tiktokGrowth: showTikTokGrowth,
@@ -322,6 +325,7 @@ export default function AgentGenieView() {
         case 'marketing': setShowMarketing(true); break;
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
+        case 'videoClips': setShowVideoClips(true); break;
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
         case 'tiktokGrowth': setShowTikTokGrowth(true); break;
