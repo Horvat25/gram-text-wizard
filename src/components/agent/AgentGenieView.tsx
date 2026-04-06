@@ -238,7 +238,7 @@ export default function AgentGenieView() {
     saveMessage(userMessage, platform);
     setIsLoading(true);
     
-    if (!showHistory) setShowHistory(true);
+    if (!showHistory) 
 
     try {
       const chatMessages = msgs
@@ -291,7 +291,7 @@ export default function AgentGenieView() {
 
   const closeAllPanels = () => {
     setShowAgentChat(false);
-    setShowHistory(false);
+    
     setShowFeeds(false);
     setShowGrowth(false);
     setShowMarketing(false);
@@ -324,7 +324,7 @@ export default function AgentGenieView() {
     if (!isCurrentlyOpen[panel]) {
       switch (panel) {
         case 'agentChat': setShowAgentChat(true); break;
-        case 'history': setShowHistory(true); break;
+        case 'history':  break;
         case 'feeds': setShowFeeds(true); break;
         case 'growth': setShowGrowth(true); break;
         case 'marketing': setShowMarketing(true); break;
