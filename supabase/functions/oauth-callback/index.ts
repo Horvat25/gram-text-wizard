@@ -210,7 +210,8 @@ serve(async (req) => {
             expires_at: expiresAt.toISOString(),
             connected_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            user_id: userId || null
+            user_id: userId || null,
+            workspace_id: workspaceId || null,
           }, {
             onConflict: 'instagram_user_id'
           })
