@@ -476,8 +476,8 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
             <ScrollArea className="flex-1 px-4">
               <div className="py-4 space-y-6">
                 <AnimatePresence mode="wait">
-                  {/* DNA Section — Personality & Identity */}
-                  {activeSection === 'dna' && (
+
+
                     <motion.div 
                       key="dna"
                       initial={{ opacity: 0, y: 8 }}
