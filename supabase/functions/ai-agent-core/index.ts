@@ -1095,24 +1095,23 @@ Responda em JSON:
     }
   }
   
-  // Fallback: generate meaningful narration segments (NOT raw topic text)
+  // Fallback: generate concise narration segments (max ~10 words each)
   if (scriptSegments.length < 4) {
-    // Extract a clean, short topic name for narration
-    const shortTopic = articleTitle.length > 60 ? articleTitle.substring(0, 60).replace(/\s\S*$/, '') : articleTitle;
+    const shortTopic = articleTitle.length > 40 ? articleTitle.substring(0, 40).replace(/\s\S*$/, '') : articleTitle;
     
     if (isNewsBroadcast) {
       scriptSegments = [
-        { text: `Atenção para esta notícia que pode mudar o cenário da tecnologia.`, imagePrompt: `Breaking news technology announcement, dramatic lighting, screens showing data` },
-        { text: `${shortTopic}. Essa é a novidade que está movimentando o mercado agora.`, imagePrompt: `Technology innovation concept, futuristic interfaces, dynamic composition` },
-        { text: `As consequências dessa mudança vão afetar milhões de pessoas nos próximos meses.`, imagePrompt: `Global impact visualization, world map with connections, dramatic scale` },
-        { text: `O futuro da tecnologia está sendo escrito agora. E você precisa acompanhar.`, imagePrompt: `Futuristic cityscape, forward-looking composition, clean and symbolic` },
+        { text: `Atenção: essa notícia muda tudo na tecnologia.`, imagePrompt: `Breaking news technology announcement, dramatic lighting, screens showing data` },
+        { text: `${shortTopic}. O mercado já sentiu.`, imagePrompt: `Technology innovation concept, futuristic interfaces, dynamic composition` },
+        { text: `Milhões de pessoas serão impactadas em breve.`, imagePrompt: `Global impact visualization, world map with connections, dramatic scale` },
+        { text: `O futuro está sendo escrito agora.`, imagePrompt: `Futuristic cityscape, forward-looking composition, clean and symbolic` },
       ];
     } else {
       scriptSegments = [
-        { text: `Você precisa saber o que está acontecendo com ${shortTopic}.`, imagePrompt: `Hook visual forte, impactful tech scene, curiosity and discovery` },
-        { text: `Especialistas estão chamando isso de revolução silenciosa na tecnologia.`, imagePrompt: `Innovation breakthrough concept, futuristic lab, progress visualization` },
-        { text: `O impacto disso é maior do que parece e vai transformar o mercado inteiro.`, imagePrompt: `Market transformation, dramatic scale, power and change visualization` },
-        { text: `A grande questão não é se isso vai acontecer. É se você vai estar preparado.`, imagePrompt: `Future vision, clean symbolic composition, thought-provoking ending` },
+        { text: `Isso vai mudar tudo sobre ${shortTopic}.`, imagePrompt: `Hook visual forte, impactful tech scene, curiosity and discovery` },
+        { text: `Especialistas confirmam: é real e irreversível.`, imagePrompt: `Innovation breakthrough concept, futuristic lab, progress visualization` },
+        { text: `Empresas inteiras já estão sendo transformadas.`, imagePrompt: `Market transformation, dramatic scale, power and change visualization` },
+        { text: `A pergunta é: você está preparado?`, imagePrompt: `Future vision, clean symbolic composition, thought-provoking ending` },
       ];
     }
   }
