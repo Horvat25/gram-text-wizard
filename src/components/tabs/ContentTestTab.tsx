@@ -398,7 +398,7 @@ export default function ContentTestTab() {
                       </div>
                     </div>
 
-                    {/* Edit Panel (RSS or Marketing) */}
+                    {/* Edit Panel (RSS, Marketing, or Clips) */}
                     {isEditing && editType && (
                       <div className="border-t bg-muted/20 p-3">
                         {editType === 'rss' && (
@@ -408,6 +408,15 @@ export default function ContentTestTab() {
                               <p className="text-xs font-semibold">Fontes RSS</p>
                             </div>
                             <CustomFeedsManager />
+                          </div>
+                        )}
+                        {editType === 'clips' && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Film className="h-4 w-4 text-primary" />
+                              <p className="text-xs font-semibold">Vídeos Curados & Clips</p>
+                            </div>
+                            <VideoClipsTab />
                           </div>
                         )}
                         {editType === 'marketing' && (
