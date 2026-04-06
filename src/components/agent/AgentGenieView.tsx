@@ -572,21 +572,9 @@ export default function AgentGenieView() {
               onClick={() => togglePanel('postHistory')}
             >
               <History className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Posts</span>
+              <span className="hidden xs:inline sm:inline">Histórico</span>
             </Button>
             
-            <Button
-              variant={showVideoClips ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showVideoClips && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('videoClips')}
-            >
-              <Film className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Clips</span>
-            </Button>
             
             <Button
               variant={showContentTest ? "default" : "ghost"}
@@ -695,23 +683,7 @@ export default function AgentGenieView() {
         
         
         
-        {/* Video Clips Panel */}
-        {showVideoClips && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-2xl mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Vídeo Clips</h2>
-                    <p className="text-xs text-muted-foreground">Cortes automáticos para Reels</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowVideoClips(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <VideoClipsTab />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
+        
         
         {/* Content Test Panel */}
         {showContentTest && (
