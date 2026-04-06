@@ -785,6 +785,24 @@ export default function AgentGenieView() {
             </ScrollArea>
           </div>
         )}
+        
+        {/* Video Clips Panel */}
+        {showVideoClips && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Vídeo Clips</h2>
+                    <p className="text-xs text-muted-foreground">Cortes automáticos para Reels</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowVideoClips(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <VideoClipsTab />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
       </div>
     )}
     </div>
