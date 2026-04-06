@@ -113,3 +113,6 @@ verify_jwt = false
 
 [functions.download-stock-video]
 verify_jwt = false
+
+[functions.search-youtube-videos]
+verify_jwt = false
