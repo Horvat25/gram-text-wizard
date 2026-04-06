@@ -313,7 +313,10 @@ function TestDetailView({
           {post.status === 'draft' && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-3">
-                <p className="text-xs font-semibold">Avaliação & Feedback</p>
+                <div>
+                  <p className="text-xs font-semibold">Avaliação & Feedback</p>
+                  <p className="text-[10px] text-muted-foreground">Seu feedback melhora as próximas gerações automaticamente</p>
+                </div>
 
                 {/* Star rating */}
                 <div className="flex items-center gap-2">
