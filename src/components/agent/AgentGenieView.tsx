@@ -115,7 +115,7 @@ export default function AgentGenieView() {
   
   // Panel states
   const [showAgentChat, setShowAgentChat] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory] = useState(false); // kept for closeAllPanels compat
   const [showFeeds, setShowFeeds] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
   const [showMarketing, setShowMarketing] = useState(false);
@@ -607,18 +607,7 @@ export default function AgentGenieView() {
               <span className="hidden xs:inline sm:inline">Marketing</span>
             </Button>
             
-            <Button
-              variant={showHistory ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showHistory && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('history')}
-            >
-              <History className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Chat</span>
-            </Button>
+            
             
             <Button
               variant={showPostHistory ? "default" : "ghost"}
