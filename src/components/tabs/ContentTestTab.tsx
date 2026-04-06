@@ -162,11 +162,17 @@ function TestDetailView({
         )}
       </div>
 
-      {/* Loading state */}
-      {generating && !post && (
+      {/* Loading / generating state */}
+      {(!post || post.status === 'generating') && (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-xs text-muted-foreground">Gerando conteúdo...</p>
+          <p className="text-sm font-medium text-foreground">Gerando conteúdo...</p>
+          <p className="text-xs text-muted-foreground max-w-xs text-center">
+            O agente está criando imagem, legenda e hashtags. Isso pode levar até 2 minutos.
+          </p>
+          {post?.caption && post.caption.includes('Gerando') && (
+            <Badge variant="secondary" className="text-[10px]">{post.caption}</Badge>
+          )}
         </div>
       )}
 
