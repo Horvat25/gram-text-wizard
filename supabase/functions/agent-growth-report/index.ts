@@ -33,8 +33,8 @@ serve(async (req) => {
     const now = new Date();
     const brasiliaHour = parseInt(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false }));
     
-    // Generate reports 2x daily: 9h and 21h BRT
-    const aiReportHours = [9, 21];
+    // Generate report 1x daily: 21h BRT only
+    const aiReportHours = [21];
     const shouldUseAI = aiReportHours.includes(brasiliaHour);
     const shouldGenerateReport = aiReportHours.includes(brasiliaHour);
 
