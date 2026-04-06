@@ -84,7 +84,7 @@ const CONTENT_TYPES = [
     icon: Tv,
     description: 'Vídeo estilo telejornal a partir de RSS',
     color: 'from-emerald-500 to-green-600',
-    editType: 'rss' as const,
+    editType: 'clips' as const,
   },
   {
     type: 'marketing_image',
