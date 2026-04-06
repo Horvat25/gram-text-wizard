@@ -551,7 +551,8 @@ export default function AgentGenieView() {
             >
               <CalendarDays className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Fila</span>
-            
+            </Button>
+
             <Button
               variant={showGrowth ? "default" : "ghost"}
               size="sm"
