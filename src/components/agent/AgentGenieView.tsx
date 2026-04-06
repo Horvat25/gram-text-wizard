@@ -626,6 +626,19 @@ export default function AgentGenieView() {
               <History className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Posts</span>
             </Button>
+            
+            <Button
+              variant={showVideoClips ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showVideoClips && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('videoClips')}
+            >
+              <Film className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Clips</span>
+            </Button>
           </div>
           
           {/* Right side */}
