@@ -1,119 +1,99 @@
 
-# Diagnóstico Completo de Custos — Corte Máximo de Gastos com IA
 
-## O que foi encontrado nos logs
-
-Analisando os logs ao vivo, encontrei **3 problemas críticos** que estão consumindo seus créditos sem necessidade:
+## Plano: Corrigir Sincronização do Crescimento + Pipeline de Vídeo com Template Branded
 
 ---
 
-### Problema 1 — `add-watermark` chamando IA para CADA imagem de vídeo (MAIOR GASTO)
+### Parte 1 — Corrigir Sincronização da Aba Crescimento
 
-Nos logs do `search-images-for-video`, o sistema está buscando **4 imagens por vídeo** (modo `legacy_segment`). Para cada uma dessas 4 imagens, ele chama `add-watermark`, que por sua vez chama `google/gemini-2.5-flash-image` (modelo de **geração de imagem**, o mais caro) para adicionar apenas um badge pequeno de marca d'água.
+**Diagnóstico**: A função `sync-instagram-metrics` não mostra logs de erro, o que sugere que ela pode estar falhando silenciosamente (timeout, problema de token, ou o erro está sendo capturado no frontend sem mensagem útil). O `handleSync` no `AgentGrowthDashboard.tsx` faz um loop com batches de 50 posts, e se qualquer batch falhar, o erro genérico "Erro ao sincronizar" aparece.
 
+**Correções**:
+
+1. **Melhorar tratamento de erros no frontend** (`AgentGrowthDashboard.tsx`):
+   - Capturar e exibir a mensagem de erro real retornada pela edge function (ex: "Nenhuma conta do Instagram conectada")
+   - Adicionar timeout de 30s por batch para evitar travamentos
+
+2. **Verificar resposta da edge function**: O `supabase.functions.invoke` retorna `{ data, error }` — se a edge function retorna status 400 (ex: "Nenhuma conta conectada"), o SDK trata como `error`, mas o `error` pode não ter a mensagem clara. Vou ajustar para extrair `error.message` ou `error.context?.body` corretamente.
+
+3. **Adicionar log de diagnóstico**: Mostrar no toast qual erro específico ocorreu (token expirado, conta não encontrada, etc.)
+
+---
+
+### Parte 2 — Pipeline de Vídeo com Template Branded "Neural Update"
+
+**Conceito**: O agente baixa vídeos curtos da internet (sobre IA/tech), enquadra dentro de um template visual fixo com a marca Neural Update, e publica como Reels.
+
+**Arquitetura proposta**:
+
+```text
+┌─────────────────────────────────────┐
+│         Template Neural Update       │
+│  ┌─────────────────────────────┐    │
+│  │    NEURAL UPDATE (header)    │    │
+│  ├─────────────────────────────┤    │
+│  │                             │    │
+│  │     VÍDEO DA INTERNET       │    │
+│  │     (área central 80%)      │    │
+│  │                             │    │
+│  ├─────────────────────────────┤    │
+│  │  Headline / Caption (footer) │    │
+│  └─────────────────────────────┘    │
+│  @neuralupdate • IA • Tecnologia    │
+└─────────────────────────────────────┘
 ```
-[add-watermark] ✅ Watermark applied  ← 1 chamada de IA cara por imagem
-[add-watermark] ✅ Watermark applied  ← 2ª chamada
-[add-watermark] ✅ Watermark applied  ← 3ª chamada
-[add-watermark] ✅ Watermark applied  ← 4ª chamada
-```
 
-**4 chamadas ao modelo de imagem mais caro POR VÍDEO.** Isso é desnecessário.
+**Etapas de implementação**:
 
----
+1. **Nova edge function `download-stock-video`**:
+   - Busca vídeos gratuitos no Pexels Video API (já tem `PEXELS_API_KEY`)
+   - Query baseada no tema do post (ex: "artificial intelligence", "robot", "technology")
+   - Baixa vídeo em resolução HD (720p ou 1080p vertical)
+   - Faz upload para o bucket `post-videos` no Storage
 
-### Problema 2 — `apply-text-overlay` também chama `gemini-2.5-flash-image` para headlines
+2. **Nova edge function `frame-video-template`**:
+   - Recebe: URL do vídeo original + headline + branding config
+   - Usa FFmpeg (via servidor Remotion existente ou serviço externo) para:
+     - Redimensionar vídeo para caber na área central (80% da tela)
+     - Adicionar barras superior/inferior com a marca
+     - Inserir texto da headline programaticamente
+     - Exportar como MP4 vertical (1080x1920)
+   - Retorna URL do vídeo processado
 
-Nos posts de notícia, `apply-text-overlay` faz **2 chamadas de IA por post**:
-1. `gemini-2.5-flash-lite` → gera o texto da headline
-2. `gemini-2.5-flash-image` → compõe a imagem com o texto
+3. **Integrar no fluxo do agente** (`ai-agent-core`):
+   - Novo tipo de conteúdo: "video_curated" (vídeo curado da internet)
+   - Fluxo: escolher tema → buscar vídeo no Pexels → aplicar template → agendar publicação
 
-A segunda chamada (composição de imagem) é **muito cara** e pode ser substituída por código puro.
+4. **Template no frontend** (para preview):
+   - Componente React que mostra o preview do vídeo dentro do template
+   - Usa Canvas ou CSS para simular o enquadramento
 
----
+**Dependências técnicas**:
+- A composição de vídeo (FFmpeg) precisa de um serviço de renderização. O projeto já tem `RENDER_SERVICE_URL` e `remotion/` — podemos usar esse pipeline existente ou criar uma edge function com FFmpeg via Deno
+- Alternativa mais simples: usar a API do Pexels para vídeos e aplicar o branding apenas via o encoder que já existe no `video-encoder.ts` (Canvas no browser), que já tem o template Neural Update
 
-### Problema 3 — Meta semanal absurdamente alta (46 posts/semana!)
-
-Os logs mostram:
-```
-Meta semanal: 18/46 posts
-weeklyGoals: { videos: 9, carousels: 6, news: 17, images: 14 }
-```
-
-**46 posts por semana = 6-7 posts por dia.** Cada post gasta créditos de IA. Com essa meta, o agente vai gastar indefinidamente. Isso precisa ser reduzido drasticamente.
-
----
-
-## Solução: Modo "Custo Zero" em 3 Etapas
-
-### Etapa 1 — Substituir IA de imagem por código SVG puro (economy: ~80% dos créditos)
-
-**`add-watermark`**: Remover completamente a chamada ao `gemini-2.5-flash-image`. Substituir por uma técnica de composição programática:
-- Baixar imagem
-- Usar a API de `upload-external-image` já existente para proxy
-- Adicionar o texto de marca d'água como **metadado** no banco de dados (sem modificar a imagem)
-- Ou usar um canvas SVG leve via Deno para sobrescrever o badge
-
-**`apply-text-overlay`**: Remover a segunda chamada ao modelo de imagem. A headline gerada pela primeira chamada (flash-lite, barata) será salva no banco (`overlay_metadata`) e renderizada no **frontend via Canvas HTML** quando o usuário visualizar o post — sem custo de servidor.
-
-### Etapa 2 — Reduzir metas semanais do agente autônomo
-
-As metas atuais de 46 posts/semana serão reduzidas para valores razoáveis:
-- Vídeos: 9 → **2**
-- Carrosséis: 6 → **1**
-- Notícias: 17 → **5**
-- Imagens: 14 → **3**
-
-**Total: 11 posts/semana** (de 46 para 11, corte de 76%)
-
-### Etapa 3 — Otimizar `search-images-for-video` (sem IA para entity extraction)
-
-A função `extractEntities` chama IA para gerar 4 queries de busca de imagem. Isso é desnecessário — o título do artigo já é suficiente para buscar no Pexels. Remover essa chamada de IA e usar o título diretamente como query.
+**Abordagem recomendada** (menor complexidade):
+- Reutilizar o `video-encoder.ts` que já tem branding Neural Update
+- Em vez de gerar 4 imagens com Ken Burns, ele receberia 1 vídeo de fundo + overlays de texto
+- Isso mantém tudo no browser sem precisar de FFmpeg server-side
 
 ---
 
-## Custo estimado APÓS as mudanças
+### Resumo das mudanças
 
-| Item | Antes | Depois |
-|------|-------|--------|
-| Chamadas de imagem IA por vídeo | 4 × caro | 0 (código puro) |
-| Chamadas de imagem IA por notícia | 1 × caro | 0 (Canvas frontend) |
-| Headline de notícia | flash-lite | flash-lite (mantido) |
-| Caption de post | flash-lite | flash-lite (mantido) |
-| Posts por semana | 46 | 11 |
-| Custo estimado/mês | ~$2-3 | ~**$0.05-0.15** |
+| Arquivo | Mudança |
+|---------|---------|
+| `src/components/agent/AgentGrowthDashboard.tsx` | Melhorar tratamento de erros na sincronização |
+| `supabase/functions/download-stock-video/index.ts` | Nova função para buscar vídeos no Pexels |
+| `src/lib/video-encoder.ts` | Adicionar modo "video frame" com template branded |
+| `supabase/functions/ai-agent-core/index.ts` | Adicionar tipo "video_curated" |
 
 ---
 
-## Arquivos que serão modificados
+### Ordem de execução sugerida
 
-### `supabase/functions/add-watermark/index.ts`
-- **Remover**: Função `applyWatermarkOnly` e `applyHeadlineWithAI` (ambas chamam `gemini-2.5-flash-image`)
-- **Adicionar**: Upload direto da imagem original para Storage sem modificação de IA, retornando a URL com os dados de marca d'água como metadado
-- **Resultado**: Zero custo de IA por watermark
+1. Primeiro: corrigir a sincronização (impacto imediato)
+2. Segundo: implementar download de vídeo stock via Pexels
+3. Terceiro: adaptar o encoder para enquadrar vídeo em template
+4. Quarto: integrar no agente autônomo
 
-### `supabase/functions/apply-text-overlay/index.ts`
-- **Remover**: Chamada ao `gemini-2.5-flash-image` na função `createProgrammaticOverlay`
-- **Manter**: Apenas a chamada `gemini-2.5-flash-lite` para gerar texto da headline (custo muito baixo)
-- **Adicionar**: Retornar a imagem original + texto da headline nos metadados (o frontend aplica o overlay via Canvas)
-- **Resultado**: 1 chamada barata (flash-lite) ao invés de 1 cara (flash-image)
-
-### `supabase/functions/search-images-for-video/index.ts`
-- **Remover**: Chamada à função `extractEntities` que usa IA para gerar queries (essa função chama flash-lite mas não é necessária)
-- **Manter**: Busca Pexels usando o título/topic diretamente
-- **Resultado**: Zero chamadas de IA para buscar imagens
-
-### `supabase/functions/ai-agent-core/index.ts`
-- **Modificar**: Reduzir `weeklyGoals` padrão de `{ videos: 9, carousels: 6, news: 17, images: 14 }` para `{ videos: 2, carousels: 1, news: 5, images: 3 }`
-- **Resultado**: Agente criará 11 posts/semana em vez de 46
-
-### Banco de dados — `agent_context`
-- Reset dos goals na tabela para os novos valores menores
-
----
-
-## Resumo do impacto
-
-O gasto principal não era o chat com o agente, mas sim o `add-watermark` sendo chamado **dezenas de vezes por hora** (para cada imagem de cada vídeo criado automaticamente), usando o modelo de geração de imagem mais caro. Com o agente autônomo rodando a cada 2 horas e criando vídeos com 4 imagens cada, isso acumula rápido.
-
-As mudanças propostas eliminam **~95% dos gastos de IA** mantendo toda a funcionalidade visual intacta, apenas movendo a renderização do texto de "servidor caro" para "navegador gratuito".
