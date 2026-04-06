@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import CostSummaryPanel from './CostSummaryPanel';
+import StrategyPanel from './StrategyPanel';
+import { DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -191,23 +193,57 @@ export default function ContentTestTab() {
     }
   };
 
+  const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
+
   return (
     <div className="space-y-4">
-      <div className="space-y-1">
-        <h2 className="flex items-center gap-2 text-sm font-semibold">
-          <Sparkles className="h-4 w-4 text-primary" />
-          Teste de Conteúdo
-        </h2>
-        <p className="text-xs text-muted-foreground">
-          Gere 1 exemplo de cada tipo para conferir qualidade, legenda, imagem e roteiro.
-        </p>
+      {/* Sub-tab toggle */}
+      <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+        <button
+          onClick={() => setSubTab('teste')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all',
+            subTab === 'teste'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          Teste
+        </button>
+        <button
+          onClick={() => setSubTab('custo')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all',
+            subTab === 'custo'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <DollarSign className="h-3.5 w-3.5" />
+          Custo
+        </button>
       </div>
 
-      {/* Cost summary panel */}
-      <CostSummaryPanel />
+      {subTab === 'custo' ? (
+        <div className="space-y-4">
+          <CostSummaryPanel />
+          <StrategyPanel />
+        </div>
+      ) : (
+        <>
+          <div className="space-y-1">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Teste de Conteúdo
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Gere 1 exemplo de cada tipo para conferir qualidade, legenda, imagem e roteiro.
+            </p>
+          </div>
 
-      <div className="space-y-3">
-        {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color }) => {
+          <div className="space-y-3">
+            {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color }) => {
           const isGenerating = generating === type;
           const result = results[type];
           const post = result?.post;
@@ -463,7 +499,9 @@ export default function ContentTestTab() {
             </Card>
           );
         })}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
