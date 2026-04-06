@@ -420,9 +420,9 @@ export default function VideoClipsTab() {
           <CardContent className="flex items-center gap-3 py-3">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <div>
-              <p className="text-sm font-medium">Gerando os cortes...</p>
+              <p className="text-sm font-medium">Gerando o corte...</p>
               <p className="text-xs text-muted-foreground">
-                Indo até a fonte, pegando o último vídeo e montando os roteiros.
+                Indo até a fonte, pegando o último vídeo e montando o roteiro.
               </p>
             </div>
           </CardContent>
@@ -441,7 +441,7 @@ export default function VideoClipsTab() {
             <Film className="mb-3 h-10 w-10 text-muted-foreground/50" />
             <p className="text-sm font-medium">Nenhum clip gerado ainda</p>
             <p className="mb-4 mt-1 text-xs text-muted-foreground">
-              Escolha uma fonte e gere 5 cortes para analisar o roteiro antes de publicar.
+              Escolha uma fonte e gere 1 corte para analisar o roteiro antes de processar.
             </p>
           </CardContent>
         </Card>
