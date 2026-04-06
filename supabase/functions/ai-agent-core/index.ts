@@ -1201,7 +1201,7 @@ OBRIGATÓRIO ao final:
       is_news_broadcast: isNewsBroadcast,
       needs_processing: true,
       created_by_agent: true,
-      publish_after_render: autoPublish
+      publish_after_render: false
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
@@ -1214,61 +1214,20 @@ OBRIGATÓRIO ao final:
     await supabase.from('rss_items').update({ used_in_post_id: post.id }).eq('id', (plan as any)._rssItemId);
   }
   
-  // STEP 4: Tentar renderização externa (se RENDER_SERVICE_URL configurado)
+  // STEP 4: Renderização manual בלבד
   if (images.length >= 2) {
-    console.log('[AGENT] Solicitando renderização externa...');
-    
-    try {
-      const renderResponse = await fetch(`${supabaseUrl}/functions/v1/request-video-render`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          images,
-          duration_per_image: 3,
-          resolution: '1080x1920',
-          platform: 'instagram_reels',
-          transition: 'fade',
-          post_id: post.id,
-          workspace_id: workspaceId
-        })
-      });
-      
-      const renderResult = await renderResponse.json();
-      
-      if (renderResult.success && renderResult.video_url) {
-        // Sucesso! Vídeo renderizado externamente
-        console.log('[AGENT] ✅ Vídeo renderizado externamente:', renderResult.video_url);
-        
-        await supabase.from('posts').update({
-          video_url: renderResult.video_url,
-          status: autoPublish ? 'scheduled' : 'draft',
-          scheduled_for: autoPublish ? new Date().toISOString() : null,
-          overlay_metadata: {
-            ...post.overlay_metadata,
-            needs_processing: false,
-            render_source: 'external',
-            rendered_at: new Date().toISOString()
-          }
-        }).eq('id', post.id);
-        
-      } else {
-        // Serviço externo não disponível ou falhou
-        console.log('[AGENT] Renderização externa não disponível:', renderResult.error || 'sem resposta');
-        console.log('[AGENT] Vídeo salvo como rascunho - aguardando configuração do serviço de renderização');
-        
-        // Atualizar post com mensagem informativa
-        await supabase.from('posts').update({
-          error_message: 'Aguardando serviço de renderização externo (RENDER_SERVICE_URL)',
-          overlay_metadata: {
-            ...post.overlay_metadata,
-            needs_processing: true,
-            render_status: 'pending_external_service'
-          }
-        }).eq('id', post.id);
+    console.log('[AGENT] Auto-render desabilitado. Vídeo salvo como rascunho para renderização manual.');
+    await supabase.from('posts').update({
+      status: 'draft',
+      error_message: null,
+      overlay_metadata: {
+        ...post.overlay_metadata,
+        needs_processing: true,
+        render_status: 'manual_pending',
+        render_source: 'manual',
+        publish_after_render: false,
       }
-    } catch (renderError: any) {
-      console.log('[AGENT] Erro ao solicitar renderização:', renderError.message);
-    }
+    }).eq('id', post.id);
   } else {
     console.log('[AGENT] Imagens insuficientes para vídeo:', images.length);
     await supabase.from('posts').update({

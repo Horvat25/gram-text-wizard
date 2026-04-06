@@ -97,8 +97,10 @@ const buildNarrationCandidates = (text: string) => {
       Math.min(totalWords, VIDEO_CONFIG.WORDS_PER_SEGMENT + 2),
       Math.min(totalWords, VIDEO_CONFIG.WORDS_PER_SEGMENT),
       Math.min(totalWords, Math.max(8, VIDEO_CONFIG.WORDS_PER_SEGMENT - 2)),
+      Math.min(totalWords, 5),
       Math.min(totalWords, 6),
       Math.min(totalWords, 4),
+      Math.min(totalWords, 3),
     ]),
   )
     .filter((budget) => budget > 0)
@@ -106,6 +108,52 @@ const buildNarrationCandidates = (text: string) => {
 
   return Array.from(new Set(budgets.map((budget) => trimNarrationText(normalized, budget)).filter(Boolean)));
 };
+
+const DEFAULT_NARRATION_PADDING = 0.18;
+
+async function audioUrlToArrayBuffer(audioUrl: string): Promise<ArrayBuffer> {
+  if (audioUrl.startsWith("data:")) {
+    const base64 = audioUrl.split(",")[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  }
+
+  const response = await fetch(audioUrl);
+  return await response.arrayBuffer();
+}
+
+function fitSegmentDurationsToBudget(
+  durations: number[],
+  speechDurations: number[],
+  maxTotalDuration: number,
+): number[] | null {
+  const adjustedDurations = [...durations];
+  let overflow = adjustedDurations.reduce((sum, duration) => sum + duration, 0) - maxTotalDuration;
+
+  if (overflow <= 0.01) {
+    return adjustedDurations;
+  }
+
+  for (let index = adjustedDurations.length - 1; index >= 0 && overflow > 0.01; index--) {
+    const minDuration = Math.max(
+      VIDEO_CONFIG.MIN_SEGMENT_DURATION,
+      speechDurations[index] || VIDEO_CONFIG.MIN_SEGMENT_DURATION,
+    );
+    const removableDuration = Math.max(0, adjustedDurations[index] - minDuration);
+
+    if (removableDuration <= 0) continue;
+
+    const reduction = Math.min(removableDuration, overflow);
+    adjustedDurations[index] -= reduction;
+    overflow -= reduction;
+  }
+
+  return overflow <= 0.01 ? adjustedDurations : null;
+}
 
 export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
   const requestedSegmentCount = options.segmentCount ?? VIDEO_CONFIG.SEGMENT_COUNT;
@@ -340,6 +388,32 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     });
   }, []);
 
+  const decodeAudioBuffer = useCallback(async (audioUrl: string): Promise<AudioBuffer | null> => {
+    const AudioContextConstructor = globalThis.AudioContext;
+    if (!AudioContextConstructor) {
+      return null;
+    }
+
+    let audioContext: AudioContext | null = null;
+
+    try {
+      audioContext = new AudioContextConstructor();
+      if (audioContext.state === "suspended") {
+        await audioContext.resume().catch(() => {});
+      }
+
+      const arrayBuffer = await audioUrlToArrayBuffer(audioUrl);
+      return await audioContext.decodeAudioData(arrayBuffer.slice(0));
+    } catch (error) {
+      console.warn("[decodeAudioBuffer] Failed to decode audio", error);
+      return null;
+    } finally {
+      if (audioContext) {
+        await audioContext.close().catch(() => {});
+      }
+    }
+  }, []);
+
   // ═══ Step 3: Generate per-segment narration — ElevenLabs first, with safe fallbacks ═══
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "", segmentDurations: [] as number[] };
@@ -481,6 +555,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       console.log("[TTS] 🎯 Generating PER-SEGMENT narration with protected fallback chain...");
       
       const segmentAudioUrls: string[] = [];
+      const segmentAudioBuffers: (AudioBuffer | null)[] = [];
       const finalSegmentTexts: string[] = [];
       let accumulatedNarrationDuration = 0;
       
@@ -500,6 +575,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
         const narrationCandidates = buildNarrationCandidates(segments[i].text);
         let selectedAudioUrl: string | null = null;
+        let selectedAudioBuffer: AudioBuffer | null = null;
         let selectedProvider = "none";
         let selectedText = narrationCandidates[0] || trimNarrationText(segments[i].text, VIDEO_CONFIG.WORDS_PER_SEGMENT);
         let selectedDuration = 0;
@@ -508,12 +584,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const { audioUrl, provider } = await callNarrationTTS(candidateText);
           if (!audioUrl) continue;
 
-          const measuredDuration = await getAudioDuration(audioUrl);
+          const decodedBuffer = await decodeAudioBuffer(audioUrl);
+          const measuredDuration = decodedBuffer?.duration || await getAudioDuration(audioUrl);
+          const safePadding = measuredDuration > 0
+            ? Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration))
+            : DEFAULT_NARRATION_PADDING;
           const visualDuration = measuredDuration > 0
-            ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + 0.3)
+            ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding)
             : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, candidateText.split(/\s+/).length / 2.0);
 
           selectedAudioUrl = audioUrl;
+          selectedAudioBuffer = decodedBuffer;
           selectedProvider = provider;
           selectedText = candidateText;
           selectedDuration = visualDuration;
@@ -532,6 +613,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
 
         segmentAudioUrls.push(selectedAudioUrl);
+        segmentAudioBuffers.push(selectedAudioBuffer);
         finalSegmentTexts.push(selectedText);
         segmentDurations.push(selectedDuration);
         accumulatedNarrationDuration += selectedDuration;
@@ -554,28 +636,26 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         try {
           const offlineCtx = new AudioContext();
           const buffers: (AudioBuffer | null)[] = [];
+          const speechDurations: number[] = [];
           
            for (let i = 0; i < segmentAudioUrls.length; i++) {
-             const url = segmentAudioUrls[i];
+              const url = segmentAudioUrls[i];
             try {
-              let arrayBuffer: ArrayBuffer;
-              if (url.startsWith('data:')) {
-                const base64 = url.split(',')[1];
-                const binary = atob(base64);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-                arrayBuffer = bytes.buffer;
-              } else {
-                const resp = await fetch(url);
-                arrayBuffer = await resp.arrayBuffer();
-              }
-              const decoded = await offlineCtx.decodeAudioData(arrayBuffer);
+               const cachedBuffer = segmentAudioBuffers[i];
+               const decoded = cachedBuffer || (await decodeAudioBuffer(url));
+               if (!decoded) {
+                 throw new Error(`Falha ao decodificar o áudio da cena ${i + 1}.`);
+               }
               buffers.push(decoded);
+               speechDurations.push(decoded.duration);
               
               // ★ RECONCILE: Use decoded buffer duration as ground truth
               // This catches cases where getAudioDuration returned 0 but buffer is valid
               if (decoded.duration > 0) {
-                const correctedDuration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, decoded.duration + 0.3);
+                 const correctedDuration = Math.max(
+                   VIDEO_CONFIG.MIN_SEGMENT_DURATION,
+                   decoded.duration + Math.max(0, Math.min(DEFAULT_NARRATION_PADDING, segmentDurations[i] - decoded.duration)),
+                 );
                  const idx = buffers.length - 1;
                 if (Math.abs(correctedDuration - segmentDurations[idx]) > 0.5) {
                   console.log(`[TTS] ⚡ Reconciled seg ${idx + 1}: ${segmentDurations[idx].toFixed(1)}s → ${correctedDuration.toFixed(1)}s (from decoded buffer)`);
@@ -587,6 +667,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
                throw new Error(`Falha ao processar o áudio da cena ${i + 1}. O vídeo foi cancelado para não sair com silêncio.`);
             }
           }
+
+           const adjustedDurations = fitSegmentDurationsToBudget(segmentDurations, speechDurations, maxNarrationDuration);
+           if (!adjustedDurations) {
+             throw new Error("A narração final ainda ficou longa demais para o formato atual.");
+           }
+
+           if (adjustedDurations.some((duration, index) => Math.abs(duration - segmentDurations[index]) > 0.01)) {
+             console.log("[TTS] Ajustando pequenos intervalos entre cenas para manter o vídeo dentro do limite.");
+             segmentDurations.splice(0, segmentDurations.length, ...adjustedDurations);
+           }
           
           const totalNarrationDuration = segmentDurations.reduce((a, b) => a + b, 0);
           const sampleRate = buffers.find(b => b)?.sampleRate || 44100;
@@ -658,7 +748,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       setState(prev => ({ ...prev, progress: 80 }));
       return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript, segmentDurations: [] as number[] };
     }
-  }, [getAudioDuration]);
+  }, [decodeAudioBuffer, getAudioDuration]);
 
   // ═══ Step 4: Generate video ═══
   const generateVideo = useCallback(async (
@@ -700,8 +790,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       );
       const totalDuration = narrationDuration + VIDEO_CONFIG.NARRATION_CTA_GAP + ctaDuration;
 
-      if (totalDuration > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
-        throw new Error(`O roteiro ficou longo demais para o formato atual. Use o preset de ~20s ou ~30s.`);
+      if (totalDuration > VIDEO_CONFIG.MAX_TOTAL_DURATION + 0.15) {
+        throw new Error("A duração final ainda passou do limite do formato.");
       }
       
       toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s, ${segments.length} cenas)...`);
