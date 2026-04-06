@@ -3310,8 +3310,8 @@ async function processWorkspace(
         theme: decision.contentPlan.theme
       }));
       
-      // Check if auto_post is enabled - pass to executeContentPlan
-      const autoPublish = state.context?.auto_post_enabled || false;
+      // Check if auto_post is enabled - but NEVER auto-publish test content
+      const autoPublish = trigger === 'test' ? false : (state.context?.auto_post_enabled || false);
       post = await executeContentPlan(supabase, decision.contentPlan, userId, workspaceId, supabaseUrl, autoPublish);
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
