@@ -461,14 +461,7 @@ export default function AgentGenieView() {
           agentAvatar={agentConfig.agent_avatar_url}
         />
         
-        {/* Chat History */}
-        <AgentChatPanel
-          isOpen={showHistory}
-          onClose={() => setShowHistory(false)}
-          messages={tkMessages}
-          agentName={agentConfig.agent_name}
-          agentAvatar={agentConfig.agent_avatar_url}
-        />
+        {/* Chat history moved into Agente panel */}
         
         {/* TikTok Queue Panel */}
         {showTikTokQueue && (
