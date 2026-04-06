@@ -381,6 +381,50 @@ export default function ContentTestTab() {
   const [editingType, setEditingType] = useState<string | null>(null);
   const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
 
+  // Poll a post until it's no longer 'generating'
+  const pollPost = async (postId: string, contentType: string) => {
+    const maxAttempts = 60; // ~2 minutes
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise((r) => setTimeout(r, 2000));
+
+      const { data: post } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', postId)
+        .single();
+
+      if (!post) continue;
+
+      if (post.status !== 'generating') {
+        setResults((prev) => ({
+          ...prev,
+          [contentType]: { post, agentResponse: { decision: post.status === 'failed' ? 'FAILED' : 'POST' } },
+        }));
+        setGenerating(null);
+
+        if (post.status === 'failed') {
+          toast.error(post.error_message || 'Falha ao gerar conteúdo');
+        } else {
+          toast.success('Conteúdo gerado! Revise e dê feedback.');
+        }
+        return;
+      }
+
+      // Update progress in UI
+      setResults((prev) => ({
+        ...prev,
+        [contentType]: {
+          post: { ...post, caption: `⏳ Gerando... (${i * 2}s)` },
+          agentResponse: { decision: 'GENERATING' },
+        },
+      }));
+    }
+
+    // Timeout
+    setGenerating(null);
+    toast.error('Geração demorou demais. Verifique a aba Fila.');
+  };
+
   const generateTest = async (contentType: string, feedbackHint?: string) => {
     if (!user || !currentWorkspace) return;
 
@@ -390,7 +434,7 @@ export default function ContentTestTab() {
     try {
       // Delete previous draft if regenerating
       const prevPost = results[contentType]?.post;
-      if (prevPost?.id && prevPost.status === 'draft') {
+      if (prevPost?.id && (prevPost.status === 'draft' || prevPost.status === 'generating')) {
         await supabase.from('posts').delete().eq('id', prevPost.id);
       }
 
@@ -418,25 +462,25 @@ export default function ContentTestTab() {
       if (data?.error) throw new Error(data.error);
 
       const post = data.post;
-      if (post && post.status === 'published') {
-        await supabase
-          .from('posts')
-          .update({ status: 'draft', published_at: null })
-          .eq('id', post.id);
-        post.status = 'draft';
-        post.published_at = null;
-      }
 
+      // Set initial result (might be placeholder with status 'generating')
       setResults((prev) => ({
         ...prev,
         [contentType]: { post, agentResponse: data.agent_response },
       }));
 
-      toast.success('Conteúdo gerado! Revise e dê feedback.');
+      // If polling mode, start polling
+      if (data.polling && post?.id) {
+        toast.info('Gerando conteúdo em segundo plano...');
+        pollPost(post.id, contentType);
+      } else {
+        // Direct result (shouldn't happen anymore but fallback)
+        setGenerating(null);
+        toast.success('Conteúdo gerado! Revise e dê feedback.');
+      }
     } catch (e: any) {
       console.error(`Error generating ${contentType}:`, e);
       toast.error(e.message || `Erro ao gerar ${contentType}`);
-    } finally {
       setGenerating(null);
     }
   };
