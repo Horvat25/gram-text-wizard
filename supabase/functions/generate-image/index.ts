@@ -121,7 +121,7 @@ async function generateWithDallE3(prompt: string, format: string, OPENAI_API_KEY
     },
     body: JSON.stringify({
       model: "dall-e-3",
-      prompt: `${prompt}. Ultra high quality, professional, vibrant colors, no watermarks.`,
+      prompt: `${prompt}. Ultra high quality, professional, vibrant colors, no watermarks. CRITICAL: DO NOT include any text, words, letters or numbers in the image. The image must be purely visual with no typography.`,
       n: 1,
       size: size,
       quality: "hd",
@@ -169,13 +169,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Build optimized prompt - PORTUGUESE ONLY
+    // Build optimized prompt - NO TEXT IN IMAGE
     const currentYear = new Date().getFullYear(); // 2026
     const styleInstructions = customStyle 
       ? `${customStyle}. Qualidade profissional, cores vibrantes.` 
       : `Profissional, alta qualidade, cores vibrantes, composição equilibrada. Estética moderna.`;
     
-    const optimizedPrompt = `${prompt}. ${styleInstructions}. Contexto: ano ${currentYear}. Todo texto na imagem deve ser em PORTUGUÊS BRASILEIRO. Não use inglês.`;
+    const optimizedPrompt = `${prompt}. ${styleInstructions}. Contexto: ano ${currentYear}. ⛔ NÃO INCLUA NENHUM TEXTO, PALAVRA, LETRA OU NÚMERO NA IMAGEM. A imagem deve ser 100% visual sem elementos tipográficos. Textos serão adicionados programaticamente depois.`;
 
     let imageUrl: string;
     let modelUsed: string;
