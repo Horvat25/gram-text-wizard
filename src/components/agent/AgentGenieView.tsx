@@ -1,11 +1,9 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
-  Rss, 
   Loader2,
   Settings,
   TrendingUp,
-  Megaphone,
   Bot,
   History,
   CalendarDays,
