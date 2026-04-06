@@ -79,6 +79,13 @@ REGRAS:
 - NÃO mencione o canal original ou criador
 - Fale como se fosse conteúdo original do Neural Update
 
+REGRAS DE SELEÇÃO DE SEGMENTOS (CRÍTICO):
+- NUNCA use trechos onde aparece um humano/apresentador falando para a câmera
+- APENAS use trechos de B-roll: imagens do TEMA sendo discutido (produto, tecnologia, demonstração, animação, gráficos)
+- Se o vídeo mostra alguém falando sobre carros elétricos, pegue APENAS os trechos que mostram os carros, NÃO a pessoa falando
+- Ignore qualquer frame com logos/watermarks do canal original
+- Priorize: demonstrações de produto > animações/gráficos > imagens aéreas > close-ups de tecnologia
+
 Também crie uma HEADLINE curta (max 50 chars) para overlay no vídeo.
 
 Responda em JSON:
@@ -90,6 +97,9 @@ Responda em JSON:
     { "text": "contexto...", "duration": 10 },
     { "text": "impacto...", "duration": 10 },
     { "text": "conclusão...", "duration": 5 }
+  ],
+  "broll_timestamps": [
+    { "start": 0, "end": 10, "description": "imagem do produto/tecnologia sem humanos" }
   ]
 }`
               },
