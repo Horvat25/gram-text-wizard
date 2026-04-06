@@ -3277,6 +3277,7 @@ async function processWorkspace(
         'marketing_video': { mediaType: 'reels', format: 'vendas', theme: 'produto afiliado VSL', actualType: 'marketing' },
       };
       const selected = contentTypeMap[forceContentType] || contentTypeMap['image'];
+      const resolvedType = (selected as any).actualType || forceContentType;
       decision = {
         decision: 'POST',
         reason: `Teste forçado: ${forceContentType}`,
@@ -3288,7 +3289,7 @@ async function processWorkspace(
           tone: 'profissional e envolvente',
           objective: 'engajamento',
           platforms: state.context?.preferred_platforms || ['instagram'],
-          contentType: forceContentType,
+          contentType: resolvedType as ContentType,
         },
         hypothesis: `Teste de ${forceContentType}`,
         expectedEngagement: 5,
