@@ -218,7 +218,7 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
 
         hasMore = Boolean(data?.has_more);
-        offset = data?.next_offset ?? offset + 50;
+        offset = data?.next_offset ?? offset + 25;
         guard += 1;
 
         if (hasMore) {
