@@ -19,18 +19,16 @@ import {
   Moon, 
   Sun,
   Settings as SettingsIcon,
-  Sparkles,
   Link2,
   Plus,
   AlertCircle,
   RefreshCw,
   Save,
   RotateCcw,
-  Image,
   Video,
-  Mic,
-  Play,
-  DollarSign
+  DollarSign,
+  Trash2,
+  Timer,
 } from "lucide-react";
 import Header from "@/components/Header";
 import { AICostsTab } from "@/components/settings/AICostsTab";
