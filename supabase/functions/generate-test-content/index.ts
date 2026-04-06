@@ -115,6 +115,18 @@ Deno.serve(async (req) => {
       post = data;
     }
 
+    // SAFETY: Force test posts to draft status — never auto-publish
+    if (post && post.status !== 'draft' && post.status !== 'failed') {
+      console.log(`[test-content] Forçando status draft (era: ${post.status})`);
+      await supabase
+        .from("posts")
+        .update({ status: 'draft', scheduled_for: null, published_at: null })
+        .eq("id", post.id);
+      post.status = 'draft';
+      post.scheduled_for = null;
+      post.published_at = null;
+    }
+
     return new Response(
       JSON.stringify({
         success: true,

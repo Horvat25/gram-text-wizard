@@ -3265,16 +3265,19 @@ async function processWorkspace(
     let decision: AgentDecision;
     if (skipLimitCheck && forceContentType) {
       // Skip all checks for test mode - go straight to POST
-      const contentTypeMap: Record<string, { mediaType: string; format: string; theme: string }> = {
+      const contentTypeMap: Record<string, { mediaType: string; format: string; theme: string; actualType?: ContentType }> = {
         'video': { mediaType: 'reels', format: 'storytelling', theme: 'tendência tecnológica impactante' },
         'video_curated': { mediaType: 'reels', format: 'noticia', theme: 'vídeo curado sobre IA e tecnologia' },
         'carousel': { mediaType: 'carousel', format: 'educacional', theme: 'dicas práticas de tecnologia' },
         'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
         'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
         'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
-        'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
+        'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' },
+        'marketing_image': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado', actualType: 'marketing' },
+        'marketing_video': { mediaType: 'reels', format: 'vendas', theme: 'produto afiliado VSL', actualType: 'marketing' },
       };
       const selected = contentTypeMap[forceContentType] || contentTypeMap['image'];
+      const resolvedType = (selected as any).actualType || forceContentType;
       decision = {
         decision: 'POST',
         reason: `Teste forçado: ${forceContentType}`,
@@ -3286,7 +3289,7 @@ async function processWorkspace(
           tone: 'profissional e envolvente',
           objective: 'engajamento',
           platforms: state.context?.preferred_platforms || ['instagram'],
-          contentType: forceContentType,
+          contentType: resolvedType as ContentType,
         },
         hypothesis: `Teste de ${forceContentType}`,
         expectedEngagement: 5,
@@ -3310,8 +3313,8 @@ async function processWorkspace(
         theme: decision.contentPlan.theme
       }));
       
-      // Check if auto_post is enabled - pass to executeContentPlan
-      const autoPublish = state.context?.auto_post_enabled || false;
+      // Check if auto_post is enabled - but NEVER auto-publish test content
+      const autoPublish = trigger === 'test' ? false : (state.context?.auto_post_enabled || false);
       post = await executeContentPlan(supabase, decision.contentPlan, userId, workspaceId, supabaseUrl, autoPublish);
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
