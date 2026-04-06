@@ -2074,6 +2074,305 @@ REGRAS OBRIGATÓRIAS:
   return post;
 }
 
+// Create MARKETING VIDEO content - VSL-style Reel for affiliate products
+// Deep research via Firecrawl → VSL script → AI images → video Reel
+async function createMarketingVideoContent(
+  supabase: any,
+  plan: ContentPlan,
+  userId: string,
+  workspaceId: string,
+  supabaseUrl: string,
+  headers: any,
+  autoPublish: boolean = false
+): Promise<any> {
+  console.log('[AGENT] 🎬 Criando VÍDEO de MARKETING/AFILIADO (VSL)');
+  
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+  
+  // 1. Get active affiliate link (least recently posted)
+  const { data: affiliateLinks, error: affErr } = await supabase
+    .from('affiliate_links')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .eq('is_active', true)
+    .order('last_posted_at', { ascending: true, nullsFirst: true })
+    .limit(5);
+  
+  if (affErr || !affiliateLinks || affiliateLinks.length === 0) {
+    console.log('[AGENT] ⚠️ Nenhum link de afiliado ativo para vídeo!');
+    const { data: failPost } = await supabase.from('posts').insert({
+      user_id: userId, workspace_id: workspaceId,
+      caption: '⚠️ Nenhum link de afiliado ativo para criar vídeo de marketing',
+      hashtags: ['#marketing'], post_type: 'afiliado', media_type: 'reels',
+      platforms: plan.platforms || ['instagram'], status: 'failed',
+      error_message: 'Sem links de afiliado ativos.',
+      ai_model_used: 'none'
+    }).select().single();
+    return failPost;
+  }
+  
+  // Pick affiliate with video format preference, or least posted
+  const videoAffiliates = affiliateLinks.filter((a: any) => a.media_format === 'video');
+  const selectedAffiliate = videoAffiliates.length > 0 ? videoAffiliates[0] : affiliateLinks[0];
+  console.log(`[AGENT] 🎯 Afiliado para vídeo: ${selectedAffiliate.product_name}`);
+  
+  // 2. DEEP RESEARCH via Firecrawl - search for product info, reviews, benefits
+  let productResearch = '';
+  let researchArticles: { title: string; description: string; markdown: string }[] = [];
+  
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        query: `${selectedAffiliate.product_name} review benefícios vale a pena funcionalidades`,
+        limit: 5, lang: 'pt-BR'
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      researchArticles = (searchResult.data || []).slice(0, 5);
+      productResearch = researchArticles.map((a: any) => 
+        `TÍTULO: ${a.title}\nDESCRIÇÃO: ${a.description || ''}\nCONTEÚDO: ${(a.markdown || '').substring(0, 500)}`
+      ).join('\n\n---\n\n');
+      console.log(`[AGENT] 🔍 Pesquisa profunda: ${researchArticles.length} artigos encontrados`);
+    }
+  } catch (e: any) {
+    console.log(`[AGENT] Pesquisa Firecrawl falhou (${e.name || e.message}), usando descrição do cadastro`);
+  }
+  
+  // Search 2: Product use cases and comparisons
+  let useCaseResearch = '';
+  try {
+    const controller2 = new AbortController();
+    const timer2 = setTimeout(() => controller2.abort(), 8000);
+    const searchResponse2 = await fetch(`${supabaseUrl}/functions/v1/firecrawl-search`, {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        query: `${selectedAffiliate.product_name} como usar tutorial casos de uso`,
+        limit: 3, lang: 'pt-BR'
+      }),
+      signal: controller2.signal,
+    });
+    clearTimeout(timer2);
+    
+    if (searchResponse2.ok) {
+      const result2 = await searchResponse2.json();
+      useCaseResearch = (result2.data || []).slice(0, 3).map((a: any) => 
+        `${a.title}: ${(a.markdown || a.description || '').substring(0, 300)}`
+      ).join('\n');
+      console.log(`[AGENT] 🔍 Pesquisa de casos de uso: ${(result2.data || []).length} resultados`);
+    }
+  } catch (e: any) {
+    console.log(`[AGENT] Pesquisa de use cases falhou: ${e.name || e.message}`);
+  }
+  
+  // 3. Generate VSL SCRIPT via AI with deep research context
+  let scriptSegments: { text: string; imagePrompt: string }[] = [];
+  
+  if (lovableApiKey) {
+    console.log('[AGENT] 🎬 Generating VSL marketing script with research...');
+    try {
+      const vslPrompt = `Você é um roteirista de vídeos de venda (VSL) para Reels do Instagram.
+Crie um roteiro de narração persuasiva para um Reel de ~30 segundos vendendo este produto:
+
+PRODUTO: ${selectedAffiliate.product_name}
+DESCRIÇÃO: ${selectedAffiliate.description || 'Sem descrição'}
+ESTRATÉGIA: ${selectedAffiliate.marketing_strategy || 'Venda autêntica e contextual'}
+LINK: ${selectedAffiliate.affiliate_url}
+
+${productResearch ? `\n=== PESQUISA WEB SOBRE O PRODUTO ===\n${productResearch}\n` : ''}
+${useCaseResearch ? `\n=== CASOS DE USO ===\n${useCaseResearch}\n` : ''}
+
+ESTRUTURA VSL OBRIGATÓRIA (5 cenas):
+1. HOOK (3-4s): Comece com uma DOR ou DESEJO do público. Frase provocativa que gera identificação imediata.
+2. PROBLEMA (5-6s): Aprofunde a dor. Mostre que você entende o problema. Use dados reais da pesquisa.
+3. SOLUÇÃO (6-7s): Apresente o produto como solução natural. Mencione funcionalidades REAIS.
+4. PROVA (5-6s): Social proof, resultados, diferenciais competitivos reais.
+5. CTA (3-4s): Call-to-action natural. "Link na bio" ou "Confere o link". NÃO seja agressivo.
+
+REGRAS CRÍTICAS:
+- TOM: Recomendação genuína de amigo, NÃO vendedor
+- Use DADOS REAIS da pesquisa web (features, preços, diferenciais)
+- JAMAIS invente funcionalidades inexistentes
+- Cada segmento: 20-45 palavras
+- PT-BR coloquial mas profissional
+- imagePrompt: visual cinematográfico em inglês (sem texto na imagem)
+
+Responda em JSON:
+{
+  "segments": [
+    { "text": "narração em português", "imagePrompt": "visual description in english, cinematic, no text" }
+  ]
+}`;
+
+      const scriptResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${lovableApiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [{ role: 'user', content: vslPrompt }],
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (scriptResponse.ok) {
+        const scriptResult = await scriptResponse.json();
+        const content = scriptResult.choices?.[0]?.message?.content;
+        if (content) {
+          try {
+            const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            const parsed = JSON.parse(cleanContent);
+            if (parsed.segments && Array.isArray(parsed.segments) && parsed.segments.length >= 4) {
+              const validSegments = parsed.segments.filter((s: any) => 
+                s.text && typeof s.text === 'string' && s.text.length > 10
+              );
+              if (validSegments.length >= 4) {
+                scriptSegments = validSegments.slice(0, 5);
+                console.log(`[AGENT] ✅ VSL script generated (${scriptSegments.length} segments)`);
+              }
+            }
+          } catch (parseErr) {
+            console.log('[AGENT] ⚠️ Failed to parse VSL script JSON:', parseErr);
+          }
+        }
+      }
+    } catch (e) {
+      console.log('[AGENT] Error generating VSL script:', e);
+    }
+  }
+  
+  // Fallback script
+  if (scriptSegments.length < 4) {
+    const pn = selectedAffiliate.product_name;
+    scriptSegments = [
+      { text: `Você já se perguntou como simplificar sua rotina digital?`, imagePrompt: `Person frustrated at computer, modern workspace, warm lighting, cinematic` },
+      { text: `A maioria perde tempo com ferramentas complicadas. E o resultado nunca sai como esperado.`, imagePrompt: `Complex interfaces, multiple screens, overwhelming technology, cinematic` },
+      { text: `${pn} resolve isso de um jeito simples, rápido e profissional.`, imagePrompt: `Clean modern software interface, satisfying simplicity, bright lighting` },
+      { text: `Milhares de pessoas já estão usando e os resultados falam por si.`, imagePrompt: `Success metrics dashboard, growth visualization, inspiring` },
+      { text: `Confere o link na bio e testa você mesmo.`, imagePrompt: `Call to action, clean background, inviting and warm` },
+    ];
+  }
+  
+  // Review script segments for spelling
+  for (let i = 0; i < scriptSegments.length; i++) {
+    scriptSegments[i].text = await reviewText(scriptSegments[i].text, 'script', supabaseUrl, headers, `VSL marketing para ${selectedAffiliate.product_name}`);
+  }
+  
+  // 4. Generate AI images for each segment
+  const images: string[] = [];
+  console.log('[AGENT] 🎨 Gerando imagens AI para vídeo de marketing...');
+  try {
+    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ topic: `${selectedAffiliate.product_name} marketing`, segments: scriptSegments })
+    });
+    if (searchResponse.ok) {
+      const searchResult = await searchResponse.json();
+      if (searchResult.images && searchResult.images.length > 0) {
+        for (const img of searchResult.images) {
+          const imgUrl = img.imageUrl || img.url;
+          if (imgUrl && typeof imgUrl === 'string') images.push(imgUrl);
+        }
+        console.log(`[AGENT] ✅ ${images.length} imagens geradas para vídeo marketing`);
+      }
+    }
+  } catch (e) {
+    console.log('[AGENT] Erro na geração de imagens:', e);
+  }
+  
+  // 5. Generate caption with affiliate link
+  const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+    method: 'POST', headers,
+    body: JSON.stringify({
+      topic: selectedAffiliate.product_name,
+      postType: 'vendas',
+      customInstructions: `REELS de marketing (VSL) para: ${selectedAffiliate.product_name}.
+Descrição: ${selectedAffiliate.description || ''}
+${productResearch ? `Pesquisa:\n${productResearch.substring(0, 400)}` : ''}
+
+REGRAS:
+1. Legenda curta e persuasiva (máximo 3 parágrafos)
+2. Tom de recomendação autêntica
+3. Inclua link no final: ${selectedAffiliate.affiliate_url}
+4. Use 1-2 emojis estratégicos
+5. CTA natural`
+    })
+  });
+  
+  let caption = `🔥 ${selectedAffiliate.product_name}\n\n${selectedAffiliate.description || ''}\n\n🔗 ${selectedAffiliate.affiliate_url}`;
+  let hashtags: string[] = ['#recomendacao', '#tecnologia', '#review', '#reels'];
+  
+  if (captionResponse.ok) {
+    const captionData = await captionResponse.json();
+    caption = captionData.caption || caption;
+    hashtags = captionData.hashtags || hashtags;
+    if (!caption.includes(selectedAffiliate.affiliate_url)) {
+      caption += `\n\n🔗 ${selectedAffiliate.affiliate_url}`;
+    }
+  }
+  caption = await reviewText(caption, 'caption', supabaseUrl, headers, `Marketing para ${selectedAffiliate.product_name}`);
+  
+  // 6. Create the video post
+  const { data: post, error } = await supabase.from('posts').insert({
+    user_id: userId, workspace_id: workspaceId,
+    caption, hashtags,
+    post_type: 'afiliado',
+    media_type: 'reels',
+    platforms: plan.platforms || ['instagram'],
+    status: 'draft',
+    image_url: images[0] || null,
+    carousel_images: images,
+    overlay_metadata: {
+      type: 'narrated_video',
+      topic: selectedAffiliate.product_name,
+      script: {
+        title: selectedAffiliate.product_name,
+        segments: scriptSegments,
+        segmentCount: scriptSegments.length,
+        totalDuration: 30,
+      },
+      affiliate_id: selectedAffiliate.id,
+      affiliate_url: selectedAffiliate.affiliate_url,
+      is_marketing_vsl: true,
+      needs_processing: true,
+      created_by_agent: true,
+      publish_after_render: false,
+      research_sources: researchArticles.map((a: any) => a.title).slice(0, 3),
+    },
+    ai_model_used: 'gemini-2.5-flash'
+  }).select().single();
+  
+  if (error) throw error;
+  
+  // 7. Set render status
+  if (images.length >= 2) {
+    await supabase.from('posts').update({
+      status: 'draft', error_message: null,
+      overlay_metadata: { ...post.overlay_metadata, needs_processing: true, render_status: 'manual_pending', render_source: 'manual', publish_after_render: false }
+    }).eq('id', post.id);
+  } else {
+    await supabase.from('posts').update({
+      status: 'draft', error_message: 'Imagens insuficientes para gerar vídeo marketing (mínimo: 2)'
+    }).eq('id', post.id);
+  }
+  
+  // 8. Update affiliate link counters
+  await supabase.from('affiliate_links').update({
+    posts_count: (selectedAffiliate.posts_count || 0) + 1,
+    last_posted_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }).eq('id', selectedAffiliate.id);
+  
+  console.log(`[AGENT] ✅ Vídeo marketing VSL criado: ${post.id} para ${selectedAffiliate.product_name} (${scriptSegments.length} cenas, ${images.length} imagens)`);
+  return post;
+}
+
 // Calculate news ranking score (0-100) for RSS items
 // PRIORIZA conteúdo de TECNOLOGIA, IA, INOVAÇÃO - penaliza off-topic
 function calculateNewsRankingScore(item: any): number {
