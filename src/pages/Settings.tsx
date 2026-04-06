@@ -554,8 +554,9 @@ const Settings = () => {
 
 
 
-            {/* Instagram Settings Tab */}
-            <TabsContent value="instagram" className="space-y-6">
+            {/* Accounts Tab — Instagram + TikTok */}
+            <TabsContent value="accounts" className="space-y-8">
+              {/* Instagram Section */}
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold">Contas Conectadas</h2>
@@ -730,10 +731,8 @@ const Settings = () => {
                   </Card>
                 </div>
               )}
-            </TabsContent>
 
-            {/* TikTok Settings Tab */}
-            <TabsContent value="tiktok" className="space-y-6">
+              {/* TikTok Section */}
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold">Contas TikTok</h2>
