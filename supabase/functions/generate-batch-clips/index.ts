@@ -378,34 +378,8 @@ Responda em JSON:
       });
     }
 
-    for (const post of createdPosts) {
-      try {
-        fetch(`${supabaseUrl}/functions/v1/process-curated-video`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${supabaseKey}`,
-          },
-          body: JSON.stringify({
-            post_id: post.id,
-            video_source: sourceVideo,
-            headline: post.headline,
-            workspace_id,
-            user_id: user.id,
-            clip_script: {
-              angle: post.angle,
-              headline: post.headline,
-              narration: post.narration,
-              segments: post.segments,
-              source_profile,
-              source_label: source_label || resolvedChannel.channelTitle,
-            },
-          }),
-        }).catch((error) => console.warn(`[batch-clips] Background process failed for ${post.id}:`, error));
-      } catch (error) {
-        console.warn(`[batch-clips] Failed to trigger process for ${post.id}:`, error);
-      }
-    }
+    // NOTE: Rendering is now triggered manually per clip from the UI.
+    // No automatic background processing.
 
     return new Response(
       JSON.stringify({
