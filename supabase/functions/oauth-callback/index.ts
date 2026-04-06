@@ -26,7 +26,7 @@ serve(async (req) => {
       throw new Error('Supabase credentials not configured');
     }
 
-    const { code, redirectUri, userId } = await req.json();
+    const { code, redirectUri, userId, workspaceId } = await req.json();
 
     if (!code) {
       throw new Error('Authorization code is required');
@@ -210,7 +210,8 @@ serve(async (req) => {
             expires_at: expiresAt.toISOString(),
             connected_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            user_id: userId || null
+            user_id: userId || null,
+            workspace_id: workspaceId || null,
           }, {
             onConflict: 'instagram_user_id'
           })

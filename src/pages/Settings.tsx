@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { 
@@ -18,18 +19,16 @@ import {
   Moon, 
   Sun,
   Settings as SettingsIcon,
-  Sparkles,
   Link2,
   Plus,
   AlertCircle,
   RefreshCw,
   Save,
   RotateCcw,
-  Image,
   Video,
-  Mic,
-  Play,
-  DollarSign
+  DollarSign,
+  Trash2,
+  Timer,
 } from "lucide-react";
 import Header from "@/components/Header";
 import { AICostsTab } from "@/components/settings/AICostsTab";
@@ -97,6 +96,10 @@ const Settings = () => {
   const [isSavingAI, setIsSavingAI] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState("camila");
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
+  const [autoCleanup, setAutoCleanup] = useState(() => {
+    return localStorage.getItem('auto_cleanup_enabled') === 'true';
+  });
+  const [clearingHistory, setClearingHistory] = useState(false);
   
   const { settings, updateSettings } = useBrandSettings();
   const { currentWorkspace } = useWorkspace();
@@ -265,11 +268,45 @@ const Settings = () => {
     }
   };
 
+  const toggleAutoCleanup = (enabled: boolean) => {
+    setAutoCleanup(enabled);
+    localStorage.setItem('auto_cleanup_enabled', String(enabled));
+    toast.success(enabled ? 'Autolimpeza ativada' : 'Autolimpeza desativada');
+  };
+
+  const handleClearHistory = async () => {
+    if (!currentWorkspace?.id) return;
+    setClearingHistory(true);
+    try {
+      // Delete chat messages and execution reports only (preserve posts, accounts, metrics)
+      const { error: chatErr } = await supabase
+        .from('agent_chat_messages')
+        .delete()
+        .eq('workspace_id', currentWorkspace.id);
+      if (chatErr) throw chatErr;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error: reportsErr } = await supabase
+          .from('agent_execution_reports')
+          .delete()
+          .eq('user_id', user.id);
+        if (reportsErr) throw reportsErr;
+      }
+
+      toast.success('Histórico de conversas e relatórios limpo com sucesso!');
+    } catch (err: any) {
+      console.error('Error clearing history:', err);
+      toast.error('Erro ao limpar histórico');
+    } finally {
+      setClearingHistory(false);
+    }
+  };
+
   // Instagram OAuth
   const startOAuth = async () => {
     setConnecting(true);
     try {
-      // Use dedicated Instagram callback route on the published app
       const publishedOrigin = 'https://gram-text-wizard.lovable.app';
       const redirectUri = `${publishedOrigin}/instagram/callback`;
       
@@ -281,6 +318,10 @@ const Settings = () => {
 
       sessionStorage.setItem('oauth_state', data.state);
       localStorage.removeItem('oauth_result');
+      // Store workspace_id so the callback page can send it to the edge function
+      if (currentWorkspace?.id) {
+        localStorage.setItem('oauth_workspace_id', currentWorkspace.id);
+      }
       
       // Always redirect in same tab for Instagram
       window.location.href = data.authUrl;
@@ -547,6 +588,75 @@ const Settings = () => {
                       </>
                     )}
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Auto-Cleanup */}
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Timer className="h-5 w-5 text-primary" />
+                    Autolimpeza de dados
+                  </CardTitle>
+                  <CardDescription>
+                    Remove automaticamente mensagens de chat e relatórios antigos (mais de 7 dias) para manter o app leve
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border">
+                    <div>
+                      <p className="font-medium">Autolimpeza automática</p>
+                      <p className="text-sm text-muted-foreground">
+                        Mantém apenas as últimas 50 mensagens e relatórios dos últimos 7 dias
+                      </p>
+                    </div>
+                    <Switch
+                      checked={autoCleanup}
+                      onCheckedChange={toggleAutoCleanup}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Clear History */}
+              <Card className="border-destructive/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Trash2 className="h-5 w-5 text-destructive" />
+                    Limpar todo o histórico
+                  </CardTitle>
+                  <CardDescription>
+                    Remove todas as conversas com o agente e relatórios de execução. Posts, contas e métricas são preservados.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full" disabled={clearingHistory}>
+                        {clearingHistory ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Limpando...</>
+                        ) : (
+                          <><Trash2 className="mr-2 h-4 w-4" /> Limpar histórico</>
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta ação <strong>não pode ser desfeita</strong>. Isso vai remover permanentemente todas as conversas com o agente e relatórios de execução.
+                          <br /><br />
+                          <strong>Seus posts, contas conectadas e métricas do Instagram NÃO serão afetados.</strong>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Sim, limpar tudo
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardContent>
               </Card>
             </TabsContent>
