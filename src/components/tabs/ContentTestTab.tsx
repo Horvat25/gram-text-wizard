@@ -225,6 +225,11 @@ export default function ContentTestTab() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
+                    {post?.cost_estimate != null && post.cost_estimate > 0 && (
+                      <span className="text-[10px] font-medium text-muted-foreground">
+                        ~${post.cost_estimate.toFixed(3)}
+                      </span>
+                    )}
                     {post && (
                       <Badge
                         variant={post.status === 'failed' ? 'destructive' : post.status === 'scheduled' ? 'default' : 'secondary'}
