@@ -268,6 +268,41 @@ const Settings = () => {
     }
   };
 
+  const toggleAutoCleanup = (enabled: boolean) => {
+    setAutoCleanup(enabled);
+    localStorage.setItem('auto_cleanup_enabled', String(enabled));
+    toast.success(enabled ? 'Autolimpeza ativada' : 'Autolimpeza desativada');
+  };
+
+  const handleClearHistory = async () => {
+    if (!currentWorkspace?.id) return;
+    setClearingHistory(true);
+    try {
+      // Delete chat messages and execution reports only (preserve posts, accounts, metrics)
+      const { error: chatErr } = await supabase
+        .from('agent_chat_messages')
+        .delete()
+        .eq('workspace_id', currentWorkspace.id);
+      if (chatErr) throw chatErr;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error: reportsErr } = await supabase
+          .from('agent_execution_reports')
+          .delete()
+          .eq('user_id', user.id);
+        if (reportsErr) throw reportsErr;
+      }
+
+      toast.success('Histórico de conversas e relatórios limpo com sucesso!');
+    } catch (err: any) {
+      console.error('Error clearing history:', err);
+      toast.error('Erro ao limpar histórico');
+    } finally {
+      setClearingHistory(false);
+    }
+  };
+
   // Instagram OAuth
   const startOAuth = async () => {
     setConnecting(true);
