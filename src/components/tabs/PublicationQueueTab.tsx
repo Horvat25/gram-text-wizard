@@ -209,7 +209,7 @@ const PublicationQueueTab = ({
   const queuedPosts = useMemo(
     () =>
       posts
-        .filter((p) => p.status === "scheduled" || p.status === "draft")
+        .filter((p) => p.status === "scheduled" || p.status === "draft" || p.status === "render_failed")
         .sort((a, b) => {
           if (!a.scheduled_for) return 1;
           if (!b.scheduled_for) return -1;
@@ -224,7 +224,7 @@ const PublicationQueueTab = ({
   );
 
   const draftPosts = useMemo(
-    () => queuedPosts.filter((p) => p.status === "draft"),
+    () => queuedPosts.filter((p) => p.status === "draft" || p.status === "render_failed"),
     [queuedPosts]
   );
 
@@ -297,6 +297,8 @@ const PublicationQueueTab = ({
     switch (status) {
       case "scheduled":
         return "bg-warning text-warning-foreground";
+      case "render_failed":
+        return "bg-destructive text-destructive-foreground";
       case "draft":
         return "bg-muted text-muted-foreground";
       default:
@@ -308,13 +310,14 @@ const PublicationQueueTab = ({
     const isOverdue = post.scheduled_for ? isPast(parseISO(post.scheduled_for)) : false;
     const needsRendering = needsVideoRendering(post);
     const isReels = post.media_type === "reels" || post.media_type === "reel";
+    const isRenderFailed = post.status === "render_failed";
     
     return (
-      <div className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${isOverdue ? 'border-destructive/50' : ''} ${needsRendering ? 'border-amber-500/50' : ''}`}>
+      <div className={`p-4 border rounded-lg bg-card hover:shadow-md transition-shadow ${isOverdue ? 'border-destructive/50' : ''} ${needsRendering ? 'border-warning/50' : ''}`}>
         <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge className={getStatusColor(post.status, isOverdue)}>
-              {isOverdue ? "Atrasado" : post.status === "scheduled" ? "Agendado" : "Rascunho"}
+              {isOverdue ? "Atrasado" : post.status === "scheduled" ? "Agendado" : isRenderFailed ? "Falhou" : "Rascunho"}
             </Badge>
             {isReels && (
               <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
@@ -369,8 +372,8 @@ const PublicationQueueTab = ({
               className="w-full h-32 object-cover rounded-md"
             />
             {needsRendering && (
-              <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
-                <span className="text-white text-xs font-medium">Thumbnail - Vídeo não renderizado</span>
+              <div className="absolute inset-0 rounded-md bg-foreground/70 flex items-center justify-center">
+                <span className="text-background text-xs font-medium">Thumbnail - Vídeo não gerado</span>
               </div>
             )}
           </div>
@@ -593,7 +596,7 @@ const PublicationQueueTab = ({
               <Edit className="h-5 w-5 text-muted-foreground" />
               Rascunhos
             </CardTitle>
-            <CardDescription>Posts aguardando agendamento</CardDescription>
+            <CardDescription>Posts aguardando agendamento ou nova renderização manual</CardDescription>
           </CardHeader>
           <CardContent>
             {draftPosts.length === 0 ? (
