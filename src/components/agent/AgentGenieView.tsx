@@ -287,7 +287,6 @@ export default function AgentGenieView() {
     setShowGrowth(false);
     setShowQueue(false);
     setShowPostHistory(false);
-    setShowVideoClips(false);
     setShowContentTest(false);
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
@@ -301,7 +300,6 @@ export default function AgentGenieView() {
       growth: showGrowth,
       queue: showQueue,
       postHistory: showPostHistory,
-      videoClips: showVideoClips,
       contentTest: showContentTest,
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
@@ -314,10 +312,8 @@ export default function AgentGenieView() {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history':  break;
         case 'growth': setShowGrowth(true); break;
-        
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
-        case 'videoClips': setShowVideoClips(true); break;
         case 'contentTest': setShowContentTest(true); break;
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
