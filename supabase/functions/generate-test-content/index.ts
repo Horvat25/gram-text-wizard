@@ -6,11 +6,10 @@ const corsHeaders = {
 };
 
 /**
- * GENERATE TEST CONTENT
+ * GENERATE TEST CONTENT — Fire-and-forget version
  * 
- * Thin wrapper that forces the ai-agent-core to create exactly ONE post
- * of a specific content type, bypassing scheduling / distribution logic.
- * Returns the created post for immediate preview.
+ * Creates a placeholder draft post immediately, then triggers ai-agent-core
+ * in the background. The client polls the post by ID until it's ready.
  */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -39,7 +38,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { workspace_id, content_type, topic } = await req.json();
+    const { workspace_id, content_type, feedback } = await req.json();
 
     if (!workspace_id || !content_type) {
       return new Response(
@@ -56,10 +55,38 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[test-content] Generating test ${content_type} for workspace ${workspace_id}`);
+    // Create a placeholder draft so client can poll it
+    const mediaTypeMap: Record<string, string> = {
+      image: 'image', carousel: 'carousel', news: 'image',
+      video: 'video', news_video: 'video',
+      marketing_image: 'image', marketing_video: 'video',
+    };
+    const postTypeMap: Record<string, string> = {
+      image: 'reflexão', carousel: 'educacional', news: 'noticia',
+      video: 'criativo', news_video: 'noticia',
+      marketing_image: 'afiliado', marketing_video: 'afiliado',
+    };
 
-    // Call ai-agent-core with forced type override
-    const agentRes = await fetch(`${supabaseUrl}/functions/v1/ai-agent-core`, {
+    const { data: placeholder, error: insertErr } = await supabase
+      .from("posts")
+      .insert({
+        workspace_id,
+        user_id: user.id,
+        caption: '⏳ Gerando conteúdo...',
+        status: 'generating',
+        media_type: mediaTypeMap[content_type] || 'image',
+        post_type: postTypeMap[content_type] || 'engajamento',
+      })
+      .select()
+      .single();
+
+    if (insertErr) throw insertErr;
+
+    console.log(`[test-content] Placeholder ${placeholder.id} created, firing agent in background`);
+
+    // Fire-and-forget: call ai-agent-core without awaiting
+    const agentUrl = `${supabaseUrl}/functions/v1/ai-agent-core`;
+    fetch(agentUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,73 +97,87 @@ Deno.serve(async (req) => {
         userId: user.id,
         trigger: "test",
         forceContentType: content_type,
-        forceTopic: topic || undefined,
         skipScheduleCheck: true,
         skipLimitCheck: true,
+        placeholderPostId: placeholder.id,
+        feedback: feedback || undefined,
       }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        const errText = await res.text().catch(() => 'unknown error');
+        console.error(`[test-content] Background agent failed: ${errText}`);
+        // Mark placeholder as failed
+        await supabase.from("posts").update({
+          status: 'failed',
+          error_message: `Falha ao gerar: ${errText.substring(0, 200)}`,
+        }).eq("id", placeholder.id);
+        return;
+      }
+
+      const agentData = await res.json().catch(() => ({}));
+      const realPostId = agentData?.postId || agentData?.post?.id;
+
+      if (realPostId && realPostId !== placeholder.id) {
+        // Agent created a different post. Copy its data to our placeholder and delete the extra.
+        const { data: realPost } = await supabase
+          .from("posts")
+          .select("*")
+          .eq("id", realPostId)
+          .single();
+
+        if (realPost) {
+          await supabase.from("posts").update({
+            caption: realPost.caption,
+            image_url: realPost.image_url,
+            video_url: realPost.video_url,
+            carousel_images: realPost.carousel_images,
+            hashtags: realPost.hashtags,
+            overlay_metadata: realPost.overlay_metadata,
+            media_type: realPost.media_type,
+            post_type: realPost.post_type,
+            ai_model_used: realPost.ai_model_used,
+            cost_estimate: realPost.cost_estimate,
+            status: 'draft',
+            scheduled_for: null,
+            published_at: null,
+          }).eq("id", placeholder.id);
+
+          // Delete the extra post
+          await supabase.from("posts").delete().eq("id", realPostId);
+          console.log(`[test-content] Merged post ${realPostId} → placeholder ${placeholder.id}`);
+        }
+      } else if (!realPostId) {
+        // No post was created, mark as failed
+        await supabase.from("posts").update({
+          status: 'failed',
+          error_message: 'Agente não criou nenhum post',
+        }).eq("id", placeholder.id);
+      } else {
+        // Agent used the same ID somehow or we need to just update status
+        await supabase.from("posts").update({
+          status: 'draft',
+          scheduled_for: null,
+          published_at: null,
+        }).eq("id", placeholder.id);
+      }
+
+      console.log(`[test-content] Background generation complete for ${placeholder.id}`);
+    }).catch(async (err) => {
+      console.error(`[test-content] Background fetch error:`, err);
+      await supabase.from("posts").update({
+        status: 'failed',
+        error_message: `Erro de conexão: ${err?.message || 'unknown'}`,
+      }).eq("id", placeholder.id);
     });
 
-    if (!agentRes.ok) {
-      const errData = await agentRes.json().catch(() => ({}));
-      console.error("[test-content] Agent failed:", errData);
-      return new Response(
-        JSON.stringify({ error: errData?.error || "Falha ao gerar conteúdo de teste" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    const agentData = await agentRes.json();
-    console.log(`[test-content] Agent response:`, JSON.stringify(agentData).substring(0, 200));
-
-    // Fetch the created post
-    const postId = agentData?.postId || agentData?.post?.id;
-    let post = agentData?.post || null;
-
-    if (postId && !post) {
-      const { data } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("id", postId)
-        .single();
-      post = data;
-    }
-
-    // If agent didn't return a post ID, try to find the latest draft
-    if (!post) {
-      const { data } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("workspace_id", workspace_id)
-        .eq("user_id", user.id)
-        .in("status", ["draft", "scheduled", "failed"])
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
-      post = data;
-    }
-
-    // SAFETY: Force test posts to draft status — never auto-publish
-    if (post && post.status !== 'draft' && post.status !== 'failed') {
-      console.log(`[test-content] Forçando status draft (era: ${post.status})`);
-      await supabase
-        .from("posts")
-        .update({ status: 'draft', scheduled_for: null, published_at: null })
-        .eq("id", post.id);
-      post.status = 'draft';
-      post.scheduled_for = null;
-      post.published_at = null;
-    }
-
+    // Return immediately with the placeholder
     return new Response(
       JSON.stringify({
         success: true,
         content_type,
-        post,
-        agent_response: {
-          decision: agentData?.decision,
-          reason: agentData?.reason,
-          summary: agentData?.summary,
-        },
+        post: placeholder,
+        polling: true,
+        agent_response: { decision: 'GENERATING', reason: 'Gerando em segundo plano...' },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
