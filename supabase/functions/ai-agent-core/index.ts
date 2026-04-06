@@ -1949,12 +1949,13 @@ Descrição: ${selectedAffiliate.description || 'Produto de tecnologia'}.
 
 REGRAS OBRIGATÓRIAS:
 1. ⛔ NÃO INCLUA NENHUM TEXTO NA IMAGEM ⛔ - Sem palavras, letras, números ou símbolos escritos
-2. Estilo: design de marketing premium, fundo escuro com gradiente tecnológico
-3. Visual persuasivo: mostre o conceito do produto com ícones e elementos gráficos
-4. Cores vibrantes de destaque (amarelo, azul, verde neon) sobre fundo escuro
+2. Estilo: fundo CLARO e LIMPO (branco, cinza claro, gradiente suave de cores claras)
+3. Visual persuasivo: mostre o conceito do produto de forma sofisticada e minimalista
+4. Cores harmoniosas e profissionais (azul, dourado, verde água, roxo suave)
 5. NÃO use fotos de pessoas
-6. Composição limpa com espaço para texto ser adicionado depois
-7. Estética moderna, futurista, profissional`
+6. Composição limpa e arejada com espaço para headline ser adicionada depois
+7. Estética moderna, premium, clean - SEM fundos escuros ou gradientes pesados
+8. Iluminação suave e natural, tons inspiracionais`
             }]
           }),
         });
