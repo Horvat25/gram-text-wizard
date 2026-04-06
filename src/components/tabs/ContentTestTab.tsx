@@ -126,6 +126,7 @@ function TestDetailView({
   onBack: () => void;
 }) {
   const [feedbackText, setFeedbackText] = useState('');
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const post = result?.post;
   const Icon = contentType.icon;
