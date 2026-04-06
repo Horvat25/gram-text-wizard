@@ -32,6 +32,7 @@ import TikTokGrowthDashboard from './TikTokGrowthDashboard';
 import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
 import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
+import VideoClipsTab from '@/components/tabs/VideoClipsTab';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
@@ -118,6 +119,7 @@ export default function AgentGenieView() {
   const [showMarketing, setShowMarketing] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
+  const [showVideoClips, setShowVideoClips] = useState(false);
   
   // TikTok panel states
     const [showTikTokQueue, setShowTikTokQueue] = useState(false);
@@ -292,6 +294,7 @@ export default function AgentGenieView() {
     setShowMarketing(false);
     setShowQueue(false);
     setShowPostHistory(false);
+    setShowVideoClips(false);
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
     setShowTikTokGrowth(false);
@@ -306,6 +309,7 @@ export default function AgentGenieView() {
       marketing: showMarketing,
       queue: showQueue,
       postHistory: showPostHistory,
+      videoClips: showVideoClips,
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
       tiktokGrowth: showTikTokGrowth,
@@ -321,6 +325,7 @@ export default function AgentGenieView() {
         case 'marketing': setShowMarketing(true); break;
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
+        case 'videoClips': setShowVideoClips(true); break;
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
         case 'tiktokGrowth': setShowTikTokGrowth(true); break;
@@ -621,6 +626,19 @@ export default function AgentGenieView() {
               <History className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Posts</span>
             </Button>
+            
+            <Button
+              variant={showVideoClips ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showVideoClips && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('videoClips')}
+            >
+              <Film className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Clips</span>
+            </Button>
           </div>
           
           {/* Right side */}
@@ -763,6 +781,24 @@ export default function AgentGenieView() {
                   <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
                 </div>
                 <AgentMarketingPanel />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+        
+        {/* Video Clips Panel */}
+        {showVideoClips && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Vídeo Clips</h2>
+                    <p className="text-xs text-muted-foreground">Cortes automáticos para Reels</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowVideoClips(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <VideoClipsTab />
               </div>
             </ScrollArea>
           </div>
