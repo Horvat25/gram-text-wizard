@@ -437,13 +437,13 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg p-0 flex flex-col">
         <SheetHeader className="p-4 pb-0">
-          <SheetTitle className="flex items-center gap-2">
+           <SheetTitle className="flex items-center gap-2">
             <div className="p-2 rounded-lg neural-gradient">
-              <Fingerprint className="h-4 w-4 text-white" />
+              <Settings className="h-4 w-4 text-white" />
             </div>
-            DNA do Agente
+            Configurações do Agente
           </SheetTitle>
-          <SheetDescription>Defina quem o agente é, como pensa e como se comunica</SheetDescription>
+          <SheetDescription>Gerencie contas e configurações gerais</SheetDescription>
         </SheetHeader>
         
         {isLoading ? (
