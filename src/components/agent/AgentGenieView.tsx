@@ -115,7 +115,7 @@ export default function AgentGenieView() {
   const [showGrowth, setShowGrowth] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
-  const [showVideoClips, setShowVideoClips] = useState(false);
+  const [showContentTest, setShowContentTest] = useState(false);
   const [showContentTest, setShowContentTest] = useState(false);
   
   // TikTok panel states
