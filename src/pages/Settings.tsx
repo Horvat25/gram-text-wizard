@@ -590,6 +590,75 @@ const Settings = () => {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Auto-Cleanup */}
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Timer className="h-5 w-5 text-primary" />
+                    Autolimpeza de dados
+                  </CardTitle>
+                  <CardDescription>
+                    Remove automaticamente mensagens de chat e relatórios antigos (mais de 7 dias) para manter o app leve
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border">
+                    <div>
+                      <p className="font-medium">Autolimpeza automática</p>
+                      <p className="text-sm text-muted-foreground">
+                        Mantém apenas as últimas 50 mensagens e relatórios dos últimos 7 dias
+                      </p>
+                    </div>
+                    <Switch
+                      checked={autoCleanup}
+                      onCheckedChange={toggleAutoCleanup}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Clear History */}
+              <Card className="border-destructive/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Trash2 className="h-5 w-5 text-destructive" />
+                    Limpar todo o histórico
+                  </CardTitle>
+                  <CardDescription>
+                    Remove todas as conversas com o agente e relatórios de execução. Posts, contas e métricas são preservados.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full" disabled={clearingHistory}>
+                        {clearingHistory ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Limpando...</>
+                        ) : (
+                          <><Trash2 className="mr-2 h-4 w-4" /> Limpar histórico</>
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta ação <strong>não pode ser desfeita</strong>. Isso vai remover permanentemente todas as conversas com o agente e relatórios de execução.
+                          <br /><br />
+                          <strong>Seus posts, contas conectadas e métricas do Instagram NÃO serão afetados.</strong>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Sim, limpar tudo
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </CardContent>
+              </Card>
             </TabsContent>
 
 
