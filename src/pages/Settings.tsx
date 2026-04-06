@@ -408,26 +408,18 @@ const Settings = () => {
           </div>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <SettingsIcon className="h-4 w-4" />
                 <span className="hidden sm:inline">Geral</span>
               </TabsTrigger>
-              <TabsTrigger value="ai" className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">IA</span>
+              <TabsTrigger value="accounts" className="flex items-center gap-2">
+                <Link2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Contas</span>
               </TabsTrigger>
               <TabsTrigger value="ai-costs" className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
                 <span className="hidden sm:inline">Custos IA</span>
-              </TabsTrigger>
-              <TabsTrigger value="instagram" className="flex items-center gap-2">
-                <Instagram className="h-4 w-4" />
-                <span className="hidden sm:inline">Instagram</span>
-              </TabsTrigger>
-              <TabsTrigger value="tiktok" className="flex items-center gap-2">
-                <Video className="h-4 w-4" />
-                <span className="hidden sm:inline">TikTok</span>
               </TabsTrigger>
             </TabsList>
 
