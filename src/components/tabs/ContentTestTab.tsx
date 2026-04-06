@@ -7,6 +7,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Image as ImageIcon,
   Film,
   Layers,
@@ -27,6 +32,7 @@ import {
   Rss,
   ArrowLeft,
   RefreshCw,
+  Maximize2,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -120,6 +126,7 @@ function TestDetailView({
   onBack: () => void;
 }) {
   const [feedbackText, setFeedbackText] = useState('');
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const post = result?.post;
   const Icon = contentType.icon;
@@ -204,22 +211,39 @@ function TestDetailView({
                 post.carousel_images.length > 0 && (
                   <div className="grid grid-cols-2 gap-1">
                     {post.carousel_images.slice(0, 4).map((img: string, i: number) => (
-                      <img
-                        key={`c-${i}`}
-                        src={img}
-                        alt={`Slide ${i + 1}`}
-                        className="aspect-square w-full rounded-md object-cover"
-                      />
+                      <div key={`c-${i}`} className="relative group">
+                        <img
+                          src={img}
+                          alt={`Slide ${i + 1}`}
+                          className="aspect-square w-full rounded-md object-cover cursor-pointer"
+                          onClick={() => setExpandedImage(img)}
+                        />
+                        <button
+                          onClick={() => setExpandedImage(img)}
+                          className="absolute top-1 right-1 p-1 rounded-md bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Maximize2 className="h-3 w-3" />
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
 
               {!post.video_url && !post.carousel_images?.length && post.image_url && (
-                <img
-                  src={post.image_url}
-                  alt="Preview"
-                  className="w-full rounded-lg aspect-square object-cover"
-                />
+                <div className="relative group">
+                  <img
+                    src={post.image_url}
+                    alt="Preview"
+                    className="w-full rounded-lg aspect-square object-cover cursor-pointer"
+                    onClick={() => setExpandedImage(post.image_url)}
+                  />
+                  <button
+                    onClick={() => setExpandedImage(post.image_url)}
+                    className="absolute top-2 right-2 p-1.5 rounded-md bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Maximize2 className="h-4 w-4" />
+                  </button>
+                </div>
               )}
 
               {/* Meta info */}
@@ -289,7 +313,10 @@ function TestDetailView({
           {post.status === 'draft' && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-3">
-                <p className="text-xs font-semibold">Avaliação & Feedback</p>
+                <div>
+                  <p className="text-xs font-semibold">Avaliação & Feedback</p>
+                  <p className="text-[10px] text-muted-foreground">Seu feedback melhora as próximas gerações automaticamente</p>
+                </div>
 
                 {/* Star rating */}
                 <div className="flex items-center gap-2">
@@ -373,6 +400,20 @@ function TestDetailView({
           )}
         </>
       )}
+
+      {/* Image expand dialog */}
+      <Dialog open={!!expandedImage} onOpenChange={() => setExpandedImage(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 sm:p-4">
+          <DialogTitle className="sr-only">Visualizar imagem</DialogTitle>
+          {expandedImage && (
+            <img
+              src={expandedImage}
+              alt="Preview expandido"
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
