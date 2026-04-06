@@ -869,6 +869,7 @@ Responda em JSON: { "theme": "tema específico e atual", "cta": "CTA do post", "
   // Return decision with content plan (no need for another AI call - we already decided based on distribution)
   const remainingForType: Record<ContentType, number> = {
     'video': state.weeklyGoals.videos - state.weeklyProgress.videos,
+    'video_curated': state.weeklyGoals.videos - state.weeklyProgress.videos,
     'carousel': state.weeklyGoals.carousels - state.weeklyProgress.carousels,
     'news': state.weeklyGoals.news - state.weeklyProgress.news,
     'news_video': state.weeklyGoals.news_videos - state.weeklyProgress.news_videos,
