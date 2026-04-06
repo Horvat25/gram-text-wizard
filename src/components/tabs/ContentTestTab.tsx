@@ -397,6 +397,20 @@ function TestDetailView({
           )}
         </>
       )}
+
+      {/* Image expand dialog */}
+      <Dialog open={!!expandedImage} onOpenChange={() => setExpandedImage(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 sm:p-4">
+          <DialogTitle className="sr-only">Visualizar imagem</DialogTitle>
+          {expandedImage && (
+            <img
+              src={expandedImage}
+              alt="Preview expandido"
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
