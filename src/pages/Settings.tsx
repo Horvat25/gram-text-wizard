@@ -28,9 +28,11 @@ import {
   Image,
   Video,
   Mic,
-  Play
+  Play,
+  DollarSign
 } from "lucide-react";
 import Header from "@/components/Header";
+import { AICostsTab } from "@/components/settings/AICostsTab";
 import { useBrandSettings } from "@/hooks/useBrandSettings";
 import { useInstagramAccounts } from "@/hooks/useInstagramAccounts";
 import { useTikTokAccounts } from "@/hooks/useTikTokAccounts";
@@ -406,7 +408,7 @@ const Settings = () => {
           </div>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <SettingsIcon className="h-4 w-4" />
                 <span className="hidden sm:inline">Geral</span>
@@ -414,6 +416,10 @@ const Settings = () => {
               <TabsTrigger value="ai" className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">IA</span>
+              </TabsTrigger>
+              <TabsTrigger value="ai-costs" className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                <span className="hidden sm:inline">Custos IA</span>
               </TabsTrigger>
               <TabsTrigger value="instagram" className="flex items-center gap-2">
                 <Instagram className="h-4 w-4" />
@@ -1139,6 +1145,10 @@ const Settings = () => {
                   </Card>
                 </div>
               )}
+            </TabsContent>
+            {/* AI Costs Tab */}
+            <TabsContent value="ai-costs">
+              <AICostsTab />
             </TabsContent>
           </Tabs>
         </div>
