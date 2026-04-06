@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Image as ImageIcon,
   Film,
@@ -16,11 +17,18 @@ import {
   CalendarDays,
   Trash2,
   ChevronDown,
+  ChevronUp,
   Sparkles,
   AlertCircle,
   Megaphone,
   Video,
   MessageSquare,
+  Settings2,
+  Star,
+  Send,
+  ThumbsUp,
+  ThumbsDown,
+  Rss,
 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,6 +36,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { CustomFeedsManager } from '@/components/CustomFeedsManager';
+import AgentMarketingPanel from '@/components/agent/AgentMarketingPanel';
 
 interface TestResult {
   post: any;
@@ -37,10 +47,11 @@ interface TestResult {
 const CONTENT_TYPES = [
   {
     type: 'image',
-    label: 'Imagem',
+    label: 'Imagem IA',
     icon: ImageIcon,
-    description: 'Post com imagem gerada por IA + headline + legenda',
+    description: 'Imagem gerada por IA + headline + legenda',
     color: 'from-violet-500 to-purple-600',
+    editType: null,
   },
   {
     type: 'carousel',
@@ -48,6 +59,7 @@ const CONTENT_TYPES = [
     icon: Layers,
     description: '4 slides educacionais sobre 1 tema (RSS)',
     color: 'from-blue-500 to-cyan-600',
+    editType: null,
   },
   {
     type: 'news',
@@ -55,13 +67,15 @@ const CONTENT_TYPES = [
     icon: Newspaper,
     description: 'Post de notícia com imagem do artigo + headline',
     color: 'from-amber-500 to-orange-600',
+    editType: 'rss' as const,
   },
   {
     type: 'video',
     label: 'Reels Criativo',
     icon: Film,
-    description: 'Vídeo narrado com imagens IA (rascunho p/ render)',
+    description: 'Vídeo narrado com imagens IA',
     color: 'from-pink-500 to-rose-600',
+    editType: null,
   },
   {
     type: 'news_video',
@@ -69,20 +83,23 @@ const CONTENT_TYPES = [
     icon: Tv,
     description: 'Vídeo estilo telejornal a partir de RSS',
     color: 'from-emerald-500 to-green-600',
+    editType: 'rss' as const,
   },
   {
     type: 'marketing_image',
     label: 'Marketing Imagem',
     icon: Megaphone,
-    description: 'Post de marketing com imagem do produto + link afiliado',
+    description: 'Post de marketing com imagem + link afiliado',
     color: 'from-yellow-500 to-amber-600',
+    editType: 'marketing' as const,
   },
   {
     type: 'marketing_video',
     label: 'Marketing Vídeo',
     icon: Video,
-    description: 'VSL / Reels de marketing com narração + link afiliado',
+    description: 'VSL / Reels de marketing com narração',
     color: 'from-red-500 to-pink-600',
+    editType: 'marketing' as const,
   },
 ] as const;
 
@@ -92,8 +109,11 @@ export default function ContentTestTab() {
   const [generating, setGenerating] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, TestResult>>({});
   const [expandedType, setExpandedType] = useState<string | null>(null);
-  const [deleteReason, setDeleteReason] = useState<Record<string, string>>({});
-  const [showDeleteReason, setShowDeleteReason] = useState<string | null>(null);
+  const [editingType, setEditingType] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Record<string, string>>({});
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+
+  const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
 
   const generateTest = async (contentType: string) => {
     if (!user || !currentWorkspace) return;
@@ -112,16 +132,27 @@ export default function ContentTestTab() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
+      // Ensure post is draft (not published)
+      const post = data.post;
+      if (post && post.status === 'published') {
+        await supabase
+          .from('posts')
+          .update({ status: 'draft', published_at: null })
+          .eq('id', post.id);
+        post.status = 'draft';
+        post.published_at = null;
+      }
+
       setResults((prev) => ({
         ...prev,
         [contentType]: {
-          post: data.post,
+          post,
           agentResponse: data.agent_response,
         },
       }));
 
       setExpandedType(contentType);
-      toast.success(`Teste de ${contentType} criado!`);
+      toast.success(`Teste de ${contentType} gerado! Revise antes de publicar.`);
     } catch (e: any) {
       console.error(`Error generating ${contentType}:`, e);
       toast.error(e.message || `Erro ao gerar ${contentType}`);
@@ -130,8 +161,24 @@ export default function ContentTestTab() {
     }
   };
 
-  const schedulePost = async (postId: string, contentType: string) => {
+  const approveAndPublish = async (postId: string, contentType: string) => {
     try {
+      const feedbackText = feedback[contentType]?.trim() || '';
+      const rating = ratings[contentType] || 0;
+
+      // Save approval feedback
+      if (feedbackText || rating) {
+        await supabase.from('agent_decisions').insert({
+          user_id: user!.id,
+          workspace_id: currentWorkspace!.id,
+          post_id: postId,
+          decision: 'test_approved',
+          decision_reason: feedbackText || `Aprovado com nota ${rating}/5`,
+          expected_engagement: rating,
+          learning: `Teste de ${contentType} aprovado (${rating}/5): ${feedbackText}`,
+        });
+      }
+
       const scheduledTime = new Date();
       scheduledTime.setHours(scheduledTime.getHours() + 1);
 
@@ -150,25 +197,26 @@ export default function ContentTestTab() {
         },
       }));
 
-      toast.success('Agendado para daqui 1 hora');
+      toast.success('Aprovado! Agendado para daqui 1 hora');
     } catch (e) {
       toast.error('Erro ao agendar');
     }
   };
 
-  const deletePost = async (postId: string, contentType: string) => {
-    const reason = deleteReason[contentType]?.trim() || '';
+  const rejectPost = async (postId: string, contentType: string) => {
+    const feedbackText = feedback[contentType]?.trim() || '';
+    const rating = ratings[contentType] || 0;
 
     try {
-      // If there's a reason, save it as a note on agent_decisions for future learning
-      if (reason) {
+      if (feedbackText || rating) {
         await supabase.from('agent_decisions').insert({
           user_id: user!.id,
           workspace_id: currentWorkspace!.id,
           post_id: postId,
           decision: 'test_rejected',
-          decision_reason: reason,
-          learning: `Teste de ${contentType} rejeitado: ${reason}`,
+          decision_reason: feedbackText || 'Rejeitado sem motivo específico',
+          expected_engagement: rating,
+          learning: `Teste de ${contentType} rejeitado (${rating}/5): ${feedbackText}`,
         });
       }
 
@@ -180,20 +228,46 @@ export default function ContentTestTab() {
         delete copy[contentType];
         return copy;
       });
-      setShowDeleteReason(null);
-      setDeleteReason((prev) => {
+      setFeedback((prev) => {
+        const copy = { ...prev };
+        delete copy[contentType];
+        return copy;
+      });
+      setRatings((prev) => {
         const copy = { ...prev };
         delete copy[contentType];
         return copy;
       });
 
-      toast.success(reason ? 'Post removido — motivo salvo para melhorar' : 'Post de teste removido');
+      toast.success(feedbackText ? 'Rejeitado — feedback salvo para melhorar' : 'Post de teste removido');
     } catch (e) {
       toast.error('Erro ao deletar');
     }
   };
 
-  const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
+  const StarRating = ({ type }: { type: string }) => {
+    const currentRating = ratings[type] || 0;
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => setRatings((prev) => ({ ...prev, [type]: star }))}
+            className="p-0.5"
+          >
+            <Star
+              className={cn(
+                'h-4 w-4 transition-colors',
+                star <= currentRating
+                  ? 'fill-yellow-400 text-yellow-400'
+                  : 'text-muted-foreground/30'
+              )}
+            />
+          </button>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -238,267 +312,351 @@ export default function ContentTestTab() {
               Teste de Conteúdo
             </h2>
             <p className="text-xs text-muted-foreground">
-              Gere 1 exemplo de cada tipo para conferir qualidade, legenda, imagem e roteiro.
+              Gere, revise e dê feedback antes de publicar.
             </p>
           </div>
 
           <div className="space-y-3">
-            {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color }) => {
-          const isGenerating = generating === type;
-          const result = results[type];
-          const post = result?.post;
-          const isExpanded = expandedType === type;
-          const isShowingDeleteReason = showDeleteReason === type;
+            {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color, editType }) => {
+              const isGenerating = generating === type;
+              const result = results[type];
+              const post = result?.post;
+              const isExpanded = expandedType === type;
+              const isEditing = editingType === type;
 
-          return (
-            <Card key={type} className="overflow-hidden">
-              <CardContent className="p-0">
-                {/* Header row */}
-                <div className="flex items-center gap-3 p-3">
-                  <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-white', color)}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{label}</p>
-                    <p className="truncate text-[11px] text-muted-foreground">{description}</p>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    {post?.cost_estimate != null && post.cost_estimate > 0 && (
-                      <span className="text-[10px] font-medium text-muted-foreground">
-                        ~${post.cost_estimate.toFixed(3)}
-                      </span>
-                    )}
-                    {post && (
-                      <Badge
-                        variant={post.status === 'failed' ? 'destructive' : post.status === 'scheduled' ? 'default' : 'secondary'}
-                        className="text-[10px]"
+              return (
+                <Card key={type} className="overflow-hidden">
+                  <CardContent className="p-0">
+                    {/* Header row */}
+                    <div className="flex items-center gap-3 p-3">
+                      <div
+                        className={cn(
+                          'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-white',
+                          color
+                        )}
                       >
-                        {post.status === 'draft' ? '✓ OK' : post.status === 'failed' ? 'Erro' : post.status === 'scheduled' ? 'Agendado' : post.status}
-                      </Badge>
-                    )}
-                    <Button
-                      size="sm"
-                      className="h-8 text-xs"
-                      onClick={() => generateTest(type)}
-                      disabled={isGenerating || generating !== null}
-                    >
-                      {isGenerating ? (
-                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                      ) : (
-                        <Sparkles className="mr-1 h-3 w-3" />
-                      )}
-                      {post ? 'Refazer' : 'Gerar'}
-                    </Button>
-                  </div>
-                </div>
+                        <Icon className="h-5 w-5" />
+                      </div>
 
-                {/* Inline mini preview (always visible when result exists) */}
-                {post && !isExpanded && (
-                  <div
-                    className="flex cursor-pointer items-center gap-3 border-t bg-muted/20 px-3 py-2"
-                    onClick={() => setExpandedType(type)}
-                  >
-                    {/* Thumbnail */}
-                    {post.image_url && (
-                      <img
-                        src={post.image_url}
-                        alt="Preview"
-                        className="h-12 w-12 shrink-0 rounded-md object-cover"
-                      />
-                    )}
-                    {!post.image_url && post.carousel_images?.[0] && (
-                      <img
-                        src={post.carousel_images[0]}
-                        alt="Preview"
-                        className="h-12 w-12 shrink-0 rounded-md object-cover"
-                      />
-                    )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold">{label}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">{description}</p>
+                      </div>
 
-                    <p className="line-clamp-2 flex-1 text-[11px] text-muted-foreground">
-                      {post.caption?.substring(0, 120)}...
-                    </p>
+                      <div className="flex items-center gap-1.5">
+                        {post && (
+                          <Badge
+                            variant={
+                              post.status === 'failed'
+                                ? 'destructive'
+                                : post.status === 'scheduled'
+                                ? 'default'
+                                : 'secondary'
+                            }
+                            className="text-[10px]"
+                          >
+                            {post.status === 'draft'
+                              ? 'Rascunho'
+                              : post.status === 'failed'
+                              ? 'Erro'
+                              : post.status === 'scheduled'
+                              ? 'Agendado'
+                              : post.status}
+                          </Badge>
+                        )}
 
-                    <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
-                  </div>
-                )}
-
-                {/* Expanded result */}
-                {post && (
-                  <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedType(open ? type : null)}>
-                    {isExpanded && (
-                      <div className="border-t px-3 py-1.5">
-                        <CollapsibleTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-7 w-full justify-between px-2 text-xs">
-                            <span>Resultado</span>
-                            <ChevronDown className="h-3 w-3 rotate-180 transition-transform" />
+                        {/* Edit button */}
+                        {editType && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => setEditingType(isEditing ? null : type)}
+                          >
+                            {isEditing ? (
+                              <ChevronUp className="h-3.5 w-3.5" />
+                            ) : (
+                              <Settings2 className="h-3.5 w-3.5" />
+                            )}
                           </Button>
-                        </CollapsibleTrigger>
+                        )}
+
+                        <Button
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => generateTest(type)}
+                          disabled={isGenerating || generating !== null}
+                        >
+                          {isGenerating ? (
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          ) : (
+                            <Sparkles className="mr-1 h-3 w-3" />
+                          )}
+                          {post ? 'Refazer' : 'Gerar'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Edit Panel (RSS or Marketing) */}
+                    {isEditing && editType && (
+                      <div className="border-t bg-muted/20 p-3">
+                        {editType === 'rss' && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Rss className="h-4 w-4 text-primary" />
+                              <p className="text-xs font-semibold">Fontes RSS</p>
+                            </div>
+                            <CustomFeedsManager />
+                          </div>
+                        )}
+                        {editType === 'marketing' && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Megaphone className="h-4 w-4 text-primary" />
+                              <p className="text-xs font-semibold">Links de Afiliados</p>
+                            </div>
+                            <AgentMarketingPanel />
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    <CollapsibleContent className="border-t bg-muted/30 p-3">
-                      <div className="space-y-3">
-                        {/* Error */}
-                        {post.status === 'failed' && (
-                          <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-2">
-                            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                            <p className="text-xs text-destructive">{post.error_message || 'Erro desconhecido'}</p>
-                          </div>
-                        )}
-
-                        {/* Video preview */}
-                        {post.video_url && (
-                          <video
-                            src={post.video_url}
-                            controls
-                            className="w-full rounded-lg"
-                            style={{ maxHeight: 300 }}
-                          />
-                        )}
-
-                        {/* Carousel preview */}
-                        {!post.video_url && post.carousel_images && post.carousel_images.length > 0 && (
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {post.carousel_images.slice(0, 8).map((img: string, i: number) => (
-                              <img
-                                key={`carousel-${type}-${i}`}
-                                src={img}
-                                alt={`Slide ${i + 1}`}
-                                className="aspect-[4/5] w-full rounded-md object-cover"
-                              />
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Single image preview */}
-                        {!post.video_url && !post.carousel_images?.length && post.image_url && (
+                    {/* Mini preview (collapsed) */}
+                    {post && !isExpanded && (
+                      <div
+                        className="flex cursor-pointer items-center gap-3 border-t bg-muted/20 px-3 py-2"
+                        onClick={() => setExpandedType(type)}
+                      >
+                        {post.image_url && (
                           <img
                             src={post.image_url}
                             alt="Preview"
-                            className="w-full rounded-lg object-cover"
-                            style={{ maxHeight: 320 }}
+                            className="h-12 w-12 shrink-0 rounded-md object-cover"
                           />
                         )}
+                        {!post.image_url && post.carousel_images?.[0] && (
+                          <img
+                            src={post.carousel_images[0]}
+                            alt="Preview"
+                            className="h-12 w-12 shrink-0 rounded-md object-cover"
+                          />
+                        )}
+                        <p className="line-clamp-2 flex-1 text-[11px] text-muted-foreground">
+                          {post.caption?.substring(0, 120)}...
+                        </p>
+                        <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
+                      </div>
+                    )}
 
-                        {/* Caption */}
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Legenda</p>
-                          <p className="whitespace-pre-wrap text-xs">{post.caption}</p>
-                        </div>
-
-                        {/* Hashtags */}
-                        {post.hashtags && post.hashtags.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {post.hashtags.map((tag: string, i: number) => (
-                              <Badge key={`tag-${type}-${i}`} variant="secondary" className="text-[10px]">
-                                #{tag.replace(/^#/, '')}
-                              </Badge>
-                            ))}
+                    {/* Expanded result with preview + feedback */}
+                    {post && (
+                      <Collapsible
+                        open={isExpanded}
+                        onOpenChange={(open) => setExpandedType(open ? type : null)}
+                      >
+                        {isExpanded && (
+                          <div className="border-t px-3 py-1.5">
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-full justify-between px-2 text-xs"
+                              >
+                                <span>Preview</span>
+                                <ChevronDown className="h-3 w-3 rotate-180 transition-transform" />
+                              </Button>
+                            </CollapsibleTrigger>
                           </div>
                         )}
 
-                        {/* Script / overlay metadata */}
-                        {post.overlay_metadata && (
-                          <div className="space-y-2">
-                            {post.overlay_metadata.script?.segments && (
-                              <div className="space-y-1.5">
-                                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Roteiro</p>
-                                {post.overlay_metadata.script.segments.map((seg: any, i: number) => (
-                                  <div key={`script-${type}-${i}`} className="rounded-md border bg-background p-2">
-                                    <p className="text-xs">{seg.text}</p>
-                                  </div>
+                        <CollapsibleContent className="border-t bg-muted/30 p-3">
+                          <div className="space-y-3">
+                            {/* Error */}
+                            {post.status === 'failed' && (
+                              <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-2">
+                                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+                                <p className="text-xs text-destructive">
+                                  {post.error_message || 'Erro desconhecido'}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Video */}
+                            {post.video_url && (
+                              <video
+                                src={post.video_url}
+                                controls
+                                className="w-full rounded-lg"
+                                style={{ maxHeight: 300 }}
+                              />
+                            )}
+
+                            {/* Carousel */}
+                            {!post.video_url &&
+                              post.carousel_images &&
+                              post.carousel_images.length > 0 && (
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  {post.carousel_images
+                                    .slice(0, 8)
+                                    .map((img: string, i: number) => (
+                                      <img
+                                        key={`carousel-${type}-${i}`}
+                                        src={img}
+                                        alt={`Slide ${i + 1}`}
+                                        className="aspect-[4/5] w-full rounded-md object-cover"
+                                      />
+                                    ))}
+                                </div>
+                              )}
+
+                            {/* Single image */}
+                            {!post.video_url &&
+                              !post.carousel_images?.length &&
+                              post.image_url && (
+                                <img
+                                  src={post.image_url}
+                                  alt="Preview"
+                                  className="w-full rounded-lg object-cover"
+                                  style={{ maxHeight: 320 }}
+                                />
+                              )}
+
+                            {/* Caption */}
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                Legenda
+                              </p>
+                              <p className="whitespace-pre-wrap text-xs">{post.caption}</p>
+                            </div>
+
+                            {/* Hashtags */}
+                            {post.hashtags && post.hashtags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {post.hashtags.map((tag: string, i: number) => (
+                                  <Badge
+                                    key={`tag-${type}-${i}`}
+                                    variant="secondary"
+                                    className="text-[10px]"
+                                  >
+                                    #{tag.replace(/^#/, '')}
+                                  </Badge>
                                 ))}
                               </div>
                             )}
 
-                            {post.overlay_metadata.headline && (
-                              <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Headline</p>
-                                <p className="text-sm font-bold">{post.overlay_metadata.headline}</p>
+                            {/* Script / overlay */}
+                            {post.overlay_metadata && (
+                              <div className="space-y-2">
+                                {post.overlay_metadata.script?.segments && (
+                                  <div className="space-y-1.5">
+                                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                      Roteiro
+                                    </p>
+                                    {post.overlay_metadata.script.segments.map(
+                                      (seg: any, i: number) => (
+                                        <div
+                                          key={`script-${type}-${i}`}
+                                          className="rounded-md border bg-background p-2"
+                                        >
+                                          <p className="text-xs">{seg.text}</p>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+
+                                {post.overlay_metadata.headline && (
+                                  <div>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                      Headline
+                                    </p>
+                                    <p className="text-sm font-bold">
+                                      {post.overlay_metadata.headline}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Meta */}
+                            <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
+                              <span>Tipo: {post.media_type}</span>
+                              <span>•</span>
+                              <span>AI: {post.ai_model_used || 'N/A'}</span>
+                              {post.cost_estimate > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span>Custo: ~${post.cost_estimate?.toFixed(3)}</span>
+                                </>
+                              )}
+                            </div>
+
+                            {/* Feedback Section */}
+                            {post.status === 'draft' && (
+                              <div className="space-y-2 rounded-lg border bg-background p-3">
+                                <p className="text-xs font-semibold">Avaliação</p>
+
+                                {/* Star rating */}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[11px] text-muted-foreground">Nota:</span>
+                                  <StarRating type={type} />
+                                  {ratings[type] ? (
+                                    <span className="text-[11px] font-medium">
+                                      {ratings[type]}/5
+                                    </span>
+                                  ) : null}
+                                </div>
+
+                                {/* Feedback text */}
+                                <Textarea
+                                  placeholder="O que poderia melhorar? (opcional)"
+                                  value={feedback[type] || ''}
+                                  onChange={(e) =>
+                                    setFeedback((prev) => ({ ...prev, [type]: e.target.value }))
+                                  }
+                                  className="min-h-[60px] text-xs"
+                                />
+
+                                {/* Actions */}
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="h-8 flex-1 gap-1 text-xs"
+                                    onClick={() => approveAndPublish(post.id, type)}
+                                  >
+                                    <ThumbsUp className="h-3 w-3" />
+                                    Aprovar e Agendar
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 flex-1 gap-1 text-xs text-destructive border-destructive/30"
+                                    onClick={() => rejectPost(post.id, type)}
+                                  >
+                                    <ThumbsDown className="h-3 w-3" />
+                                    Rejeitar
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Already scheduled */}
+                            {post.status === 'scheduled' && (
+                              <div className="flex items-center gap-2 rounded-md border bg-primary/5 p-2">
+                                <CalendarDays className="h-4 w-4 text-primary" />
+                                <p className="text-xs text-primary font-medium">
+                                  Aprovado e agendado para publicação
+                                </p>
                               </div>
                             )}
                           </div>
-                        )}
-
-                        {/* Meta info */}
-                        <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
-                          <span>Tipo: {post.media_type}</span>
-                          <span>•</span>
-                          <span>AI: {post.ai_model_used || 'N/A'}</span>
-                          {post.cost_estimate > 0 && (
-                            <>
-                              <span>•</span>
-                              <span>Custo: ~${post.cost_estimate?.toFixed(3)}</span>
-                            </>
-                          )}
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {post.status === 'draft' && (
-                            <Button
-                              size="sm"
-                              className="h-7 px-3 text-[11px] neural-gradient border-0"
-                              onClick={() => schedulePost(post.id, type)}
-                            >
-                              <CalendarDays className="mr-1 h-3 w-3" />
-                              Agendar (1h)
-                            </Button>
-                          )}
-
-                          {!isShowingDeleteReason ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-3 text-[11px] text-destructive hover:text-destructive"
-                              onClick={() => setShowDeleteReason(type)}
-                            >
-                              <Trash2 className="mr-1 h-3 w-3" />
-                              Excluir
-                            </Button>
-                          ) : (
-                            <div className="flex w-full items-center gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-2">
-                              <MessageSquare className="h-4 w-4 shrink-0 text-destructive" />
-                              <Input
-                                placeholder="O que ficou ruim? (opcional)"
-                                value={deleteReason[type] || ''}
-                                onChange={(e) =>
-                                  setDeleteReason((prev) => ({ ...prev, [type]: e.target.value }))
-                                }
-                                className="h-7 flex-1 text-xs"
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') deletePost(post.id, type);
-                                }}
-                              />
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                className="h-7 px-2 text-[10px]"
-                                onClick={() => deletePost(post.id, type)}
-                              >
-                                Confirmar
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 px-2 text-[10px]"
-                                onClick={() => setShowDeleteReason(null)}
-                              >
-                                Cancelar
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+                        </CollapsibleContent>
+                      </Collapsible>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </>
       )}

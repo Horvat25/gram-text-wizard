@@ -1,11 +1,9 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
-  Rss, 
   Loader2,
   Settings,
   TrendingUp,
-  Megaphone,
   Bot,
   History,
   CalendarDays,
@@ -23,12 +21,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 import AgentGenie3D from './AgentGenie3D';
 import AgentMinimalChat from './AgentMinimalChat';
-import AgentChatPanel from './AgentChatPanel';
 import AgentProactiveChat from './AgentProactiveChat';
-import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentSettingsPanel from './AgentSettingsPanel';
 import AgentGrowthDashboard from './AgentGrowthDashboard';
-import AgentMarketingPanel from './AgentMarketingPanel';
+
 import TikTokGrowthDashboard from './TikTokGrowthDashboard';
 import PublicationQueueTab from '@/components/tabs/PublicationQueueTab';
 import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
@@ -116,9 +112,7 @@ export default function AgentGenieView() {
   // Panel states
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [showHistory] = useState(false); // kept for closeAllPanels compat
-  const [showFeeds, setShowFeeds] = useState(false);
   const [showGrowth, setShowGrowth] = useState(false);
-  const [showMarketing, setShowMarketing] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
   const [showVideoClips, setShowVideoClips] = useState(false);
@@ -291,10 +285,7 @@ export default function AgentGenieView() {
 
   const closeAllPanels = () => {
     setShowAgentChat(false);
-    
-    setShowFeeds(false);
     setShowGrowth(false);
-    setShowMarketing(false);
     setShowQueue(false);
     setShowPostHistory(false);
     setShowVideoClips(false);
@@ -308,9 +299,7 @@ export default function AgentGenieView() {
     const isCurrentlyOpen: Record<string, boolean> = {
       agentChat: showAgentChat,
       history: showHistory,
-      feeds: showFeeds,
       growth: showGrowth,
-      marketing: showMarketing,
       queue: showQueue,
       postHistory: showPostHistory,
       videoClips: showVideoClips,
@@ -325,9 +314,8 @@ export default function AgentGenieView() {
       switch (panel) {
         case 'agentChat': setShowAgentChat(true); break;
         case 'history':  break;
-        case 'feeds': setShowFeeds(true); break;
         case 'growth': setShowGrowth(true); break;
-        case 'marketing': setShowMarketing(true); break;
+        
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
         case 'videoClips': setShowVideoClips(true); break;
@@ -560,20 +548,7 @@ export default function AgentGenieView() {
               <CalendarDays className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Fila</span>
             </Button>
-            
-            <Button
-              variant={showFeeds ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showFeeds && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('feeds')}
-            >
-              <Rss className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Fontes</span>
-            </Button>
-            
+
             <Button
               variant={showGrowth ? "default" : "ghost"}
               size="sm"
@@ -586,22 +561,7 @@ export default function AgentGenieView() {
               <TrendingUp className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Crescimento</span>
             </Button>
-            
-            <Button
-              variant={showMarketing ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showMarketing && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('marketing')}
-            >
-              <Megaphone className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Marketing</span>
-            </Button>
-            
-            
-            
+
             <Button
               variant={showPostHistory ? "default" : "ghost"}
               size="sm"
@@ -733,52 +693,7 @@ export default function AgentGenieView() {
           </div>
         )}
         
-        {/* Feeds Sources Panel */}
-        {showFeeds && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-lg mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Fontes de Conteúdo</h2>
-                    <p className="text-xs text-muted-foreground">Sites que o agente usa para buscar notícias</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowFeeds(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <CustomFeedsManager />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
         
-        {/* Growth Dashboard Panel */}
-        {showGrowth && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-lg mx-auto">
-                <AgentGrowthDashboard context={agentCtx} onUpdate={updateContext} />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-        
-        {/* Marketing Panel */}
-        {showMarketing && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-lg mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Marketing & Afiliados</h2>
-                    <p className="text-xs text-muted-foreground">Links que o agente promove automaticamente</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowMarketing(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <AgentMarketingPanel />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
         
         {/* Video Clips Panel */}
         {showVideoClips && (
