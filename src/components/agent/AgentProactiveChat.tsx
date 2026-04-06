@@ -138,6 +138,14 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
         .order('created_at', { ascending: false })
         .limit(20);
 
+      // Fetch all chat messages (for history tab)
+      const { data: allChatMsgs } = await supabase
+        .from('agent_chat_messages')
+        .select('id, role, content, created_at')
+        .eq('workspace_id', currentWorkspace.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
       const items: TimelineItem[] = [];
 
       (messages || []).forEach((m: any) => {
@@ -157,6 +165,15 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
             date: new Date(m.created_at),
           });
         });
+
+      // Add chat messages as timeline items
+      (allChatMsgs || []).forEach((m: any) => {
+        items.push({
+          type: 'chat',
+          data: { id: m.id, role: m.role, content: m.content, created_at: m.created_at },
+          date: new Date(m.created_at),
+        });
+      });
 
       items.sort((a, b) => b.date.getTime() - a.date.getTime());
       setTimeline(items);
