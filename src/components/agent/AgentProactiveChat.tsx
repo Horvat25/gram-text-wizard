@@ -515,7 +515,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1 px-3 py-2 border-b border-border/30">
-            {(['all', 'reports', 'actions'] as const).map((f) => (
+            {(['all', 'reports', 'actions', 'chat'] as const).map((f) => (
               <Button
                 key={f}
                 variant={filter === f ? "default" : "ghost"}
@@ -526,7 +526,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
                 )}
                 onClick={() => setFilter(f)}
               >
-                {f === 'all' ? 'Tudo' : f === 'reports' ? '📊 Relatórios' : '⚡ Ações'}
+                {f === 'all' ? 'Tudo' : f === 'reports' ? '📊 Relatórios' : f === 'actions' ? '⚡ Ações' : '💬 Histórico'}
               </Button>
             ))}
             <span className="text-[10px] text-muted-foreground ml-auto">
