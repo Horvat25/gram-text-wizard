@@ -28,7 +28,8 @@ import {
   Image,
   Video,
   Mic,
-  Play
+  Play,
+  DollarSign
 } from "lucide-react";
 import Header from "@/components/Header";
 import { AICostsTab } from "@/components/settings/AICostsTab";
