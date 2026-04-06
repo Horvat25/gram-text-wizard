@@ -64,6 +64,7 @@ export default function VideoClipsTab() {
   const [clips, setClips] = useState<ClipPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [renderingClipId, setRenderingClipId] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<string>('realidade-impressionante');
   const [customSource, setCustomSource] = useState('');
   const [expandedClipId, setExpandedClipId] = useState<string | null>(null);
@@ -261,7 +262,7 @@ export default function VideoClipsTab() {
             <div>
               <h2 className="font-semibold text-sm">Clips por fonte</h2>
               <p className="text-xs text-muted-foreground">
-                Escolha um perfil do YouTube e gere 5 cortes do vídeo mais recente.
+                Escolha um perfil do YouTube e gere 1 corte do vídeo mais recente.
               </p>
             </div>
           </div>
@@ -320,7 +321,7 @@ export default function VideoClipsTab() {
                 ) : (
                   <Sparkles className="mr-1 h-3 w-3" />
                 )}
-                Gerar 5 clips
+                Gerar 1 clip
               </Button>
             </div>
           </div>
