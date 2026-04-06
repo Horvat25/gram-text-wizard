@@ -159,13 +159,13 @@ export default function VideoClipsTab() {
     if (!user || !currentWorkspace || !activeSource) return;
 
     setIsGenerating(true);
-    toast.info(`Buscando o último vídeo de ${activeSourceLabel} e criando 5 cortes...`);
+    toast.info(`Buscando o último vídeo de ${activeSourceLabel} e criando 1 corte...`);
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-batch-clips', {
         body: {
           workspace_id: currentWorkspace.id,
-          clips_count: 5,
+          clips_count: 1,
           source_profile: activeSource,
           source_label: activeSourceLabel,
         },
@@ -175,11 +175,11 @@ export default function VideoClipsTab() {
       if (data?.error) throw new Error(data.error);
 
       setLastGeneratedSource(data?.source_video ?? null);
-      toast.success(`${data.clips_created} cortes criados de "${data.source_video?.title}"`);
+      toast.success(`Corte criado de "${data.source_video?.title}"`);
       await loadClips();
     } catch (e: any) {
       console.error('Error generating clips:', e);
-      toast.error(e.message || 'Erro ao gerar cortes');
+      toast.error(e.message || 'Erro ao gerar corte');
     } finally {
       setIsGenerating(false);
     }
