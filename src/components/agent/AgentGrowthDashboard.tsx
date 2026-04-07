@@ -195,11 +195,14 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
           await new Promise((r) => setTimeout(r, 1000));
         }
 
-        // If both attempts failed, log warning but continue with what we have
+        // If both attempts failed, check if it's a fatal error (no account) vs transient
         if (lastError && !data) {
           console.warn(`[Sync] Batch at offset ${offset} failed after retries: ${lastError}`);
           allErrors.push(lastError);
-          // Skip this batch and try next
+          // Stop entirely if no Instagram account is connected — no point retrying
+          if (lastError.toLowerCase().includes('nenhuma conta') || lastError.toLowerCase().includes('no account')) {
+            break;
+          }
           offset += 25;
           guard++;
           continue;
