@@ -1630,8 +1630,8 @@ async function createCarouselContent(
   // Mark as used
   await supabase.from('rss_items').update({ is_used: true }).eq('id', bestArticle.id);
   
-  // STEP 2: Use AI to generate 4 PROGRESSIVE slides about this ONE topic
-  // Each slide builds on the previous one: Contexto → O que é → Impacto → O que fazer
+  // STEP 2: Use AI to generate 3 PROGRESSIVE slides about this ONE topic
+  // Each slide builds on the previous one: Hook → Contexto → Impacto+Ação
   let slideContents: { slideTitle: string; slideText: string; imagePrompt: string }[] = [];
   
   if (lovableApiKey) {
@@ -1642,24 +1642,22 @@ TEMA DO CARROSSEL: "${bestArticle.title}"
 CONTEXTO: ${bestArticle.description || bestArticle.title}
 FONTE: ${bestArticle.source_name || 'Tech News'}
 
-Crie um carrossel EDUCACIONAL de 4 slides sobre esse ÚNICO tema. Cada slide deve aprofundar progressivamente:
+Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema:
 
-SLIDE 1 - HOOK: Título impactante que gera curiosidade. Deve fazer a pessoa parar de rolar o feed.
+SLIDE 1 - HOOK: Título impactante que gera curiosidade.
 SLIDE 2 - CONTEXTO: Explicação clara do que está acontecendo e por quê é importante.
-SLIDE 3 - IMPACTO: Como isso afeta a vida das pessoas, empresas ou o futuro.
-SLIDE 4 - AÇÃO: O que as pessoas devem saber/fazer. Conclusão forte com insight valioso.
+SLIDE 3 - IMPACTO + AÇÃO: Como isso afeta as pessoas e o que devem saber/fazer.
 
 REGRAS:
-- Todos os 4 slides são sobre o MESMO tema, aprofundando progressivamente
+- Todos os 3 slides são sobre o MESMO tema, aprofundando progressivamente
 - slideTitle: máximo 8 palavras, impactante, em CAIXA ALTA
-- slideText: 2-3 frases curtas e diretas por slide (texto que aparece no slide)
+- slideText: 2-3 frases curtas e diretas por slide
 - imagePrompt: descrição visual para gerar imagem IA coerente com o slide (em inglês)
-- As 4 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, cores, ambiente)
+- As 3 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, cores, ambiente)
 
 Responda em JSON:
 {
   "slides": [
-    { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." }
