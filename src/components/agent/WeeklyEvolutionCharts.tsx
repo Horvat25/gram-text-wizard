@@ -1,43 +1,48 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Legend,
 } from 'recharts';
-import { TrendingUp, Eye, Heart, Bookmark, Share2, BarChart3 } from 'lucide-react';
+import { TrendingUp, Heart, BarChart3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useWorkspace } from '@/hooks/useWorkspace';
 import { motion } from 'framer-motion';
 
-interface SnapshotRow {
-  snapshot_date: string;
-  total_reach: number;
-  total_impressions: number;
-  total_likes: number;
-  total_comments: number;
-  total_saves: number;
-  total_shares: number;
-  followers_count: number;
-  avg_engagement: number;
-  posts_count: number;
-  content_distribution_videos: number;
-  content_distribution_carousels: number;
-  content_distribution_news: number;
-  content_distribution_images: number;
-  top_performing_type: string | null;
+interface WeeklyEvolutionChartsProps {
+  workspaceId?: string | null;
+  period?: number;
+}
+
+interface PostRow {
+  published_at: string | null;
+  reach: number | null;
+  impressions: number | null;
+  likes_count: number | null;
+  comments_count: number | null;
+  saves_count: number | null;
+  shares_count: number | null;
+  media_type: string | null;
+  post_type: string | null;
 }
 
 interface WeeklyData {
   week: string;
   weekLabel: string;
   reach: number;
+  impressions: number;
   likes: number;
+  comments: number;
   saves: number;
   shares: number;
-  comments: number;
-  followers: number;
-  engagement: number;
   posts: number;
   reels: number;
   newsReels: number;
@@ -48,166 +53,87 @@ interface WeeklyData {
   marketingVideo: number;
 }
 
-// Derive content mix from actual posts for a given week range
-async function fetchPostsMixByWeek(workspaceId: string, since: Date): Promise<Record<string, { reels: number; newsReels: number; carousels: number; news: number; images: number; marketingImg: number; marketingVideo: number }>> {
-  const { data } = await supabase
-    .from('posts')
-    .select('published_at, media_type, post_type')
-    .eq('workspace_id', workspaceId)
-    .eq('status', 'published')
-    .gte('published_at', since.toISOString())
-    .order('published_at', { ascending: true });
+function getWeekStart(dateString: string) {
+  const d = new Date(dateString);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d);
+  monday.setDate(diff);
+  monday.setHours(0, 0, 0, 0);
+  return monday.toISOString().slice(0, 10);
+}
 
-  const weekMap: Record<string, { reels: number; newsReels: number; carousels: number; news: number; images: number; marketingImg: number; marketingVideo: number }> = {};
+function classifyPost(post: PostRow) {
+  const mediaType = (post.media_type || '').toLowerCase();
+  const postType = (post.post_type || '').toLowerCase();
 
-  for (const row of data || []) {
-    if (!row.published_at) continue;
-    const d = new Date(row.published_at);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(d);
-    monday.setDate(diff);
-    const key = monday.toISOString().slice(0, 10);
+  if (postType === 'afiliado' || postType.includes('marketing') || postType === 'vendas') {
+    return mediaType === 'video' || mediaType === 'reel' || mediaType === 'reels'
+      ? 'marketingVideo'
+      : 'marketingImg';
+  }
 
-    if (!weekMap[key]) weekMap[key] = { reels: 0, newsReels: 0, carousels: 0, news: 0, images: 0, marketingImg: 0, marketingVideo: 0 };
+  if (postType === 'video_curated') return 'newsReels';
 
-    const mt = row.media_type || '';
-    const pt = row.post_type || '';
+  if ((mediaType === 'video' || mediaType === 'reel' || mediaType === 'reels') && (postType === 'noticia' || postType === 'notícia' || postType === 'news')) {
+    return 'newsReels';
+  }
 
-    if (pt.includes('marketing') && (mt === 'video' || mt === 'reels' || mt === 'reel')) {
-      weekMap[key].marketingVideo++;
-    } else if (pt.includes('marketing')) {
-      weekMap[key].marketingImg++;
-    } else if ((mt === 'reels' || mt === 'reel' || mt === 'video') && (pt === 'news_video' || pt === 'noticia_video')) {
-      weekMap[key].newsReels++;
-    } else if (mt === 'reels' || mt === 'reel' || mt === 'video') {
-      weekMap[key].reels++;
-    } else if (mt === 'carousel' || mt === 'carousel_album') {
-      weekMap[key].carousels++;
-    } else if (pt === 'news' || pt === 'noticia' || pt === 'notícia') {
-      weekMap[key].news++;
-    } else {
-      weekMap[key].images++;
+  if (mediaType === 'video' || mediaType === 'reel' || mediaType === 'reels') {
+    return 'reels';
+  }
+
+  if (mediaType === 'carousel' || mediaType === 'carousel_album') {
+    return 'carousels';
+  }
+
+  if (postType === 'noticia' || postType === 'notícia' || postType === 'news') {
+    return 'news';
+  }
+
+  return 'images';
+}
+
+function aggregateByWeek(posts: PostRow[]): WeeklyData[] {
+  const weekMap: Record<string, WeeklyData> = {};
+
+  for (const post of posts) {
+    if (!post.published_at) continue;
+    const week = getWeekStart(post.published_at);
+    if (!weekMap[week]) {
+      const d = new Date(week);
+      weekMap[week] = {
+        week,
+        weekLabel: `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`,
+        reach: 0,
+        impressions: 0,
+        likes: 0,
+        comments: 0,
+        saves: 0,
+        shares: 0,
+        posts: 0,
+        reels: 0,
+        newsReels: 0,
+        carousels: 0,
+        news: 0,
+        images: 0,
+        marketingImg: 0,
+        marketingVideo: 0,
+      };
     }
+
+    const item = weekMap[week];
+    item.reach += post.reach || 0;
+    item.impressions += post.impressions || 0;
+    item.likes += post.likes_count || 0;
+    item.comments += post.comments_count || 0;
+    item.saves += post.saves_count || 0;
+    item.shares += post.shares_count || 0;
+    item.posts += 1;
+    item[classifyPost(post)] += 1;
   }
 
-  return weekMap;
-}
-
-function aggregateByWeek(snapshots: SnapshotRow[], postsMix?: Record<string, { reels: number; newsReels: number; carousels: number; news: number; images: number; marketingImg: number; marketingVideo: number }>): WeeklyData[] {
-  const weekMap: Record<string, SnapshotRow[]> = {};
-
-  for (const s of snapshots) {
-    const d = new Date(s.snapshot_date);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(d);
-    monday.setDate(diff);
-    const key = monday.toISOString().slice(0, 10);
-    if (!weekMap[key]) weekMap[key] = [];
-    weekMap[key].push(s);
-  }
-
-  return Object.entries(weekMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([weekStart, rows]) => {
-      const lastRow = rows[rows.length - 1];
-      const totalReach = rows.reduce((s, r) => s + (r.total_reach || 0), 0);
-      const totalLikes = rows.reduce((s, r) => s + (r.total_likes || 0), 0);
-      const totalSaves = rows.reduce((s, r) => s + (r.total_saves || 0), 0);
-      const totalShares = rows.reduce((s, r) => s + (r.total_shares || 0), 0);
-      const totalComments = rows.reduce((s, r) => s + (r.total_comments || 0), 0);
-      const totalPosts = rows.reduce((s, r) => s + (r.posts_count || 0), 0);
-      const avgEng = rows.length > 0
-        ? rows.reduce((s, r) => s + (r.avg_engagement || 0), 0) / rows.length
-        : 0;
-
-      const d = new Date(weekStart);
-      const weekLabel = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-
-      // Use real posts mix data if available, otherwise fall back to snapshot columns
-      const mix = postsMix?.[weekStart];
-
-      return {
-        week: weekStart,
-        weekLabel,
-        reach: totalReach,
-        likes: totalLikes,
-        saves: totalSaves,
-        shares: totalShares,
-        comments: totalComments,
-        followers: lastRow.followers_count || 0,
-        engagement: parseFloat(avgEng.toFixed(2)),
-        posts: totalPosts,
-        reels: mix?.reels ?? rows.reduce((s, r) => s + (r.content_distribution_videos || 0), 0),
-        newsReels: mix?.newsReels ?? 0,
-        carousels: mix?.carousels ?? rows.reduce((s, r) => s + (r.content_distribution_carousels || 0), 0),
-        news: mix?.news ?? rows.reduce((s, r) => s + (r.content_distribution_news || 0), 0),
-        images: mix?.images ?? rows.reduce((s, r) => s + (r.content_distribution_images || 0), 0),
-        marketingImg: mix?.marketingImg ?? 0,
-        marketingVideo: mix?.marketingVideo ?? 0,
-      };
-    });
-}
-
-// Also build weekly data from posts only (when no snapshots)
-async function buildFromPosts(workspaceId: string, since: Date): Promise<WeeklyData[]> {
-  const { data } = await supabase
-    .from('posts')
-    .select('published_at, media_type, post_type, reach, impressions, likes_count, comments_count, saves_count, shares_count')
-    .eq('workspace_id', workspaceId)
-    .eq('status', 'published')
-    .gte('published_at', since.toISOString())
-    .order('published_at', { ascending: true });
-
-  if (!data || data.length === 0) return [];
-
-  const weekMap: Record<string, any[]> = {};
-  for (const row of data) {
-    if (!row.published_at) continue;
-    const d = new Date(row.published_at);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(d);
-    monday.setDate(diff);
-    const key = monday.toISOString().slice(0, 10);
-    if (!weekMap[key]) weekMap[key] = [];
-    weekMap[key].push(row);
-  }
-
-  return Object.entries(weekMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([weekStart, rows]) => {
-      const d = new Date(weekStart);
-      const weekLabel = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-
-      let reels = 0, newsReels = 0, carousels = 0, news = 0, images = 0, marketingImg = 0, marketingVideo = 0;
-      for (const row of rows) {
-        const mt = row.media_type || '';
-        const pt = row.post_type || '';
-        if (pt.includes('marketing') && (mt === 'video' || mt === 'reels' || mt === 'reel')) marketingVideo++;
-        else if (pt.includes('marketing')) marketingImg++;
-        else if ((mt === 'reels' || mt === 'reel' || mt === 'video') && (pt === 'news_video' || pt === 'noticia_video')) newsReels++;
-        else if (mt === 'reels' || mt === 'reel' || mt === 'video') reels++;
-        else if (mt === 'carousel' || mt === 'carousel_album') carousels++;
-        else if (pt === 'news' || pt === 'noticia' || pt === 'notícia') news++;
-        else images++;
-      }
-
-      return {
-        week: weekStart,
-        weekLabel,
-        reach: rows.reduce((s, r) => s + (r.reach || 0), 0),
-        likes: rows.reduce((s, r) => s + (r.likes_count || 0), 0),
-        saves: rows.reduce((s, r) => s + (r.saves_count || 0), 0),
-        shares: rows.reduce((s, r) => s + (r.shares_count || 0), 0),
-        comments: rows.reduce((s, r) => s + (r.comments_count || 0), 0),
-        followers: 0,
-        engagement: 0,
-        posts: rows.length,
-        reels, newsReels, carousels, news, images, marketingImg, marketingVideo,
-      };
-    });
+  return Object.values(weekMap).sort((a, b) => a.week.localeCompare(b.week));
 }
 
 function formatK(n: number): string {
@@ -240,44 +166,39 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export default function WeeklyEvolutionCharts() {
-  const { currentWorkspace } = useWorkspace();
-  const [weeklyData, setWeeklyData] = useState<WeeklyData[]>([]);
+export default function WeeklyEvolutionCharts({ workspaceId, period = 90 }: WeeklyEvolutionChartsProps) {
+  const [posts, setPosts] = useState<PostRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!currentWorkspace?.id) return;
+    if (!workspaceId) {
+      setPosts([]);
+      setLoading(false);
+      return;
+    }
+
     const load = async () => {
       setLoading(true);
       const since = new Date();
-      since.setDate(since.getDate() - 90);
+      since.setDate(since.getDate() - period);
 
-      // Fetch snapshots and posts mix in parallel
-      const [snapshotsRes, postsMix] = await Promise.all([
-        supabase
-          .from('agent_strategy_snapshots')
-          .select('*')
-          .eq('workspace_id', currentWorkspace.id)
-          .gte('snapshot_date', since.toISOString().slice(0, 10))
-          .order('snapshot_date', { ascending: true }),
-        fetchPostsMixByWeek(currentWorkspace.id, since),
-      ]);
+      const { data } = await supabase
+        .from('posts')
+        .select('published_at, reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, post_type')
+        .eq('workspace_id', workspaceId)
+        .eq('status', 'published')
+        .not('instagram_post_id', 'is', null)
+        .gte('published_at', since.toISOString())
+        .order('published_at', { ascending: true });
 
-      const snapshots = (snapshotsRes.data as SnapshotRow[]) || [];
-
-      if (snapshots.length > 0) {
-        // Use snapshots enriched with real posts mix
-        setWeeklyData(aggregateByWeek(snapshots, postsMix));
-      } else {
-        // No snapshots — build entirely from posts
-        const fromPosts = await buildFromPosts(currentWorkspace.id, since);
-        setWeeklyData(fromPosts);
-      }
-
+      setPosts((data as PostRow[]) || []);
       setLoading(false);
     };
+
     load();
-  }, [currentWorkspace?.id]);
+  }, [workspaceId, period]);
+
+  const weeklyData = useMemo(() => aggregateByWeek(posts), [posts]);
 
   if (loading) {
     return (
@@ -289,7 +210,7 @@ export default function WeeklyEvolutionCharts() {
     );
   }
 
-  if (weeklyData.length < 2) {
+  if (weeklyData.length === 0) {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Card className="border-border/50">
@@ -297,7 +218,7 @@ export default function WeeklyEvolutionCharts() {
             <div className="text-center py-6">
               <BarChart3 className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
               <p className="text-xs text-muted-foreground">
-                Dados insuficientes para gráficos de evolução. Os gráficos aparecerão após 2+ semanas de posts publicados.
+                Nenhum post publicado do Instagram encontrado nos últimos {period} dias.
               </p>
             </div>
           </CardContent>
@@ -312,19 +233,15 @@ export default function WeeklyEvolutionCharts() {
 
   return (
     <div className="space-y-3">
-      {/* Reach Evolution */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-1 pt-3 px-3">
             <CardTitle className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-1.5">
-                <TrendingUp className="h-4 w-4 text-emerald-500" />
-                Evolução Semanal — Alcance
+                <TrendingUp className="h-4 w-4 text-primary" />
+                Evolução Semanal — Alcance ({period}d)
               </span>
-              <Badge
-                variant="outline"
-                className={`text-[10px] ${reachTrend.direction === 'up' ? 'text-emerald-500 border-emerald-500/30' : reachTrend.direction === 'down' ? 'text-red-500 border-red-500/30' : 'text-muted-foreground'}`}
-              >
+              <Badge variant="outline" className="text-[10px]">
                 {reachTrend.direction === 'up' ? '▲' : reachTrend.direction === 'down' ? '▼' : '—'} {reachTrend.pct}%
               </Badge>
             </CardTitle>
@@ -342,78 +259,44 @@ export default function WeeklyEvolutionCharts() {
                 <XAxis dataKey="weekLabel" tick={{ fontSize: 10 }} className="fill-muted-foreground" />
                 <YAxis tickFormatter={formatK} tick={{ fontSize: 10 }} className="fill-muted-foreground" />
                 <Tooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="reach"
-                  name="Alcance"
-                  stroke="hsl(var(--primary))"
-                  fill="url(#reachGrad)"
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: 'hsl(var(--primary))' }}
-                />
+                <Area type="monotone" dataKey="reach" name="Alcance" stroke="hsl(var(--primary))" fill="url(#reachGrad)" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--primary))' }} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* Engagement Metrics */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-1 pt-3 px-3">
             <CardTitle className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-1.5">
-                <Heart className="h-4 w-4 text-red-500" />
-                Engajamento Semanal
+                <Heart className="h-4 w-4 text-primary" />
+                Engajamento Semanal ({period}d)
               </span>
               <div className="flex gap-1.5">
-                <Badge
-                  variant="outline"
-                  className={`text-[10px] ${likesTrend.direction === 'up' ? 'text-red-500 border-red-500/30' : 'text-muted-foreground'}`}
-                >
-                  ❤️ {likesTrend.direction === 'up' ? '▲' : '▼'}{likesTrend.pct}%
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className={`text-[10px] ${savesTrend.direction === 'up' ? 'text-amber-500 border-amber-500/30' : 'text-muted-foreground'}`}
-                >
-                  💾 {savesTrend.direction === 'up' ? '▲' : '▼'}{savesTrend.pct}%
-                </Badge>
+                <Badge variant="outline" className="text-[10px]">❤️ {likesTrend.direction === 'up' ? '▲' : likesTrend.direction === 'down' ? '▼' : '—'}{likesTrend.pct}%</Badge>
+                <Badge variant="outline" className="text-[10px]">💾 {savesTrend.direction === 'up' ? '▲' : savesTrend.direction === 'down' ? '▼' : '—'}{savesTrend.pct}%</Badge>
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="px-1 pb-2">
             <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={weeklyData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="likesGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="savesGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
                 <XAxis dataKey="weekLabel" tick={{ fontSize: 10 }} className="fill-muted-foreground" />
                 <YAxis tickFormatter={formatK} tick={{ fontSize: 10 }} className="fill-muted-foreground" />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  wrapperStyle={{ fontSize: '10px' }}
-                  iconType="circle"
-                  iconSize={6}
-                />
-                <Area type="monotone" dataKey="likes" name="Curtidas" stroke="#ef4444" fill="url(#likesGrad)" strokeWidth={2} dot={{ r: 2 }} />
-                <Area type="monotone" dataKey="saves" name="Salvamentos" stroke="#f59e0b" fill="url(#savesGrad)" strokeWidth={2} dot={{ r: 2 }} />
-                <Area type="monotone" dataKey="shares" name="Compartilh." stroke="#a855f7" fill="none" strokeWidth={1.5} strokeDasharray="4 2" dot={{ r: 2 }} />
+                <Legend wrapperStyle={{ fontSize: '10px' }} iconType="circle" iconSize={6} />
+                <Area type="monotone" dataKey="likes" name="Curtidas" stroke="hsl(var(--destructive))" fillOpacity={0} strokeWidth={2} dot={{ r: 2 }} />
+                <Area type="monotone" dataKey="saves" name="Salvamentos" stroke="hsl(var(--accent-foreground))" fillOpacity={0} strokeWidth={2} dot={{ r: 2 }} />
+                <Area type="monotone" dataKey="shares" name="Compartilh." stroke="hsl(var(--muted-foreground))" fillOpacity={0} strokeWidth={1.5} strokeDasharray="4 2" dot={{ r: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* Content Mix per Week — all 7 types */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-1 pt-3 px-3">
@@ -424,20 +307,20 @@ export default function WeeklyEvolutionCharts() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-1 pb-2">
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={210}>
               <BarChart data={weeklyData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
                 <XAxis dataKey="weekLabel" tick={{ fontSize: 10 }} className="fill-muted-foreground" />
-                <YAxis tick={{ fontSize: 10 }} className="fill-muted-foreground" />
+                <YAxis tick={{ fontSize: 10 }} className="fill-muted-foreground" allowDecimals={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '9px' }} iconType="circle" iconSize={6} />
-                <Bar dataKey="reels" name="Reels Criativos" fill="#8b5cf6" radius={[2, 2, 0, 0]} stackId="a" />
+                <Bar dataKey="reels" name="Reels Criativos" fill="#8b5cf6" stackId="a" />
                 <Bar dataKey="newsReels" name="Reels Notícia" fill="#10b981" stackId="a" />
                 <Bar dataKey="carousels" name="Carrosséis" fill="#06b6d4" stackId="a" />
                 <Bar dataKey="news" name="Notícias Img" fill="#f97316" stackId="a" />
                 <Bar dataKey="images" name="Imagens IA" fill="#ec4899" stackId="a" />
                 <Bar dataKey="marketingImg" name="Mkt Imagem" fill="#eab308" stackId="a" />
-                <Bar dataKey="marketingVideo" name="Mkt Vídeo" fill="#ef4444" radius={[2, 2, 0, 0]} stackId="a" />
+                <Bar dataKey="marketingVideo" name="Mkt Vídeo" fill="#ef4444" stackId="a" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -447,35 +330,24 @@ export default function WeeklyEvolutionCharts() {
   );
 }
 
-// Export the data fetcher for the agent to use
-export async function getWeeklyEvolutionSummary(workspaceId: string): Promise<string> {
+export async function getWeeklyEvolutionSummary(workspaceId: string, period = 30): Promise<string> {
   const since = new Date();
-  since.setDate(since.getDate() - 30);
+  since.setDate(since.getDate() - period);
 
-  const [snapshotsRes, postsMix] = await Promise.all([
-    supabase
-      .from('agent_strategy_snapshots')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .gte('snapshot_date', since.toISOString().slice(0, 10))
-      .order('snapshot_date', { ascending: true }),
-    fetchPostsMixByWeek(workspaceId, since),
-  ]);
+  const { data } = await supabase
+    .from('posts')
+    .select('published_at, reach, impressions, likes_count, comments_count, saves_count, shares_count, media_type, post_type')
+    .eq('workspace_id', workspaceId)
+    .eq('status', 'published')
+    .not('instagram_post_id', 'is', null)
+    .gte('published_at', since.toISOString())
+    .order('published_at', { ascending: true });
 
-  const snapshots = (snapshotsRes.data as SnapshotRow[]) || [];
-  let weekly: WeeklyData[];
-
-  if (snapshots.length > 0) {
-    weekly = aggregateByWeek(snapshots, postsMix);
-  } else {
-    weekly = await buildFromPosts(workspaceId, since);
-  }
-
+  const weekly = aggregateByWeek((data as PostRow[]) || []);
   if (weekly.length < 2) return 'Dados insuficientes para análise de evolução semanal.';
 
   const curr = weekly[weekly.length - 1];
   const prev = weekly[weekly.length - 2];
-
   const delta = (c: number, p: number) => {
     if (p === 0) return c > 0 ? '+∞' : '0%';
     const pct = Math.round(((c - p) / p) * 100);
@@ -490,6 +362,5 @@ export async function getWeeklyEvolutionSummary(workspaceId: string): Promise<st
     `- Compartilhamentos: ${formatK(curr.shares)} (${delta(curr.shares, prev.shares)})`,
     `- Posts: ${curr.posts} (${delta(curr.posts, prev.posts)})`,
     `- Mix: ${curr.reels} reels criativos, ${curr.newsReels} reels notícia, ${curr.carousels} carrosséis, ${curr.news} notícias img, ${curr.images} imagens IA, ${curr.marketingImg} mkt img, ${curr.marketingVideo} mkt vídeo`,
-    `- Seguidores: ${curr.followers}`,
   ].join('\n');
 }
