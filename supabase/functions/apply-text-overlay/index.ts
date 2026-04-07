@@ -403,32 +403,35 @@ serve(async (req) => {
       headlineText = await generateHeadlineText(title, lovableApiKey);
     }
 
-    // STEP 1.5: ALWAYS review headline with review-portuguese for spelling/grammar
-    try {
-      console.log("[apply-text-overlay] 📝 Revisando headline com review-portuguese...");
-      const reviewResponse = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseKey}`,
-          'apikey': supabaseKey,
-        },
-        body: JSON.stringify({
-          text: headlineText,
-          type: 'headline',
-          maxLength: 80,
-          context: 'Headline para post de notícia/carrossel do Instagram'
-        })
-      });
-      if (reviewResponse.ok) {
-        const reviewResult = await reviewResponse.json();
-        if (reviewResult.corrected && reviewResult.wasModified) {
-          console.log(`[apply-text-overlay] ✅ Headline corrigida: "${headlineText}" → "${reviewResult.corrected}"`);
-          headlineText = reviewResult.corrected;
+    // STEP 1.5: Review headline ONLY when it was generated here (not pre-reviewed by caller)
+    // When providedHeadline is passed, the caller (ai-agent-core) already reviewed it
+    if (!providedHeadline && generateHeadline) {
+      try {
+        console.log("[apply-text-overlay] 📝 Revisando headline gerada com review-portuguese...");
+        const reviewResponse = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+          },
+          body: JSON.stringify({
+            text: headlineText,
+            type: 'headline',
+            maxLength: 80,
+            context: 'Headline para post de notícia do Instagram'
+          })
+        });
+        if (reviewResponse.ok) {
+          const reviewResult = await reviewResponse.json();
+          if (reviewResult.corrected && reviewResult.wasModified) {
+            console.log(`[apply-text-overlay] ✅ Headline corrigida: "${headlineText}" → "${reviewResult.corrected}"`);
+            headlineText = reviewResult.corrected;
+          }
         }
+      } catch (e) {
+        console.warn("[apply-text-overlay] Review-portuguese falhou (não-bloqueante):", e);
       }
-    } catch (e) {
-      console.warn("[apply-text-overlay] Review-portuguese falhou (não-bloqueante):", e);
     }
 
     // STEP 2: Download the original image
