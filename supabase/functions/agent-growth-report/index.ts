@@ -134,6 +134,58 @@ serve(async (req) => {
         }
       }
 
+      // ===== WEEKLY EVOLUTION ANALYSIS =====
+      let weeklyEvolutionText = '';
+      try {
+        const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+        const { data: snapshots } = await supabase
+          .from('agent_strategy_snapshots')
+          .select('snapshot_date, total_reach, total_likes, total_saves, total_shares, total_comments, followers_count, posts_count, content_distribution_videos, content_distribution_carousels, content_distribution_news, content_distribution_images')
+          .eq('workspace_id', workspaceId)
+          .gte('snapshot_date', fourWeeksAgo)
+          .order('snapshot_date', { ascending: true });
+
+        if (snapshots && snapshots.length >= 7) {
+          // Group by week
+          const weekMap: Record<string, any[]> = {};
+          for (const s of snapshots) {
+            const d = new Date(s.snapshot_date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(d);
+            monday.setDate(diff);
+            const key = monday.toISOString().slice(0, 10);
+            if (!weekMap[key]) weekMap[key] = [];
+            weekMap[key].push(s);
+          }
+          
+          const weeks = Object.entries(weekMap).sort(([a], [b]) => a.localeCompare(b));
+          if (weeks.length >= 2) {
+            weeklyEvolutionText = '\n\nEVOLUÇÃO SEMANAL:';
+            for (const [weekStart, rows] of weeks) {
+              const reach = rows.reduce((s: number, r: any) => s + (r.total_reach || 0), 0);
+              const likes = rows.reduce((s: number, r: any) => s + (r.total_likes || 0), 0);
+              const saves = rows.reduce((s: number, r: any) => s + (r.total_saves || 0), 0);
+              const posts = rows.reduce((s: number, r: any) => s + (r.posts_count || 0), 0);
+              const d = new Date(weekStart);
+              weeklyEvolutionText += `\n- Semana ${d.getDate()}/${d.getMonth()+1}: ${reach.toLocaleString()} alcance, ${likes} likes, ${saves} saves, ${posts} posts`;
+            }
+            
+            // Calculate trend
+            const lastWeek = weeks[weeks.length - 1][1];
+            const prevWeek = weeks[weeks.length - 2][1];
+            const currReach = lastWeek.reduce((s: number, r: any) => s + (r.total_reach || 0), 0);
+            const prevReach = prevWeek.reduce((s: number, r: any) => s + (r.total_reach || 0), 0);
+            if (prevReach > 0) {
+              const trendPct = Math.round(((currReach - prevReach) / prevReach) * 100);
+              weeklyEvolutionText += `\n- Tendência: alcance ${trendPct >= 0 ? '+' : ''}${trendPct}% vs semana anterior`;
+            }
+          }
+        }
+      } catch (e) {
+        console.log('[Growth Report] Weekly evolution analysis failed (non-critical):', e);
+      }
+
       // Goals
       const goalViews = ctx.goal_weekly_views || 10000;
       const goalFollowers = ctx.goal_weekly_followers || 100;
