@@ -557,9 +557,9 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* 3.5 Weekly Evolution Charts */}
+      {/* 3.5 Weekly Evolution Charts — uses real posts data filtered by period */}
       <Suspense fallback={<div className="h-20 flex items-center justify-center text-xs text-muted-foreground">Carregando gráficos...</div>}>
-        <WeeklyEvolutionCharts />
+        <WeeklyEvolutionCharts workspaceId={currentWorkspace?.id} period={period} />
       </Suspense>
 
       {/* 5. Top Posts Ranking */}
