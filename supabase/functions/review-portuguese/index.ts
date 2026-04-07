@@ -181,7 +181,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash", // Flash (não lite) para maior precisão ortográfica
+        model: "google/gemini-2.5-flash-lite", // Flash-lite: preciso o suficiente para revisão, 5x mais barato que flash
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1, // Baixa para consistência
         max_tokens: 500,
