@@ -1686,9 +1686,9 @@ Responda em JSON:
         const content = result.choices?.[0]?.message?.content;
         if (content) {
           const parsed = JSON.parse(content);
-          if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length >= 4) {
-            slideContents = parsed.slides.slice(0, 4);
-            console.log('[AGENT] ✅ 4 slides educacionais gerados pela IA');
+          if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length >= 3) {
+            slideContents = parsed.slides.slice(0, 3);
+            console.log('[AGENT] ✅ 3 slides educacionais gerados pela IA');
           }
         }
       }
@@ -1723,7 +1723,7 @@ Responda em JSON:
   // Build segments for search-images-for-video (AI generation mode)
   const segments = slideContents.map((slide, i) => ({
     text: slide.slideTitle,
-    imagePrompt: `${slide.imagePrompt}. Style: dark tech aesthetic, neon accents, consistent color palette across all 4 slides. Slide ${i + 1} of 4. Square format 1080x1080. NO TEXT in image.`,
+    imagePrompt: `${slide.imagePrompt}. Style: dark tech aesthetic, neon accents, consistent color palette across all 3 slides. Slide ${i + 1} of 3. Square format 1080x1080. NO TEXT in image.`,
   }));
   
   try {
@@ -1789,11 +1789,10 @@ Responda em JSON:
   
   const captionPrompt = `Crie uma legenda RICA e EDUCACIONAL para um carrossel do Instagram sobre: "${bestArticle.title}"
 
-Os 4 slides do carrossel cobrem:
+Os 3 slides do carrossel cobrem:
 1. ${slideContents[0]?.slideTitle}: ${slideContents[0]?.slideText}
 2. ${slideContents[1]?.slideTitle}: ${slideContents[1]?.slideText}
 3. ${slideContents[2]?.slideTitle}: ${slideContents[2]?.slideText}
-4. ${slideContents[3]?.slideTitle}: ${slideContents[3]?.slideText}
 
 ESTRUTURA DA LEGENDA (obrigatória):
 🔥 HOOK (1 linha): Frase impactante que complementa o slide 1 sem repetir
