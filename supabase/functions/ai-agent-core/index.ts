@@ -1708,6 +1708,14 @@ Responda em JSON:
     ];
   }
   
+  // STEP 2.5: Review ALL slide texts with review-portuguese BEFORE image generation/overlay
+  console.log('[AGENT] 📝 Revisando textos dos slides com review-portuguese...');
+  for (let i = 0; i < slideContents.length; i++) {
+    slideContents[i].slideTitle = await reviewText(slideContents[i].slideTitle, 'headline', supabaseUrl, headers, `Título do slide ${i + 1} de carrossel educacional`);
+    slideContents[i].slideText = await reviewText(slideContents[i].slideText, 'general', supabaseUrl, headers, `Texto do slide ${i + 1} de carrossel educacional`);
+  }
+  console.log('[AGENT] ✅ Slides revisados ortograficamente');
+  
   // STEP 3: Generate 4 AI images with VISUAL CONSISTENCY
   console.log('[AGENT] 🎨 Gerando 4 imagens IA com consistência visual...');
   const carouselImages: string[] = [];
