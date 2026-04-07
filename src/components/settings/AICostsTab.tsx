@@ -34,16 +34,16 @@ const CALLS_PER_POST: Record<string, CostItem[]> = {
   'educacional|carousel': [
     { label: 'Decidir tema', calls: 1, model: 'gemini-2.5-flash-lite', costPerCall: 0.002 },
     { label: 'Gerar conteúdo slides', calls: 1, model: 'gemini-2.5-flash', costPerCall: 0.005 },
-    { label: 'Gerar imagens (4 slides)', calls: 4, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
-    { label: 'Overlay em cada slide', calls: 4, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
+    { label: 'Gerar imagens (3 slides)', calls: 3, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
+    { label: 'Overlay em cada slide', calls: 3, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
     { label: 'Gerar legenda', calls: 1, model: 'gemini-2.5-flash', costPerCall: 0.005 },
     { label: 'Revisar português', calls: 1, model: 'gemini-2.5-flash-lite', costPerCall: 0.002 },
   ],
   'noticia|carousel': [
     { label: 'Decidir tema', calls: 1, model: 'gemini-2.5-flash-lite', costPerCall: 0.002 },
     { label: 'Gerar conteúdo slides', calls: 1, model: 'gemini-2.5-flash', costPerCall: 0.005 },
-    { label: 'Gerar imagens (4 slides)', calls: 4, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
-    { label: 'Overlay em cada slide', calls: 4, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
+    { label: 'Gerar imagens (3 slides)', calls: 3, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
+    { label: 'Overlay em cada slide', calls: 3, model: 'gemini-2.5-flash-image', costPerCall: 0.02 },
     { label: 'Gerar legenda', calls: 1, model: 'gemini-2.5-flash', costPerCall: 0.005 },
     { label: 'Revisar português', calls: 1, model: 'gemini-2.5-flash-lite', costPerCall: 0.002 },
   ],
@@ -159,7 +159,7 @@ export function AICostsTab() {
     return total + calcPostCost(items) * s.count;
   }, 0);
 
-  const chatCost = chatMsgs * 0.005; // gemini-2.5-flash after optimization
+  const chatCost = chatMsgs * 0.002; // gemini-2.5-flash-lite after optimization
   const reportsCost = reports * 0.002;
   const totalCost30d = postsCost30d + chatCost + reportsCost;
   const totalCost7d = postsCost7d + (chatCost / 4.3) + (reportsCost / 4.3); // weekly estimate
