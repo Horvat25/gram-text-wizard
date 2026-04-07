@@ -414,13 +414,19 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
   const totalViews = (period === 7 || period === 30) && accountViews > 0 ? accountViews : postLevelViews;
   const avgEngRate = totalReach > 0 ? ((totalLikes + totalComments + totalSaves) / totalReach) * 100 : 0;
 
-  const GOALS: Record<number, { views: number; likes: number; saves: number; comments: number }> = {
-    7: { views: 2500, likes: 120, saves: 50, comments: 25 },
-    30: { views: 10000, likes: 500, saves: 200, comments: 100 },
-    60: { views: 25000, likes: 1200, saves: 500, comments: 250 },
-    90: { views: 50000, likes: 2500, saves: 1000, comments: 500 },
+  // Use real goals from agent_context, scaled by period
+  const weeklyViews = context?.goal_weekly_views || 10000;
+  const weeklyFollowers = context?.goal_weekly_followers || 100;
+  const weeklyEngagement = context?.goal_weekly_engagement || 5;
+  const periodWeeks = period / 7;
+  
+  // Estimate period goals based on weekly targets
+  const goals = {
+    views: Math.round(weeklyViews * periodWeeks),
+    likes: Math.round(weeklyViews * periodWeeks * 0.05), // ~5% of views
+    saves: Math.round(weeklyViews * periodWeeks * 0.02), // ~2% of views
+    comments: Math.round(weeklyViews * periodWeeks * 0.01), // ~1% of views
   };
-  const goals = GOALS[period] || GOALS[90];
 
   const viewsProgress = goals.views > 0 ? Math.min((totalViews / goals.views) * 100, 100) : 0;
   const likesProgress = goals.likes > 0 ? Math.min((totalLikes / goals.likes) * 100, 100) : 0;
