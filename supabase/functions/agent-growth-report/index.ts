@@ -275,7 +275,7 @@ AFILIADOS:
 - Links de afiliado ativos: ${affiliateLinks?.length || 0}
 - Posts desde último afiliado: ${postsSinceLastAffiliate}
 - Precisa postar afiliado? ${postsSinceLastAffiliate >= 4 && (affiliateLinks?.length || 0) > 0 ? 'SIM (já passou 4 posts)' : 'NÃO'}
-${sourceRankingText}${webTrendsText}
+${sourceRankingText}${webTrendsText}${weeklyEvolutionText}
 
 - Hora atual Brasília: ${brasiliaHour}h
 
