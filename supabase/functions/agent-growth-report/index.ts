@@ -290,7 +290,8 @@ REGRAS:
 8. Use emojis moderados
 9. Se houver TENDÊNCIAS EM TEMPO REAL, sugira como aproveitar nos próximos posts
 10. Se houver CONTEÚDO VIRAL DE CONCORRENTES, analise o que podemos aprender
-11. Termine com o plano pras próximas horas`;
+11. Se houver EVOLUÇÃO SEMANAL, analise a tendência: estamos crescendo ou caindo? Destaque mudanças significativas no alcance ou engajamento semana a semana
+12. Termine com o plano pras próximas horas`;
 
         const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
           method: 'POST',
