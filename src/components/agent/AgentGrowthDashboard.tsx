@@ -551,7 +551,10 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         </Card>
       </motion.div>
 
-      {/* Strategy moved to Teste/Custo tab */}
+      {/* 3.5 Weekly Evolution Charts */}
+      <Suspense fallback={<div className="h-20 flex items-center justify-center text-xs text-muted-foreground">Carregando gráficos...</div>}>
+        <WeeklyEvolutionCharts />
+      </Suspense>
 
       {/* 5. Top Posts Ranking */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
