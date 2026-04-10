@@ -36,10 +36,13 @@ interface ReviewResponse {
 // Sistema de prompt para revisão de português
 function buildReviewPrompt(text: string, type: string, maxLength?: number, context?: string): string {
   const typeInstructions: Record<string, string> = {
-    headline: `Este é um HEADLINE/TÍTULO para post de notícias.
-- Deve ser impactante e curto
+    headline: `Este é um HEADLINE/TÍTULO para post de notícias de tecnologia.
+- Deve ser impactante e curto (máximo 10 palavras)
 - Use LETRAS MAIÚSCULAS se apropriado para impacto
-- Máximo 2 linhas`,
+- Máximo 2 linhas
+- SEMPRE traduzir "AI" para "IA"
+- VERIFICAR TODOS os acentos: é, ê, á, ã, õ, ç, ü
+- Erros frequentes: "Inteligencia"→"Inteligência", "lancamento"→"lançamento", "revolucao"→"revolução", "analise"→"análise"`,
     caption: `Esta é uma LEGENDA para Instagram/TikTok.
 - Tom envolvente e conversacional
 - Pode usar emojis se já existirem
@@ -181,7 +184,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite", // Flash-lite: preciso o suficiente para revisão, 5x mais barato que flash
+        model: "google/gemini-2.5-flash", // Flash: mais preciso para revisão ortográfica
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1, // Baixa para consistência
         max_tokens: 500,
