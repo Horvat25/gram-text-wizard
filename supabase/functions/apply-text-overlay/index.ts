@@ -69,11 +69,12 @@ async function generateHeadlineText(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",
             content: `Você é um editor de headlines para notícias virais de tecnologia no Instagram.
+VOCÊ ESCREVE EXCLUSIVAMENTE EM PORTUGUÊS BRASILEIRO (PT-BR) COM ORTOGRAFIA PERFEITA.
 
 TAREFA: Transforme o título da notícia em uma HEADLINE curta, impactante e 100% correta em PT-BR.
 
@@ -84,19 +85,29 @@ REGRAS DE GERAÇÃO:
 - NÃO use emojis nem pontuação excessiva
 - NÃO inclua aspas na resposta
 
-ACENTUAÇÃO OBRIGATÓRIA (revise antes de responder):
-- você (NUNCA voce/vouê)
-- Inteligência (NUNCA Inteligencia)
-- IA (NUNCA "AI")
-- revolução, atenção, decisão, ação (sempre com acento)
-- através, análise, possível, próximo, automático (sempre com acento)
-- é, está, já, até, então (sempre com acento)
+REGRAS ORTOGRÁFICAS OBRIGATÓRIAS (REVISE 2x ANTES DE RESPONDER):
+- SEMPRE "IA" (NUNCA "AI" para Inteligência Artificial)
+- SEMPRE "Inteligência" (NUNCA "Inteligencia")
+- SEMPRE acentuar: revolução, atenção, decisão, ação, proteção, conexão
+- SEMPRE acentuar: através, análise, possível, próximo, automático, específico
+- SEMPRE acentuar: é, está, já, até, então, você, também, será, terá
+- SEMPRE "ç" correto: lançamento, ameaça, avanço, preço, serviço
+- NUNCA esquecer til: são, não, coração, padrão, milhão, bilhão
+- Traduzir termos: "launches" → "lança", "announces" → "anuncia", "reveals" → "revela"
 
 EXEMPLOS CORRETOS:
 ✅ "OpenAI Revela GPT-5 e Muda Tudo"
-✅ "Apple Compra Startup de IA por US$ 1 Bilhão"  
-✅ "Meta Fecha Acordo Bilionário com Nvidia para Chips de IA"
-✅ "Antártida Revela 23 Milhões de Anos de História Climática"
+✅ "Apple Compra Startup de IA por US$ 1 Bilhão"
+✅ "Meta Fecha Acordo Bilionário com Nvidia"
+✅ "Samsung Lança Galaxy com IA Integrada"
+
+ERROS COMUNS QUE VOCÊ NÃO PODE COMETER:
+❌ "Inteligencia" → ✅ "Inteligência"
+❌ "AI" → ✅ "IA"
+❌ "revolucao" → ✅ "revolução"
+❌ "lancamento" → ✅ "lançamento"
+❌ "voce" → ✅ "você"
+❌ "analise" → ✅ "análise"
 
 Responda APENAS com o texto da headline, sem explicações.`
           },
@@ -106,7 +117,7 @@ Responda APENAS com o texto da headline, sem explicações.`
           }
         ],
         max_tokens: 80,
-        temperature: 0.5
+        temperature: 0.3
       }),
     });
 
@@ -403,35 +414,36 @@ serve(async (req) => {
       headlineText = await generateHeadlineText(title, lovableApiKey);
     }
 
-    // STEP 1.5: Review headline ONLY when it was generated here (not pre-reviewed by caller)
-    // When providedHeadline is passed, the caller (ai-agent-core) already reviewed it
-    if (!providedHeadline && generateHeadline) {
-      try {
-        console.log("[apply-text-overlay] 📝 Revisando headline gerada com review-portuguese...");
-        const reviewResponse = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-          },
-          body: JSON.stringify({
-            text: headlineText,
-            type: 'headline',
-            maxLength: 80,
-            context: 'Headline para post de notícia do Instagram'
-          })
-        });
-        if (reviewResponse.ok) {
-          const reviewResult = await reviewResponse.json();
-          if (reviewResult.corrected && reviewResult.wasModified) {
+    // STEP 1.5: ALWAYS review headline with review-portuguese for spelling accuracy
+    try {
+      console.log("[apply-text-overlay] 📝 Revisando headline com review-portuguese...");
+      const reviewResponse = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': supabaseKey,
+        },
+        body: JSON.stringify({
+          text: headlineText,
+          type: 'headline',
+          maxLength: 80,
+          context: 'Headline para post de notícia do Instagram. VERIFICAR acentuação e ortografia PT-BR.'
+        })
+      });
+      if (reviewResponse.ok) {
+        const reviewResult = await reviewResponse.json();
+        if (reviewResult.corrected) {
+          if (reviewResult.wasModified) {
             console.log(`[apply-text-overlay] ✅ Headline corrigida: "${headlineText}" → "${reviewResult.corrected}"`);
-            headlineText = reviewResult.corrected;
           }
+          headlineText = reviewResult.corrected;
         }
-      } catch (e) {
-        console.warn("[apply-text-overlay] Review-portuguese falhou (não-bloqueante):", e);
+      } else {
+        console.warn("[apply-text-overlay] Review response not ok:", reviewResponse.status);
       }
+    } catch (e) {
+      console.warn("[apply-text-overlay] Review-portuguese falhou (não-bloqueante):", e);
     }
 
     // STEP 2: Download the original image
