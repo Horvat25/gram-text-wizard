@@ -267,39 +267,10 @@ function buildOverlaySvg(
 
 // ── SVG → PNG RENDERING ──
 async function renderSvgToPng(svgString: string): Promise<Uint8Array> {
-  // Use resvg-wasm for server-side SVG → PNG
-  try {
-    const { Resvg, initWasm } = await import("https://esm.sh/@aspect-dev/resvg-wasm@0.1.0");
-    
-    // Initialize WASM (idempotent)
-    try {
-      const wasmUrl = "https://esm.sh/@aspect-dev/resvg-wasm@0.1.0/resvg.wasm";
-      const wasmResponse = await fetch(wasmUrl);
-      const wasmBuf = await wasmResponse.arrayBuffer();
-      await initWasm(wasmBuf);
-    } catch (e) {
-      // Already initialized is fine
-      if (!String(e).includes('already')) {
-        console.warn("[resvg] WASM init warning:", e);
-      }
-    }
-    
-    const resvg = new Resvg(svgString, {
-      fitTo: { mode: 'width', value: 1080 },
-      font: { loadSystemFonts: false },
-    });
-    
-    const rendered = resvg.render();
-    const pngData = rendered.asPng();
-    console.log(`[resvg] ✅ SVG rendered to PNG: ${pngData.length} bytes`);
-    return pngData;
-  } catch (resvgError) {
-    console.warn("[resvg] resvg-wasm failed, trying fallback:", resvgError);
-    
-    // Fallback: use Gemini to render the SVG (just render, not write text)
-    // The SVG already has the exact text — Gemini just converts SVG → raster
-    throw new Error(`SVG rendering failed: ${resvgError}`);
-  }
+  const { render } = await import("https://deno.land/x/resvg_wasm/mod.ts");
+  const pngData = await render(svgString);
+  console.log(`[resvg] ✅ SVG rendered to PNG: ${pngData.length} bytes`);
+  return pngData;
 }
 
 // ── FALLBACK: Gemini image edit with EXACT text verification ──
