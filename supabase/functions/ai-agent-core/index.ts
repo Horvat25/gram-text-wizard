@@ -1695,14 +1695,17 @@ Responda em JSON:
     }
   }
   
-  // Fallback if AI failed
-  if (slideContents.length < 4) {
+  // Fallback ONLY if AI completely failed (returned 0 slides)
+  if (slideContents.length === 0) {
+    console.warn('[AGENT] ⚠️ IA não gerou slides, usando fallback contextual');
     const topic = bestArticle.title;
+    const desc = bestArticle.description || topic;
+    // Generate contextual fallback headlines based on the actual topic (not generic phrases)
+    const topicWords = topic.split(' ').slice(0, 5).join(' ').toUpperCase();
     slideContents = [
-      { slideTitle: 'VOCÊ PRECISA SABER DISSO', slideText: topic, imagePrompt: `Dramatic tech scene, futuristic environment, strong visual hook about: ${topic}` },
-      { slideTitle: 'O QUE ESTÁ ACONTECENDO', slideText: bestArticle.description || topic, imagePrompt: `Informative tech visualization, data flows and connections about: ${topic}` },
-      { slideTitle: 'POR QUE ISSO IMPORTA', slideText: `O impacto dessa mudança vai além do que você imagina.`, imagePrompt: `Impact visualization, global scale technology transformation about: ${topic}` },
-      { slideTitle: 'O QUE VOCÊ DEVE FAZER', slideText: `Fique atento e se prepare para as mudanças que vêm por aí.`, imagePrompt: `Conclusion scene, person looking at future tech horizon, hopeful and determined about: ${topic}` },
+      { slideTitle: topicWords, slideText: desc, imagePrompt: `Dramatic tech scene about: ${topic}. Dark aesthetic, neon accents. NO TEXT.` },
+      { slideTitle: `O IMPACTO DE ${topicWords.split(' ').slice(0, 3).join(' ')}`, slideText: desc, imagePrompt: `Impact visualization about: ${topic}. Same style. NO TEXT.` },
+      { slideTitle: `O FUTURO APÓS ${topicWords.split(' ').slice(0, 3).join(' ')}`, slideText: `As consequências dessa mudança são profundas.`, imagePrompt: `Future tech horizon about: ${topic}. Same style. NO TEXT.` },
     ];
   }
   
