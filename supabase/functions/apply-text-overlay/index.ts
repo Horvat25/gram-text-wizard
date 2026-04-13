@@ -240,11 +240,22 @@ function buildOverlaySvg(
       <stop offset="0%" stop-color="black" stop-opacity="0"/>
       <stop offset="${gradientStartPct}%" stop-color="black" stop-opacity="0"/>
       <stop offset="${gradientStartPct + 20}%" stop-color="black" stop-opacity="0.5"/>
-      <stop offset="85%" stop-color="black" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="black" stop-opacity="0.92"/>
+      <stop offset="80%" stop-color="black" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0.95"/>
+    </linearGradient>
+    <!-- Top gradient for watermark area -->
+    <linearGradient id="topGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="black" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0"/>
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="${width}" height="${height}" fill="url(#grad)"/>
+  
+  <!-- Solid black bar at very bottom to COVER source watermarks (tecnoblog etc) -->
+  <rect x="0" y="${height - 120}" width="${width}" height="120" fill="black" opacity="0.95"/>
+  
+  <!-- Top strip for branding -->
+  <rect x="0" y="0" width="${width}" height="80" fill="url(#topGrad)"/>
   
   <!-- Headline text (programmatic — pixel-perfect, no AI hallucination) -->
   ${textElements}
@@ -256,10 +267,17 @@ function buildOverlaySvg(
     ARRASTE PARA MAIS →
   </text>
   
-  <!-- Watermark top-right -->
-  <text x="${width - 30}" y="50" text-anchor="end"
-        font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="600"
-        fill="white" opacity="0.7">
+  <!-- Neural Update watermark bottom-right (covers any source watermark) -->
+  <text x="${width - 40}" y="${height - 45}" text-anchor="end"
+        font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" font-size="28" font-weight="900"
+        fill="#FFD700" opacity="0.9">
+    ⚡ ${escapeXml(watermark.toUpperCase())}
+  </text>
+  
+  <!-- Small watermark top-left too -->
+  <text x="30" y="50"
+        font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600"
+        fill="white" opacity="0.6">
     ${escapeXml(watermark)}
   </text>
 </svg>`;
