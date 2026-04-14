@@ -3290,19 +3290,56 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
     }
 
     const data = await response.json();
-    const choice = data.choices?.[0];
-    
-    // Check if there are tool calls to execute
-    if (choice?.message?.tool_calls && choice.message.tool_calls.length > 0) {
+    let choice = data.choices?.[0];
+
+    const latestUserMessage =
+      [...validMessages].reverse().find((message) => message.role === 'user')?.content || '';
+
+    const normalizedLatestUserMessage = latestUserMessage
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+
+    const asksToCreateSomething = /(cria|crie|faz|faca|gera|gere|monta|monte|produz|prepare|posta|publique|publica|coloca|bota|deixa)/.test(normalizedLatestUserMessage);
+    const asksForVideo = /(reels?|video|videos|shorts?|stories?)/.test(normalizedLatestUserMessage);
+    const asksForMarketing = /(marketing|afiliad)/.test(normalizedLatestUserMessage);
+
+    const forcedToolName =
+      asksToCreateSomething && asksForVideo
+        ? (asksForMarketing ? 'create_marketing_video' : 'create_narrated_video')
+        : null;
+
+    const buildDirectVideoFallbackArgs = () => {
+      const topicMatch = latestUserMessage.match(/(?:sobre|tema|assunto)\s+(.+)$/i);
+      const rawTopic = topicMatch?.[1]
+        || latestUserMessage
+          .replace(/^(cria|crie|faz|faca|gera|gere|monta|monte|produz|prepare|posta|publique|publica|coloca|bota|deixa)\s+/i, '')
+          .replace(/\b(um|uma|o|os|a|as|pra mim|para mim|na fila|já|ja|agora|por favor)\b/gi, ' ')
+          .replace(/\b(reels?|vídeo|video|shorts?|stories?)\b/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+      const topic = rawTopic || 'tecnologia e inovação';
+
+      return {
+        topic,
+        caption: `🎬 ${topic}\n\n${topic} em foco agora.`,
+        hashtags: ['#tecnologia', '#ia', '#inovacao', '#reels'],
+        platforms: ['instagram'],
+        style: 'impactante',
+      };
+    };
+
+    const executeChoiceWithTools = async (choiceWithTools: any) => {
       const toolResults = [];
       const executedActions = [];
-      
-      for (const toolCall of choice.message.tool_calls) {
+
+      for (const toolCall of choiceWithTools.message.tool_calls) {
         const toolName = toolCall.function.name;
         const toolArgs = JSON.parse(toolCall.function.arguments || '{}');
-        
+
         console.log(`Executing tool: ${toolName}`, toolArgs);
-        
+
         const result = await executeTool(supabase, userId, workspaceId, toolName, toolArgs);
         toolResults.push({
           tool_call_id: toolCall.id,
@@ -3314,8 +3351,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
           ...result
         });
       }
-      
-      // Second API call with tool results to get final response
+
       const finalResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -3327,20 +3363,19 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
           messages: [
             { role: 'system', content: systemPrompt },
             ...messages,
-            choice.message,
+            choiceWithTools.message,
             ...toolResults
           ]
         })
       });
-      
+
       if (!finalResponse.ok) {
-        // Generate a conversational fallback when final response fails
         const actionSummaries = executedActions.map(a => {
           if (a.tool === 'create_rss_news_post' && a.success) {
             return `Criei um post de notícia sobre ${a.topic || 'tech'} com a headline "${a.headline || 'impactante'}"! ${a.scheduled ? `Agendei pra ${a.scheduled_for_brasilia || 'depois'}.` : ''}`;
           }
-          if (a.tool === 'create_narrated_video' && a.success) {
-            return `Montei um roteiro de vídeo sobre "${a.topic || 'tech'}". Quando você entrar na aba Fila, é só clicar pra renderizar!`;
+          if ((a.tool === 'create_narrated_video' || a.tool === 'create_marketing_video') && a.success) {
+            return `Montei um roteiro de vídeo sobre "${a.topic || 'tech'}". Quando você entrar na aba Fila, ele já vai aparecer pra renderizar.`;
           }
           if (a.tool === 'list_posts') {
             const count = a.count || a.posts?.length || 0;
@@ -3348,28 +3383,84 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
           }
           return a.message;
         }).join(' ');
-        
+
         return new Response(JSON.stringify({
           content: actionSummaries || 'Feito! O que mais posso fazer por você?',
           actions: executedActions
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
       }
-      
+
       const finalData = await finalResponse.json();
       const aiContent = finalData.choices?.[0]?.message?.content;
-      
-      // Fallback if AI returns empty or generic response
-      const fallbackContent = executedActions.length > 0 
+
+      const fallbackContent = executedActions.length > 0
         ? `Pronto! Executei ${executedActions.length} ação(ões). ${executedActions.map(a => a.message).join(' ')} O que mais posso ajudar?`
         : 'Feito! Como posso ajudar agora?';
-      
+
       return new Response(JSON.stringify({
         content: aiContent && aiContent.length > 10 ? aiContent : fallbackContent,
         actions: executedActions
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+    };
+
+    if (!choice?.message?.tool_calls?.length && forcedToolName) {
+      console.warn(`[agent-chat] No tool call returned for an explicit creation request. Forcing tool: ${forcedToolName}`);
+
+      const forcedToolResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash-lite',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...validMessages
+          ],
+          tools: AGENT_TOOLS,
+          tool_choice: {
+            type: 'function',
+            function: { name: forcedToolName }
+          }
+        })
+      });
+
+      if (forcedToolResponse.ok) {
+        const forcedData = await forcedToolResponse.json();
+        const forcedChoice = forcedData.choices?.[0];
+
+        if (forcedChoice?.message?.tool_calls?.length) {
+          choice = forcedChoice;
+        }
+      } else {
+        const forcedErrorText = await forcedToolResponse.text();
+        console.warn(`[agent-chat] Forced tool call request failed (${forcedToolResponse.status}):`, forcedErrorText);
+      }
     }
-    
-    // No tool calls, just return the response
+
+    if (choice?.message?.tool_calls?.length) {
+      return await executeChoiceWithTools(choice);
+    }
+
+    if (forcedToolName === 'create_narrated_video') {
+      console.warn('[agent-chat] Falling back to direct narrated video execution for explicit creation request');
+
+      const directResult = await executeCreateNarratedVideo(
+        supabase,
+        userId,
+        workspaceId,
+        buildDirectVideoFallbackArgs()
+      );
+
+      return new Response(JSON.stringify({
+        content: directResult.success
+          ? `Pronto! ${directResult.message}`
+          : directResult.message || 'Não consegui criar o Reels agora.',
+        actions: [{ tool: 'create_narrated_video', ...directResult }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+    }
+
     return new Response(JSON.stringify({
       content: choice?.message?.content || 'Erro ao processar resposta'
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
