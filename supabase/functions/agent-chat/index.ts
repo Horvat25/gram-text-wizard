@@ -3004,11 +3004,28 @@ serve(async (req) => {
       'aggressive': 'Use 15-20 hashtags maximizando descoberta (cuidado: pode parecer spam).'
     };
 
-    const currentHour = new Date().getHours();
-    const currentDay = new Date().getDay(); // 0=Dom, 6=Sáb
+    // Use Brasília time (UTC-3) for all date/time awareness
+    const nowBrasilia = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const currentHour = nowBrasilia.getHours();
+    const currentDay = nowBrasilia.getDay(); // 0=Dom, 6=Sáb
     const isOptimalTime = (currentDay >= 2 && currentDay <= 4 && currentHour >= 11 && currentHour <= 18);
 
-    const currentYear = new Date().getFullYear(); // 2026
+    const currentYear = nowBrasilia.getFullYear();
+    const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const currentDayName = dayNames[currentDay];
+    const currentDate = `${nowBrasilia.getDate().toString().padStart(2, '0')}/${(nowBrasilia.getMonth() + 1).toString().padStart(2, '0')}/${currentYear}`;
+    const currentMonthName = monthNames[nowBrasilia.getMonth()];
+    
+    // Calculate week boundaries (Monday-Sunday)
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+    const weekStart = new Date(nowBrasilia);
+    weekStart.setDate(nowBrasilia.getDate() + mondayOffset);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    const weekStartStr = `${weekStart.getDate().toString().padStart(2, '0')}/${(weekStart.getMonth() + 1).toString().padStart(2, '0')}`;
+    const weekEndStr = `${weekEnd.getDate().toString().padStart(2, '0')}/${(weekEnd.getMonth() + 1).toString().padStart(2, '0')}`;
+    const daysUntilSunday = currentDay === 0 ? 0 : 7 - currentDay;
     
     const systemPrompt = `Você é **${agentName}**, um CURADOR EDITORIAL de notícias tech para Instagram.
 
