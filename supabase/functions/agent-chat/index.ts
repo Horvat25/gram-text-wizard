@@ -1221,11 +1221,11 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     // Determine next step message
     let nextStepMessage = '';
     if (publish_now) {
-      nextStepMessage = '⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar e publicar automaticamente!';
-    } else if (scheduledForUTC) {
-      nextStepMessage = `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}\n⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels antes do horário agendado!`;
+      nextStepMessage = '✅ **Enviado para a fila!** O vídeo será renderizado e publicado automaticamente.\n⚡ Acesse a aba "Fila" para acompanhar o progresso.';
+    } else if (effectiveSchedule) {
+      nextStepMessage = `📅 **Agendado para ${formatBrasiliaTime(effectiveSchedule)}** e enviado para a fila!\n⚡ Acesse a aba "Fila" e clique em "Gerar Vídeo" para renderizar antes do horário.`;
     } else {
-      nextStepMessage = '📝 Salvo como rascunho\n⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels!';
+      nextStepMessage = '📝 Salvo como rascunho.\n⚡ Acesse a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels!';
     }
     
     return {
