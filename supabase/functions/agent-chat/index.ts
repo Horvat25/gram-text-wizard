@@ -1171,6 +1171,17 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     // Step 3: Create the post with video metadata
     const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
     
+    // If user wants to schedule or publish, set status to 'scheduled' so it appears in the queue
+    // The scheduled-publisher will check for video_url before publishing reels
+    const postStatus = (scheduledForUTC || publish_now) ? 'scheduled' : 'draft';
+    
+    // If publish_now but no scheduled_for, schedule for 5 minutes from now to allow rendering
+    const effectiveSchedule = scheduledForUTC 
+      ? scheduledForUTC 
+      : publish_now 
+        ? new Date(Date.now() + 5 * 60 * 1000).toISOString() 
+        : null;
+
     const postData = {
       user_id: userId,
       workspace_id: workspaceId,
@@ -1178,9 +1189,8 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
       hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
       post_type: 'entretenimento',
       platforms: platforms || ['instagram', 'tiktok'],
-      // CRITICAL: Always start as draft - video MUST be rendered before publishing
-      status: 'draft',
-      scheduled_for: scheduledForUTC,
+      status: postStatus,
+      scheduled_for: effectiveSchedule,
       media_type: 'reels',
       image_url: thumbnailUrl,
       overlay_metadata: {
@@ -1193,7 +1203,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         needs_processing: true,
         created_by_agent: true,
         publish_after_render: publish_now === true,
-        requested_schedule: scheduledForUTC,
+        requested_schedule: effectiveSchedule,
       }
     };
     
@@ -1211,11 +1221,11 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     // Determine next step message
     let nextStepMessage = '';
     if (publish_now) {
-      nextStepMessage = '⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar e publicar automaticamente!';
-    } else if (scheduledForUTC) {
-      nextStepMessage = `📅 Agendado para ${formatBrasiliaTime(scheduledForUTC)}\n⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels antes do horário agendado!`;
+      nextStepMessage = '✅ **Enviado para a fila!** O vídeo será renderizado e publicado automaticamente.\n⚡ Acesse a aba "Fila" para acompanhar o progresso.';
+    } else if (effectiveSchedule) {
+      nextStepMessage = `📅 **Agendado para ${formatBrasiliaTime(effectiveSchedule)}** e enviado para a fila!\n⚡ Acesse a aba "Fila" e clique em "Gerar Vídeo" para renderizar antes do horário.`;
     } else {
-      nextStepMessage = '📝 Salvo como rascunho\n⚡ **Próximo passo:** Abra a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels!';
+      nextStepMessage = '📝 Salvo como rascunho.\n⚡ Acesse a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels!';
     }
     
     return {
