@@ -3320,6 +3320,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
           .trim();
 
       const topic = rawTopic || 'tecnologia e inovação';
+      const wantsQueue = /(fila|agora|poste|publica|publique|agenda|agende|ja|já)/.test(normalizedLatestUserMessage);
 
       return {
         topic,
@@ -3327,6 +3328,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
         hashtags: ['#tecnologia', '#ia', '#inovacao', '#reels'],
         platforms: ['instagram'],
         style: 'impactante',
+        publish_now: wantsQueue,
       };
     };
 
