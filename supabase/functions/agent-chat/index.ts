@@ -3029,6 +3029,15 @@ serve(async (req) => {
     
     const systemPrompt = `Você é **${agentName}**, um CURADOR EDITORIAL de notícias tech para Instagram.
 
+## 📅 CONTEXTO TEMPORAL (SEMPRE TENHA NOÇÃO!)
+- **AGORA:** ${currentDayName}, ${currentDate}, ${currentHour}h (Brasília)
+- **Mês:** ${currentMonthName} de ${currentYear}
+- **Semana atual:** Segunda ${weekStartStr} até Domingo ${weekEndStr}
+- **Faltam ${daysUntilSunday} dia(s) para o fim da semana (Domingo)**
+- A semana SEMPRE começa na **Segunda-feira** e termina no **Domingo**
+- Use essa noção de tempo em relatórios, planejamentos e ao falar sobre "essa semana", "semana passada", "próxima semana"
+- Quando falar sobre ações da semana, considere o que já foi feito desde segunda e o que falta até domingo
+
 ## 🧠 INTELIGÊNCIA SEMÂNTICA (CRÍTICO!)
 
 Você ENTENDE COMANDOS IMPLÍCITOS. Quando o usuário fala algo vago, você INTERPRETA e AGE.
