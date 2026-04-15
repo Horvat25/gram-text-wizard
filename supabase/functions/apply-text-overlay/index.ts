@@ -343,7 +343,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { imageUrl, title, headlineText: providedHeadline, watermarkText = "Neural Update", generateHeadline = true } = body;
+    const { imageUrl, title, headlineText: providedHeadline, watermarkText = "Neural Update", generateHeadline = true, mediaType = "image" } = body;
 
     if (!imageUrl) throw new Error("imageUrl é obrigatório");
     const effectiveTitle = title || providedHeadline || '';
@@ -390,7 +390,9 @@ serve(async (req) => {
     // ── STEP 4: Build SVG with programmatic text overlay ──
     const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
     const imageBase64 = b64encode(imageData);
-    const svgString = buildOverlaySvg(imageBase64, mimeType, headlineText, watermarkText);
+    const isCarousel = mediaType === 'carousel' || mediaType === 'carrossel';
+    const ctaText = isCarousel ? 'ARRASTE PARA MAIS →' : 'LEIA A LEGENDA 👇';
+    const svgString = buildOverlaySvg(imageBase64, mimeType, headlineText, watermarkText, ctaText);
     console.log("[apply-text-overlay] SVG built:", svgString.length, "chars");
 
     // ── STEP 5: Render SVG → PNG ──
@@ -451,7 +453,7 @@ serve(async (req) => {
           style: {
             headlineColor: '#FFD700',
             watermarkColor: 'rgba(255,255,255,0.7)',
-            ctaText: 'ARRASTE PARA MAIS →',
+            ctaText,
             ctaColor: '#FF6B35',
           }
         }
