@@ -193,6 +193,7 @@ function buildOverlaySvg(
   mimeType: string,
   headline: string,
   watermark: string,
+  ctaText: string = 'LEIA A LEGENDA 👇',
   width = 1080,
   height = 1350
 ): string {
@@ -218,9 +219,10 @@ function buildOverlaySvg(
     const escaped = escapeXml(line);
     return `
       <text x="${width / 2}" y="${y}" text-anchor="middle" 
-            font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" 
-            font-size="${fontSize}" font-weight="900" fill="#FFD700"
-            stroke="#000" stroke-width="2" paint-order="stroke">
+             font-family="Helvetica, Arial, sans-serif" 
+             font-size="${fontSize}" font-weight="800" fill="#FFD700"
+             stroke="#000" stroke-width="3" paint-order="stroke"
+             letter-spacing="1">
         ${escaped}
       </text>`;
   }).join('\n');
@@ -264,7 +266,7 @@ function buildOverlaySvg(
   <text x="${width / 2}" y="${textStartY + totalTextHeight + 40}" text-anchor="middle"
         font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700"
         fill="#FF6B35">
-    ARRASTE PARA MAIS →
+    ${escapeXml(ctaText)}
   </text>
   
   <!-- Neural Update watermark bottom-right (covers any source watermark) -->
@@ -343,7 +345,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { imageUrl, title, headlineText: providedHeadline, watermarkText = "Neural Update", generateHeadline = true } = body;
+    const { imageUrl, title, headlineText: providedHeadline, watermarkText = "Neural Update", generateHeadline = true, mediaType = "image" } = body;
 
     if (!imageUrl) throw new Error("imageUrl é obrigatório");
     const effectiveTitle = title || providedHeadline || '';
@@ -390,7 +392,9 @@ serve(async (req) => {
     // ── STEP 4: Build SVG with programmatic text overlay ──
     const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
     const imageBase64 = b64encode(imageData);
-    const svgString = buildOverlaySvg(imageBase64, mimeType, headlineText, watermarkText);
+    const isCarousel = mediaType === 'carousel' || mediaType === 'carrossel';
+    const ctaText = isCarousel ? 'ARRASTE PARA MAIS →' : 'LEIA A LEGENDA 👇';
+    const svgString = buildOverlaySvg(imageBase64, mimeType, headlineText, watermarkText, ctaText);
     console.log("[apply-text-overlay] SVG built:", svgString.length, "chars");
 
     // ── STEP 5: Render SVG → PNG ──
@@ -451,7 +455,7 @@ serve(async (req) => {
           style: {
             headlineColor: '#FFD700',
             watermarkColor: 'rgba(255,255,255,0.7)',
-            ctaText: 'ARRASTE PARA MAIS →',
+            ctaText,
             ctaColor: '#FF6B35',
           }
         }
