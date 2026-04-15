@@ -193,6 +193,7 @@ function buildOverlaySvg(
   mimeType: string,
   headline: string,
   watermark: string,
+  ctaText: string = 'LEIA A LEGENDA 👇',
   width = 1080,
   height = 1350
 ): string {
@@ -218,9 +219,10 @@ function buildOverlaySvg(
     const escaped = escapeXml(line);
     return `
       <text x="${width / 2}" y="${y}" text-anchor="middle" 
-            font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" 
-            font-size="${fontSize}" font-weight="900" fill="#FFD700"
-            stroke="#000" stroke-width="2" paint-order="stroke">
+             font-family="Helvetica, Arial, sans-serif" 
+             font-size="${fontSize}" font-weight="800" fill="#FFD700"
+             stroke="#000" stroke-width="3" paint-order="stroke"
+             letter-spacing="1">
         ${escaped}
       </text>`;
   }).join('\n');
@@ -264,7 +266,7 @@ function buildOverlaySvg(
   <text x="${width / 2}" y="${textStartY + totalTextHeight + 40}" text-anchor="middle"
         font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700"
         fill="#FF6B35">
-    ARRASTE PARA MAIS →
+    ${escapeXml(ctaText)}
   </text>
   
   <!-- Neural Update watermark bottom-right (covers any source watermark) -->
