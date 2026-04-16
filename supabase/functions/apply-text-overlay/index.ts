@@ -213,18 +213,20 @@ function buildOverlaySvg(
   const textStartY = height * 0.63 - (totalTextHeight / 2);
   const gradientStartPct = Math.max(30, Math.round((textStartY / height) * 100) - 15);
   
-  // Build text lines with shadow for readability
+  // Build text lines: render black "shadow" copies offset in 4 directions, then yellow text on top
+  // This avoids resvg paint-order/stroke rendering bugs that cut letters in half
   const textElements = lines.map((line, i) => {
     const y = textStartY + (i * lineHeight);
     const escaped = escapeXml(line);
+    const commonAttrs = `text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="${fontSize}" font-weight="700" letter-spacing="2"`;
+    // Black shadow copies (offset in 8 directions for full outline effect)
+    const offsets = [[-2,-2],[2,-2],[-2,2],[2,2],[0,-3],[0,3],[-3,0],[3,0]];
+    const shadows = offsets.map(([dx, dy]) =>
+      `<text x="${width / 2 + dx}" y="${y + dy}" ${commonAttrs} fill="#000">${escaped}</text>`
+    ).join('');
     return `
-      <text x="${width / 2}" y="${y}" text-anchor="middle" 
-             font-family="Helvetica, Arial, sans-serif" 
-             font-size="${fontSize}" font-weight="800" fill="#FFD700"
-             stroke="#000" stroke-width="3" paint-order="stroke"
-             letter-spacing="1">
-        ${escaped}
-      </text>`;
+      ${shadows}
+      <text x="${width / 2}" y="${y}" ${commonAttrs} fill="#FFD700">${escaped}</text>`;
   }).join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
