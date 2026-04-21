@@ -758,6 +758,51 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          article_slug: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          id: string
+          page_path: string
+          page_type: string
+          referrer: string | null
+          search_query: string | null
+          session_id: string | null
+          user_agent: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          article_slug?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          page_path: string
+          page_type?: string
+          referrer?: string | null
+          search_query?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          article_slug?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          page_path?: string
+          page_type?: string
+          referrer?: string | null
+          search_query?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           ai_model_used: string | null
@@ -969,6 +1014,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seo_settings: {
+        Row: {
+          created_at: string
+          enable_internal_analytics: boolean
+          ga4_measurement_id: string | null
+          gsc_verification_code: string | null
+          id: string
+          site_url: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          enable_internal_analytics?: boolean
+          ga4_measurement_id?: string | null
+          gsc_verification_code?: string | null
+          id?: string
+          site_url?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          enable_internal_analytics?: boolean
+          ga4_measurement_id?: string | null
+          gsc_verification_code?: string | null
+          id?: string
+          site_url?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
       }
       settings: {
         Row: {
