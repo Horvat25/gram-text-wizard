@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ARTICLE_CATEGORIES, formatArticleDate, slugify } from "@/lib/article-helpers";
-import { Loader2, Plus, ExternalLink, Eye, Edit, Trash2, Sparkles, Star } from "lucide-react";
+import { Loader2, Plus, Eye, Edit, Trash2, Sparkles, Star, Newspaper } from "lucide-react";
 
 interface ArticleRow {
   id: string;
