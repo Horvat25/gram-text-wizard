@@ -1,0 +1,3 @@
+UPDATE public.articles SET hero_image_url = 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1600&q=80' WHERE slug = 'openai-lanca-memoria-unificada-para-chatgpt-em-2026' AND hero_image_url IS NULL;
+UPDATE public.articles SET hero_image_url = 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80' WHERE slug = 'xai-expande-grok-com-modo-operacional-para-analise-em-tempo-real' AND hero_image_url IS NULL;
+UPDATE public.articles SET hero_image_url = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1600&q=80' WHERE slug = 'meta-reposiciona-llama-com-foco-em-ecossistema-aberto-e-dispositivos' AND hero_image_url IS NULL;
