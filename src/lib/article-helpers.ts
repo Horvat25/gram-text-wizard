@@ -91,14 +91,20 @@ export function renderMarkdown(md: string): string {
 
   const isLikelyHeading = (line: string, next: string): boolean => {
     const t = line.trim();
+    const nextTrimmed = next.trim();
     if (!t || t.length > 90) return false;
     if (/^[#>\-*\d`]/.test(t)) return false;
     if (/[.!?:;,]$/.test(t)) return false;
     if (!/^[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ"']/.test(t)) return false;
     if (t.split(/\s+/).length > 12) return false;
-    if (next.trim().length < 24) return false;
-    if (/^[#>\-*]/.test(next.trim())) return false;
-    return true;
+    if (!nextTrimmed) return false;
+    if (/^#{1,3}\s+/.test(nextTrimmed)) return false;
+    const nextLooksLikeContent =
+      nextTrimmed.length >= 24 ||
+      /^[-*]\s+/.test(nextTrimmed) ||
+      /^>\s+/.test(nextTrimmed) ||
+      /^\*\*/.test(nextTrimmed);
+    return nextLooksLikeContent;
   };
 
   const lines = normalizedInput.split("\n");
