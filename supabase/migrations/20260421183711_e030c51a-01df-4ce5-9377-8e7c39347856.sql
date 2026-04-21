@@ -1,0 +1,1 @@
+UPDATE public.posts SET status = 'failed', error_message = COALESCE(error_message, 'Geração travada — encerrada por timeout de processo de fundo') WHERE status = 'generating' AND created_at < NOW() - INTERVAL '5 minutes';

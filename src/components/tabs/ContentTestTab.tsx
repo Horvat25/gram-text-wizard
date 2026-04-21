@@ -489,7 +489,7 @@ export default function ContentTestTab() {
 
   // Poll a post until it's no longer 'generating'
   const pollPost = async (postId: string, contentType: string) => {
-    const maxAttempts = 60; // ~2 minutes
+    const maxAttempts = 150; // ~5 minutes (matches edge watchdog of 4min + margin)
     for (let i = 0; i < maxAttempts; i++) {
       await new Promise((r) => setTimeout(r, 2000));
 
@@ -526,9 +526,24 @@ export default function ContentTestTab() {
       }));
     }
 
-    // Timeout
+    // Timeout — mark the post as failed so it stops occupying the slot
     setGenerating(null);
-    toast.error('Geração demorou demais. Verifique a aba Fila.');
+    await supabase
+      .from('posts')
+      .update({
+        status: 'failed',
+        error_message: 'Timeout no cliente: geração demorou mais de 5 minutos',
+      })
+      .eq('id', postId)
+      .eq('status', 'generating');
+    setResults((prev) => ({
+      ...prev,
+      [contentType]: {
+        post: { ...prev[contentType]?.post, status: 'failed', error_message: 'Timeout (>5min)' },
+        agentResponse: { decision: 'FAILED' },
+      },
+    }));
+    toast.error('Geração demorou demais (>5min). Tente gerar novamente.');
   };
 
   const generateTest = async (contentType: string, feedbackHint?: string) => {
