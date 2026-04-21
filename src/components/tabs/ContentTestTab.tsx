@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import CostSummaryPanel from './CostSummaryPanel';
 import StrategyPanel from './StrategyPanel';
 import AgentVisionPanel from './AgentVisionPanel';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -434,7 +434,7 @@ export default function ContentTestTab() {
   const [results, setResults] = useState<Record<string, TestResult>>({});
   const [activeDetailType, setActiveDetailType] = useState<string | null>(null);
   const [editingType, setEditingType] = useState<string | null>(null);
-  const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
+  const [subTab, setSubTab] = useState<'teste' | 'custo' | 'estrategia'>('teste');
 
   // Recover pending_review/generating posts on mount (survives tab switching)
   // This way trocar de aba durante geração não perde o post de vista
@@ -719,12 +719,12 @@ export default function ContentTestTab() {
 
   return (
     <div className="space-y-4">
-      {/* Sub-tab toggle */}
+      {/* Sub-tab toggle: Teste / Custo / Estratégia */}
       <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
         <button
           onClick={() => setSubTab('teste')}
           className={cn(
-            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all',
+            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all',
             subTab === 'teste'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -736,7 +736,7 @@ export default function ContentTestTab() {
         <button
           onClick={() => setSubTab('custo')}
           className={cn(
-            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all',
+            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all',
             subTab === 'custo'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -745,11 +745,26 @@ export default function ContentTestTab() {
           <DollarSign className="h-3.5 w-3.5" />
           Custo
         </button>
+        <button
+          onClick={() => setSubTab('estrategia')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all',
+            subTab === 'estrategia'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <Brain className="h-3.5 w-3.5" />
+          Estratégia
+        </button>
       </div>
 
       {subTab === 'custo' ? (
         <div className="space-y-4">
           <CostSummaryPanel />
+        </div>
+      ) : subTab === 'estrategia' ? (
+        <div className="space-y-4">
           <StrategyPanel />
         </div>
       ) : (
