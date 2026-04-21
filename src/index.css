@@ -264,3 +264,45 @@
   }
   .instagram-border { border-color: #DD2A7B; }
 }
+
+/* ─── Article body — typography sem plugin de prose (robusto, sem dependência) ─── */
+.article-body { color: hsl(var(--foreground) / 0.88); font-size: 1.06rem; line-height: 1.85; }
+.article-body p { margin: 0 0 1.15rem; }
+.article-body strong { color: hsl(var(--foreground)); font-weight: 600; }
+.article-body em { color: hsl(var(--foreground) / 0.95); }
+.article-body a { color: hsl(var(--primary)); font-weight: 500; text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body code { background: hsl(var(--muted) / 0.5); color: hsl(var(--primary));
+  padding: 0.12rem 0.4rem; border-radius: 0.35rem; font-size: 0.9em; }
+.article-body ul, .article-body ol { margin: 1.25rem 0; padding-left: 1.4rem; }
+.article-body li { margin: 0.4rem 0; }
+.article-body li::marker { color: hsl(var(--primary)); }
+.article-body blockquote {
+  margin: 1.75rem 0; padding: 1rem 1.25rem;
+  border-left: 3px solid hsl(var(--primary));
+  background: hsl(var(--primary) / 0.06);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: hsl(var(--foreground)); font-weight: 500;
+}
+.article-body h2 {
+  margin: 2.6rem 0 1rem; padding: 0.7rem 1rem;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 1.7rem; font-weight: 700; line-height: 1.2;
+  color: hsl(var(--foreground));
+  background: hsl(var(--card) / 0.55);
+  border: 1px solid hsl(var(--primary) / 0.28);
+  border-left: 4px solid hsl(var(--primary));
+  border-radius: 0.6rem;
+}
+.article-body h3 {
+  margin: 2rem 0 0.75rem; padding: 0.45rem 0.8rem;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 1.25rem; font-weight: 700;
+  color: hsl(var(--foreground));
+  background: hsl(var(--muted) / 0.4);
+  border-radius: 0.45rem;
+}
+@media (min-width: 768px) {
+  .article-body h2 { font-size: 2rem; }
+  .article-body h3 { font-size: 1.4rem; }
+}
