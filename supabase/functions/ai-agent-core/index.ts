@@ -2760,8 +2760,12 @@ async function createNewsContent(
   // - LLM generates ONLY the headline TEXT (string)
   // - Code applies the text as overlay (fixed font, color, layout)
   let imageUrl = null;
+  let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' = 'fallback_external_url';
+  let overlayFailureReason: string | null = null;
+
   if (selectedImage && selectedArticle?.title) {
-    console.log('[AGENT] Aplicando overlay de texto via código...');
+    // ── TENTATIVA 1: apply-text-overlay (headline + watermark) ──
+    console.log('[AGENT] [1/4] Aplicando overlay de texto via SVG...');
     try {
       const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
@@ -2773,54 +2777,27 @@ async function createNewsContent(
           generateHeadline: true
         })
       });
-      
+
       if (overlayResponse.ok) {
         const overlayResult = await overlayResponse.json();
-        if (overlayResult.hasOverlay) {
+        if (overlayResult.publicUrl) {
           imageUrl = overlayResult.publicUrl;
-          console.log('[AGENT] ✅ Overlay com headline aplicado:', overlayResult.headline);
-        } else {
-          // Overlay returned image but WITHOUT headline (e.g. 402 credits)
-          console.log('[AGENT] ⚠️ Overlay sem headline (créditos?), tentando add-watermark com headline...');
-          // Try add-watermark WITH the headline text
-          try {
-            const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({
-                imageUrl: selectedImage,
-                watermarkText: 'Neural Update',
-                headlineText: overlayResult.headline || selectedArticle?.title
-              })
-            });
-            if (wmResponse.ok) {
-              const wmResult = await wmResponse.json();
-              if (wmResult.hasHeadline) {
-                imageUrl = wmResult.publicUrl;
-                console.log('[AGENT] ✅ Headline aplicada via add-watermark');
-              } else {
-                // add-watermark also failed to apply headline, use overlay's image
-                imageUrl = overlayResult.publicUrl;
-                console.log('[AGENT] ⚠️ add-watermark sem headline, usando imagem sem overlay');
-              }
-            } else {
-              imageUrl = overlayResult.publicUrl;
-            }
-          } catch (wmErr) {
-            console.log('[AGENT] add-watermark falhou:', wmErr);
-            imageUrl = overlayResult.publicUrl;
-          }
+          overlayStatus = overlayResult.hasOverlay ? 'success' : 'fallback_no_overlay';
+          console.log(`[AGENT] ✅ Overlay aplicado (${overlayStatus}):`, overlayResult.headline);
         }
       } else {
-        console.error('[AGENT] Overlay falhou (status:', overlayResponse.status, ')');
+        const errBody = await overlayResponse.text().catch(() => '');
+        overlayFailureReason = `overlay_http_${overlayResponse.status}: ${errBody.substring(0, 120)}`;
+        console.error('[AGENT] ❌ Overlay falhou:', overlayFailureReason);
       }
-    } catch (overlayErr) {
-      console.error('[AGENT] Erro ao aplicar overlay:', overlayErr);
+    } catch (overlayErr: any) {
+      overlayFailureReason = `overlay_exception: ${overlayErr?.message || overlayErr}`;
+      console.error('[AGENT] ❌ Erro ao aplicar overlay:', overlayFailureReason);
     }
-    
-    // FALLBACK 1: Use add-watermark if overlay completely failed
+
+    // ── TENTATIVA 2: add-watermark (sem overlay, mas com watermark) ──
     if (!imageUrl) {
-      console.log('[AGENT] Fallback: aplicando watermark com headline...');
+      console.log('[AGENT] [2/4] Fallback: add-watermark...');
       try {
         const wmResponse = await fetch(`${supabaseUrl}/functions/v1/add-watermark`, {
           method: 'POST',
@@ -2828,42 +2805,66 @@ async function createNewsContent(
           body: JSON.stringify({
             imageUrl: selectedImage,
             watermarkText: 'Neural Update',
-            headlineText: selectedArticle?.title // Pass headline text!
+            headlineText: selectedArticle?.title
           })
         });
         if (wmResponse.ok) {
           const wmResult = await wmResponse.json();
-          imageUrl = wmResult.publicUrl;
-          console.log('[AGENT] Watermark' + (wmResult.hasHeadline ? ' + headline' : '') + ' aplicado ✅');
+          if (wmResult.publicUrl) {
+            imageUrl = wmResult.publicUrl;
+            overlayStatus = 'fallback_watermark_only';
+            console.log('[AGENT] ✅ Watermark aplicado (sem overlay)');
+          }
+        } else {
+          console.warn('[AGENT] ⚠️ add-watermark http', wmResponse.status);
         }
-      } catch (wmErr) {
-        console.log('[AGENT] Watermark também falhou:', wmErr);
+      } catch (wmErr: any) {
+        console.warn('[AGENT] add-watermark falhou:', wmErr?.message || wmErr);
       }
     }
-  }
-  
-  // FALLBACK 2: Just upload the original image
-  if (!imageUrl && selectedImage) {
-    console.log('[AGENT] Fallback: usando imagem original sem overlay');
-    try {
-      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ imageUrl: selectedImage })
-      });
-      if (uploadResponse.ok) {
-        const uploadResult = await uploadResponse.json();
-        imageUrl = uploadResult.publicUrl;
+
+    // ── TENTATIVA 3: upload-external-image (imagem original sem nada) ──
+    if (!imageUrl) {
+      console.log('[AGENT] [3/4] Fallback: upload-external-image...');
+      try {
+        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ imageUrl: selectedImage })
+        });
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          if (uploadResult.publicUrl) {
+            imageUrl = uploadResult.publicUrl;
+            overlayStatus = 'fallback_no_overlay';
+            console.log('[AGENT] ✅ Imagem original re-uploadada');
+          }
+        } else {
+          console.warn('[AGENT] ⚠️ upload-external-image http', uploadResponse.status);
+        }
+      } catch (e: any) {
+        console.warn('[AGENT] upload-external-image falhou:', e?.message || e);
       }
-    } catch (e) {
-      console.log('[AGENT] Erro upload fallback:', e);
+    }
+
+    // ── TENTATIVA 4: usar a URL externa diretamente (último recurso) ──
+    if (!imageUrl) {
+      const isHttpImage = /^https?:\/\//.test(selectedImage) && !selectedImage.includes('youtube.com') && !selectedImage.includes('youtu.be');
+      if (isHttpImage) {
+        console.log('[AGENT] [4/4] Último recurso: usando URL externa direta');
+        imageUrl = selectedImage;
+        overlayStatus = 'fallback_external_url';
+      } else {
+        console.warn('[AGENT] ⚠️ selectedImage não é uma URL HTTP de imagem (pode ser embed YouTube). Pulando.');
+      }
     }
   }
   
   // DO NOT generate AI image for news - only use real images
-  // If no real image found, post will be text-only (draft status)
   if (!imageUrl) {
-    console.log('[AGENT] AVISO: Nenhuma imagem real encontrada. Post será salvo como draft.');
+    console.log('[AGENT] AVISO: Nenhuma imagem real disponível. Post será salvo como draft.');
+  } else {
+    console.log(`[AGENT] 🖼️ Imagem final: ${overlayStatus} → ${imageUrl.substring(0, 80)}...`);
   }
   
   // Generate caption with source attribution (3-block editorial structure)
@@ -2926,7 +2927,9 @@ OBRIGATÓRIO ao final:
       source_domain: sourceDomain,
       original_title: selectedArticle?.title,
       used_real_image: !!selectedImage,
-      text_applied_by_code: true // Flag indicating text was applied programmatically
+      text_applied_by_code: true,
+      overlay_status: overlayStatus,
+      overlay_failure_reason: overlayFailureReason,
     },
     ai_model_used: 'gemini-2.5-flash' // For headline generation only
   }).select().single();

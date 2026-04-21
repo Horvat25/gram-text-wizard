@@ -369,22 +369,18 @@ serve(async (req) => {
       headlineText = await generateHeadlineText(title, lovableApiKey);
     }
 
-    // ── STEP 2: MANDATORY Portuguese review (HARD BLOCK) ──
+    // ── STEP 2: Portuguese review (SOFT — não bloqueia, apenas avisa) ──
+    // Antes era HARD BLOCK 422, mas isso descartava imagens válidas no fluxo do agente.
+    // Agora, se o review falhar, seguimos com o texto original (que já passou pelo Gemini com regras de ortografia).
     const review = await reviewPortuguese(headlineText, supabaseUrl, supabaseKey);
+    let reviewWarning: string | null = null;
     if (!review.success) {
-      console.error("[apply-text-overlay] ❌ HARD BLOCK: Revisão ortográfica falhou. Publicação bloqueada.");
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Revisão ortográfica obrigatória falhou. Publicação bloqueada para evitar erros.",
-          headline: headlineText,
-          reviewFailed: true,
-        }),
-        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      console.warn("[apply-text-overlay] ⚠️ Revisão ortográfica falhou — prosseguindo com headline original (sem bloquear publicação).");
+      reviewWarning = "Revisão ortográfica indisponível; usando texto original.";
+    } else {
+      headlineText = review.corrected;
+      console.log("[apply-text-overlay] ✅ Headline revisada:", headlineText);
     }
-    headlineText = review.corrected;
-    console.log("[apply-text-overlay] ✅ Headline revisada:", headlineText);
 
     // ── STEP 3: Download original image ──
     console.log("[apply-text-overlay] Downloading image...");
@@ -449,8 +445,9 @@ serve(async (req) => {
         headline: headlineText,
         hasOverlay: renderMethod !== 'original-no-overlay',
         renderMethod,
-        spellingReviewed: true,
-        spellingCorrected: review.wasModified,
+        spellingReviewed: review.success,
+        spellingCorrected: review.success && review.wasModified,
+        reviewWarning,
         overlayMetadata: {
           headlineText: headlineText.toUpperCase(),
           watermarkText,
