@@ -725,6 +725,8 @@ export default function ContentTestTab() {
             </p>
           </div>
 
+          <TestFeedbackHistoryPanel />
+
           <div className="space-y-2">
             {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color, editType }) => {
               const isGenerating = generating === type;
