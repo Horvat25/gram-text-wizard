@@ -272,6 +272,27 @@ const ArticlePage = () => {
             ))}
           </div>
         )}
+
+        {/* Fonte ancorada — IA Search prioriza conteúdo com citação clara */}
+        {article.source_url && (
+          <footer className="mt-10 pt-6 border-t border-border/60">
+            <p className="text-xs text-muted-foreground mb-1.5 uppercase tracking-wider font-semibold">
+              Fonte original
+            </p>
+            <a
+              href={article.source_url}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline break-all"
+            >
+              {article.source_name || article.source_url}
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+            <p className="text-[11px] text-muted-foreground mt-2">
+              Publicado em {formatArticleDate(article.published_at)} · Neural Update · Editorial assistido por IA
+            </p>
+          </footer>
+        )}
       </article>
 
       {related.length > 0 && (
