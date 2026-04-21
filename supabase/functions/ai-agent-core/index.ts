@@ -387,20 +387,14 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const hasAffiliateLinks = (activeAffiliateLinks?.length || 0) > 0;
   
-  // Check if video rendering is available (RENDER_SERVICE_URL must be configured)
-  // Without it, reels get stuck as drafts and waste daily post slots
-  const renderServiceAvailable = !!Deno.env.get('RENDER_SERVICE_URL');
-  if (!renderServiceAvailable) {
-    console.log('[AGENT] ⚠️ RENDER_SERVICE_URL não configurado - tipo "video" desabilitado (reels ficam como drafts inúteis)');
-  }
+  // ⛔ REELS AUTOMÁTICOS DESLIGADOS (decisão do usuário)
+  // Agente só cria Reels quando solicitado manualmente via chat ou aba Teste.
+  // Foco: imagem, carrossel, notícia (formatos com 0 falhas no histórico).
+  // Para reativar, descomente os tipos 'video' / 'video_curated' / 'news_video' abaixo.
+  console.log('[AGENT] ⛔ Reels automáticos DESLIGADOS - foco em imagem/carrossel/notícia');
   
   const typeStats = [
-    // Creative video (AI themes) - only if render service is available
-    ...(renderServiceAvailable ? [{ type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 }] : []),
-    // Curated video (Pexels stock) - available even without render service
-    ...(!renderServiceAvailable ? [{ type: 'video_curated' as ContentType, ...getCompletionStats('video_curated'), priority: 3.8 }] : []),
-    // News video (RSS broadcast Reels) - also needs render service
-    ...(renderServiceAvailable ? [{ type: 'news_video' as ContentType, ...getCompletionStats('news_video'), priority: 3.5 }] : []),
+    // ❌ video, video_curated, news_video DESABILITADOS para auto-rotação
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },
