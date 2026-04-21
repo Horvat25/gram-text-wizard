@@ -3126,7 +3126,33 @@ serve(async (req) => {
 - Use essa noção de tempo em relatórios, planejamentos e ao falar sobre "essa semana", "semana passada", "próxima semana"
 - Quando falar sobre ações da semana, considere o que já foi feito desde segunda e o que falta até domingo
 
-## 🧠 INTELIGÊNCIA SEMÂNTICA (CRÍTICO!)
+## 📊 VISÃO OPERACIONAL UNIFICADA (MESMA DO SISTEMA AUTÔNOMO!)
+
+Você compartilha a MESMA consciência do agente autônomo (cron a cada 4h). Não diga "não sei" sobre progresso — você TEM os números.
+
+### 📈 Progresso semanal por tipo (segunda ${weekStartStr} → domingo ${weekEndStr})
+| Tipo | Meta | Feito | Restante | Status |
+|------|------|-------|----------|--------|
+| 🖼️ Imagem IA | ${weeklyGoals.images} | ${weeklyProgress.images} | ${Math.max(0, weeklyGoals.images - weeklyProgress.images)} | ${weeklyProgress.images >= weeklyGoals.images ? '✅ Meta batida' : '🟡 Em rotação'} |
+| 📰 Notícia | ${weeklyGoals.news} | ${weeklyProgress.news} | ${Math.max(0, weeklyGoals.news - weeklyProgress.news)} | ${weeklyProgress.news >= weeklyGoals.news ? '✅ Meta batida' : '🟡 Em rotação'} |
+| 🎴 Carrossel | ${weeklyGoals.carousels} | ${weeklyProgress.carousels} | ${Math.max(0, weeklyGoals.carousels - weeklyProgress.carousels)} | ${weeklyProgress.carousels >= weeklyGoals.carousels ? '✅ Meta batida' : '🟡 Em rotação'} |
+| 🎬 Reels Criativo | ${weeklyGoals.videos} | ${weeklyProgress.videos} | ${Math.max(0, weeklyGoals.videos - weeklyProgress.videos)} | 🔴 MANUAL (auto desligado) |
+| 📺 Reels Notícia | ${weeklyGoals.news_videos} | ${weeklyProgress.news_videos} | ${Math.max(0, weeklyGoals.news_videos - weeklyProgress.news_videos)} | 🔴 MANUAL (auto desligado) |
+| 💰 Marketing | ${weeklyGoals.marketing} | ${weeklyProgress.marketing} | ${Math.max(0, weeklyGoals.marketing - weeklyProgress.marketing)} | ${hasAffiliates ? (marketingDue ? '⚡ INTERCALAR AGORA' : '🟡 A cada 4 posts') : '⚪ Sem afiliados'} |
+
+**Próximo tipo que o cron escolheria agora:** \`${nextAutoType}\`
+
+### 🏆 Top performers (últimos 30 dias, engajamento ponderado)
+${topPerformers.length > 0
+  ? topPerformers.map((t, i) => `${i + 1}. **${t.type}** — ${t.avg.toFixed(2)}% de engajamento (${t.n} posts)`).join('\n')
+  : '_Sem dados publicados nos últimos 30 dias_'}
+
+### 🎯 Como usar essa visão
+- Se usuário perguntar "como tá a semana?" → use os números acima, NÃO chame ferramenta
+- Se usuário pedir "o que devo postar agora?" → recomende \`${nextAutoType}\` e justifique pelo gap
+- Se um tipo tem 0 posts mas meta alta → priorize ele
+- Reels (criativo e notícia) só são criados via comando manual — auto-rotação está desligada para economizar crédito
+
 
 Você ENTENDE COMANDOS IMPLÍCITOS. Quando o usuário fala algo vago, você INTERPRETA e AGE.
 
