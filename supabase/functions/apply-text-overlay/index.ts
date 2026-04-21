@@ -401,31 +401,28 @@ serve(async (req) => {
     const { data: imageData, contentType } = await downloadImage(imageUrl);
     console.log("[apply-text-overlay] Downloaded:", imageData.length, "bytes");
 
-    // ── STEP 4: Build SVG with programmatic text overlay ──
-    const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
-    const imageBase64 = b64encode(imageData);
+    // ── STEP 4: Build LIGHTWEIGHT SVG (only overlay layer, no embedded image) ──
     const isCarousel = mediaType === 'carousel' || mediaType === 'carrossel';
     const ctaText = isCarousel ? 'ARRASTE PARA MAIS →' : 'LEIA A LEGENDA 👇';
-    const svgString = buildOverlaySvg(imageBase64, mimeType, headlineText, watermarkText, ctaText);
-    console.log("[apply-text-overlay] SVG built:", svgString.length, "chars");
+    const svgString = buildOverlaySvg(headlineText, watermarkText, ctaText);
+    console.log("[apply-text-overlay] Overlay SVG built:", svgString.length, "chars");
 
-    // ── STEP 5: Render SVG → PNG ──
+    // ── STEP 5: Render overlay SVG → PNG, then COMPOSE with base image ──
     let finalImageData: Uint8Array;
-    let renderMethod = 'svg-programmatic';
+    let renderMethod = 'svg-composite';
     
     try {
-      finalImageData = await renderSvgToPng(svgString);
-      console.log("[apply-text-overlay] ✅ Programmatic SVG rendered:", finalImageData.length, "bytes");
+      const overlayPng = await renderSvgToPng(svgString);
+      finalImageData = await composeImageWithOverlay(imageData, overlayPng, 1080, 1350);
+      console.log("[apply-text-overlay] ✅ Composite ready:", finalImageData.length, "bytes");
     } catch (svgError) {
-      console.warn("[apply-text-overlay] SVG render failed, using Gemini fallback:", svgError);
-      // Fallback to Gemini image edit (text already reviewed, so less risk)
+      console.warn("[apply-text-overlay] Composite failed, using Gemini fallback:", svgError);
       const fallbackResult = await burnTextWithGeminiFallback(imageData, contentType, headlineText, watermarkText, lovableApiKey);
       if (fallbackResult && fallbackResult.length > 1000) {
         finalImageData = fallbackResult;
         renderMethod = 'gemini-fallback';
         console.log("[apply-text-overlay] ✅ Gemini fallback succeeded:", fallbackResult.length, "bytes");
       } else {
-        // Last resort: upload original image with metadata
         finalImageData = imageData;
         renderMethod = 'original-no-overlay';
         console.warn("[apply-text-overlay] ⚠️ All render methods failed, using original image");
