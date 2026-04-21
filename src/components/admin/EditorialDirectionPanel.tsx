@@ -437,30 +437,59 @@ export default function EditorialDirectionPanel() {
               />
             </div>
 
-            {/* Frequência cron */}
-            <div className="rounded-md border border-border/60 bg-card/40 p-2.5">
+            {/* Auto-pilot do blog */}
+            <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2.5">
               <div className="flex items-center gap-2 text-xs">
-                <Gauge className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span className="font-medium">Ritmo do agente</span>
-                <span className="text-muted-foreground ml-auto">
-                  {metrics.cyclesLast24h > 0
-                    ? `1 ciclo a cada ${metrics.avgHoursBetweenCycles}h`
-                    : "sem ciclos hoje"}
-                </span>
+                <Zap className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                <span className="font-medium">Auto-pilot do blog</span>
+                <Badge variant="outline" className="ml-auto text-[10px] border-emerald-500/40 text-emerald-300">
+                  ATIVO · 3×/dia
+                </Badge>
               </div>
               <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">
-                {metrics.cyclesLast24h > 8
-                  ? "⚠️ Frequência alta. O agente está rodando demais — considere reduzir para a cada 6h em Configurações."
-                  : metrics.cyclesLast24h >= 4
-                  ? "✓ Ritmo saudável. O agente avalia a cada 4-6h e só posta quando vale a pena."
-                  : "🐢 Ritmo lento. Bom para começar; aumente quando quiser mais alcance."}
+                Publica automaticamente às <strong className="text-foreground">09h, 13h e 19h</strong> (Brasília).
+                Filtro tech-only: bloqueia ofertas, cupons, listas de produtos, jogos, filmes e qualquer notícia que não seja IA, tecnologia, inovação ou ciência.
+              </p>
+              <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground">
+                <span>Hoje: {articles.filter(a => {
+                  const d = new Date(a.created_at);
+                  const todayBR = new Date();
+                  todayBR.setUTCHours(3, 0, 0, 0);
+                  if (todayBR > new Date()) todayBR.setUTCDate(todayBR.getUTCDate() - 1);
+                  return d >= todayBR;
+                }).length}/3 artigos publicados</span>
+                <span className="text-muted-foreground/70">isolado do Instagram</span>
+              </div>
+            </div>
+
+            {/* Comparativo de custo: Blog vs Instagram */}
+            <div className="rounded-md border border-border/60 bg-card/40 p-2.5 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs">
+                <DollarSign className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="font-medium">Blog vs Instagram (custo médio por peça)</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div className="rounded border border-emerald-500/30 bg-emerald-500/5 px-2 py-1.5">
+                  <div className="text-muted-foreground text-[10px]">📰 Blog (artigo completo)</div>
+                  <div className="font-mono font-semibold text-emerald-300">~$0.004</div>
+                  <div className="text-[10px] text-muted-foreground/70">Gemini Flash + Unsplash grátis</div>
+                </div>
+                <div className="rounded border border-amber-500/30 bg-amber-500/5 px-2 py-1.5">
+                  <div className="text-muted-foreground text-[10px]">📱 Instagram (Reels narrado)</div>
+                  <div className="font-mono font-semibold text-amber-300">~$0.020</div>
+                  <div className="text-[10px] text-muted-foreground/70">Gemini + ElevenLabs + Pexels</div>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground/80 leading-snug pt-0.5">
+                Blog é <strong className="text-emerald-300">~5× mais barato</strong> que Reels do IG. 3 artigos/dia ≈ <strong>$0.36/mês</strong>.
+                Instagram e blog rodam em <strong>pipelines totalmente separados</strong>.
               </p>
             </div>
 
             {/* Plano gradual */}
             <div className="rounded-md border border-primary/30 bg-primary/5 p-2.5 space-y-2">
               <div className="flex items-center gap-2">
-                <Zap className="h-3.5 w-3.5 text-primary" />
+                <Calendar className="h-3.5 w-3.5 text-primary" />
                 <span className="text-xs font-semibold">{currentPhase.label}</span>
                 <Badge variant="outline" className="ml-auto text-[10px]">
                   {metrics.totalArticles} artigos publicados
@@ -471,7 +500,7 @@ export default function EditorialDirectionPanel() {
                 <strong className="text-foreground">
                   {currentPhase.articlesPerDay} artigo{currentPhase.articlesPerDay > 1 ? "s" : ""}/dia
                 </strong>{" "}
-                publicado no blog. Comece devagar para medir o que funciona antes de acelerar.
+                no blog. O auto-pilot já está configurado para 3/dia — quando bater consistência, sobe pra 4.
               </p>
               <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                 <span>Esta semana: {metrics.weekArticles} artigos publicados</span>
@@ -481,7 +510,7 @@ export default function EditorialDirectionPanel() {
                     isPaceHealthy ? "border-emerald-500/40 text-emerald-300" : "border-amber-500/40 text-amber-300"
                   }`}
                 >
-                  {isPaceHealthy ? "✓ no ritmo" : "abaixo da meta"}
+                  {isPaceHealthy ? "✓ no ritmo" : "aquecendo"}
                 </Badge>
               </div>
             </div>
