@@ -19,11 +19,13 @@ import {
   Eye,
   Users,
   FileText,
-  Gauge,
   Calendar,
   Globe,
   Search,
   Zap,
+  Sunrise,
+  Moon,
+  Info,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -39,8 +41,8 @@ import {
 import { formatRelativeDate, formatArticleDate, ARTICLE_CATEGORIES } from "@/lib/article-helpers";
 
 /**
- * EditorialDirectionPanel — painel UNIFICADO (Direção + Conteúdo + Visitas).
- * Read-only. Foco em ritmo gradual e economia de IA.
+ * EditorialDirectionPanel — painel UNIFICADO read-only.
+ * Foco: custo POR POST + decisões do agente + relatórios diários.
  */
 
 type Snapshot = {
@@ -93,20 +95,21 @@ type ArticleRow = {
   cost_estimate: number | null;
 };
 
-type PostRow = {
-  id: string;
-  cost_estimate: number | null;
-  created_at: string;
-  post_type: string | null;
-};
-
 type PageView = {
   page_path: string;
   page_type: string;
+  article_slug: string | null;
   referrer: string | null;
   device_type: string | null;
   created_at: string;
   session_id: string | null;
+};
+
+type DailyReport = {
+  id: string;
+  content: string;
+  created_at: string;
+  metadata: any;
 };
 
 const startOfWeekBrasilia = () => {
@@ -120,25 +123,42 @@ const startOfWeekBrasilia = () => {
 
 const decisionLabel = (d: string) => {
   const map: Record<string, { label: string; color: string }> = {
-    create_image: { label: "Imagem", color: "bg-blue-500/10 text-blue-300 border-blue-500/30" },
-    create_carousel: { label: "Carrossel", color: "bg-purple-500/10 text-purple-300 border-purple-500/30" },
-    create_video: { label: "Reels", color: "bg-pink-500/10 text-pink-300 border-pink-500/30" },
-    create_news: { label: "Notícia", color: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" },
-    create_news_video: { label: "Reels Notícia", color: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
-    create_marketing: { label: "Marketing", color: "bg-orange-500/10 text-orange-300 border-orange-500/30" },
-    create_article: { label: "Artigo", color: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30" },
+    create_image: { label: "Imagem (IG)", color: "bg-blue-500/10 text-blue-300 border-blue-500/30" },
+    create_carousel: { label: "Carrossel (IG)", color: "bg-purple-500/10 text-purple-300 border-purple-500/30" },
+    create_video: { label: "Reels (IG)", color: "bg-pink-500/10 text-pink-300 border-pink-500/30" },
+    create_news: { label: "Notícia (IG)", color: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" },
+    create_news_video: { label: "Reels Notícia (IG)", color: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
+    create_marketing: { label: "Marketing (IG)", color: "bg-orange-500/10 text-orange-300 border-orange-500/30" },
+    create_article: { label: "Artigo (Blog)", color: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30" },
     skip: { label: "Pausa estratégica", color: "bg-zinc-500/10 text-zinc-300 border-zinc-500/30" },
   };
   return map[d] ?? { label: d, color: "bg-zinc-500/10 text-zinc-300 border-zinc-500/30" };
 };
 
-// Plano gradual de "ramp-up" para o BLOG (independente do Instagram/TikTok)
-const RAMPUP_PLAN = [
-  { week: 1, articlesPerDay: 1, label: "Semana 1 — Aquecimento" },
-  { week: 2, articlesPerDay: 2, label: "Semana 2 — Validação" },
-  { week: 3, articlesPerDay: 3, label: "Semana 3 — Aceleração" },
-  { week: 4, articlesPerDay: 4, label: "Semana 4+ — Ritmo pleno" },
-];
+// Formato HH:mm em Brasília
+const fmtTimeBR = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleTimeString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+};
+
+const fmtDayBR = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      day: "2-digit",
+      month: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+};
 
 export default function EditorialDirectionPanel() {
   const { currentWorkspace: workspace } = useWorkspace();
@@ -147,8 +167,8 @@ export default function EditorialDirectionPanel() {
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [articles, setArticles] = useState<ArticleRow[]>([]);
-  const [posts, setPosts] = useState<PostRow[]>([]);
   const [pageViews, setPageViews] = useState<PageView[]>([]);
+  const [dailyReports, setDailyReports] = useState<DailyReport[]>([]);
   const [topCategory, setTopCategory] = useState<string | null>(null);
 
   useEffect(() => {
@@ -157,10 +177,9 @@ export default function EditorialDirectionPanel() {
     (async () => {
       setLoading(true);
       const weekStart = startOfWeekBrasilia();
-      const last30d = new Date(Date.now() - 30 * 86400000).toISOString();
       const last7d = new Date(Date.now() - 7 * 86400000).toISOString();
 
-      const [snapRes, decRes, repRes, artAllRes, postsRes, viewsRes] = await Promise.all([
+      const [snapRes, decRes, repRes, artAllRes, viewsRes, dailyRes] = await Promise.all([
         supabase
           .from("agent_strategy_snapshots")
           .select("*")
@@ -189,18 +208,18 @@ export default function EditorialDirectionPanel() {
           .order("created_at", { ascending: false })
           .limit(200),
         supabase
-          .from("posts")
-          .select("id, cost_estimate, created_at, post_type")
-          .eq("workspace_id", workspace.id)
-          .gte("created_at", last30d)
-          .order("created_at", { ascending: false })
-          .limit(500),
-        supabase
           .from("page_views")
-          .select("page_path, page_type, referrer, device_type, created_at, session_id")
+          .select("page_path, page_type, article_slug, referrer, device_type, created_at, session_id")
           .gte("created_at", last7d)
           .order("created_at", { ascending: false })
           .limit(2000),
+        supabase
+          .from("agent_proactive_messages")
+          .select("id, content, created_at, metadata")
+          .eq("workspace_id", workspace.id)
+          .eq("message_type", "daily_blog_report")
+          .order("created_at", { ascending: false })
+          .limit(4),
       ]);
 
       if (!active) return;
@@ -209,10 +228,9 @@ export default function EditorialDirectionPanel() {
       setDecisions((decRes.data as Decision[]) ?? []);
       setReports((repRes.data as Report[]) ?? []);
       setArticles((artAllRes.data as ArticleRow[]) ?? []);
-      setPosts((postsRes.data as PostRow[]) ?? []);
       setPageViews((viewsRes.data as PageView[]) ?? []);
+      setDailyReports((dailyRes.data as DailyReport[]) ?? []);
 
-      // Top category na semana
       const weekArt = ((artAllRes.data as ArticleRow[]) ?? []).filter(
         (a) => a.published_at && a.published_at >= weekStart
       );
@@ -234,42 +252,28 @@ export default function EditorialDirectionPanel() {
     };
   }, [workspace?.id]);
 
-  // ============= MÉTRICAS DERIVADAS =============
   const metrics = useMemo(() => {
     const weekStart = startOfWeekBrasilia();
-    const last30d = new Date(Date.now() - 30 * 86400000).toISOString();
-    const last7d = new Date(Date.now() - 7 * 86400000).toISOString();
-    const last24h = new Date(Date.now() - 86400000).toISOString();
 
-    // ====== CUSTO IA ======
-    const cost30d = posts.reduce((s, p) => s + (p.cost_estimate || 0), 0);
-    const cost7d = posts
-      .filter((p) => p.created_at >= last7d)
-      .reduce((s, p) => s + (p.cost_estimate || 0), 0);
-    const cost24h = posts
-      .filter((p) => p.created_at >= last24h)
-      .reduce((s, p) => s + (p.cost_estimate || 0), 0);
-    const articleCost30d = articles
-      .filter((a) => a.created_at >= last30d)
-      .reduce((s, a) => s + (a.cost_estimate || 0), 0);
+    // Posts recentes (últimos 10) com custo individual
+    const recentArticles = [...articles]
+      .filter((a) => a.cost_estimate != null && a.cost_estimate > 0)
+      .slice(0, 10);
 
-    const totalCost30d = cost30d + articleCost30d;
-    const dailyAvg = totalCost30d / 30;
-    const monthlyProjection = dailyAvg * 30;
+    // Hoje (Brasília)
+    const todayBR = new Date();
+    todayBR.setUTCHours(3, 0, 0, 0);
+    if (todayBR > new Date()) todayBR.setUTCDate(todayBR.getUTCDate() - 1);
+    const todayArticles = articles.filter((a) => new Date(a.created_at) >= todayBR);
+    const todayCost = todayArticles.reduce((s, a) => s + (a.cost_estimate || 0), 0);
 
-    // Frequência cron
-    const cyclesLast24h = reports.filter((r) => r.started_at >= last24h).length;
-    const avgHoursBetweenCycles = cyclesLast24h > 0 ? Math.round((24 / cyclesLast24h) * 10) / 10 : 0;
-
-    // ====== CONTEÚDO ======
     const weekArticles = articles.filter(
       (a) => a.status === "published" && a.published_at && a.published_at >= weekStart
     );
-    const weekPosts = posts.filter((p) => p.created_at >= weekStart);
     const totalArticles = articles.filter((a) => a.status === "published").length;
     const totalDrafts = articles.filter((a) => a.status === "draft").length;
 
-    // Tendência publicação 7d (artigos por dia)
+    // Tendência publicação 7d
     const days: Record<string, number> = {};
     for (let i = 6; i >= 0; i--) {
       const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
@@ -289,18 +293,17 @@ export default function EditorialDirectionPanel() {
       Artigos: count,
     }));
 
-    // Top 5 artigos
+    // Top 5 mais lidos
     const topArticles = [...articles]
       .filter((a) => a.status === "published")
       .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
       .slice(0, 5);
 
-    // ====== VISITAS ======
+    // Visitas
     const totalViews = pageViews.length;
     const sessions = new Set(pageViews.map((v) => v.session_id).filter(Boolean)).size;
     const articleViews = pageViews.filter((v) => v.page_type === "article").length;
 
-    // Visitas por dia (7d)
     const viewDays: Record<string, number> = {};
     for (let i = 6; i >= 0; i--) {
       const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
@@ -318,7 +321,6 @@ export default function EditorialDirectionPanel() {
       Visitas: count,
     }));
 
-    // Fontes
     const refMap = new Map<string, number>();
     pageViews.forEach((v) => {
       let src = "Direto";
@@ -336,15 +338,10 @@ export default function EditorialDirectionPanel() {
       .map(([source, count]) => ({ source, count }));
 
     return {
-      cost30d: totalCost30d,
-      cost7d,
-      cost24h,
-      dailyAvg,
-      monthlyProjection,
-      cyclesLast24h,
-      avgHoursBetweenCycles,
+      recentArticles,
+      todayArticles,
+      todayCost,
       weekArticles: weekArticles.length,
-      weekPosts: weekPosts.length,
       totalArticles,
       totalDrafts,
       publishTrend,
@@ -355,16 +352,7 @@ export default function EditorialDirectionPanel() {
       viewsTrend,
       sources,
     };
-  }, [articles, posts, pageViews, reports]);
-
-  // Determinar fase de ramp-up baseado em quantos artigos publicados nos últimos 7 dias
-  const currentPhase = useMemo(() => {
-    const totalPub = metrics.totalArticles;
-    if (totalPub < 7) return RAMPUP_PLAN[0];
-    if (totalPub < 21) return RAMPUP_PLAN[1];
-    if (totalPub < 50) return RAMPUP_PLAN[2];
-    return RAMPUP_PLAN[3];
-  }, [metrics.totalArticles]);
+  }, [articles, pageViews]);
 
   if (loading) {
     return (
@@ -381,143 +369,154 @@ export default function EditorialDirectionPanel() {
     (snapshot?.content_distribution_images ?? 0);
 
   const planItems = [
-    { key: "news", label: "Notícias", value: snapshot?.content_distribution_news ?? 0, color: "bg-emerald-500" },
-    { key: "videos", label: "Reels", value: snapshot?.content_distribution_videos ?? 0, color: "bg-pink-500" },
-    { key: "carousels", label: "Carrosséis", value: snapshot?.content_distribution_carousels ?? 0, color: "bg-purple-500" },
-    { key: "images", label: "Imagens", value: snapshot?.content_distribution_images ?? 0, color: "bg-blue-500" },
+    {
+      key: "news",
+      label: "Notícias",
+      value: snapshot?.content_distribution_news ?? 0,
+      color: "bg-emerald-500",
+      explain: "Posts de notícia tech no Instagram (imagem + caption resumindo a manchete).",
+    },
+    {
+      key: "videos",
+      label: "Reels",
+      value: snapshot?.content_distribution_videos ?? 0,
+      color: "bg-pink-500",
+      explain: "Vídeos curtos verticais (9:16) narrados — só no Instagram/TikTok.",
+    },
+    {
+      key: "carousels",
+      label: "Carrosséis",
+      value: snapshot?.content_distribution_carousels ?? 0,
+      color: "bg-purple-500",
+      explain: "Sequência de slides no Instagram (até 3 imagens), útil pra contar uma história em pedaços.",
+    },
+    {
+      key: "images",
+      label: "Imagens",
+      value: snapshot?.content_distribution_images ?? 0,
+      color: "bg-blue-500",
+      explain: "Post estático de imagem única no Instagram com caption editorial.",
+    },
   ];
 
   const lastReport = reports[0];
+  const recentDecisions = decisions.slice(0, 5);
   const decisionsWithLearning = decisions.filter((d) => d.learning && d.hypothesis_confirmed !== null).slice(0, 3);
 
-  // Status de ritmo
-  const isPaceHealthy = metrics.weekArticles >= currentPhase.articlesPerDay * 3; // >= 3 dias da fase
+  // Separa relatórios diários
+  const morningReports = dailyReports.filter((r) => r.metadata?.period === "morning").slice(0, 1);
+  const eveningReports = dailyReports.filter((r) => r.metadata?.period === "evening").slice(0, 1);
 
   return (
     <ScrollArea className="h-full">
       <div className="space-y-3 pb-6">
-        {/* ============ ECONOMIA & RITMO (TOPO) ============ */}
-        <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 via-background to-background">
+        {/* ============ AUTO-PILOT (faixa fina) ============ */}
+        <div className="flex items-center gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2">
+          <Zap className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+          <span className="text-[11px] text-foreground">
+            <strong className="text-emerald-300">Auto-pilot ATIVO</strong> · 09h, 13h e 19h (BR) ·{" "}
+            <span className="text-muted-foreground">
+              hoje {metrics.todayArticles.length}/3 artigos · ${metrics.todayCost.toFixed(4)}
+            </span>
+          </span>
+          <Badge variant="outline" className="ml-auto text-[10px] border-emerald-500/40 text-emerald-300 shrink-0">
+            tech-only
+          </Badge>
+        </div>
+
+        {/* ============ CUSTO POR POST ============ */}
+        <Card>
           <CardHeader className="pb-2">
-            <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shrink-0">
-                <DollarSign className="h-4 w-4 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-sm leading-tight">Economia & ritmo de IA</CardTitle>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Quanto custou, quanto vai custar, e o ritmo gradual de publicação.
-                </p>
-              </div>
-              <Badge
-                variant="outline"
-                className={`text-[10px] shrink-0 ${
-                  metrics.monthlyProjection < 5
-                    ? "border-emerald-500/40 text-emerald-300"
-                    : metrics.monthlyProjection < 20
-                    ? "border-amber-500/40 text-amber-300"
-                    : "border-rose-500/40 text-rose-300"
-                }`}
-              >
-                {metrics.monthlyProjection < 5 ? "💚 econômico" : metrics.monthlyProjection < 20 ? "💛 controlado" : "🔴 alto"}
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-emerald-400" />
+              <CardTitle className="text-sm">Custo por post (últimos 10)</CardTitle>
+              <Badge variant="outline" className="ml-auto text-[10px]">
+                hoje: ${metrics.todayCost.toFixed(4)}
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {/* KPIs custo */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <KPI label="Últimas 24h" value={`$${metrics.cost24h.toFixed(4)}`} sub={`${metrics.cyclesLast24h} ciclos`} />
-              <KPI label="Últimos 7d" value={`$${metrics.cost7d.toFixed(3)}`} sub={`${metrics.weekArticles} artigos`} />
-              <KPI label="Últimos 30d" value={`$${metrics.cost30d.toFixed(2)}`} sub={`${articles.length} artigos total`} />
-              <KPI
-                label="Projeção mensal"
-                value={`$${metrics.monthlyProjection.toFixed(2)}`}
-                sub="ritmo atual"
-                accent
-              />
-            </div>
-
-            {/* Auto-pilot do blog */}
-            <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2.5">
-              <div className="flex items-center gap-2 text-xs">
-                <Zap className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                <span className="font-medium">Auto-pilot do blog</span>
-                <Badge variant="outline" className="ml-auto text-[10px] border-emerald-500/40 text-emerald-300">
-                  ATIVO · 3×/dia
-                </Badge>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">
-                Publica automaticamente às <strong className="text-foreground">09h, 13h e 19h</strong> (Brasília).
-                Filtro tech-only: bloqueia ofertas, cupons, listas de produtos, jogos, filmes e qualquer notícia que não seja IA, tecnologia, inovação ou ciência.
+          <CardContent className="space-y-1.5">
+            {metrics.recentArticles.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground text-center py-3">
+                Nenhum artigo com custo registrado ainda.
               </p>
-              <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground">
-                <span>Hoje: {articles.filter(a => {
-                  const d = new Date(a.created_at);
-                  const todayBR = new Date();
-                  todayBR.setUTCHours(3, 0, 0, 0);
-                  if (todayBR > new Date()) todayBR.setUTCDate(todayBR.getUTCDate() - 1);
-                  return d >= todayBR;
-                }).length}/3 artigos publicados</span>
-                <span className="text-muted-foreground/70">isolado do Instagram</span>
-              </div>
-            </div>
-
-            {/* Comparativo de custo: Blog vs Instagram */}
-            <div className="rounded-md border border-border/60 bg-card/40 p-2.5 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs">
-                <DollarSign className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span className="font-medium">Blog vs Instagram (custo médio por peça)</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div className="rounded border border-emerald-500/30 bg-emerald-500/5 px-2 py-1.5">
-                  <div className="text-muted-foreground text-[10px]">📰 Blog (artigo completo)</div>
-                  <div className="font-mono font-semibold text-emerald-300">~$0.004</div>
-                  <div className="text-[10px] text-muted-foreground/70">Gemini Flash + Unsplash grátis</div>
-                </div>
-                <div className="rounded border border-amber-500/30 bg-amber-500/5 px-2 py-1.5">
-                  <div className="text-muted-foreground text-[10px]">📱 Instagram (Reels narrado)</div>
-                  <div className="font-mono font-semibold text-amber-300">~$0.020</div>
-                  <div className="text-[10px] text-muted-foreground/70">Gemini + ElevenLabs + Pexels</div>
-                </div>
-              </div>
-              <p className="text-[10px] text-muted-foreground/80 leading-snug pt-0.5">
-                Blog é <strong className="text-emerald-300">~5× mais barato</strong> que Reels do IG. 3 artigos/dia ≈ <strong>$0.36/mês</strong>.
-                Instagram e blog rodam em <strong>pipelines totalmente separados</strong>.
-              </p>
-            </div>
-
-            {/* Plano gradual */}
-            <div className="rounded-md border border-primary/30 bg-primary/5 p-2.5 space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-semibold">{currentPhase.label}</span>
-                <Badge variant="outline" className="ml-auto text-[10px]">
-                  {metrics.totalArticles} artigos publicados
-                </Badge>
-              </div>
-              <p className="text-[11px] text-muted-foreground leading-snug">
-                Meta desta fase:{" "}
-                <strong className="text-foreground">
-                  {currentPhase.articlesPerDay} artigo{currentPhase.articlesPerDay > 1 ? "s" : ""}/dia
-                </strong>{" "}
-                no blog. O auto-pilot já está configurado para 3/dia — quando bater consistência, sobe pra 4.
-              </p>
-              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>Esta semana: {metrics.weekArticles} artigos publicados</span>
-                <Badge
-                  variant="outline"
-                  className={`text-[10px] ${
-                    isPaceHealthy ? "border-emerald-500/40 text-emerald-300" : "border-amber-500/40 text-amber-300"
-                  }`}
+            ) : (
+              metrics.recentArticles.map((a) => (
+                <a
+                  key={a.id}
+                  href={`/noticia/${a.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/40 transition-colors group border border-border/40"
                 >
-                  {isPaceHealthy ? "✓ no ritmo" : "aquecendo"}
-                </Badge>
-              </div>
-            </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-medium line-clamp-1 group-hover:text-primary transition-colors">
+                      {a.title}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {fmtDayBR(a.created_at)} · {fmtTimeBR(a.created_at)} · {a.category}
+                    </p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="shrink-0 font-mono text-[10px] border-emerald-500/30 text-emerald-300"
+                  >
+                    ${(a.cost_estimate ?? 0).toFixed(4)}
+                  </Badge>
+                </a>
+              ))
+            )}
           </CardContent>
         </Card>
 
-        {/* ============ DIREÇÃO EDITORIAL ============ */}
+        {/* ============ RELATÓRIOS DIÁRIOS (manhã + noite) ============ */}
+        <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/5 via-background to-background">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-400" />
+              <CardTitle className="text-sm">Relatórios do dia</CardTitle>
+              <Badge variant="outline" className="ml-auto text-[10px] border-amber-500/30 text-amber-300">
+                08h & 22h BR
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {dailyReports.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground">
+                Nenhum relatório ainda. O agente publica 2/dia automaticamente: <strong>08h</strong> (matinal) e <strong>22h</strong> (noturno).
+              </p>
+            ) : (
+              <>
+                {morningReports.map((r) => (
+                  <div key={r.id} className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2.5 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <Sunrise className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                      <span className="text-[11px] font-semibold">Matinal</span>
+                      <span className="text-[10px] text-muted-foreground ml-auto">
+                        {fmtDayBR(r.created_at)} · {fmtTimeBR(r.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-foreground/90 leading-snug whitespace-pre-line">{r.content}</p>
+                  </div>
+                ))}
+                {eveningReports.map((r) => (
+                  <div key={r.id} className="rounded-md border border-indigo-500/20 bg-indigo-500/5 p-2.5 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <Moon className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      <span className="text-[11px] font-semibold">Noturno</span>
+                      <span className="text-[10px] text-muted-foreground ml-auto">
+                        {fmtDayBR(r.created_at)} · {fmtTimeBR(r.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-foreground/90 leading-snug whitespace-pre-line">{r.content}</p>
+                  </div>
+                ))}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ============ DIREÇÃO EDITORIAL + EXPLICAÇÃO DOS TIPOS ============ */}
         <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-background to-background">
           <CardHeader className="pb-2">
             <div className="flex items-start gap-3">
@@ -549,11 +548,54 @@ export default function EditorialDirectionPanel() {
               <MiniStat label="Categoria" value={topCategory ?? "—"} />
             </div>
 
-            {/* Distribuição planejada */}
+            {/* Explicação do que é cada tipo de conteúdo */}
+            <div className="rounded-md border border-border/60 bg-card/40 p-2.5 space-y-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium">
+                <Info className="h-3 w-3 text-primary" />
+                O que é cada tipo de conteúdo
+              </div>
+              <div className="space-y-1.5 text-[10.5px] leading-snug">
+                <div className="flex gap-2">
+                  <span className="font-semibold text-cyan-300 shrink-0 w-20">📰 Artigo</span>
+                  <span className="text-muted-foreground">
+                    Texto completo (~600-1200 palavras) publicado <strong className="text-foreground">no blog Neural Update</strong>. É o único formato do blog.
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold text-emerald-300 shrink-0 w-20">📱 Notícia</span>
+                  <span className="text-muted-foreground">
+                    Post de notícia <strong className="text-foreground">no Instagram</strong> (imagem + caption resumida da manchete).
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold text-pink-300 shrink-0 w-20">🎬 Reels</span>
+                  <span className="text-muted-foreground">
+                    Vídeo vertical 9:16 narrado <strong className="text-foreground">no Instagram/TikTok</strong>. Não existe no blog.
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold text-purple-300 shrink-0 w-20">🎴 Carrossel</span>
+                  <span className="text-muted-foreground">
+                    Sequência de até 3 slides <strong className="text-foreground">no Instagram</strong>. Não existe no blog.
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold text-blue-300 shrink-0 w-20">🖼️ Imagem</span>
+                  <span className="text-muted-foreground">
+                    Post de imagem única <strong className="text-foreground">no Instagram</strong>. Não existe no blog.
+                  </span>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground/80 pt-1 border-t border-border/40">
+                <strong className="text-foreground">Resumo:</strong> Blog = só artigo escrito. Os demais formatos são exclusivos do Instagram/TikTok e rodam num pipeline totalmente separado.
+              </p>
+            </div>
+
+            {/* Distribuição planejada (Instagram) */}
             {planTotals > 0 && (
               <div className="space-y-1.5 pt-1">
                 <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                  <Target className="h-3 w-3" /> Distribuição planejada
+                  <Target className="h-3 w-3" /> Distribuição planejada (Instagram)
                 </div>
                 {planItems.map((item) => {
                   const pct = planTotals > 0 ? Math.round((item.value / planTotals) * 100) : 0;
@@ -574,41 +616,72 @@ export default function EditorialDirectionPanel() {
           </CardContent>
         </Card>
 
-        {/* ============ ÚLTIMO CICLO ============ */}
-        {lastReport && (
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                {lastReport.status === "completed" ? (
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                ) : lastReport.status === "running" ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                ) : (
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                )}
-                <CardTitle className="text-sm">Último ciclo</CardTitle>
+        {/* ============ ÚLTIMO CICLO + DECISÕES RECENTES ============ */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              {lastReport?.status === "completed" ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              ) : lastReport?.status === "running" ? (
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-amber-500" />
+              )}
+              <CardTitle className="text-sm">Último ciclo & decisões</CardTitle>
+              {lastReport && (
                 <Badge variant="outline" className="ml-auto text-[10px] capitalize">
                   {lastReport.trigger} · {formatRelativeDate(lastReport.started_at)}
                 </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {lastReport.decision && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-muted-foreground">Decisão:</span>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {lastReport?.summary && (
+              <div className="rounded-md border border-primary/20 bg-primary/5 p-2 space-y-1">
+                {lastReport.decision && (
                   <Badge className={`${decisionLabel(lastReport.decision).color} border text-[10px]`}>
                     {decisionLabel(lastReport.decision).label}
                   </Badge>
-                </div>
-              )}
-              {lastReport.summary && (
-                <p className="text-[11px] text-foreground/80 leading-snug">{lastReport.summary}</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                )}
+                <p className="text-[11px] text-foreground/90 leading-snug">{lastReport.summary}</p>
+              </div>
+            )}
 
-        {/* ============ CONTEÚDO (publicação 7d + top artigos) ============ */}
+            {recentDecisions.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground">Nenhuma decisão registrada esta semana.</p>
+            ) : (
+              <>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground pt-1">
+                  Decisões recentes (semana)
+                </div>
+                {recentDecisions.map((d) => {
+                  const meta = decisionLabel(d.decision);
+                  return (
+                    <div key={d.id} className="rounded-md border border-border/50 bg-card/40 p-2 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${meta.color} border text-[10px]`}>{meta.label}</Badge>
+                        <span className="text-[10px] text-muted-foreground ml-auto">
+                          <Clock3 className="h-2.5 w-2.5 inline mr-0.5" />
+                          {formatRelativeDate(d.created_at)}
+                        </span>
+                      </div>
+                      {d.decision_reason && (
+                        <p className="text-[11px] text-foreground/80 leading-snug">{d.decision_reason}</p>
+                      )}
+                      {d.hypothesis && (
+                        <p className="text-[10px] text-muted-foreground italic leading-snug">
+                          Hipótese: {d.hypothesis}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ============ CONTEÚDO PUBLICADO ============ */}
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
@@ -674,7 +747,7 @@ export default function EditorialDirectionPanel() {
           </CardContent>
         </Card>
 
-        {/* ============ VISITAS ============ */}
+        {/* ============ VISITAS NO SITE ============ */}
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
@@ -746,48 +819,7 @@ export default function EditorialDirectionPanel() {
           </CardContent>
         </Card>
 
-        {/* ============ DECISÕES DA SEMANA ============ */}
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <CardTitle className="text-sm">Decisões da semana</CardTitle>
-              <Badge variant="outline" className="ml-auto text-[10px]">
-                {decisions.length}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {decisions.length === 0 ? (
-              <p className="text-[11px] text-muted-foreground">Nenhuma decisão registrada esta semana.</p>
-            ) : (
-              decisions.slice(0, 5).map((d) => {
-                const meta = decisionLabel(d.decision);
-                return (
-                  <div key={d.id} className="rounded-md border border-border/50 bg-card/40 p-2 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Badge className={`${meta.color} border text-[10px]`}>{meta.label}</Badge>
-                      <span className="text-[10px] text-muted-foreground ml-auto">
-                        <Clock3 className="h-2.5 w-2.5 inline mr-0.5" />
-                        {formatRelativeDate(d.created_at)}
-                      </span>
-                    </div>
-                    {d.decision_reason && (
-                      <p className="text-[11px] text-foreground/80 leading-snug">{d.decision_reason}</p>
-                    )}
-                    {d.hypothesis && (
-                      <p className="text-[10px] text-muted-foreground italic leading-snug">
-                        Hipótese: {d.hypothesis}
-                      </p>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
-
-        {/* ============ APRENDIZADO ============ */}
+        {/* ============ APRENDIZADO (se houver) ============ */}
         {decisionsWithLearning.length > 0 && (
           <Card className="border-amber-500/20">
             <CardHeader className="pb-2">
@@ -821,22 +853,6 @@ export default function EditorialDirectionPanel() {
             </CardContent>
           </Card>
         )}
-
-        {/* ============ DICA ============ */}
-        <Card className="border-dashed">
-          <CardContent className="pt-3 pb-3 space-y-1.5">
-            <div className="flex items-center gap-2 text-[11px] font-medium">
-              <Calendar className="h-3 w-3 text-primary" />
-              Como acompanhar nos próximos dias
-            </div>
-            <ul className="text-[10px] text-muted-foreground space-y-1 ml-4 list-disc leading-snug">
-              <li>Volte aqui 1×/dia. Tese e custo atualizam a cada ciclo do agente.</li>
-              <li>Custo abaixo de $5/mês = saudável. Acima de $20 = revisar frequência do cron.</li>
-              <li>Comece devagar (1-2 artigos/dia) e acelere só quando ver tração nas Visitas.</li>
-              <li>Para dados completos de SEO, abra o Search Console (~24-48h pra começar).</li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
     </ScrollArea>
   );
