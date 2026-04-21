@@ -239,6 +239,12 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
       finalSlug = `${baseSlug}-${attempt + 1}`;
     }
 
+    // 3.5 Resolve hero image: validate RSS image, otherwise generate one
+    let heroImage: string | null = isValidImageUrl(rssItem.image_url) ? rssItem.image_url : null;
+    if (!heroImage) {
+      heroImage = await generateHeroImage(supabase, workspaceId, title, category);
+    }
+
     // 4. Insert
     const { data: inserted, error: insertErr } = await supabase
       .from("articles")
@@ -251,8 +257,8 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
         content: body,
         category,
         tags,
-        hero_image_url: rssItem.image_url ?? null,
-        og_image_url: rssItem.image_url ?? null,
+        hero_image_url: heroImage,
+        og_image_url: heroImage,
         seo_title: seoTitle,
         seo_description: seoDesc,
         author_name: "Agente Horvat",
