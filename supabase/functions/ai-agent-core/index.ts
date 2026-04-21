@@ -3546,6 +3546,7 @@ Deno.serve(async (req) => {
     let trigger = 'manual';
     let forceContentType: ContentType | null = null;
     let skipLimitCheck = false;
+    let placeholderPostId: string | null = null;
     
     try {
       const body = await req.json();
@@ -3554,11 +3555,15 @@ Deno.serve(async (req) => {
       trigger = body.trigger || 'manual';
       forceContentType = body.forceContentType as ContentType | null;
       skipLimitCheck = body.skipLimitCheck === true;
+      placeholderPostId = body.placeholderPostId || null;
       if (forceContentType) {
         console.log('[AGENT] FORÇANDO tipo de conteúdo:', forceContentType);
       }
       if (skipLimitCheck) {
         console.log('[AGENT] SKIP LIMIT CHECK (teste)');
+      }
+      if (placeholderPostId) {
+        console.log('[AGENT] PLACEHOLDER POST ID:', placeholderPostId);
       }
     } catch {
       // No body or invalid JSON
