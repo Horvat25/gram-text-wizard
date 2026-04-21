@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
 import { cn } from "@/lib/utils";
+import logoUrl from "@/assets/neural-update-logo.png";
 
 export const PortalHeader = () => {
   const navigate = useNavigate();
@@ -21,41 +22,60 @@ export const PortalHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="Neural Update — Início">
-            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">N</span>
+          {/* Logo */}
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 shrink-0 group"
+            aria-label="Neural Update — Início"
+          >
+            <div className="relative h-9 w-9 rounded-lg overflow-hidden ring-1 ring-border/60 group-hover:ring-primary/60 transition-all">
+              <img src={logoUrl} alt="" className="h-full w-full object-cover" />
             </div>
-            <span className="font-bold text-lg tracking-tight">
-              Neural<span className="text-primary">Update</span>
-            </span>
+            <div className="flex flex-col leading-none">
+              <span className="font-display font-bold text-base tracking-tight">
+                Neural<span className="portal-gradient-text">Update</span>
+              </span>
+              <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
+                <span className="inline-block h-1 w-1 rounded-full bg-primary portal-live-dot mr-1 align-middle" />
+                Tecnologia · IA · Futuro
+              </span>
+            </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1" aria-label="Categorias">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-0.5" aria-label="Categorias">
             {ARTICLE_CATEGORIES.slice(0, 5).map((cat) => (
               <NavLink
                 key={cat.slug}
                 to={`/categoria/${cat.slug}`}
                 className={({ isActive }) =>
                   cn(
-                    "px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    "relative px-3 py-2 text-[13px] font-medium rounded-md transition-colors",
                     isActive
-                      ? "text-primary"
+                      ? "text-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )
                 }
               >
-                {cat.label}
+                {({ isActive }) => (
+                  <>
+                    {cat.label}
+                    {isActive && (
+                      <span className="absolute left-3 right-3 -bottom-px h-px portal-gradient" />
+                    )}
+                  </>
+                )}
               </NavLink>
             ))}
             <NavLink
               to="/sobre"
               className={({ isActive }) =>
                 cn(
-                  "px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  "px-3 py-2 text-[13px] font-medium rounded-md transition-colors",
+                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 )
               }
             >
@@ -63,10 +83,11 @@ export const PortalHeader = () => {
             </NavLink>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
+              className="h-9 w-9 hover:text-primary"
               onClick={() => setSearchOpen((v) => !v)}
               aria-label="Buscar"
             >
@@ -75,7 +96,7 @@ export const PortalHeader = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="h-9 w-9 md:hidden"
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="Menu"
             >
@@ -91,7 +112,7 @@ export const PortalHeader = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar notícias…"
-              className="w-full"
+              className="w-full bg-card/60 border-border/60 focus-visible:ring-primary"
             />
           </form>
         )}
@@ -103,7 +124,7 @@ export const PortalHeader = () => {
                 key={cat.slug}
                 to={`/categoria/${cat.slug}`}
                 onClick={() => setMenuOpen(false)}
-                className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60"
               >
                 {cat.label}
               </NavLink>
@@ -111,7 +132,7 @@ export const PortalHeader = () => {
             <NavLink
               to="/sobre"
               onClick={() => setMenuOpen(false)}
-              className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60"
             >
               Sobre
             </NavLink>

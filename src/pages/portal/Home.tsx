@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { HeroArticle } from "@/components/portal/HeroArticle";
 import { ArticleCard, type ArticleCardData } from "@/components/portal/ArticleCard";
-import { ARTICLE_CATEGORIES, getCategoryLabel } from "@/lib/article-helpers";
-import { Loader2 } from "lucide-react";
+import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
+import { Loader2, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const PortalHome = () => {
@@ -27,7 +27,7 @@ const PortalHome = () => {
   if (loading) {
     return (
       <PortalLayout>
-        <div className="container mx-auto px-4 py-20 flex items-center justify-center">
+        <div className="container mx-auto px-4 py-32 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </PortalLayout>
@@ -37,10 +37,16 @@ const PortalHome = () => {
   if (articles.length === 0) {
     return (
       <PortalLayout>
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-3xl font-bold mb-3">Em breve</h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            O Neural Update está sendo preparado. Em instantes, as primeiras notícias estarão aqui, geradas pelo Agente Horvat.
+        <div className="container mx-auto px-4 py-24 text-center max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-[10px] uppercase tracking-[0.22em] text-primary mb-6">
+            <Sparkles className="h-3 w-3" /> Newsroom em preparação
+          </div>
+          <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.05] mb-4">
+            <span className="portal-gradient-text">Em breve</span>
+          </h1>
+          <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
+            O Neural Update está sendo preparado. Em instantes, as primeiras notícias estarão aqui,
+            geradas e curadas em tempo real pelo Agente Horvat.
           </p>
         </div>
       </PortalLayout>
@@ -53,34 +59,53 @@ const PortalHome = () => {
 
   return (
     <PortalLayout>
-      <div className="container mx-auto px-4 py-6 md:py-10">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Editorial badge above hero */}
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-card/60 border border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary portal-live-dot" />
+              Edição ao vivo
+            </span>
+            <span className="hidden sm:inline text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+            </span>
+          </div>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground hidden md:inline">
+            Por Agente Horvat
+          </span>
+        </div>
+
         <HeroArticle article={hero} />
 
-        <section className="mt-12">
-          <div className="flex items-baseline justify-between mb-6">
-            <h2 className="text-2xl font-bold">Últimas notícias</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Latest news grid */}
+        <section className="mt-16 md:mt-20">
+          <SectionHeader eyebrow="Últimas" title="Notícias mais recentes" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {topGrid.map((a) => (
               <ArticleCard key={a.slug} article={a} />
             ))}
           </div>
         </section>
 
+        {/* Per-category sections */}
         {ARTICLE_CATEGORIES.slice(0, 5).map((cat) => {
           const inCat = articles.filter((a) => a.category === cat.slug).slice(0, 4);
           if (inCat.length === 0) return null;
           return (
-            <section key={cat.slug} className="mt-16">
-              <div className="flex items-baseline justify-between mb-6">
-                <h2 className="text-2xl font-bold">{cat.label}</h2>
-                <Link
-                  to={`/categoria/${cat.slug}`}
-                  className="text-sm text-primary hover:underline font-medium"
-                >
-                  Ver todas →
-                </Link>
-              </div>
+            <section key={cat.slug} className="mt-20">
+              <SectionHeader
+                eyebrow="Editoria"
+                title={cat.label}
+                action={
+                  <Link
+                    to={`/categoria/${cat.slug}`}
+                    className="text-xs font-semibold text-primary hover:underline uppercase tracking-[0.18em]"
+                  >
+                    Ver todas →
+                  </Link>
+                }
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {inCat.map((a) => (
                   <ArticleCard key={a.slug} article={a} />
@@ -91,8 +116,8 @@ const PortalHome = () => {
         })}
 
         {remaining.length > 0 && (
-          <section className="mt-16">
-            <h2 className="text-2xl font-bold mb-6">Mais notícias</h2>
+          <section className="mt-20">
+            <SectionHeader eyebrow="Arquivo" title="Mais notícias" />
             <div className="max-w-3xl">
               {remaining.map((a) => (
                 <ArticleCard key={a.slug} article={a} variant="horizontal" />
@@ -104,5 +129,32 @@ const PortalHome = () => {
     </PortalLayout>
   );
 };
+
+/* ────────── Local helpers ────────── */
+
+const SectionHeader = ({
+  eyebrow,
+  title,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  action?: React.ReactNode;
+}) => (
+  <div className="mb-8">
+    <div className="portal-divider mb-5" />
+    <div className="flex items-end justify-between gap-3 flex-wrap">
+      <div>
+        <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-1.5">
+          / {eyebrow}
+        </p>
+        <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
+          {title}
+        </h2>
+      </div>
+      {action}
+    </div>
+  </div>
+);
 
 export default PortalHome;
