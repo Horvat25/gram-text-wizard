@@ -1,6 +1,11 @@
 // supabase/functions/generate-article/index.ts
-// Generates a full long-form article for the Neural Update portal from a fresh RSS item.
-// One AI call produces title + subtitle + excerpt + body + tags + SEO metadata.
+// Neural Update — Editorial article generator (Agente Horvat)
+// Pipeline:
+//   1. Pick a fresh angle (RSS item OR autonomous Firecrawl search)
+//   2. Research via Firecrawl (3-5 fresh sources, last 7 days)
+//   3. Generate a long-form, well-structured article (H2/H3, lists, highlights)
+//   4. Validate / generate hero image
+//   5. Persist as published article — never references the original source
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -12,8 +17,19 @@ const corsHeaders = {
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
 const VALID_CATEGORIES = ["ia", "gadgets", "futuro", "mercado", "ciencia", "tecnologia"];
+
+// Topic seeds for autonomous research when no RSS item is provided
+const AUTONOMOUS_TOPICS = [
+  { q: "novidades inteligência artificial Brasil", category: "ia" },
+  { q: "lançamento smartphone tecnologia 2026", category: "gadgets" },
+  { q: "inovação tecnológica futuro empresas", category: "futuro" },
+  { q: "mercado tech investimento startup", category: "mercado" },
+  { q: "descoberta científica tecnologia", category: "ciencia" },
+  { q: "novidade tecnologia consumidor", category: "tecnologia" },
+];
 
 function slugify(input: string): string {
   return input
@@ -32,36 +48,27 @@ function estimateReadingTime(content: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
-// Validates that URL is actually an image (not YouTube embed, video, html, etc)
 function isValidImageUrl(url: string | null | undefined): boolean {
   if (!url || typeof url !== "string") return false;
   const lower = url.toLowerCase();
-  // Reject obvious non-images
   if (lower.includes("youtube.com") || lower.includes("youtu.be")) return false;
   if (lower.includes("vimeo.com")) return false;
   if (lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".mov")) return false;
   if (lower.endsWith(".html") || lower.endsWith(".htm")) return false;
-  // Accept if it looks like an image
   if (/\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(lower)) return true;
-  // Accept generic CDN/storage URLs that don't have an extension but aren't blacklisted
   if (lower.startsWith("http://") || lower.startsWith("https://")) {
-    // Heuristic: probably ok if it doesn't look like a page
     return !lower.includes("/embed/") && !lower.includes("/watch");
   }
   return false;
 }
 
-// Generates a hero image for the article using Gemini Image
 async function generateHeroImage(
-  supabase: any,
-  workspaceId: string,
   title: string,
   category: string
 ): Promise<string | null> {
   try {
-    console.log(`[generate-article] Generating hero image for: ${title}`);
-    const prompt = `Imagem editorial fotorrealista para matéria de tecnologia sobre: "${title}". 
-Categoria: ${category}. 
+    const prompt = `Imagem editorial fotorrealista para matéria de tecnologia sobre: "${title}".
+Categoria: ${category}.
 Estilo: cinematográfico, iluminação dramática, paleta dark com acentos neon ciano e roxo, composição editorial premium estilo The Verge / Wired.
 Formato 16:9, ultra alta definição.
 ⛔ ABSOLUTAMENTE SEM TEXTO, LETRAS, NÚMEROS OU LOGOTIPOS NA IMAGEM.`;
@@ -72,22 +79,66 @@ Formato 16:9, ultra alta definição.
         "Content-Type": "application/json",
         Authorization: `Bearer ${SERVICE_KEY}`,
       },
-      body: JSON.stringify({
-        prompt,
-        format: "landscape",
-        applyWatermark: false,
-      }),
+      body: JSON.stringify({ prompt, format: "landscape", applyWatermark: false }),
     });
-
-    if (!res.ok) {
-      console.warn(`[generate-article] image generation failed: ${res.status}`);
-      return null;
-    }
+    if (!res.ok) return null;
     const data = await res.json();
     return data?.imageUrl ?? null;
   } catch (e) {
     console.warn("[generate-article] hero image error:", e);
     return null;
+  }
+}
+
+interface ResearchSource {
+  title: string;
+  url: string;
+  snippet: string;
+  markdown?: string;
+  publishedAt?: string;
+}
+
+/** Firecrawl research — fresh PT-BR results from the last 7 days. */
+async function firecrawlResearch(query: string): Promise<ResearchSource[]> {
+  if (!FIRECRAWL_API_KEY) {
+    console.warn("[generate-article] FIRECRAWL_API_KEY missing — skipping research");
+    return [];
+  }
+  try {
+    const res = await fetch("https://api.firecrawl.dev/v2/search", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        limit: 5,
+        lang: "pt",
+        country: "br",
+        tbs: "qdr:w", // last week
+        scrapeOptions: { formats: ["markdown"] },
+      }),
+    });
+    if (!res.ok) {
+      console.warn(`[generate-article] firecrawl ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    const items = data?.data ?? data?.web ?? [];
+    return (Array.isArray(items) ? items : [])
+      .slice(0, 5)
+      .map((it: any) => ({
+        title: it.title ?? "",
+        url: it.url ?? "",
+        snippet: it.description ?? it.snippet ?? "",
+        markdown: typeof it.markdown === "string" ? it.markdown.slice(0, 4000) : undefined,
+        publishedAt: it.publishedAt ?? it.date,
+      }))
+      .filter((s: ResearchSource) => s.title && s.url);
+  } catch (e) {
+    console.warn("[generate-article] firecrawl error:", e);
+    return [];
   }
 }
 
@@ -98,7 +149,7 @@ Deno.serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { workspaceId, rssItemId } = await req.json().catch(() => ({}));
+    const { workspaceId, rssItemId, topic } = await req.json().catch(() => ({}));
 
     if (!workspaceId) {
       return new Response(JSON.stringify({ error: "workspaceId required" }), {
@@ -107,13 +158,28 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 1. Pick an RSS item
-    let rssItem: any = null;
+    // ====== 1. Decide angle ======
+    let angle: { seedTitle: string; seedDescription: string; category: string; sourceRssId: string | null } = {
+      seedTitle: "",
+      seedDescription: "",
+      category: "tecnologia",
+      sourceRssId: null,
+    };
+
     if (rssItemId) {
       const { data } = await supabase.from("rss_items").select("*").eq("id", rssItemId).maybeSingle();
-      rssItem = data;
+      if (data) {
+        angle = {
+          seedTitle: data.title,
+          seedDescription: data.description ?? "",
+          category: "tecnologia",
+          sourceRssId: data.id,
+        };
+      }
+    } else if (topic && typeof topic === "string") {
+      angle.seedTitle = topic;
     } else {
-      // Find a recent RSS item not yet turned into an article
+      // Try fresh RSS first
       const { data: candidates } = await supabase
         .from("rss_items")
         .select("*")
@@ -121,59 +187,90 @@ Deno.serve(async (req) => {
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(30);
 
-      if (!candidates || candidates.length === 0) {
-        return new Response(
-          JSON.stringify({ skipped: true, reason: "Nenhum item RSS disponível. Atualize as fontes." }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (candidates && candidates.length > 0) {
+        const ids = candidates.map((c) => c.id);
+        const { data: used } = await supabase
+          .from("articles")
+          .select("source_rss_item_id")
+          .in("source_rss_item_id", ids);
+        const usedSet = new Set((used ?? []).map((u: any) => u.source_rss_item_id));
+        const fresh = candidates.find((c) => !usedSet.has(c.id));
+        if (fresh) {
+          angle = {
+            seedTitle: fresh.title,
+            seedDescription: fresh.description ?? "",
+            category: "tecnologia",
+            sourceRssId: fresh.id,
+          };
+        }
       }
 
-      // Skip ones already used as article source
-      const ids = candidates.map((c) => c.id);
-      const { data: used } = await supabase
-        .from("articles")
-        .select("source_rss_item_id")
-        .in("source_rss_item_id", ids);
-      const usedSet = new Set((used ?? []).map((u: any) => u.source_rss_item_id));
-
-      rssItem = candidates.find((c) => !usedSet.has(c.id));
-      if (!rssItem) {
-        return new Response(
-          JSON.stringify({ skipped: true, reason: "Todos os itens RSS recentes já viraram artigo." }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      // Autonomous fallback — Horvat picks a topic himself
+      if (!angle.seedTitle) {
+        const seed = AUTONOMOUS_TOPICS[Math.floor(Math.random() * AUTONOMOUS_TOPICS.length)];
+        angle.seedTitle = seed.q;
+        angle.category = seed.category;
       }
     }
 
-    console.log(`[generate-article] Generating for RSS item: ${rssItem.title}`);
+    console.log(`[generate-article] Angle: "${angle.seedTitle}"`);
 
-    // 2. Single AI call — produce the entire article + metadata as JSON
-    const aiPrompt = `Você é o Agente Horvat, jornalista sênior de tecnologia do portal "Neural Update". Escreva uma matéria editorial COMPLETA em PT-BR (Brasil) baseada na notícia abaixo.
+    // ====== 2. Autonomous research ======
+    const researchQuery = angle.seedTitle.length > 100
+      ? angle.seedTitle.slice(0, 100)
+      : angle.seedTitle;
+    const sources = await firecrawlResearch(researchQuery);
+    console.log(`[generate-article] Research: ${sources.length} sources`);
 
-NOTÍCIA-FONTE:
-Título: ${rssItem.title}
-Resumo: ${rssItem.description ?? "(sem resumo)"}
-Fonte: ${rssItem.source_name}
-Link: ${rssItem.link}
+    const researchBriefing = sources.length > 0
+      ? sources.map((s, i) => {
+          const head = `### Fonte ${i + 1}: ${s.title}${s.publishedAt ? ` (${s.publishedAt})` : ""}`;
+          const body = s.markdown ? s.markdown.slice(0, 2500) : s.snippet;
+          return `${head}\n${body}`;
+        }).join("\n\n---\n\n")
+      : `(Sem fontes externas — escreva com base em conhecimento público amplamente difundido sobre o tema.)`;
 
-REGRAS RÍGIDAS:
-- Português brasileiro impecável, sem erros, tom editorial sério (não use "no ano de 2024/2025" — estamos em 2026).
-- Não invente fatos, dados ou citações. Use apenas o que está na notícia-fonte e contexto público amplamente conhecido.
-- Não escreva "segundo a fonte" ou "de acordo com o site X" — escreva como matéria própria do Neural Update.
-- Não use clichês de IA (jamais "no mundo digital atual", "em um cenário cada vez mais", "explosão de IA").
-- Categorias permitidas: "ia", "gadgets", "futuro", "mercado", "ciencia", "tecnologia". Escolha A MAIS ESPECÍFICA.
-- Corpo: 600-900 palavras. Markdown leve permitido (## subtítulo, **negrito**, listas com -).
-- Estrutura: lide forte, contexto, desenvolvimento em 2-3 blocos com subtítulos, fechamento com perspectiva.
-- NUNCA promocional. Sem CTA, sem "siga-nos", sem links externos no corpo.
+    const todayBR = new Date().toLocaleDateString("pt-BR", {
+      day: "2-digit", month: "long", year: "numeric", timeZone: "America/Sao_Paulo",
+    });
 
-Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato:
+    // ====== 3. Generate article ======
+    const aiPrompt = `Você é o **Agente Horvat**, jornalista sênior de tecnologia do portal Neural Update. Hoje é ${todayBR}. Escreva uma matéria editorial COMPLETA, ORIGINAL e BEM ESTRUTURADA em PT-BR.
+
+# TEMA / ÂNGULO INICIAL
+${angle.seedTitle}
+${angle.seedDescription ? `Contexto adicional: ${angle.seedDescription}` : ""}
+
+# BRIEFING DE PESQUISA (use como base factual)
+${researchBriefing}
+
+# REGRAS RÍGIDAS
+- Português brasileiro impecável. Tom editorial sério, analítico, jornalístico — não promocional.
+- Estamos em **2026**. Use datas e referências temporais coerentes (ex.: "nesta semana", "${todayBR}", "no início de 2026").
+- **NUNCA** mencione "fonte original", "segundo o site X", "de acordo com Tecnoblog/G1/etc.". A matéria é ORIGINAL do Neural Update assinada por Horvat.
+- **NUNCA** use links externos no corpo. Sem CTA, sem "siga-nos", sem "leia mais".
+- Não invente números, valores, datas, nomes de pessoas ou citações que não estejam no briefing.
+- Sem clichês ("no mundo digital atual", "cenário cada vez mais", "explosão de IA", "revolução tecnológica").
+- Use a categoria MAIS específica entre: ia, gadgets, futuro, mercado, ciencia, tecnologia.
+
+# ESTRUTURA OBRIGATÓRIA DO CORPO (Markdown)
+Total: 700-1000 palavras. NÃO escreva como bloco único. SEMPRE use:
+1. **Lide forte** (1 parágrafo curto de abertura, 2-3 frases, prende o leitor).
+2. **## Subtítulo H2** (3 a 5 seções temáticas, cada uma com nome curto e específico — não use "Introdução", "Conclusão").
+3. Em cada seção: 1-2 parágrafos curtos (máx. 4 frases cada).
+4. Pelo menos **1 lista com bullets** (use "- ") em alguma seção, listando características, fatos ou implicações.
+5. Pelo menos **1 frase em destaque** usando blockquote ("> ") com uma análise impactante de Horvat.
+6. **Negrito** (**texto**) para 3-5 termos-chave ao longo do texto.
+7. Última seção: **## O que esperar** ou **## Próximos passos** com perspectiva analítica de Horvat (não use "Conclusão").
+
+# RETORNE EXCLUSIVAMENTE JSON VÁLIDO neste formato (sem texto antes/depois):
 {
-  "title": "Título editorial impactante (max 80 chars)",
-  "subtitle": "Linha de apoio que complementa o título (max 140 chars)",
-  "excerpt": "Resumo executivo de 1-2 frases para preview (max 180 chars)",
+  "title": "Título editorial impactante e específico (max 80 chars, sem clickbait barato)",
+  "subtitle": "Linha de apoio que aprofunda o título (max 140 chars)",
+  "excerpt": "Resumo de 1-2 frases para preview do card (max 180 chars)",
   "category": "ia|gadgets|futuro|mercado|ciencia|tecnologia",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "body": "Corpo completo em Markdown (600-900 palavras, com ## subtítulos)",
+  "body": "Corpo completo em Markdown seguindo a ESTRUTURA OBRIGATÓRIA",
   "seo_title": "Título otimizado para Google (max 60 chars)",
   "seo_description": "Meta description (max 155 chars)"
 }`;
@@ -202,50 +299,49 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
     try {
       parsed = JSON.parse(rawContent);
     } catch {
-      // Try to extract JSON from string
       const match = rawContent.match(/\{[\s\S]*\}/);
       if (!match) throw new Error("AI returned invalid JSON");
       parsed = JSON.parse(match[0]);
     }
 
-    const title = String(parsed.title ?? rssItem.title).trim().slice(0, 200);
+    const title = String(parsed.title ?? angle.seedTitle).trim().slice(0, 200);
     const subtitle = parsed.subtitle ? String(parsed.subtitle).trim().slice(0, 200) : null;
     const excerpt = parsed.excerpt ? String(parsed.excerpt).trim().slice(0, 280) : null;
-    const body = String(parsed.body ?? "").trim();
-    const category = VALID_CATEGORIES.includes(parsed.category) ? parsed.category : "tecnologia";
+    let body = String(parsed.body ?? "").trim();
+    const category = VALID_CATEGORIES.includes(parsed.category) ? parsed.category : (angle.category || "tecnologia");
     const tags = Array.isArray(parsed.tags)
       ? parsed.tags.map((t: any) => String(t).toLowerCase().trim()).filter(Boolean).slice(0, 8)
       : [];
     const seoTitle = parsed.seo_title ? String(parsed.seo_title).slice(0, 70) : title.slice(0, 60);
     const seoDesc = parsed.seo_description ? String(parsed.seo_description).slice(0, 160) : excerpt;
 
-    if (!body || body.length < 200) {
+    if (!body || body.length < 400) {
       throw new Error("AI returned a body too short");
     }
 
-    // 3. Build a unique slug
+    // Safety scrub: strip any accidental "fonte original" references
+    body = body
+      .replace(/^.*\b(fonte original|segundo (o |a )?(tecnoblog|g1|olhar digital|canaltech|the verge|wired|reuters|bloomberg|exame))\b.*$/gim, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+
+    // ====== 4. Slug ======
     let baseSlug = slugify(title);
     if (!baseSlug) baseSlug = `noticia-${Date.now()}`;
     let finalSlug = baseSlug;
     let attempt = 0;
     while (attempt < 5) {
       const { data: existing } = await supabase
-        .from("articles")
-        .select("id")
-        .eq("slug", finalSlug)
-        .maybeSingle();
+        .from("articles").select("id").eq("slug", finalSlug).maybeSingle();
       if (!existing) break;
       attempt += 1;
       finalSlug = `${baseSlug}-${attempt + 1}`;
     }
 
-    // 3.5 Resolve hero image: validate RSS image, otherwise generate one
-    let heroImage: string | null = isValidImageUrl(rssItem.image_url) ? rssItem.image_url : null;
-    if (!heroImage) {
-      heroImage = await generateHeroImage(supabase, workspaceId, title, category);
-    }
+    // ====== 5. Hero image ======
+    const heroImage = await generateHeroImage(title, category);
 
-    // 4. Insert
+    // ====== 6. Insert ======
     const { data: inserted, error: insertErr } = await supabase
       .from("articles")
       .insert({
@@ -265,22 +361,21 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
         status: "published",
         published_at: new Date().toISOString(),
         reading_time_minutes: estimateReadingTime(body),
-        source_rss_item_id: rssItem.id,
-        source_url: rssItem.link,
-        source_name: rssItem.source_name,
+        source_rss_item_id: angle.sourceRssId,
+        // Source URL/name intentionally omitted — article is original Neural Update content
+        source_url: null,
+        source_name: null,
         ai_model_used: "google/gemini-2.5-flash",
-        cost_estimate: 0.002,
+        cost_estimate: 0.004,
       })
       .select("id, slug, title")
       .single();
 
     if (insertErr) throw insertErr;
 
-    // 5. Mark RSS item as used
-    await supabase
-      .from("rss_items")
-      .update({ is_used: true })
-      .eq("id", rssItem.id);
+    if (angle.sourceRssId) {
+      await supabase.from("rss_items").update({ is_used: true }).eq("id", angle.sourceRssId);
+    }
 
     console.log(`[generate-article] Created article ${inserted.slug}`);
 
@@ -291,6 +386,7 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
         slug: inserted.slug,
         title: inserted.title,
         url: `/noticia/${inserted.slug}`,
+        researchSourcesUsed: sources.length,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
