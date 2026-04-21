@@ -32,6 +32,65 @@ function estimateReadingTime(content: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
+// Validates that URL is actually an image (not YouTube embed, video, html, etc)
+function isValidImageUrl(url: string | null | undefined): boolean {
+  if (!url || typeof url !== "string") return false;
+  const lower = url.toLowerCase();
+  // Reject obvious non-images
+  if (lower.includes("youtube.com") || lower.includes("youtu.be")) return false;
+  if (lower.includes("vimeo.com")) return false;
+  if (lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".mov")) return false;
+  if (lower.endsWith(".html") || lower.endsWith(".htm")) return false;
+  // Accept if it looks like an image
+  if (/\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(lower)) return true;
+  // Accept generic CDN/storage URLs that don't have an extension but aren't blacklisted
+  if (lower.startsWith("http://") || lower.startsWith("https://")) {
+    // Heuristic: probably ok if it doesn't look like a page
+    return !lower.includes("/embed/") && !lower.includes("/watch");
+  }
+  return false;
+}
+
+// Generates a hero image for the article using Gemini Image
+async function generateHeroImage(
+  supabase: any,
+  workspaceId: string,
+  title: string,
+  category: string
+): Promise<string | null> {
+  try {
+    console.log(`[generate-article] Generating hero image for: ${title}`);
+    const prompt = `Imagem editorial fotorrealista para matéria de tecnologia sobre: "${title}". 
+Categoria: ${category}. 
+Estilo: cinematográfico, iluminação dramática, paleta dark com acentos neon ciano e roxo, composição editorial premium estilo The Verge / Wired.
+Formato 16:9, ultra alta definição.
+⛔ ABSOLUTAMENTE SEM TEXTO, LETRAS, NÚMEROS OU LOGOTIPOS NA IMAGEM.`;
+
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${SERVICE_KEY}`,
+      },
+      body: JSON.stringify({
+        prompt,
+        format: "landscape",
+        applyWatermark: false,
+      }),
+    });
+
+    if (!res.ok) {
+      console.warn(`[generate-article] image generation failed: ${res.status}`);
+      return null;
+    }
+    const data = await res.json();
+    return data?.imageUrl ?? null;
+  } catch (e) {
+    console.warn("[generate-article] hero image error:", e);
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -180,6 +239,12 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
       finalSlug = `${baseSlug}-${attempt + 1}`;
     }
 
+    // 3.5 Resolve hero image: validate RSS image, otherwise generate one
+    let heroImage: string | null = isValidImageUrl(rssItem.image_url) ? rssItem.image_url : null;
+    if (!heroImage) {
+      heroImage = await generateHeroImage(supabase, workspaceId, title, category);
+    }
+
     // 4. Insert
     const { data: inserted, error: insertErr } = await supabase
       .from("articles")
@@ -192,8 +257,8 @@ Retorne EXCLUSIVAMENTE um JSON válido (sem texto antes ou depois) neste formato
         content: body,
         category,
         tags,
-        hero_image_url: rssItem.image_url ?? null,
-        og_image_url: rssItem.image_url ?? null,
+        hero_image_url: heroImage,
+        og_image_url: heroImage,
         seo_title: seoTitle,
         seo_description: seoDesc,
         author_name: "Agente Horvat",

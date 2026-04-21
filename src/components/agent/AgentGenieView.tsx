@@ -32,6 +32,8 @@ import TikTokContentCreation from '@/components/TikTokContentCreation';
 
 import ContentTestTab from '@/components/tabs/ContentTestTab';
 import ArticlesManagerTab from '@/components/admin/ArticlesManagerTab';
+import BlogStatsPanel from '@/components/admin/BlogStatsPanel';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
@@ -398,11 +400,28 @@ export default function AgentGenieView() {
           </div>
         </header>
 
-        {/* Content */}
+        {/* Content with tabs: Stats + Articles */}
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="p-4 max-w-4xl mx-auto">
-              <ArticlesManagerTab />
+              <Tabs defaultValue="stats" className="w-full">
+                <TabsList className="grid grid-cols-2 mb-3 h-8">
+                  <TabsTrigger value="stats" className="text-xs gap-1.5">
+                    <TrendingUp className="h-3.5 w-3.5" />
+                    Estatísticas
+                  </TabsTrigger>
+                  <TabsTrigger value="articles" className="text-xs gap-1.5">
+                    <Newspaper className="h-3.5 w-3.5" />
+                    Artigos
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="stats" className="mt-0">
+                  <BlogStatsPanel />
+                </TabsContent>
+                <TabsContent value="articles" className="mt-0">
+                  <ArticlesManagerTab />
+                </TabsContent>
+              </Tabs>
             </div>
           </ScrollArea>
         </div>
