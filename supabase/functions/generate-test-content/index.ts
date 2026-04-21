@@ -137,14 +137,16 @@ Deno.serve(async (req) => {
             post_type: realPost.post_type,
             ai_model_used: realPost.ai_model_used,
             cost_estimate: realPost.cost_estimate,
-            status: 'draft',
+            // CRITICAL: pending_review impede que o post vaze pra Fila/Rascunhos
+            // antes do usuário aprovar/rejeitar na aba Teste.
+            status: 'pending_review',
             scheduled_for: null,
             published_at: null,
           }).eq("id", placeholder.id);
 
           // Delete the extra post
           await supabase.from("posts").delete().eq("id", realPostId);
-          console.log(`[test-content] Merged post ${realPostId} → placeholder ${placeholder.id}`);
+          console.log(`[test-content] Merged post ${realPostId} → placeholder ${placeholder.id} (pending_review)`);
         }
       } else if (!realPostId) {
         // No post was created, mark as failed
@@ -155,7 +157,7 @@ Deno.serve(async (req) => {
       } else {
         // Agent used the same ID somehow or we need to just update status
         await supabase.from("posts").update({
-          status: 'draft',
+          status: 'pending_review',
           scheduled_for: null,
           published_at: null,
         }).eq("id", placeholder.id);

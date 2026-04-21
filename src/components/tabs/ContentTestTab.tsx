@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CostSummaryPanel from './CostSummaryPanel';
 import StrategyPanel from './StrategyPanel';
 import AgentVisionPanel from './AgentVisionPanel';
@@ -43,6 +43,7 @@ import { cn } from '@/lib/utils';
 import { CustomFeedsManager } from '@/components/CustomFeedsManager';
 import AgentMarketingPanel from '@/components/agent/AgentMarketingPanel';
 import VideoClipsTab from '@/components/tabs/VideoClipsTab';
+import TestFeedbackHistoryPanel from '@/components/tabs/TestFeedbackHistoryPanel';
 
 interface TestResult {
   post: any;
@@ -159,7 +160,9 @@ function TestDetailView({
             }
             className="text-[10px]"
           >
-            {post.status === 'draft'
+            {post.status === 'pending_review'
+              ? 'Aguardando Revisão'
+              : post.status === 'draft'
               ? 'Rascunho'
               : post.status === 'failed'
               ? 'Erro'
@@ -310,13 +313,17 @@ function TestDetailView({
             </div>
           </div>
 
-          {/* Feedback & Actions (only for drafts) */}
-          {post.status === 'draft' && (
+          {/* Feedback & Actions (drafts E pending_review) */}
+          {(post.status === 'draft' || post.status === 'pending_review') && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-3">
                 <div>
                   <p className="text-xs font-semibold">Avaliação & Feedback</p>
-                  <p className="text-[10px] text-muted-foreground">Seu feedback melhora as próximas gerações automaticamente</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {post.status === 'pending_review'
+                      ? 'Aguardando sua revisão — não vai pra fila até você decidir'
+                      : 'Seu feedback melhora as próximas gerações automaticamente'}
+                  </p>
                 </div>
 
                 {/* Star rating */}
@@ -428,6 +435,57 @@ export default function ContentTestTab() {
   const [activeDetailType, setActiveDetailType] = useState<string | null>(null);
   const [editingType, setEditingType] = useState<string | null>(null);
   const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
+
+  // Recover pending_review/generating posts on mount (survives tab switching)
+  // This way trocar de aba durante geração não perde o post de vista
+  useEffect(() => {
+    if (!currentWorkspace?.id) return;
+    let cancelled = false;
+    (async () => {
+      // Look back 30 min for pending posts created via test flow
+      const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { data: pending } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('workspace_id', currentWorkspace.id)
+        .in('status', ['pending_review', 'generating'])
+        .gte('created_at', since)
+        .order('created_at', { ascending: false });
+
+      if (cancelled || !pending || pending.length === 0) return;
+
+      // Map by media_type → content_type slot
+      const typeMap: Record<string, string> = {
+        image: 'image',
+        carousel: 'carousel',
+        video: 'video',
+      };
+      const recovered: Record<string, TestResult> = {};
+      for (const p of pending) {
+        const slot = typeMap[p.media_type as string] || 'image';
+        if (!recovered[slot]) {
+          recovered[slot] = {
+            post: p,
+            agentResponse: { decision: p.status === 'generating' ? 'GENERATING' : 'POST' },
+          };
+        }
+      }
+      setResults((prev) => ({ ...recovered, ...prev }));
+
+      // Re-poll any that are still generating
+      for (const p of pending) {
+        if (p.status === 'generating') {
+          const slot = typeMap[p.media_type as string] || 'image';
+          setGenerating(slot);
+          pollPost(p.id, slot);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWorkspace?.id]);
 
   // Poll a post until it's no longer 'generating'
   const pollPost = async (postId: string, contentType: string) => {
@@ -667,6 +725,8 @@ export default function ContentTestTab() {
             </p>
           </div>
 
+          <TestFeedbackHistoryPanel />
+
           <div className="space-y-2">
             {CONTENT_TYPES.map(({ type, label, icon: Icon, description, color, editType }) => {
               const isGenerating = generating === type;
@@ -702,10 +762,14 @@ export default function ContentTestTab() {
                             className="text-[10px] cursor-pointer"
                             onClick={() => setActiveDetailType(type)}
                           >
-                            {post.status === 'draft'
+                            {post.status === 'pending_review'
+                              ? '⏳ Revisar'
+                              : post.status === 'draft'
                               ? '👁 Ver'
                               : post.status === 'scheduled'
                               ? '✓ Agendado'
+                              : post.status === 'generating'
+                              ? '⏳ Gerando'
                               : post.status}
                           </Badge>
                         )}
