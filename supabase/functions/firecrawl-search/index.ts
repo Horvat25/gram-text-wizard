@@ -1,10 +1,22 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Gera chave de cache estável a partir dos parâmetros da pesquisa
+async function buildCacheKey(query: string, limit: number, lang: string, country: string): Promise<string> {
+  const normalized = `${query.toLowerCase().trim()}|${limit}|${lang}|${country}`;
+  const buf = new TextEncoder().encode(normalized);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32);
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -13,7 +25,7 @@ serve(async (req) => {
   }
 
   try {
-    const { query, limit = 5, lang = 'pt-BR', country = 'BR' } = await req.json();
+    const { query, limit = 5, lang = 'pt-BR', country = 'BR', skipCache = false } = await req.json();
 
     if (!query) {
       return new Response(
@@ -29,6 +41,40 @@ serve(async (req) => {
         JSON.stringify({ success: false, error: 'Firecrawl API key not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // ============= CACHE LOOKUP (24h) =============
+    const cacheKey = await buildCacheKey(query, limit, lang, country);
+    
+    if (!skipCache) {
+      const { data: cached } = await supabase
+        .from('firecrawl_cache')
+        .select('result, created_at, expires_at')
+        .eq('cache_key', cacheKey)
+        .gt('expires_at', new Date().toISOString())
+        .maybeSingle();
+      
+      if (cached?.result) {
+        const ageMinutes = Math.round((Date.now() - new Date(cached.created_at).getTime()) / 60000);
+        console.log(`[firecrawl-search] ✅ CACHE HIT (${ageMinutes}min old): "${query.slice(0, 60)}"`);
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            data: cached.result,
+            query,
+            cached: true,
+            cacheAgeMinutes: ageMinutes,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      console.log(`[firecrawl-search] ⚠️ CACHE MISS: "${query.slice(0, 60)}" - calling Firecrawl API`);
+    } else {
+      console.log(`[firecrawl-search] 🔄 Cache bypassed (skipCache=true)`);
     }
 
     console.log('Searching with Firecrawl:', query);
@@ -137,11 +183,32 @@ serve(async (req) => {
 
     console.log('Search successful, found', processedResults.length, 'results');
     
+    // ============= CACHE STORE (upsert) =============
+    if (processedResults.length > 0) {
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const { error: cacheError } = await supabase
+        .from('firecrawl_cache')
+        .upsert({
+          cache_key: cacheKey,
+          query,
+          result: processedResults,
+          expires_at: expiresAt,
+          created_at: new Date().toISOString(),
+        }, { onConflict: 'cache_key' });
+      
+      if (cacheError) {
+        console.warn('[firecrawl-search] Cache write failed (non-fatal):', cacheError.message);
+      } else {
+        console.log(`[firecrawl-search] 💾 Cached for 24h: "${query.slice(0, 60)}"`);
+      }
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
         data: processedResults,
-        query 
+        query,
+        cached: false,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
