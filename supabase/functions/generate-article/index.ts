@@ -62,10 +62,106 @@ function isValidImageUrl(url: string | null | undefined): boolean {
   return false;
 }
 
+// Translate PT-BR title to English keywords for stock photo search
+function buildImageQuery(title: string, category: string): string {
+  const categoryMap: Record<string, string> = {
+    ia: "artificial intelligence technology",
+    gadgets: "gadgets electronics device",
+    futuro: "futuristic technology innovation",
+    mercado: "tech business startup",
+    ciencia: "science research laboratory",
+    tecnologia: "technology computer",
+  };
+  // Extract key nouns from title (simple heuristic)
+  const stop = new Set(["a","o","e","de","da","do","para","com","em","que","os","as","um","uma","no","na","por","sua","seu","como","ao","mais","novo","nova"]);
+  const keywords = title
+    .toLowerCase()
+    .replace(/[^a-záéíóúâêôãõç\s]/gi, " ")
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !stop.has(w))
+    .slice(0, 3)
+    .join(" ");
+  return keywords || categoryMap[category] || "technology";
+}
+
+// Try Unsplash (free, high quality)
+async function fetchUnsplashImage(query: string): Promise<string | null> {
+  const key = Deno.env.get("UNSPLASH_ACCESS_KEY");
+  if (!key) return null;
+  try {
+    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape&content_filter=high`;
+    const res = await fetch(url, { headers: { Authorization: `Client-ID ${key}` } });
+    if (!res.ok) {
+      console.warn("[generate-article] Unsplash failed:", res.status);
+      return null;
+    }
+    const data = await res.json();
+    const results = data?.results || [];
+    if (results.length === 0) return null;
+    // Pick first relevant result
+    const photo = results[0];
+    return photo?.urls?.regular || photo?.urls?.full || null;
+  } catch (e) {
+    console.warn("[generate-article] Unsplash error:", e);
+    return null;
+  }
+}
+
+// Try Pexels (free, fallback)
+async function fetchPexelsImage(query: string): Promise<string | null> {
+  const key = Deno.env.get("PEXELS_API_KEY");
+  if (!key) return null;
+  try {
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`;
+    const res = await fetch(url, { headers: { Authorization: key } });
+    if (!res.ok) {
+      console.warn("[generate-article] Pexels failed:", res.status);
+      return null;
+    }
+    const data = await res.json();
+    const photos = data?.photos || [];
+    if (photos.length === 0) return null;
+    return photos[0]?.src?.large2x || photos[0]?.src?.large || photos[0]?.src?.original || null;
+  } catch (e) {
+    console.warn("[generate-article] Pexels error:", e);
+    return null;
+  }
+}
+
+// Strategy: Stock photos FIRST (free), AI as last resort (saves cost)
 async function generateHeroImage(
   title: string,
   category: string
 ): Promise<string | null> {
+  const query = buildImageQuery(title, category);
+  console.log(`[generate-article] 🔍 Searching free stock photo for: "${query}"`);
+
+  // 1. Unsplash (preferred - editorial quality)
+  const unsplash = await fetchUnsplashImage(query);
+  if (unsplash) {
+    console.log("[generate-article] ✅ Unsplash image found (FREE, $0.00)");
+    return unsplash;
+  }
+
+  // 2. Pexels (fallback - also free)
+  const pexels = await fetchPexelsImage(query);
+  if (pexels) {
+    console.log("[generate-article] ✅ Pexels image found (FREE, $0.00)");
+    return pexels;
+  }
+
+  // 3. Try broader category fallback before going to AI
+  const broadQuery = buildImageQuery("", category);
+  if (broadQuery !== query) {
+    const fallback = await fetchUnsplashImage(broadQuery) || await fetchPexelsImage(broadQuery);
+    if (fallback) {
+      console.log("[generate-article] ✅ Stock fallback (category) found (FREE)");
+      return fallback;
+    }
+  }
+
+  // 4. Last resort: AI generation (costs ~$0.02)
+  console.log("[generate-article] ⚠️ No stock photo found, falling back to AI (paid)");
   try {
     const prompt = `Imagem editorial fotorrealista para matéria de tecnologia sobre: "${title}".
 Categoria: ${category}.
