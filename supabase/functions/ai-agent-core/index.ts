@@ -3637,7 +3637,7 @@ Deno.serve(async (req) => {
       );
     }
     
-    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType, skipLimitCheck);
+    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType, skipLimitCheck, placeholderPostId);
     
     console.log('[AGENT] ===== CICLO FINALIZADO =====');
     return new Response(
