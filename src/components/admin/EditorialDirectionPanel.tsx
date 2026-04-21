@@ -427,8 +427,8 @@ export default function EditorialDirectionPanel() {
             {/* KPIs custo */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <KPI label="Últimas 24h" value={`$${metrics.cost24h.toFixed(4)}`} sub={`${metrics.cyclesLast24h} ciclos`} />
-              <KPI label="Últimos 7d" value={`$${metrics.cost7d.toFixed(3)}`} sub={`${metrics.weekPosts} posts`} />
-              <KPI label="Últimos 30d" value={`$${metrics.cost30d.toFixed(2)}`} sub={`${posts.length} posts`} />
+              <KPI label="Últimos 7d" value={`$${metrics.cost7d.toFixed(3)}`} sub={`${metrics.weekArticles} artigos`} />
+              <KPI label="Últimos 30d" value={`$${metrics.cost30d.toFixed(2)}`} sub={`${articles.length} artigos total`} />
               <KPI
                 label="Projeção mensal"
                 value={`$${metrics.monthlyProjection.toFixed(2)}`}
@@ -471,16 +471,10 @@ export default function EditorialDirectionPanel() {
                 <strong className="text-foreground">
                   {currentPhase.articlesPerDay} artigo{currentPhase.articlesPerDay > 1 ? "s" : ""}/dia
                 </strong>{" "}
-                no blog +{" "}
-                <strong className="text-foreground">
-                  {currentPhase.postsPerDay} post{currentPhase.postsPerDay > 1 ? "s" : ""}/dia
-                </strong>{" "}
-                no Instagram. Comece devagar para medir o que funciona antes de acelerar.
+                publicado no blog. Comece devagar para medir o que funciona antes de acelerar.
               </p>
               <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>
-                  Esta semana: {metrics.weekArticles} artigos · {metrics.weekPosts} posts
-                </span>
+                <span>Esta semana: {metrics.weekArticles} artigos publicados</span>
                 <Badge
                   variant="outline"
                   className={`text-[10px] ${
