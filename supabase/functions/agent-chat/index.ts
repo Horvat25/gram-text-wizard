@@ -2957,9 +2957,97 @@ serve(async (req) => {
     const { data: recentPosts } = await supabase
       .from('posts')
       .select('*')
-      .eq('user_id', userId)
+      .eq('workspace_id', workspaceId)
       .order('created_at', { ascending: false })
       .limit(10);
+
+    // ============================================================
+    // 🧠 VISÃO OPERACIONAL UNIFICADA (espelha ai-agent-core)
+    // O chat enxerga EXATAMENTE o que o agente autônomo enxerga:
+    // - Progresso semanal por tipo (segunda-domingo, Brasília)
+    // - Próximo tipo que o cron escolheria
+    // - Snapshot de crescimento (Instagram metrics)
+    // - Top performers dos últimos 30 dias
+    // ============================================================
+    const nowBR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const dayBR = nowBR.getDay();
+    const monOffset = dayBR === 0 ? -6 : 1 - dayBR;
+    const wkStart = new Date(nowBR);
+    wkStart.setDate(nowBR.getDate() + monOffset);
+    wkStart.setHours(0, 0, 0, 0);
+
+    const { data: weekPosts } = await supabase
+      .from('posts')
+      .select('media_type, post_type, status, reach, likes_count, comments_count, saves_count, shares_count, created_at')
+      .eq('workspace_id', workspaceId)
+      .gte('created_at', wkStart.toISOString());
+
+    const publishableWeek = (weekPosts || []).filter((p: any) => {
+      if ((p.media_type === 'reels' || p.media_type === 'video') && p.status === 'draft') return false;
+      if (p.status === 'failed') return false;
+      return true;
+    });
+
+    const weeklyGoals = {
+      videos: context?.content_distribution_videos ?? 3,
+      carousels: context?.content_distribution_carousels ?? 3,
+      news: context?.content_distribution_news ?? 8,
+      news_videos: context?.content_distribution_news_video ?? 2,
+      images: context?.content_distribution_images ?? 7,
+      marketing: context?.content_distribution_marketing ?? 2,
+    };
+    const weeklyProgress = {
+      videos: publishableWeek.filter((p: any) => (p.media_type === 'reels' || p.media_type === 'video') && p.post_type !== 'noticia').length,
+      carousels: publishableWeek.filter((p: any) => p.media_type === 'carousel').length,
+      news: publishableWeek.filter((p: any) => p.post_type === 'noticia' && p.media_type !== 'carousel' && p.media_type !== 'reels' && p.media_type !== 'video').length,
+      news_videos: publishableWeek.filter((p: any) => p.post_type === 'noticia' && (p.media_type === 'reels' || p.media_type === 'video')).length,
+      images: publishableWeek.filter((p: any) => p.media_type === 'image' && p.post_type !== 'noticia' && p.post_type !== 'afiliado').length,
+      marketing: publishableWeek.filter((p: any) => p.post_type === 'afiliado').length,
+    };
+
+    // Próximo tipo (mesma lógica do cron — Reels desligados, marketing intercalado a cada 4)
+    const totalRegular = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.news_videos + weeklyProgress.images;
+    const { data: affLinks } = await supabase
+      .from('affiliate_links').select('id').eq('workspace_id', workspaceId).eq('is_active', true).limit(1);
+    const hasAffiliates = (affLinks?.length || 0) > 0;
+    const marketingDue = hasAffiliates && totalRegular >= 4 && weeklyProgress.marketing === 0;
+
+    const autoRotation = [
+      { key: 'images', label: 'image', goal: weeklyGoals.images, prog: weeklyProgress.images },
+      { key: 'news', label: 'news', goal: weeklyGoals.news, prog: weeklyProgress.news },
+      { key: 'carousels', label: 'carousel', goal: weeklyGoals.carousels, prog: weeklyProgress.carousels },
+    ];
+    const remaining = autoRotation
+      .map(t => ({ ...t, remaining: Math.max(0, t.goal - t.prog), pct: t.goal > 0 ? (t.prog / t.goal) * 100 : 100 }))
+      .filter(t => t.remaining > 0)
+      .sort((a, b) => a.pct - b.pct);
+    const nextAutoType = marketingDue ? 'marketing' : (remaining[0]?.label || 'nenhum (semana completa)');
+
+    // Top performers (30d) — mesma análise do cron
+    const since30d = new Date(Date.now() - 30 * 86400000).toISOString();
+    const { data: posts30d } = await supabase
+      .from('posts')
+      .select('media_type, post_type, reach, likes_count, comments_count, saves_count, shares_count, status')
+      .eq('workspace_id', workspaceId)
+      .eq('status', 'published')
+      .gte('created_at', since30d);
+
+    const engagementByType: Record<string, { sum: number; n: number }> = {};
+    (posts30d || []).forEach((p: any) => {
+      const reach = p.reach || 1;
+      const eng = ((p.likes_count || 0) + (p.comments_count || 0) * 2 + (p.saves_count || 0) * 3 + (p.shares_count || 0) * 3) / reach * 100;
+      const type = p.post_type === 'noticia' ? (p.media_type === 'reels' ? 'news_video' : 'news') :
+                   p.post_type === 'afiliado' ? 'marketing' :
+                   p.media_type === 'reels' ? 'video' :
+                   p.media_type || 'image';
+      if (!engagementByType[type]) engagementByType[type] = { sum: 0, n: 0 };
+      engagementByType[type].sum += eng;
+      engagementByType[type].n++;
+    });
+    const topPerformers = Object.entries(engagementByType)
+      .map(([type, { sum, n }]) => ({ type, avg: sum / n, n }))
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 3);
 
     // Build dynamic system prompt based on user config
     const agentName = context?.agent_name || 'Aria';
