@@ -3768,6 +3768,38 @@ async function processWorkspace(
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
       
+      // === TEST FLOW: merge real post into placeholder, mark pending_review ===
+      if (placeholderPostId && post && post.id !== placeholderPostId) {
+        console.log(`[AGENT] 🔀 Mergeando post real ${post.id} → placeholder ${placeholderPostId}`);
+        const { error: mergeErr } = await supabase.from('posts').update({
+          caption: post.caption,
+          image_url: post.image_url,
+          video_url: post.video_url,
+          carousel_images: post.carousel_images,
+          hashtags: post.hashtags,
+          overlay_metadata: post.overlay_metadata,
+          media_type: post.media_type,
+          post_type: post.post_type,
+          ai_model_used: post.ai_model_used,
+          cost_estimate: post.cost_estimate,
+          // pending_review: aguardando aprovação manual no Test Tab
+          status: 'pending_review',
+          scheduled_for: null,
+          published_at: null,
+          error_message: null,
+        }).eq('id', placeholderPostId);
+        
+        if (mergeErr) {
+          console.error(`[AGENT] Erro ao mergear placeholder:`, mergeErr);
+        } else {
+          // Delete extra post and reassign post.id for downstream logic
+          await supabase.from('posts').delete().eq('id', post.id);
+          console.log(`[AGENT] ✅ Placeholder ${placeholderPostId} atualizado, post extra ${post.id} deletado`);
+          post.id = placeholderPostId;
+          post.status = 'pending_review';
+        }
+      }
+      
       // Send completion message with VIDEO-SPECIFIC notification
       const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
       const actualTheme = post?.caption?.split('\n')[0]?.replace(/[🚀📰🎬✅⚡🤯💾🧠💻]/g, '').trim().substring(0, 80) || decision.contentPlan.theme;
