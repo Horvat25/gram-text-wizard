@@ -84,9 +84,11 @@ Deno.serve(async (req) => {
 
     console.log(`[test-content] Placeholder ${placeholder.id} created, firing agent in background`);
 
-    // Fire-and-forget: call ai-agent-core without awaiting
+    // Background task — wrapped in EdgeRuntime.waitUntil so it survives
+    // the response being returned. Without this, the runtime can kill the
+    // outbound fetch as soon as we return, leaving posts stuck in 'generating'.
     const agentUrl = `${supabaseUrl}/functions/v1/ai-agent-core`;
-    fetch(agentUrl, {
+    const backgroundTask = fetch(agentUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -171,6 +173,34 @@ Deno.serve(async (req) => {
         error_message: `Erro de conexão: ${err?.message || 'unknown'}`,
       }).eq("id", placeholder.id);
     });
+
+    // CRITICAL: keep runtime alive until the agent finishes,
+    // so the placeholder gets updated even after we respond.
+    // @ts-ignore - EdgeRuntime is available on Supabase Edge Runtime
+    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(backgroundTask);
+    }
+
+    // Safety net: if no terminal status after 4min, mark as failed so
+    // the UI doesn't spin forever.
+    const watchdog = (async () => {
+      await new Promise((r) => setTimeout(r, 4 * 60 * 1000));
+      const { data: cur } = await supabase
+        .from("posts").select("status").eq("id", placeholder.id).single();
+      if (cur?.status === "generating") {
+        await supabase.from("posts").update({
+          status: "failed",
+          error_message: "Timeout: geração demorou mais de 4 minutos",
+        }).eq("id", placeholder.id);
+        console.error(`[test-content] Watchdog killed stuck post ${placeholder.id}`);
+      }
+    })();
+    // @ts-ignore
+    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(watchdog);
+    }
 
     // Return immediately with the placeholder
     return new Response(
