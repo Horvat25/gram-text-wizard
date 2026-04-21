@@ -2,10 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Neural Update - Tech Design System
-   Cores focadas em tecnologia com tons de azul ciano e gradientes futuristas
+/* ═══════════════════════════════════════════════════════════════════
+   Neural Update — Antigravity-inspired Design System
+   Deep space dark + neon cyan→purple gradients + glow effects
    All colors MUST be HSL.
-*/
+   ═══════════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
@@ -18,20 +19,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 10%;
 
-    /* Primary: Cyan/Teal tech color */
     --primary: 192 85% 45%;
     --primary-foreground: 0 0% 100%;
-    
-    /* Neural gradient - cyan to blue to purple */
     --primary-gradient: linear-gradient(135deg, hsl(192 85% 45%), hsl(210 90% 50%), hsl(250 70% 55%));
-    
+
     --secondary: 210 20% 94%;
     --secondary-foreground: 220 20% 20%;
 
     --muted: 210 15% 92%;
     --muted-foreground: 220 10% 45%;
 
-    /* Accent: Electric blue */
     --accent: 210 90% 50%;
     --accent-foreground: 0 0% 100%;
 
@@ -43,65 +40,73 @@
     --ring: 192 85% 45%;
 
     --radius: 0.75rem;
-    
-    /* Gradient tokens for neural theme */
+
     --gradient-start: 192 85% 45%;
     --gradient-middle: 210 90% 50%;
     --gradient-end: 250 70% 55%;
-    
+
     --success: 160 75% 40%;
     --success-foreground: 0 0% 100%;
-    
+
     --warning: 45 90% 50%;
     --warning-foreground: 0 0% 10%;
-    
+
     --chart-1: 192 85% 45%;
     --chart-2: 210 90% 50%;
     --chart-3: 160 75% 40%;
     --chart-4: 45 90% 50%;
     --chart-5: 250 70% 55%;
-    
-    /* Neural glow effect */
+
     --glow-primary: 192 85% 45%;
+
+    --portal-cyan: 200 100% 60%;
+    --portal-purple: 280 90% 65%;
+    --portal-magenta: 320 90% 60%;
   }
 
   .dark {
-    --background: 220 25% 8%;
-    --foreground: 210 20% 98%;
+    /* Deep space — quase preto azulado, profundo */
+    --background: 230 35% 5%;
+    --foreground: 210 40% 98%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 210 20% 98%;
+    --card: 230 30% 8%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 230 30% 8%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Primary: Bright cyan for dark mode */
-    --primary: 192 90% 55%;
-    --primary-foreground: 220 25% 8%;
+    /* Primary: neon cyan vivo (igual ao logo Neural Update) */
+    --primary: 200 100% 60%;
+    --primary-foreground: 230 35% 5%;
 
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 230 25% 12%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 210 15% 55%;
+    --muted: 230 20% 14%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 210 95% 60%;
-    --accent-foreground: 220 25% 8%;
+    /* Accent: neon purple/magenta (segunda cor do logo) */
+    --accent: 280 90% 65%;
+    --accent-foreground: 230 35% 5%;
 
-    --destructive: 0 70% 45%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 192 90% 55%;
-    
-    --chart-1: 192 90% 60%;
-    --chart-2: 210 95% 65%;
-    --chart-3: 160 80% 50%;
-    --chart-4: 45 95% 60%;
-    --chart-5: 250 80% 65%;
-    
-    --glow-primary: 192 90% 55%;
+    --border: 230 25% 16%;
+    --input: 230 25% 14%;
+    --ring: 200 100% 60%;
+
+    --chart-1: 200 100% 60%;
+    --chart-2: 240 95% 70%;
+    --chart-3: 280 90% 65%;
+    --chart-4: 320 90% 60%;
+    --chart-5: 160 80% 55%;
+
+    --glow-primary: 200 100% 60%;
+
+    --portal-cyan: 200 100% 60%;
+    --portal-purple: 280 90% 65%;
+    --portal-magenta: 320 90% 60%;
   }
 }
 
@@ -112,62 +117,150 @@
 
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Portal-only typography (Space Grotesk for display, Inter for body) */
+  .portal-root {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .portal-root .font-display {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
-/* Neural glow utilities */
+/* ───────────────────────────  Utilities  ─────────────────────────── */
 @layer utilities {
   .glow-primary {
     box-shadow: 0 0 20px hsl(var(--glow-primary) / 0.3),
                 0 0 40px hsl(var(--glow-primary) / 0.1);
   }
-  
+
   .glow-sm {
     box-shadow: 0 0 10px hsl(var(--glow-primary) / 0.2);
   }
-  
+
   .neural-gradient {
-    background: linear-gradient(135deg, 
-      hsl(var(--gradient-start)), 
-      hsl(var(--gradient-middle)), 
+    background: linear-gradient(135deg,
+      hsl(var(--gradient-start)),
+      hsl(var(--gradient-middle)),
       hsl(var(--gradient-end)));
   }
-  
+
   .neural-gradient-text {
-    background: linear-gradient(135deg, 
-      hsl(var(--gradient-start)), 
-      hsl(var(--gradient-middle)), 
+    background: linear-gradient(135deg,
+      hsl(var(--gradient-start)),
+      hsl(var(--gradient-middle)),
       hsl(var(--gradient-end)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* TikTok Theme */
+  /* ───── Portal Antigravity utilities ───── */
+
+  .portal-gradient {
+    background: linear-gradient(135deg,
+      hsl(var(--portal-cyan)),
+      hsl(var(--portal-purple)),
+      hsl(var(--portal-magenta)));
+  }
+  .portal-gradient-text {
+    background: linear-gradient(135deg,
+      hsl(var(--portal-cyan)),
+      hsl(var(--portal-purple)),
+      hsl(var(--portal-magenta)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Mesh background — animated radial blobs of cyan + purple in deep space */
+  .portal-mesh {
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(at 12% 8%, hsl(var(--portal-cyan) / 0.18) 0px, transparent 45%),
+      radial-gradient(at 88% 12%, hsl(var(--portal-purple) / 0.18) 0px, transparent 45%),
+      radial-gradient(at 50% 95%, hsl(var(--portal-magenta) / 0.10) 0px, transparent 45%);
+  }
+
+  /* Subtle grid overlay (Antigravity hallmark) */
+  .portal-grid {
+    background-image:
+      linear-gradient(hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .portal-glow-cyan {
+    box-shadow:
+      0 0 24px hsl(var(--portal-cyan) / 0.35),
+      0 0 60px hsl(var(--portal-cyan) / 0.15);
+  }
+  .portal-glow-purple {
+    box-shadow:
+      0 0 24px hsl(var(--portal-purple) / 0.35),
+      0 0 60px hsl(var(--portal-purple) / 0.15);
+  }
+
+  .portal-card {
+    position: relative;
+    background: hsl(var(--card) / 0.6);
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: blur(8px);
+    transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  }
+  .portal-card:hover {
+    transform: translateY(-4px);
+    border-color: hsl(var(--portal-cyan) / 0.55);
+    box-shadow:
+      0 10px 40px -10px hsl(var(--portal-cyan) / 0.35),
+      0 0 0 1px hsl(var(--portal-cyan) / 0.25) inset;
+  }
+
+  .portal-divider {
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      hsl(var(--portal-cyan) / 0.6),
+      hsl(var(--portal-purple) / 0.6),
+      transparent);
+  }
+
+  @keyframes portal-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+  .portal-live-dot {
+    animation: portal-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes portal-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -10px) scale(1.05); }
+  }
+  .portal-drift {
+    animation: portal-drift 12s ease-in-out infinite;
+  }
+
+  /* TikTok / Instagram themes (kept) */
   .tiktok-gradient {
     background: linear-gradient(135deg, #25F4EE, #FE2C55);
   }
-  
   .tiktok-glow {
     box-shadow: 0 0 15px rgba(37, 244, 238, 0.4),
                 0 0 30px rgba(254, 44, 85, 0.2);
   }
-  
-  .tiktok-border {
-    border-color: #25F4EE;
-  }
+  .tiktok-border { border-color: #25F4EE; }
 
-  /* Instagram Theme */
   .instagram-gradient {
     background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF);
   }
-  
   .instagram-glow {
     box-shadow: 0 0 15px rgba(221, 42, 123, 0.4),
                 0 0 30px rgba(129, 52, 175, 0.2);
   }
-  
-  .instagram-border {
-    border-color: #DD2A7B;
-  }
+  .instagram-border { border-color: #DD2A7B; }
 }
