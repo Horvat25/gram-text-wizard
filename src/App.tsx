@@ -17,6 +17,11 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import DataDeletion from "./pages/DataDeletion";
 import NotFound from "./pages/NotFound";
+import PortalHome from "./pages/portal/Home";
+import ArticlePage from "./pages/portal/ArticlePage";
+import CategoryPage from "./pages/portal/CategoryPage";
+import SearchPage from "./pages/portal/SearchPage";
+import About from "./pages/portal/About";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 
@@ -54,12 +59,21 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/install" element={<Install />} />
-              <Route path="/" element={
+
+              {/* Public Portal — Neural Update */}
+              <Route path="/" element={<PortalHome />} />
+              <Route path="/noticia/:slug" element={<ArticlePage />} />
+              <Route path="/categoria/:nome" element={<CategoryPage />} />
+              <Route path="/busca" element={<SearchPage />} />
+              <Route path="/sobre" element={<About />} />
+
+              {/* Admin (protected) */}
+              <Route path="/admin" element={
                 <ProtectedRoute>
                   <Index />
                 </ProtectedRoute>
               } />
-              <Route path="/settings" element={<Navigate to="/" replace />} />
+              <Route path="/settings" element={<Navigate to="/admin" replace />} />
               <Route path="/instagram/callback" element={<InstagramCallback />} />
               <Route path="/tiktok-callback" element={<TikTokCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />

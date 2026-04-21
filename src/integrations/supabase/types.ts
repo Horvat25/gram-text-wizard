@@ -513,6 +513,111 @@ export type Database = {
           },
         ]
       }
+      articles: {
+        Row: {
+          ai_model_used: string | null
+          author_name: string
+          category: string
+          content: string
+          cost_estimate: number | null
+          created_at: string
+          excerpt: string | null
+          hero_image_url: string | null
+          id: string
+          is_featured: boolean
+          linked_post_ids: string[] | null
+          og_image_url: string | null
+          published_at: string | null
+          reading_time_minutes: number | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          source_name: string | null
+          source_rss_item_id: string | null
+          source_url: string | null
+          status: string
+          subtitle: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          view_count: number
+          workspace_id: string
+        }
+        Insert: {
+          ai_model_used?: string | null
+          author_name?: string
+          category?: string
+          content: string
+          cost_estimate?: number | null
+          created_at?: string
+          excerpt?: string | null
+          hero_image_url?: string | null
+          id?: string
+          is_featured?: boolean
+          linked_post_ids?: string[] | null
+          og_image_url?: string | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          source_name?: string | null
+          source_rss_item_id?: string | null
+          source_url?: string | null
+          status?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          view_count?: number
+          workspace_id: string
+        }
+        Update: {
+          ai_model_used?: string | null
+          author_name?: string
+          category?: string
+          content?: string
+          cost_estimate?: number | null
+          created_at?: string
+          excerpt?: string | null
+          hero_image_url?: string | null
+          id?: string
+          is_featured?: boolean
+          linked_post_ids?: string[] | null
+          og_image_url?: string | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          source_name?: string | null
+          source_rss_item_id?: string | null
+          source_url?: string | null
+          status?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_source_rss_item_id_fkey"
+            columns: ["source_rss_item_id"]
+            isOneToOne: false
+            referencedRelation: "rss_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backups: {
         Row: {
           backup_type: string
@@ -1066,6 +1171,7 @@ export type Database = {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
       }
+      increment_article_views: { Args: { _slug: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_workspace_owner: {
         Args: { _user_id: string; _workspace_id: string }
