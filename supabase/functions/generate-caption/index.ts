@@ -235,15 +235,20 @@ serve(async (req) => {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;
     }
 
-    // Regras de tamanho diferenciadas: legendas profundas vs. curtas
+    // Regras de tamanho — SEMPRE 3 a 4 parágrafos com conteúdo valioso e CTA bem encaixada
     const sizeRules = isDeepCaption
-      ? `- ENTRE 800 E 1500 CARACTERES (legenda PROFUNDA — o leitor não vai pra lugar nenhum, ENTREGUE conteúdo)
-- 4 blocos separados por linha em branco (hook → contexto → análise → provocação)
-- Cada parágrafo: máximo 4 linhas
-- Sem hype vazio: cada frase precisa de informação OU opinião concreta`
-      : `- MÁXIMO 2-3 parágrafos curtos (no máximo 4 em casos especiais)
-- MÁXIMO 400-700 caracteres (seja CONCISO!)
-- Ninguém quer ler textão - vá DIRETO ao ponto`;
+      ? `- ENTRE 800 E 1400 CARACTERES (legenda PROFUNDA — o leitor não vai pra lugar nenhum, ENTREGUE conteúdo)
+- EXATAMENTE 3 a 4 parágrafos separados por linha em branco (NUNCA menos que 3, NUNCA mais que 4)
+- Estrutura: hook → contexto/dados → análise/visão → provocação OU CTA bem encaixada
+- Cada parágrafo: 2 a 4 linhas (curtos, escaneáveis)
+- Sem hype vazio: cada frase precisa de informação OU opinião concreta
+- A CTA precisa estar INTEGRADA naturalmente (não solta no final como aviso)`
+      : `- ENTRE 500 E 900 CARACTERES (conciso mas com substância)
+- EXATAMENTE 3 a 4 parágrafos separados por linha em branco (NUNCA menos que 3, NUNCA mais que 4)
+- Estrutura: hook → desenvolvimento com valor real → fechamento com CTA encaixada
+- Cada parágrafo: 2 a 3 linhas (curtos)
+- Conteúdo VALIOSO em cada parágrafo — sem encheção de linguiça
+- A CTA precisa fluir natural com o último parágrafo (não pode parecer enxertada)`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
