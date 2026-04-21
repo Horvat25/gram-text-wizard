@@ -2964,23 +2964,66 @@ async function createImageContent(
   }
   
   // STEP 2: Generate AI image based on topic
+  // IMPORTANTE: O prompt precisa ser ESPECÍFICO ao tema da notícia, não genérico.
+  // Usamos Gemini Flash Lite (barato) para extrair o conceito visual central.
+  let visualConcept = inspirationTopic;
+  try {
+    const conceptResp = await fetch(`https://ai.gateway.lovable.dev/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [{
+          role: 'user',
+          content: `Você é diretor de arte editorial tech. Com base na notícia abaixo, descreva em PT-BR um conceito visual ESPECÍFICO e SIMBÓLICO para uma imagem de Instagram (sem texto na imagem). Foque no ELEMENTO CENTRAL da história (produto, empresa, tecnologia, pessoa, cena) — não em conceitos genéricos como "código binário" ou "homem usando notebook".
+
+NOTÍCIA:
+Título: ${inspirationTopic}
+Contexto: ${(inspirationDesc || '').substring(0, 600)}
+
+Responda em 1-2 frases descrevendo a CENA visual concreta. Exemplo bom: "Close-up de um chip Nvidia H100 brilhando em azul neon sobre fundo escuro, cabos de fibra óptica saindo dele como tentáculos, atmosfera cinematográfica de servidor de IA". Exemplo ruim: "Imagem futurista sobre tecnologia".
+
+Apenas a descrição visual, sem introdução.`
+        }],
+      })
+    });
+    if (conceptResp.ok) {
+      const conceptData = await conceptResp.json();
+      const extracted = conceptData.choices?.[0]?.message?.content?.trim();
+      if (extracted && extracted.length > 20) {
+        visualConcept = extracted;
+        console.log('[AGENT] 🎨 Conceito visual extraído:', visualConcept.substring(0, 150));
+      }
+    }
+  } catch (conceptErr) {
+    console.log('[AGENT] Falha ao extrair conceito visual, usando título:', conceptErr);
+  }
+
   let imageUrl = null;
   try {
-    console.log('[AGENT] 🎨 Gerando imagem IA para post de reflexão...');
+    console.log('[AGENT] 🎨 Gerando imagem IA específica ao tema...');
     const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        prompt: `Imagem futurista e impactante sobre: ${inspirationTopic}. Estilo editorial tech, cores vibrantes, composição cinematográfica, sem texto na imagem`,
-        width: 1080,
-        height: 1080,
+        prompt: `${visualConcept}
+
+ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D cinematográfica. Iluminação dramática (rim light, neon, golden hour). Profundidade de campo. Cores vibrantes mas não saturadas. Composição em regra dos terços com ponto focal claro. SEM TEXTO, SEM LOGOS, SEM PALAVRAS na imagem (textos serão adicionados depois). A imagem deve dar ÊNFASE VISUAL ao tema central da notícia "${inspirationTopic.substring(0, 100)}" — não pode ser genérica.`,
+        format: 'square',
+        applyWatermark: false,
       })
     });
     
     if (imageResponse.ok) {
       const imageResult = await imageResponse.json();
-      imageUrl = imageResult.publicUrl || imageResult.url || imageResult.image_url;
-      console.log('[AGENT] ✅ Imagem IA gerada:', imageUrl ? 'sim' : 'não');
+      imageUrl = imageResult.imageUrl || imageResult.publicUrl || imageResult.url || imageResult.image_url;
+      console.log('[AGENT] ✅ Imagem IA gerada:', imageUrl ? `sim (${imageResult.modelUsed || 'unknown'})` : 'não');
+    } else {
+      const errTxt = await imageResponse.text().catch(() => '');
+      console.log('[AGENT] ❌ generate-image falhou:', imageResponse.status, errTxt.substring(0, 200));
     }
   } catch (e) {
     console.log('[AGENT] Erro ao gerar imagem IA:', e);
