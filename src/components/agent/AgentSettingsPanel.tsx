@@ -46,7 +46,7 @@ interface AgentSettingsPanelProps {
   trigger?: React.ReactNode;
   onConfigChange?: (config: any) => void;
   onClearChat?: () => void;
-  activePlatform?: 'instagram' | 'tiktok';
+  activePlatform?: 'instagram' | 'tiktok' | 'blog';
 }
 
 export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat, activePlatform = 'instagram' }: AgentSettingsPanelProps) {

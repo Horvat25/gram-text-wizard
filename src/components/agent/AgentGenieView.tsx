@@ -67,6 +67,18 @@ const PlatformToggle = ({ selected, onSelect }: { selected: Platform; onSelect: 
     >
       <TikTokIcon className="h-3.5 w-3.5" />
     </button>
+    <button
+      onClick={() => onSelect("blog")}
+      className={cn(
+        "p-1 rounded transition-all",
+        selected === "blog" 
+          ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      title="Blog Neural Update"
+    >
+      <Newspaper className="h-3.5 w-3.5" />
+    </button>
   </div>
 );
 
@@ -340,7 +352,62 @@ export default function AgentGenieView() {
 
   return (
     <div className="h-full">
-    {selectedPlatform === "tiktok" ? (
+    {selectedPlatform === "blog" ? (
+      /* Blog / Portal Neural Update — view dedicada (3ª plataforma) */
+      <div className="h-full flex flex-col relative overflow-hidden bg-background">
+        {/* Top Bar */}
+        <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1 border-b border-border/50">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="h-7 w-7 rounded-md bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
+              <Newspaper className="h-3.5 w-3.5 text-white" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold truncate">Portal Neural Update</h2>
+              <p className="text-[10px] text-muted-foreground truncate">Blog público — fonte da verdade</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1 px-2 text-[11px]"
+              onClick={() => window.open('/', '_blank', 'noopener,noreferrer')}
+              title="Abrir site público"
+            >
+              <Newspaper className="h-3 w-3" />
+              <span className="hidden sm:inline">Ver site</span>
+            </Button>
+            <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
+            <AgentSettingsPanel
+              activePlatform={selectedPlatform}
+              trigger={
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <Settings className="h-3.5 w-3.5" />
+                </Button>
+              }
+              onConfigChange={(config) => {
+                setAgentConfig(prev => ({
+                  ...prev,
+                  agent_name: config.agent_name,
+                  agent_avatar_url: config.agent_avatar_url,
+                  auto_post_enabled: config.auto_post_enabled
+                }));
+              }}
+            />
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 max-w-4xl mx-auto">
+              <ArticlesManagerTab />
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
+    ) : selectedPlatform === "tiktok" ? (
       <div className="h-full flex flex-col relative overflow-hidden bg-background">
         {/* 3D Background */}
         <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
@@ -578,18 +645,7 @@ export default function AgentGenieView() {
               <span className="hidden xs:inline sm:inline">Teste</span>
             </Button>
 
-            <Button
-              variant={showPortal ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showPortal && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('portal')}
-            >
-              <Newspaper className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Portal</span>
-            </Button>
+            {/* Portal removido — agora é a 3ª plataforma "Blog" no toggle à direita */}
 
             {/* Histórico por último — separado visualmente */}
             <div className="w-px h-4 bg-border/50 mx-0.5 shrink-0" />

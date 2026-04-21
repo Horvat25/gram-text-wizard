@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Platform = "instagram" | "tiktok";
+export type Platform = "instagram" | "tiktok" | "blog";
 
 interface PlatformSelectorProps {
   selected: Platform;
