@@ -658,40 +658,7 @@ export default function EditorialDirectionPanel() {
           </CardContent>
         </Card>
 
-        {/* ============ APRENDIZADO (se houver) ============ */}
-        {decisionsWithLearning.length > 0 && (
-          <Card className="border-amber-500/20">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-amber-500" />
-                <CardTitle className="text-sm">O que o agente aprendeu</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {decisionsWithLearning.map((d) => (
-                <div key={d.id} className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 space-y-1">
-                  <div className="flex items-center gap-2">
-                    {d.hypothesis_confirmed ? (
-                      <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-[10px]">
-                        ✓ confirmada
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-rose-500/10 text-rose-300 border-rose-500/30 text-[10px]">
-                        ✗ refutada
-                      </Badge>
-                    )}
-                    {d.expected_engagement != null && d.actual_engagement != null && (
-                      <span className="text-[10px] text-muted-foreground ml-auto">
-                        esperado {d.expected_engagement.toFixed(1)} → real {d.actual_engagement.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-foreground/85 leading-snug">{d.learning}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+        {/* Aprendizado removido — agora consolidado no Relatório Diário. */}
       </div>
     </ScrollArea>
   );
