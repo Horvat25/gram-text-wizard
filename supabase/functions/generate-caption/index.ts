@@ -235,15 +235,20 @@ serve(async (req) => {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;
     }
 
-    // Regras de tamanho diferenciadas: legendas profundas vs. curtas
+    // Regras de tamanho — SEMPRE 3 a 4 parágrafos com conteúdo valioso e CTA bem encaixada
     const sizeRules = isDeepCaption
-      ? `- ENTRE 800 E 1500 CARACTERES (legenda PROFUNDA — o leitor não vai pra lugar nenhum, ENTREGUE conteúdo)
-- 4 blocos separados por linha em branco (hook → contexto → análise → provocação)
-- Cada parágrafo: máximo 4 linhas
-- Sem hype vazio: cada frase precisa de informação OU opinião concreta`
-      : `- MÁXIMO 2-3 parágrafos curtos (no máximo 4 em casos especiais)
-- MÁXIMO 400-700 caracteres (seja CONCISO!)
-- Ninguém quer ler textão - vá DIRETO ao ponto`;
+      ? `- ENTRE 800 E 1400 CARACTERES (legenda PROFUNDA — o leitor não vai pra lugar nenhum, ENTREGUE conteúdo)
+- EXATAMENTE 3 a 4 parágrafos separados por linha em branco (NUNCA menos que 3, NUNCA mais que 4)
+- Estrutura: hook → contexto/dados → análise/visão → provocação OU CTA bem encaixada
+- Cada parágrafo: 2 a 4 linhas (curtos, escaneáveis)
+- Sem hype vazio: cada frase precisa de informação OU opinião concreta
+- A CTA precisa estar INTEGRADA naturalmente (não solta no final como aviso)`
+      : `- ENTRE 500 E 900 CARACTERES (conciso mas com substância)
+- EXATAMENTE 3 a 4 parágrafos separados por linha em branco (NUNCA menos que 3, NUNCA mais que 4)
+- Estrutura: hook → desenvolvimento com valor real → fechamento com CTA encaixada
+- Cada parágrafo: 2 a 3 linhas (curtos)
+- Conteúdo VALIOSO em cada parágrafo — sem encheção de linguiça
+- A CTA precisa fluir natural com o último parágrafo (não pode parecer enxertada)`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -341,18 +346,30 @@ ${sizeRules}
       }
     }
 
-    // CTA FINAL OBRIGATÓRIO — "Segue a gente" (3 variações alternadas)
-    // Aplica apenas se a caption NÃO já termina com convite a seguir
+    // CTA FINAL — só adiciona se o último parágrafo NÃO traz CTA/follow naturalmente
+    // (a IA já foi instruída a encaixar a CTA no 3º/4º parágrafo)
     const finalCtaVariants = [
-      '\n\n👉 Segue @neuralupdate pra acompanhar o futuro da tecnologia em primeira mão.',
-      '\n\n⚡ Curtiu? Segue @neuralupdate — todo dia uma análise nova sobre IA, robótica e o que vem por aí.',
-      '\n\n🚀 Não perde a próxima — segue @neuralupdate e ativa o sininho 🔔 pra receber tudo antes de virar manchete.',
+      '👉 Segue @neuralupdate pra acompanhar o futuro da tecnologia em primeira mão.',
+      '⚡ Curtiu a análise? Segue @neuralupdate — todo dia uma nova sobre IA, robótica e o que vem por aí.',
+      '🚀 Não perde a próxima — segue @neuralupdate e ativa o sininho 🔔.',
     ];
-    const lastParagraphLower = (caption.split('\n\n').pop() || '').toLowerCase();
-    const alreadyHasFollowCta = /\b(segue|siga|seguir|follow|@neuralupdate)\b/.test(lastParagraphLower);
+    const paragraphsCheck = caption.split('\n\n');
+    const lastParagraphLower = (paragraphsCheck[paragraphsCheck.length - 1] || '').toLowerCase();
+    const alreadyHasFollowCta = /\b(segue|siga|seguir|follow|@neuralupdate|comenta|salva|compartilha)\b/.test(lastParagraphLower);
+
     if (!alreadyHasFollowCta) {
+      // Anexa ao final do último parágrafo (não cria parágrafo novo) — fica mais integrado
       const variant = finalCtaVariants[Math.floor(Math.random() * finalCtaVariants.length)];
-      caption = caption.trimEnd() + variant;
+      paragraphsCheck[paragraphsCheck.length - 1] = paragraphsCheck[paragraphsCheck.length - 1].trimEnd() + '\n\n' + variant;
+      caption = paragraphsCheck.join('\n\n');
+    }
+
+    // Garantir limite de 4 parágrafos (junta excesso no penúltimo)
+    const finalParagraphs = caption.split('\n\n');
+    if (finalParagraphs.length > 4) {
+      const head = finalParagraphs.slice(0, 3);
+      const tail = finalParagraphs.slice(3).join(' ');
+      caption = [...head, tail].join('\n\n');
     }
 
     console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
