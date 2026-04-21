@@ -2844,6 +2844,77 @@ async function executeListAffiliateLinks(supabase: any, workspaceId: string) {
   }
 }
 
+// Execute create_ai_image_post — Delegates to ai-agent-core with forceContentType='image'
+// This is the SAME pipeline used by the Test tab AND the autonomous cron, ensuring 100%
+// consistency in Imagem IA generation across all entry points (chat, teste, automático).
+async function executeCreateAiImagePost(supabase: any, userId: string, workspaceId: string, args: any) {
+  const { topic } = args || {};
+  console.log('[CREATE_AI_IMAGE_POST] Delegating to ai-agent-core, topic:', topic || '(auto)');
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    // Create placeholder so frontend can poll (mirrors generate-test-content flow)
+    const { data: placeholder, error: insertErr } = await supabase
+      .from('posts')
+      .insert({
+        workspace_id: workspaceId,
+        user_id: userId,
+        caption: '⏳ Gerando imagem IA via chat...',
+        status: 'generating',
+        media_type: 'image',
+        post_type: 'reflexão',
+      })
+      .select()
+      .single();
+
+    if (insertErr) throw insertErr;
+
+    // Fire ai-agent-core in background using SAME parameters as the Test tab
+    const agentUrl = `${supabaseUrl}/functions/v1/ai-agent-core`;
+    const backgroundTask = fetch(agentUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`,
+      },
+      body: JSON.stringify({
+        workspaceId,
+        userId,
+        trigger: 'chat',
+        forceContentType: 'image',
+        skipScheduleCheck: true,
+        skipLimitCheck: true,
+        placeholderPostId: placeholder.id,
+        feedback: topic ? `Tema sugerido pelo usuário: ${topic}` : undefined,
+      }),
+    }).catch(async (err) => {
+      console.error('[CREATE_AI_IMAGE_POST] Background fetch error:', err?.message || err);
+      await supabase.from('posts').update({
+        status: 'failed',
+        error_message: `Erro ao gerar imagem IA: ${err?.message || 'unknown'}`,
+      }).eq('id', placeholder.id);
+    });
+
+    // @ts-ignore - keep runtime alive until agent finishes
+    if (typeof EdgeRuntime !== 'undefined' && (EdgeRuntime as any)?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(backgroundTask);
+    }
+
+    return {
+      success: true,
+      message: `🎨 Imagem IA sendo gerada em segundo plano! Vou criar usando o mesmo pipeline da aba Teste:\n\n• Imagem gerada por IA específica ao tema\n• Headline em SVG overlay (sem alucinação)\n• Legenda 3-4 parágrafos com CTA\n\nVai aparecer em Histórico/Fila assim que ficar pronta (~1-2 min).`,
+      post_id: placeholder.id,
+      status: 'generating',
+    };
+  } catch (error: any) {
+    console.error('[CREATE_AI_IMAGE_POST] Error:', error);
+    return { success: false, message: `❌ Erro ao iniciar geração de imagem IA: ${error?.message || 'unknown'}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
