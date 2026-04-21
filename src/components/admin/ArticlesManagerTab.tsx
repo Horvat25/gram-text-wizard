@@ -137,29 +137,17 @@ const ArticlesManagerTab = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Portal Neural Update</h2>
-          <p className="text-sm text-muted-foreground">
-            Artigos publicados em <code className="text-xs bg-muted px-1 rounded">neuralupdate</code>
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={handleGenerate} disabled={generating}>
-            {generating ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Sparkles className="h-4 w-4 mr-2" />
-            )}
-            Gerar artigo agora
-          </Button>
-          <Button variant="outline" asChild>
-            <a href="/" target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4 mr-2" /> Ver portal
-            </a>
-          </Button>
-        </div>
+    <div className="space-y-3">
+      {/* Toolbar compacta — header principal vem do AgentGenieView */}
+      <div className="flex items-center justify-end gap-2">
+        <Button size="sm" onClick={handleGenerate} disabled={generating}>
+          {generating ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+          )}
+          Gerar artigo
+        </Button>
       </div>
 
       {loading ? (
@@ -167,74 +155,97 @@ const ArticlesManagerTab = () => {
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : articles.length === 0 ? (
-        <Card className="p-10 text-center">
-          <Plus className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-          <h3 className="font-semibold mb-1">Nenhum artigo ainda</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Clique em "Gerar artigo agora" para criar o primeiro artigo a partir do feed RSS.
+        <Card className="p-8 text-center">
+          <Plus className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+          <h3 className="font-semibold text-sm mb-1">Nenhum artigo ainda</h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Clique em "Gerar artigo" para criar o primeiro a partir do feed RSS.
           </p>
-          <Button onClick={handleGenerate} disabled={generating}>
-            {generating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+          <Button size="sm" onClick={handleGenerate} disabled={generating}>
+            {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
             Gerar primeiro artigo
           </Button>
         </Card>
       ) : (
         <div className="space-y-2">
           {articles.map((a) => (
-            <Card key={a.id} className="p-4">
-              <div className="flex gap-4">
-                {a.hero_image_url && (
-                  <img
-                    src={a.hero_image_url}
-                    alt=""
-                    className="w-24 h-24 object-cover rounded-md shrink-0"
-                  />
-                )}
+            <Card key={a.id} className="p-2.5">
+              <div className="flex gap-2.5">
+                {/* Thumbnail com fallback */}
+                <div className="w-16 h-16 rounded-md shrink-0 overflow-hidden bg-muted flex items-center justify-center">
+                  {a.hero_image_url ? (
+                    <img
+                      src={a.hero_image_url}
+                      alt=""
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <Newspaper className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <Badge variant={a.status === "published" ? "default" : "secondary"}>
-                          {a.status === "published" ? "Publicado" : "Rascunho"}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1 mb-1 flex-wrap">
+                        <Badge
+                          variant={a.status === "published" ? "default" : "secondary"}
+                          className="text-[10px] px-1.5 py-0 h-4"
+                        >
+                          {a.status === "published" ? "Pub" : "Rascunho"}
                         </Badge>
-                        <Badge variant="outline">{a.category}</Badge>
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
+                          {a.category}
+                        </Badge>
                         {a.is_featured && (
-                          <Badge variant="secondary" className="gap-1">
-                            <Star className="h-3 w-3" /> Destaque
+                          <Badge variant="secondary" className="gap-1 text-[10px] px-1.5 py-0 h-4">
+                            <Star className="h-2.5 w-2.5" /> Destaque
                           </Badge>
                         )}
                       </div>
-                      <h3 className="font-semibold truncate">{a.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {formatArticleDate(a.published_at)} • {a.view_count} leituras • /noticia/{a.slug}
+                      <h3 className="font-semibold text-sm leading-tight line-clamp-2">{a.title}</h3>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                        {formatArticleDate(a.published_at)} • {a.view_count} leituras
                       </p>
                     </div>
-                    <div className="flex gap-1 shrink-0">
+                    <div className="flex gap-0.5 shrink-0">
                       <Button
                         size="icon"
                         variant="ghost"
+                        className="h-7 w-7"
                         onClick={() => toggleFeatured(a)}
                         title={a.is_featured ? "Remover destaque" : "Marcar como destaque"}
                       >
-                        <Star className={`h-4 w-4 ${a.is_featured ? "fill-yellow-500 text-yellow-500" : ""}`} />
+                        <Star className={`h-3.5 w-3.5 ${a.is_featured ? "fill-yellow-500 text-yellow-500" : ""}`} />
                       </Button>
                       {a.status === "published" && (
-                        <Button size="icon" variant="ghost" asChild title="Ver no portal">
+                        <Button size="icon" variant="ghost" className="h-7 w-7" asChild title="Ver no portal">
                           <a href={`/noticia/${a.slug}`} target="_blank" rel="noopener noreferrer">
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3.5 w-3.5" />
                           </a>
                         </Button>
                       )}
-                      <Button size="icon" variant="ghost" onClick={() => setEditing(a)} title="Editar">
-                        <Edit className="h-4 w-4" />
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => setEditing(a)}
+                        title="Editar"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
                       </Button>
                       <Button
                         size="icon"
                         variant="ghost"
+                        className="h-7 w-7"
                         onClick={() => handleDelete(a.id)}
                         title="Excluir"
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
                       </Button>
                     </div>
                   </div>
