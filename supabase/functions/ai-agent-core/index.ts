@@ -1630,24 +1630,30 @@ async function createCarouselContent(
   
   if (lovableApiKey) {
     try {
-      const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram.
+      const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram em PT-BR.
 
 TEMA DO CARROSSEL: "${bestArticle.title}"
 CONTEXTO: ${bestArticle.description || bestArticle.title}
 FONTE: ${bestArticle.source_name || 'Tech News'}
 
-Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema:
+Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema, formando uma NARRATIVA CONTÍNUA:
 
-SLIDE 1 - HOOK: Título impactante que gera curiosidade.
-SLIDE 2 - CONTEXTO: Explicação clara do que está acontecendo e por quê é importante.
-SLIDE 3 - IMPACTO + AÇÃO: Como isso afeta as pessoas e o que devem saber/fazer.
+SLIDE 1 - HOOK: Título impactante que abre o gancho da história.
+SLIDE 2 - DESENVOLVIMENTO: Continua a ideia do slide 1, aprofundando o ponto central. NÃO repete o slide 1, COMPLEMENTA.
+SLIDE 3 - CONCLUSÃO + CTA visual: Fecha a narrativa com o impacto/conclusão. Termina convidando a ler mais.
 
-REGRAS:
-- Todos os 3 slides são sobre o MESMO tema, aprofundando progressivamente
-- slideTitle: máximo 8 palavras, impactante, em CAIXA ALTA
-- slideText: 2-3 frases curtas e diretas por slide
-- imagePrompt: descrição visual para gerar imagem IA coerente com o slide (em inglês)
-- As 3 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, cores, ambiente)
+REGRAS CRÍTICAS DE CONTINUIDADE:
+- Os 3 slideTitle devem SE CONECTAR: leia 1→2→3 e tem que fluir como uma frase/história única
+- Slide 2 começa de onde slide 1 parou (use conectivos: "Mas...", "Por isso...", "O resultado...", "Agora...")
+- Slide 3 entrega a conclusão prometida nos slides anteriores
+- NÃO repita o mesmo título em slides diferentes
+- slideTitle: máximo 7 palavras, impactante, em CAIXA ALTA, SEM emojis
+- slideText: 2 frases curtas e diretas que expandem o título
+- imagePrompt: descrição visual EM INGLÊS, coerente com o slide
+- As 3 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, paleta, ambiente)
+
+IMPORTANTE — FERRAMENTAS:
+Se o tema mencionar ferramentas/produtos de tecnologia (ChatGPT, Gemini, Claude, Midjourney, Sora, DALL-E, Cursor, Lovable, Notion AI, Perplexity, GitHub Copilot, etc.), liste-as no campo "tools_mentioned" para que o agente inclua links oficiais na legenda.
 
 Responda em JSON:
 {
@@ -1655,7 +1661,8 @@ Responda em JSON:
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." }
-  ]
+  ],
+  "tools_mentioned": ["nome da ferramenta", "..."]
 }`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -1680,7 +1687,8 @@ Responda em JSON:
           const parsed = JSON.parse(content);
           if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length >= 3) {
             slideContents = parsed.slides.slice(0, 3);
-            console.log('[AGENT] ✅ 3 slides educacionais gerados pela IA');
+            (slideContents as any).tools_mentioned = Array.isArray(parsed.tools_mentioned) ? parsed.tools_mentioned : [];
+            console.log('[AGENT] ✅ 3 slides progressivos gerados pela IA. Ferramentas:', (slideContents as any).tools_mentioned);
           }
         }
       }
@@ -1694,13 +1702,13 @@ Responda em JSON:
     console.warn('[AGENT] ⚠️ IA não gerou slides, usando fallback contextual');
     const topic = bestArticle.title;
     const desc = bestArticle.description || topic;
-    // Generate contextual fallback headlines based on the actual topic (not generic phrases)
     const topicWords = topic.split(' ').slice(0, 5).join(' ').toUpperCase();
     slideContents = [
       { slideTitle: topicWords, slideText: desc, imagePrompt: `Dramatic tech scene about: ${topic}. Dark aesthetic, neon accents. NO TEXT.` },
-      { slideTitle: `O IMPACTO DE ${topicWords.split(' ').slice(0, 3).join(' ')}`, slideText: desc, imagePrompt: `Impact visualization about: ${topic}. Same style. NO TEXT.` },
-      { slideTitle: `O FUTURO APÓS ${topicWords.split(' ').slice(0, 3).join(' ')}`, slideText: `As consequências dessa mudança são profundas.`, imagePrompt: `Future tech horizon about: ${topic}. Same style. NO TEXT.` },
+      { slideTitle: `POR QUE ISSO IMPORTA`, slideText: desc, imagePrompt: `Impact visualization about: ${topic}. Same style. NO TEXT.` },
+      { slideTitle: `O QUE VEM A SEGUIR`, slideText: `As consequências dessa mudança são profundas.`, imagePrompt: `Future tech horizon about: ${topic}. Same style. NO TEXT.` },
     ];
+    (slideContents as any).tools_mentioned = [];
   }
   
   // STEP 2.5: Review ALL slide texts with review-portuguese BEFORE image generation/overlay
@@ -1747,9 +1755,14 @@ Responda em JSON:
     console.log('[AGENT] Erro geração IA carrossel:', e);
   }
   
-  // STEP 4: Apply text overlays to each slide (headline burned into image)
+  // STEP 4: Apply text overlays to each slide
+  // - Slides 1 e 2: apenas headline (sem CTA, sem watermark grande) — visual limpo
+  // - Último slide: headline + "LEIA A LEGENDA 👇" + watermark Neural Update
   const overlaidImages: string[] = [];
-  for (let i = 0; i < Math.min(carouselImages.length, slideContents.length); i++) {
+  const totalSlides = Math.min(carouselImages.length, slideContents.length);
+  for (let i = 0; i < totalSlides; i++) {
+    const isLastSlide = i === totalSlides - 1;
+    const slidePosition = isLastSlide ? 'last' : (i === 0 ? 'first' : 'middle');
     try {
       const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
@@ -1757,7 +1770,9 @@ Responda em JSON:
         body: JSON.stringify({
           imageUrl: carouselImages[i],
           headlineText: slideContents[i].slideTitle,
-          watermarkText: i === carouselImages.length - 1 ? 'Neural Update' : undefined, // Watermark only on last slide
+          mediaType: 'carousel',
+          slidePosition,
+          watermarkText: 'Neural Update',
         })
       });
       
@@ -1778,29 +1793,97 @@ Responda em JSON:
   
   console.log(`[AGENT] Carrossel com ${finalImages.length} slides finais`);
   
-  // STEP 5: Generate RICH educational caption
+  // STEP 5: Generate RICH educational caption + automatic tool links
+  // Mapeamento curado de ferramentas → links oficiais (agrega valor ao lead)
+  const TOOL_LINKS: Record<string, string> = {
+    'chatgpt': 'https://chat.openai.com',
+    'gpt-4': 'https://chat.openai.com',
+    'gpt-5': 'https://chat.openai.com',
+    'openai': 'https://openai.com',
+    'gemini': 'https://gemini.google.com',
+    'google gemini': 'https://gemini.google.com',
+    'claude': 'https://claude.ai',
+    'anthropic': 'https://anthropic.com',
+    'midjourney': 'https://midjourney.com',
+    'sora': 'https://openai.com/sora',
+    'dall-e': 'https://openai.com/dall-e-3',
+    'dalle': 'https://openai.com/dall-e-3',
+    'stable diffusion': 'https://stability.ai',
+    'runway': 'https://runwayml.com',
+    'pika': 'https://pika.art',
+    'cursor': 'https://cursor.com',
+    'lovable': 'https://lovable.dev',
+    'notion ai': 'https://notion.so/product/ai',
+    'notion': 'https://notion.so',
+    'perplexity': 'https://perplexity.ai',
+    'github copilot': 'https://github.com/features/copilot',
+    'copilot': 'https://copilot.microsoft.com',
+    'elevenlabs': 'https://elevenlabs.io',
+    'suno': 'https://suno.com',
+    'udio': 'https://udio.com',
+    'v0': 'https://v0.dev',
+    'figma': 'https://figma.com',
+    'canva': 'https://canva.com',
+    'grok': 'https://x.ai',
+    'deepseek': 'https://deepseek.com',
+    'llama': 'https://llama.meta.com',
+    'meta ai': 'https://meta.ai',
+  };
+
+  // Detect tools in slide content + article title/description (case-insensitive)
+  const detectTools = (text: string): { name: string; url: string }[] => {
+    const found: { name: string; url: string }[] = [];
+    const lower = text.toLowerCase();
+    const seen = new Set<string>();
+    for (const [keyword, url] of Object.entries(TOOL_LINKS)) {
+      if (lower.includes(keyword) && !seen.has(url)) {
+        // Use the proper-cased version (capitalize)
+        const properName = keyword.replace(/\b\w/g, c => c.toUpperCase());
+        found.push({ name: properName, url });
+        seen.add(url);
+      }
+    }
+    return found;
+  };
+
+  const aiSuggestedTools: string[] = (slideContents as any).tools_mentioned || [];
+  const haystack = [
+    bestArticle.title,
+    bestArticle.description || '',
+    slideContents.map(s => `${s.slideTitle} ${s.slideText}`).join(' '),
+    aiSuggestedTools.join(' '),
+  ].join(' ');
+  const detectedTools = detectTools(haystack).slice(0, 4); // máx 4 links para não poluir
+  console.log('[AGENT] 🔗 Ferramentas detectadas no carrossel:', detectedTools.map(t => t.name));
+
   let caption = '';
   let hashtags: string[] = ['#tecnologia', '#ia', '#inovacao', '#futuro', '#carrossel'];
   
+  const toolsBlock = detectedTools.length > 0
+    ? `\n\nFERRAMENTAS MENCIONADAS (inclua um bloco "🔗 FERRAMENTAS" no fim da legenda, ANTES das hashtags, listando cada uma com nome + link curto):\n${detectedTools.map(t => `- ${t.name}: ${t.url}`).join('\n')}`
+    : '';
+
   const captionPrompt = `Crie uma legenda RICA e EDUCACIONAL para um carrossel do Instagram sobre: "${bestArticle.title}"
 
-Os 3 slides do carrossel cobrem:
+Os 3 slides do carrossel cobrem (em ordem narrativa):
 1. ${slideContents[0]?.slideTitle}: ${slideContents[0]?.slideText}
 2. ${slideContents[1]?.slideTitle}: ${slideContents[1]?.slideText}
 3. ${slideContents[2]?.slideTitle}: ${slideContents[2]?.slideText}
 
-ESTRUTURA DA LEGENDA (obrigatória):
+ESTRUTURA DA LEGENDA (obrigatória, 3 a 4 parágrafos):
 🔥 HOOK (1 linha): Frase impactante que complementa o slide 1 sem repetir
-📌 CONTEXTO (2-3 linhas): Explicação concisa do tema com dados ou fatos
-💡 INSIGHT VALIOSO (2-3 linhas): Análise profunda, opinião ou previsão que agrega valor real
-👉 CTA (1 linha): Pergunta que convida ao debate
+📌 CONTEXTO + INSIGHT (2-3 linhas): Explicação concisa + análise valiosa
+💡 IMPACTO PRÁTICO (2-3 linhas): O que isso muda para o leitor (lead)
+👉 CTA (1 linha): Pergunta + "siga @neuralupdate para mais"
+${toolsBlock}
 
 REGRAS:
-- Legenda com VALOR REAL, não genérica
+- Legenda com VALOR REAL ao lead, não genérica
 - Tom: especialista acessível, não robótico
 - Máximo 250 palavras
 - Use emojis com moderação (máx 5)
 - Inclua fonte: ${bestArticle.source_name || 'Tech News'}
+- ${detectedTools.length > 0 ? 'OBRIGATÓRIO: incluir o bloco de ferramentas com links — isso agrega valor real ao lead' : 'Sem ferramentas detectadas neste tema'}
 - Gere 8-12 hashtags relevantes
 
 Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
@@ -1834,7 +1917,18 @@ Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
   
   // Fallback caption
   if (!caption) {
-    caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente!`;
+    caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente e siga @neuralupdate!`;
+  }
+
+  // SAFETY NET: se a IA esqueceu de incluir os links das ferramentas, anexamos antes das hashtags
+  if (detectedTools.length > 0) {
+    const captionLower = caption.toLowerCase();
+    const missingTools = detectedTools.filter(t => !captionLower.includes(t.url.toLowerCase()));
+    if (missingTools.length > 0) {
+      const toolsSection = `\n\n🔗 FERRAMENTAS:\n${missingTools.map(t => `• ${t.name}: ${t.url}`).join('\n')}`;
+      caption = caption.trimEnd() + toolsSection;
+      console.log('[AGENT] ⚠️ Ferramentas anexadas pelo safety net:', missingTools.map(t => t.name));
+    }
   }
   
   // Review caption for spelling
