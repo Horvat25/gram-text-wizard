@@ -132,12 +132,12 @@ const decisionLabel = (d: string) => {
   return map[d] ?? { label: d, color: "bg-zinc-500/10 text-zinc-300 border-zinc-500/30" };
 };
 
-// Plano gradual de "ramp-up" — semana atual desde a última segunda
+// Plano gradual de "ramp-up" para o BLOG (independente do Instagram/TikTok)
 const RAMPUP_PLAN = [
-  { week: 1, articlesPerDay: 1, postsPerDay: 1, label: "Semana 1 — Aquecimento" },
-  { week: 2, articlesPerDay: 2, postsPerDay: 2, label: "Semana 2 — Validação" },
-  { week: 3, articlesPerDay: 3, postsPerDay: 2, label: "Semana 3 — Aceleração" },
-  { week: 4, articlesPerDay: 4, postsPerDay: 3, label: "Semana 4+ — Ritmo pleno" },
+  { week: 1, articlesPerDay: 1, label: "Semana 1 — Aquecimento" },
+  { week: 2, articlesPerDay: 2, label: "Semana 2 — Validação" },
+  { week: 3, articlesPerDay: 3, label: "Semana 3 — Aceleração" },
+  { week: 4, articlesPerDay: 4, label: "Semana 4+ — Ritmo pleno" },
 ];
 
 export default function EditorialDirectionPanel() {
