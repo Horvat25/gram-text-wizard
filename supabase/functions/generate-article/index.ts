@@ -410,15 +410,24 @@ ${researchBriefing}
 - Sem clichês ("no mundo digital atual", "cenário cada vez mais", "explosão de IA", "revolução tecnológica").
 - Use a categoria MAIS específica entre: ia, gadgets, futuro, mercado, ciencia, tecnologia.
 
-# ESTRUTURA OBRIGATÓRIA DO CORPO (Markdown)
-Total: 700-1000 palavras. NÃO escreva como bloco único. SEMPRE use:
+# ESTRUTURA OBRIGATÓRIA DO CORPO (Markdown rigoroso)
+Total: 700-1000 palavras. NÃO escreva como bloco único. SEMPRE siga:
+
 1. **Lide forte** (1 parágrafo curto de abertura, 2-3 frases, prende o leitor).
-2. **## Subtítulo H2** (3 a 5 seções temáticas, cada uma com nome curto e específico — não use "Introdução", "Conclusão").
-3. Em cada seção: 1-2 parágrafos curtos (máx. 4 frases cada).
-4. Pelo menos **1 lista com bullets** (use "- ") em alguma seção, listando características, fatos ou implicações.
-5. Pelo menos **1 frase em destaque** usando blockquote ("> ") com uma análise impactante de Horvat.
-6. **Negrito** (**texto**) para 3-5 termos-chave ao longo do texto.
-7. Última seção: **## O que esperar** ou **## Próximos passos** com perspectiva analítica de Horvat (não use "Conclusão").
+
+2. **OBRIGATÓRIO: 3 a 5 seções** com cabeçalho **## Título da Seção** (Markdown H2 com dois "#" e espaço).
+   ⚠️ NUNCA escreva o título de seção como texto solto numa linha. SEMPRE prefixe com "## " — exemplo correto: "## Impacto no Consumidor". Exemplo ERRADO: "Impacto no Consumidor" (sem o ##).
+   Use nomes curtos e específicos — NÃO use "Introdução", "Conclusão", "Desenvolvimento".
+
+3. Em cada seção: 1-2 parágrafos curtos (máx. 4 frases cada). Sempre uma linha em branco entre parágrafos.
+
+4. Pelo menos **1 lista com bullets** em alguma seção. Cada item começa com "- " (hífen e espaço) numa linha própria.
+
+5. Pelo menos **1 frase em destaque** usando blockquote: linha começando com "> " contendo uma análise impactante de Horvat.
+
+6. **Negrito** com \`**texto**\` para 3-5 termos-chave ao longo do artigo.
+
+7. Última seção OBRIGATORIAMENTE com cabeçalho "## O que esperar" ou "## Próximos passos" (com ## no começo).
 
 # RETORNE EXCLUSIVAMENTE JSON VÁLIDO neste formato (sem texto antes/depois):
 {
@@ -427,7 +436,7 @@ Total: 700-1000 palavras. NÃO escreva como bloco único. SEMPRE use:
   "excerpt": "Resumo de 1-2 frases para preview do card (max 180 chars)",
   "category": "ia|gadgets|futuro|mercado|ciencia|tecnologia",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "body": "Corpo completo em Markdown seguindo a ESTRUTURA OBRIGATÓRIA",
+  "body": "Corpo completo em Markdown seguindo a ESTRUTURA OBRIGATÓRIA — TODA seção começa com '## '",
   "seo_title": "Título otimizado para Google (max 60 chars)",
   "seo_description": "Meta description (max 155 chars)"
 }`;

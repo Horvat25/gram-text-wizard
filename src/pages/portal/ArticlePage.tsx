@@ -249,14 +249,17 @@ const ArticlePage = () => {
 
         <div
           className="article-body prose prose-lg max-w-none dark:prose-invert
-            prose-headings:font-bold prose-headings:tracking-tight
-            prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-border/40
-            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-            prose-p:leading-relaxed prose-p:text-foreground/90 prose-p:my-5
+            prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground
+            prose-h2:text-2xl md:prose-h2:text-[1.7rem] prose-h2:mt-12 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b-2 prose-h2:border-primary/30 prose-h2:leading-tight
+            prose-h3:text-xl prose-h3:mt-9 prose-h3:mb-3 prose-h3:text-primary/95
+            prose-p:leading-[1.8] prose-p:text-foreground/85 prose-p:my-5 prose-p:text-[1.05rem]
             prose-strong:text-foreground prose-strong:font-semibold
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-            prose-ul:my-5 prose-li:my-1.5 prose-li:marker:text-primary
-            prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-muted/30 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-foreground"
+            prose-em:text-foreground/95
+            prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-a:font-medium
+            prose-code:text-primary prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-medium prose-code:before:content-none prose-code:after:content-none
+            prose-ul:my-6 prose-ul:space-y-2 prose-li:my-1 prose-li:marker:text-primary prose-li:leading-relaxed
+            prose-ol:my-6 prose-ol:space-y-2
+            prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-foreground prose-blockquote:my-8 prose-blockquote:text-[1.1rem] prose-blockquote:leading-relaxed prose-blockquote:shadow-sm"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
         />
 
