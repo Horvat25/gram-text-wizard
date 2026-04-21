@@ -155,25 +155,17 @@ const ArticlePage = () => {
         )}
 
         <div
-          className="article-body prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary"
+          className="article-body prose prose-lg max-w-none dark:prose-invert
+            prose-headings:font-bold prose-headings:tracking-tight
+            prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-border/40
+            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+            prose-p:leading-relaxed prose-p:text-foreground/90 prose-p:my-5
+            prose-strong:text-foreground prose-strong:font-semibold
+            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+            prose-ul:my-5 prose-li:my-1.5 prose-li:marker:text-primary
+            prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-muted/30 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-foreground"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
         />
-
-        {article.source_url && article.source_name && (
-          <div className="mt-10 p-4 rounded-lg bg-muted/50 border border-border">
-            <p className="text-sm text-muted-foreground">
-              Fonte original:{" "}
-              <a
-                href={article.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
-              >
-                {article.source_name} <ExternalLink className="h-3 w-3" />
-              </a>
-            </p>
-          </div>
-        )}
 
         {article.tags && article.tags.length > 0 && (
           <div className="mt-8 flex flex-wrap gap-2">
