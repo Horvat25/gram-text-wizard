@@ -3054,23 +3054,19 @@ async function createImageContent(
     }
   }
   
-  // STEP 3: Generate OPINION/REFLECTION caption (NOT news format)
+  // STEP 3: Generate DEEP REFLECTION caption (4 blocks, 800-1500 chars)
+  // O lead NÃO clica em link nenhum — todo o ouro precisa estar AQUI na legenda.
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      topic: `${inspirationTopic}. ${inspirationDesc}`,
-      postType: 'engajamento',
-      customInstructions: `Este é um post de REFLEXÃO/OPINIÃO sobre tecnologia, NÃO uma notícia.
-      
-Estrutura:
-1. PROVOCAÇÃO - Uma afirmação forte ou pergunta provocativa sobre o tema
-2. CONTEXTO PESSOAL - Sua análise/opinião como especialista em tech
-3. CTA DE ENGAJAMENTO - Pergunta aberta para gerar discussão nos comentários
+      topic: `${inspirationTopic}\n\nContexto da notícia (use como matéria-prima para análise):\n${inspirationDesc || 'sem descrição adicional'}`,
+      postType: 'reflexao_profunda',
+      mediaType: 'image',
+      customInstructions: `Tom: ${plan.tone || 'provocativo, analítico, visionário'}.
+${plan.cta || ''}
 
-Tom: ${plan.tone || 'provocativo e visionário'}
-NÃO inclua "Fonte:" ou links de artigos. Este é conteúdo ORIGINAL, não curadoria.
-Use emojis com moderação. ${plan.cta || ''}`
+LEMBRE: a headline na imagem já criou tensão. Você precisa ENTREGAR aqui — análise de quem entende, dados concretos, visão de futuro. Sem repetir a headline. Sem "Fonte:" (este é conteúdo de OPINIÃO, não curadoria de notícia).`
     })
   });
   
