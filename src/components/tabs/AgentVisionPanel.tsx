@@ -227,7 +227,7 @@ export default function AgentVisionPanel() {
     return () => {
       active = false;
     };
-  }, [currentWorkspace?.id]);
+  }, [currentWorkspace?.id, reloadKey]);
 
   if (loading) {
     return (
