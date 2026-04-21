@@ -609,7 +609,7 @@ export default function ContentTestTab() {
   const approveAndPublish = async (postId: string, feedbackText: string, rating: number) => {
     try {
       if (feedbackText || rating) {
-        await supabase.from('agent_decisions').insert({
+        const { error: feedbackError } = await supabase.from('agent_decisions').insert({
           user_id: user!.id,
           workspace_id: currentWorkspace!.id,
           post_id: postId,
@@ -618,6 +618,11 @@ export default function ContentTestTab() {
           expected_engagement: rating,
           learning: `Aprovado (${rating}/5): ${feedbackText}`,
         });
+        if (feedbackError) {
+          console.error('Erro ao salvar feedback:', feedbackError);
+          toast.error(`Erro ao salvar feedback: ${feedbackError.message}`);
+          return;
+        }
       }
 
       const scheduledTime = new Date();
@@ -640,8 +645,9 @@ export default function ContentTestTab() {
       }));
 
       toast.success('Aprovado! Agendado para daqui 1 hora');
-    } catch (e) {
-      toast.error('Erro ao agendar');
+    } catch (e: any) {
+      console.error('approveAndPublish error:', e);
+      toast.error(e?.message || 'Erro ao agendar');
     }
   };
 
