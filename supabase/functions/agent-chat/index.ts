@@ -262,6 +262,20 @@ const AGENT_TOOLS = [
   {
     type: "function",
     function: {
+      name: "create_ai_image_post",
+      description: "🖼️✨ Cria um post de IMAGEM IA pura (sem RSS, sem URL externa) usando o MESMO pipeline da aba Teste e do agente automático: imagem gerada por IA + headline em SVG overlay + legenda 3-4 parágrafos com CTA. Use quando o usuário pedir 'cria uma imagem IA', 'imagem com IA', 'post de imagem' (sem mencionar notícia ou link).",
+      parameters: {
+        type: "object",
+        properties: {
+          topic: { type: "string", description: "Tema/assunto opcional para guiar a geração. Se vazio, o agente escolhe um tema baseado na estratégia atual." }
+        },
+        required: []
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "create_marketing_video",
       description: "🎬💰 Cria um VÍDEO DE MARKETING promovendo um produto de afiliado cadastrado. Use SEMPRE que o usuário pedir: 'vídeo de marketing', 'reels de marketing', 'vídeo de afiliado', 'cria um vídeo de marketing'. Busca automaticamente o link de afiliado e cria o vídeo com o link na legenda.",
       parameters: {
