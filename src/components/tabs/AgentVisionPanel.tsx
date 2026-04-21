@@ -35,6 +35,15 @@ export default function AgentVisionPanel() {
   const [weekRange, setWeekRange] = useState<string>('');
   const [topTypes, setTopTypes] = useState<{ type: string; avg: number }[]>([]);
 
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // Listen to global sync events from Crescimento tab
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener('horvat:metrics-synced', handler);
+    return () => window.removeEventListener('horvat:metrics-synced', handler);
+  }, []);
+
   useEffect(() => {
     if (!currentWorkspace?.id) return;
     let active = true;
