@@ -199,8 +199,8 @@ const ArticlesManagerTab = () => {
                         </Badge>
                         <Badge variant="outline">{a.category}</Badge>
                         {a.is_featured && (
-                          <Badge variant="default" className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-300">
-                            <Star className="h-3 w-3 mr-1" /> Destaque
+                          <Badge variant="secondary" className="gap-1">
+                            <Star className="h-3 w-3" /> Destaque
                           </Badge>
                         )}
                       </div>
