@@ -3546,6 +3546,7 @@ Deno.serve(async (req) => {
     let trigger = 'manual';
     let forceContentType: ContentType | null = null;
     let skipLimitCheck = false;
+    let placeholderPostId: string | null = null;
     
     try {
       const body = await req.json();
@@ -3554,11 +3555,15 @@ Deno.serve(async (req) => {
       trigger = body.trigger || 'manual';
       forceContentType = body.forceContentType as ContentType | null;
       skipLimitCheck = body.skipLimitCheck === true;
+      placeholderPostId = body.placeholderPostId || null;
       if (forceContentType) {
         console.log('[AGENT] FORÇANDO tipo de conteúdo:', forceContentType);
       }
       if (skipLimitCheck) {
         console.log('[AGENT] SKIP LIMIT CHECK (teste)');
+      }
+      if (placeholderPostId) {
+        console.log('[AGENT] PLACEHOLDER POST ID:', placeholderPostId);
       }
     } catch {
       // No body or invalid JSON
@@ -3632,7 +3637,7 @@ Deno.serve(async (req) => {
       );
     }
     
-    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType, skipLimitCheck);
+    const result = await processWorkspace(supabase, userId, workspaceId, lovableApiKey, supabaseUrl, trigger, forceContentType, skipLimitCheck, placeholderPostId);
     
     console.log('[AGENT] ===== CICLO FINALIZADO =====');
     return new Response(
@@ -3659,9 +3664,10 @@ async function processWorkspace(
   supabaseUrl: string,
   trigger: string = 'manual',
   forceContentType: ContentType | null = null,
-  skipLimitCheck: boolean = false
+  skipLimitCheck: boolean = false,
+  placeholderPostId: string | null = null
 ): Promise<any> {
-  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId}, skipLimits: ${skipLimitCheck})`);
+  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId}, skipLimits: ${skipLimitCheck}, placeholder: ${placeholderPostId})`);
   
   // Get agent name for conversational messages
   const { data: contextData } = await supabase
@@ -3761,6 +3767,38 @@ async function processWorkspace(
       post = await executeContentPlan(supabase, decision.contentPlan, userId, workspaceId, supabaseUrl, autoPublish);
       
       console.log(`[AGENT] Post criado: ${post.id}, status: ${post.status}, autoPublish: ${autoPublish}`);
+      
+      // === TEST FLOW: merge real post into placeholder, mark pending_review ===
+      if (placeholderPostId && post && post.id !== placeholderPostId) {
+        console.log(`[AGENT] 🔀 Mergeando post real ${post.id} → placeholder ${placeholderPostId}`);
+        const { error: mergeErr } = await supabase.from('posts').update({
+          caption: post.caption,
+          image_url: post.image_url,
+          video_url: post.video_url,
+          carousel_images: post.carousel_images,
+          hashtags: post.hashtags,
+          overlay_metadata: post.overlay_metadata,
+          media_type: post.media_type,
+          post_type: post.post_type,
+          ai_model_used: post.ai_model_used,
+          cost_estimate: post.cost_estimate,
+          // pending_review: aguardando aprovação manual no Test Tab
+          status: 'pending_review',
+          scheduled_for: null,
+          published_at: null,
+          error_message: null,
+        }).eq('id', placeholderPostId);
+        
+        if (mergeErr) {
+          console.error(`[AGENT] Erro ao mergear placeholder:`, mergeErr);
+        } else {
+          // Delete extra post and reassign post.id for downstream logic
+          await supabase.from('posts').delete().eq('id', post.id);
+          console.log(`[AGENT] ✅ Placeholder ${placeholderPostId} atualizado, post extra ${post.id} deletado`);
+          post.id = placeholderPostId;
+          post.status = 'pending_review';
+        }
+      }
       
       // Send completion message with VIDEO-SPECIFIC notification
       const isReels = decision.contentPlan.mediaType === 'reels' || decision.contentPlan.mediaType === 'video';
