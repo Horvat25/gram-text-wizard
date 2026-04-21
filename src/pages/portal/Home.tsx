@@ -91,6 +91,9 @@ const PortalHome = () => {
           </div>
         </section>
 
+        {/* Notícias por modelo de IA (ChatGPT / Gemini / Claude / Grok / Llama) */}
+        <AIModelSections articles={articles} />
+
         {/* Per-category sections */}
         {ARTICLE_CATEGORIES.slice(0, 5).map((cat) => {
           const inCat = articles.filter((a) => a.category === cat.slug).slice(0, 4);
