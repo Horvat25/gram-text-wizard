@@ -8,7 +8,7 @@ import {
   getCategoryLabel,
   renderMarkdown,
 } from "@/lib/article-helpers";
-import { Clock, Eye, Loader2 } from "lucide-react";
+import { Clock, Eye, Loader2, Sparkles, ListChecks, ExternalLink } from "lucide-react";
 
 interface ArticleFull extends ArticleCardData {
   id: string;
@@ -210,6 +210,41 @@ const ArticlePage = () => {
               className="w-full rounded-lg"
             />
           </figure>
+        )}
+
+        {/* TL;DR — extraído pra buscadores generativos (ChatGPT, Perplexity, Gemini) */}
+        <aside
+          className="mt-8 mb-2 rounded-lg border border-primary/30 bg-primary/5 p-4 md:p-5"
+          aria-label="Resumo do artigo"
+        >
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-2">
+            <Sparkles className="h-3.5 w-3.5" />
+            TL;DR — em uma frase
+          </div>
+          <p className="text-base md:text-lg leading-relaxed text-foreground/95 font-medium">
+            {tldr}
+          </p>
+        </aside>
+
+        {/* Pontos-chave — para extração por IA */}
+        {keyPoints.length >= 2 && (
+          <aside
+            className="mb-8 rounded-lg border border-border/60 bg-card/40 p-4 md:p-5"
+            aria-label="Pontos-chave do artigo"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground mb-3">
+              <ListChecks className="h-3.5 w-3.5 text-primary" />
+              Pontos-chave
+            </div>
+            <ul className="space-y-1.5">
+              {keyPoints.map((p, i) => (
+                <li key={i} className="text-sm text-foreground/85 flex gap-2">
+                  <span className="text-primary font-bold shrink-0">{i + 1}.</span>
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
         )}
 
         <div
