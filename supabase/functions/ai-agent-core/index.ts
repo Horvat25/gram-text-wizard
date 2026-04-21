@@ -1630,24 +1630,30 @@ async function createCarouselContent(
   
   if (lovableApiKey) {
     try {
-      const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram.
+      const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram em PT-BR.
 
 TEMA DO CARROSSEL: "${bestArticle.title}"
 CONTEXTO: ${bestArticle.description || bestArticle.title}
 FONTE: ${bestArticle.source_name || 'Tech News'}
 
-Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema:
+Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema, formando uma NARRATIVA CONTÍNUA:
 
-SLIDE 1 - HOOK: Título impactante que gera curiosidade.
-SLIDE 2 - CONTEXTO: Explicação clara do que está acontecendo e por quê é importante.
-SLIDE 3 - IMPACTO + AÇÃO: Como isso afeta as pessoas e o que devem saber/fazer.
+SLIDE 1 - HOOK: Título impactante que abre o gancho da história.
+SLIDE 2 - DESENVOLVIMENTO: Continua a ideia do slide 1, aprofundando o ponto central. NÃO repete o slide 1, COMPLEMENTA.
+SLIDE 3 - CONCLUSÃO + CTA visual: Fecha a narrativa com o impacto/conclusão. Termina convidando a ler mais.
 
-REGRAS:
-- Todos os 3 slides são sobre o MESMO tema, aprofundando progressivamente
-- slideTitle: máximo 8 palavras, impactante, em CAIXA ALTA
-- slideText: 2-3 frases curtas e diretas por slide
-- imagePrompt: descrição visual para gerar imagem IA coerente com o slide (em inglês)
-- As 3 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, cores, ambiente)
+REGRAS CRÍTICAS DE CONTINUIDADE:
+- Os 3 slideTitle devem SE CONECTAR: leia 1→2→3 e tem que fluir como uma frase/história única
+- Slide 2 começa de onde slide 1 parou (use conectivos: "Mas...", "Por isso...", "O resultado...", "Agora...")
+- Slide 3 entrega a conclusão prometida nos slides anteriores
+- NÃO repita o mesmo título em slides diferentes
+- slideTitle: máximo 7 palavras, impactante, em CAIXA ALTA, SEM emojis
+- slideText: 2 frases curtas e diretas que expandem o título
+- imagePrompt: descrição visual EM INGLÊS, coerente com o slide
+- As 3 imagens devem ter CONSISTÊNCIA VISUAL (mesmo estilo, paleta, ambiente)
+
+IMPORTANTE — FERRAMENTAS:
+Se o tema mencionar ferramentas/produtos de tecnologia (ChatGPT, Gemini, Claude, Midjourney, Sora, DALL-E, Cursor, Lovable, Notion AI, Perplexity, GitHub Copilot, etc.), liste-as no campo "tools_mentioned" para que o agente inclua links oficiais na legenda.
 
 Responda em JSON:
 {
@@ -1655,7 +1661,8 @@ Responda em JSON:
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." },
     { "slideTitle": "...", "slideText": "...", "imagePrompt": "..." }
-  ]
+  ],
+  "tools_mentioned": ["nome da ferramenta", "..."]
 }`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -1680,7 +1687,8 @@ Responda em JSON:
           const parsed = JSON.parse(content);
           if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length >= 3) {
             slideContents = parsed.slides.slice(0, 3);
-            console.log('[AGENT] ✅ 3 slides educacionais gerados pela IA');
+            (slideContents as any).tools_mentioned = Array.isArray(parsed.tools_mentioned) ? parsed.tools_mentioned : [];
+            console.log('[AGENT] ✅ 3 slides progressivos gerados pela IA. Ferramentas:', (slideContents as any).tools_mentioned);
           }
         }
       }
@@ -1694,13 +1702,13 @@ Responda em JSON:
     console.warn('[AGENT] ⚠️ IA não gerou slides, usando fallback contextual');
     const topic = bestArticle.title;
     const desc = bestArticle.description || topic;
-    // Generate contextual fallback headlines based on the actual topic (not generic phrases)
     const topicWords = topic.split(' ').slice(0, 5).join(' ').toUpperCase();
     slideContents = [
       { slideTitle: topicWords, slideText: desc, imagePrompt: `Dramatic tech scene about: ${topic}. Dark aesthetic, neon accents. NO TEXT.` },
-      { slideTitle: `O IMPACTO DE ${topicWords.split(' ').slice(0, 3).join(' ')}`, slideText: desc, imagePrompt: `Impact visualization about: ${topic}. Same style. NO TEXT.` },
-      { slideTitle: `O FUTURO APÓS ${topicWords.split(' ').slice(0, 3).join(' ')}`, slideText: `As consequências dessa mudança são profundas.`, imagePrompt: `Future tech horizon about: ${topic}. Same style. NO TEXT.` },
+      { slideTitle: `POR QUE ISSO IMPORTA`, slideText: desc, imagePrompt: `Impact visualization about: ${topic}. Same style. NO TEXT.` },
+      { slideTitle: `O QUE VEM A SEGUIR`, slideText: `As consequências dessa mudança são profundas.`, imagePrompt: `Future tech horizon about: ${topic}. Same style. NO TEXT.` },
     ];
+    (slideContents as any).tools_mentioned = [];
   }
   
   // STEP 2.5: Review ALL slide texts with review-portuguese BEFORE image generation/overlay
