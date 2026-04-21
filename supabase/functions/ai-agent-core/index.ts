@@ -3664,9 +3664,10 @@ async function processWorkspace(
   supabaseUrl: string,
   trigger: string = 'manual',
   forceContentType: ContentType | null = null,
-  skipLimitCheck: boolean = false
+  skipLimitCheck: boolean = false,
+  placeholderPostId: string | null = null
 ): Promise<any> {
-  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId}, skipLimits: ${skipLimitCheck})`);
+  console.log(`[AGENT] Processando workspace: ${workspaceId} (user: ${userId}, skipLimits: ${skipLimitCheck}, placeholder: ${placeholderPostId})`);
   
   // Get agent name for conversational messages
   const { data: contextData } = await supabase
