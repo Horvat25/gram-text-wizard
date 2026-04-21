@@ -86,32 +86,46 @@ export function renderMarkdown(md: string): string {
     return out;
   };
 
-  // Heuristic: detect "fake" headings — a short line (≤ 80 chars, no terminal
-  // punctuation) immediately followed by a paragraph. The AI sometimes drops
-  // the "## " prefix; we promote those lines to <h2> so the article doesn't
-  // turn into a wall of text.
+  // Heuristic: detect "fake" headings — short lines (≤ 80 chars, no terminal
+  // punctuation, capitalized) that the AI dropped without "## " prefix.
+  // We aggressively split them out as standalone H2 blocks, even when they
+  // appear inside a paragraph (no blank line above), because that's the
+  // most common failure mode (article becomes a wall of text).
+  const isLikelyHeading = (line: string, next: string): boolean => {
+    const t = line.trim();
+    if (t.length === 0 || t.length > 80) return false;
+    if (/^[#>\-*\d`]/.test(t)) return false;
+    if (/[.!?:;,]$/.test(t)) return false;
+    if (!/^[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ"']/.test(t)) return false;
+    // must be followed by substantial content (a real paragraph)
+    if (next.trim().length < 40) return false;
+    if (/^[#>\-*]/.test(next.trim())) return false;
+    // Reject lines with too many words that look like sentences
+    const wordCount = t.split(/\s+/).length;
+    if (wordCount > 12) return false;
+    return true;
+  };
+
   const lines = md.split("\n");
   const promotedLines: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     const cur = lines[i];
-    const trimmed = cur.trim();
-    const next = lines[i + 1]?.trim() ?? "";
+    const next = lines[i + 1] ?? "";
     const prev = lines[i - 1]?.trim() ?? "";
 
-    const looksLikeHeading =
-      trimmed.length > 0 &&
-      trimmed.length <= 80 &&
-      !/^[#>\-*\d`]/.test(trimmed) &&
-      !/[.!?:;,]$/.test(trimmed) &&
-      // capital letter or accentuated capital at start
-      /^[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ]/.test(trimmed) &&
-      // followed by a real paragraph (not list / heading / blockquote)
-      next.length > 60 &&
-      !/^[#>\-*]/.test(next) &&
-      // and preceded by blank line or start
-      (prev === "" || /[.!?]"?$/.test(prev));
-
-    promotedLines.push(looksLikeHeading ? `## ${trimmed}` : cur);
+    if (isLikelyHeading(cur, next)) {
+      // Force blank line BEFORE so it becomes its own block
+      if (prev !== "" && promotedLines[promotedLines.length - 1]?.trim() !== "") {
+        promotedLines.push("");
+      }
+      promotedLines.push(`## ${cur.trim()}`);
+      // Force blank line AFTER so the next paragraph is separate
+      if (next.trim() !== "") {
+        promotedLines.push("");
+      }
+    } else {
+      promotedLines.push(cur);
+    }
   }
   const normalized = promotedLines.join("\n");
 
