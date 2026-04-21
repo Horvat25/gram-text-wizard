@@ -25,11 +25,11 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
           <div className="w-full h-full portal-gradient opacity-40 portal-drift" />
         )}
 
-        {/* Dark gradient overlay so text reads */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/10" />
+        {/* Dark gradient overlay so text reads — keep image visible on top */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/55 to-transparent" />
         {/* Side neon vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(var(--portal-cyan)/0.25),_transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(var(--portal-purple)/0.18),_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(var(--portal-cyan)/0.18),_transparent_55%)] mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(var(--portal-purple)/0.12),_transparent_60%)] mix-blend-overlay" />
       </div>
 
       {/* Content */}
@@ -44,9 +44,9 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
           </span>
         </div>
 
-        <h1 className="font-display text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.05] max-w-4xl text-foreground">
+        <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.05] max-w-4xl text-foreground drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
           {article.title}
-        </h1>
+        </h2>
 
         {article.excerpt && (
           <p className="hidden md:block text-base lg:text-lg text-muted-foreground mt-4 max-w-2xl line-clamp-2 leading-relaxed">

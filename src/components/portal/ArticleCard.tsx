@@ -89,8 +89,8 @@ export const ArticleCard = ({ article, variant = "default" }: ArticleCardProps) 
           <div className="w-full h-full portal-gradient opacity-30 portal-drift" />
         )}
         {/* Soft top gradient for category chip readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-transparent" />
-        <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary bg-background/70 border border-primary/30 px-2 py-0.5 rounded-full backdrop-blur">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-background/55 to-transparent" />
+        <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary bg-background/80 border border-primary/30 px-2 py-0.5 rounded-full backdrop-blur">
           {getCategoryLabel(article.category)}
         </span>
       </div>

@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
@@ -106,14 +106,20 @@ export const PortalHeader = () => {
         </div>
 
         {searchOpen && (
-          <form onSubmit={handleSearch} className="pb-3">
-            <Input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar notícias…"
-              className="w-full bg-card/60 border-border/60 focus-visible:ring-primary"
-            />
+          <form onSubmit={handleSearch} className="pb-3 flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar notícias, ChatGPT, Gemini, gadgets…"
+                className="w-full pl-9 bg-card/60 border-border/60 focus-visible:ring-primary"
+              />
+            </div>
+            <Button type="submit" size="sm" className="shrink-0">
+              Buscar <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            </Button>
           </form>
         )}
 

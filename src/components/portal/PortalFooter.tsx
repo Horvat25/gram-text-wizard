@@ -74,13 +74,13 @@ export const PortalFooter = () => {
             </h3>
             <ul className="space-y-2.5">
               <li>
-                <Link to="/admin" className="text-sm text-foreground/80 hover:text-primary transition-colors">
-                  Painel editorial
+                <Link to="/busca" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+                  Buscar
                 </Link>
               </li>
               <li>
-                <Link to="/busca" className="text-sm text-foreground/80 hover:text-primary transition-colors">
-                  Buscar
+                <Link to="/sobre" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+                  Quem é o Agente Horvat
                 </Link>
               </li>
             </ul>
