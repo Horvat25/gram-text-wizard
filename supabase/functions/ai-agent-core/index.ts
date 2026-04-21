@@ -1756,11 +1756,13 @@ Responda em JSON:
   }
   
   // STEP 4: Apply text overlays to each slide
-  // - Slides 1 e 2: apenas headline (sem CTA)
-  // - Último slide: headline + "📖 Leia a legenda" + watermark
+  // - Slides 1 e 2: apenas headline (sem CTA, sem watermark grande) — visual limpo
+  // - Último slide: headline + "LEIA A LEGENDA 👇" + watermark Neural Update
   const overlaidImages: string[] = [];
-  for (let i = 0; i < Math.min(carouselImages.length, slideContents.length); i++) {
-    const isLastSlide = i === Math.min(carouselImages.length, slideContents.length) - 1;
+  const totalSlides = Math.min(carouselImages.length, slideContents.length);
+  for (let i = 0; i < totalSlides; i++) {
+    const isLastSlide = i === totalSlides - 1;
+    const slidePosition = isLastSlide ? 'last' : (i === 0 ? 'first' : 'middle');
     try {
       const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
@@ -1768,8 +1770,9 @@ Responda em JSON:
         body: JSON.stringify({
           imageUrl: carouselImages[i],
           headlineText: slideContents[i].slideTitle,
-          ctaText: isLastSlide ? '📖 LEIA A LEGENDA' : undefined,
-          watermarkText: isLastSlide ? 'Neural Update' : undefined,
+          mediaType: 'carousel',
+          slidePosition,
+          watermarkText: 'Neural Update',
         })
       });
       
