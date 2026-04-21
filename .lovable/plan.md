@@ -1,71 +1,100 @@
 
 
-## Posts de imagem ficando como rascunho sem mídia
+## Portal Neural Update: site público de notícias de tecnologia
 
-### Diagnóstico
+Transformar o app numa **plataforma editorial completa**, onde o portal Neural Update é a fonte primária — as redes sociais (Instagram/TikTok) passam a ser **distribuição** do que já foi publicado no site.
 
-Confirmei no banco: **6 posts de imagem** virando draft sem `image_url` nas últimas 24h. Todos vieram de artigos RSS que **tinham `og:image` válida** (`has_image = true`). Ou seja, a imagem original existia, mas o pipeline a descartou no caminho.
-
-### Causa raiz
-
-No `ai-agent-core` (linha 2762-2920), o fluxo de notícia faz:
+### Visão geral
 
 ```text
-selectedImage (og:image real, válida)
-   ↓
-apply-text-overlay (gera headline + revisão PT-BR + SVG)
-   ↓
-   ├─ 422 (revisão PT-BR falha — HARD BLOCK) → overlayResponse.ok = false
-   ├─ 500 (erro SVG/render)                  → overlayResponse.ok = false
-   └─ network error                          → catch
-   ↓
-imageUrl = null
-   ↓
-Fallback add-watermark é chamado SÓ se overlayResponse.ok === true
-   (não cobre 422/500/exception)
-   ↓
-Fallback upload-external-image — também depende de !imageUrl,
-mas se algo na cadeia anterior já jogou exceção, pode pular
-   ↓
-Post salvo como draft com image_url = null
+RSS / Firecrawl (notícias frescas)
+        ↓
+  Agente Horvat escreve artigo COMPLETO (1x — armazenado)
+        ↓
+   ┌────────────────────────────────────────┐
+   │   Artigo no Portal Neural Update       │  ← fonte da verdade
+   │   (público, SEO, /noticia/slug)        │
+   └────────────────────────────────────────┘
+        ↓ (reaproveita: título + resumo + imagem)
+   Posts Instagram / TikTok / Carrossel
+   (zero crédito extra — tudo pré-pronto)
 ```
 
-A `apply-text-overlay` foi reforçada recentemente com revisão de português obrigatória (HARD BLOCK 422) e novo render SVG offset de 8 sombras. Toda vez que esses dois bloqueiam, **a imagem real do artigo é jogada fora** em vez de cair para os fallbacks.
+### O que vai ser construído
 
-### Plano de correção
+**1. Site público "Neural Update" (rotas abertas, sem login)**
+- `/` — homepage do portal: manchete principal + grade de últimas notícias por categoria (IA, Gadgets, Futuro, Mercado, Ciência)
+- `/noticia/:slug` — página individual do artigo (título SEO, hero image, corpo formatado, tempo de leitura, autor "Agente Horvat", data, tags, "leia também")
+- `/categoria/:nome` — listagem filtrada por categoria
+- `/busca?q=` — busca por palavra-chave
+- `/sobre` — página institucional do Neural Update
+- Header com logo + menu de categorias + busca; Footer com links sociais (IG/TikTok), políticas, RSS feed
 
-**1. Tornar a cadeia de fallback resiliente em `ai-agent-core/index.ts`** (função `handleNewsContent`, linhas ~2762-2867)
+**2. Painel administrativo (rotas protegidas — login atual)**
+- Tudo que já existe (Agente, Fila, Crescimento, Teste, Histórico) continua igual em `/admin`
+- Nova aba **"Portal"**: lista de artigos publicados no site, edição manual, destaque de manchete, agendamento
 
-Refatorar a lógica de fallback para sempre garantir que `imageUrl` seja preenchido quando `selectedImage` existir:
+**3. Geração de conteúdo otimizada para custo**
+- Agente roda RSS/Firecrawl (já existe) → escolhe notícia → **gera UMA vez** o artigo completo (~600-1000 palavras) + título SEO + meta description + imagem hero + 5-8 tags
+- A partir desse mesmo artigo, **derivações gratuitas** (sem nova chamada de IA):
+  - **Post imagem IG**: reaproveita hero + título como headline overlay + parágrafo de abertura como legenda
+  - **Carrossel**: divide artigo em 3 blocos lógicos (intro, ponto-chave, conclusão) → vira 3 slides
+  - **Reels notícia**: usa o resumo já gerado como roteiro
+- Resultado: **1 chamada cara de IA** alimenta o site + 3 formatos de redes sociais
 
-```text
-TENTATIVA 1: apply-text-overlay (com headline)
-  ↓ falhou (422/500/erro)?
-TENTATIVA 2: add-watermark (com headlineText do título original)
-  ↓ falhou?
-TENTATIVA 3: upload-external-image (imagem original sem nada)
-  ↓ falhou?
-ÚLTIMO: usar selectedImage diretamente (URL externa)
+**4. SEO e descoberta**
+- Sitemap.xml automático
+- Meta tags Open Graph (preview rico no WhatsApp/Twitter)
+- Schema.org NewsArticle (aparece bonito no Google)
+- RSS feed próprio (`/feed.xml`) — outros sites podem consumir o Neural Update
+- URLs amigáveis em PT-BR (ex: `/noticia/openai-lanca-novo-modelo-2026`)
 
-Resultado: post sempre é criado como 'scheduled' se autoPublish=true
-e tiver QUALQUER imagem, mesmo sem overlay.
-```
+**5. Domínio próprio**
+- Você compra **neuralupdate.com.br** direto via Lovable Settings → Domains
+- Subdomínio `app.neuralupdate.com.br` para o painel admin
+- Domínio raiz `neuralupdate.com.br` para o portal público
+- SSL automático
 
-**2. Logar motivo do fallback** no `overlay_metadata` para rastrear quando o overlay falha (`overlay_status: 'fallback_no_overlay' | 'fallback_watermark_only' | 'success'`).
+### Estrutura técnica (resumo para você)
 
-**3. Reprocessar os 6 rascunhos órfãos**: criar uma função de manutenção pontual que pega os 6 posts em draft com `media_type='image'` + `image_url IS NULL`, reaplica o pipeline corrigido buscando a `image_url` do `rss_items` vinculado, e atualiza o status para `scheduled` (ou mantém draft se realmente não houver imagem).
+**Banco de dados** — nova tabela `articles`:
+- `id`, `workspace_id`, `slug` (único), `title`, `subtitle`, `content` (markdown/html), `excerpt`, `hero_image_url`, `category`, `tags[]`, `author_name`, `status` (draft/published), `published_at`, `view_count`, `seo_title`, `seo_description`, `og_image_url`, `source_rss_item_id`, `linked_post_ids[]` (vínculo com posts IG/TikTok já gerados)
+- RLS: SELECT público (`USING true` quando `status='published'`); INSERT/UPDATE/DELETE só para editores do workspace
 
-**4. Investigar e reduzir falsos positivos do HARD BLOCK PT-BR** em `apply-text-overlay`: o review está bloqueando headlines válidas. Suavizar para `WARN` em vez de `BLOCK` quando a confiança da rejeição for baixa, mantendo o bloqueio apenas para erros graves de ortografia. Isso evita que headlines tecnicamente OK sejam rejeitadas.
+**Edge functions novas/modificadas**:
+- `generate-article` (nova): pega item RSS + Firecrawl deep research → gera artigo completo de uma vez
+- `derive-social-from-article` (nova): pega `article_id` → cria entradas em `posts` para IG/TikTok sem nova chamada de IA
+- `ai-agent-core` (modificada): novo fluxo "article first" — gera artigo, depois deriva os formatos sociais
 
-### Arquivos afetados
+**Roteamento**:
+- `App.tsx` ganha rotas públicas: `/`, `/noticia/:slug`, `/categoria/:nome`, `/busca`, `/sobre`
+- Painel admin migra para `/admin/*` (mantém auth atual)
+- Quando o domínio próprio for conectado: `app.` → painel, raiz → portal
 
-- `supabase/functions/ai-agent-core/index.ts` — refatorar cadeia de fallback de imagem (linhas 2762-2920)
-- `supabase/functions/apply-text-overlay/index.ts` — suavizar HARD BLOCK do review PT-BR
-- Script SQL pontual via migration para reagendar os 6 rascunhos órfãos com a `image_url` do `rss_items`
+**Componentes a criar**:
+- `src/pages/portal/Home.tsx`, `ArticlePage.tsx`, `CategoryPage.tsx`, `SearchPage.tsx`, `About.tsx`
+- `src/components/portal/PortalHeader.tsx`, `PortalFooter.tsx`, `ArticleCard.tsx`, `HeroArticle.tsx`, `CategoryNav.tsx`
+- `src/components/admin/ArticlesManagerTab.tsx` (nova aba no painel)
+- `src/lib/article-helpers.ts` (slug generator, reading time, markdown render)
 
-### Resultado esperado
+### Entrega faseada
 
-- Nenhum post de notícia com imagem RSS válida vai mais cair em draft sem mídia
-- Os 6 rascunhos atuais serão recuperados e voltam para a fila como `scheduled`
-- Falhas de overlay viram posts publicados com a imagem original (sem headline) em vez de virarem draft órfão
+**Fase 1 (esta entrega)** — base funcional:
+- Tabela `articles` + RLS
+- Edge function `generate-article` integrada com RSS + Firecrawl
+- Rotas públicas do portal (Home, Artigo, Categoria, Busca)
+- Painel admin: aba "Portal" para listar/editar artigos
+- Header/Footer do portal com identidade Neural Update
+- SEO básico (meta tags, Open Graph)
+
+**Fase 2 (próxima conversa)**:
+- Derivação automática artigo → IG/TikTok (a integração com `ai-agent-core` existente)
+- Sitemap.xml + RSS feed + Schema.org
+- Newsletter (captura de email)
+- Compra do domínio neuralupdate.com.br
+
+### Custo de IA reduzido
+
+- **Antes**: cada formato (post imagem, carrossel, reels) = 1 chamada de IA = 3 chamadas/notícia
+- **Depois**: 1 chamada gera o artigo, e os formatos sociais são montados por código (template + recortes do texto) = **~70% menos custo de IA por notícia publicada nos 3 lugares**
 
