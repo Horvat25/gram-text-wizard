@@ -362,48 +362,7 @@ export default function EditorialDirectionPanel() {
     );
   }
 
-  const planTotals =
-    (snapshot?.content_distribution_news ?? 0) +
-    (snapshot?.content_distribution_videos ?? 0) +
-    (snapshot?.content_distribution_carousels ?? 0) +
-    (snapshot?.content_distribution_images ?? 0);
-
-  const planItems = [
-    {
-      key: "news",
-      label: "Notícias",
-      value: snapshot?.content_distribution_news ?? 0,
-      color: "bg-emerald-500",
-      explain: "Posts de notícia tech no Instagram (imagem + caption resumindo a manchete).",
-    },
-    {
-      key: "videos",
-      label: "Reels",
-      value: snapshot?.content_distribution_videos ?? 0,
-      color: "bg-pink-500",
-      explain: "Vídeos curtos verticais (9:16) narrados — só no Instagram/TikTok.",
-    },
-    {
-      key: "carousels",
-      label: "Carrosséis",
-      value: snapshot?.content_distribution_carousels ?? 0,
-      color: "bg-purple-500",
-      explain: "Sequência de slides no Instagram (até 3 imagens), útil pra contar uma história em pedaços.",
-    },
-    {
-      key: "images",
-      label: "Imagens",
-      value: snapshot?.content_distribution_images ?? 0,
-      color: "bg-blue-500",
-      explain: "Post estático de imagem única no Instagram com caption editorial.",
-    },
-  ];
-
-  const lastReport = reports[0];
-  const recentDecisions = decisions.slice(0, 5);
-  const decisionsWithLearning = decisions.filter((d) => d.learning && d.hypothesis_confirmed !== null).slice(0, 3);
-
-  // Separa relatórios diários
+  // Separa relatórios diários (manhã + noite)
   const morningReports = dailyReports.filter((r) => r.metadata?.period === "morning").slice(0, 1);
   const eveningReports = dailyReports.filter((r) => r.metadata?.period === "evening").slice(0, 1);
 
