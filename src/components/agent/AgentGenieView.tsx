@@ -408,18 +408,10 @@ export default function AgentGenieView() {
           <ScrollArea className="h-full">
             <div className="p-4 max-w-4xl mx-auto">
               <Tabs defaultValue="direction" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-3 h-8">
+                <TabsList className="grid grid-cols-2 mb-3 h-8">
                   <TabsTrigger value="direction" className="text-xs gap-1.5">
                     <TrendingUp className="h-3.5 w-3.5" />
                     Direção
-                  </TabsTrigger>
-                  <TabsTrigger value="stats" className="text-xs gap-1.5">
-                    <Newspaper className="h-3.5 w-3.5" />
-                    Conteúdo
-                  </TabsTrigger>
-                  <TabsTrigger value="analytics" className="text-xs gap-1.5">
-                    <Eye className="h-3.5 w-3.5" />
-                    Visitas
                   </TabsTrigger>
                   <TabsTrigger value="articles" className="text-xs gap-1.5">
                     <Newspaper className="h-3.5 w-3.5" />
@@ -428,12 +420,6 @@ export default function AgentGenieView() {
                 </TabsList>
                 <TabsContent value="direction" className="mt-0">
                   <EditorialDirectionPanel />
-                </TabsContent>
-                <TabsContent value="stats" className="mt-0">
-                  <BlogStatsPanel />
-                </TabsContent>
-                <TabsContent value="analytics" className="mt-0">
-                  <AnalyticsPanel />
                 </TabsContent>
                 <TabsContent value="articles" className="mt-0">
                   <ArticlesManagerTab />
