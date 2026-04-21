@@ -1755,9 +1755,12 @@ Responda em JSON:
     console.log('[AGENT] Erro geração IA carrossel:', e);
   }
   
-  // STEP 4: Apply text overlays to each slide (headline burned into image)
+  // STEP 4: Apply text overlays to each slide
+  // - Slides 1 e 2: apenas headline (sem CTA)
+  // - Último slide: headline + "📖 Leia a legenda" + watermark
   const overlaidImages: string[] = [];
   for (let i = 0; i < Math.min(carouselImages.length, slideContents.length); i++) {
+    const isLastSlide = i === Math.min(carouselImages.length, slideContents.length) - 1;
     try {
       const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
@@ -1765,7 +1768,8 @@ Responda em JSON:
         body: JSON.stringify({
           imageUrl: carouselImages[i],
           headlineText: slideContents[i].slideTitle,
-          watermarkText: i === carouselImages.length - 1 ? 'Neural Update' : undefined, // Watermark only on last slide
+          ctaText: isLastSlide ? '📖 LEIA A LEGENDA' : undefined,
+          watermarkText: isLastSlide ? 'Neural Update' : undefined,
         })
       });
       
