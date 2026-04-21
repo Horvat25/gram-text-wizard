@@ -1,6 +1,8 @@
 import { ReactNode, useEffect } from "react";
 import { PortalHeader } from "./PortalHeader";
 import { PortalFooter } from "./PortalFooter";
+import { SeoHead } from "@/components/SeoHead";
+import { usePageTracking } from "@/hooks/usePageTracking";
 
 interface SEO {
   title?: string;
@@ -28,6 +30,9 @@ const setMeta = (selector: string, attr: string, value: string) => {
 };
 
 export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
+  // Internal analytics: tracks every pageview to page_views table
+  usePageTracking();
+
   useEffect(() => {
     const title = seo?.title ? `${seo.title} | Neural Update` : "Neural Update — Notícias de tecnologia e IA";
     document.title = title;
@@ -80,6 +85,8 @@ export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
 
   return (
     <div className="portal-root min-h-screen flex flex-col bg-background text-foreground relative overflow-x-hidden">
+      {/* Inject GA4 + Search Console verification when configured */}
+      <SeoHead />
       {/* Ambient mesh background */}
       <div className="fixed inset-0 portal-mesh pointer-events-none" aria-hidden />
       <div className="fixed inset-0 portal-grid opacity-40 pointer-events-none" aria-hidden />
