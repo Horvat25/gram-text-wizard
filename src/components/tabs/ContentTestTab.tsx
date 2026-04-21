@@ -159,7 +159,9 @@ function TestDetailView({
             }
             className="text-[10px]"
           >
-            {post.status === 'draft'
+            {post.status === 'pending_review'
+              ? 'Aguardando Revisão'
+              : post.status === 'draft'
               ? 'Rascunho'
               : post.status === 'failed'
               ? 'Erro'
@@ -310,13 +312,17 @@ function TestDetailView({
             </div>
           </div>
 
-          {/* Feedback & Actions (only for drafts) */}
-          {post.status === 'draft' && (
+          {/* Feedback & Actions (drafts E pending_review) */}
+          {(post.status === 'draft' || post.status === 'pending_review') && (
             <Card className="border-primary/20">
               <CardContent className="p-3 space-y-3">
                 <div>
                   <p className="text-xs font-semibold">Avaliação & Feedback</p>
-                  <p className="text-[10px] text-muted-foreground">Seu feedback melhora as próximas gerações automaticamente</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {post.status === 'pending_review'
+                      ? 'Aguardando sua revisão — não vai pra fila até você decidir'
+                      : 'Seu feedback melhora as próximas gerações automaticamente'}
+                  </p>
                 </div>
 
                 {/* Star rating */}
