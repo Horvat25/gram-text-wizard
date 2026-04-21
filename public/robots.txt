@@ -12,3 +12,14 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Block admin/auth routes from indexing
+Disallow: /admin
+Disallow: /auth
+Disallow: /settings
+Disallow: /install
+Disallow: /tiktok-callback
+Disallow: /instagram-callback
+
+# Sitemap (dynamic, served by edge function — covers all published articles)
+Sitemap: https://vtvvmikilbcalohutsmf.supabase.co/functions/v1/sitemap-xml
