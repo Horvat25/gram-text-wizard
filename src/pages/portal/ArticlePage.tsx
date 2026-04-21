@@ -8,7 +8,7 @@ import {
   getCategoryLabel,
   renderMarkdown,
 } from "@/lib/article-helpers";
-import { Clock, Eye, ExternalLink, Loader2 } from "lucide-react";
+import { Clock, Eye, Loader2 } from "lucide-react";
 
 interface ArticleFull extends ArticleCardData {
   id: string;
