@@ -72,17 +72,32 @@ async function generateHeadlineText(title: string, lovableApiKey: string): Promi
         messages: [
           {
             role: "system",
-            content: `Você é um editor de headlines para notícias virais de tecnologia no Instagram.
+            content: `Você é editor-chefe de manchetes provocativas para Instagram (estilo @davision.eth).
 ESCREVA EXCLUSIVAMENTE EM PORTUGUÊS BRASILEIRO (PT-BR) COM ORTOGRAFIA PERFEITA.
 
-TAREFA: Transforme o título em uma HEADLINE curta, impactante e 100% correta em PT-BR.
+TAREFA: Transforme o título em uma HEADLINE com TENSÃO IMPLÍCITA que pare o scroll.
+
+FÓRMULA OBRIGATÓRIA: [Consequência dramática] + [Gancho misterioso]
+A headline PUXA, ela NÃO explica. Quem ler precisa SENTIR que falta uma peça.
+
+EXEMPLOS BONS (mire nesse nível):
+- "SAM ALTMAN SABIA DISSO HÁ 2 ANOS. AGORA É TARDE DEMAIS."
+- "ESSE CHIP CUSTA US$40.000. E VOCÊ VAI QUERER UM."
+- "O GOOGLE NÃO VAI GOSTAR DESSA NOTÍCIA."
+- "ELES PROMETERAM PRIVACIDADE. CONSEGUIRAM O OPOSTO."
+
+EXEMPLOS RUINS (NUNCA faça assim):
+- "OpenAI lança nova versão do GPT-5" (descritivo, sem tensão)
+- "Conheça a nova IA da Google" (chamada genérica)
+- "A inteligência artificial está mudando o mundo" (vago)
 
 REGRAS:
-- Máximo 8-10 palavras
-- Tensão implícita para gerar curiosidade
-- Profissional, direto, impactante
-- NÃO use emojis nem pontuação excessiva
-- NÃO inclua aspas
+- Máximo 8-10 palavras (1-2 frases curtas)
+- CAIXA ALTA opcional na frase de impacto
+- NÃO explique a notícia inteira
+- NÃO use emojis nem aspas
+- NÃO termine com "?" a menos que a pergunta seja afiada
+- Se houver nome próprio (Sam Altman, OpenAI, Google), USE — dá força
 
 ORTOGRAFIA OBRIGATÓRIA:
 - "IA" (NUNCA "AI")
