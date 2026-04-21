@@ -341,6 +341,20 @@ ${sizeRules}
       }
     }
 
+    // CTA FINAL OBRIGATÓRIO — "Segue a gente" (3 variações alternadas)
+    // Aplica apenas se a caption NÃO já termina com convite a seguir
+    const finalCtaVariants = [
+      '\n\n👉 Segue @neuralupdate pra acompanhar o futuro da tecnologia em primeira mão.',
+      '\n\n⚡ Curtiu? Segue @neuralupdate — todo dia uma análise nova sobre IA, robótica e o que vem por aí.',
+      '\n\n🚀 Não perde a próxima — segue @neuralupdate e ativa o sininho 🔔 pra receber tudo antes de virar manchete.',
+    ];
+    const lastParagraphLower = (caption.split('\n\n').pop() || '').toLowerCase();
+    const alreadyHasFollowCta = /\b(segue|siga|seguir|follow|@neuralupdate)\b/.test(lastParagraphLower);
+    if (!alreadyHasFollowCta) {
+      const variant = finalCtaVariants[Math.floor(Math.random() * finalCtaVariants.length)];
+      caption = caption.trimEnd() + variant;
+    }
+
     console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
 
     return new Response(
