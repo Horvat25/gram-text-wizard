@@ -10,7 +10,6 @@ import {
   Instagram,
   FlaskConical,
   Newspaper,
-  Eye,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,8 +32,6 @@ import TikTokContentCreation from '@/components/TikTokContentCreation';
 
 import ContentTestTab from '@/components/tabs/ContentTestTab';
 import ArticlesManagerTab from '@/components/admin/ArticlesManagerTab';
-import BlogStatsPanel from '@/components/admin/BlogStatsPanel';
-import AnalyticsPanel from '@/components/admin/AnalyticsPanel';
 import EditorialDirectionPanel from '@/components/admin/EditorialDirectionPanel';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Platform } from '@/components/PlatformSelector';
