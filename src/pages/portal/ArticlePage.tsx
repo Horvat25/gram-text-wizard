@@ -214,14 +214,14 @@ const ArticlePage = () => {
 
         {/* TL;DR — extraído pra buscadores generativos (ChatGPT, Perplexity, Gemini) */}
         <aside
-          className="mt-8 mb-2 rounded-lg border border-primary/30 bg-primary/5 p-4 md:p-5"
+          className="mt-8 mb-3 rounded-xl border border-primary/30 bg-card/60 p-4 md:p-6 shadow-sm"
           aria-label="Resumo do artigo"
         >
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-2">
             <Sparkles className="h-3.5 w-3.5" />
             TL;DR — em uma frase
           </div>
-          <p className="text-base md:text-lg leading-relaxed text-foreground/95 font-medium">
+          <p className="text-base md:text-lg leading-relaxed text-foreground font-medium">
             {tldr}
           </p>
         </aside>
@@ -250,9 +250,9 @@ const ArticlePage = () => {
         <div
           className="article-body prose prose-lg max-w-none dark:prose-invert
             prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground
-            prose-h2:text-2xl md:prose-h2:text-[1.7rem] prose-h2:mt-12 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b-2 prose-h2:border-primary/30 prose-h2:leading-tight
-            prose-h3:text-xl prose-h3:mt-9 prose-h3:mb-3 prose-h3:text-primary/95
-            prose-p:leading-[1.8] prose-p:text-foreground/85 prose-p:my-5 prose-p:text-[1.05rem]
+            prose-h2:text-[1.85rem] md:prose-h2:text-[2.15rem] prose-h2:mt-14 prose-h2:mb-6 prose-h2:px-4 prose-h2:py-3 prose-h2:rounded-lg prose-h2:border prose-h2:border-primary/25 prose-h2:bg-card/55 prose-h2:leading-tight
+            prose-h3:text-[1.35rem] prose-h3:mt-10 prose-h3:mb-4 prose-h3:px-3 prose-h3:py-2 prose-h3:rounded-md prose-h3:bg-muted/35 prose-h3:text-foreground
+            prose-p:leading-[1.9] prose-p:text-foreground/85 prose-p:my-5 prose-p:text-[1.06rem]
             prose-strong:text-foreground prose-strong:font-semibold
             prose-em:text-foreground/95
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-a:font-medium
