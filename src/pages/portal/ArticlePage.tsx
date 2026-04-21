@@ -83,22 +83,80 @@ const ArticlePage = () => {
   const seoDesc = article.seo_description || article.excerpt || article.title;
   const seoImage = article.og_image_url || article.hero_image_url || undefined;
 
-  const jsonLd = {
+  // Extract first 3 H2/H3 headings as "Key points" for AI Search engines
+  const extractKeyPoints = (md: string): string[] => {
+    const lines = md.split("\n");
+    const headings: string[] = [];
+    for (const l of lines) {
+      const m = l.match(/^#{2,3}\s+(.+)$/);
+      if (m) headings.push(m[1].trim());
+      if (headings.length >= 5) break;
+    }
+    return headings;
+  };
+  const keyPoints = extractKeyPoints(article.content);
+
+  // TL;DR — short factual summary AI engines (ChatGPT, Perplexity) extract first
+  const tldr =
+    article.excerpt ||
+    article.subtitle ||
+    article.content.replace(/[#*>\-]/g, "").trim().split("\n").find((l) => l.length > 80)?.slice(0, 280) ||
+    seoDesc;
+
+  // Rich JSON-LD: NewsArticle + (optional) FAQPage when keyPoints exist.
+  // Generative engines parse structured data first — this is the #1 GEO lever.
+  const articleLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: article.title,
+    alternativeHeadline: article.subtitle || undefined,
     description: seoDesc,
+    abstract: tldr,
     image: seoImage ? [seoImage] : undefined,
     datePublished: article.published_at,
     dateModified: article.published_at,
-    author: { "@type": "Person", name: article.author_name },
+    author: {
+      "@type": "Person",
+      name: article.author_name,
+      url: `${window.location.origin}/sobre`,
+    },
     publisher: {
       "@type": "Organization",
       name: "Neural Update",
       logo: { "@type": "ImageObject", url: `${window.location.origin}/favicon.ico` },
+      url: window.location.origin,
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": window.location.href },
+    articleSection: getCategoryLabel(article.category),
+    keywords: article.tags?.join(", ") || undefined,
+    inLanguage: "pt-BR",
+    isAccessibleForFree: true,
+    wordCount: article.content.split(/\s+/).length,
+    citation: article.source_url
+      ? [{ "@type": "CreativeWork", name: article.source_name || "Fonte", url: article.source_url }]
+      : undefined,
   };
+
+  const jsonLd =
+    keyPoints.length >= 2
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            articleLd,
+            {
+              "@type": "FAQPage",
+              mainEntity: keyPoints.map((q) => ({
+                "@type": "Question",
+                name: q,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: `Resposta detalhada na seção "${q}" deste artigo da Neural Update.`,
+                },
+              })),
+            },
+          ],
+        }
+      : articleLd;
 
   return (
     <PortalLayout
