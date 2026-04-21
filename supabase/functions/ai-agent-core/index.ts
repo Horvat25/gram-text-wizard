@@ -3019,8 +3019,11 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
     
     if (imageResponse.ok) {
       const imageResult = await imageResponse.json();
-      imageUrl = imageResult.publicUrl || imageResult.url || imageResult.image_url;
-      console.log('[AGENT] ✅ Imagem IA gerada:', imageUrl ? 'sim' : 'não');
+      imageUrl = imageResult.imageUrl || imageResult.publicUrl || imageResult.url || imageResult.image_url;
+      console.log('[AGENT] ✅ Imagem IA gerada:', imageUrl ? `sim (${imageResult.modelUsed || 'unknown'})` : 'não');
+    } else {
+      const errTxt = await imageResponse.text().catch(() => '');
+      console.log('[AGENT] ❌ generate-image falhou:', imageResponse.status, errTxt.substring(0, 200));
     }
   } catch (e) {
     console.log('[AGENT] Erro ao gerar imagem IA:', e);
