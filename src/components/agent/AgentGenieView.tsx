@@ -67,6 +67,18 @@ const PlatformToggle = ({ selected, onSelect }: { selected: Platform; onSelect: 
     >
       <TikTokIcon className="h-3.5 w-3.5" />
     </button>
+    <button
+      onClick={() => onSelect("blog")}
+      className={cn(
+        "p-1 rounded transition-all",
+        selected === "blog" 
+          ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      title="Blog Neural Update"
+    >
+      <Newspaper className="h-3.5 w-3.5" />
+    </button>
   </div>
 );
 
