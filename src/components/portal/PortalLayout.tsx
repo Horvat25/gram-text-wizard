@@ -45,6 +45,8 @@ export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
     setMeta('meta[property="og:title"]', "content", title);
     setMeta('meta[property="og:description"]', "content", desc);
     setMeta('meta[property="og:type"]', "content", seo?.type ?? "website");
+    setMeta('meta[property="og:site_name"]', "content", "Neural Update");
+    setMeta('meta[property="og:locale"]', "content", "pt_BR");
     if (seo?.image) {
       setMeta('meta[property="og:image"]', "content", seo.image);
       setMeta('meta[name="twitter:image"]', "content", seo.image);
@@ -52,6 +54,11 @@ export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
     setMeta('meta[name="twitter:card"]', "content", "summary_large_image");
     setMeta('meta[name="twitter:title"]', "content", title);
     setMeta('meta[name="twitter:description"]', "content", desc);
+    setMeta('meta[name="twitter:site"]', "content", "@neuralupdate");
+
+    // GEO meta — sinaliza para IA Search idioma + audiência
+    setMeta('meta[name="robots"]', "content", "index, follow, max-image-preview:large, max-snippet:-1");
+    setMeta('meta[http-equiv="content-language"]', "content", "pt-BR");
 
     const canonicalHref = `${window.location.origin}${seo?.canonicalPath ?? window.location.pathname}`;
     let link = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
@@ -62,6 +69,7 @@ export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
     }
     link.setAttribute("href", canonicalHref);
 
+    // Page-level JSON-LD (NewsArticle when seo.jsonLd is provided)
     const existing = document.head.querySelector('script[data-portal-ld="1"]');
     if (existing) existing.remove();
     if (seo?.jsonLd) {
@@ -71,6 +79,43 @@ export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
       script.text = JSON.stringify(seo.jsonLd);
       document.head.appendChild(script);
     }
+
+    // Global Organization + WebSite JSON-LD (com SearchAction — IA Search adora)
+    const existingOrg = document.head.querySelector('script[data-portal-org-ld="1"]');
+    if (existingOrg) existingOrg.remove();
+    const orgLd = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": `${window.location.origin}#org`,
+          name: "Neural Update",
+          url: window.location.origin,
+          logo: `${window.location.origin}/favicon.ico`,
+          sameAs: [],
+          inLanguage: "pt-BR",
+          description: "Portal brasileiro de notícias sobre tecnologia, IA, gadgets e futuro.",
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${window.location.origin}#website`,
+          url: window.location.origin,
+          name: "Neural Update",
+          publisher: { "@id": `${window.location.origin}#org` },
+          inLanguage: "pt-BR",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: { "@type": "EntryPoint", urlTemplate: `${window.location.origin}/busca?q={search_term_string}` },
+            "query-input": "required name=search_term_string",
+          },
+        },
+      ],
+    };
+    const orgScript = document.createElement("script");
+    orgScript.setAttribute("type", "application/ld+json");
+    orgScript.setAttribute("data-portal-org-ld", "1");
+    orgScript.text = JSON.stringify(orgLd);
+    document.head.appendChild(orgScript);
   }, [seo]);
 
   // Force dark mode for the public portal (Antigravity aesthetic)
