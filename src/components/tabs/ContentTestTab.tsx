@@ -553,22 +553,27 @@ export default function ContentTestTab() {
     setActiveDetailType(contentType);
 
     try {
-      // Delete previous draft if regenerating
+      // Save rejection feedback BEFORE deleting (with post_id=null to avoid FK conflict)
       const prevPost = results[contentType]?.post;
-      if (prevPost?.id && (prevPost.status === 'draft' || prevPost.status === 'generating')) {
-        await supabase.from('posts').delete().eq('id', prevPost.id);
-      }
-
-      // Save rejection feedback if regenerating with feedback
       if (feedbackHint && prevPost?.id) {
-        await supabase.from('agent_decisions').insert({
+        const captionPreview = prevPost?.caption?.slice(0, 200) || '';
+        const { error: feedbackError } = await supabase.from('agent_decisions').insert({
           user_id: user.id,
           workspace_id: currentWorkspace.id,
-          post_id: prevPost.id,
+          post_id: null,
           decision: 'test_regenerated',
           decision_reason: feedbackHint,
-          learning: `Regenerado ${contentType}: ${feedbackHint}`,
+          learning: `Regenerado [${contentType}]: ${feedbackHint}\n--- Conteúdo anterior: ${captionPreview}`,
         });
+        if (feedbackError) {
+          console.error('Erro ao salvar feedback de regeneração:', feedbackError);
+          toast.error(`Erro ao salvar feedback: ${feedbackError.message}`);
+        }
+      }
+
+      // Delete previous draft if regenerating
+      if (prevPost?.id && (prevPost.status === 'draft' || prevPost.status === 'generating' || prevPost.status === 'pending_review')) {
+        await supabase.from('posts').delete().eq('id', prevPost.id);
       }
 
       const { data, error } = await supabase.functions.invoke('generate-test-content', {
