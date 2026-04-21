@@ -374,7 +374,18 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { imageUrl, title, headlineText: providedHeadline, watermarkText = "Neural Update", generateHeadline = true, mediaType = "image" } = body;
+    const {
+      imageUrl,
+      title,
+      headlineText: providedHeadline,
+      watermarkText = "Neural Update",
+      generateHeadline = true,
+      mediaType = "image",
+      // NEW: para carrosséis, controlar CTA por slide
+      // slidePosition: 'first' | 'middle' | 'last' (apenas o último mostra "LEIA A LEGENDA" + watermark inferior)
+      slidePosition,
+      ctaText: providedCtaText, // permite override explícito; null = sem CTA
+    } = body;
 
     if (!imageUrl) throw new Error("imageUrl é obrigatório");
     const effectiveTitle = title || providedHeadline || '';
@@ -397,12 +408,10 @@ serve(async (req) => {
     }
 
     // ── STEP 2: Portuguese review (SOFT — não bloqueia, apenas avisa) ──
-    // Antes era HARD BLOCK 422, mas isso descartava imagens válidas no fluxo do agente.
-    // Agora, se o review falhar, seguimos com o texto original (que já passou pelo Gemini com regras de ortografia).
     const review = await reviewPortuguese(headlineText, supabaseUrl, supabaseKey);
     let reviewWarning: string | null = null;
     if (!review.success) {
-      console.warn("[apply-text-overlay] ⚠️ Revisão ortográfica falhou — prosseguindo com headline original (sem bloquear publicação).");
+      console.warn("[apply-text-overlay] ⚠️ Revisão ortográfica falhou — prosseguindo com headline original.");
       reviewWarning = "Revisão ortográfica indisponível; usando texto original.";
     } else {
       headlineText = review.corrected;
@@ -414,11 +423,31 @@ serve(async (req) => {
     const { data: imageData, contentType } = await downloadImage(imageUrl);
     console.log("[apply-text-overlay] Downloaded:", imageData.length, "bytes");
 
-    // ── STEP 4: Build LIGHTWEIGHT SVG (only overlay layer, no embedded image) ──
+    // ── STEP 4: Build LIGHTWEIGHT SVG ──
+    // Lógica de CTA:
+    //   - slidePosition === 'first' ou 'middle' (slides intermediários do carrossel) → SEM CTA, SEM watermark grande
+    //   - slidePosition === 'last' → "LEIA A LEGENDA 👇" + watermark grande
+    //   - sem slidePosition + carrossel → "ARRASTE PARA MAIS →"
+    //   - sem slidePosition + image normal → "LEIA A LEGENDA 👇"
+    //   - providedCtaText explicitamente null → sem CTA
     const isCarousel = mediaType === 'carousel' || mediaType === 'carrossel';
-    const ctaText = isCarousel ? 'ARRASTE PARA MAIS →' : 'LEIA A LEGENDA 👇';
-    const svgString = buildOverlaySvg(headlineText, watermarkText, ctaText);
-    console.log("[apply-text-overlay] Overlay SVG built:", svgString.length, "chars");
+    let ctaText: string | null;
+    let showWatermarkBottom: boolean;
+    if (providedCtaText !== undefined) {
+      ctaText = providedCtaText; // pode ser string ou null
+      showWatermarkBottom = providedCtaText !== null;
+    } else if (slidePosition === 'first' || slidePosition === 'middle') {
+      ctaText = null;
+      showWatermarkBottom = false;
+    } else if (slidePosition === 'last') {
+      ctaText = 'LEIA A LEGENDA 👇';
+      showWatermarkBottom = true;
+    } else {
+      ctaText = isCarousel ? 'ARRASTE PARA MAIS →' : 'LEIA A LEGENDA 👇';
+      showWatermarkBottom = true;
+    }
+    const svgString = buildOverlaySvg(headlineText, watermarkText, ctaText, 1080, 1350, showWatermarkBottom);
+    console.log(`[apply-text-overlay] Overlay SVG built (slide=${slidePosition || 'auto'}, cta=${ctaText || 'none'}):`, svgString.length, "chars");
 
     // ── STEP 5: Render overlay SVG → PNG, then COMPOSE with base image ──
     let finalImageData: Uint8Array;
