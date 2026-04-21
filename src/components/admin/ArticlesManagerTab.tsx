@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ARTICLE_CATEGORIES, formatArticleDate, slugify } from "@/lib/article-helpers";
-import { Loader2, Plus, Eye, Edit, Trash2, Sparkles, Star, Newspaper } from "lucide-react";
+import { Loader2, Plus, Eye, Edit, Trash2, Sparkles, Star, Newspaper, ImageIcon } from "lucide-react";
 
 interface ArticleRow {
   id: string;
@@ -34,6 +34,7 @@ const ArticlesManagerTab = () => {
   const [articles, setArticles] = useState<ArticleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [regeneratingImageId, setRegeneratingImageId] = useState<string | null>(null);
   const [editing, setEditing] = useState<ArticleRow | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -136,6 +137,33 @@ const ArticlesManagerTab = () => {
     await load();
   };
 
+  const regenerateImage = async (a: ArticleRow) => {
+    setRegeneratingImageId(a.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-image", {
+        body: {
+          prompt: `Imagem editorial fotorrealista para matéria de tecnologia: "${a.title}". Categoria: ${a.category}. Estilo cinematográfico, paleta dark com acentos neon ciano e roxo, composição editorial premium. SEM TEXTO NA IMAGEM.`,
+          format: "landscape",
+          applyWatermark: false,
+        },
+      });
+      if (error) throw error;
+      const imageUrl = data?.imageUrl;
+      if (!imageUrl) throw new Error("Sem URL retornada");
+      const { error: updErr } = await supabase
+        .from("articles")
+        .update({ hero_image_url: imageUrl, og_image_url: imageUrl })
+        .eq("id", a.id);
+      if (updErr) throw updErr;
+      toast({ title: "Imagem regenerada", description: "Nova imagem aplicada ao artigo." });
+      await load();
+    } catch (err: any) {
+      toast({ title: "Falha ao regenerar imagem", description: err?.message ?? "Tente novamente.", variant: "destructive" });
+    } finally {
+      setRegeneratingImageId(null);
+    }
+  };
+
   return (
     <div className="space-y-3">
       {/* Toolbar compacta — header principal vem do AgentGenieView */}
@@ -229,6 +257,20 @@ const ArticlesManagerTab = () => {
                           </a>
                         </Button>
                       )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => regenerateImage(a)}
+                        disabled={regeneratingImageId === a.id}
+                        title="Regenerar imagem com IA"
+                      >
+                        {regeneratingImageId === a.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <ImageIcon className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
                       <Button
                         size="icon"
                         variant="ghost"
