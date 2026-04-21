@@ -1,99 +1,71 @@
 
 
-## Plano: Corrigir Sincronização do Crescimento + Pipeline de Vídeo com Template Branded
+## Posts de imagem ficando como rascunho sem mídia
 
----
+### Diagnóstico
 
-### Parte 1 — Corrigir Sincronização da Aba Crescimento
+Confirmei no banco: **6 posts de imagem** virando draft sem `image_url` nas últimas 24h. Todos vieram de artigos RSS que **tinham `og:image` válida** (`has_image = true`). Ou seja, a imagem original existia, mas o pipeline a descartou no caminho.
 
-**Diagnóstico**: A função `sync-instagram-metrics` não mostra logs de erro, o que sugere que ela pode estar falhando silenciosamente (timeout, problema de token, ou o erro está sendo capturado no frontend sem mensagem útil). O `handleSync` no `AgentGrowthDashboard.tsx` faz um loop com batches de 50 posts, e se qualquer batch falhar, o erro genérico "Erro ao sincronizar" aparece.
+### Causa raiz
 
-**Correções**:
-
-1. **Melhorar tratamento de erros no frontend** (`AgentGrowthDashboard.tsx`):
-   - Capturar e exibir a mensagem de erro real retornada pela edge function (ex: "Nenhuma conta do Instagram conectada")
-   - Adicionar timeout de 30s por batch para evitar travamentos
-
-2. **Verificar resposta da edge function**: O `supabase.functions.invoke` retorna `{ data, error }` — se a edge function retorna status 400 (ex: "Nenhuma conta conectada"), o SDK trata como `error`, mas o `error` pode não ter a mensagem clara. Vou ajustar para extrair `error.message` ou `error.context?.body` corretamente.
-
-3. **Adicionar log de diagnóstico**: Mostrar no toast qual erro específico ocorreu (token expirado, conta não encontrada, etc.)
-
----
-
-### Parte 2 — Pipeline de Vídeo com Template Branded "Neural Update"
-
-**Conceito**: O agente baixa vídeos curtos da internet (sobre IA/tech), enquadra dentro de um template visual fixo com a marca Neural Update, e publica como Reels.
-
-**Arquitetura proposta**:
+No `ai-agent-core` (linha 2762-2920), o fluxo de notícia faz:
 
 ```text
-┌─────────────────────────────────────┐
-│         Template Neural Update       │
-│  ┌─────────────────────────────┐    │
-│  │    NEURAL UPDATE (header)    │    │
-│  ├─────────────────────────────┤    │
-│  │                             │    │
-│  │     VÍDEO DA INTERNET       │    │
-│  │     (área central 80%)      │    │
-│  │                             │    │
-│  ├─────────────────────────────┤    │
-│  │  Headline / Caption (footer) │    │
-│  └─────────────────────────────┘    │
-│  @neuralupdate • IA • Tecnologia    │
-└─────────────────────────────────────┘
+selectedImage (og:image real, válida)
+   ↓
+apply-text-overlay (gera headline + revisão PT-BR + SVG)
+   ↓
+   ├─ 422 (revisão PT-BR falha — HARD BLOCK) → overlayResponse.ok = false
+   ├─ 500 (erro SVG/render)                  → overlayResponse.ok = false
+   └─ network error                          → catch
+   ↓
+imageUrl = null
+   ↓
+Fallback add-watermark é chamado SÓ se overlayResponse.ok === true
+   (não cobre 422/500/exception)
+   ↓
+Fallback upload-external-image — também depende de !imageUrl,
+mas se algo na cadeia anterior já jogou exceção, pode pular
+   ↓
+Post salvo como draft com image_url = null
 ```
 
-**Etapas de implementação**:
+A `apply-text-overlay` foi reforçada recentemente com revisão de português obrigatória (HARD BLOCK 422) e novo render SVG offset de 8 sombras. Toda vez que esses dois bloqueiam, **a imagem real do artigo é jogada fora** em vez de cair para os fallbacks.
 
-1. **Nova edge function `download-stock-video`**:
-   - Busca vídeos gratuitos no Pexels Video API (já tem `PEXELS_API_KEY`)
-   - Query baseada no tema do post (ex: "artificial intelligence", "robot", "technology")
-   - Baixa vídeo em resolução HD (720p ou 1080p vertical)
-   - Faz upload para o bucket `post-videos` no Storage
+### Plano de correção
 
-2. **Nova edge function `frame-video-template`**:
-   - Recebe: URL do vídeo original + headline + branding config
-   - Usa FFmpeg (via servidor Remotion existente ou serviço externo) para:
-     - Redimensionar vídeo para caber na área central (80% da tela)
-     - Adicionar barras superior/inferior com a marca
-     - Inserir texto da headline programaticamente
-     - Exportar como MP4 vertical (1080x1920)
-   - Retorna URL do vídeo processado
+**1. Tornar a cadeia de fallback resiliente em `ai-agent-core/index.ts`** (função `handleNewsContent`, linhas ~2762-2867)
 
-3. **Integrar no fluxo do agente** (`ai-agent-core`):
-   - Novo tipo de conteúdo: "video_curated" (vídeo curado da internet)
-   - Fluxo: escolher tema → buscar vídeo no Pexels → aplicar template → agendar publicação
+Refatorar a lógica de fallback para sempre garantir que `imageUrl` seja preenchido quando `selectedImage` existir:
 
-4. **Template no frontend** (para preview):
-   - Componente React que mostra o preview do vídeo dentro do template
-   - Usa Canvas ou CSS para simular o enquadramento
+```text
+TENTATIVA 1: apply-text-overlay (com headline)
+  ↓ falhou (422/500/erro)?
+TENTATIVA 2: add-watermark (com headlineText do título original)
+  ↓ falhou?
+TENTATIVA 3: upload-external-image (imagem original sem nada)
+  ↓ falhou?
+ÚLTIMO: usar selectedImage diretamente (URL externa)
 
-**Dependências técnicas**:
-- A composição de vídeo (FFmpeg) precisa de um serviço de renderização. O projeto já tem `RENDER_SERVICE_URL` e `remotion/` — podemos usar esse pipeline existente ou criar uma edge function com FFmpeg via Deno
-- Alternativa mais simples: usar a API do Pexels para vídeos e aplicar o branding apenas via o encoder que já existe no `video-encoder.ts` (Canvas no browser), que já tem o template Neural Update
+Resultado: post sempre é criado como 'scheduled' se autoPublish=true
+e tiver QUALQUER imagem, mesmo sem overlay.
+```
 
-**Abordagem recomendada** (menor complexidade):
-- Reutilizar o `video-encoder.ts` que já tem branding Neural Update
-- Em vez de gerar 4 imagens com Ken Burns, ele receberia 1 vídeo de fundo + overlays de texto
-- Isso mantém tudo no browser sem precisar de FFmpeg server-side
+**2. Logar motivo do fallback** no `overlay_metadata` para rastrear quando o overlay falha (`overlay_status: 'fallback_no_overlay' | 'fallback_watermark_only' | 'success'`).
 
----
+**3. Reprocessar os 6 rascunhos órfãos**: criar uma função de manutenção pontual que pega os 6 posts em draft com `media_type='image'` + `image_url IS NULL`, reaplica o pipeline corrigido buscando a `image_url` do `rss_items` vinculado, e atualiza o status para `scheduled` (ou mantém draft se realmente não houver imagem).
 
-### Resumo das mudanças
+**4. Investigar e reduzir falsos positivos do HARD BLOCK PT-BR** em `apply-text-overlay`: o review está bloqueando headlines válidas. Suavizar para `WARN` em vez de `BLOCK` quando a confiança da rejeição for baixa, mantendo o bloqueio apenas para erros graves de ortografia. Isso evita que headlines tecnicamente OK sejam rejeitadas.
 
-| Arquivo | Mudança |
-|---------|---------|
-| `src/components/agent/AgentGrowthDashboard.tsx` | Melhorar tratamento de erros na sincronização |
-| `supabase/functions/download-stock-video/index.ts` | Nova função para buscar vídeos no Pexels |
-| `src/lib/video-encoder.ts` | Adicionar modo "video frame" com template branded |
-| `supabase/functions/ai-agent-core/index.ts` | Adicionar tipo "video_curated" |
+### Arquivos afetados
 
----
+- `supabase/functions/ai-agent-core/index.ts` — refatorar cadeia de fallback de imagem (linhas 2762-2920)
+- `supabase/functions/apply-text-overlay/index.ts` — suavizar HARD BLOCK do review PT-BR
+- Script SQL pontual via migration para reagendar os 6 rascunhos órfãos com a `image_url` do `rss_items`
 
-### Ordem de execução sugerida
+### Resultado esperado
 
-1. Primeiro: corrigir a sincronização (impacto imediato)
-2. Segundo: implementar download de vídeo stock via Pexels
-3. Terceiro: adaptar o encoder para enquadrar vídeo em template
-4. Quarto: integrar no agente autônomo
+- Nenhum post de notícia com imagem RSS válida vai mais cair em draft sem mídia
+- Os 6 rascunhos atuais serão recuperados e voltam para a fila como `scheduled`
+- Falhas de overlay viram posts publicados com a imagem original (sem headline) em vez de virarem draft órfão
 
