@@ -65,6 +65,12 @@ export function formatRelativeDate(iso: string | null | undefined): string {
 export function renderMarkdown(md: string): string {
   if (!md) return "";
 
+  const normalizedInput = md
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .trim();
+
   // Escape HTML first
   const escape = (s: string) =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -72,13 +78,10 @@ export function renderMarkdown(md: string): string {
   // Inline formatting helper (bold, italic, links, inline code)
   const inline = (s: string) => {
     let out = escape(s);
-    // Bold **text**
     out = out.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
-    // Italic *text* (not part of bold)
     out = out.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
-    // Inline code `text`
+    out = out.replace(/_([^_\n]+)_/g, "<em>$1</em>");
     out = out.replace(/`([^`\n]+)`/g, "<code>$1</code>");
-    // Links [text](url)
     out = out.replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
@@ -86,66 +89,78 @@ export function renderMarkdown(md: string): string {
     return out;
   };
 
-  // Heuristic: detect "fake" headings — short lines (≤ 80 chars, no terminal
-  // punctuation, capitalized) that the AI dropped without "## " prefix.
-  // We aggressively split them out as standalone H2 blocks, even when they
-  // appear inside a paragraph (no blank line above), because that's the
-  // most common failure mode (article becomes a wall of text).
   const isLikelyHeading = (line: string, next: string): boolean => {
     const t = line.trim();
-    if (t.length === 0 || t.length > 80) return false;
+    const nextTrimmed = next.trim();
+    if (!t || t.length > 90) return false;
     if (/^[#>\-*\d`]/.test(t)) return false;
     if (/[.!?:;,]$/.test(t)) return false;
     if (!/^[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ"']/.test(t)) return false;
-    // must be followed by substantial content (a real paragraph)
-    if (next.trim().length < 40) return false;
-    if (/^[#>\-*]/.test(next.trim())) return false;
-    // Reject lines with too many words that look like sentences
-    const wordCount = t.split(/\s+/).length;
-    if (wordCount > 12) return false;
-    return true;
+    if (t.split(/\s+/).length > 12) return false;
+    if (!nextTrimmed) return false;
+    if (/^#{1,3}\s+/.test(nextTrimmed)) return false;
+    const nextLooksLikeContent =
+      nextTrimmed.length >= 24 ||
+      /^[-*]\s+/.test(nextTrimmed) ||
+      /^>\s+/.test(nextTrimmed) ||
+      /^\*\*/.test(nextTrimmed);
+    return nextLooksLikeContent;
   };
 
-  const lines = md.split("\n");
+  const lines = normalizedInput.split("\n");
   const promotedLines: string[] = [];
+
   for (let i = 0; i < lines.length; i++) {
-    const cur = lines[i];
+    const cur = lines[i] ?? "";
+    const trimmed = cur.trim();
     const next = lines[i + 1] ?? "";
-    const prev = lines[i - 1]?.trim() ?? "";
+    const prevOutput = promotedLines[promotedLines.length - 1]?.trim() ?? "";
 
     if (isLikelyHeading(cur, next)) {
-      // Force blank line BEFORE so it becomes its own block
-      if (prev !== "" && promotedLines[promotedLines.length - 1]?.trim() !== "") {
-        promotedLines.push("");
-      }
-      promotedLines.push(`## ${cur.trim()}`);
-      // Force blank line AFTER so the next paragraph is separate
-      if (next.trim() !== "") {
-        promotedLines.push("");
-      }
-    } else {
-      promotedLines.push(cur);
+      if (prevOutput !== "") promotedLines.push("");
+      promotedLines.push(`## ${trimmed}`);
+      if (next.trim() !== "") promotedLines.push("");
+      continue;
     }
-  }
-  const normalized = promotedLines.join("\n");
 
-  // Block-level parser
+    // Linhas em negrito seguidas de dois-pontos costumam ser mini-subtítulos.
+    if (/^\*\*[^*\n]{3,80}:\*\*/.test(trimmed) && prevOutput !== "") {
+      promotedLines.push("");
+      promotedLines.push(cur);
+      continue;
+    }
+
+    promotedLines.push(cur);
+  }
+
+  const normalized = promotedLines
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
   const blocks: string[] = [];
-  const rawBlocks = normalized.split(/\n{2,}/);
+  const rawBlocks = normalized.split(/\n\s*\n+/);
 
   for (const raw of rawBlocks) {
     const block = raw.trim();
     if (!block) continue;
 
-    // Heading
-    const h3 = block.match(/^###\s+(.+)$/);
-    const h2 = block.match(/^##\s+(.+)$/);
-    const h1 = block.match(/^#\s+(.+)$/);
-    if (h3) { blocks.push(`<h3>${inline(h3[1])}</h3>`); continue; }
-    if (h2) { blocks.push(`<h2>${inline(h2[1])}</h2>`); continue; }
-    if (h1) { blocks.push(`<h1>${inline(h1[1])}</h1>`); continue; }
+    const h3 = block.match(/^###\s+(.+)$/s);
+    const h2 = block.match(/^##\s+(.+)$/s);
+    const h1 = block.match(/^#\s+(.+)$/s);
+    if (h3) {
+      blocks.push(`<h3>${inline(h3[1].trim())}</h3>`);
+      continue;
+    }
+    if (h2) {
+      blocks.push(`<h2>${inline(h2[1].trim())}</h2>`);
+      continue;
+    }
+    if (h1) {
+      blocks.push(`<h1>${inline(h1[1].trim())}</h1>`);
+      continue;
+    }
 
-    // Blockquote (one or many > lines)
     if (/^>\s+/.test(block)) {
       const text = block
         .split("\n")
@@ -156,7 +171,6 @@ export function renderMarkdown(md: string): string {
       continue;
     }
 
-    // List (bullets)
     if (/^[-*]\s+/.test(block)) {
       const items = block
         .split("\n")
@@ -167,7 +181,6 @@ export function renderMarkdown(md: string): string {
       continue;
     }
 
-    // Numbered list
     if (/^\d+\.\s+/.test(block)) {
       const items = block
         .split("\n")
@@ -178,7 +191,38 @@ export function renderMarkdown(md: string): string {
       continue;
     }
 
-    // Paragraph — preserve single line breaks as <br/>
+    // Quando um bloco mistura parágrafo + subtítulo + parágrafo, quebramos linha a linha.
+    const sublines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    if (sublines.length > 1) {
+      for (let i = 0; i < sublines.length; i++) {
+        const line = sublines[i];
+        const next = sublines[i + 1] ?? "";
+
+        if (/^##\s+/.test(line)) {
+          blocks.push(`<h2>${inline(line.replace(/^##\s+/, ""))}</h2>`);
+          continue;
+        }
+        if (/^###\s+/.test(line)) {
+          blocks.push(`<h3>${inline(line.replace(/^###\s+/, ""))}</h3>`);
+          continue;
+        }
+        if (isLikelyHeading(line, next)) {
+          blocks.push(`<h2>${inline(line)}</h2>`);
+          continue;
+        }
+        if (/^[-*]\s+/.test(line)) {
+          blocks.push(`<ul><li>${inline(line.replace(/^[-*]\s+/, ""))}</li></ul>`);
+          continue;
+        }
+        if (/^>\s+/.test(line)) {
+          blocks.push(`<blockquote>${inline(line.replace(/^>\s+/, ""))}</blockquote>`);
+          continue;
+        }
+        blocks.push(`<p>${inline(line)}</p>`);
+      }
+      continue;
+    }
+
     blocks.push(`<p>${inline(block).replace(/\n/g, "<br/>")}</p>`);
   }
 
