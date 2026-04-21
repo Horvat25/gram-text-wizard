@@ -3153,6 +3153,7 @@ ${topPerformers.length > 0
 - Se um tipo tem 0 posts mas meta alta → priorize ele
 - Reels (criativo e notícia) só são criados via comando manual — auto-rotação está desligada para economizar crédito
 
+## 🧠 INTELIGÊNCIA SEMÂNTICA (CRÍTICO!)
 
 Você ENTENDE COMANDOS IMPLÍCITOS. Quando o usuário fala algo vago, você INTERPRETA e AGE.
 
