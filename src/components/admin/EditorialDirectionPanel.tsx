@@ -90,7 +90,7 @@ const decisionLabel = (d: string) => {
 };
 
 export default function EditorialDirectionPanel() {
-  const { workspace } = useWorkspace();
+  const { currentWorkspace: workspace } = useWorkspace();
   const [loading, setLoading] = useState(true);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [decisions, setDecisions] = useState<Decision[]>([]);
