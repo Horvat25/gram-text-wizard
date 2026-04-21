@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CostSummaryPanel from './CostSummaryPanel';
 import StrategyPanel from './StrategyPanel';
 import AgentVisionPanel from './AgentVisionPanel';
@@ -708,10 +708,14 @@ export default function ContentTestTab() {
                             className="text-[10px] cursor-pointer"
                             onClick={() => setActiveDetailType(type)}
                           >
-                            {post.status === 'draft'
+                            {post.status === 'pending_review'
+                              ? '⏳ Revisar'
+                              : post.status === 'draft'
                               ? '👁 Ver'
                               : post.status === 'scheduled'
                               ? '✓ Agendado'
+                              : post.status === 'generating'
+                              ? '⏳ Gerando'
                               : post.status}
                           </Badge>
                         )}
