@@ -102,7 +102,10 @@ export const AIModelSections = ({ articles }: AIModelSectionsProps) => {
   const [featuredArticle, ...otherArticles] = activeBucket.items;
 
   return (
-    <section aria-label="Notícias por empresa e modelo de IA" className="relative mt-16 md:mt-20 left-1/2 right-1/2 -mx-[50vw] w-screen border-y border-border/60">
+    <section
+      aria-label="Notícias por empresa e modelo de IA"
+      className="relative mt-16 md:mt-20 -mx-4 md:left-1/2 md:right-1/2 md:-mx-[50vw] md:w-screen border-y border-border/60 overflow-hidden"
+    >
       <div className={`absolute inset-0 bg-gradient-to-br ${activeBucket.model.backdropClass}`} />
       <div className="absolute inset-0 opacity-50 pointer-events-none bg-[linear-gradient(to_right,hsl(var(--border)/0.08)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.08)_1px,transparent_1px)] bg-[size:32px_32px]" />
 

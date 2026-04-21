@@ -63,6 +63,9 @@ const PortalHome = () => {
   return (
     <PortalLayout>
       <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* SEO: H1 semântico (uma vez por página) */}
+        <h1 className="sr-only">Neural Update — Notícias de tecnologia, IA e futuro</h1>
+
         {/* Editorial badge above hero */}
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
