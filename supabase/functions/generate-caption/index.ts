@@ -346,18 +346,30 @@ ${sizeRules}
       }
     }
 
-    // CTA FINAL OBRIGATÓRIO — "Segue a gente" (3 variações alternadas)
-    // Aplica apenas se a caption NÃO já termina com convite a seguir
+    // CTA FINAL — só adiciona se o último parágrafo NÃO traz CTA/follow naturalmente
+    // (a IA já foi instruída a encaixar a CTA no 3º/4º parágrafo)
     const finalCtaVariants = [
-      '\n\n👉 Segue @neuralupdate pra acompanhar o futuro da tecnologia em primeira mão.',
-      '\n\n⚡ Curtiu? Segue @neuralupdate — todo dia uma análise nova sobre IA, robótica e o que vem por aí.',
-      '\n\n🚀 Não perde a próxima — segue @neuralupdate e ativa o sininho 🔔 pra receber tudo antes de virar manchete.',
+      '👉 Segue @neuralupdate pra acompanhar o futuro da tecnologia em primeira mão.',
+      '⚡ Curtiu a análise? Segue @neuralupdate — todo dia uma nova sobre IA, robótica e o que vem por aí.',
+      '🚀 Não perde a próxima — segue @neuralupdate e ativa o sininho 🔔.',
     ];
-    const lastParagraphLower = (caption.split('\n\n').pop() || '').toLowerCase();
-    const alreadyHasFollowCta = /\b(segue|siga|seguir|follow|@neuralupdate)\b/.test(lastParagraphLower);
+    const paragraphsCheck = caption.split('\n\n');
+    const lastParagraphLower = (paragraphsCheck[paragraphsCheck.length - 1] || '').toLowerCase();
+    const alreadyHasFollowCta = /\b(segue|siga|seguir|follow|@neuralupdate|comenta|salva|compartilha)\b/.test(lastParagraphLower);
+
     if (!alreadyHasFollowCta) {
+      // Anexa ao final do último parágrafo (não cria parágrafo novo) — fica mais integrado
       const variant = finalCtaVariants[Math.floor(Math.random() * finalCtaVariants.length)];
-      caption = caption.trimEnd() + variant;
+      paragraphsCheck[paragraphsCheck.length - 1] = paragraphsCheck[paragraphsCheck.length - 1].trimEnd() + '\n\n' + variant;
+      caption = paragraphsCheck.join('\n\n');
+    }
+
+    // Garantir limite de 4 parágrafos (junta excesso no penúltimo)
+    const finalParagraphs = caption.split('\n\n');
+    if (finalParagraphs.length > 4) {
+      const head = finalParagraphs.slice(0, 3);
+      const tail = finalParagraphs.slice(3).join(' ');
+      caption = [...head, tail].join('\n\n');
     }
 
     console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
