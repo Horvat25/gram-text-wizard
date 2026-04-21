@@ -35,6 +35,7 @@ import ContentTestTab from '@/components/tabs/ContentTestTab';
 import ArticlesManagerTab from '@/components/admin/ArticlesManagerTab';
 import BlogStatsPanel from '@/components/admin/BlogStatsPanel';
 import AnalyticsPanel from '@/components/admin/AnalyticsPanel';
+import EditorialDirectionPanel from '@/components/admin/EditorialDirectionPanel';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Platform } from '@/components/PlatformSelector';
 
@@ -406,10 +407,14 @@ export default function AgentGenieView() {
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="p-4 max-w-4xl mx-auto">
-              <Tabs defaultValue="stats" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-3 h-8">
-                  <TabsTrigger value="stats" className="text-xs gap-1.5">
+              <Tabs defaultValue="direction" className="w-full">
+                <TabsList className="grid grid-cols-4 mb-3 h-8">
+                  <TabsTrigger value="direction" className="text-xs gap-1.5">
                     <TrendingUp className="h-3.5 w-3.5" />
+                    Direção
+                  </TabsTrigger>
+                  <TabsTrigger value="stats" className="text-xs gap-1.5">
+                    <Newspaper className="h-3.5 w-3.5" />
                     Conteúdo
                   </TabsTrigger>
                   <TabsTrigger value="analytics" className="text-xs gap-1.5">
@@ -421,6 +426,9 @@ export default function AgentGenieView() {
                     Artigos
                   </TabsTrigger>
                 </TabsList>
+                <TabsContent value="direction" className="mt-0">
+                  <EditorialDirectionPanel />
+                </TabsContent>
                 <TabsContent value="stats" className="mt-0">
                   <BlogStatsPanel />
                 </TabsContent>
