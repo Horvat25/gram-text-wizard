@@ -374,8 +374,8 @@ export default function AgentGenieView() {
               variant="ghost"
               size="sm"
               className="h-7 gap-1 px-2 text-[11px]"
-              onClick={() => window.open('/', '_blank', 'noopener,noreferrer')}
-              title="Abrir site público"
+              onClick={() => window.open('https://neural-update.com.br', '_blank', 'noopener,noreferrer')}
+              title="Abrir neural-update.com.br"
             >
               <Newspaper className="h-3 w-3" />
               <span className="hidden sm:inline">Ver site</span>

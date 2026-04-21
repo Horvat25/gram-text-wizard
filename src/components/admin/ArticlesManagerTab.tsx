@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ARTICLE_CATEGORIES, formatArticleDate, slugify } from "@/lib/article-helpers";
+import { publicArticleUrl } from "@/lib/site-url";
 import { Loader2, Plus, Eye, Edit, Trash2, Sparkles, Star, Newspaper, ImageIcon } from "lucide-react";
 
 interface ArticleRow {
@@ -251,8 +252,8 @@ const ArticlesManagerTab = () => {
                         <Star className={`h-3.5 w-3.5 ${a.is_featured ? "fill-yellow-500 text-yellow-500" : ""}`} />
                       </Button>
                       {a.status === "published" && (
-                        <Button size="icon" variant="ghost" className="h-7 w-7" asChild title="Ver no portal">
-                          <a href={`/noticia/${a.slug}`} target="_blank" rel="noopener noreferrer">
+                        <Button size="icon" variant="ghost" className="h-7 w-7" asChild title="Ver no portal (neural-update.com.br)">
+                          <a href={publicArticleUrl(a.slug)} target="_blank" rel="noopener noreferrer">
                             <Eye className="h-3.5 w-3.5" />
                           </a>
                         </Button>
