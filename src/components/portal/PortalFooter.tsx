@@ -1,33 +1,42 @@
 import { Link } from "react-router-dom";
 import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
+import logoUrl from "@/assets/neural-update-logo.png";
 
 export const PortalFooter = () => {
   return (
-    <footer className="border-t border-border bg-muted/30 mt-20">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">N</span>
+    <footer className="relative mt-24 border-t border-border/40">
+      <div className="absolute top-0 inset-x-0 portal-divider" aria-hidden />
+      <div className="container mx-auto px-4 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="h-9 w-9 rounded-lg overflow-hidden ring-1 ring-border/60">
+                <img src={logoUrl} alt="" className="h-full w-full object-cover" />
               </div>
-              <span className="font-bold text-lg">
-                Neural<span className="text-primary">Update</span>
+              <span className="font-display font-bold text-base tracking-tight">
+                Neural<span className="portal-gradient-text">Update</span>
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              O portal de notícias de tecnologia e futuro, atualizado em tempo real pela IA.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Notícias de tecnologia, inteligência artificial e futuro,
+              curadas e produzidas em tempo real pelo Agente Horvat.
             </p>
+            <div className="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary portal-live-dot" />
+              Atualizado ao vivo
+            </div>
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm mb-3">Categorias</h3>
-            <ul className="space-y-2">
+            <h3 className="font-display font-semibold text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">
+              Editorias
+            </h3>
+            <ul className="space-y-2.5">
               {ARTICLE_CATEGORIES.slice(0, 5).map((cat) => (
                 <li key={cat.slug}>
                   <Link
                     to={`/categoria/${cat.slug}`}
-                    className="text-sm text-muted-foreground hover:text-foreground"
+                    className="text-sm text-foreground/80 hover:text-primary transition-colors"
                   >
                     {cat.label}
                   </Link>
@@ -37,44 +46,53 @@ export const PortalFooter = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm mb-3">Institucional</h3>
-            <ul className="space-y-2">
+            <h3 className="font-display font-semibold text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">
+              Institucional
+            </h3>
+            <ul className="space-y-2.5">
               <li>
-                <Link to="/sobre" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link to="/sobre" className="text-sm text-foreground/80 hover:text-primary transition-colors">
                   Sobre
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
-                  Política de Privacidade
+                <Link to="/privacy-policy" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+                  Privacidade
                 </Link>
               </li>
               <li>
-                <Link to="/terms-of-service" className="text-sm text-muted-foreground hover:text-foreground">
-                  Termos de Uso
+                <Link to="/terms-of-service" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+                  Termos
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm mb-3">Acesso</h3>
-            <ul className="space-y-2">
+            <h3 className="font-display font-semibold text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">
+              Newsroom
+            </h3>
+            <ul className="space-y-2.5">
               <li>
-                <Link to="/admin" className="text-sm text-muted-foreground hover:text-foreground">
-                  Painel Editorial
+                <Link to="/admin" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+                  Painel editorial
+                </Link>
+              </li>
+              <li>
+                <Link to="/busca" className="text-sm text-foreground/80 hover:text-primary transition-colors">
+                  Buscar
                 </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-12 pt-6 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Neural Update. Conteúdo curado e produzido pelo Agente Horvat.
+            © {new Date().getFullYear()} Neural Update. Todos os direitos reservados.
           </p>
-          <p className="text-xs text-muted-foreground">
-            Tecnologia · IA · Futuro
+          <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            Brasil · 2026
           </p>
         </div>
       </div>
