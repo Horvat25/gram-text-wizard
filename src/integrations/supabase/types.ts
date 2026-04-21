@@ -543,6 +543,33 @@ export type Database = {
         }
         Relationships: []
       }
+      firecrawl_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          id: string
+          query: string
+          result: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          query: string
+          result: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          query?: string
+          result?: Json
+        }
+        Relationships: []
+      }
       instagram_accounts: {
         Row: {
           access_token: string
