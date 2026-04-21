@@ -1793,29 +1793,97 @@ Responda em JSON:
   
   console.log(`[AGENT] Carrossel com ${finalImages.length} slides finais`);
   
-  // STEP 5: Generate RICH educational caption
+  // STEP 5: Generate RICH educational caption + automatic tool links
+  // Mapeamento curado de ferramentas → links oficiais (agrega valor ao lead)
+  const TOOL_LINKS: Record<string, string> = {
+    'chatgpt': 'https://chat.openai.com',
+    'gpt-4': 'https://chat.openai.com',
+    'gpt-5': 'https://chat.openai.com',
+    'openai': 'https://openai.com',
+    'gemini': 'https://gemini.google.com',
+    'google gemini': 'https://gemini.google.com',
+    'claude': 'https://claude.ai',
+    'anthropic': 'https://anthropic.com',
+    'midjourney': 'https://midjourney.com',
+    'sora': 'https://openai.com/sora',
+    'dall-e': 'https://openai.com/dall-e-3',
+    'dalle': 'https://openai.com/dall-e-3',
+    'stable diffusion': 'https://stability.ai',
+    'runway': 'https://runwayml.com',
+    'pika': 'https://pika.art',
+    'cursor': 'https://cursor.com',
+    'lovable': 'https://lovable.dev',
+    'notion ai': 'https://notion.so/product/ai',
+    'notion': 'https://notion.so',
+    'perplexity': 'https://perplexity.ai',
+    'github copilot': 'https://github.com/features/copilot',
+    'copilot': 'https://copilot.microsoft.com',
+    'elevenlabs': 'https://elevenlabs.io',
+    'suno': 'https://suno.com',
+    'udio': 'https://udio.com',
+    'v0': 'https://v0.dev',
+    'figma': 'https://figma.com',
+    'canva': 'https://canva.com',
+    'grok': 'https://x.ai',
+    'deepseek': 'https://deepseek.com',
+    'llama': 'https://llama.meta.com',
+    'meta ai': 'https://meta.ai',
+  };
+
+  // Detect tools in slide content + article title/description (case-insensitive)
+  const detectTools = (text: string): { name: string; url: string }[] => {
+    const found: { name: string; url: string }[] = [];
+    const lower = text.toLowerCase();
+    const seen = new Set<string>();
+    for (const [keyword, url] of Object.entries(TOOL_LINKS)) {
+      if (lower.includes(keyword) && !seen.has(url)) {
+        // Use the proper-cased version (capitalize)
+        const properName = keyword.replace(/\b\w/g, c => c.toUpperCase());
+        found.push({ name: properName, url });
+        seen.add(url);
+      }
+    }
+    return found;
+  };
+
+  const aiSuggestedTools: string[] = (slideContents as any).tools_mentioned || [];
+  const haystack = [
+    bestArticle.title,
+    bestArticle.description || '',
+    slideContents.map(s => `${s.slideTitle} ${s.slideText}`).join(' '),
+    aiSuggestedTools.join(' '),
+  ].join(' ');
+  const detectedTools = detectTools(haystack).slice(0, 4); // máx 4 links para não poluir
+  console.log('[AGENT] 🔗 Ferramentas detectadas no carrossel:', detectedTools.map(t => t.name));
+
   let caption = '';
   let hashtags: string[] = ['#tecnologia', '#ia', '#inovacao', '#futuro', '#carrossel'];
   
+  const toolsBlock = detectedTools.length > 0
+    ? `\n\nFERRAMENTAS MENCIONADAS (inclua um bloco "🔗 FERRAMENTAS" no fim da legenda, ANTES das hashtags, listando cada uma com nome + link curto):\n${detectedTools.map(t => `- ${t.name}: ${t.url}`).join('\n')}`
+    : '';
+
   const captionPrompt = `Crie uma legenda RICA e EDUCACIONAL para um carrossel do Instagram sobre: "${bestArticle.title}"
 
-Os 3 slides do carrossel cobrem:
+Os 3 slides do carrossel cobrem (em ordem narrativa):
 1. ${slideContents[0]?.slideTitle}: ${slideContents[0]?.slideText}
 2. ${slideContents[1]?.slideTitle}: ${slideContents[1]?.slideText}
 3. ${slideContents[2]?.slideTitle}: ${slideContents[2]?.slideText}
 
-ESTRUTURA DA LEGENDA (obrigatória):
+ESTRUTURA DA LEGENDA (obrigatória, 3 a 4 parágrafos):
 🔥 HOOK (1 linha): Frase impactante que complementa o slide 1 sem repetir
-📌 CONTEXTO (2-3 linhas): Explicação concisa do tema com dados ou fatos
-💡 INSIGHT VALIOSO (2-3 linhas): Análise profunda, opinião ou previsão que agrega valor real
-👉 CTA (1 linha): Pergunta que convida ao debate
+📌 CONTEXTO + INSIGHT (2-3 linhas): Explicação concisa + análise valiosa
+💡 IMPACTO PRÁTICO (2-3 linhas): O que isso muda para o leitor (lead)
+👉 CTA (1 linha): Pergunta + "siga @neuralupdate para mais"
+${toolsBlock}
 
 REGRAS:
-- Legenda com VALOR REAL, não genérica
+- Legenda com VALOR REAL ao lead, não genérica
 - Tom: especialista acessível, não robótico
 - Máximo 250 palavras
 - Use emojis com moderação (máx 5)
 - Inclua fonte: ${bestArticle.source_name || 'Tech News'}
+- ${detectedTools.length > 0 ? 'OBRIGATÓRIO: incluir o bloco de ferramentas com links — isso agrega valor real ao lead' : 'Sem ferramentas detectadas neste tema'}
 - Gere 8-12 hashtags relevantes
 
 Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
@@ -1849,7 +1917,18 @@ Responda em JSON: { "caption": "...", "hashtags": ["...", "..."] }`;
   
   // Fallback caption
   if (!caption) {
-    caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente!`;
+    caption = `🔥 ${slideContents[0]?.slideTitle || bestArticle.title}\n\n${slideContents.map((s, i) => `${i + 1}. ${s.slideText}`).join('\n')}\n\n💡 Deslize para entender o impacto completo.\n\n📰 Fonte: ${bestArticle.source_name || 'Tech News'}\n\n👉 O que você acha? Comente e siga @neuralupdate!`;
+  }
+
+  // SAFETY NET: se a IA esqueceu de incluir os links das ferramentas, anexamos antes das hashtags
+  if (detectedTools.length > 0) {
+    const captionLower = caption.toLowerCase();
+    const missingTools = detectedTools.filter(t => !captionLower.includes(t.url.toLowerCase()));
+    if (missingTools.length > 0) {
+      const toolsSection = `\n\n🔗 FERRAMENTAS:\n${missingTools.map(t => `• ${t.name}: ${t.url}`).join('\n')}`;
+      caption = caption.trimEnd() + toolsSection;
+      console.log('[AGENT] ⚠️ Ferramentas anexadas pelo safety net:', missingTools.map(t => t.name));
+    }
   }
   
   // Review caption for spelling
