@@ -8,7 +8,7 @@ import {
   getCategoryLabel,
   renderMarkdown,
 } from "@/lib/article-helpers";
-import { Clock, Eye, Loader2 } from "lucide-react";
+import { Clock, Eye, Loader2, Sparkles, ListChecks, ExternalLink } from "lucide-react";
 
 interface ArticleFull extends ArticleCardData {
   id: string;
@@ -83,22 +83,80 @@ const ArticlePage = () => {
   const seoDesc = article.seo_description || article.excerpt || article.title;
   const seoImage = article.og_image_url || article.hero_image_url || undefined;
 
-  const jsonLd = {
+  // Extract first 3 H2/H3 headings as "Key points" for AI Search engines
+  const extractKeyPoints = (md: string): string[] => {
+    const lines = md.split("\n");
+    const headings: string[] = [];
+    for (const l of lines) {
+      const m = l.match(/^#{2,3}\s+(.+)$/);
+      if (m) headings.push(m[1].trim());
+      if (headings.length >= 5) break;
+    }
+    return headings;
+  };
+  const keyPoints = extractKeyPoints(article.content);
+
+  // TL;DR — short factual summary AI engines (ChatGPT, Perplexity) extract first
+  const tldr =
+    article.excerpt ||
+    article.subtitle ||
+    article.content.replace(/[#*>\-]/g, "").trim().split("\n").find((l) => l.length > 80)?.slice(0, 280) ||
+    seoDesc;
+
+  // Rich JSON-LD: NewsArticle + (optional) FAQPage when keyPoints exist.
+  // Generative engines parse structured data first — this is the #1 GEO lever.
+  const articleLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: article.title,
+    alternativeHeadline: article.subtitle || undefined,
     description: seoDesc,
+    abstract: tldr,
     image: seoImage ? [seoImage] : undefined,
     datePublished: article.published_at,
     dateModified: article.published_at,
-    author: { "@type": "Person", name: article.author_name },
+    author: {
+      "@type": "Person",
+      name: article.author_name,
+      url: `${window.location.origin}/sobre`,
+    },
     publisher: {
       "@type": "Organization",
       name: "Neural Update",
       logo: { "@type": "ImageObject", url: `${window.location.origin}/favicon.ico` },
+      url: window.location.origin,
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": window.location.href },
+    articleSection: getCategoryLabel(article.category),
+    keywords: article.tags?.join(", ") || undefined,
+    inLanguage: "pt-BR",
+    isAccessibleForFree: true,
+    wordCount: article.content.split(/\s+/).length,
+    citation: article.source_url
+      ? [{ "@type": "CreativeWork", name: article.source_name || "Fonte", url: article.source_url }]
+      : undefined,
   };
+
+  const jsonLd =
+    keyPoints.length >= 2
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            articleLd,
+            {
+              "@type": "FAQPage",
+              mainEntity: keyPoints.map((q) => ({
+                "@type": "Question",
+                name: q,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: `Resposta detalhada na seção "${q}" deste artigo da Neural Update.`,
+                },
+              })),
+            },
+          ],
+        }
+      : articleLd;
 
   return (
     <PortalLayout
@@ -154,6 +212,41 @@ const ArticlePage = () => {
           </figure>
         )}
 
+        {/* TL;DR — extraído pra buscadores generativos (ChatGPT, Perplexity, Gemini) */}
+        <aside
+          className="mt-8 mb-2 rounded-lg border border-primary/30 bg-primary/5 p-4 md:p-5"
+          aria-label="Resumo do artigo"
+        >
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-2">
+            <Sparkles className="h-3.5 w-3.5" />
+            TL;DR — em uma frase
+          </div>
+          <p className="text-base md:text-lg leading-relaxed text-foreground/95 font-medium">
+            {tldr}
+          </p>
+        </aside>
+
+        {/* Pontos-chave — para extração por IA */}
+        {keyPoints.length >= 2 && (
+          <aside
+            className="mb-8 rounded-lg border border-border/60 bg-card/40 p-4 md:p-5"
+            aria-label="Pontos-chave do artigo"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground mb-3">
+              <ListChecks className="h-3.5 w-3.5 text-primary" />
+              Pontos-chave
+            </div>
+            <ul className="space-y-1.5">
+              {keyPoints.map((p, i) => (
+                <li key={i} className="text-sm text-foreground/85 flex gap-2">
+                  <span className="text-primary font-bold shrink-0">{i + 1}.</span>
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+
         <div
           className="article-body prose prose-lg max-w-none dark:prose-invert
             prose-headings:font-bold prose-headings:tracking-tight
@@ -178,6 +271,27 @@ const ArticlePage = () => {
               </span>
             ))}
           </div>
+        )}
+
+        {/* Fonte ancorada — IA Search prioriza conteúdo com citação clara */}
+        {article.source_url && (
+          <footer className="mt-10 pt-6 border-t border-border/60">
+            <p className="text-xs text-muted-foreground mb-1.5 uppercase tracking-wider font-semibold">
+              Fonte original
+            </p>
+            <a
+              href={article.source_url}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline break-all"
+            >
+              {article.source_name || article.source_url}
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+            <p className="text-[11px] text-muted-foreground mt-2">
+              Publicado em {formatArticleDate(article.published_at)} · Neural Update · Editorial assistido por IA
+            </p>
+          </footer>
         )}
       </article>
 

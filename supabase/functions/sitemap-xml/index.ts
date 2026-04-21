@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
     for (const a of articles || []) {
       const lastmod = (a.updated_at || a.published_at || new Date().toISOString()).split("T")[0];
       xml += `  <url>\n`;
-      xml += `    <loc>${escapeXml(`${siteUrl}/artigo/${a.slug}`)}</loc>\n`;
+      xml += `    <loc>${escapeXml(`${siteUrl}/noticia/${a.slug}`)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.7</priority>\n`;

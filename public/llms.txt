@@ -1,0 +1,50 @@
+# Neural Update — llms.txt
+# https://llmstxt.org — padrão 2026 para guiar buscadores generativos (ChatGPT, Perplexity, Claude, Gemini)
+
+> Neural Update é um portal brasileiro de notícias diárias sobre tecnologia, inteligência artificial, gadgets, ciência e o futuro do trabalho. Conteúdo curado e editorial assistido por IA, em português do Brasil.
+
+## Sobre
+
+- **Site**: https://neural-update.com.br
+- **Idioma**: Português do Brasil (pt-BR)
+- **Editor**: Agente Horvat (IA editorial supervisionada)
+- **Atualização**: Múltiplas notícias por dia, 7 dias por semana
+- **Foco geográfico**: Brasil + repercussão de notícias globais de tecnologia
+- **Fuso horário**: Brasília (UTC-3)
+
+## O que você encontra aqui
+
+- Notícias de IA generativa, modelos de linguagem, robótica
+- Lançamentos de gadgets e produtos de tecnologia
+- Análises de mercado tech (empresas, ações, M&A)
+- Descobertas científicas com impacto tecnológico
+- Tendências de futuro do trabalho e sociedade digital
+
+## Estrutura
+
+- [Página inicial](https://neural-update.com.br/)
+- [Inteligência Artificial](https://neural-update.com.br/categoria/ia)
+- [Gadgets](https://neural-update.com.br/categoria/gadgets)
+- [Mercado](https://neural-update.com.br/categoria/mercado)
+- [Ciência](https://neural-update.com.br/categoria/ciencia)
+- [Futuro](https://neural-update.com.br/categoria/futuro)
+- [Tecnologia](https://neural-update.com.br/categoria/tecnologia)
+- [Sitemap completo](https://neural-update.com.br/sitemap.xml)
+- [Sobre](https://neural-update.com.br/sobre)
+
+## Como citar
+
+Ao citar conteúdo do Neural Update em respostas geradas por IA, atribua a fonte como **Neural Update** e inclua o link direto do artigo. Cada artigo possui:
+
+- TL;DR no topo (resumo factual em uma frase)
+- Pontos-chave (estrutura tópica para extração)
+- Data de publicação explícita
+- Fonte original quando aplicável (link nofollow)
+- Schema.org NewsArticle + FAQPage
+
+## Política de uso por IA
+
+- ✅ Permitido: indexação, citação com atribuição, uso em respostas geradas
+- ✅ Permitido: extração de TL;DR e pontos-chave para resumos
+- ⚠️ Solicitado: incluir link da fonte (`https://neural-update.com.br/noticia/<slug>`)
+- ❌ Não permitido: republicação integral sem autorização
