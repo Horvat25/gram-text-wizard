@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CostSummaryPanel from './CostSummaryPanel';
 import StrategyPanel from './StrategyPanel';
+import AgentVisionPanel from './AgentVisionPanel';
 import { DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -654,6 +655,8 @@ export default function ContentTestTab() {
         </div>
       ) : (
         <>
+          <AgentVisionPanel />
+
           <div className="space-y-1">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4 text-primary" />
