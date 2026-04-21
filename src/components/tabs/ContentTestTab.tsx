@@ -435,6 +435,57 @@ export default function ContentTestTab() {
   const [editingType, setEditingType] = useState<string | null>(null);
   const [subTab, setSubTab] = useState<'teste' | 'custo'>('teste');
 
+  // Recover pending_review/generating posts on mount (survives tab switching)
+  // This way trocar de aba durante geração não perde o post de vista
+  useEffect(() => {
+    if (!currentWorkspace?.id) return;
+    let cancelled = false;
+    (async () => {
+      // Look back 30 min for pending posts created via test flow
+      const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { data: pending } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('workspace_id', currentWorkspace.id)
+        .in('status', ['pending_review', 'generating'])
+        .gte('created_at', since)
+        .order('created_at', { ascending: false });
+
+      if (cancelled || !pending || pending.length === 0) return;
+
+      // Map by media_type → content_type slot
+      const typeMap: Record<string, string> = {
+        image: 'image',
+        carousel: 'carousel',
+        video: 'video',
+      };
+      const recovered: Record<string, TestResult> = {};
+      for (const p of pending) {
+        const slot = typeMap[p.media_type as string] || 'image';
+        if (!recovered[slot]) {
+          recovered[slot] = {
+            post: p,
+            agentResponse: { decision: p.status === 'generating' ? 'GENERATING' : 'POST' },
+          };
+        }
+      }
+      setResults((prev) => ({ ...recovered, ...prev }));
+
+      // Re-poll any that are still generating
+      for (const p of pending) {
+        if (p.status === 'generating') {
+          const slot = typeMap[p.media_type as string] || 'image';
+          setGenerating(slot);
+          pollPost(p.id, slot);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWorkspace?.id]);
+
   // Poll a post until it's no longer 'generating'
   const pollPost = async (postId: string, contentType: string) => {
     const maxAttempts = 60; // ~2 minutes
