@@ -21,14 +21,56 @@ const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
 const VALID_CATEGORIES = ["ia", "gadgets", "futuro", "mercado", "ciencia", "tecnologia"];
 
-// Topic seeds for autonomous research when no RSS item is provided
+// ───────────────────────────────────────────────────────────────────────────
+// TECH-ONLY FILTER (Neural Update editorial focus)
+// Block anything that isn't IA / tech / inovação / ciência tech.
+// Rejects: deals, coupons, "10 ofertas de…", product lists, game reviews,
+// movies/series, sports, lifestyle, finance unrelated to tech.
+// ───────────────────────────────────────────────────────────────────────────
+const BLOCKED_PATTERNS = [
+  // promotional / commerce
+  /\b(oferta|ofertas|cupom|cupons|desconto|descontos|promoç[ãa]o|black\s*friday)\b/i,
+  /\b\d+\s*%\s*(off|de\s*desconto)\b/i,
+  /\b(magalu|magazine\s*luiza|mercado\s*livre|amazon\.com|americanas|kabum|shopee|aliexpress)\b/i,
+  /\bmelhor(es)?\s+(pre[çc]o|oferta)/i,
+  /\bem\s+oferta\b/i,
+  // generic "top X products" lists (afiliado disfarçado)
+  /^\s*\d{1,2}\s+(melhores|ofertas|dicas|coisas|produtos|gadgets|smartphones|notebooks|monitores|teclados|mouses|fones|smartwatches|capinhas|ssds)\b/i,
+  // games / entertainment
+  /\b(diablo|fortnite|minecraft|fifa|call\s*of\s*duty|gta|xbox\s*game\s*pass|playstation\s*plus|nintendo\s*switch)\b/i,
+  /\b(filme|filmes|s[ée]rie|s[ée]ries|netflix|prime\s*video|disney\+|globoplay|hbo)\b/i,
+  /\breview\s+de\s+(jogo|game)\b/i,
+  /\bzerar\s+(jogo|game)\b/i,
+  // sports / lifestyle
+  /\b(futebol|ronaldinho|neymar|copa\s+do\s+mundo|olimp[íi]ada)\b/i,
+  /\b(receita|moda|beleza|fitness|emagrecer)\b/i,
+];
+
+function isTechRelevant(title: string, description?: string): { allowed: boolean; reason: string } {
+  const text = `${title} ${description ?? ""}`.toLowerCase();
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(text)) {
+      return { allowed: false, reason: `bloqueado por padrão: ${pattern.source.slice(0, 60)}` };
+    }
+  }
+  // Must contain at least one tech signal
+  const TECH_SIGNALS = /\b(ia|inteligência\s*artificial|machine\s*learning|chatgpt|gemini|claude|openai|anthropic|google|apple|meta|microsoft|nvidia|samsung|tesla|spacex|robô|robótica|quantum|qu[âa]ntic|chip|processador|semicondutor|algoritmo|software|aplicativo|app|tecnologia|inovação|startup\s+(de|tech)|computação|nuvem|cloud|cibersegurança|blockchain|criptomoeda|metaverso|realidade\s+(virtual|aumentada)|biotec|neurotec|wearable|iot|5g|6g|satélite|foguete|missão\s+espacial|nasa|ciência|pesquisa|descoberta|estudo|cientistas|pesquisadores)\b/i;
+  if (!TECH_SIGNALS.test(text)) {
+    return { allowed: false, reason: "sem sinal claro de IA/tecnologia/ciência" };
+  }
+  return { allowed: true, reason: "ok" };
+}
+
+// Topic seeds for autonomous research when no RSS item is provided (TECH-ONLY)
 const AUTONOMOUS_TOPICS = [
-  { q: "novidades inteligência artificial Brasil", category: "ia" },
-  { q: "lançamento smartphone tecnologia 2026", category: "gadgets" },
-  { q: "inovação tecnológica futuro empresas", category: "futuro" },
-  { q: "mercado tech investimento startup", category: "mercado" },
-  { q: "descoberta científica tecnologia", category: "ciencia" },
-  { q: "novidade tecnologia consumidor", category: "tecnologia" },
+  { q: "avanço inteligência artificial generativa 2026", category: "ia" },
+  { q: "novo modelo de IA OpenAI Anthropic Google", category: "ia" },
+  { q: "lançamento chip processador NVIDIA Apple", category: "gadgets" },
+  { q: "robótica humanoide avanço pesquisa", category: "futuro" },
+  { q: "computação quântica breakthrough", category: "ciencia" },
+  { q: "missão espacial SpaceX NASA", category: "ciencia" },
+  { q: "startup tecnologia inovação Brasil", category: "futuro" },
+  { q: "cibersegurança ataque vulnerabilidade", category: "tecnologia" },
 ];
 
 function slugify(input: string): string {
@@ -265,6 +307,13 @@ Deno.serve(async (req) => {
     if (rssItemId) {
       const { data } = await supabase.from("rss_items").select("*").eq("id", rssItemId).maybeSingle();
       if (data) {
+        const check = isTechRelevant(data.title, data.description ?? "");
+        if (!check.allowed) {
+          return new Response(
+            JSON.stringify({ success: false, skipped: true, reason: check.reason, title: data.title }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
         angle = {
           seedTitle: data.title,
           seedDescription: data.description ?? "",
@@ -275,13 +324,14 @@ Deno.serve(async (req) => {
     } else if (topic && typeof topic === "string") {
       angle.seedTitle = topic;
     } else {
-      // Try fresh RSS first
+      // Try fresh RSS first — scan up to 100 to skip the promotional noise
       const { data: candidates } = await supabase
         .from("rss_items")
         .select("*")
         .eq("workspace_id", workspaceId)
+        .eq("is_used", false)
         .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(30);
+        .limit(100);
 
       if (candidates && candidates.length > 0) {
         const ids = candidates.map((c) => c.id);
@@ -290,22 +340,33 @@ Deno.serve(async (req) => {
           .select("source_rss_item_id")
           .in("source_rss_item_id", ids);
         const usedSet = new Set((used ?? []).map((u: any) => u.source_rss_item_id));
-        const fresh = candidates.find((c) => !usedSet.has(c.id));
-        if (fresh) {
+
+        // Find first RSS item that passes tech filter AND wasn't used
+        let skippedCount = 0;
+        for (const c of candidates) {
+          if (usedSet.has(c.id)) continue;
+          const check = isTechRelevant(c.title, c.description ?? "");
+          if (!check.allowed) {
+            skippedCount += 1;
+            continue;
+          }
           angle = {
-            seedTitle: fresh.title,
-            seedDescription: fresh.description ?? "",
+            seedTitle: c.title,
+            seedDescription: c.description ?? "",
             category: "tecnologia",
-            sourceRssId: fresh.id,
+            sourceRssId: c.id,
           };
+          break;
         }
+        console.log(`[generate-article] Skipped ${skippedCount} non-tech RSS items`);
       }
 
-      // Autonomous fallback — Horvat picks a topic himself
+      // Autonomous fallback — Horvat picks a TECH topic himself
       if (!angle.seedTitle) {
         const seed = AUTONOMOUS_TOPICS[Math.floor(Math.random() * AUTONOMOUS_TOPICS.length)];
         angle.seedTitle = seed.q;
         angle.category = seed.category;
+        console.log(`[generate-article] Using autonomous tech topic: "${seed.q}"`);
       }
     }
 
