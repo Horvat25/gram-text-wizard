@@ -105,73 +105,37 @@ Deno.serve(async (req) => {
         feedback: feedback || undefined,
       }),
     }).then(async (res) => {
+      // The agent now handles the placeholder merge internally (via placeholderPostId).
+      // We only need to mark as failed if the HTTP call itself failed AND the placeholder
+      // is still in 'generating' state (meaning the agent didn't process it).
       if (!res.ok) {
         const errText = await res.text().catch(() => 'unknown error');
-        console.error(`[test-content] Background agent failed: ${errText}`);
-        // Mark placeholder as failed
-        await supabase.from("posts").update({
-          status: 'failed',
-          error_message: `Falha ao gerar: ${errText.substring(0, 200)}`,
-        }).eq("id", placeholder.id);
+        console.error(`[test-content] Background agent HTTP failed: ${errText.substring(0, 200)}`);
+        // Wait a bit — the agent may still be processing despite gateway error
+        await new Promise(r => setTimeout(r, 3000));
+        const { data: cur } = await supabase
+          .from('posts').select('status').eq('id', placeholder.id).single();
+        if (cur?.status === 'generating') {
+          await supabase.from("posts").update({
+            status: 'failed',
+            error_message: `Falha ao gerar (HTTP ${res.status}): ${errText.substring(0, 150)}`,
+          }).eq("id", placeholder.id);
+        }
         return;
       }
-
-      const agentData = await res.json().catch(() => ({}));
-      const realPostId = agentData?.postId || agentData?.post?.id;
-
-      if (realPostId && realPostId !== placeholder.id) {
-        // Agent created a different post. Copy its data to our placeholder and delete the extra.
-        const { data: realPost } = await supabase
-          .from("posts")
-          .select("*")
-          .eq("id", realPostId)
-          .single();
-
-        if (realPost) {
-          await supabase.from("posts").update({
-            caption: realPost.caption,
-            image_url: realPost.image_url,
-            video_url: realPost.video_url,
-            carousel_images: realPost.carousel_images,
-            hashtags: realPost.hashtags,
-            overlay_metadata: realPost.overlay_metadata,
-            media_type: realPost.media_type,
-            post_type: realPost.post_type,
-            ai_model_used: realPost.ai_model_used,
-            cost_estimate: realPost.cost_estimate,
-            // CRITICAL: pending_review impede que o post vaze pra Fila/Rascunhos
-            // antes do usuário aprovar/rejeitar na aba Teste.
-            status: 'pending_review',
-            scheduled_for: null,
-            published_at: null,
-          }).eq("id", placeholder.id);
-
-          // Delete the extra post
-          await supabase.from("posts").delete().eq("id", realPostId);
-          console.log(`[test-content] Merged post ${realPostId} → placeholder ${placeholder.id} (pending_review)`);
-        }
-      } else if (!realPostId) {
-        // No post was created, mark as failed
+      console.log(`[test-content] Agent fetch returned OK for placeholder ${placeholder.id}`);
+    }).catch(async (err) => {
+      console.error(`[test-content] Background fetch error:`, err?.message || err);
+      // Same logic — only mark failed if placeholder is still generating
+      await new Promise(r => setTimeout(r, 3000));
+      const { data: cur } = await supabase
+        .from('posts').select('status').eq('id', placeholder.id).single();
+      if (cur?.status === 'generating') {
         await supabase.from("posts").update({
           status: 'failed',
-          error_message: 'Agente não criou nenhum post',
-        }).eq("id", placeholder.id);
-      } else {
-        // Agent used the same ID somehow or we need to just update status
-        await supabase.from("posts").update({
-          status: 'pending_review',
-          scheduled_for: null,
-          published_at: null,
+          error_message: `Erro de conexão: ${err?.message || 'unknown'}`,
         }).eq("id", placeholder.id);
       }
-
-      console.log(`[test-content] Background generation complete for ${placeholder.id}`);
-    }).catch(async (err) => {
-      console.error(`[test-content] Background fetch error:`, err);
-      await supabase.from("posts").update({
-        status: 'failed',
-        error_message: `Erro de conexão: ${err?.message || 'unknown'}`,
-      }).eq("id", placeholder.id);
     });
 
     // CRITICAL: keep runtime alive until the agent finishes,
