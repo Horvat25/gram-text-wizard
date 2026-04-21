@@ -206,13 +206,17 @@ serve(async (req) => {
     const currentYear = new Date().getFullYear(); // Always use current year (2025+)
     
     // CTA programático baseado no tipo de mídia
+    // ⚠️ Para imagens com legenda profunda (noticia, reflexao_profunda) NÃO injetamos
+    // o "👇 LEIA A LEGENDA" — a própria headline provocativa já faz esse trabalho,
+    // e o conteúdo precisa começar entregando, não prometendo.
     let mediaCTA = "";
+    const isDeepCaption = postType === "noticia" || postType === "reflexao_profunda";
     if (mediaType === "carousel") {
       mediaCTA = "\n\n🔹 ARRASTE PRO LADO para ver mais 👉";
     } else if (mediaType === "video" || mediaType === "reel") {
       mediaCTA = "\n\n📺 ASSISTA ATÉ O FINAL ▶️";
-    } else {
-      // Para imagens (posts de notícia)
+    } else if (!isDeepCaption) {
+      // Só posts curtos ganham o gancho explícito
       mediaCTA = "\n\n👇 LEIA A LEGENDA COMPLETA";
     }
 
@@ -231,6 +235,16 @@ serve(async (req) => {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;
     }
 
+    // Regras de tamanho diferenciadas: legendas profundas vs. curtas
+    const sizeRules = isDeepCaption
+      ? `- ENTRE 800 E 1500 CARACTERES (legenda PROFUNDA — o leitor não vai pra lugar nenhum, ENTREGUE conteúdo)
+- 4 blocos separados por linha em branco (hook → contexto → análise → provocação)
+- Cada parágrafo: máximo 4 linhas
+- Sem hype vazio: cada frase precisa de informação OU opinião concreta`
+      : `- MÁXIMO 2-3 parágrafos curtos (no máximo 4 em casos especiais)
+- MÁXIMO 400-700 caracteres (seja CONCISO!)
+- Ninguém quer ler textão - vá DIRETO ao ponto`;
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -248,9 +262,7 @@ serve(async (req) => {
 REGRAS OBRIGATÓRIAS:
 - Retorne APENAS a legenda pronta (sem títulos ou explicações)
 - NÃO USE MARKDOWN: sem **, _, \`
-- MÁXIMO 2-3 parágrafos curtos (no máximo 4 em casos especiais)
-- MÁXIMO 400-700 caracteres (seja CONCISO!)
-- Ninguém quer ler textão - vá DIRETO ao ponto
+${sizeRules}
 - Use 2-3 emojis estratégicos
 - Use CAPS para ênfase quando necessário
 - Hashtags separadas por linha em branco no final
