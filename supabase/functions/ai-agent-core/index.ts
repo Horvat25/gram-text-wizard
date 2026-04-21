@@ -2927,7 +2927,9 @@ OBRIGATÓRIO ao final:
       source_domain: sourceDomain,
       original_title: selectedArticle?.title,
       used_real_image: !!selectedImage,
-      text_applied_by_code: true // Flag indicating text was applied programmatically
+      text_applied_by_code: true,
+      overlay_status: overlayStatus,
+      overlay_failure_reason: overlayFailureReason,
     },
     ai_model_used: 'gemini-2.5-flash' // For headline generation only
   }).select().single();
