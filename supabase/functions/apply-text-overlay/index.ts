@@ -445,8 +445,9 @@ serve(async (req) => {
         headline: headlineText,
         hasOverlay: renderMethod !== 'original-no-overlay',
         renderMethod,
-        spellingReviewed: true,
-        spellingCorrected: review.wasModified,
+        spellingReviewed: review.success,
+        spellingCorrected: review.success && review.wasModified,
+        reviewWarning,
         overlayMetadata: {
           headlineText: headlineText.toUpperCase(),
           watermarkText,
