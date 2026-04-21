@@ -553,22 +553,27 @@ export default function ContentTestTab() {
     setActiveDetailType(contentType);
 
     try {
-      // Delete previous draft if regenerating
+      // Save rejection feedback BEFORE deleting (with post_id=null to avoid FK conflict)
       const prevPost = results[contentType]?.post;
-      if (prevPost?.id && (prevPost.status === 'draft' || prevPost.status === 'generating')) {
-        await supabase.from('posts').delete().eq('id', prevPost.id);
-      }
-
-      // Save rejection feedback if regenerating with feedback
       if (feedbackHint && prevPost?.id) {
-        await supabase.from('agent_decisions').insert({
+        const captionPreview = prevPost?.caption?.slice(0, 200) || '';
+        const { error: feedbackError } = await supabase.from('agent_decisions').insert({
           user_id: user.id,
           workspace_id: currentWorkspace.id,
-          post_id: prevPost.id,
+          post_id: null,
           decision: 'test_regenerated',
           decision_reason: feedbackHint,
-          learning: `Regenerado ${contentType}: ${feedbackHint}`,
+          learning: `Regenerado [${contentType}]: ${feedbackHint}\n--- Conteúdo anterior: ${captionPreview}`,
         });
+        if (feedbackError) {
+          console.error('Erro ao salvar feedback de regeneração:', feedbackError);
+          toast.error(`Erro ao salvar feedback: ${feedbackError.message}`);
+        }
+      }
+
+      // Delete previous draft if regenerating
+      if (prevPost?.id && (prevPost.status === 'draft' || prevPost.status === 'generating' || prevPost.status === 'pending_review')) {
+        await supabase.from('posts').delete().eq('id', prevPost.id);
       }
 
       const { data, error } = await supabase.functions.invoke('generate-test-content', {
@@ -609,7 +614,7 @@ export default function ContentTestTab() {
   const approveAndPublish = async (postId: string, feedbackText: string, rating: number) => {
     try {
       if (feedbackText || rating) {
-        await supabase.from('agent_decisions').insert({
+        const { error: feedbackError } = await supabase.from('agent_decisions').insert({
           user_id: user!.id,
           workspace_id: currentWorkspace!.id,
           post_id: postId,
@@ -618,6 +623,11 @@ export default function ContentTestTab() {
           expected_engagement: rating,
           learning: `Aprovado (${rating}/5): ${feedbackText}`,
         });
+        if (feedbackError) {
+          console.error('Erro ao salvar feedback:', feedbackError);
+          toast.error(`Erro ao salvar feedback: ${feedbackError.message}`);
+          return;
+        }
       }
 
       const scheduledTime = new Date();
@@ -640,27 +650,42 @@ export default function ContentTestTab() {
       }));
 
       toast.success('Aprovado! Agendado para daqui 1 hora');
-    } catch (e) {
-      toast.error('Erro ao agendar');
+    } catch (e: any) {
+      console.error('approveAndPublish error:', e);
+      toast.error(e?.message || 'Erro ao agendar');
     }
   };
 
   const rejectPost = async (postId: string, feedbackText: string, rating: number) => {
     const ct = activeDetailType!;
     try {
+      // Capture post snapshot for context BEFORE deletion
+      const snapshot = results[ct]?.post;
+      const captionPreview = snapshot?.caption?.slice(0, 200) || '';
+
+      // Save feedback with post_id = null (to avoid FK conflict on delete)
       if (feedbackText || rating) {
-        await supabase.from('agent_decisions').insert({
+        const { error: feedbackError } = await supabase.from('agent_decisions').insert({
           user_id: user!.id,
           workspace_id: currentWorkspace!.id,
-          post_id: postId,
+          post_id: null, // null to avoid FK NO ACTION blocking the delete
           decision: 'test_rejected',
           decision_reason: feedbackText || 'Rejeitado',
           expected_engagement: rating,
-          learning: `Rejeitado (${rating}/5): ${feedbackText}`,
+          learning: `Rejeitado [${ct}] (${rating}/5): ${feedbackText}\n--- Conteúdo: ${captionPreview}`,
         });
+        if (feedbackError) {
+          console.error('Erro ao salvar feedback:', feedbackError);
+          toast.error(`Erro ao salvar feedback: ${feedbackError.message}`);
+          return;
+        }
       }
 
-      await supabase.from('posts').delete().eq('id', postId);
+      const { error: deleteError } = await supabase.from('posts').delete().eq('id', postId);
+      if (deleteError) {
+        console.error('Erro ao deletar post:', deleteError);
+        toast.error(`Feedback salvo, mas falha ao deletar: ${deleteError.message}`);
+      }
 
       setResults((prev) => {
         const copy = { ...prev };
@@ -670,8 +695,9 @@ export default function ContentTestTab() {
 
       toast.success(feedbackText ? 'Rejeitado — feedback salvo' : 'Post removido');
       setActiveDetailType(null);
-    } catch (e) {
-      toast.error('Erro ao deletar');
+    } catch (e: any) {
+      console.error('rejectPost error:', e);
+      toast.error(e?.message || 'Erro ao rejeitar');
     }
   };
 
