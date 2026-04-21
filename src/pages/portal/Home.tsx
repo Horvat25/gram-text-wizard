@@ -3,23 +3,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { HeroArticle } from "@/components/portal/HeroArticle";
 import { ArticleCard, type ArticleCardData } from "@/components/portal/ArticleCard";
+import { AIModelSections } from "@/components/portal/AIModelSections";
 import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
 import { Loader2, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
+type ArticleListItem = ArticleCardData & { tags?: string[] | null };
+
 const PortalHome = () => {
-  const [articles, setArticles] = useState<ArticleCardData[]>([]);
+  const [articles, setArticles] = useState<ArticleListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
         .from("articles")
-        .select("slug,title,excerpt,hero_image_url,category,published_at,reading_time_minutes,is_featured")
+        .select("slug,title,excerpt,hero_image_url,category,published_at,reading_time_minutes,is_featured,tags")
         .eq("status", "published")
         .order("published_at", { ascending: false })
         .limit(40);
-      setArticles((data ?? []) as ArticleCardData[]);
+      setArticles((data ?? []) as ArticleListItem[]);
       setLoading(false);
     })();
   }, []);
