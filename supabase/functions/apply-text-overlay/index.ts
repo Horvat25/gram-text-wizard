@@ -207,9 +207,10 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
 function buildOverlaySvg(
   headline: string,
   watermark: string,
-  ctaText: string = 'LEIA A LEGENDA 👇',
+  ctaText: string | null = 'LEIA A LEGENDA 👇',
   width = 1080,
-  height = 1350
+  height = 1350,
+  showWatermark: boolean = true,
 ): string {
   const headlineUpper = headline.toUpperCase();
   
@@ -238,6 +239,23 @@ function buildOverlaySvg(
     return `${shadows}<text x="${width / 2}" y="${y}" ${commonAttrs} fill="#FFD700">${escaped}</text>`;
   }).join('\n');
 
+  const ctaElement = ctaText
+    ? `<text x="${width / 2}" y="${textStartY + totalTextHeight + 40}" text-anchor="middle"
+         font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700"
+         fill="#FF6B35">${escapeXml(ctaText)}</text>`
+    : '';
+
+  const watermarkBottomElement = showWatermark
+    ? `<text x="${width - 40}" y="${height - 45}" text-anchor="end"
+         font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" font-size="28" font-weight="900"
+         fill="#FFD700" opacity="0.95">⚡ ${escapeXml(watermark.toUpperCase())}</text>`
+    : '';
+
+  // Top-left small watermark sempre presente (branding sutil)
+  const watermarkTopElement = `<text x="30" y="50"
+         font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600"
+         fill="white" opacity="0.6">${escapeXml(watermark)}</text>`;
+
   // SVG SEM a imagem embedded (compomos depois com imagescript — muito mais leve para o resvg)
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -258,15 +276,9 @@ function buildOverlaySvg(
   <rect x="0" y="${height - 120}" width="${width}" height="120" fill="black" opacity="0.92"/>
   <rect x="0" y="0" width="${width}" height="80" fill="url(#topGrad)"/>
   ${textElements}
-  <text x="${width / 2}" y="${textStartY + totalTextHeight + 40}" text-anchor="middle"
-        font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700"
-        fill="#FF6B35">${escapeXml(ctaText)}</text>
-  <text x="${width - 40}" y="${height - 45}" text-anchor="end"
-        font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" font-size="28" font-weight="900"
-        fill="#FFD700" opacity="0.95">⚡ ${escapeXml(watermark.toUpperCase())}</text>
-  <text x="30" y="50"
-        font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600"
-        fill="white" opacity="0.6">${escapeXml(watermark)}</text>
+  ${ctaElement}
+  ${watermarkBottomElement}
+  ${watermarkTopElement}
 </svg>`;
 }
 
