@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { encode as b64encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
+import { Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -204,8 +205,6 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
 }
 
 function buildOverlaySvg(
-  imageBase64: string,
-  mimeType: string,
   headline: string,
   watermark: string,
   ctaText: string = 'LEIA A LEGENDA 👇',
@@ -224,90 +223,91 @@ function buildOverlaySvg(
   const lineHeight = fontSize * 1.25;
   const totalTextHeight = lines.length * lineHeight;
   
-  // Position text at ~65% height, leaving bottom padding for Instagram crop
+  // Position text at ~63% height (deixa espaço para CTA e watermark sem ocultar foco)
   const textStartY = height * 0.63 - (totalTextHeight / 2);
   const gradientStartPct = Math.max(30, Math.round((textStartY / height) * 100) - 15);
   
-  // Build text lines: render black "shadow" copies offset in 4 directions, then yellow text on top
-  // This avoids resvg paint-order/stroke rendering bugs that cut letters in half
   const textElements = lines.map((line, i) => {
     const y = textStartY + (i * lineHeight);
     const escaped = escapeXml(line);
     const commonAttrs = `text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="${fontSize}" font-weight="700" letter-spacing="2"`;
-    // Black shadow copies (offset in 8 directions for full outline effect)
     const offsets = [[-2,-2],[2,-2],[-2,2],[2,2],[0,-3],[0,3],[-3,0],[3,0]];
     const shadows = offsets.map(([dx, dy]) =>
       `<text x="${width / 2 + dx}" y="${y + dy}" ${commonAttrs} fill="#000">${escaped}</text>`
     ).join('');
-    return `
-      ${shadows}
-      <text x="${width / 2}" y="${y}" ${commonAttrs} fill="#FFD700">${escaped}</text>`;
+    return `${shadows}<text x="${width / 2}" y="${y}" ${commonAttrs} fill="#FFD700">${escaped}</text>`;
   }).join('\n');
 
+  // SVG SEM a imagem embedded (compomos depois com imagescript — muito mais leve para o resvg)
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-     width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  
-  <!-- Background image -->
-  <image href="data:${mimeType};base64,${imageBase64}" 
-         x="0" y="0" width="${width}" height="${height}" 
-         preserveAspectRatio="xMidYMid slice"/>
-  
-  <!-- Dark gradient overlay on bottom half -->
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <defs>
     <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="black" stop-opacity="0"/>
       <stop offset="${gradientStartPct}%" stop-color="black" stop-opacity="0"/>
-      <stop offset="${gradientStartPct + 20}%" stop-color="black" stop-opacity="0.5"/>
+      <stop offset="${gradientStartPct + 20}%" stop-color="black" stop-opacity="0.55"/>
       <stop offset="80%" stop-color="black" stop-opacity="0.85"/>
       <stop offset="100%" stop-color="black" stop-opacity="0.95"/>
     </linearGradient>
-    <!-- Top gradient for watermark area -->
     <linearGradient id="topGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="black" stop-opacity="0.7"/>
+      <stop offset="0%" stop-color="black" stop-opacity="0.65"/>
       <stop offset="100%" stop-color="black" stop-opacity="0"/>
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="${width}" height="${height}" fill="url(#grad)"/>
-  
-  <!-- Solid black bar at very bottom to COVER source watermarks (tecnoblog etc) -->
-  <rect x="0" y="${height - 120}" width="${width}" height="120" fill="black" opacity="0.95"/>
-  
-  <!-- Top strip for branding -->
+  <rect x="0" y="${height - 120}" width="${width}" height="120" fill="black" opacity="0.92"/>
   <rect x="0" y="0" width="${width}" height="80" fill="url(#topGrad)"/>
-  
-  <!-- Headline text (programmatic — pixel-perfect, no AI hallucination) -->
   ${textElements}
-  
-  <!-- CTA -->
   <text x="${width / 2}" y="${textStartY + totalTextHeight + 40}" text-anchor="middle"
         font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700"
-        fill="#FF6B35">
-    ${escapeXml(ctaText)}
-  </text>
-  
-  <!-- Neural Update watermark bottom-right (covers any source watermark) -->
+        fill="#FF6B35">${escapeXml(ctaText)}</text>
   <text x="${width - 40}" y="${height - 45}" text-anchor="end"
         font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" font-size="28" font-weight="900"
-        fill="#FFD700" opacity="0.9">
-    ⚡ ${escapeXml(watermark.toUpperCase())}
-  </text>
-  
-  <!-- Small watermark top-left too -->
+        fill="#FFD700" opacity="0.95">⚡ ${escapeXml(watermark.toUpperCase())}</text>
   <text x="30" y="50"
         font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600"
-        fill="white" opacity="0.6">
-    ${escapeXml(watermark)}
-  </text>
+        fill="white" opacity="0.6">${escapeXml(watermark)}</text>
 </svg>`;
 }
 
-// ── SVG → PNG RENDERING ──
+// ── SVG → PNG RENDERING (now lightweight: only overlay layer, no embedded image) ──
 async function renderSvgToPng(svgString: string): Promise<Uint8Array> {
   const { render } = await import("https://deno.land/x/resvg_wasm/mod.ts");
   const pngData = await render(svgString);
-  console.log(`[resvg] ✅ SVG rendered to PNG: ${pngData.length} bytes`);
+  console.log(`[resvg] ✅ Overlay SVG rendered: ${pngData.length} bytes`);
   return pngData;
+}
+
+// ── COMPOSE base image + overlay using imagescript (CPU-light) ──
+async function composeImageWithOverlay(
+  baseImageData: Uint8Array,
+  overlayPngData: Uint8Array,
+  targetWidth = 1080,
+  targetHeight = 1350
+): Promise<Uint8Array> {
+  console.log(`[compose] Decoding base image (${baseImageData.length} bytes)...`);
+  const base = await Image.decode(baseImageData);
+  console.log(`[compose] Base: ${base.width}x${base.height} → resize/crop to ${targetWidth}x${targetHeight}`);
+
+  // Cover crop: scale to fill and center
+  const scale = Math.max(targetWidth / base.width, targetHeight / base.height);
+  const newW = Math.ceil(base.width * scale);
+  const newH = Math.ceil(base.height * scale);
+  base.resize(newW, newH);
+  const cropX = Math.floor((newW - targetWidth) / 2);
+  const cropY = Math.floor((newH - targetHeight) / 2);
+  base.crop(cropX, cropY, targetWidth, targetHeight);
+
+  console.log(`[compose] Decoding overlay (${overlayPngData.length} bytes)...`);
+  const overlay = await Image.decode(overlayPngData);
+
+  console.log(`[compose] Compositing overlay onto base...`);
+  base.composite(overlay, 0, 0);
+
+  console.log(`[compose] Encoding final PNG...`);
+  const out = await base.encode(2); // PNG, fast compression
+  console.log(`[compose] ✅ Final image: ${out.length} bytes`);
+  return out;
 }
 
 // ── FALLBACK: Gemini image edit with EXACT text verification ──
@@ -402,31 +402,28 @@ serve(async (req) => {
     const { data: imageData, contentType } = await downloadImage(imageUrl);
     console.log("[apply-text-overlay] Downloaded:", imageData.length, "bytes");
 
-    // ── STEP 4: Build SVG with programmatic text overlay ──
-    const mimeType = contentType.includes('png') ? 'image/png' : 'image/jpeg';
-    const imageBase64 = b64encode(imageData);
+    // ── STEP 4: Build LIGHTWEIGHT SVG (only overlay layer, no embedded image) ──
     const isCarousel = mediaType === 'carousel' || mediaType === 'carrossel';
     const ctaText = isCarousel ? 'ARRASTE PARA MAIS →' : 'LEIA A LEGENDA 👇';
-    const svgString = buildOverlaySvg(imageBase64, mimeType, headlineText, watermarkText, ctaText);
-    console.log("[apply-text-overlay] SVG built:", svgString.length, "chars");
+    const svgString = buildOverlaySvg(headlineText, watermarkText, ctaText);
+    console.log("[apply-text-overlay] Overlay SVG built:", svgString.length, "chars");
 
-    // ── STEP 5: Render SVG → PNG ──
+    // ── STEP 5: Render overlay SVG → PNG, then COMPOSE with base image ──
     let finalImageData: Uint8Array;
-    let renderMethod = 'svg-programmatic';
+    let renderMethod = 'svg-composite';
     
     try {
-      finalImageData = await renderSvgToPng(svgString);
-      console.log("[apply-text-overlay] ✅ Programmatic SVG rendered:", finalImageData.length, "bytes");
+      const overlayPng = await renderSvgToPng(svgString);
+      finalImageData = await composeImageWithOverlay(imageData, overlayPng, 1080, 1350);
+      console.log("[apply-text-overlay] ✅ Composite ready:", finalImageData.length, "bytes");
     } catch (svgError) {
-      console.warn("[apply-text-overlay] SVG render failed, using Gemini fallback:", svgError);
-      // Fallback to Gemini image edit (text already reviewed, so less risk)
+      console.warn("[apply-text-overlay] Composite failed, using Gemini fallback:", svgError);
       const fallbackResult = await burnTextWithGeminiFallback(imageData, contentType, headlineText, watermarkText, lovableApiKey);
       if (fallbackResult && fallbackResult.length > 1000) {
         finalImageData = fallbackResult;
         renderMethod = 'gemini-fallback';
         console.log("[apply-text-overlay] ✅ Gemini fallback succeeded:", fallbackResult.length, "bytes");
       } else {
-        // Last resort: upload original image with metadata
         finalImageData = imageData;
         renderMethod = 'original-no-overlay';
         console.warn("[apply-text-overlay] ⚠️ All render methods failed, using original image");
