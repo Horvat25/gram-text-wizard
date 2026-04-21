@@ -132,12 +132,12 @@ const decisionLabel = (d: string) => {
   return map[d] ?? { label: d, color: "bg-zinc-500/10 text-zinc-300 border-zinc-500/30" };
 };
 
-// Plano gradual de "ramp-up" — semana atual desde a última segunda
+// Plano gradual de "ramp-up" para o BLOG (independente do Instagram/TikTok)
 const RAMPUP_PLAN = [
-  { week: 1, articlesPerDay: 1, postsPerDay: 1, label: "Semana 1 — Aquecimento" },
-  { week: 2, articlesPerDay: 2, postsPerDay: 2, label: "Semana 2 — Validação" },
-  { week: 3, articlesPerDay: 3, postsPerDay: 2, label: "Semana 3 — Aceleração" },
-  { week: 4, articlesPerDay: 4, postsPerDay: 3, label: "Semana 4+ — Ritmo pleno" },
+  { week: 1, articlesPerDay: 1, label: "Semana 1 — Aquecimento" },
+  { week: 2, articlesPerDay: 2, label: "Semana 2 — Validação" },
+  { week: 3, articlesPerDay: 3, label: "Semana 3 — Aceleração" },
+  { week: 4, articlesPerDay: 4, label: "Semana 4+ — Ritmo pleno" },
 ];
 
 export default function EditorialDirectionPanel() {
@@ -427,8 +427,8 @@ export default function EditorialDirectionPanel() {
             {/* KPIs custo */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <KPI label="Últimas 24h" value={`$${metrics.cost24h.toFixed(4)}`} sub={`${metrics.cyclesLast24h} ciclos`} />
-              <KPI label="Últimos 7d" value={`$${metrics.cost7d.toFixed(3)}`} sub={`${metrics.weekPosts} posts`} />
-              <KPI label="Últimos 30d" value={`$${metrics.cost30d.toFixed(2)}`} sub={`${posts.length} posts`} />
+              <KPI label="Últimos 7d" value={`$${metrics.cost7d.toFixed(3)}`} sub={`${metrics.weekArticles} artigos`} />
+              <KPI label="Últimos 30d" value={`$${metrics.cost30d.toFixed(2)}`} sub={`${articles.length} artigos total`} />
               <KPI
                 label="Projeção mensal"
                 value={`$${metrics.monthlyProjection.toFixed(2)}`}
@@ -471,16 +471,10 @@ export default function EditorialDirectionPanel() {
                 <strong className="text-foreground">
                   {currentPhase.articlesPerDay} artigo{currentPhase.articlesPerDay > 1 ? "s" : ""}/dia
                 </strong>{" "}
-                no blog +{" "}
-                <strong className="text-foreground">
-                  {currentPhase.postsPerDay} post{currentPhase.postsPerDay > 1 ? "s" : ""}/dia
-                </strong>{" "}
-                no Instagram. Comece devagar para medir o que funciona antes de acelerar.
+                publicado no blog. Comece devagar para medir o que funciona antes de acelerar.
               </p>
               <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>
-                  Esta semana: {metrics.weekArticles} artigos · {metrics.weekPosts} posts
-                </span>
+                <span>Esta semana: {metrics.weekArticles} artigos publicados</span>
                 <Badge
                   variant="outline"
                   className={`text-[10px] ${
