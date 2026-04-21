@@ -371,19 +371,6 @@ export default function AgentGenieView() {
             </Button>
             
             <Button
-              variant={showTikTokHistory ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showTikTokHistory && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0"
-              )}
-              onClick={() => togglePanel('tiktokHistory')}
-            >
-              <History className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Posts</span>
-            </Button>
-            
-            <Button
               variant={showTikTokGrowth ? "default" : "ghost"}
               size="sm"
               className={cn(
@@ -394,6 +381,22 @@ export default function AgentGenieView() {
             >
               <TrendingUp className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Crescimento</span>
+            </Button>
+
+            {/* Histórico (Posts) por último — separado visualmente */}
+            <div className="w-px h-4 bg-border/50 mx-0.5 shrink-0" />
+
+            <Button
+              variant={showTikTokHistory ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0 opacity-80",
+                showTikTokHistory && "bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0 opacity-100"
+              )}
+              onClick={() => togglePanel('tiktokHistory')}
+            >
+              <History className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Posts</span>
             </Button>
           </div>
           
@@ -557,20 +560,6 @@ export default function AgentGenieView() {
             </Button>
 
             <Button
-              variant={showPostHistory ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
-                showPostHistory && "neural-gradient border-0"
-              )}
-              onClick={() => togglePanel('postHistory')}
-            >
-              <History className="h-3 w-3" />
-              <span className="hidden xs:inline sm:inline">Histórico</span>
-            </Button>
-            
-            
-            <Button
               variant={showContentTest ? "default" : "ghost"}
               size="sm"
               className={cn(
@@ -581,6 +570,22 @@ export default function AgentGenieView() {
             >
               <FlaskConical className="h-3 w-3" />
               <span className="hidden xs:inline sm:inline">Teste</span>
+            </Button>
+
+            {/* Histórico por último — separado visualmente */}
+            <div className="w-px h-4 bg-border/50 mx-0.5 shrink-0" />
+
+            <Button
+              variant={showPostHistory ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0 opacity-80",
+                showPostHistory && "neural-gradient border-0 opacity-100"
+              )}
+              onClick={() => togglePanel('postHistory')}
+            >
+              <History className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Histórico</span>
             </Button>
           </div>
           

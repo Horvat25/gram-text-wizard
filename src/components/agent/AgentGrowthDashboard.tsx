@@ -249,6 +249,11 @@ export default function AgentGrowthDashboard({ context, onUpdate }: AgentGrowthD
         fetchSourceRankings(),
         fetchAccountViews(),
       ]);
+
+      // Notify other panels (AgentVisionPanel, Test tab, etc.) to refresh
+      window.dispatchEvent(new CustomEvent('horvat:metrics-synced', {
+        detail: { workspaceId: currentWorkspace.id, updated: totalUpdated, deleted: totalDeleted }
+      }));
     } catch (e: any) {
       toast.dismiss('sync-ig');
       const msg = e?.message || 'Erro ao sincronizar';
