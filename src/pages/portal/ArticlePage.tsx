@@ -171,49 +171,69 @@ const ArticlePage = () => {
         jsonLd,
       }}
     >
-      <article className="container mx-auto px-4 py-8 md:py-12 max-w-3xl">
-        <Link
-          to={`/categoria/${article.category}`}
-          className="inline-block text-xs font-bold text-primary uppercase tracking-wider mb-4 hover:underline"
-        >
-          {getCategoryLabel(article.category)}
-        </Link>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <article className="lg:col-span-8 lg:col-start-2 max-w-3xl">
+            <Link
+              to={`/categoria/${article.category}`}
+              className="inline-block text-xs font-bold text-primary uppercase tracking-wider mb-4 hover:underline"
+            >
+              {getCategoryLabel(article.category)}
+            </Link>
 
-        <h1 className="text-3xl md:text-5xl font-bold leading-tight">{article.title}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold leading-tight">{article.title}</h1>
 
-        {article.subtitle && (
-          <p className="text-lg md:text-xl text-muted-foreground mt-4 leading-relaxed">
-            {article.subtitle}
-          </p>
-        )}
+            {article.subtitle && (
+              <p className="text-lg md:text-xl text-muted-foreground mt-4 leading-relaxed">
+                {article.subtitle}
+              </p>
+            )}
 
-        <div className="flex flex-wrap items-center gap-4 mt-6 text-sm text-muted-foreground border-y border-border py-4">
-          <span className="font-medium text-foreground">Por {article.author_name}</span>
-          <span>•</span>
-          <span>{formatArticleDate(article.published_at)}</span>
-          {article.reading_time_minutes ? (
-            <>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-6 text-sm text-muted-foreground border-y border-border py-4">
+              <span className="font-medium text-foreground inline-flex items-center gap-1.5">
+                <span className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-accent inline-flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                  {article.author_name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                </span>
+                Por {article.author_name}
+              </span>
+              <span>•</span>
+              <span>{formatArticleDate(article.published_at)}</span>
+              {article.updated_at &&
+                article.published_at &&
+                new Date(article.updated_at).getTime() - new Date(article.published_at).getTime() > 60_000 && (
+                  <>
+                    <span>•</span>
+                    <span className="text-primary/80 text-xs">
+                      Atualizado em {formatArticleDate(article.updated_at)}
+                    </span>
+                  </>
+                )}
+              {article.reading_time_minutes ? (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> {article.reading_time_minutes} min
+                  </span>
+                </>
+              ) : null}
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" /> {article.reading_time_minutes} min
+                <Eye className="h-3 w-3" /> {article.view_count} leituras
               </span>
-            </>
-          ) : null}
-          <span>•</span>
-          <span className="flex items-center gap-1">
-            <Eye className="h-3 w-3" /> {article.view_count} leituras
-          </span>
-        </div>
+              <span className="ml-auto">
+                <ShareButtons title={article.title} layout="horizontal" />
+              </span>
+            </div>
 
-        {article.hero_image_url && (
-          <figure className="my-8 -mx-4 md:mx-0">
-            <img
-              src={article.hero_image_url}
-              alt={article.title}
-              className="w-full rounded-lg"
-            />
-          </figure>
-        )}
+            {article.hero_image_url && (
+              <figure className="my-8 -mx-4 md:mx-0">
+                <img
+                  src={article.hero_image_url}
+                  alt={article.title}
+                  className="w-full rounded-lg"
+                />
+              </figure>
+            )}
 
         {/* TL;DR — extraído pra buscadores generativos (ChatGPT, Perplexity, Gemini) */}
         <aside
