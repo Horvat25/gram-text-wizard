@@ -51,7 +51,6 @@ export const PortalHeader = () => {
               <span className="font-display font-bold text-base tracking-tight">
                 Neural<span className="portal-gradient-text">Update</span>
               </span>
-              <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
               <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground mt-0.5 flex items-center gap-1.5">
                 <span className="inline-block h-1 w-1 rounded-full bg-primary portal-live-dot" />
                 Tecnologia · IA · Futuro
