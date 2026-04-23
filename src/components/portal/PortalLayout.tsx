@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { PortalHeader } from "./PortalHeader";
 import { PortalFooter } from "./PortalFooter";
+import { BreakingTicker } from "./BreakingTicker";
 import { SeoHead } from "@/components/SeoHead";
 import { usePageTracking } from "@/hooks/usePageTracking";
 
@@ -139,6 +140,7 @@ export const PortalLayout = ({ children, seo }: PortalLayoutProps) => {
       <div className="fixed top-0 inset-x-0 portal-divider z-50 pointer-events-none" aria-hidden />
 
       <div className="relative z-10 flex flex-col min-h-screen">
+        <BreakingTicker />
         <PortalHeader />
         <main className="flex-1">{children}</main>
         <PortalFooter />

@@ -245,6 +245,12 @@
     animation: portal-drift 12s ease-in-out infinite;
   }
 
+  /* Breaking ticker — infinite horizontal scroll */
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   /* TikTok / Instagram themes (kept) */
   .tiktok-gradient {
     background: linear-gradient(135deg, #25F4EE, #FE2C55);
@@ -325,4 +331,54 @@
     padding: 1.1rem 1.4rem 1.1rem 1.7rem;
   }
   .article-body h3 { font-size: 1.45rem; margin-top: 2.5rem; }
+}
+
+/* Lead paragraph — primeiro parágrafo do artigo em destaque */
+.article-body > p:first-of-type {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  margin-bottom: 1.75rem;
+}
+@media (min-width: 768px) {
+  .article-body > p:first-of-type {
+    font-size: 1.35rem;
+    line-height: 1.65;
+  }
+}
+
+/* Drop cap — primeira letra do primeiro parágrafo */
+.article-body > p:first-of-type::first-letter {
+  float: left;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 3.6rem;
+  line-height: 0.85;
+  font-weight: 700;
+  padding: 0.35rem 0.55rem 0 0;
+  margin-top: 0.2rem;
+  background: linear-gradient(135deg, hsl(var(--portal-cyan)), hsl(var(--portal-purple)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Separador suave entre seções H2 */
+.article-body h2 + p::before {
+  content: none;
+}
+.article-body h2:not(:first-child) {
+  position: relative;
+}
+.article-body h2:not(:first-child)::after {
+  content: "· · ·";
+  display: block;
+  position: absolute;
+  top: -1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: hsl(var(--muted-foreground));
+  letter-spacing: 0.4em;
+  font-size: 0.95rem;
+  opacity: 0.6;
 }

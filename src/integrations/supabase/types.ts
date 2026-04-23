@@ -758,6 +758,41 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          active: boolean
+          email: string
+          id: string
+          source: string | null
+          subscribed_at: string
+          workspace_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          email: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string
+          workspace_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          email?: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_subscribers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_views: {
         Row: {
           article_slug: string | null

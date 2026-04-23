@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Menu, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,24 @@ import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
 import { cn } from "@/lib/utils";
 import logoUrl from "@/assets/neural-update-logo.png";
 
+const formatBrtClock = () =>
+  new Date().toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  });
+
 export const PortalHeader = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [clock, setClock] = useState(formatBrtClock());
+
+  useEffect(() => {
+    const id = setInterval(() => setClock(formatBrtClock()), 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,22 +51,23 @@ export const PortalHeader = () => {
               <span className="font-display font-bold text-base tracking-tight">
                 Neural<span className="portal-gradient-text">Update</span>
               </span>
-              <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
-                <span className="inline-block h-1 w-1 rounded-full bg-primary portal-live-dot mr-1 align-middle" />
+              <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground mt-0.5 flex items-center gap-1.5">
+                <span className="inline-block h-1 w-1 rounded-full bg-primary portal-live-dot" />
                 Tecnologia · IA · Futuro
+                <span className="hidden sm:inline text-foreground/70 font-mono ml-1">· {clock} BRT</span>
               </span>
             </div>
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-0.5" aria-label="Categorias">
-            {ARTICLE_CATEGORIES.slice(0, 5).map((cat) => (
+            {ARTICLE_CATEGORIES.map((cat) => (
               <NavLink
                 key={cat.slug}
                 to={`/categoria/${cat.slug}`}
                 className={({ isActive }) =>
                   cn(
-                    "relative px-3 py-2 text-[13px] font-medium rounded-md transition-colors",
+                    "relative px-2.5 py-2 text-[12px] font-medium rounded-md transition-colors whitespace-nowrap",
                     isActive
                       ? "text-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -64,7 +78,7 @@ export const PortalHeader = () => {
                   <>
                     {cat.label}
                     {isActive && (
-                      <span className="absolute left-3 right-3 -bottom-px h-px portal-gradient" />
+                      <span className="absolute left-2.5 right-2.5 -bottom-px h-px portal-gradient" />
                     )}
                   </>
                 )}
@@ -74,7 +88,7 @@ export const PortalHeader = () => {
               to="/sobre"
               className={({ isActive }) =>
                 cn(
-                  "px-3 py-2 text-[13px] font-medium rounded-md transition-colors",
+                  "px-2.5 py-2 text-[12px] font-medium rounded-md transition-colors",
                   isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 )
               }
@@ -132,7 +146,7 @@ export const PortalHeader = () => {
 
         {menuOpen && (
           <nav className="md:hidden pb-4 flex flex-col gap-1" aria-label="Menu mobile">
-            {ARTICLE_CATEGORIES.slice(0, 5).map((cat) => (
+            {ARTICLE_CATEGORIES.map((cat) => (
               <NavLink
                 key={cat.slug}
                 to={`/categoria/${cat.slug}`}

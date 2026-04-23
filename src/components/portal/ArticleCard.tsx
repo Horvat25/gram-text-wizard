@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Clock, ArrowUpRight } from "lucide-react";
 import { formatRelativeDate, getCategoryLabel } from "@/lib/article-helpers";
+import { EditorialBadge, getEditorialBadge } from "./EditorialBadge";
 
 export interface ArticleCardData {
   slug: string;
@@ -10,6 +11,8 @@ export interface ArticleCardData {
   category: string;
   published_at?: string | null;
   reading_time_minutes?: number | null;
+  is_featured?: boolean | null;
+  view_count?: number | null;
 }
 
 interface ArticleCardProps {
@@ -19,6 +22,7 @@ interface ArticleCardProps {
 
 export const ArticleCard = ({ article, variant = "default" }: ArticleCardProps) => {
   const href = `/noticia/${article.slug}`;
+  const editorialBadge = getEditorialBadge(article);
 
   if (variant === "horizontal") {
     return (
@@ -93,6 +97,11 @@ export const ArticleCard = ({ article, variant = "default" }: ArticleCardProps) 
         <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary bg-background/80 border border-primary/30 px-2 py-0.5 rounded-full backdrop-blur">
           {getCategoryLabel(article.category)}
         </span>
+        {editorialBadge && (
+          <div className="absolute top-3 right-3">
+            <EditorialBadge kind={editorialBadge} />
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col flex-1 p-4">

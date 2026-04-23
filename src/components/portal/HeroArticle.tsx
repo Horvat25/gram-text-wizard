@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Clock, ArrowUpRight } from "lucide-react";
 import { formatRelativeDate, getCategoryLabel } from "@/lib/article-helpers";
+import { EditorialBadge, getEditorialBadge } from "./EditorialBadge";
 import type { ArticleCardData } from "./ArticleCard";
 
 interface HeroArticleProps {
@@ -8,6 +9,7 @@ interface HeroArticleProps {
 }
 
 export const HeroArticle = ({ article }: HeroArticleProps) => {
+  const editorialBadge = getEditorialBadge(article) ?? "manchete";
   return (
     <Link
       to={`/noticia/${article.slug}`}
@@ -34,13 +36,11 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
 
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-12">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          <EditorialBadge kind={editorialBadge} size="md" />
           <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-full backdrop-blur">
             <span className="h-1 w-1 rounded-full bg-primary portal-live-dot" />
             {getCategoryLabel(article.category)}
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Manchete
           </span>
         </div>
 
