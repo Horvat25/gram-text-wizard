@@ -22,7 +22,26 @@ const TikTokCallback = lazy(() => import("./pages/TikTokCallback"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const DataDeletion = lazy(() => import("./pages/DataDeletion"));
-const PortalHome = lazy(() => import("./pages/portal/Home"));
+// Retry-on-fail wrapper: if a chunk hash is stale (deploy happened), force reload once.
+const lazyWithReload = <T extends { default: React.ComponentType<any> }>(
+  factory: () => Promise<T>
+) =>
+  lazy(async () => {
+    try {
+      return await factory();
+    } catch (err) {
+      const key = "lovable:chunk-reloaded";
+      if (typeof window !== "undefined" && !sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        window.location.reload();
+        // Return a placeholder while the reload happens
+        return { default: () => null } as unknown as T;
+      }
+      throw err;
+    }
+  });
+
+const PortalHome = lazyWithReload(() => import("./pages/portal/Home"));
 const ArticlePage = lazy(() => import("./pages/portal/ArticlePage"));
 const CategoryPage = lazy(() => import("./pages/portal/CategoryPage"));
 const SearchPage = lazy(() => import("./pages/portal/SearchPage"));
