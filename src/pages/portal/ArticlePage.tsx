@@ -299,38 +299,74 @@ const ArticlePage = () => {
           </div>
         )}
 
-        {/* Fonte ancorada — IA Search prioriza conteúdo com citação clara */}
-        {article.source_url && (
-          <footer className="mt-10 pt-6 border-t border-border/60">
-            <p className="text-xs text-muted-foreground mb-1.5 uppercase tracking-wider font-semibold">
-              Fonte original
-            </p>
-            <a
-              href={article.source_url}
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline break-all"
-            >
-              {article.source_name || article.source_url}
-              <ExternalLink className="h-3 w-3 shrink-0" />
-            </a>
-            <p className="text-[11px] text-muted-foreground mt-2">
-              Publicado em {formatArticleDate(article.published_at)} · Neural Update · Editorial assistido por IA
-            </p>
-          </footer>
-        )}
-      </article>
+            {/* Fonte ancorada — IA Search prioriza conteúdo com citação clara */}
+            {article.source_url && (
+              <footer className="mt-10 pt-6 border-t border-border/60">
+                <p className="text-xs text-muted-foreground mb-1.5 uppercase tracking-wider font-semibold">
+                  Fonte original
+                </p>
+                <a
+                  href={article.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline break-all"
+                >
+                  {article.source_name || article.source_url}
+                  <ExternalLink className="h-3 w-3 shrink-0" />
+                </a>
+                <p className="text-[11px] text-muted-foreground mt-2">
+                  Publicado em {formatArticleDate(article.published_at)} · Neural Update · Editorial assistido por IA
+                </p>
+              </footer>
+            )}
 
-      {related.length > 0 && (
-        <section className="container mx-auto px-4 py-12 max-w-5xl border-t border-border mt-12">
-          <h2 className="text-2xl font-bold mb-6">Leia também</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {related.map((a) => (
-              <ArticleCard key={a.slug} article={a} />
-            ))}
-          </div>
-        </section>
-      )}
+            {/* Bloco do autor */}
+            <div className="mt-10 pt-8 border-t border-border/40 flex items-start gap-4">
+              <div className="h-14 w-14 rounded-full bg-gradient-to-br from-primary to-accent inline-flex items-center justify-center shrink-0">
+                <User className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
+                  Escrito por
+                </p>
+                <p className="font-display font-bold text-base">{article.author_name}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+                  Estrategista de conteúdo e curador editorial do Neural Update. Acompanha as
+                  fronteiras de IA, gadgets e ciência em tempo real.
+                </p>
+                <Link
+                  to="/sobre"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline mt-2"
+                >
+                  Sobre o autor →
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-center">
+              <ShareButtons title={article.title} layout="horizontal" />
+            </div>
+          </article>
+
+          {/* Sidebar — mais lidas (sticky no desktop) */}
+          <aside className="lg:col-span-3 hidden lg:block">
+            <div className="sticky top-28">
+              <MostReadSidebar excludeSlug={article.slug} />
+            </div>
+          </aside>
+        </div>
+
+        {related.length > 0 && (
+          <section className="mt-16 pt-12 border-t border-border max-w-5xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6">Leia também</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {related.map((a) => (
+                <ArticleCard key={a.slug} article={a} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </PortalLayout>
   );
 };
