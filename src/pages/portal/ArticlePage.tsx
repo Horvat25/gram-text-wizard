@@ -3,12 +3,14 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { ArticleCard, type ArticleCardData } from "@/components/portal/ArticleCard";
+import { MostReadSidebar } from "@/components/portal/MostReadSidebar";
+import { ShareButtons } from "@/components/portal/ShareButtons";
 import {
   formatArticleDate,
   getCategoryLabel,
   renderMarkdown,
 } from "@/lib/article-helpers";
-import { Clock, Eye, Loader2, Sparkles, ListChecks, ExternalLink } from "lucide-react";
+import { Clock, Eye, Loader2, Sparkles, ListChecks, ExternalLink, User } from "lucide-react";
 
 interface ArticleFull extends ArticleCardData {
   id: string;
@@ -22,6 +24,7 @@ interface ArticleFull extends ArticleCardData {
   og_image_url?: string | null;
   source_url?: string | null;
   source_name?: string | null;
+  updated_at?: string | null;
 }
 
 const ArticlePage = () => {
