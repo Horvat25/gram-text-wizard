@@ -149,6 +149,13 @@ export const PortalHeader = () => {
             >
               Sobre
             </NavLink>
+            <Link
+              to="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="mt-2 px-3 py-2 text-sm font-semibold rounded-md border border-primary/40 text-primary hover:bg-primary/10 text-center uppercase tracking-wider"
+            >
+              Acessar Admin
+            </Link>
           </nav>
         )}
       </div>
