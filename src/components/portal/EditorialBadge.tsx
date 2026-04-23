@@ -72,7 +72,7 @@ export const EditorialBadge = ({ kind, size = "sm", className }: EditorialBadgeP
           className={cn(
             base,
             sizing,
-            "bg-orange-500/95 text-white border border-orange-300/40",
+            "bg-destructive/90 text-destructive-foreground border border-destructive/50",
             className
           )}
         >
@@ -85,7 +85,7 @@ export const EditorialBadge = ({ kind, size = "sm", className }: EditorialBadgeP
           className={cn(
             base,
             sizing,
-            "bg-amber-500/95 text-black border border-amber-300/40",
+            "bg-accent text-accent-foreground border border-accent/50",
             className
           )}
         >
