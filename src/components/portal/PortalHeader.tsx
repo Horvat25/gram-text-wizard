@@ -93,6 +93,13 @@ export const PortalHeader = () => {
             >
               <Search className="h-4 w-4" />
             </Button>
+            <Link
+              to="/admin"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-md text-[12px] font-semibold uppercase tracking-[0.14em] border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+              aria-label="Acessar painel administrativo"
+            >
+              Admin
+            </Link>
             <Button
               variant="ghost"
               size="icon"
