@@ -4,8 +4,10 @@ import { PortalLayout } from "@/components/portal/PortalLayout";
 import { HeroArticle } from "@/components/portal/HeroArticle";
 import { ArticleCard, type ArticleCardData } from "@/components/portal/ArticleCard";
 import { AIModelSections } from "@/components/portal/AIModelSections";
-import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
-import { Loader2, Sparkles } from "lucide-react";
+import { LiveNewsFeed } from "@/components/portal/LiveNewsFeed";
+import { MostReadSidebar } from "@/components/portal/MostReadSidebar";
+import { ARTICLE_CATEGORIES, formatRelativeDate, getCategoryLabel } from "@/lib/article-helpers";
+import { Loader2, Sparkles, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type ArticleListItem = ArticleCardData & { tags?: string[] | null };
@@ -18,7 +20,9 @@ const PortalHome = () => {
     (async () => {
       const { data } = await supabase
         .from("articles")
-        .select("slug,title,excerpt,hero_image_url,category,published_at,reading_time_minutes,is_featured,tags")
+        .select(
+          "slug,title,excerpt,hero_image_url,category,published_at,reading_time_minutes,is_featured,view_count,tags"
+        )
         .eq("status", "published")
         .order("published_at", { ascending: false })
         .limit(40);
@@ -57,8 +61,9 @@ const PortalHome = () => {
   }
 
   const [hero, ...rest] = articles;
-  const topGrid = rest.slice(0, 6);
-  const remaining = rest.slice(6);
+  const sideHeadlines = rest.slice(0, 3);
+  const topGrid = rest.slice(3, 9);
+  const remaining = rest.slice(9);
 
   return (
     <PortalLayout>
@@ -82,15 +87,64 @@ const PortalHome = () => {
           </span>
         </div>
 
-        <HeroArticle article={hero} />
-
-        {/* Latest news grid */}
-        <section className="mt-16 md:mt-20">
-          <SectionHeader eyebrow="Últimas" title="Notícias mais recentes" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {topGrid.map((a) => (
-              <ArticleCard key={a.slug} article={a} />
+        {/* HERO + SIDE HEADLINES — layout tipo Olhar Digital (2/3 + 1/3 desktop) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <HeroArticle article={hero} />
+          </div>
+          <aside className="lg:col-span-1 flex flex-col gap-3">
+            {sideHeadlines.map((a) => (
+              <Link
+                key={a.slug}
+                to={`/noticia/${a.slug}`}
+                className="group flex gap-3 rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm p-3 hover:border-primary/40 transition-all"
+              >
+                {a.hero_image_url ? (
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 overflow-hidden rounded-lg ring-1 ring-border/40">
+                    <img
+                      src={a.hero_image_url}
+                      alt={a.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-lg portal-gradient opacity-40" />
+                )}
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <span className="text-[9px] font-bold text-primary uppercase tracking-[0.18em]">
+                    {getCategoryLabel(a.category)}
+                  </span>
+                  <h3 className="font-display font-semibold text-sm leading-snug mt-1 group-hover:text-primary transition-colors line-clamp-3">
+                    {a.title}
+                  </h3>
+                  <span className="text-[10px] text-muted-foreground mt-auto pt-1.5">
+                    {formatRelativeDate(a.published_at)}
+                  </span>
+                </div>
+                <ArrowUpRight className="h-3.5 w-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity self-start mt-1" />
+              </Link>
             ))}
+          </aside>
+        </div>
+
+        {/* Live news feed — "última hora" denso */}
+        <LiveNewsFeed articles={articles} limit={12} />
+
+        {/* Latest news grid + Most read sidebar */}
+        <section className="mt-16 md:mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <SectionHeader eyebrow="Últimas" title="Notícias mais recentes" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {topGrid.map((a) => (
+                <ArticleCard key={a.slug} article={a} />
+              ))}
+            </div>
+          </div>
+          <div className="lg:col-span-1">
+            <div className="lg:sticky lg:top-28">
+              <MostReadSidebar />
+            </div>
           </div>
         </section>
 
