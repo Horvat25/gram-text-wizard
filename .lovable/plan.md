@@ -1,100 +1,101 @@
 
 
-## Portal Neural Update: site público de notícias de tecnologia
+# Relatório: Neural Update vs Olhar Digital / Tecnoblog / Canaltech
 
-Transformar o app numa **plataforma editorial completa**, onde o portal Neural Update é a fonte primária — as redes sociais (Instagram/TikTok) passam a ser **distribuição** do que já foi publicado no site.
+## Diagnóstico — o que falta no Neural Update
 
-### Visão geral
+Comparando o site atual com os 3 maiores portais brasileiros de tech, identifiquei **8 lacunas críticas de profissionalismo**:
 
-```text
-RSS / Firecrawl (notícias frescas)
-        ↓
-  Agente Horvat escreve artigo COMPLETO (1x — armazenado)
-        ↓
-   ┌────────────────────────────────────────┐
-   │   Artigo no Portal Neural Update       │  ← fonte da verdade
-   │   (público, SEO, /noticia/slug)        │
-   └────────────────────────────────────────┘
-        ↓ (reaproveita: título + resumo + imagem)
-   Posts Instagram / TikTok / Carrossel
-   (zero crédito extra — tudo pré-pronto)
+### 1. Header sem densidade informacional
+- **Eles:** Header com barra de "AGORA" / breaking news em tempo real, ícones sociais visíveis, hora atualizada, navegação com 7-8 categorias visíveis.
+- **Nós:** Header limpo demais, só 5 categorias, sem indicador de "última atualização", sem breaking ticker.
+
+### 2. Falta o "feed AGORA" cronológico (timestamp)
+- **Olhar Digital** tem uma seção "AGORA" com timestamps (`14:34`, `14:33`, `14:16`) listando as últimas 10 notícias do dia em formato compacto. É o componente mais consultado por leitores recorrentes.
+- **Nós** só temos cards visuais grandes — falta o feed denso "última hora".
+
+### 3. Hero ocupa espaço demais e não mostra 2-3 manchetes
+- **Olhar Digital** mostra **4 manchetes simultâneas** acima da dobra (1 grande + 3 médias na coluna direita).
+- **Nós** mostramos só **1 hero gigante** que ocupa 100% da dobra — perde-se densidade editorial.
+
+### 4. Cards sem "selo PRO/MANCHETE/EXCLUSIVO"
+- Portais profissionais usam selos coloridos (verde "PRO", vermelho "EXCLUSIVO", "AO VIVO") sobre a thumb. Cria hierarquia visual.
+- Nós só temos a categoria — falta o "tag editorial" do tipo de conteúdo.
+
+### 5. Falta sidebar de "Mais lidas / Em alta"
+- Todos os 3 portais têm uma coluna lateral (desktop) ou seção dedicada com "Top 5 mais lidas hoje" usando o `view_count` (que já temos no banco!).
+- Nós **temos o dado**, mas não exibimos.
+
+### 6. Tipografia do artigo: largura e ritmo
+- **Tecnoblog/Canaltech** usam coluna de leitura ~720px com lead paragraph (1ª frase em destaque maior), drop cap e separadores `· · ·` entre seções.
+- **Nós** já melhoramos mas falta lead paragraph e separadores visuais entre blocos.
+
+### 7. Footer pobre
+- **Olhar Digital** tem footer com colunas: Categorias / Sobre / Newsletter / Redes Sociais / Apps / Política.
+- **Nós** temos footer mínimo — falta newsletter e organização em colunas.
+
+### 8. Falta "data atualizada" e autor com foto
+- Sites profissionais mostram avatar do autor, bio curta no fim do artigo e "Atualizado em DD/MM HH:MM".
+- Nós só dizemos "Por Agente Horvat" sem destaque visual.
+
+---
+
+## Plano de implementação (1 ciclo, ~7 arquivos)
+
+### A. Header reforçado (`PortalHeader.tsx`)
+- Adicionar **mini-ticker "AO VIVO"** acima do header com as 3 últimas manchetes em scroll horizontal (só desktop)
+- Mostrar **hora atual de Brasília** ao lado do logo
+- Adicionar 7ª categoria visível (compactando padding)
+
+### B. Hero + Side Manchetes (`Home.tsx`)
+- Trocar layout: hero ocupa **2/3 da largura** (desktop) + coluna direita com **3 manchetes secundárias** empilhadas
+- Mobile mantém o hero full-width atual
+
+### C. Novo componente `LiveNewsFeed.tsx`
+- Lista compacta tipo "AGORA" com `HH:MM | CATEGORIA | Título`
+- Renderizado em 2 colunas no desktop, 1 no mobile
+- Atualiza a cada 60s (sem reload, busca novas via Supabase)
+
+### D. Sidebar "Mais lidas" (`MostReadSidebar.tsx`)
+- Top 5 artigos por `view_count` da última semana
+- Numerados 01-05 em estilo grande tipo Olhar Digital
+- Aparece na home (sticky no desktop) e na página de artigo
+
+### E. Selos editoriais (`ArticleCard.tsx` + `HeroArticle.tsx`)
+- Suportar badge customizado: `MANCHETE` (gradiente primary), `EXCLUSIVO` (âmbar), `EM ALTA` (vermelho), `AO VIVO` (animado)
+- Lógica automática: artigos `is_featured` = MANCHETE; `view_count > 100` = EM ALTA; publicado < 1h = AO VIVO
+
+### F. Página de artigo profissional (`ArticlePage.tsx` + `index.css`)
+- **Lead paragraph**: primeiro `<p>` com font-size 1.25rem, peso 500, cor mais clara
+- **Drop cap** opcional na primeira letra
+- **Separadores `· · ·`** automáticos entre H2 (alternativa visual aos blocos)
+- **Bloco do autor** no final: avatar + bio curta do Agente Horvat + link "Ver mais matérias"
+- **"Atualizado em"** ao lado da data quando `updated_at != published_at`
+- **Compartilhamento social** (WhatsApp, X, Copiar link) sticky lateral no desktop
+
+### G. Footer profissional (`PortalFooter.tsx`)
+- 4 colunas: Editorias / Sobre o portal / Siga o agente / Legal
+- Inscrição em **newsletter** (form simples → tabela `newsletter_subscribers`)
+- Logo + tagline + "© 2026 Neural Update"
+
+### H. Banco — nova tabela
+```sql
+create table newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  workspace_id uuid,
+  subscribed_at timestamptz default now(),
+  active boolean default true
+);
 ```
+RLS: insert público (qualquer um se inscreve), select só admin.
 
-### O que vai ser construído
+---
 
-**1. Site público "Neural Update" (rotas abertas, sem login)**
-- `/` — homepage do portal: manchete principal + grade de últimas notícias por categoria (IA, Gadgets, Futuro, Mercado, Ciência)
-- `/noticia/:slug` — página individual do artigo (título SEO, hero image, corpo formatado, tempo de leitura, autor "Agente Horvat", data, tags, "leia também")
-- `/categoria/:nome` — listagem filtrada por categoria
-- `/busca?q=` — busca por palavra-chave
-- `/sobre` — página institucional do Neural Update
-- Header com logo + menu de categorias + busca; Footer com links sociais (IG/TikTok), políticas, RSS feed
+## Resultado esperado
 
-**2. Painel administrativo (rotas protegidas — login atual)**
-- Tudo que já existe (Agente, Fila, Crescimento, Teste, Histórico) continua igual em `/admin`
-- Nova aba **"Portal"**: lista de artigos publicados no site, edição manual, destaque de manchete, agendamento
+Antes: site bonito mas com "ar de blog pessoal" — hero gigante, pouca densidade.
+Depois: cara de **portal de notícias profissional** comparável a Olhar Digital, com ticker ao vivo, feed denso "AGORA", mais lidas, selos editoriais, leitura premium e newsletter.
 
-**3. Geração de conteúdo otimizada para custo**
-- Agente roda RSS/Firecrawl (já existe) → escolhe notícia → **gera UMA vez** o artigo completo (~600-1000 palavras) + título SEO + meta description + imagem hero + 5-8 tags
-- A partir desse mesmo artigo, **derivações gratuitas** (sem nova chamada de IA):
-  - **Post imagem IG**: reaproveita hero + título como headline overlay + parágrafo de abertura como legenda
-  - **Carrossel**: divide artigo em 3 blocos lógicos (intro, ponto-chave, conclusão) → vira 3 slides
-  - **Reels notícia**: usa o resumo já gerado como roteiro
-- Resultado: **1 chamada cara de IA** alimenta o site + 3 formatos de redes sociais
-
-**4. SEO e descoberta**
-- Sitemap.xml automático
-- Meta tags Open Graph (preview rico no WhatsApp/Twitter)
-- Schema.org NewsArticle (aparece bonito no Google)
-- RSS feed próprio (`/feed.xml`) — outros sites podem consumir o Neural Update
-- URLs amigáveis em PT-BR (ex: `/noticia/openai-lanca-novo-modelo-2026`)
-
-**5. Domínio próprio**
-- Você compra **neuralupdate.com.br** direto via Lovable Settings → Domains
-- Subdomínio `app.neuralupdate.com.br` para o painel admin
-- Domínio raiz `neuralupdate.com.br` para o portal público
-- SSL automático
-
-### Estrutura técnica (resumo para você)
-
-**Banco de dados** — nova tabela `articles`:
-- `id`, `workspace_id`, `slug` (único), `title`, `subtitle`, `content` (markdown/html), `excerpt`, `hero_image_url`, `category`, `tags[]`, `author_name`, `status` (draft/published), `published_at`, `view_count`, `seo_title`, `seo_description`, `og_image_url`, `source_rss_item_id`, `linked_post_ids[]` (vínculo com posts IG/TikTok já gerados)
-- RLS: SELECT público (`USING true` quando `status='published'`); INSERT/UPDATE/DELETE só para editores do workspace
-
-**Edge functions novas/modificadas**:
-- `generate-article` (nova): pega item RSS + Firecrawl deep research → gera artigo completo de uma vez
-- `derive-social-from-article` (nova): pega `article_id` → cria entradas em `posts` para IG/TikTok sem nova chamada de IA
-- `ai-agent-core` (modificada): novo fluxo "article first" — gera artigo, depois deriva os formatos sociais
-
-**Roteamento**:
-- `App.tsx` ganha rotas públicas: `/`, `/noticia/:slug`, `/categoria/:nome`, `/busca`, `/sobre`
-- Painel admin migra para `/admin/*` (mantém auth atual)
-- Quando o domínio próprio for conectado: `app.` → painel, raiz → portal
-
-**Componentes a criar**:
-- `src/pages/portal/Home.tsx`, `ArticlePage.tsx`, `CategoryPage.tsx`, `SearchPage.tsx`, `About.tsx`
-- `src/components/portal/PortalHeader.tsx`, `PortalFooter.tsx`, `ArticleCard.tsx`, `HeroArticle.tsx`, `CategoryNav.tsx`
-- `src/components/admin/ArticlesManagerTab.tsx` (nova aba no painel)
-- `src/lib/article-helpers.ts` (slug generator, reading time, markdown render)
-
-### Entrega faseada
-
-**Fase 1 (esta entrega)** — base funcional:
-- Tabela `articles` + RLS
-- Edge function `generate-article` integrada com RSS + Firecrawl
-- Rotas públicas do portal (Home, Artigo, Categoria, Busca)
-- Painel admin: aba "Portal" para listar/editar artigos
-- Header/Footer do portal com identidade Neural Update
-- SEO básico (meta tags, Open Graph)
-
-**Fase 2 (próxima conversa)**:
-- Derivação automática artigo → IG/TikTok (a integração com `ai-agent-core` existente)
-- Sitemap.xml + RSS feed + Schema.org
-- Newsletter (captura de email)
-- Compra do domínio neuralupdate.com.br
-
-### Custo de IA reduzido
-
-- **Antes**: cada formato (post imagem, carrossel, reels) = 1 chamada de IA = 3 chamadas/notícia
-- **Depois**: 1 chamada gera o artigo, e os formatos sociais são montados por código (template + recortes do texto) = **~70% menos custo de IA por notícia publicada nos 3 lugares**
+**Custo estimado:** 1 ciclo de implementação. Nenhum custo de IA recorrente (tudo é UI/UX + 1 tabela simples).
 
