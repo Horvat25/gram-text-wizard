@@ -150,7 +150,7 @@ const PortalHome = () => {
         <LiveNewsFeed articles={articles} limit={12} />
 
         {/* Latest news grid + Most read sidebar */}
-        <section className="mt-16 md:mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <section className="mt-10 md:mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <SectionHeader eyebrow="Últimas" title="Notícias mais recentes" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -174,7 +174,7 @@ const PortalHome = () => {
           const inCat = articles.filter((a) => a.category === cat.slug).slice(0, 4);
           if (inCat.length === 0) return null;
           return (
-            <section key={cat.slug} className="mt-20">
+            <section key={cat.slug} className="mt-12 md:mt-20">
               <SectionHeader
                 eyebrow="Editoria"
                 title={cat.label}
