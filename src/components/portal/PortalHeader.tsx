@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ARTICLE_CATEGORIES } from "@/lib/article-helpers";
 import { cn } from "@/lib/utils";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import logoUrl from "@/assets/neural-update-logo.png";
 
 const formatBrtClock = () =>
@@ -98,6 +99,7 @@ export const PortalHeader = () => {
           </nav>
 
           <div className="flex items-center gap-1">
+            <LanguageSwitcher />
             <Button
               variant="ghost"
               size="icon"

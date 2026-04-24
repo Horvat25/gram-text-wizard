@@ -5,6 +5,7 @@ import { PortalLayout } from "@/components/portal/PortalLayout";
 import { ArticleCard, type ArticleCardData } from "@/components/portal/ArticleCard";
 import { MostReadSidebar } from "@/components/portal/MostReadSidebar";
 import { ShareButtons } from "@/components/portal/ShareButtons";
+import { Breadcrumbs, breadcrumbsJsonLd } from "@/components/portal/Breadcrumbs";
 import {
   formatArticleDate,
   getCategoryLabel,
@@ -144,12 +145,19 @@ const ArticlePage = () => {
       : undefined,
   };
 
+  const breadcrumbItems = [
+    { label: getCategoryLabel(article.category), href: `/categoria/${article.category}` },
+    { label: article.title },
+  ];
+  const breadcrumbLd = breadcrumbsJsonLd(breadcrumbItems, window.location.origin);
+
   const jsonLd =
     keyPoints.length >= 2
       ? {
           "@context": "https://schema.org",
           "@graph": [
             articleLd,
+            breadcrumbLd,
             {
               "@type": "FAQPage",
               mainEntity: keyPoints.map((q) => ({
@@ -163,7 +171,7 @@ const ArticlePage = () => {
             },
           ],
         }
-      : articleLd;
+      : { "@context": "https://schema.org", "@graph": [articleLd, breadcrumbLd] };
 
   return (
     <PortalLayout
