@@ -117,7 +117,7 @@ const ArticlePage = () => {
     abstract: tldr,
     image: seoImage ? [seoImage] : undefined,
     datePublished: article.published_at,
-    dateModified: article.published_at,
+    dateModified: article.updated_at || article.published_at,
     author: {
       "@type": "Person",
       name: article.author_name,
@@ -126,7 +126,7 @@ const ArticlePage = () => {
     publisher: {
       "@type": "Organization",
       name: "Neural Update",
-      logo: { "@type": "ImageObject", url: `${window.location.origin}/favicon.ico` },
+      logo: { "@type": "ImageObject", url: `${window.location.origin}/og-neural-update.jpg` },
       url: window.location.origin,
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": window.location.href },
@@ -135,6 +135,10 @@ const ArticlePage = () => {
     inLanguage: "pt-BR",
     isAccessibleForFree: true,
     wordCount: article.content.split(/\s+/).length,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "[aria-label='Resumo do artigo'] p"],
+    },
     citation: article.source_url
       ? [{ "@type": "CreativeWork", name: article.source_name || "Fonte", url: article.source_url }]
       : undefined,
