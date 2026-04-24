@@ -16,7 +16,7 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
       className="group block relative overflow-hidden rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm transition-all hover:border-primary/40"
     >
       {/* Image */}
-      <div className="relative aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden">
+      <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden">
         {article.hero_image_url ? (
           <img
             src={article.hero_image_url}
@@ -35,16 +35,16 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
       </div>
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-12">
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
+      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-10 lg:p-12">
+        <div className="flex items-center gap-1.5 mb-2 sm:mb-4 flex-wrap">
           <EditorialBadge kind={editorialBadge} size="md" />
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-full backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.18em] sm:tracking-[0.2em] text-primary bg-primary/10 border border-primary/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full backdrop-blur">
             <span className="h-1 w-1 rounded-full bg-primary portal-live-dot" />
             {getCategoryLabel(article.category)}
           </span>
         </div>
 
-        <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.05] max-w-4xl text-foreground drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)]">
+        <h2 className="font-display text-xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.1] sm:leading-[1.05] max-w-4xl text-foreground drop-shadow-[0_2px_24px_rgba(0,0,0,0.6)] line-clamp-3 sm:line-clamp-none">
           {article.title}
         </h2>
 
@@ -54,7 +54,7 @@ export const HeroArticle = ({ article }: HeroArticleProps) => {
           </p>
         )}
 
-        <div className="flex items-center justify-between gap-3 mt-6">
+        <div className="flex items-center justify-between gap-3 mt-3 sm:mt-6">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span>{formatRelativeDate(article.published_at)}</span>
             {article.reading_time_minutes ? (
