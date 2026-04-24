@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     // Site URL: ?site=https://example.com OR header X-Site-Url OR origin fallback
-    const siteUrl = (url.searchParams.get("site") || req.headers.get("x-site-url") || "https://gram-text-wizard.lovable.app").replace(/\/$/, "");
+    const siteUrl = (url.searchParams.get("site") || req.headers.get("x-site-url") || "https://neural-update.com.br").replace(/\/$/, "");
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 

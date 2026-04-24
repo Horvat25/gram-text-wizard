@@ -24,3 +24,6 @@ Disallow: /instagram-callback
 # Sitemaps (dinâmicos via edge functions)
 Sitemap: https://vtvvmikilbcalohutsmf.supabase.co/functions/v1/sitemap-xml?site=https://neural-update.com.br
 Sitemap: https://vtvvmikilbcalohutsmf.supabase.co/functions/v1/sitemap-news?site=https://neural-update.com.br
+
+# RSS feed (Feedly, Inoreader, etc.)
+# https://vtvvmikilbcalohutsmf.supabase.co/functions/v1/rss-feed?site=https://neural-update.com.br

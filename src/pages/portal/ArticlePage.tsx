@@ -5,6 +5,7 @@ import { PortalLayout } from "@/components/portal/PortalLayout";
 import { ArticleCard, type ArticleCardData } from "@/components/portal/ArticleCard";
 import { MostReadSidebar } from "@/components/portal/MostReadSidebar";
 import { ShareButtons } from "@/components/portal/ShareButtons";
+import { Breadcrumbs, breadcrumbsJsonLd } from "@/components/portal/Breadcrumbs";
 import {
   formatArticleDate,
   getCategoryLabel,
@@ -117,7 +118,7 @@ const ArticlePage = () => {
     abstract: tldr,
     image: seoImage ? [seoImage] : undefined,
     datePublished: article.published_at,
-    dateModified: article.published_at,
+    dateModified: article.updated_at || article.published_at,
     author: {
       "@type": "Person",
       name: article.author_name,
@@ -126,7 +127,7 @@ const ArticlePage = () => {
     publisher: {
       "@type": "Organization",
       name: "Neural Update",
-      logo: { "@type": "ImageObject", url: `${window.location.origin}/favicon.ico` },
+      logo: { "@type": "ImageObject", url: `${window.location.origin}/og-neural-update.jpg` },
       url: window.location.origin,
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": window.location.href },
@@ -135,10 +136,20 @@ const ArticlePage = () => {
     inLanguage: "pt-BR",
     isAccessibleForFree: true,
     wordCount: article.content.split(/\s+/).length,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "[aria-label='Resumo do artigo'] p"],
+    },
     citation: article.source_url
       ? [{ "@type": "CreativeWork", name: article.source_name || "Fonte", url: article.source_url }]
       : undefined,
   };
+
+  const breadcrumbItems = [
+    { label: getCategoryLabel(article.category), href: `/categoria/${article.category}` },
+    { label: article.title },
+  ];
+  const breadcrumbLd = breadcrumbsJsonLd(breadcrumbItems, window.location.origin);
 
   const jsonLd =
     keyPoints.length >= 2
@@ -146,6 +157,7 @@ const ArticlePage = () => {
           "@context": "https://schema.org",
           "@graph": [
             articleLd,
+            breadcrumbLd,
             {
               "@type": "FAQPage",
               mainEntity: keyPoints.map((q) => ({
@@ -159,7 +171,7 @@ const ArticlePage = () => {
             },
           ],
         }
-      : articleLd;
+      : { "@context": "https://schema.org", "@graph": [articleLd, breadcrumbLd] };
 
   return (
     <PortalLayout
@@ -174,6 +186,7 @@ const ArticlePage = () => {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <article className="lg:col-span-8 lg:col-start-2 max-w-3xl">
+            <Breadcrumbs items={breadcrumbItems} />
             <Link
               to={`/categoria/${article.category}`}
               className="inline-block text-xs font-bold text-primary uppercase tracking-wider mb-4 hover:underline"

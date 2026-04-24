@@ -17,17 +17,24 @@ export function getCategoryLabel(slug: string): string {
   return ARTICLE_CATEGORIES.find((c) => c.slug === slug)?.label ?? "Tecnologia";
 }
 
-/** Generate a URL-friendly slug from a title (PT-BR aware). */
+/** Generate a URL-friendly slug from a title (PT-BR aware). Stop-words removed for SEO. */
+const PT_STOPWORDS = new Set([
+  "a","o","as","os","um","uma","uns","umas","de","da","do","das","dos","e","ou","mas",
+  "para","por","pelo","pela","com","sem","em","no","na","nos","nas","ao","aos","à","às",
+  "que","se","na","no","como","mais","menos","ja","já","sobre","entre","ate","até",
+]);
 export function slugify(input: string): string {
-  return input
+  const base = input
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 80);
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !PT_STOPWORDS.has(w))
+    .join("-")
+    .replace(/-+/g, "-");
+  return base.slice(0, 60).replace(/-+$/g, "");
 }
 
 /** Estimate reading time in minutes. ~200 wpm PT-BR. */
