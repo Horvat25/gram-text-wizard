@@ -67,19 +67,37 @@ const PortalHome = () => {
 
   return (
     <PortalLayout>
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-3 md:py-12">
         {/* SEO: H1 semântico (uma vez por página) */}
         <h1 className="sr-only">Neural Update — Notícias de tecnologia, IA e futuro</h1>
 
-        {/* Editorial badge above hero */}
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-card/60 border border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
+        {/* Mobile-only: chips de categoria (scroll-x) — substitui menu hambúrguer afundado */}
+        <nav
+          aria-label="Atalhos de categorias"
+          className="md:hidden -mx-4 mb-3 px-4 overflow-x-auto scrollbar-hide"
+        >
+          <div className="flex items-center gap-2 w-max pb-1">
+            {ARTICLE_CATEGORIES.map((cat) => (
+              <Link
+                key={cat.slug}
+                to={`/categoria/${cat.slug}`}
+                className="shrink-0 inline-flex items-center px-3 h-7 rounded-full bg-card/60 border border-border/60 text-[11px] font-semibold text-foreground/85 hover:border-primary/50 hover:text-primary transition-colors whitespace-nowrap"
+              >
+                {cat.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+
+        {/* Editorial badge above hero — compacta no mobile */}
+        <div className="mb-3 md:mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="inline-flex items-center gap-1.5 px-2 md:px-3 py-1 rounded-full bg-card/60 border border-border/60 text-[9px] md:text-[10px] uppercase tracking-[0.18em] md:tracking-[0.22em] text-muted-foreground backdrop-blur whitespace-nowrap">
               <span className="h-1.5 w-1.5 rounded-full bg-primary portal-live-dot" />
-              Edição ao vivo
+              Ao vivo
             </span>
-            <span className="hidden sm:inline text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+            <span className="text-[9px] md:text-[10px] uppercase tracking-[0.18em] md:tracking-[0.22em] text-muted-foreground truncate">
+              {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
             </span>
           </div>
           <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground hidden md:inline">
