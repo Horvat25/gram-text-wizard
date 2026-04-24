@@ -186,6 +186,7 @@ const ArticlePage = () => {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <article className="lg:col-span-8 lg:col-start-2 max-w-3xl">
+            <Breadcrumbs items={breadcrumbItems} />
             <Link
               to={`/categoria/${article.category}`}
               className="inline-block text-xs font-bold text-primary uppercase tracking-wider mb-4 hover:underline"
