@@ -65,6 +65,17 @@ export const PortalFooter = () => {
                 </Link>
               </li>
               <li>
+                <a
+                  href="https://vtvvmikilbcalohutsmf.supabase.co/functions/v1/rss-feed?site=https://neural-update.com.br"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-foreground/80 hover:text-primary transition-colors inline-flex items-center gap-1.5"
+                >
+                  Feed RSS
+                  <span className="text-[9px] px-1 py-0.5 rounded bg-primary/15 text-primary font-bold">XML</span>
+                </a>
+              </li>
+              <li>
                 <Link to="/privacy-policy" className="text-sm text-foreground/80 hover:text-primary transition-colors">
                   Privacidade
                 </Link>
