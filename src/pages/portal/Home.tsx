@@ -222,17 +222,12 @@ const SectionHeader = ({
   title: string;
   action?: React.ReactNode;
 }) => (
-  <div className="mb-8">
-    <div className="portal-divider mb-5" />
+  <div className="mb-6 md:mb-8">
+    <div className="portal-divider mb-4 md:mb-5" />
     <div className="flex items-end justify-between gap-3 flex-wrap">
-      <div>
-        <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-1.5">
-          / {eyebrow}
-        </p>
-        <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
-          {title}
-        </h2>
-      </div>
+      <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
+        {title}
+      </h2>
       {action}
     </div>
   </div>
