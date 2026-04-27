@@ -3269,11 +3269,31 @@ ${topPerformers.length > 0
   ? topPerformers.map((t, i) => `${i + 1}. **${t.type}** — ${t.avg.toFixed(2)}% de engajamento (${t.n} posts)`).join('\n')
   : '_Sem dados publicados nos últimos 30 dias_'}
 
+### 🩺 READLINE — O que aconteceu nos últimos 7 dias?
+**Resumo:** ${totalPub7d} posts publicados (média ${avgPerDay7d}/dia) | ${totalFail7d} falhas
+
+| Dia (BR) | Publicados | Falhas | Drafts | Agendados | Pendentes |
+|----------|------------|--------|--------|-----------|-----------|
+${sortedDays.length > 0
+  ? sortedDays.map(([d, v]) => `| ${d} | ${v.published} | ${v.failed} | ${v.draft} | ${v.scheduled} | ${v.pending} |`).join('\n')
+  : '| _sem dados_ | - | - | - | - | - |'}
+
+${errorSamples.length > 0 ? `**Últimos erros detectados:**\n${errorSamples.map(e => `- ${e}`).join('\n')}` : ''}
+
+**REGRA:** Se o usuário perguntar "o que aconteceu?", "por que postou pouco?", "cadê os posts?", USE essa tabela acima. NÃO diga "não sei" — você TEM o histórico. Explique o padrão (queda nos últimos dias? falhas concentradas? drafts presos?). Seja direto.
+
 ### 🎯 Como usar essa visão
-- Se usuário perguntar "como tá a semana?" → use os números acima, NÃO chame ferramenta
+- Se usuário perguntar "como tá a semana?" → use os números da tabela semanal acima, NÃO chame ferramenta
+- Se usuário perguntar "o que rolou?" / "últimos dias" → use o READLINE 7 dias acima
 - Se usuário pedir "o que devo postar agora?" → recomende \`${nextAutoType}\` e justifique pelo gap
 - Se um tipo tem 0 posts mas meta alta → priorize ele
 - Reels (criativo e notícia) só são criados via comando manual — auto-rotação está desligada para economizar crédito
+
+### 📰 SEPARAÇÃO IMPORTANTE: Instagram ≠ Blog Neural Update
+Você é o agente do **Instagram** (posts/reels/carrosséis). Existe OUTRO agente cuidando do **Blog Neural Update** (artigos no site neural-update.com.br).
+- Se aparecer um relatório com tag \`📰 Blog Neural Update\` no painel, é do **outro agente** — você NÃO controla artigos do blog.
+- Se o usuário perguntar sobre o blog, diga: "Esse é o agente editorial do blog, eu cuido só do Instagram. Mas posso te dar uma visão geral se quiser."
+- NUNCA misture métricas de blog (artigos, leituras, page_views) com métricas de Instagram (posts, reach, likes).
 
 ## 🧠 INTELIGÊNCIA SEMÂNTICA (CRÍTICO!)
 
