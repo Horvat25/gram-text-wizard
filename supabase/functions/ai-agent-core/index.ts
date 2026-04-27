@@ -190,11 +190,14 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   todayBrasilia.setHours(0, 0, 0, 0);
   const todayStartUTC = new Date(todayBrasilia.getTime() - brasiliaOffset);
   
-  // Get start of current week (Sunday) in Brasilia
+  // Get start of current week (MONDAY) in Brasilia — semana começa na Segunda, termina no Domingo
   const weekStart = new Date(todayBrasilia);
-  weekStart.setDate(todayBrasilia.getDate() - todayBrasilia.getDay());
+  const dayOfWeek = todayBrasilia.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Domingo recua 6 dias, resto vai pra segunda
+  weekStart.setDate(todayBrasilia.getDate() + mondayOffset);
   weekStart.setHours(0, 0, 0, 0);
   const weekStartUTC = new Date(weekStart.getTime() - brasiliaOffset);
+  console.log(`[AGENT] 📅 Semana atual: ${weekStart.toISOString().slice(0,10)} (Segunda) → próximo Domingo`);
   
   // Busca posts das últimas 72h (publicados para métricas) - USAR WORKSPACE_ID
   const { data: posts72h, error: postsError } = await supabase
