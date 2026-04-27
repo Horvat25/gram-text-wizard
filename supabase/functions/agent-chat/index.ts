@@ -3136,6 +3136,41 @@ serve(async (req) => {
       .sort((a, b) => b.avg - a.avg)
       .slice(0, 3);
 
+    // ============================================================
+    // 🩺 READLINE — Diagnóstico dos últimos 7 dias (por que postou pouco?)
+    // ============================================================
+    const since7d = new Date(Date.now() - 7 * 86400000).toISOString();
+    const { data: posts7d } = await supabase
+      .from('posts')
+      .select('id, status, media_type, post_type, created_at, published_at, error_message, last_render_error')
+      .eq('workspace_id', workspaceId)
+      .gte('created_at', since7d)
+      .order('created_at', { ascending: false });
+
+    const dayBuckets: Record<string, { published: number; failed: number; draft: number; scheduled: number; pending: number }> = {};
+    const errorSamples: string[] = [];
+    (posts7d || []).forEach((p: any) => {
+      const dBR = new Date(new Date(p.created_at).toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+      const key = `${String(dBR.getDate()).padStart(2,'0')}/${String(dBR.getMonth()+1).padStart(2,'0')}`;
+      if (!dayBuckets[key]) dayBuckets[key] = { published: 0, failed: 0, draft: 0, scheduled: 0, pending: 0 };
+      if (p.status === 'published') dayBuckets[key].published++;
+      else if (p.status === 'failed') {
+        dayBuckets[key].failed++;
+        const err = p.error_message || p.last_render_error;
+        if (err && errorSamples.length < 3) errorSamples.push(`${key}: ${String(err).slice(0, 120)}`);
+      }
+      else if (p.status === 'draft') dayBuckets[key].draft++;
+      else if (p.status === 'scheduled') dayBuckets[key].scheduled++;
+      else if (p.status === 'pending_review') dayBuckets[key].pending++;
+    });
+    const sortedDays = Object.entries(dayBuckets).sort(([a],[b]) => {
+      const [da, ma] = a.split('/').map(Number); const [db, mb] = b.split('/').map(Number);
+      return mb !== ma ? mb - ma : db - da;
+    }).slice(0, 7);
+    const totalPub7d = sortedDays.reduce((s, [,v]) => s + v.published, 0);
+    const totalFail7d = sortedDays.reduce((s, [,v]) => s + v.failed, 0);
+    const avgPerDay7d = (totalPub7d / 7).toFixed(1);
+
     // Build dynamic system prompt based on user config
     const agentName = context?.agent_name || 'Aria';
     const brandVoice = context?.brand_voice || 'Direto e prático. Fala como amigo que já tentou de tudo e finalmente descobriu o que funciona.';
