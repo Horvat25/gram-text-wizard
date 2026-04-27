@@ -3136,6 +3136,41 @@ serve(async (req) => {
       .sort((a, b) => b.avg - a.avg)
       .slice(0, 3);
 
+    // ============================================================
+    // 🩺 READLINE — Diagnóstico dos últimos 7 dias (por que postou pouco?)
+    // ============================================================
+    const since7d = new Date(Date.now() - 7 * 86400000).toISOString();
+    const { data: posts7d } = await supabase
+      .from('posts')
+      .select('id, status, media_type, post_type, created_at, published_at, error_message, last_render_error')
+      .eq('workspace_id', workspaceId)
+      .gte('created_at', since7d)
+      .order('created_at', { ascending: false });
+
+    const dayBuckets: Record<string, { published: number; failed: number; draft: number; scheduled: number; pending: number }> = {};
+    const errorSamples: string[] = [];
+    (posts7d || []).forEach((p: any) => {
+      const dBR = new Date(new Date(p.created_at).toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+      const key = `${String(dBR.getDate()).padStart(2,'0')}/${String(dBR.getMonth()+1).padStart(2,'0')}`;
+      if (!dayBuckets[key]) dayBuckets[key] = { published: 0, failed: 0, draft: 0, scheduled: 0, pending: 0 };
+      if (p.status === 'published') dayBuckets[key].published++;
+      else if (p.status === 'failed') {
+        dayBuckets[key].failed++;
+        const err = p.error_message || p.last_render_error;
+        if (err && errorSamples.length < 3) errorSamples.push(`${key}: ${String(err).slice(0, 120)}`);
+      }
+      else if (p.status === 'draft') dayBuckets[key].draft++;
+      else if (p.status === 'scheduled') dayBuckets[key].scheduled++;
+      else if (p.status === 'pending_review') dayBuckets[key].pending++;
+    });
+    const sortedDays = Object.entries(dayBuckets).sort(([a],[b]) => {
+      const [da, ma] = a.split('/').map(Number); const [db, mb] = b.split('/').map(Number);
+      return mb !== ma ? mb - ma : db - da;
+    }).slice(0, 7);
+    const totalPub7d = sortedDays.reduce((s, [,v]) => s + v.published, 0);
+    const totalFail7d = sortedDays.reduce((s, [,v]) => s + v.failed, 0);
+    const avgPerDay7d = (totalPub7d / 7).toFixed(1);
+
     // Build dynamic system prompt based on user config
     const agentName = context?.agent_name || 'Aria';
     const brandVoice = context?.brand_voice || 'Direto e prático. Fala como amigo que já tentou de tudo e finalmente descobriu o que funciona.';
@@ -3234,11 +3269,31 @@ ${topPerformers.length > 0
   ? topPerformers.map((t, i) => `${i + 1}. **${t.type}** — ${t.avg.toFixed(2)}% de engajamento (${t.n} posts)`).join('\n')
   : '_Sem dados publicados nos últimos 30 dias_'}
 
+### 🩺 READLINE — O que aconteceu nos últimos 7 dias?
+**Resumo:** ${totalPub7d} posts publicados (média ${avgPerDay7d}/dia) | ${totalFail7d} falhas
+
+| Dia (BR) | Publicados | Falhas | Drafts | Agendados | Pendentes |
+|----------|------------|--------|--------|-----------|-----------|
+${sortedDays.length > 0
+  ? sortedDays.map(([d, v]) => `| ${d} | ${v.published} | ${v.failed} | ${v.draft} | ${v.scheduled} | ${v.pending} |`).join('\n')
+  : '| _sem dados_ | - | - | - | - | - |'}
+
+${errorSamples.length > 0 ? `**Últimos erros detectados:**\n${errorSamples.map(e => `- ${e}`).join('\n')}` : ''}
+
+**REGRA:** Se o usuário perguntar "o que aconteceu?", "por que postou pouco?", "cadê os posts?", USE essa tabela acima. NÃO diga "não sei" — você TEM o histórico. Explique o padrão (queda nos últimos dias? falhas concentradas? drafts presos?). Seja direto.
+
 ### 🎯 Como usar essa visão
-- Se usuário perguntar "como tá a semana?" → use os números acima, NÃO chame ferramenta
+- Se usuário perguntar "como tá a semana?" → use os números da tabela semanal acima, NÃO chame ferramenta
+- Se usuário perguntar "o que rolou?" / "últimos dias" → use o READLINE 7 dias acima
 - Se usuário pedir "o que devo postar agora?" → recomende \`${nextAutoType}\` e justifique pelo gap
 - Se um tipo tem 0 posts mas meta alta → priorize ele
 - Reels (criativo e notícia) só são criados via comando manual — auto-rotação está desligada para economizar crédito
+
+### 📰 SEPARAÇÃO IMPORTANTE: Instagram ≠ Blog Neural Update
+Você é o agente do **Instagram** (posts/reels/carrosséis). Existe OUTRO agente cuidando do **Blog Neural Update** (artigos no site neural-update.com.br).
+- Se aparecer um relatório com tag \`📰 Blog Neural Update\` no painel, é do **outro agente** — você NÃO controla artigos do blog.
+- Se o usuário perguntar sobre o blog, diga: "Esse é o agente editorial do blog, eu cuido só do Instagram. Mas posso te dar uma visão geral se quiser."
+- NUNCA misture métricas de blog (artigos, leituras, page_views) com métricas de Instagram (posts, reach, likes).
 
 ## 🧠 INTELIGÊNCIA SEMÂNTICA (CRÍTICO!)
 
