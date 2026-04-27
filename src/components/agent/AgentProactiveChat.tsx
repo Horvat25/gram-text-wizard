@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
   CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb, 
-  Zap, Clock, Pause, User, MessageSquare
+  Zap, Clock, Pause, User, MessageSquare, Newspaper, Instagram
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -69,17 +69,24 @@ interface AgentProactiveChatProps {
 }
 
 const TYPE_ICONS: Record<string, typeof TrendingUp> = {
-  report: TrendingUp,
+  report: Instagram,
   decision: FileText,
   strategy: Megaphone,
   alert: AlertCircle,
+  daily_blog_report: Newspaper,
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  report: 'Relatório',
+  report: '📱 Instagram',
   decision: 'Decisão',
   strategy: 'Estratégia',
   alert: 'Alerta',
+  daily_blog_report: '📰 Blog Neural Update',
+};
+
+const TYPE_BADGE_CLASS: Record<string, string> = {
+  report: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30',
+  daily_blog_report: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
 };
 
 export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAvatar }: AgentProactiveChatProps) {
