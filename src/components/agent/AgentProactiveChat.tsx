@@ -271,7 +271,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
+              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 gap-1 font-semibold", TYPE_BADGE_CLASS[msg.message_type])}>
                 <Icon className="h-2.5 w-2.5" />
                 {TYPE_LABELS[msg.message_type] || msg.message_type}
               </Badge>
