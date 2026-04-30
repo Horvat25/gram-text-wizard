@@ -43,10 +43,12 @@ function buildReviewPrompt(text: string, type: string, maxLength?: number, conte
 - SEMPRE traduzir "AI" para "IA"
 - VERIFICAR TODOS os acentos: é, ê, á, ã, õ, ç, ü
 - Erros frequentes: "Inteligencia"→"Inteligência", "lancamento"→"lançamento", "revolucao"→"revolução", "analise"→"análise"`,
-    caption: `Esta é uma LEGENDA para Instagram/TikTok.
+    caption: `Esta é uma LEGENDA COMPLETA para Instagram (pode ter 800 a 1500 caracteres, 3 a 4 parágrafos).
 - Tom envolvente e conversacional
-- Pode usar emojis se já existirem
-- Mantenha hashtags se existirem`,
+- PRESERVE TODOS os parágrafos, quebras de linha, emojis e hashtags exatamente como estão
+- PRESERVE a linha "📰 Fonte: ..." se existir
+- NÃO encurte o texto, NÃO resuma, NÃO remova parágrafos — só corrija ortografia/gramática
+- Mantenha o tamanho final muito próximo do original (apenas correções pontuais)`,
     script: `Este é um SCRIPT de narração para vídeo.
 - Tom natural e fluido para leitura em voz alta
 - Frases curtas e claras
