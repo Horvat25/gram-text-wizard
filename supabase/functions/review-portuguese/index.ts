@@ -187,7 +187,9 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash", // Flash: mais preciso para revisão ortográfica
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1, // Baixa para consistência
-        max_tokens: 500,
+        // 4096 tokens cobre legendas profundas (até ~1500 chars / ~700 tokens) com folga.
+        // O bug anterior (max_tokens: 500) cortava legendas no meio da palavra.
+        max_tokens: 4096,
       }),
     });
 
