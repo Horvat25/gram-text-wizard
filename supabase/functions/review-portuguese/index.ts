@@ -211,8 +211,30 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const rawResponse = data.choices?.[0]?.message?.content || text;
+    const choice = data.choices?.[0];
+    const rawResponse = choice?.message?.content || text;
+    const finishReason = choice?.finish_reason;
     const corrected = extractCleanText(rawResponse);
+
+    // 🛡️ GUARDA ANTI-TRUNCAMENTO: se a IA cortou a resposta (finish_reason=length)
+    // OU se o texto revisado é significativamente menor que o original (>30% perdido),
+    // descarta a "correção" e retorna o original. Revisão ortográfica raramente
+    // reduz texto em mais de 30% — quando reduz, é truncamento.
+    const wasTruncated = finishReason === 'length' || finishReason === 'MAX_TOKENS';
+    const lostTooMuch = corrected.length < text.length * 0.7;
+    if (wasTruncated || lostTooMuch) {
+      console.warn(`[review-portuguese] ⚠️ Truncamento detectado (finish=${finishReason}, original=${text.length}, corrigido=${corrected.length}). Mantendo texto original.`);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          original: text,
+          corrected: text,
+          wasModified: false,
+          error: `truncated_response (finish_reason=${finishReason})`,
+        } as ReviewResponse),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Verificar se houve mudança significativa
     const wasModified = corrected.toLowerCase().trim() !== text.toLowerCase().trim();
