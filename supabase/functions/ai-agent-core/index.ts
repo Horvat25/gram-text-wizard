@@ -93,6 +93,12 @@ async function reviewText(
     if (response.ok) {
       const result = await response.json();
       if (result.success && result.corrected) {
+        // 🛡️ Defesa em profundidade: se a revisão "comeu" mais de 30% do texto,
+        // é truncamento — descarta a correção e mantém o original.
+        if (result.corrected.length < text.length * 0.7) {
+          console.warn(`[AGENT] ⚠️ Revisão truncada (${type}): original=${text.length}, corrigido=${result.corrected.length}. Mantendo original.`);
+          return text;
+        }
         if (result.wasModified) {
           console.log(`[AGENT] 📝 Texto revisado (${type}): "${text.substring(0, 30)}..." → "${result.corrected.substring(0, 30)}..."`);
         }
@@ -2019,10 +2025,15 @@ REGRAS:
     if (reviewResponse.ok) {
       const reviewResult = await reviewResponse.json();
       if (reviewResult.success && reviewResult.corrected) {
-        if (reviewResult.wasModified) {
-          console.log(`[AGENT] ✅ Caption revisada: "${caption.substring(0, 40)}..." → "${reviewResult.corrected.substring(0, 40)}..."`);
+        // 🛡️ Anti-truncamento
+        if (reviewResult.corrected.length < caption.length * 0.7) {
+          console.warn(`[AGENT] ⚠️ Caption revisada truncada (orig=${caption.length}, rev=${reviewResult.corrected.length}). Mantendo original.`);
+        } else {
+          if (reviewResult.wasModified) {
+            console.log(`[AGENT] ✅ Caption revisada: "${caption.substring(0, 40)}..." → "${reviewResult.corrected.substring(0, 40)}..."`);
+          }
+          caption = reviewResult.corrected;
         }
-        caption = reviewResult.corrected;
       }
     }
   } catch (e) {

@@ -43,10 +43,12 @@ function buildReviewPrompt(text: string, type: string, maxLength?: number, conte
 - SEMPRE traduzir "AI" para "IA"
 - VERIFICAR TODOS os acentos: é, ê, á, ã, õ, ç, ü
 - Erros frequentes: "Inteligencia"→"Inteligência", "lancamento"→"lançamento", "revolucao"→"revolução", "analise"→"análise"`,
-    caption: `Esta é uma LEGENDA para Instagram/TikTok.
+    caption: `Esta é uma LEGENDA COMPLETA para Instagram (pode ter 800 a 1500 caracteres, 3 a 4 parágrafos).
 - Tom envolvente e conversacional
-- Pode usar emojis se já existirem
-- Mantenha hashtags se existirem`,
+- PRESERVE TODOS os parágrafos, quebras de linha, emojis e hashtags exatamente como estão
+- PRESERVE a linha "📰 Fonte: ..." se existir
+- NÃO encurte o texto, NÃO resuma, NÃO remova parágrafos — só corrija ortografia/gramática
+- Mantenha o tamanho final muito próximo do original (apenas correções pontuais)`,
     script: `Este é um SCRIPT de narração para vídeo.
 - Tom natural e fluido para leitura em voz alta
 - Frases curtas e claras
@@ -187,7 +189,9 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash", // Flash: mais preciso para revisão ortográfica
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1, // Baixa para consistência
-        max_tokens: 500,
+        // 4096 tokens cobre legendas profundas (até ~1500 chars / ~700 tokens) com folga.
+        // O bug anterior (max_tokens: 500) cortava legendas no meio da palavra.
+        max_tokens: 4096,
       }),
     });
 
@@ -209,8 +213,30 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const rawResponse = data.choices?.[0]?.message?.content || text;
+    const choice = data.choices?.[0];
+    const rawResponse = choice?.message?.content || text;
+    const finishReason = choice?.finish_reason;
     const corrected = extractCleanText(rawResponse);
+
+    // 🛡️ GUARDA ANTI-TRUNCAMENTO: se a IA cortou a resposta (finish_reason=length)
+    // OU se o texto revisado é significativamente menor que o original (>30% perdido),
+    // descarta a "correção" e retorna o original. Revisão ortográfica raramente
+    // reduz texto em mais de 30% — quando reduz, é truncamento.
+    const wasTruncated = finishReason === 'length' || finishReason === 'MAX_TOKENS';
+    const lostTooMuch = corrected.length < text.length * 0.7;
+    if (wasTruncated || lostTooMuch) {
+      console.warn(`[review-portuguese] ⚠️ Truncamento detectado (finish=${finishReason}, original=${text.length}, corrigido=${corrected.length}). Mantendo texto original.`);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          original: text,
+          corrected: text,
+          wasModified: false,
+          error: `truncated_response (finish_reason=${finishReason})`,
+        } as ReviewResponse),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Verificar se houve mudança significativa
     const wasModified = corrected.toLowerCase().trim() !== text.toLowerCase().trim();
