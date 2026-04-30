@@ -2025,10 +2025,15 @@ REGRAS:
     if (reviewResponse.ok) {
       const reviewResult = await reviewResponse.json();
       if (reviewResult.success && reviewResult.corrected) {
-        if (reviewResult.wasModified) {
-          console.log(`[AGENT] ✅ Caption revisada: "${caption.substring(0, 40)}..." → "${reviewResult.corrected.substring(0, 40)}..."`);
+        // 🛡️ Anti-truncamento
+        if (reviewResult.corrected.length < caption.length * 0.7) {
+          console.warn(`[AGENT] ⚠️ Caption revisada truncada (orig=${caption.length}, rev=${reviewResult.corrected.length}). Mantendo original.`);
+        } else {
+          if (reviewResult.wasModified) {
+            console.log(`[AGENT] ✅ Caption revisada: "${caption.substring(0, 40)}..." → "${reviewResult.corrected.substring(0, 40)}..."`);
+          }
+          caption = reviewResult.corrected;
         }
-        caption = reviewResult.corrected;
       }
     }
   } catch (e) {
