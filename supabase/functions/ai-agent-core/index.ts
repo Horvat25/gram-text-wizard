@@ -93,6 +93,12 @@ async function reviewText(
     if (response.ok) {
       const result = await response.json();
       if (result.success && result.corrected) {
+        // 🛡️ Defesa em profundidade: se a revisão "comeu" mais de 30% do texto,
+        // é truncamento — descarta a correção e mantém o original.
+        if (result.corrected.length < text.length * 0.7) {
+          console.warn(`[AGENT] ⚠️ Revisão truncada (${type}): original=${text.length}, corrigido=${result.corrected.length}. Mantendo original.`);
+          return text;
+        }
         if (result.wasModified) {
           console.log(`[AGENT] 📝 Texto revisado (${type}): "${text.substring(0, 30)}..." → "${result.corrected.substring(0, 30)}..."`);
         }
