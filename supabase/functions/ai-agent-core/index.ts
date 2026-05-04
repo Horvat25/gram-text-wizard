@@ -3602,6 +3602,46 @@ Deno.serve(async (req) => {
     } catch {
       // No body or invalid JSON
     }
+
+    // ===== AUTH: Verify caller for user-triggered requests =====
+    // Service-role callers (cron jobs, internal edge functions like generate-test-content)
+    // pass the service-role key as bearer and bypass JWT validation. End-user calls must
+    // present a valid JWT whose user.id matches the claimed userId.
+    const authHeader = req.headers.get('Authorization') || '';
+    const bearer = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const isServiceRole = !!bearer && bearer === supabaseKey;
+
+    if (!isServiceRole && userId) {
+      if (!bearer) {
+        return new Response(JSON.stringify({ error: 'Unauthorized: missing token' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      const authClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: `Bearer ${bearer}` } }
+      });
+      const { data: userData, error: userErr } = await authClient.auth.getUser(bearer);
+      if (userErr || !userData?.user || userData.user.id !== userId) {
+        return new Response(JSON.stringify({ error: 'Forbidden: userId mismatch' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      if (workspaceId) {
+        const { data: hasAccess } = await authClient.rpc('has_workspace_access', {
+          _user_id: userId,
+          _workspace_id: workspaceId,
+        });
+        if (!hasAccess) {
+          return new Response(JSON.stringify({ error: 'Forbidden: workspace access denied' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+      }
+    }
     
     // If triggered by cron, process all workspaces with auto_post_enabled
     if (trigger === 'cron' && !userId) {
