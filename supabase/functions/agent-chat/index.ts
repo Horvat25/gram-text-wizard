@@ -2985,19 +2985,54 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTH: Validate JWT and resolve authenticated user =====
+    const authHeader = req.headers.get('Authorization') || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (!token) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: missing token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
+    const { data: userData, error: userErr } = await authClient.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    const authedUserId = userData.user.id;
+
     const body = await req.json();
     const { messages, userId, workspaceId } = body;
-    
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'userId is required' }), {
+
+    if (!userId || userId !== authedUserId) {
+      return new Response(JSON.stringify({ error: 'Forbidden: userId mismatch' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!workspaceId) {
+      return new Response(JSON.stringify({ error: 'workspaceId is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
-    
-    if (!workspaceId) {
-      return new Response(JSON.stringify({ error: 'workspaceId is required' }), {
-        status: 400,
+
+    // Verify the authenticated user has access to the claimed workspace
+    const { data: hasAccess, error: accessErr } = await authClient.rpc('has_workspace_access', {
+      _user_id: authedUserId,
+      _workspace_id: workspaceId,
+    });
+    if (accessErr || !hasAccess) {
+      return new Response(JSON.stringify({ error: 'Forbidden: workspace access denied' }), {
+        status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }

@@ -9,8 +9,6 @@ export interface TikTokAccount {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
-  access_token: string;
-  refresh_token: string | null;
   expires_at: string | null;
   connected_at: string | null;
   workspace_id: string | null;
@@ -33,9 +31,10 @@ export function useTikTokAccounts() {
     setError(null);
     try {
       // Query by workspace_id first, fallback to user_id for accounts without workspace
+      // NOTE: token columns intentionally excluded — only the backend (service role) reads tokens.
       const { data, error: fetchError } = await supabase
         .from('tiktok_accounts')
-        .select('*')
+        .select('id, open_id, username, display_name, avatar_url, expires_at, connected_at, workspace_id')
         .or(`workspace_id.eq.${currentWorkspace.id},and(workspace_id.is.null,user_id.eq.${user.id})`);
 
       if (fetchError) throw fetchError;
