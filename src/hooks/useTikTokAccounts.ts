@@ -9,8 +9,6 @@ export interface TikTokAccount {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
-  access_token: string;
-  refresh_token: string | null;
   expires_at: string | null;
   connected_at: string | null;
   workspace_id: string | null;
