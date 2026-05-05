@@ -9,7 +9,6 @@ import {
   CalendarDays,
   Instagram,
   FlaskConical,
-  Newspaper,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,9 +30,6 @@ import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
 
 import ContentTestTab from '@/components/tabs/ContentTestTab';
-import ArticlesManagerTab from '@/components/admin/ArticlesManagerTab';
-import EditorialDirectionPanel from '@/components/admin/EditorialDirectionPanel';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
@@ -68,18 +64,6 @@ const PlatformToggle = ({ selected, onSelect }: { selected: Platform; onSelect: 
       title="TikTok"
     >
       <TikTokIcon className="h-3.5 w-3.5" />
-    </button>
-    <button
-      onClick={() => onSelect("blog")}
-      className={cn(
-        "p-1 rounded transition-all",
-        selected === "blog" 
-          ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm" 
-          : "text-muted-foreground hover:text-foreground"
-      )}
-      title="Blog Neural Update"
-    >
-      <Newspaper className="h-3.5 w-3.5" />
     </button>
   </div>
 );
@@ -131,7 +115,7 @@ export default function AgentGenieView() {
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
   const [showContentTest, setShowContentTest] = useState(false);
-  const [showPortal, setShowPortal] = useState(false);
+  
   
   // TikTok panel states
     const [showTikTokQueue, setShowTikTokQueue] = useState(false);
@@ -304,7 +288,7 @@ export default function AgentGenieView() {
     setShowQueue(false);
     setShowPostHistory(false);
     setShowContentTest(false);
-    setShowPortal(false);
+    
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
     setShowTikTokGrowth(false);
@@ -318,7 +302,7 @@ export default function AgentGenieView() {
       queue: showQueue,
       postHistory: showPostHistory,
       contentTest: showContentTest,
-      portal: showPortal,
+      
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
       tiktokGrowth: showTikTokGrowth,
@@ -333,7 +317,7 @@ export default function AgentGenieView() {
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
         case 'contentTest': setShowContentTest(true); break;
-        case 'portal': setShowPortal(true); break;
+        
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
         case 'tiktokGrowth': setShowTikTokGrowth(true); break;
@@ -354,79 +338,7 @@ export default function AgentGenieView() {
 
   return (
     <div className="h-full">
-    {selectedPlatform === "blog" ? (
-      /* Blog / Portal Neural Update — view dedicada (3ª plataforma) */
-      <div className="h-full flex flex-col relative overflow-hidden bg-background">
-        {/* Top Bar */}
-        <header className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 gap-1 border-b border-border/50">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="h-7 w-7 rounded-md bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
-              <Newspaper className="h-3.5 w-3.5 text-white" />
-            </div>
-            <div className="min-w-0">
-              <h2 className="text-sm font-semibold truncate">Portal Neural Update</h2>
-              <p className="text-[10px] text-muted-foreground truncate">Blog público — fonte da verdade</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 gap-1 px-2 text-[11px]"
-              onClick={() => window.open('https://neural-update.com.br', '_blank', 'noopener,noreferrer')}
-              title="Abrir neural-update.com.br"
-            >
-              <Newspaper className="h-3 w-3" />
-              <span className="hidden sm:inline">Ver site</span>
-            </Button>
-            <PlatformToggle selected={selectedPlatform} onSelect={setSelectedPlatform} />
-            <AgentSettingsPanel
-              activePlatform={selectedPlatform}
-              trigger={
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <Settings className="h-3.5 w-3.5" />
-                </Button>
-              }
-              onConfigChange={(config) => {
-                setAgentConfig(prev => ({
-                  ...prev,
-                  agent_name: config.agent_name,
-                  agent_avatar_url: config.agent_avatar_url,
-                  auto_post_enabled: config.auto_post_enabled
-                }));
-              }}
-            />
-          </div>
-        </header>
-
-        {/* Content with tabs: Stats + Articles */}
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-4xl mx-auto">
-              <Tabs defaultValue="direction" className="w-full">
-                <TabsList className="grid grid-cols-2 mb-3 h-8">
-                  <TabsTrigger value="direction" className="text-xs gap-1.5">
-                    <TrendingUp className="h-3.5 w-3.5" />
-                    Direção
-                  </TabsTrigger>
-                  <TabsTrigger value="articles" className="text-xs gap-1.5">
-                    <Newspaper className="h-3.5 w-3.5" />
-                    Artigos
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="direction" className="mt-0">
-                  <EditorialDirectionPanel />
-                </TabsContent>
-                <TabsContent value="articles" className="mt-0">
-                  <ArticlesManagerTab />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </ScrollArea>
-        </div>
-      </div>
-    ) : selectedPlatform === "tiktok" ? (
+    {selectedPlatform === "tiktok" ? (
       <div className="h-full flex flex-col relative overflow-hidden bg-background">
         {/* 3D Background */}
         <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
@@ -814,23 +726,6 @@ export default function AgentGenieView() {
           </div>
         )}
 
-        {/* Portal Articles Panel */}
-        {showPortal && (
-          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 max-w-4xl mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-semibold text-sm">Portal Neural Update</h2>
-                    <p className="text-xs text-muted-foreground">Artigos publicados no site</p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setShowPortal(false)} className="h-7 w-7 p-0">✕</Button>
-                </div>
-                <ArticlesManagerTab />
-              </div>
-            </ScrollArea>
-          </div>
-        )}
       </div>
     )}
     </div>

@@ -513,111 +513,6 @@ export type Database = {
           },
         ]
       }
-      articles: {
-        Row: {
-          ai_model_used: string | null
-          author_name: string
-          category: string
-          content: string
-          cost_estimate: number | null
-          created_at: string
-          excerpt: string | null
-          hero_image_url: string | null
-          id: string
-          is_featured: boolean
-          linked_post_ids: string[] | null
-          og_image_url: string | null
-          published_at: string | null
-          reading_time_minutes: number | null
-          seo_description: string | null
-          seo_title: string | null
-          slug: string
-          source_name: string | null
-          source_rss_item_id: string | null
-          source_url: string | null
-          status: string
-          subtitle: string | null
-          tags: string[] | null
-          title: string
-          updated_at: string
-          view_count: number
-          workspace_id: string
-        }
-        Insert: {
-          ai_model_used?: string | null
-          author_name?: string
-          category?: string
-          content: string
-          cost_estimate?: number | null
-          created_at?: string
-          excerpt?: string | null
-          hero_image_url?: string | null
-          id?: string
-          is_featured?: boolean
-          linked_post_ids?: string[] | null
-          og_image_url?: string | null
-          published_at?: string | null
-          reading_time_minutes?: number | null
-          seo_description?: string | null
-          seo_title?: string | null
-          slug: string
-          source_name?: string | null
-          source_rss_item_id?: string | null
-          source_url?: string | null
-          status?: string
-          subtitle?: string | null
-          tags?: string[] | null
-          title: string
-          updated_at?: string
-          view_count?: number
-          workspace_id: string
-        }
-        Update: {
-          ai_model_used?: string | null
-          author_name?: string
-          category?: string
-          content?: string
-          cost_estimate?: number | null
-          created_at?: string
-          excerpt?: string | null
-          hero_image_url?: string | null
-          id?: string
-          is_featured?: boolean
-          linked_post_ids?: string[] | null
-          og_image_url?: string | null
-          published_at?: string | null
-          reading_time_minutes?: number | null
-          seo_description?: string | null
-          seo_title?: string | null
-          slug?: string
-          source_name?: string | null
-          source_rss_item_id?: string | null
-          source_url?: string | null
-          status?: string
-          subtitle?: string | null
-          tags?: string[] | null
-          title?: string
-          updated_at?: string
-          view_count?: number
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "articles_source_rss_item_id_fkey"
-            columns: ["source_rss_item_id"]
-            isOneToOne: false
-            referencedRelation: "rss_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "articles_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       backups: {
         Row: {
           backup_type: string
@@ -755,86 +650,6 @@ export type Database = {
           is_connected?: boolean | null
           updated_at?: string | null
           user_id?: string
-        }
-        Relationships: []
-      }
-      newsletter_subscribers: {
-        Row: {
-          active: boolean
-          email: string
-          id: string
-          source: string | null
-          subscribed_at: string
-          workspace_id: string | null
-        }
-        Insert: {
-          active?: boolean
-          email: string
-          id?: string
-          source?: string | null
-          subscribed_at?: string
-          workspace_id?: string | null
-        }
-        Update: {
-          active?: boolean
-          email?: string
-          id?: string
-          source?: string | null
-          subscribed_at?: string
-          workspace_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "newsletter_subscribers_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      page_views: {
-        Row: {
-          article_slug: string | null
-          country: string | null
-          created_at: string
-          device_type: string | null
-          id: string
-          page_path: string
-          page_type: string
-          referrer: string | null
-          search_query: string | null
-          session_id: string | null
-          user_agent: string | null
-          workspace_id: string | null
-        }
-        Insert: {
-          article_slug?: string | null
-          country?: string | null
-          created_at?: string
-          device_type?: string | null
-          id?: string
-          page_path: string
-          page_type?: string
-          referrer?: string | null
-          search_query?: string | null
-          session_id?: string | null
-          user_agent?: string | null
-          workspace_id?: string | null
-        }
-        Update: {
-          article_slug?: string | null
-          country?: string | null
-          created_at?: string
-          device_type?: string | null
-          id?: string
-          page_path?: string
-          page_type?: string
-          referrer?: string | null
-          search_query?: string | null
-          session_id?: string | null
-          user_agent?: string | null
-          workspace_id?: string | null
         }
         Relationships: []
       }
@@ -1050,39 +865,6 @@ export type Database = {
           },
         ]
       }
-      seo_settings: {
-        Row: {
-          created_at: string
-          enable_internal_analytics: boolean
-          ga4_measurement_id: string | null
-          gsc_verification_code: string | null
-          id: string
-          site_url: string | null
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          enable_internal_analytics?: boolean
-          ga4_measurement_id?: string | null
-          gsc_verification_code?: string | null
-          id?: string
-          site_url?: string | null
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          enable_internal_analytics?: boolean
-          ga4_measurement_id?: string | null
-          gsc_verification_code?: string | null
-          id?: string
-          site_url?: string | null
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: []
-      }
       settings: {
         Row: {
           brand_logo_url: string | null
@@ -1284,7 +1066,6 @@ export type Database = {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
       }
-      increment_article_views: { Args: { _slug: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_workspace_owner: {
         Args: { _user_id: string; _workspace_id: string }
