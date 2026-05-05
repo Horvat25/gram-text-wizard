@@ -115,7 +115,7 @@ export default function AgentGenieView() {
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
   const [showContentTest, setShowContentTest] = useState(false);
-  const [showPortal, setShowPortal] = useState(false);
+  
   
   // TikTok panel states
     const [showTikTokQueue, setShowTikTokQueue] = useState(false);
@@ -288,7 +288,7 @@ export default function AgentGenieView() {
     setShowQueue(false);
     setShowPostHistory(false);
     setShowContentTest(false);
-    setShowPortal(false);
+    
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
     setShowTikTokGrowth(false);
@@ -302,7 +302,7 @@ export default function AgentGenieView() {
       queue: showQueue,
       postHistory: showPostHistory,
       contentTest: showContentTest,
-      portal: showPortal,
+      
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
       tiktokGrowth: showTikTokGrowth,
@@ -317,7 +317,7 @@ export default function AgentGenieView() {
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
         case 'contentTest': setShowContentTest(true); break;
-        case 'portal': setShowPortal(true); break;
+        
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
         case 'tiktokGrowth': setShowTikTokGrowth(true); break;
