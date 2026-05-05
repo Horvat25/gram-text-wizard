@@ -119,19 +119,3 @@ verify_jwt = false
 
 [functions.process-curated-video]
 verify_jwt = false
-
-[functions.generate-article]
-verify_jwt = false
-
-[functions.sitemap-news]
-verify_jwt = false
-
-[functions.rss-feed]
-verify_jwt = false
-
-[functions.auto-publish-article]
-verify_jwt = false
-
-[functions.daily-blog-report]
-verify_jwt = false
-
