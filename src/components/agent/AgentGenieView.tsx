@@ -9,7 +9,6 @@ import {
   CalendarDays,
   Instagram,
   FlaskConical,
-  Newspaper,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,9 +30,6 @@ import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
 
 import ContentTestTab from '@/components/tabs/ContentTestTab';
-import ArticlesManagerTab from '@/components/admin/ArticlesManagerTab';
-import EditorialDirectionPanel from '@/components/admin/EditorialDirectionPanel';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
@@ -68,18 +64,6 @@ const PlatformToggle = ({ selected, onSelect }: { selected: Platform; onSelect: 
       title="TikTok"
     >
       <TikTokIcon className="h-3.5 w-3.5" />
-    </button>
-    <button
-      onClick={() => onSelect("blog")}
-      className={cn(
-        "p-1 rounded transition-all",
-        selected === "blog" 
-          ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm" 
-          : "text-muted-foreground hover:text-foreground"
-      )}
-      title="Blog Neural Update"
-    >
-      <Newspaper className="h-3.5 w-3.5" />
     </button>
   </div>
 );
