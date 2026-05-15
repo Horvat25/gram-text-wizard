@@ -113,9 +113,11 @@ async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array>
   const chunks = splitForTTS(text, 480);
   const buffers: ArrayBuffer[] = [];
 
+  const VERSION = "89b6fa84e4fa2dd6bd3a96be3e1f12827a3516c9fda8fddbac7a0be131c9a6f5";
+
   for (let i = 0; i < chunks.length; i++) {
     const resp = await fetch(
-      "https://api.replicate.com/v1/models/alphanumericuser/kokoro-82m/predictions",
+      "https://api.replicate.com/v1/predictions",
       {
         method: "POST",
         headers: {
@@ -124,6 +126,7 @@ async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array>
           "Prefer": "wait=60",
         },
         body: JSON.stringify({
+          version: VERSION,
           input: {
             text: chunks[i],
             voice: "pf_dora",
