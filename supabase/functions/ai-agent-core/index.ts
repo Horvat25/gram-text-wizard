@@ -1621,8 +1621,13 @@ async function createCarouselContent(
     return post;
   }
   
-  // Pick THE BEST single article as the unified theme
-  const scored = rssItems.map((item: any) => ({
+  // Pick THE BEST single article — Neural Update tem prioridade absoluta
+  const neuralItems = rssItems.filter((i: any) => i.source_name === 'Atualização Neural');
+  const carouselPool = neuralItems.length > 0 ? neuralItems : rssItems;
+  if (neuralItems.length > 0) {
+    console.log(`[AGENT] 🟢 Carrossel: usando fonte prioritária Neural Update (${neuralItems.length} itens)`);
+  }
+  const scored = carouselPool.map((item: any) => ({
     item,
     score: calculateNewsRankingScore(item)
   })).sort((a: any, b: any) => b.score - a.score);
