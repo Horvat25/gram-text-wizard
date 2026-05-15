@@ -160,9 +160,6 @@ async function generateHuggingFaceTTS(text: string, apiKey: string): Promise<Uin
 
   return concatBuffers(buffers);
 }
-    };
-  });
-}
 
 // ========== Polly via StreamElements (fallback) ==========
 
