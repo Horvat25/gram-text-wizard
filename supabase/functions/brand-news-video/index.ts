@@ -339,7 +339,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { postId, title, description, workspaceId, userId, articleUrl } = await req.json();
+    const { postId, title, description, workspaceId, userId, articleUrl, primaryImageUrl } = await req.json();
 
     if (!postId || !title) {
       throw new Error("postId e title são obrigatórios");
@@ -367,7 +367,7 @@ Deno.serve(async (req) => {
     console.log(`[BRAND-VIDEO] ✅ Script: ${segments.length} segmentos`);
 
     // ─── STEP 2: Generate images ───
-    await generateSegmentImages(segments, title, supabaseUrl, serviceRoleKey);
+    await fetchRealImages(segments, title, description || "", articleUrl, primaryImageUrl, supabaseUrl, serviceRoleKey);
 
     // ─── STEP 3: Brand each image with Neural Update style ───
     for (let i = 0; i < segments.length; i++) {
