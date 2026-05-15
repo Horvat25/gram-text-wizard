@@ -127,6 +127,7 @@ async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array>
           input: {
             text: chunks[i],
             voice: "pf_dora",
+            language_code: "p",
             speed: 1.0,
           },
         }),
