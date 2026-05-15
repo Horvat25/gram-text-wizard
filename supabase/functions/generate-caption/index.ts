@@ -188,7 +188,7 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, postType = "engajamento", mediaType, customInstructions } = await req.json();
+    const { topic, postType = "engajamento", mediaType, customInstructions, sourceUrl, sourceName } = await req.json();
 
     if (!topic || typeof topic !== "string") {
       throw new Error("Topic é obrigatório e deve ser uma string");
