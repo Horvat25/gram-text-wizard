@@ -7,12 +7,13 @@ const corsHeaders = {
 };
 
 /**
- * TTS — Voz padrão: Kokoro PT-BR (neural open-source via Replicate)
+ * TTS — Voz padrão: Microsoft Edge Neural PT-BR (Francisca/Antonio)
+ * 100% GRÁTIS, sem chave, via WebSocket público do navegador Edge.
  *
  * Cadeia de fallback:
- *   1. Kokoro pf_dora (Replicate) — neural natural PT-BR, ~$0.0002/run
- *   2. Polly Camila (StreamElements) — se Replicate falhar
- *   3. Google Translate TTS — último recurso
+ *   1. Edge TTS Francisca neural (PT-BR feminina natural)
+ *   2. Edge TTS Antonio neural (PT-BR masculino)
+ *   3. Google Translate TTS (último recurso, robótico)
  *
  * ElevenLabs Sarah só é usada se `preferPaid: true`.
  */
