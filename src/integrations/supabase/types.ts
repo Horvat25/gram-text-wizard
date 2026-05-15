@@ -810,6 +810,7 @@ export type Database = {
           source_name: string
           source_url: string
           title: string
+          used_for_reel: boolean
           used_in_post_id: string | null
           user_id: string
           workspace_id: string | null
@@ -827,6 +828,7 @@ export type Database = {
           source_name: string
           source_url: string
           title: string
+          used_for_reel?: boolean
           used_in_post_id?: string | null
           user_id: string
           workspace_id?: string | null
@@ -844,6 +846,7 @@ export type Database = {
           source_name?: string
           source_url?: string
           title?: string
+          used_for_reel?: boolean
           used_in_post_id?: string | null
           user_id?: string
           workspace_id?: string | null
