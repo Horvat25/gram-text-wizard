@@ -2922,7 +2922,6 @@ async function createNewsContent(
       }
     }
   }
-  }
   
   // DO NOT generate AI image for news - only use real images
   if (!imageUrl) {
@@ -2931,7 +2930,7 @@ async function createNewsContent(
     console.log(`[AGENT] 🖼️ Imagem final: ${overlayStatus} → ${imageUrl.substring(0, 80)}...`);
   }
   
-  // Generate caption with source attribution (3-block editorial structure)
+  // Generate caption — generate-caption injeta CTA do blog automaticamente
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
@@ -2940,16 +2939,14 @@ async function createNewsContent(
       postType: 'noticia',
       sourceUrl: sourceUrl,
       sourceName: sourceDomain,
-      customInstructions: `Esta é uma notícia REAL com imagem real do site. 
-      
+      customInstructions: `Esta é uma notícia REAL com imagem real do site.
+
 Estrutura OBRIGATÓRIA da legenda (3 blocos):
 1. HOOK DE IMPACTO - Uma frase curta e impactante (sem emoji no início)
 2. CONTEXTO MÍNIMO - 1-2 frases explicando o essencial
 3. REFLEXÃO/PERGUNTA - Engajamento com o leitor
 
-OBRIGATÓRIO ao final:
-📰 Fonte: ${sourceDomain}
-🔗 ${sourceUrl}`
+⚠️ NÃO inclua linha "Fonte:" nem URL — o sistema adiciona o CTA do blog Atualização Neural automaticamente.`
     })
   });
   
@@ -2962,15 +2959,6 @@ OBRIGATÓRIO ao final:
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
-  
-  const hasSourceInCaption = caption.includes('Fonte:') || caption.includes('🔗');
-  if (!hasSourceInCaption && selectedArticle) {
-    if (sourceUrl) {
-      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
-    } else if (sourceDomain && sourceDomain !== 'fonte') {
-      caption += `\n\n📰 Fonte: ${sourceDomain}`;
-    }
-  }
   
   // Create post - publish directly if autoPublish and has real image
   const canPublish = autoPublish && imageUrl;
