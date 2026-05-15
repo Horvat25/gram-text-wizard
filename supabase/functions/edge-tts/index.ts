@@ -106,7 +106,51 @@ serve(async (req) => {
   }
 });
 
-// ========== Polly via StreamElements (GRÁTIS) ==========
+// ========== Kokoro PT-BR via Replicate (neural, ~grátis) ==========
+
+async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array> {
+  // Kokoro tem limite prático ~500 chars por inferência. Fatiamos e concatenamos.
+  const chunks = splitForTTS(text, 480);
+  const buffers: ArrayBuffer[] = [];
+
+  for (let i = 0; i < chunks.length; i++) {
+    const resp = await fetch(
+      "https://api.replicate.com/v1/models/codingayam/kokoro-82m-complete/predictions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "Prefer": "wait=60",
+        },
+        body: JSON.stringify({
+          input: {
+            text: chunks[i],
+            voice: "pf_dora",
+            speed: 1.0,
+          },
+        }),
+      }
+    );
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`Replicate ${resp.status}: ${err.substring(0, 200)}`);
+    }
+
+    const data = await resp.json();
+    const audioUrl = typeof data.output === "string" ? data.output : data.output?.[0];
+    if (!audioUrl) throw new Error(`Kokoro sem output: ${JSON.stringify(data).substring(0, 200)}`);
+
+    const audioResp = await fetch(audioUrl);
+    if (!audioResp.ok) throw new Error(`Kokoro audio fetch falhou: ${audioResp.status}`);
+    buffers.push(await audioResp.arrayBuffer());
+  }
+
+  return concatBuffers(buffers);
+}
+
+// ========== Polly via StreamElements (fallback) ==========
 
 async function generatePolly(text: string, voice: string): Promise<Uint8Array> {
   // StreamElements limita ~500 chars por chamada, então fatiamos por sentença.
