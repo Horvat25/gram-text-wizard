@@ -21,6 +21,7 @@ interface ScriptSegment {
   text: string;
   imagePrompt: string;
   imageUrl?: string;
+  imageSource?: "article" | "pexels" | "scrape";
   audioUrl?: string;
   audioDuration?: number;
   brandedImageUrl?: string;
@@ -101,39 +102,59 @@ Responda em JSON:
   ];
 }
 
-// ─── STEP 2: Generate images for segments ───
-async function generateSegmentImages(
+// ─── STEP 2: Buscar IMAGENS REAIS (sem IA) — Pexels + capa do artigo ───
+async function fetchRealImages(
   segments: ScriptSegment[],
   title: string,
+  description: string,
+  articleUrl: string | undefined,
+  primaryImageUrl: string | undefined,
   supabaseUrl: string,
   serviceRoleKey: string
 ): Promise<void> {
-  console.log("[BRAND-VIDEO] 🎨 Gerando imagens para segmentos...");
-  
+  console.log("[BRAND-VIDEO] 📸 Buscando imagens REAIS (Pexels + artigo)...");
+
   try {
-    const searchResponse = await fetch(`${supabaseUrl}/functions/v1/search-images-for-video`, {
+    const resp = await fetch(`${supabaseUrl}/functions/v1/fetch-real-news-images`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${serviceRoleKey}`,
       },
       body: JSON.stringify({
-        topic: title,
-        segments: segments.map(s => ({ text: s.text, imagePrompt: s.imagePrompt })),
+        title,
+        description,
+        articleUrl,
+        primaryImageUrl,
+        count: segments.length,
       }),
     });
 
-    if (searchResponse.ok) {
-      const result = await searchResponse.json();
-      const images = result.images || [];
-      for (let i = 0; i < Math.min(images.length, segments.length); i++) {
-        const imgUrl = images[i]?.imageUrl || images[i]?.url;
-        if (imgUrl) segments[i].imageUrl = imgUrl;
-      }
-      console.log(`[BRAND-VIDEO] ✅ ${images.length} imagens geradas`);
+    if (!resp.ok) {
+      console.warn("[BRAND-VIDEO] fetch-real-news-images falhou:", resp.status);
+      return;
     }
+
+    const data = await resp.json();
+    const images = data.images || [];
+
+    // Capa (article) sempre na cena 1; demais distribuídas em ordem
+    const articleImg = images.find((i: any) => i.source === "article");
+    const others = images.filter((i: any) => i.source !== "article");
+    const ordered: any[] = [];
+    if (articleImg) ordered.push(articleImg);
+    ordered.push(...others);
+    // Se sobrou espaço e existe capa, repete na última cena pra fechar
+    while (ordered.length < segments.length && articleImg) ordered.push(articleImg);
+    while (ordered.length < segments.length && others.length > 0) ordered.push(others[ordered.length % others.length]);
+
+    for (let i = 0; i < segments.length && i < ordered.length; i++) {
+      segments[i].imageUrl = ordered[i].url;
+      segments[i].imageSource = ordered[i].source;
+    }
+    console.log(`[BRAND-VIDEO] ✅ ${images.length} imagens reais (article=${images.filter((i:any)=>i.source==='article').length}, pexels=${images.filter((i:any)=>i.source==='pexels').length})`);
   } catch (e) {
-    console.warn("[BRAND-VIDEO] Erro nas imagens:", e);
+    console.warn("[BRAND-VIDEO] Erro ao buscar imagens reais:", e);
   }
 }
 
@@ -318,7 +339,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { postId, title, description, workspaceId, userId, articleUrl } = await req.json();
+    const { postId, title, description, workspaceId, userId, articleUrl, primaryImageUrl } = await req.json();
 
     if (!postId || !title) {
       throw new Error("postId e title são obrigatórios");
@@ -346,7 +367,7 @@ Deno.serve(async (req) => {
     console.log(`[BRAND-VIDEO] ✅ Script: ${segments.length} segmentos`);
 
     // ─── STEP 2: Generate images ───
-    await generateSegmentImages(segments, title, supabaseUrl, serviceRoleKey);
+    await fetchRealImages(segments, title, description || "", articleUrl, primaryImageUrl, supabaseUrl, serviceRoleKey);
 
     // ─── STEP 3: Brand each image with Neural Update style ───
     for (let i = 0; i < segments.length; i++) {
