@@ -21,6 +21,7 @@ interface ScriptSegment {
   text: string;
   imagePrompt: string;
   imageUrl?: string;
+  imageSource?: "article" | "pexels" | "scrape";
   audioUrl?: string;
   audioDuration?: number;
   brandedImageUrl?: string;
