@@ -1101,7 +1101,7 @@ async function createVideoContent(
   supabaseUrl: string,
   headers: any,
   autoPublish: boolean = false,
-  rssArticle?: { url: string; title: string; description?: string } // Optional RSS article context
+  rssArticle?: { url: string; title: string; description?: string; sourceName?: string } // Optional RSS article context
 ): Promise<any> {
   console.log('[AGENT] Criando vídeo/reels:', plan.theme);
   const isNewsBroadcast = !!rssArticle;
