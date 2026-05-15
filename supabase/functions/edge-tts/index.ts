@@ -115,7 +115,7 @@ async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array>
 
   for (let i = 0; i < chunks.length; i++) {
     const resp = await fetch(
-      "https://api.replicate.com/v1/models/codingayam/kokoro-82m-complete/predictions",
+      "https://api.replicate.com/v1/models/alphanumericuser/kokoro-82m/predictions",
       {
         method: "POST",
         headers: {
