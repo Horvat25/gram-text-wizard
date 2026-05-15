@@ -209,10 +209,10 @@ async function notify(supabase: any, userId: string, workspaceId: string, messag
       user_id: userId,
       workspace_id: workspaceId,
       role: "assistant",
-      content: message,
-      message_type: "system_alert",
+      content: `🔔 ${message}`,
+      platform: "instagram",
     });
   } catch (e) {
-    console.warn("[AUTO-REEL] notify falhou (tabela pode não existir):", e);
+    console.warn("[AUTO-REEL] notify falhou:", e);
   }
 }
