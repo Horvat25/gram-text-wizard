@@ -2795,15 +2795,38 @@ async function createNewsContent(
   }
 
   // STEP 3 & 4: Apply text overlay via CODE (not AI image generation)
-  // The apply-text-overlay function:
-  // - Downloads the real image
-  // - LLM generates ONLY the headline TEXT (string)
-  // - Code applies the text as overlay (fixed font, color, layout)
+  // 🟢 EXCEÇÃO: notícias do Atualização Neural reusam a imagem original SEM overlay,
+  // mantendo a consistência visual do blog (capa do artigo já é a imagem oficial).
   let imageUrl = null;
-  let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' = 'fallback_external_url';
+  let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' | 'neural_original' = 'fallback_external_url';
   let overlayFailureReason: string | null = null;
+  const isNeuralUpdate = sourceDomain === 'Atualização Neural';
 
-  if (selectedImage && selectedArticle?.title) {
+  if (selectedImage && isNeuralUpdate) {
+    console.log('[AGENT] 🟢 Notícia do Neural Update — reusando imagem original do blog (sem overlay)');
+    try {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ imageUrl: selectedImage })
+      });
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        if (uploadResult.publicUrl) {
+          imageUrl = uploadResult.publicUrl;
+          overlayStatus = 'neural_original';
+          console.log('[AGENT] ✅ Imagem do Neural Update re-uploadada');
+        }
+      }
+    } catch (e: any) {
+      console.warn('[AGENT] upload Neural Update falhou:', e?.message || e);
+    }
+    // Último recurso: URL externa direta
+    if (!imageUrl && /^https?:\/\//.test(selectedImage)) {
+      imageUrl = selectedImage;
+      overlayStatus = 'neural_original';
+    }
+  } else if (selectedImage && selectedArticle?.title) {
     // ── TENTATIVA 1: apply-text-overlay (headline + watermark) ──
     console.log('[AGENT] [1/4] Aplicando overlay de texto via SVG...');
     try {
@@ -2898,6 +2921,7 @@ async function createNewsContent(
         console.warn('[AGENT] ⚠️ selectedImage não é uma URL HTTP de imagem (pode ser embed YouTube). Pulando.');
       }
     }
+  }
   }
   
   // DO NOT generate AI image for news - only use real images
