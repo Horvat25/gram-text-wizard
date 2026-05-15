@@ -99,120 +99,67 @@ serve(async (req) => {
   }
 });
 
-// ========== Microsoft Edge TTS PT-BR (neural, GRÁTIS via WebSocket) ==========
-// Usa o mesmo endpoint público do navegador Microsoft Edge. Sem chave, sem cadastro.
-// Vozes PT-BR neurais: pt-BR-FranciscaNeural (feminina), pt-BR-AntonioNeural (masculina).
+// ========== HuggingFace MMS-TTS Portuguese (neural, GRÁTIS) ==========
+// Modelo facebook/mms-tts-por do Meta (Massively Multilingual Speech).
+// Free tier do HF Inference API. Retorna WAV diretamente como bytes.
 
-const EDGE_TRUSTED_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
-const EDGE_WSS_URL = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${EDGE_TRUSTED_TOKEN}`;
+async function generateHuggingFaceTTS(text: string, apiKey: string): Promise<Uint8Array> {
+  // MMS-TTS lida bem com chunks de até ~600 chars.
+  const chunks = splitForTTS(text, 550);
+  const buffers: ArrayBuffer[] = [];
 
-async function generateEdgeTTS(text: string, voiceName: string): Promise<Uint8Array> {
-  // Fatia o texto em pedaços de ~800 chars (Edge TTS suporta bem chunks grandes).
-  const chunks = splitForTTS(text, 800);
-  const audioBuffers: Uint8Array[] = [];
+  for (let i = 0; i < chunks.length; i++) {
+    let attempts = 0;
+    let success = false;
+    let lastError = "";
 
-  for (const chunk of chunks) {
-    const audio = await synthesizeEdgeChunk(chunk, voiceName);
-    audioBuffers.push(audio);
+    // O HF Inference pode retornar 503 quando o modelo está "loading".
+    // Tentamos 3 vezes com backoff.
+    while (attempts < 3 && !success) {
+      attempts++;
+      const resp = await fetch(
+        "https://api-inference.huggingface.co/models/facebook/mms-tts-por",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            "Accept": "audio/wav",
+          },
+          body: JSON.stringify({
+            inputs: chunks[i],
+            options: { wait_for_model: true, use_cache: false },
+          }),
+        }
+      );
+
+      if (resp.ok) {
+        const contentType = resp.headers.get("content-type") || "";
+        if (contentType.includes("audio") || contentType.includes("octet-stream")) {
+          buffers.push(await resp.arrayBuffer());
+          success = true;
+          break;
+        }
+        // Caso retorne JSON (erro mascarado)
+        const txt = await resp.text();
+        lastError = `HF resposta inesperada: ${txt.substring(0, 200)}`;
+      } else {
+        const txt = await resp.text();
+        lastError = `HF ${resp.status}: ${txt.substring(0, 200)}`;
+        // 503 = modelo carregando; aguarda e tenta de novo
+        if (resp.status === 503) {
+          await new Promise(r => setTimeout(r, 3000));
+          continue;
+        }
+        break;
+      }
+    }
+
+    if (!success) throw new Error(lastError || "HF MMS-TTS falhou");
   }
 
-  const total = audioBuffers.reduce((s, b) => s + b.length, 0);
-  const out = new Uint8Array(total);
-  let off = 0;
-  for (const b of audioBuffers) { out.set(b, off); off += b.length; }
-  return out;
+  return concatBuffers(buffers);
 }
-
-function synthesizeEdgeChunk(text: string, voiceName: string): Promise<Uint8Array> {
-  return new Promise((resolve, reject) => {
-    const connectionId = crypto.randomUUID().replace(/-/g, "");
-    const requestId = crypto.randomUUID().replace(/-/g, "");
-    const url = `${EDGE_WSS_URL}&ConnectionId=${connectionId}`;
-
-    const ws = new WebSocket(url);
-    ws.binaryType = "arraybuffer";
-
-    const audioChunks: Uint8Array[] = [];
-    let finished = false;
-
-    const timeout = setTimeout(() => {
-      if (!finished) {
-        finished = true;
-        try { ws.close(); } catch (_) { /* noop */ }
-        reject(new Error("Edge TTS timeout (30s)"));
-      }
-    }, 30000);
-
-    ws.onopen = () => {
-      // 1) Configuração: formato de saída MP3.
-      const configMsg =
-        `X-Timestamp:${new Date().toISOString()}\r\n` +
-        `Content-Type:application/json; charset=utf-8\r\n` +
-        `Path:speech.config\r\n\r\n` +
-        `{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}`;
-      ws.send(configMsg);
-
-      // 2) Requisição SSML.
-      const escaped = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-      const ssml =
-        `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='pt-BR'>` +
-        `<voice name='${voiceName}'>` +
-        `<prosody pitch='+0Hz' rate='+0%' volume='+0%'>${escaped}</prosody>` +
-        `</voice></speak>`;
-      const ssmlMsg =
-        `X-RequestId:${requestId}\r\n` +
-        `Content-Type:application/ssml+xml\r\n` +
-        `X-Timestamp:${new Date().toISOString()}\r\n` +
-        `Path:ssml\r\n\r\n${ssml}`;
-      ws.send(ssmlMsg);
-    };
-
-    ws.onmessage = (event) => {
-      if (typeof event.data === "string") {
-        // Mensagens de controle (turn.start, turn.end, response).
-        if (event.data.includes("Path:turn.end")) {
-          finished = true;
-          clearTimeout(timeout);
-          try { ws.close(); } catch (_) { /* noop */ }
-          const total = audioChunks.reduce((s, b) => s + b.length, 0);
-          if (total === 0) {
-            reject(new Error("Edge TTS retornou áudio vazio"));
-            return;
-          }
-          const out = new Uint8Array(total);
-          let off = 0;
-          for (const c of audioChunks) { out.set(c, off); off += c.length; }
-          resolve(out);
-        }
-      } else {
-        // Frame binário: header ASCII + "\r\n\r\n" + bytes de áudio.
-        const buf = new Uint8Array(event.data as ArrayBuffer);
-        // Os primeiros 2 bytes são o tamanho do header (big-endian).
-        const headerLen = (buf[0] << 8) | buf[1];
-        const audioStart = 2 + headerLen;
-        if (audioStart < buf.length) {
-          audioChunks.push(buf.slice(audioStart));
-        }
-      }
-    };
-
-    ws.onerror = (e) => {
-      if (!finished) {
-        finished = true;
-        clearTimeout(timeout);
-        reject(new Error(`Edge TTS WS erro: ${(e as any).message || "unknown"}`));
-      }
-    };
-
-    ws.onclose = (ev) => {
-      if (!finished) {
-        finished = true;
-        clearTimeout(timeout);
-        reject(new Error(`Edge TTS WS fechou: code=${ev.code} reason=${ev.reason}`));
-      }
     };
   });
 }
