@@ -7,8 +7,15 @@ const corsHeaders = {
 };
 
 /**
- * TTS — ElevenLabs Sarah ONLY (sem fallbacks)
- * Voz: Sarah (EXAVITQu4vr4xnSDxMaL) — eleven_multilingual_v2
+ * TTS — Voz padrão GRÁTIS: Camila (Amazon Polly Neural via StreamElements)
+ *
+ * Cadeia de fallback:
+ *   1. Polly Camila (StreamElements) — neural natural PT-BR
+ *   2. Polly Vitória (StreamElements) — fallback feminino
+ *   3. Google Translate TTS — último recurso (mais robótico)
+ *
+ * ElevenLabs é OPCIONAL: só usado se `preferPaid: true` for passado
+ * E a chave estiver configurada (pra testes pontuais).
  */
 
 serve(async (req) => {
@@ -17,7 +24,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text } = await req.json();
+    const { text, preferPaid } = await req.json();
 
     if (!text || text.trim().length === 0) {
       return new Response(
@@ -27,26 +34,49 @@ serve(async (req) => {
     }
 
     const cleanedText = prepareTextForTTS(text);
-    console.log(`[TTS] Request: ${cleanedText.length} chars — ElevenLabs Sarah ONLY`);
+    console.log(`[TTS] Request: ${cleanedText.length} chars (preferPaid=${!!preferPaid})`);
 
-    const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
-    if (!ELEVENLABS_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "ELEVENLABS_API_KEY not configured. Please add credits and set the key." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    let audioData: Uint8Array | null = null;
+    let provider = "";
+    let voice = "";
+
+    // ── Caminho opcional: ElevenLabs Sarah (se pedido + chave disponível) ──
+    if (preferPaid) {
+      const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
+      if (ELEVENLABS_API_KEY) {
+        try {
+          audioData = await generateElevenLabs(cleanedText, ELEVENLABS_API_KEY);
+          provider = "ElevenLabs Neural";
+          voice = "Sarah";
+          console.log(`[TTS] ✅ ElevenLabs: ${(audioData.length / 1024).toFixed(1)}KB`);
+        } catch (e: any) {
+          console.warn(`[TTS] ElevenLabs falhou, caindo pra Polly: ${e.message}`);
+        }
+      }
     }
 
-    let audioData: Uint8Array;
-    try {
-      audioData = await generateElevenLabs(cleanedText, ELEVENLABS_API_KEY);
-      console.log(`[TTS] ✅ ElevenLabs Sarah success! ${(audioData.length / 1024).toFixed(1)}KB`);
-    } catch (e: any) {
-      console.error(`[TTS] ❌ ElevenLabs failed: ${e.message}`);
-      return new Response(
-        JSON.stringify({ error: `ElevenLabs failed: ${e.message}. Check credits at elevenlabs.io` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // ── Padrão: Polly Camila (StreamElements, GRÁTIS) ──
+    if (!audioData) {
+      try {
+        audioData = await generatePolly(cleanedText, "Camila");
+        provider = "Amazon Polly Neural";
+        voice = "Camila";
+        console.log(`[TTS] ✅ Polly Camila: ${(audioData.length / 1024).toFixed(1)}KB`);
+      } catch (e: any) {
+        console.warn(`[TTS] Camila falhou, tentando Vitória: ${e.message}`);
+        try {
+          audioData = await generatePolly(cleanedText, "Vitoria");
+          provider = "Amazon Polly";
+          voice = "Vitoria";
+          console.log(`[TTS] ✅ Polly Vitória: ${(audioData.length / 1024).toFixed(1)}KB`);
+        } catch (e2: any) {
+          console.warn(`[TTS] Polly indisponível, fallback Google: ${e2.message}`);
+          audioData = await generateGoogleTTS(cleanedText);
+          provider = "Google Translate TTS";
+          voice = "pt-BR";
+          console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
+        }
+      }
     }
 
     const base64Audio = base64Encode(audioData);
@@ -55,8 +85,8 @@ serve(async (req) => {
       JSON.stringify({
         audioContent: base64Audio,
         format: "mp3",
-        voice: "Sarah",
-        provider: "ElevenLabs Neural",
+        voice,
+        provider,
         duration_estimate: Math.ceil(cleanedText.length / 14),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -70,7 +100,56 @@ serve(async (req) => {
   }
 });
 
-// ========== ElevenLabs Sarah ==========
+// ========== Polly via StreamElements (GRÁTIS) ==========
+
+async function generatePolly(text: string, voice: string): Promise<Uint8Array> {
+  // StreamElements limita ~500 chars por chamada, então fatiamos por sentença.
+  const chunks = splitForTTS(text, 480);
+  const buffers: ArrayBuffer[] = [];
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`;
+    const resp = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    });
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`StreamElements ${resp.status}: ${err.substring(0, 120)}`);
+    }
+    buffers.push(await resp.arrayBuffer());
+    if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 120));
+  }
+
+  return concatBuffers(buffers);
+}
+
+// ========== Google Translate TTS (último fallback) ==========
+
+async function generateGoogleTTS(text: string): Promise<Uint8Array> {
+  const chunks = splitForTTS(text, 180);
+  const buffers: ArrayBuffer[] = [];
+
+  for (let i = 0; i < chunks.length; i++) {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunks[i])}&tl=pt-BR&client=tw-ob`;
+    const resp = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": "https://translate.google.com/",
+      },
+    });
+    if (!resp.ok) continue;
+    buffers.push(await resp.arrayBuffer());
+    if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 120));
+  }
+
+  if (buffers.length === 0) throw new Error("Google TTS retornou vazio");
+  return concatBuffers(buffers);
+}
+
+// ========== ElevenLabs Sarah (opcional, pago) ==========
 
 async function generateElevenLabs(text: string, apiKey: string): Promise<Uint8Array> {
   const voiceId = "EXAVITQu4vr4xnSDxMaL"; // Sarah
@@ -102,11 +181,44 @@ async function generateElevenLabs(text: string, apiKey: string): Promise<Uint8Ar
     throw new Error(`ElevenLabs ${response.status}: ${errorText.substring(0, 200)}`);
   }
 
-  const buffer = await response.arrayBuffer();
-  return new Uint8Array(buffer);
+  return new Uint8Array(await response.arrayBuffer());
 }
 
 // ========== HELPERS ==========
+
+function splitForTTS(text: string, maxLen: number): string[] {
+  if (text.length <= maxLen) return [text];
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  const chunks: string[] = [];
+  let current = "";
+  for (const s of sentences) {
+    if ((current + s).length <= maxLen) {
+      current += s;
+    } else {
+      if (current) chunks.push(current.trim());
+      if (s.length > maxLen) {
+        const words = s.split(" ");
+        current = "";
+        for (const w of words) {
+          if ((current + " " + w).length <= maxLen) current += (current ? " " : "") + w;
+          else { if (current) chunks.push(current.trim()); current = w; }
+        }
+      } else {
+        current = s;
+      }
+    }
+  }
+  if (current) chunks.push(current.trim());
+  return chunks;
+}
+
+function concatBuffers(buffers: ArrayBuffer[]): Uint8Array {
+  const total = buffers.reduce((s, b) => s + b.byteLength, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const b of buffers) { out.set(new Uint8Array(b), off); off += b.byteLength; }
+  return out;
+}
 
 function prepareTextForTTS(text: string): string {
   return text
