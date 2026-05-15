@@ -8,6 +8,8 @@ const corsHeaders = {
 
 // Feeds RSS de sites de tecnologia - PRIORIDADE PORTUGUÊS
 const DEFAULT_FEEDS = [
+  // 🟢 Fonte prioritária — blog próprio Atualização Neural
+  { name: 'Atualização Neural', url: 'https://neural-update.com.br/rss.xml', priority: true },
   { name: 'Olhar Digital', url: 'https://olhardigital.com.br/feed/' },
   { name: 'TecMundo', url: 'https://rss.tecmundo.com.br/feed' },
   { name: 'Canaltech', url: 'https://canaltech.com.br/rss/' },
