@@ -949,26 +949,27 @@ async function executeContentPlan(
           url: bestRssItem.item.link,
           title: bestRssItem.item.title,
           description: bestRssItem.item.description || '',
+          sourceName: bestRssItem.item.source_name || new URL(bestRssItem.item.link).hostname.replace('www.', ''),
         };
         await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
         plan.theme = bestRssItem.item.title;
         (plan as any)._rssItemId = bestRssItem.item.id;
-        console.log(`[AGENT] 📰 News-broadcast Reel: "${rssArticle.title}" (score: ${bestRssItem.score})`);
+        console.log(`[AGENT] 📰 News-broadcast Reel: "${rssArticle.title}" (fonte: ${rssArticle.sourceName}, score: ${bestRssItem.score})`);
 
-        // Generate caption first
+        // Generate caption — generate-caption injeta CTA do blog/Neural Update automaticamente
         const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
             topic: rssArticle.title,
             postType: 'noticia',
+            sourceUrl: rssArticle.url,
+            sourceName: rssArticle.sourceName,
             customInstructions: `REELS de notícia estilo telejornal. 
 1. HOOK curto (1 frase impactante)
 2. CONTEXTO (2-3 frases)
 3. OPINIÃO (sua análise)
-4. Fonte no final:
-📰 Fonte: ${new URL(rssArticle.url).hostname.replace('www.', '')}
-🔗 ${rssArticle.url}`
+⚠️ NÃO inclua "Fonte:" nem URL — o sistema adiciona o CTA do blog automaticamente.`
           })
         });
         
@@ -980,11 +981,6 @@ async function executeContentPlan(
           hashtags = captionData.hashtags || hashtags;
         }
         caption = await reviewText(caption, 'caption', supabaseUrl, headers);
-
-        // Ensure source link is present
-        if (!caption.includes('Fonte:') && !caption.includes('🔗')) {
-          caption += `\n\n📰 Fonte: ${new URL(rssArticle.url).hostname.replace('www.', '')}\n🔗 ${rssArticle.url}`;
-        }
 
         // Create post first
         const { data: post, error } = await supabase.from('posts').insert({
@@ -1105,7 +1101,7 @@ async function createVideoContent(
   supabaseUrl: string,
   headers: any,
   autoPublish: boolean = false,
-  rssArticle?: { url: string; title: string; description?: string } // Optional RSS article context
+  rssArticle?: { url: string; title: string; description?: string; sourceName?: string } // Optional RSS article context
 ): Promise<any> {
   console.log('[AGENT] Criando vídeo/reels:', plan.theme);
   const isNewsBroadcast = !!rssArticle;
@@ -1249,18 +1245,13 @@ Responda em JSON:
 
   console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
   
-  // STEP 3: Generate caption (with URL for news, without URL in video)
+  // STEP 3: Generate caption — generate-caption injeta CTA do blog/Neural Update automaticamente
   const captionInstructions = isNewsBroadcast
-    ? `Este é um REELS de notícia estilo telejornal. 
-Estrutura da legenda:
+    ? `REELS de notícia estilo telejornal. 
 1. HOOK curto (1 frase impactante)
 2. CONTEXTO (2-3 frases sobre a notícia)
 3. OPINIÃO (sua análise)
-4. Fonte e link no final
-
-OBRIGATÓRIO ao final:
-📰 Fonte: ${rssArticle ? new URL(rssArticle.url).hostname.replace('www.', '') : 'Tech News'}
-🔗 ${rssArticle?.url || ''}`
+⚠️ NÃO inclua "Fonte:" nem URL — o sistema adiciona o CTA do blog automaticamente.`
     : `Este é um REELS/vídeo curto. ${plan.cta}`;
   
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
@@ -1269,6 +1260,8 @@ OBRIGATÓRIO ao final:
     body: JSON.stringify({
       topic: plan.theme,
       postType: isNewsBroadcast ? 'noticia' : 'entretenimento',
+      sourceUrl: rssArticle?.url,
+      sourceName: rssArticle?.sourceName || (rssArticle?.url ? new URL(rssArticle.url).hostname.replace('www.', '') : undefined),
       customInstructions: captionInstructions
     })
   });
@@ -1282,14 +1275,6 @@ OBRIGATÓRIO ao final:
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
-  
-  if (isNewsBroadcast && rssArticle?.url) {
-    const hasSource = caption.includes('Fonte:') || caption.includes('🔗');
-    if (!hasSource) {
-      const sourceDomain = new URL(rssArticle.url).hostname.replace('www.', '');
-      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${rssArticle.url}`;
-    }
-  }
   
   // STEP 4: Create post
   const { data: post, error } = await supabase.from('posts').insert({
