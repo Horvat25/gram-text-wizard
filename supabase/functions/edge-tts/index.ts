@@ -7,15 +7,14 @@ const corsHeaders = {
 };
 
 /**
- * TTS — Voz padrão GRÁTIS: Camila (Amazon Polly Neural via StreamElements)
+ * TTS — Voz padrão: Kokoro PT-BR (neural open-source via Replicate)
  *
  * Cadeia de fallback:
- *   1. Polly Camila (StreamElements) — neural natural PT-BR
- *   2. Polly Vitória (StreamElements) — fallback feminino
- *   3. Google Translate TTS — último recurso (mais robótico)
+ *   1. Kokoro pf_dora (Replicate) — neural natural PT-BR, ~$0.0002/run
+ *   2. Polly Camila (StreamElements) — se Replicate falhar
+ *   3. Google Translate TTS — último recurso
  *
- * ElevenLabs é OPCIONAL: só usado se `preferPaid: true` for passado
- * E a chave estiver configurada (pra testes pontuais).
+ * ElevenLabs Sarah só é usada se `preferPaid: true`.
  */
 
 serve(async (req) => {
