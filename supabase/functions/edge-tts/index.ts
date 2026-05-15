@@ -7,15 +7,12 @@ const corsHeaders = {
 };
 
 /**
- * TTS — Voz padrão: Microsoft Edge Neural PT-BR (Francisca/Antonio)
- * 100% GRÁTIS, sem chave, via WebSocket público do navegador Edge.
+ * TTS — Voz padrão: ElevenLabs Sarah (PT-BR neural premium via free tier).
  *
- * Cadeia de fallback:
- *   1. Edge TTS Francisca neural (PT-BR feminina natural)
- *   2. Edge TTS Antonio neural (PT-BR masculino)
- *   3. Google Translate TTS (último recurso, robótico)
- *
- * ElevenLabs Sarah só é usada se `preferPaid: true`.
+ * Cadeia:
+ *   1. ElevenLabs Sarah (free tier ~10k chars/mês = ~30 reels)
+ *   2. HuggingFace MMS-TTS Portuguese (se a chave HF responder)
+ *   3. Google Translate TTS (último recurso quando o free estoura)
  */
 
 serve(async (req) => {
@@ -24,7 +21,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, preferPaid } = await req.json();
+    const { text } = await req.json();
 
     if (!text || text.trim().length === 0) {
       return new Response(
@@ -34,28 +31,26 @@ serve(async (req) => {
     }
 
     const cleanedText = prepareTextForTTS(text);
-    console.log(`[TTS] Request: ${cleanedText.length} chars (preferPaid=${!!preferPaid})`);
+    console.log(`[TTS] Request: ${cleanedText.length} chars`);
 
     let audioData: Uint8Array | null = null;
     let provider = "";
     let voice = "";
 
-    // ── Caminho opcional: ElevenLabs Sarah (se pedido + chave disponível) ──
-    if (preferPaid) {
-      const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
-      if (ELEVENLABS_API_KEY) {
-        try {
-          audioData = await generateElevenLabs(cleanedText, ELEVENLABS_API_KEY);
-          provider = "ElevenLabs Neural";
-          voice = "Sarah";
-          console.log(`[TTS] ✅ ElevenLabs: ${(audioData.length / 1024).toFixed(1)}KB`);
-        } catch (e: any) {
-          console.warn(`[TTS] ElevenLabs falhou, caindo pra Polly: ${e.message}`);
-        }
+    // ── 1) Padrão: ElevenLabs Sarah (free tier) ──
+    const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
+    if (ELEVENLABS_API_KEY) {
+      try {
+        audioData = await generateElevenLabs(cleanedText, ELEVENLABS_API_KEY);
+        provider = "ElevenLabs Neural";
+        voice = "Sarah";
+        console.log(`[TTS] ✅ ElevenLabs Sarah: ${(audioData.length / 1024).toFixed(1)}KB`);
+      } catch (e: any) {
+        console.warn(`[TTS] ElevenLabs falhou (provável quota free): ${e.message}`);
       }
     }
 
-    // ── Padrão: HuggingFace MMS-TTS Portuguese (neural, GRÁTIS) ──
+    // ── 2) Fallback: HuggingFace MMS-TTS PT ──
     if (!audioData) {
       const HF_API_KEY = Deno.env.get("HF_API_KEY");
       if (HF_API_KEY) {
@@ -70,12 +65,12 @@ serve(async (req) => {
       }
     }
 
-    // ── Último recurso: Google Translate TTS ──
+    // ── 3) Último recurso: Google Translate TTS ──
     if (!audioData) {
       audioData = await generateGoogleTTS(cleanedText);
       provider = "Google Translate TTS";
       voice = "pt-BR";
-      console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
+      console.log(`[TTS] ⚠️ Google fallback (quota ElevenLabs free provavelmente estourou)`);
     }
 
     const base64Audio = base64Encode(audioData);
