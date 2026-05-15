@@ -99,52 +99,122 @@ serve(async (req) => {
   }
 });
 
-// ========== Kokoro PT-BR via Replicate (neural, ~grátis) ==========
+// ========== Microsoft Edge TTS PT-BR (neural, GRÁTIS via WebSocket) ==========
+// Usa o mesmo endpoint público do navegador Microsoft Edge. Sem chave, sem cadastro.
+// Vozes PT-BR neurais: pt-BR-FranciscaNeural (feminina), pt-BR-AntonioNeural (masculina).
 
-async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array> {
-  // Kokoro tem limite prático ~500 chars por inferência. Fatiamos e concatenamos.
-  const chunks = splitForTTS(text, 480);
-  const buffers: ArrayBuffer[] = [];
+const EDGE_TRUSTED_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
+const EDGE_WSS_URL = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${EDGE_TRUSTED_TOKEN}`;
 
-  const VERSION = "89b6fa84e4fa2dd6bd3a96be3e1f12827a3516c9fda8fddbac7a0be131c9a6f5";
+async function generateEdgeTTS(text: string, voiceName: string): Promise<Uint8Array> {
+  // Fatia o texto em pedaços de ~800 chars (Edge TTS suporta bem chunks grandes).
+  const chunks = splitForTTS(text, 800);
+  const audioBuffers: Uint8Array[] = [];
 
-  for (let i = 0; i < chunks.length; i++) {
-    const resp = await fetch(
-      "https://api.replicate.com/v1/predictions",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "Prefer": "wait=60",
-        },
-        body: JSON.stringify({
-          version: VERSION,
-          input: {
-            text: chunks[i],
-            voice: "pf_dora",
-            language_code: "p",
-            speed: 1.0,
-          },
-        }),
-      }
-    );
-
-    if (!resp.ok) {
-      const err = await resp.text();
-      throw new Error(`Replicate ${resp.status}: ${err.substring(0, 200)}`);
-    }
-
-    const data = await resp.json();
-    const audioUrl = typeof data.output === "string" ? data.output : data.output?.[0];
-    if (!audioUrl) throw new Error(`Kokoro sem output: ${JSON.stringify(data).substring(0, 200)}`);
-
-    const audioResp = await fetch(audioUrl);
-    if (!audioResp.ok) throw new Error(`Kokoro audio fetch falhou: ${audioResp.status}`);
-    buffers.push(await audioResp.arrayBuffer());
+  for (const chunk of chunks) {
+    const audio = await synthesizeEdgeChunk(chunk, voiceName);
+    audioBuffers.push(audio);
   }
 
-  return concatBuffers(buffers);
+  const total = audioBuffers.reduce((s, b) => s + b.length, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const b of audioBuffers) { out.set(b, off); off += b.length; }
+  return out;
+}
+
+function synthesizeEdgeChunk(text: string, voiceName: string): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const connectionId = crypto.randomUUID().replace(/-/g, "");
+    const requestId = crypto.randomUUID().replace(/-/g, "");
+    const url = `${EDGE_WSS_URL}&ConnectionId=${connectionId}`;
+
+    const ws = new WebSocket(url);
+    ws.binaryType = "arraybuffer";
+
+    const audioChunks: Uint8Array[] = [];
+    let finished = false;
+
+    const timeout = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        try { ws.close(); } catch (_) { /* noop */ }
+        reject(new Error("Edge TTS timeout (30s)"));
+      }
+    }, 30000);
+
+    ws.onopen = () => {
+      // 1) Configuração: formato de saída MP3.
+      const configMsg =
+        `X-Timestamp:${new Date().toISOString()}\r\n` +
+        `Content-Type:application/json; charset=utf-8\r\n` +
+        `Path:speech.config\r\n\r\n` +
+        `{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}`;
+      ws.send(configMsg);
+
+      // 2) Requisição SSML.
+      const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      const ssml =
+        `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='pt-BR'>` +
+        `<voice name='${voiceName}'>` +
+        `<prosody pitch='+0Hz' rate='+0%' volume='+0%'>${escaped}</prosody>` +
+        `</voice></speak>`;
+      const ssmlMsg =
+        `X-RequestId:${requestId}\r\n` +
+        `Content-Type:application/ssml+xml\r\n` +
+        `X-Timestamp:${new Date().toISOString()}\r\n` +
+        `Path:ssml\r\n\r\n${ssml}`;
+      ws.send(ssmlMsg);
+    };
+
+    ws.onmessage = (event) => {
+      if (typeof event.data === "string") {
+        // Mensagens de controle (turn.start, turn.end, response).
+        if (event.data.includes("Path:turn.end")) {
+          finished = true;
+          clearTimeout(timeout);
+          try { ws.close(); } catch (_) { /* noop */ }
+          const total = audioChunks.reduce((s, b) => s + b.length, 0);
+          if (total === 0) {
+            reject(new Error("Edge TTS retornou áudio vazio"));
+            return;
+          }
+          const out = new Uint8Array(total);
+          let off = 0;
+          for (const c of audioChunks) { out.set(c, off); off += c.length; }
+          resolve(out);
+        }
+      } else {
+        // Frame binário: header ASCII + "\r\n\r\n" + bytes de áudio.
+        const buf = new Uint8Array(event.data as ArrayBuffer);
+        // Os primeiros 2 bytes são o tamanho do header (big-endian).
+        const headerLen = (buf[0] << 8) | buf[1];
+        const audioStart = 2 + headerLen;
+        if (audioStart < buf.length) {
+          audioChunks.push(buf.slice(audioStart));
+        }
+      }
+    };
+
+    ws.onerror = (e) => {
+      if (!finished) {
+        finished = true;
+        clearTimeout(timeout);
+        reject(new Error(`Edge TTS WS erro: ${(e as any).message || "unknown"}`));
+      }
+    };
+
+    ws.onclose = (ev) => {
+      if (!finished) {
+        finished = true;
+        clearTimeout(timeout);
+        reject(new Error(`Edge TTS WS fechou: code=${ev.code} reason=${ev.reason}`));
+      }
+    };
+  });
 }
 
 // ========== Polly via StreamElements (fallback) ==========
