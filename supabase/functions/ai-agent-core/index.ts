@@ -2632,8 +2632,15 @@ async function selectBestRssItem(supabase: any, workspaceId: string, supabaseUrl
     return null;
   }
   
-  // Score and rank all items
-  const scoredItems = rssItems.map((item: any) => ({
+  // 🟢 Prioridade absoluta para Atualização Neural (blog próprio)
+  const neuralItems = rssItems.filter((i: any) => i.source_name === 'Atualização Neural');
+  const pool = neuralItems.length > 0 ? neuralItems : rssItems;
+  if (neuralItems.length > 0) {
+    console.log(`[AGENT] 🟢 Usando fonte prioritária Neural Update (${neuralItems.length} itens)`);
+  }
+  
+  // Score and rank pool
+  const scoredItems = pool.map((item: any) => ({
     item,
     score: calculateNewsRankingScore(item)
   })).sort((a: any, b: any) => b.score - a.score);
