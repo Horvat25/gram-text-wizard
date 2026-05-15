@@ -1245,18 +1245,13 @@ Responda em JSON:
 
   console.log(`[AGENT] Total de imagens para vídeo: ${images.length}`);
   
-  // STEP 3: Generate caption (with URL for news, without URL in video)
+  // STEP 3: Generate caption — generate-caption injeta CTA do blog/Neural Update automaticamente
   const captionInstructions = isNewsBroadcast
-    ? `Este é um REELS de notícia estilo telejornal. 
-Estrutura da legenda:
+    ? `REELS de notícia estilo telejornal. 
 1. HOOK curto (1 frase impactante)
 2. CONTEXTO (2-3 frases sobre a notícia)
 3. OPINIÃO (sua análise)
-4. Fonte e link no final
-
-OBRIGATÓRIO ao final:
-📰 Fonte: ${rssArticle ? new URL(rssArticle.url).hostname.replace('www.', '') : 'Tech News'}
-🔗 ${rssArticle?.url || ''}`
+⚠️ NÃO inclua "Fonte:" nem URL — o sistema adiciona o CTA do blog automaticamente.`
     : `Este é um REELS/vídeo curto. ${plan.cta}`;
   
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
@@ -1265,6 +1260,8 @@ OBRIGATÓRIO ao final:
     body: JSON.stringify({
       topic: plan.theme,
       postType: isNewsBroadcast ? 'noticia' : 'entretenimento',
+      sourceUrl: rssArticle?.url,
+      sourceName: rssArticle?.sourceName || (rssArticle?.url ? new URL(rssArticle.url).hostname.replace('www.', '') : undefined),
       customInstructions: captionInstructions
     })
   });
@@ -1278,14 +1275,6 @@ OBRIGATÓRIO ao final:
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
-  
-  if (isNewsBroadcast && rssArticle?.url) {
-    const hasSource = caption.includes('Fonte:') || caption.includes('🔗');
-    if (!hasSource) {
-      const sourceDomain = new URL(rssArticle.url).hostname.replace('www.', '');
-      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${rssArticle.url}`;
-    }
-  }
   
   // STEP 4: Create post
   const { data: post, error } = await supabase.from('posts').insert({
