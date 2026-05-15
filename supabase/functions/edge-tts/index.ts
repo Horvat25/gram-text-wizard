@@ -54,27 +54,34 @@ serve(async (req) => {
       }
     }
 
-    // ── Padrão: Polly Camila (StreamElements, GRÁTIS) ──
+    // ── Padrão: Kokoro PT-BR (Replicate, ~grátis) ──
+    if (!audioData) {
+      const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY");
+      if (REPLICATE_API_KEY) {
+        try {
+          audioData = await generateKokoro(cleanedText, REPLICATE_API_KEY);
+          provider = "Kokoro PT-BR Neural";
+          voice = "pf_dora";
+          console.log(`[TTS] ✅ Kokoro pf_dora: ${(audioData.length / 1024).toFixed(1)}KB`);
+        } catch (e: any) {
+          console.warn(`[TTS] Kokoro falhou, tentando Polly: ${e.message}`);
+        }
+      }
+    }
+
+    // ── Fallback 1: Polly Camila (StreamElements) ──
     if (!audioData) {
       try {
         audioData = await generatePolly(cleanedText, "Camila");
-        provider = "Amazon Polly Neural";
+        provider = "Amazon Polly";
         voice = "Camila";
         console.log(`[TTS] ✅ Polly Camila: ${(audioData.length / 1024).toFixed(1)}KB`);
       } catch (e: any) {
-        console.warn(`[TTS] Camila falhou, tentando Vitória: ${e.message}`);
-        try {
-          audioData = await generatePolly(cleanedText, "Vitoria");
-          provider = "Amazon Polly";
-          voice = "Vitoria";
-          console.log(`[TTS] ✅ Polly Vitória: ${(audioData.length / 1024).toFixed(1)}KB`);
-        } catch (e2: any) {
-          console.warn(`[TTS] Polly indisponível, fallback Google: ${e2.message}`);
-          audioData = await generateGoogleTTS(cleanedText);
-          provider = "Google Translate TTS";
-          voice = "pt-BR";
-          console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
-        }
+        console.warn(`[TTS] Polly falhou, fallback Google: ${e.message}`);
+        audioData = await generateGoogleTTS(cleanedText);
+        provider = "Google Translate TTS";
+        voice = "pt-BR";
+        console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
       }
     }
 
