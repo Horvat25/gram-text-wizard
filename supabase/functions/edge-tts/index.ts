@@ -7,15 +7,14 @@ const corsHeaders = {
 };
 
 /**
- * TTS — Voz padrão GRÁTIS: Camila (Amazon Polly Neural via StreamElements)
+ * TTS — Voz padrão: Kokoro PT-BR (neural open-source via Replicate)
  *
  * Cadeia de fallback:
- *   1. Polly Camila (StreamElements) — neural natural PT-BR
- *   2. Polly Vitória (StreamElements) — fallback feminino
- *   3. Google Translate TTS — último recurso (mais robótico)
+ *   1. Kokoro pf_dora (Replicate) — neural natural PT-BR, ~$0.0002/run
+ *   2. Polly Camila (StreamElements) — se Replicate falhar
+ *   3. Google Translate TTS — último recurso
  *
- * ElevenLabs é OPCIONAL: só usado se `preferPaid: true` for passado
- * E a chave estiver configurada (pra testes pontuais).
+ * ElevenLabs Sarah só é usada se `preferPaid: true`.
  */
 
 serve(async (req) => {
@@ -55,27 +54,34 @@ serve(async (req) => {
       }
     }
 
-    // ── Padrão: Polly Camila (StreamElements, GRÁTIS) ──
+    // ── Padrão: Kokoro PT-BR (Replicate, ~grátis) ──
+    if (!audioData) {
+      const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY");
+      if (REPLICATE_API_KEY) {
+        try {
+          audioData = await generateKokoro(cleanedText, REPLICATE_API_KEY);
+          provider = "Kokoro PT-BR Neural";
+          voice = "pf_dora";
+          console.log(`[TTS] ✅ Kokoro pf_dora: ${(audioData.length / 1024).toFixed(1)}KB`);
+        } catch (e: any) {
+          console.warn(`[TTS] Kokoro falhou, tentando Polly: ${e.message}`);
+        }
+      }
+    }
+
+    // ── Fallback 1: Polly Camila (StreamElements) ──
     if (!audioData) {
       try {
         audioData = await generatePolly(cleanedText, "Camila");
-        provider = "Amazon Polly Neural";
+        provider = "Amazon Polly";
         voice = "Camila";
         console.log(`[TTS] ✅ Polly Camila: ${(audioData.length / 1024).toFixed(1)}KB`);
       } catch (e: any) {
-        console.warn(`[TTS] Camila falhou, tentando Vitória: ${e.message}`);
-        try {
-          audioData = await generatePolly(cleanedText, "Vitoria");
-          provider = "Amazon Polly";
-          voice = "Vitoria";
-          console.log(`[TTS] ✅ Polly Vitória: ${(audioData.length / 1024).toFixed(1)}KB`);
-        } catch (e2: any) {
-          console.warn(`[TTS] Polly indisponível, fallback Google: ${e2.message}`);
-          audioData = await generateGoogleTTS(cleanedText);
-          provider = "Google Translate TTS";
-          voice = "pt-BR";
-          console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
-        }
+        console.warn(`[TTS] Polly falhou, fallback Google: ${e.message}`);
+        audioData = await generateGoogleTTS(cleanedText);
+        provider = "Google Translate TTS";
+        voice = "pt-BR";
+        console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
       }
     }
 
@@ -100,7 +106,55 @@ serve(async (req) => {
   }
 });
 
-// ========== Polly via StreamElements (GRÁTIS) ==========
+// ========== Kokoro PT-BR via Replicate (neural, ~grátis) ==========
+
+async function generateKokoro(text: string, apiKey: string): Promise<Uint8Array> {
+  // Kokoro tem limite prático ~500 chars por inferência. Fatiamos e concatenamos.
+  const chunks = splitForTTS(text, 480);
+  const buffers: ArrayBuffer[] = [];
+
+  const VERSION = "89b6fa84e4fa2dd6bd3a96be3e1f12827a3516c9fda8fddbac7a0be131c9a6f5";
+
+  for (let i = 0; i < chunks.length; i++) {
+    const resp = await fetch(
+      "https://api.replicate.com/v1/predictions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "Prefer": "wait=60",
+        },
+        body: JSON.stringify({
+          version: VERSION,
+          input: {
+            text: chunks[i],
+            voice: "pf_dora",
+            language_code: "p",
+            speed: 1.0,
+          },
+        }),
+      }
+    );
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`Replicate ${resp.status}: ${err.substring(0, 200)}`);
+    }
+
+    const data = await resp.json();
+    const audioUrl = typeof data.output === "string" ? data.output : data.output?.[0];
+    if (!audioUrl) throw new Error(`Kokoro sem output: ${JSON.stringify(data).substring(0, 200)}`);
+
+    const audioResp = await fetch(audioUrl);
+    if (!audioResp.ok) throw new Error(`Kokoro audio fetch falhou: ${audioResp.status}`);
+    buffers.push(await audioResp.arrayBuffer());
+  }
+
+  return concatBuffers(buffers);
+}
+
+// ========== Polly via StreamElements (fallback) ==========
 
 async function generatePolly(text: string, voice: string): Promise<Uint8Array> {
   // StreamElements limita ~500 chars por chamada, então fatiamos por sentença.
