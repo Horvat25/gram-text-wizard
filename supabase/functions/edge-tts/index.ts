@@ -55,28 +55,27 @@ serve(async (req) => {
       }
     }
 
-    // ── Padrão: Microsoft Edge TTS PT-BR (Francisca neural, GRÁTIS, sem chave) ──
+    // ── Padrão: HuggingFace MMS-TTS Portuguese (neural, GRÁTIS) ──
     if (!audioData) {
-      try {
-        audioData = await generateEdgeTTS(cleanedText, "pt-BR-FranciscaNeural");
-        provider = "Microsoft Edge Neural";
-        voice = "Francisca";
-        console.log(`[TTS] ✅ Edge TTS Francisca: ${(audioData.length / 1024).toFixed(1)}KB`);
-      } catch (e: any) {
-        console.warn(`[TTS] Edge TTS Francisca falhou, tentando Antonio: ${e.message}`);
+      const HF_API_KEY = Deno.env.get("HF_API_KEY");
+      if (HF_API_KEY) {
         try {
-          audioData = await generateEdgeTTS(cleanedText, "pt-BR-AntonioNeural");
-          provider = "Microsoft Edge Neural";
-          voice = "Antonio";
-          console.log(`[TTS] ✅ Edge TTS Antonio: ${(audioData.length / 1024).toFixed(1)}KB`);
-        } catch (e2: any) {
-          console.warn(`[TTS] Edge TTS indisponível, fallback Google: ${e2.message}`);
-          audioData = await generateGoogleTTS(cleanedText);
-          provider = "Google Translate TTS";
-          voice = "pt-BR";
-          console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
+          audioData = await generateHuggingFaceTTS(cleanedText, HF_API_KEY);
+          provider = "HuggingFace MMS Neural";
+          voice = "mms-tts-por";
+          console.log(`[TTS] ✅ HF MMS-TTS: ${(audioData.length / 1024).toFixed(1)}KB`);
+        } catch (e: any) {
+          console.warn(`[TTS] HF MMS falhou, fallback Google: ${e.message}`);
         }
       }
+    }
+
+    // ── Último recurso: Google Translate TTS ──
+    if (!audioData) {
+      audioData = await generateGoogleTTS(cleanedText);
+      provider = "Google Translate TTS";
+      voice = "pt-BR";
+      console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
     }
 
     const base64Audio = base64Encode(audioData);
