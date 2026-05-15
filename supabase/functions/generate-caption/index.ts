@@ -373,11 +373,12 @@ ${sizeRules}
     }
 
     // 🟢 BLOCO BLOG ATUALIZAÇÃO NEURAL — sempre divulga o blog ao final
-    // Limpa qualquer "Fonte:/🔗" que a IA tenha enfiado contra a regra
+    // Limpa qualquer "Fonte:/🔗" que a IA tenha enfiado (em qualquer posição)
     caption = caption
-      .replace(/\n+\s*(📰\s*)?Fonte:.*$/gim, '')
-      .replace(/\n+\s*🔗\s*https?:\/\/\S+/gim, '')
-      .trimEnd();
+      .replace(/(📰\s*)?Fonte:\s*[^\n]*/gi, '')
+      .replace(/🔗\s*https?:\/\/\S+/gi, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
 
     const isNeuralUpdate = sourceName === 'Atualização Neural';
     let blogBlock = '';
