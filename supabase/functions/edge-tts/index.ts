@@ -54,34 +54,27 @@ serve(async (req) => {
       }
     }
 
-    // ── Padrão: Kokoro PT-BR (Replicate, ~grátis) ──
-    if (!audioData) {
-      const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY");
-      if (REPLICATE_API_KEY) {
-        try {
-          audioData = await generateKokoro(cleanedText, REPLICATE_API_KEY);
-          provider = "Kokoro PT-BR Neural";
-          voice = "pf_dora";
-          console.log(`[TTS] ✅ Kokoro pf_dora: ${(audioData.length / 1024).toFixed(1)}KB`);
-        } catch (e: any) {
-          console.warn(`[TTS] Kokoro falhou, tentando Polly: ${e.message}`);
-        }
-      }
-    }
-
-    // ── Fallback 1: Polly Camila (StreamElements) ──
+    // ── Padrão: Microsoft Edge TTS PT-BR (Francisca neural, GRÁTIS, sem chave) ──
     if (!audioData) {
       try {
-        audioData = await generatePolly(cleanedText, "Camila");
-        provider = "Amazon Polly";
-        voice = "Camila";
-        console.log(`[TTS] ✅ Polly Camila: ${(audioData.length / 1024).toFixed(1)}KB`);
+        audioData = await generateEdgeTTS(cleanedText, "pt-BR-FranciscaNeural");
+        provider = "Microsoft Edge Neural";
+        voice = "Francisca";
+        console.log(`[TTS] ✅ Edge TTS Francisca: ${(audioData.length / 1024).toFixed(1)}KB`);
       } catch (e: any) {
-        console.warn(`[TTS] Polly falhou, fallback Google: ${e.message}`);
-        audioData = await generateGoogleTTS(cleanedText);
-        provider = "Google Translate TTS";
-        voice = "pt-BR";
-        console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
+        console.warn(`[TTS] Edge TTS Francisca falhou, tentando Antonio: ${e.message}`);
+        try {
+          audioData = await generateEdgeTTS(cleanedText, "pt-BR-AntonioNeural");
+          provider = "Microsoft Edge Neural";
+          voice = "Antonio";
+          console.log(`[TTS] ✅ Edge TTS Antonio: ${(audioData.length / 1024).toFixed(1)}KB`);
+        } catch (e2: any) {
+          console.warn(`[TTS] Edge TTS indisponível, fallback Google: ${e2.message}`);
+          audioData = await generateGoogleTTS(cleanedText);
+          provider = "Google Translate TTS";
+          voice = "pt-BR";
+          console.log(`[TTS] ⚠️ Google fallback: ${(audioData.length / 1024).toFixed(1)}KB`);
+        }
       }
     }
 
