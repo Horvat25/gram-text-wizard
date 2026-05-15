@@ -1621,8 +1621,13 @@ async function createCarouselContent(
     return post;
   }
   
-  // Pick THE BEST single article as the unified theme
-  const scored = rssItems.map((item: any) => ({
+  // Pick THE BEST single article — Neural Update tem prioridade absoluta
+  const neuralItems = rssItems.filter((i: any) => i.source_name === 'Atualização Neural');
+  const carouselPool = neuralItems.length > 0 ? neuralItems : rssItems;
+  if (neuralItems.length > 0) {
+    console.log(`[AGENT] 🟢 Carrossel: usando fonte prioritária Neural Update (${neuralItems.length} itens)`);
+  }
+  const scored = carouselPool.map((item: any) => ({
     item,
     score: calculateNewsRankingScore(item)
   })).sort((a: any, b: any) => b.score - a.score);
@@ -2632,8 +2637,15 @@ async function selectBestRssItem(supabase: any, workspaceId: string, supabaseUrl
     return null;
   }
   
-  // Score and rank all items
-  const scoredItems = rssItems.map((item: any) => ({
+  // 🟢 Prioridade absoluta para Atualização Neural (blog próprio)
+  const neuralItems = rssItems.filter((i: any) => i.source_name === 'Atualização Neural');
+  const pool = neuralItems.length > 0 ? neuralItems : rssItems;
+  if (neuralItems.length > 0) {
+    console.log(`[AGENT] 🟢 Usando fonte prioritária Neural Update (${neuralItems.length} itens)`);
+  }
+  
+  // Score and rank pool
+  const scoredItems = pool.map((item: any) => ({
     item,
     score: calculateNewsRankingScore(item)
   })).sort((a: any, b: any) => b.score - a.score);
@@ -2783,15 +2795,38 @@ async function createNewsContent(
   }
 
   // STEP 3 & 4: Apply text overlay via CODE (not AI image generation)
-  // The apply-text-overlay function:
-  // - Downloads the real image
-  // - LLM generates ONLY the headline TEXT (string)
-  // - Code applies the text as overlay (fixed font, color, layout)
+  // 🟢 EXCEÇÃO: notícias do Atualização Neural reusam a imagem original SEM overlay,
+  // mantendo a consistência visual do blog (capa do artigo já é a imagem oficial).
   let imageUrl = null;
-  let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' = 'fallback_external_url';
+  let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' | 'neural_original' = 'fallback_external_url';
   let overlayFailureReason: string | null = null;
+  const isNeuralUpdate = sourceDomain === 'Atualização Neural';
 
-  if (selectedImage && selectedArticle?.title) {
+  if (selectedImage && isNeuralUpdate) {
+    console.log('[AGENT] 🟢 Notícia do Neural Update — reusando imagem original do blog (sem overlay)');
+    try {
+      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ imageUrl: selectedImage })
+      });
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        if (uploadResult.publicUrl) {
+          imageUrl = uploadResult.publicUrl;
+          overlayStatus = 'neural_original';
+          console.log('[AGENT] ✅ Imagem do Neural Update re-uploadada');
+        }
+      }
+    } catch (e: any) {
+      console.warn('[AGENT] upload Neural Update falhou:', e?.message || e);
+    }
+    // Último recurso: URL externa direta
+    if (!imageUrl && /^https?:\/\//.test(selectedImage)) {
+      imageUrl = selectedImage;
+      overlayStatus = 'neural_original';
+    }
+  } else if (selectedImage && selectedArticle?.title) {
     // ── TENTATIVA 1: apply-text-overlay (headline + watermark) ──
     console.log('[AGENT] [1/4] Aplicando overlay de texto via SVG...');
     try {
@@ -2895,7 +2930,7 @@ async function createNewsContent(
     console.log(`[AGENT] 🖼️ Imagem final: ${overlayStatus} → ${imageUrl.substring(0, 80)}...`);
   }
   
-  // Generate caption with source attribution (3-block editorial structure)
+  // Generate caption — generate-caption injeta CTA do blog automaticamente
   const captionResponse = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
     method: 'POST',
     headers,
@@ -2904,16 +2939,14 @@ async function createNewsContent(
       postType: 'noticia',
       sourceUrl: sourceUrl,
       sourceName: sourceDomain,
-      customInstructions: `Esta é uma notícia REAL com imagem real do site. 
-      
+      customInstructions: `Esta é uma notícia REAL com imagem real do site.
+
 Estrutura OBRIGATÓRIA da legenda (3 blocos):
 1. HOOK DE IMPACTO - Uma frase curta e impactante (sem emoji no início)
 2. CONTEXTO MÍNIMO - 1-2 frases explicando o essencial
 3. REFLEXÃO/PERGUNTA - Engajamento com o leitor
 
-OBRIGATÓRIO ao final:
-📰 Fonte: ${sourceDomain}
-🔗 ${sourceUrl}`
+⚠️ NÃO inclua linha "Fonte:" nem URL — o sistema adiciona o CTA do blog Atualização Neural automaticamente.`
     })
   });
   
@@ -2926,15 +2959,6 @@ OBRIGATÓRIO ao final:
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
-  
-  const hasSourceInCaption = caption.includes('Fonte:') || caption.includes('🔗');
-  if (!hasSourceInCaption && selectedArticle) {
-    if (sourceUrl) {
-      caption += `\n\n📰 Fonte: ${sourceDomain}\n🔗 ${sourceUrl}`;
-    } else if (sourceDomain && sourceDomain !== 'fonte') {
-      caption += `\n\n📰 Fonte: ${sourceDomain}`;
-    }
-  }
   
   // Create post - publish directly if autoPublish and has real image
   const canPublish = autoPublish && imageUrl;

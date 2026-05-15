@@ -188,7 +188,7 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, postType = "engajamento", mediaType, customInstructions } = await req.json();
+    const { topic, postType = "engajamento", mediaType, customInstructions, sourceUrl, sourceName } = await req.json();
 
     if (!topic || typeof topic !== "string") {
       throw new Error("Topic é obrigatório e deve ser uma string");
@@ -370,6 +370,26 @@ ${sizeRules}
       const head = finalParagraphs.slice(0, 3);
       const tail = finalParagraphs.slice(3).join(' ');
       caption = [...head, tail].join('\n\n');
+    }
+
+    // 🟢 BLOCO BLOG ATUALIZAÇÃO NEURAL — sempre divulga o blog ao final
+    // Limpa qualquer "Fonte:/🔗" que a IA tenha enfiado contra a regra
+    caption = caption
+      .replace(/\n+\s*(📰\s*)?Fonte:.*$/gim, '')
+      .replace(/\n+\s*🔗\s*https?:\/\/\S+/gim, '')
+      .trimEnd();
+
+    const isNeuralUpdate = sourceName === 'Atualização Neural';
+    let blogBlock = '';
+    if (postType === 'noticia' && sourceUrl && isNeuralUpdate) {
+      blogBlock = `📖 Leia o artigo completo no Neural Update 👉 ${sourceUrl}`;
+    } else if (postType === 'noticia' && sourceUrl) {
+      blogBlock = `📰 Fonte: ${sourceName || 'site original'} — ${sourceUrl}\n🧠 Acompanhe mais notícias de IA em neural-update.com.br`;
+    } else if (postType !== 'noticia') {
+      blogBlock = `🧠 Mais notícias de IA no nosso blog: neural-update.com.br`;
+    }
+    if (blogBlock) {
+      caption = `${caption}\n\n${blogBlock}`;
     }
 
     console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
