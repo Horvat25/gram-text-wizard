@@ -483,109 +483,55 @@ serve(async (req) => {
       );
     }
 
-    // ============= AI GENERATION MODE (Videos/Carousels) =============
-    // Generate 4 AI images using generate-image (Gemini Flash Image ~$0.02/img)
-    // This ensures visual consistency and relevance instead of random stock photos
+    // ============= REAL IMAGES MODE (Pexels + scrape, ZERO IA) =============
+    // Mudança 05/2026: removida geração por IA (~$0,10/reel). Sempre usa imagens reais.
     const neededCount = segments?.length || 4;
-    console.log(`[images] 🎨 AI GENERATION MODE: ${neededCount} images for: "${searchQuery}"`);
+    console.log(`[images] 📸 REAL IMAGES MODE (Pexels): ${neededCount} images for: "${searchQuery}"`);
 
-    const results: { imageUrl: string; source: string; sourceId: string }[] = [];
+    const realRes = await fetch(`${supabaseUrl}/functions/v1/fetch-real-news-images`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+      body: JSON.stringify({
+        title: searchQuery || topic || 'tecnologia',
+        description: segments?.map((s: any) => s.text).join(' ').slice(0, 600) || '',
+        articleUrl: articleUrl || null,
+        primaryImageUrl: articleImageUrl || null,
+        count: neededCount,
+      }),
+    });
 
-    // Build progressive prompts with FULL Neural Update visual identity
-    const baseContext = searchQuery || topic || 'tecnologia';
-    const sceneStructure = [
-      { phase: 'CONTEXTO', direction: 'Crie uma cena impactante que introduza visualmente o tema da notícia. Mostrar o ambiente principal relacionado ao assunto, com sensação de novidade e descoberta. A imagem deve gerar curiosidade imediata. Foco em: impacto visual inicial, ambiente tecnológico coerente com o tema, clima de antecipação.' },
-      { phase: 'DESENVOLVIMENTO', direction: 'Continuação direta da cena anterior, mesmo ambiente ou universo visual, adicionando novos elementos que representem evolução do tema. Mostrar mais detalhes, dados visuais, interfaces ou interações relacionadas à notícia. Sensação: explicação visual, movimento implícito, construção narrativa.' },
-      { phase: 'IMPACTO', direction: 'Manter identidade visual e continuidade. Agora representar visualmente o impacto da notícia no mundo, sociedade ou mercado. A cena deve parecer maior, mais ampla ou mais intensa que as anteriores. Sensação: escala, transformação, poder.' },
-      { phase: 'CONCLUSÃO', direction: 'Cena final com sensação futurista e reflexiva. Mostrar projeção para o futuro ou consequência de longo prazo da notícia. Manter continuidade estética, mas com composição mais limpa e simbólica. Sensação: futuro, reflexão, encerramento forte.' },
-    ];
-
-    for (let i = 0; i < neededCount; i++) {
-      const segPrompt = segments?.[i]?.imagePrompt || segments?.[i]?.text || baseContext;
-      const scene = sceneStructure[i] || sceneStructure[0];
-      
-      // Full Neural Update visual identity prompt
-      const aiPrompt = `Crie uma sequência visual cinematográfica para um vídeo vertical de notícias de tecnologia da marca "Neural Update".
-
-IDENTIDADE VISUAL OBRIGATÓRIA:
-- Paleta predominante: azul escuro (#0B0F1A) e roxo neon (#7B2CFF)
-- Iluminação high-tech com contraste forte
-- Estética futurista minimalista
-- Atmosfera levemente dramática
-- Nitidez alta e acabamento premium
-- Mesmo estilo de lente e enquadramento em todas as cenas
-- Formato vertical 9:16
-- Espaço negativo na parte superior para possível headline
-- Marca d'água discreta "Neural Update" no canto inferior direito, integrada ao ambiente com leve glow roxo neon
-
-ESTILO VISUAL: Fotorrealista cinematográfico, iluminação volumétrica, reflexos sutis, profundidade de campo profissional, composição moderna semelhante a trailers de tecnologia.
-
-TEMA PRINCIPAL: ${baseContext}
-
-🎬 CENA ${i + 1} de ${neededCount} — ${scene.phase} (${segPrompt}):
-${scene.direction}
-
-IMPORTANTE: Todas as 4 imagens devem parecer parte do mesmo vídeo, com continuidade visual, mesma paleta, mesma atmosfera e mesma linguagem estética.`;
-
-      console.log(`[images] Segment [${i + 1}/${neededCount}] Generating AI image...`);
-
-      try {
-        const genResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseKey}`,
-          },
-          body: JSON.stringify({
-            prompt: aiPrompt,
-            format: 'portrait', // 9:16 for Reels
-            applyWatermark: !skipWatermark,
-          }),
-        });
-
-        if (genResponse.ok) {
-          const genResult = await genResponse.json();
-          if (genResult.imageUrl) {
-            results.push({
-              imageUrl: genResult.imageUrl,
-              source: 'ai-generated',
-              sourceId: `ai_gen_${Date.now()}_${i}`,
-            });
-            console.log(`[images] ✅ Segment [${i + 1}] AI image generated — model: ${genResult.modelUsed || 'gemini'}`);
-          } else {
-            console.warn(`[images] ❌ Segment [${i + 1}] AI generation returned no URL`);
-          }
-        } else {
-          const errText = await genResponse.text();
-          console.error(`[images] ❌ Segment [${i + 1}] AI generation failed:`, genResponse.status, errText);
+    const realImages: { imageUrl: string; source: string; sourceId: string }[] = [];
+    if (realRes.ok) {
+      const realData = await realRes.json();
+      (realData.images || []).forEach((img: any, i: number) => {
+        if (img?.url) {
+          realImages.push({
+            imageUrl: img.url,
+            source: img.source || 'pexels',
+            sourceId: `real_${Date.now()}_${i}`,
+          });
         }
-      } catch (genError) {
-        console.error(`[images] ❌ Segment [${i + 1}] AI generation error:`, genError);
-      }
-
-      // Small delay between generations to avoid rate limiting
-      if (i < neededCount - 1) {
-        await new Promise(r => setTimeout(r, 500));
-      }
+      });
+      console.log(`[images] ✅ Real images: ${realImages.length}/${neededCount}`);
+    } else {
+      console.warn(`[images] fetch-real-news-images falhou: ${realRes.status}`);
     }
 
-    const stats = {
-      total: results.length,
-      aiGenerated: results.length,
-      mode: 'ai_generation',
-    };
-
-    console.log(`[images] 🎨 AI generation complete: ${results.length}/${neededCount} images`);
+    // Se faltou alguma, repete a última pra não quebrar o render (sem IA)
+    while (realImages.length < neededCount && realImages.length > 0) {
+      realImages.push({ ...realImages[realImages.length - 1], sourceId: `real_dup_${realImages.length}` });
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        images: results.map(r => ({ imageUrl: r.imageUrl, source: r.source })),
-        imageIds: results.map(r => r.sourceId),
-        stats,
+        images: realImages.slice(0, neededCount).map(r => ({ imageUrl: r.imageUrl, source: r.source })),
+        imageIds: realImages.slice(0, neededCount).map(r => r.sourceId),
+        stats: { total: realImages.length, mode: 'real_pexels', aiGenerated: 0 },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
 
   } catch (error) {
     console.error('[images] Error:', error);
