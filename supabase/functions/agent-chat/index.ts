@@ -1099,9 +1099,136 @@ async function executeUpdateSettings(supabase: any, userId: string, workspaceId:
   };
 }
 
+const normalizeIntentText = (value: string) =>
+  (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+const cleanNarratedVideoTopic = (message: string) => {
+  const topicMatch = message.match(/(?:sobre|tema|assunto)\s+(.+)$/i);
+  const rawTopic = topicMatch?.[1]
+    || message
+      .replace(/^(cria|crie|faz|faca|gera|gere|monta|monte|produz|prepare|posta|publique|publica|coloca|bota|deixa)\s+/i, '')
+      .replace(/\b(um|uma|o|os|a|as|pra mim|para mim|na fila|já|ja|agora|por favor|renderizar|renderiza|gerar)\b/gi, ' ')
+      .replace(/\b(reels?|vídeo|video|videos|shorts?|stories?)\b/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  return rawTopic || 'tecnologia e inovação';
+};
+
+const buildCostAwareTechScript = (topic: string) => {
+  const topicClean = (topic || 'tecnologia e inovação').replace(/\s+/g, ' ').trim();
+  const shortTopic = topicClean.length > 52 ? topicClean.substring(0, 52).replace(/\s\S*$/, '') : topicClean;
+  const normalized = normalizeIntentText(topicClean);
+  const isUsChina = /(eua|estados unidos|china|pequim|washington|viagem|viajem)/.test(normalized);
+
+  if (isUsChina) {
+    return {
+      title: 'EUA x China: a viagem por trás dos chips',
+      thesis: 'A agenda entre EUA e China é menos sobre diplomacia tradicional e mais sobre quem controla a infraestrutura da IA.',
+      segments: [
+        {
+          text: 'Essa viagem dos EUA à China não é turismo: é negociação sobre chips, IA e poder industrial.',
+          imagePrompt: 'US China diplomacy meeting semiconductor chips, cinematic newsroom, vertical 9:16, no text',
+          visualKeywords: ['US China diplomacy meeting', 'semiconductor chip macro', 'global trade route map'],
+        },
+        {
+          text: 'O ponto central é simples: quem controla semicondutores avançados controla datacenters, fábricas e modelos de IA.',
+          imagePrompt: 'semiconductor wafer macro datacenter corridor, dramatic blue light, vertical 9:16, no text',
+          visualKeywords: ['semiconductor wafer macro', 'datacenter corridor blue lights', 'AI server rack close up'],
+        },
+        {
+          text: 'Washington quer limitar tecnologia sensível; Pequim quer reduzir dependência e acelerar sua cadeia própria.',
+          imagePrompt: 'geopolitical technology tension Washington Beijing skyline, cinematic split light, vertical 9:16, no text',
+          visualKeywords: ['Washington Beijing skyline', 'technology export controls', 'factory robotics assembly line'],
+        },
+        {
+          text: 'Para o mercado, o recado é prático: hardware, logística e nuvem ficaram mais estratégicos que software bonito.',
+          imagePrompt: 'cargo containers microchips cloud servers supply chain, cinematic dark gold, vertical 9:16, no text',
+          visualKeywords: ['cargo containers technology supply chain', 'cloud server infrastructure', 'microchip logistics'],
+        },
+        {
+          text: 'Observa os próximos acordos de chips e exportação. Comenta: isso vira trégua técnica ou guerra fria digital?',
+          imagePrompt: 'global digital cold war hologram map, dramatic newsroom style, vertical 9:16, no text',
+          visualKeywords: ['global digital cold war', 'semiconductor export agreement', 'hologram world map'],
+        },
+      ],
+      totalDuration: 40,
+      _fallback: true,
+      _costAware: true,
+    };
+  }
+
+  return {
+    title: `${shortTopic}: o detalhe que muda tudo`,
+    thesis: `O tema ${shortTopic} importa porque revela uma mudança prática na infraestrutura da tecnologia, não só uma tendência de momento.`,
+    segments: [
+      {
+        text: `Se você acha que ${shortTopic} é só mais uma notícia tech, o ponto principal passou batido.`,
+        imagePrompt: `specific technology breaking news about ${shortTopic}, cinematic newsroom, vertical 9:16, no text`,
+        visualKeywords: [`${shortTopic} technology news`, 'cinematic newsroom screens', 'future technology infrastructure'],
+      },
+      {
+        text: 'A tese é simples: a tecnologia vencedora não é a mais bonita, é a que vira infraestrutura invisível.',
+        imagePrompt: 'datacenter infrastructure servers dramatic corridor, vertical 9:16, no text',
+        visualKeywords: ['datacenter infrastructure servers', 'microchip macro detail', 'network cables close up'],
+      },
+      {
+        text: 'Quando empresas movem capital para isso, elas não estão testando moda; estão comprando vantagem operacional.',
+        imagePrompt: 'technology investment control room market data, cinematic dark lighting, vertical 9:16, no text',
+        visualKeywords: ['market data control room', 'technology investment boardroom', 'server rack blue lights'],
+      },
+      {
+        text: 'O impacto prático aparece em custo, velocidade, privacidade e no poder de quem controla a distribuição.',
+        imagePrompt: 'digital privacy speed cost infrastructure visualization, cinematic, vertical 9:16, no text',
+        visualKeywords: ['digital privacy infrastructure', 'fiber optic network macro', 'cloud computing control room'],
+      },
+      {
+        text: 'Salva este tema e observa os próximos movimentos. A próxima virada vai parecer pequena antes de ficar óbvia.',
+        imagePrompt: 'future technology horizon analyst desk, dramatic golden light, vertical 9:16, no text',
+        visualKeywords: ['future technology horizon', 'analyst desk monitors', 'dramatic innovation silhouette'],
+      },
+    ],
+    totalDuration: 40,
+    _fallback: true,
+    _costAware: true,
+  };
+};
+
+const buildNarratedVideoCaption = (topic: string, title: string) =>
+  `🎬 ${title}\n\n${topic} não é só notícia: é um sinal de como infraestrutura, dados e poder tecnológico estão se reorganizando em tempo real.\n\nNo vídeo, a leitura é direta: menos hype, mais consequência prática para IA, chips, nuvem e mercado.\n\nComenta: isso acelera uma trégua técnica ou abre uma nova fase da disputa digital?`;
+
+const buildDirectNarratedVideoArgs = (latestUserMessage: string) => {
+  const normalized = normalizeIntentText(latestUserMessage);
+  const topic = cleanNarratedVideoTopic(latestUserMessage);
+  const wantsPublishNow = /(poste|postar|publica|publique|publicar)/.test(normalized);
+
+  return {
+    topic,
+    caption: buildNarratedVideoCaption(topic, buildCostAwareTechScript(topic).title),
+    hashtags: ['#tecnologia', '#ia', '#chips', '#geopolitica', '#reels'],
+    platforms: ['instagram'],
+    style: 'editorial tech direto, explicativo, com tese e CTA acionável',
+    publish_now: wantsPublishNow,
+    __fast: true,
+  };
+};
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number, label: string) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(`${label} timeout`), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Execute create_narrated_video - creates a video post with script for frontend processing
 async function executeCreateNarratedVideo(supabase: any, userId: string, workspaceId: string, args: any) {
-  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style, article_url, article_image_url } = args;
+  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style, article_url, article_image_url, __fast } = args;
   
   console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
   
