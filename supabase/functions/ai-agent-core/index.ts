@@ -111,6 +111,29 @@ async function reviewText(
   return text;
 }
 
+function hasFullEditorialCaption(caption: string): boolean {
+  const body = (caption || '').replace(/#[\p{L}\p{N}_]+/gu, '').trim();
+  return body.length >= 650 && body.split(/\n\s*\n/).filter(Boolean).length >= 3;
+}
+
+function buildEditorialFallbackCaption(topic: string, description?: string, sourceUrl?: string, sourceName?: string): string {
+  const cleanTopic = (topic || 'Essa mudança na tecnologia').replace(/\s+/g, ' ').trim();
+  const cleanDescription = (description || cleanTopic).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const isNeuralUpdate = sourceName === 'Atualização Neural';
+  const sourceBlock = sourceUrl
+    ? isNeuralUpdate
+      ? `📖 Leia o artigo completo no Neural Update 👉 ${sourceUrl}`
+      : `📰 Fonte: ${sourceName || 'site original'} — ${sourceUrl}\n🧠 Acompanhe mais notícias de IA em neural-update.com.br`
+    : `🧠 Mais notícias de IA no nosso blog: neural-update.com.br`;
+
+  return [
+    `💡 ${cleanTopic} não é só uma manchete solta: é um sinal de como infraestrutura, acesso e poder digital estão sendo reorganizados em tempo real.`,
+    `O ponto central é este: ${cleanDescription.substring(0, 320)}. Quando uma mudança assim aparece, ela costuma mexer com preço, adoção, concorrência e com a dependência que pessoas e empresas têm dessas plataformas.`,
+    `A leitura mais importante é que tecnologia deixou de ser apenas produto. Virou território estratégico. Quem controla conexão, modelos, dados e distribuição passa a influenciar mercados inteiros — e isso exige atenção além do hype.`,
+    `A pergunta é simples: isso melhora a vida do usuário ou cria mais uma camada de dependência tecnológica?\n\n${sourceBlock}`,
+  ].join('\n\n');
+}
+
 async function sendChatMessage(supabase: any, userId: string, message: string): Promise<void> {
   try {
     await supabase.from('agent_chat_messages').insert({
@@ -708,8 +731,7 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     'news': { mediaType: 'image', format: 'noticia', theme: 'notícia tecnologia inteligência artificial' },
     'news_video': { mediaType: 'reels', format: 'noticia', theme: 'notícia para reels estilo telejornal' },
     'image': { mediaType: 'image', format: 'engajamento', theme: 'reflexão sobre tecnologia e futuro' },
-    'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' },
-    'marketing_video': { mediaType: 'reels', format: 'vendas', theme: 'produto afiliado VSL' }
+    'marketing': { mediaType: 'image', format: 'vendas', theme: 'produto afiliado' }
   };
   
   const selectedType = contentTypeMap[state.nextContentType];
@@ -1275,6 +1297,16 @@ Responda em JSON:
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  if (isNewsBroadcast && !hasFullEditorialCaption(caption)) {
+    console.warn(`[AGENT] ⚠️ Legenda de notícia rasa (${caption.length} chars). Aplicando fallback editorial local.`);
+    caption = buildEditorialFallbackCaption(
+      rssArticle?.title || plan.theme,
+      rssArticle?.description || '',
+      rssArticle?.url,
+      rssArticle?.sourceName || (rssArticle?.url ? new URL(rssArticle.url).hostname.replace('www.', '') : undefined)
+    );
+    hashtags = hashtags?.length ? hashtags : ['tecnologia', 'noticias', 'ia', 'futuro', 'neuralupdate'];
+  }
   
   // STEP 4: Create post
   const { data: post, error } = await supabase.from('posts').insert({
@@ -2785,31 +2817,62 @@ async function createNewsContent(
   let imageUrl = null;
   let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' | 'neural_original' = 'fallback_external_url';
   let overlayFailureReason: string | null = null;
+  let generatedHeadline: string | null = null;
   const isNeuralUpdate = sourceDomain === 'Atualização Neural';
 
   if (selectedImage && isNeuralUpdate) {
-    console.log('[AGENT] 🟢 Notícia do Neural Update — reusando imagem original do blog (sem overlay)');
+    console.log('[AGENT] 🟢 Notícia do Neural Update — aplicando headline programática sobre imagem original');
     try {
-      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ imageUrl: selectedImage })
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          title: selectedArticle.title,
+          watermarkText: 'Neural Update',
+          generateHeadline: true,
+          ctaText: 'LEIA A LEGENDA 👇'
+        })
       });
-      if (uploadResponse.ok) {
-        const uploadResult = await uploadResponse.json();
-        if (uploadResult.publicUrl) {
-          imageUrl = uploadResult.publicUrl;
-          overlayStatus = 'neural_original';
-          console.log('[AGENT] ✅ Imagem do Neural Update re-uploadada');
+      if (overlayResponse.ok) {
+        const overlayResult = await overlayResponse.json();
+        if (overlayResult.publicUrl && overlayResult.hasOverlay) {
+          imageUrl = overlayResult.publicUrl;
+          generatedHeadline = overlayResult.headline || null;
+          overlayStatus = 'success';
+          console.log('[AGENT] ✅ Headline Neural Update aplicada:', generatedHeadline);
         }
+      } else {
+        const errBody = await overlayResponse.text().catch(() => '');
+        overlayFailureReason = `neural_overlay_http_${overlayResponse.status}: ${errBody.substring(0, 120)}`;
       }
     } catch (e: any) {
-      console.warn('[AGENT] upload Neural Update falhou:', e?.message || e);
+      overlayFailureReason = `neural_overlay_exception: ${e?.message || e}`;
+      console.warn('[AGENT] overlay Neural Update falhou:', overlayFailureReason);
     }
-    // Último recurso: URL externa direta
-    if (!imageUrl && /^https?:\/\//.test(selectedImage)) {
-      imageUrl = selectedImage;
-      overlayStatus = 'neural_original';
+
+    if (!imageUrl) {
+      try {
+        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ imageUrl: selectedImage })
+        });
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          if (uploadResult.publicUrl) {
+            imageUrl = uploadResult.publicUrl;
+            overlayStatus = 'neural_original';
+            console.log('[AGENT] ✅ Imagem do Neural Update re-uploadada sem headline após fallback');
+          }
+        }
+      } catch (e: any) {
+        console.warn('[AGENT] upload Neural Update falhou:', e?.message || e);
+      }
+      if (!imageUrl && /^https?:\/\//.test(selectedImage)) {
+        imageUrl = selectedImage;
+        overlayStatus = 'neural_original';
+      }
     }
   } else if (selectedImage && selectedArticle?.title) {
     // ── TENTATIVA 1: apply-text-overlay (headline + watermark) ──
@@ -2830,6 +2893,7 @@ async function createNewsContent(
         const overlayResult = await overlayResponse.json();
         if (overlayResult.publicUrl) {
           imageUrl = overlayResult.publicUrl;
+          generatedHeadline = overlayResult.headline || null;
           overlayStatus = overlayResult.hasOverlay ? 'success' : 'fallback_no_overlay';
           console.log(`[AGENT] ✅ Overlay aplicado (${overlayStatus}):`, overlayResult.headline);
         }
@@ -2944,6 +3008,16 @@ Estrutura OBRIGATÓRIA da legenda (3 blocos):
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  if (!hasFullEditorialCaption(caption)) {
+    console.warn(`[AGENT] ⚠️ Legenda de notícia rasa (${caption.length} chars). Aplicando fallback editorial local.`);
+    caption = buildEditorialFallbackCaption(
+      selectedArticle?.title || plan.theme,
+      selectedArticle?.description || '',
+      sourceUrl,
+      sourceDomain
+    );
+    hashtags = hashtags?.length ? hashtags : ['tecnologia', 'noticias', 'ia', 'futuro', 'neuralupdate'];
+  }
   
   // Create post - publish directly if autoPublish and has real image
   const canPublish = autoPublish && imageUrl;
@@ -2965,6 +3039,7 @@ Estrutura OBRIGATÓRIA da legenda (3 blocos):
       original_title: selectedArticle?.title,
       used_real_image: !!selectedImage,
       text_applied_by_code: true,
+      generated_headline: generatedHeadline,
       overlay_status: overlayStatus,
       overlay_failure_reason: overlayFailureReason,
     },
@@ -3094,6 +3169,7 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
   // Posts inspired by RSS topics should have the yellow headline for brand consistency
   if (imageUrl && inspirationTopic) {
     console.log('[AGENT] 🔥 Aplicando headline overlay no post de imagem...');
+    let imageHeadline: string | null = null;
     try {
       const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
@@ -3110,6 +3186,7 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
         const overlayResult = await overlayResponse.json();
         if (overlayResult.hasOverlay) {
           imageUrl = overlayResult.publicUrl;
+          imageHeadline = overlayResult.headline || null;
           console.log('[AGENT] ✅ Headline overlay aplicado em post de imagem:', overlayResult.headline);
         } else {
           console.log('[AGENT] ⚠️ Overlay retornou sem headline, tentando add-watermark...');
@@ -3138,6 +3215,7 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
     } catch (overlayErr) {
       console.log('[AGENT] Erro ao aplicar headline overlay em imagem:', overlayErr);
     }
+    (plan as any)._generatedHeadline = imageHeadline;
   }
   
   // STEP 3: Generate DEEP REFLECTION caption (4 blocks, 800-1500 chars)
@@ -3167,6 +3245,11 @@ LEMBRE: a headline na imagem já criou tensão. Você precisa ENTREGAR aqui — 
   
   // Review caption for spelling
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  if (!hasFullEditorialCaption(caption)) {
+    console.warn(`[AGENT] ⚠️ Legenda de imagem veio rasa (${caption.length} chars). Aplicando fallback editorial local.`);
+    caption = buildEditorialFallbackCaption(inspirationTopic, inspirationDesc, undefined, undefined);
+    hashtags = hashtags?.length ? hashtags : ['tecnologia', 'reflexao', 'futuro', 'ia', 'inovacao'];
+  }
   
   const canPublish = autoPublish && imageUrl;
   
@@ -3186,7 +3269,8 @@ LEMBRE: a headline na imagem já criou tensão. Você precisa ENTREGAR aqui — 
       inspiration_topic: inspirationTopic,
       ai_generated_image: true,
       created_by_agent: true,
-      text_applied_by_code: true
+      text_applied_by_code: true,
+      generated_headline: (plan as any)._generatedHeadline || null
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
