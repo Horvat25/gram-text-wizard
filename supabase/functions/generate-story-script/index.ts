@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
-    const { topic, segmentCount = 6, wordsPerSegment = 22, totalDuration = 55, style, brandName } = await req.json();
+    const { topic, segmentCount = 5, wordsPerSegment = 24, totalDuration = 50, style, brandName } = await req.json();
 
     if (!topic) {
       throw new Error("Tópico é obrigatório");
@@ -247,16 +247,20 @@ Responda APENAS com JSON:
 
     // Spelling correction function - validates and fixes Portuguese spelling
     const correctSpelling = async (script: any): Promise<any> => {
-      const spellingPrompt = `Você é um revisor ortográfico rigoroso de português brasileiro.
+      const spellingPrompt = `Você é um EDITOR-CHEFE rigoroso de português brasileiro e revisor de roteiros de Reels de tecnologia.
 
-TAREFA: Revise o JSON abaixo e corrija TODOS os erros ortográficos, de acentuação e gramática.
+TAREFA: Revise o JSON abaixo aplicando uma ANÁLISE DE REDAÇÃO COMPLETA e retorne a versão melhorada.
 
-REGRAS:
-- Corrija acentos faltando: você, através, é, está, já, até, revolução, atenção, decisão
-- Corrija palavras em inglês para português: AI→IA, Robotics→Robótica, Computing→Computação
-- NÃO altere o significado ou estrutura do conteúdo
-- NÃO adicione nem remova segmentos
-- Retorne APENAS o JSON corrigido, sem explicações
+CHECKLIST OBRIGATÓRIO:
+1. ✅ FRASES COMPLETAS: NENHUMA frase pode terminar no meio (sem "e...", "que...", "para...", "porque..." pendurados no fim). Se achar truncamento, REESCREVA terminando a ideia.
+2. ✅ ORTOGRAFIA: você, através, é, está, já, até, revolução, atenção, decisão, análise, inteligência
+3. ✅ TRADUÇÃO: AI→IA, Robotics→Robótica, Computing→Computação, Startup→startup (minúsculo)
+4. ✅ RITMO ÁGIL: corte palavras-muleta ("basicamente", "então", "tipo assim", "vale lembrar que"). Cada frase deve ser DIRETA e densa.
+5. ✅ VALOR: se um segmento estiver vago/genérico, reescreva com fato concreto, número, nome de empresa ou exemplo prático.
+6. ✅ FLUIDEZ: cada cena conecta naturalmente com a próxima. Sem repetir ideias.
+7. ❌ NÃO altere número de segmentos. NÃO altere visualKeywords.
+
+Retorne APENAS o JSON corrigido, sem explicações.
 
 JSON para revisar:
 ${JSON.stringify(script, null, 2)}`;
