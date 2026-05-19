@@ -46,36 +46,39 @@ async function generateBroadcastScript(
         model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
-          content: `Você é roteirista EDITORIAL sênior do Neural Update — perfil de Reels sobre IA e tecnologia. Tese, autoridade, zero clichê.
+          content: `Você é roteirista EDITORIAL sênior do Neural Update — perfil de Reels sobre IA e tecnologia. Tese, autoridade, zero clichê. Conteúdo VALIOSO, denso e explicativo (não superficial).
 
 NOTÍCIA:
 TÍTULO: ${title}
 CONTEXTO: ${description}
 
-ESTRUTURA OBRIGATÓRIA (4 cenas, total ~22-26s):
-1. HOOK (2-3s) — MÁXIMO 8 PALAVRAS. Afirmação polêmica ou pergunta provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
-   Exemplos bons: "Isso vai apagar 40% dos empregos.", "A OpenAI te enganou de novo.", "O Google acabou de perder a guerra."
-2. CONTEXTO (5-7s): O fato concreto. Direto, sem rodeios. Nome de empresas/produtos reais.
-3. ANÁLISE (6-8s): TESE clara — POR QUE isso muda algo. 1 dado ou consequência prática.
-4. CONCLUSÃO + CTA (4-6s): Frase forte + CTA acionável CURTO. PROIBIDO "siga", "curta", "compartilhe".
-   CTAs bons: "Salva antes que mudem.", "Comenta: você confia?", "Marca quem precisa ver.", "Link na bio."
+ESTRUTURA OBRIGATÓRIA (6 cenas, total ~45-55s — Reels DENSO de tecnologia):
+1. HOOK (2-3s) — MÁXIMO 8 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
+   Exemplos: "Isso vai apagar 40% dos empregos.", "O Google acabou de perder a guerra."
+2. CONTEXTO (6-8s): O FATO concreto com nome de empresas, produtos e números reais da notícia. Direto.
+3. EXPLICAÇÃO TÉCNICA (8-10s): COMO funciona / o que mudou tecnicamente. Linguagem clara mas específica (modelo, arquitetura, capacidade, métrica).
+4. ANÁLISE (8-10s): TESE — POR QUE isso importa. Consequência prática, comparação com o estado anterior, dado de mercado.
+5. IMPACTO PRÁTICO (7-9s): O que MUDA para o usuário/profissional. Exemplo concreto de uso ou risco.
+6. CTA FORTE (4-6s): Frase de fechamento + CTA acionável. PROIBIDO "siga", "curta", "compartilhe", "link na bio" genérico.
+   CTAs bons: "Salva esse antes que apaguem.", "Comenta: você usaria?", "Marca o dev que precisa ver.", "Quer o passo a passo? Comenta 'quero'."
 
 REGRAS:
-- TOM: autoridade editorial, NUNCA robótico ou genérico
-- PT-BR PERFEITO com acentos (você, é, está, já, até, atenção, decisão, inteligência)
-- 12-30 palavras por segmento (HOOK = máx 8)
-- ZERO inglês na narração
-- imagePrompt: cena cinematográfica em inglês, VERTICAL 9:16, sem texto
+- TOM: autoridade editorial densa, NUNCA robótico, NUNCA superficial. Cada segmento entrega INFORMAÇÃO nova.
+- PT-BR PERFEITO com acentos (você, é, está, já, até, inteligência, decisão)
+- 18-35 palavras por segmento (HOOK = máx 8). NÃO corte frases no meio.
+- ZERO inglês na narração (exceto nomes próprios: OpenAI, ChatGPT, etc)
+- ZERO clichês "futuro já chegou", "revolução da IA", "mudou tudo"
+- imagePrompt: cena cinematográfica EM INGLÊS, VERTICAL 9:16, sem texto
 
-Responda em JSON:
+Responda APENAS JSON válido completo:
 {
   "segments": [
-    { "text": "narração PT-BR", "imagePrompt": "cinematic visual, vertical 9:16, no text" }
+    { "text": "narração PT-BR completa", "imagePrompt": "cinematic visual, vertical 9:16, no text" }
   ]
 }`
         }],
         response_format: { type: "json_object" },
-        max_tokens: 500,
+        max_tokens: 2500,
       }),
     });
 
@@ -86,7 +89,7 @@ Responda em JSON:
         const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
         const parsed = JSON.parse(cleaned);
         if (parsed.segments?.length >= 4) {
-          return parsed.segments.slice(0, 4);
+          return parsed.segments.slice(0, 6);
         }
       }
     }
