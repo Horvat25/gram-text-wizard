@@ -46,24 +46,26 @@ async function generateBroadcastScript(
         model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
-          content: `Você é um roteirista de telejornal de tecnologia para Reels.
-Crie um roteiro de narração editorial para um Reel de ~25 segundos sobre esta notícia:
+          content: `Você é roteirista EDITORIAL sênior do Neural Update — perfil de Reels sobre IA e tecnologia. Tese, autoridade, zero clichê.
 
+NOTÍCIA:
 TÍTULO: ${title}
 CONTEXTO: ${description}
 
-ESTRUTURA OBRIGATÓRIA (4 cenas):
-1. HOOK (3-4s): Frase provocativa de abertura que prende atenção.
-2. CONTEXTO (6-8s): O que aconteceu, conciso e direto. Como um âncora de TV.
-3. ANÁLISE (6-8s): POR QUE isso é importante. Impacto real. Tese clara.
-4. CONCLUSÃO (4-5s): Frase de encerramento forte e provocativa.
+ESTRUTURA OBRIGATÓRIA (4 cenas, total ~22-26s):
+1. HOOK (2-3s) — MÁXIMO 8 PALAVRAS. Afirmação polêmica ou pergunta provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
+   Exemplos bons: "Isso vai apagar 40% dos empregos.", "A OpenAI te enganou de novo.", "O Google acabou de perder a guerra."
+2. CONTEXTO (5-7s): O fato concreto. Direto, sem rodeios. Nome de empresas/produtos reais.
+3. ANÁLISE (6-8s): TESE clara — POR QUE isso muda algo. 1 dado ou consequência prática.
+4. CONCLUSÃO + CTA (4-6s): Frase forte + CTA acionável CURTO. PROIBIDO "siga", "curta", "compartilhe".
+   CTAs bons: "Salva antes que mudem.", "Comenta: você confia?", "Marca quem precisa ver.", "Link na bio."
 
 REGRAS:
-- TOM: Jornalístico editorial, autoridade sem ser robótico
-- JAMAIS mencione URLs, links, "clique", "comente", "compartilhe"
-- 15-40 palavras por segmento
-- PT-BR formal mas acessível
-- imagePrompt: cena cinematográfica em inglês, VERTICAL 9:16, sem texto na imagem
+- TOM: autoridade editorial, NUNCA robótico ou genérico
+- PT-BR PERFEITO com acentos (você, é, está, já, até, atenção, decisão, inteligência)
+- 12-30 palavras por segmento (HOOK = máx 8)
+- ZERO inglês na narração
+- imagePrompt: cena cinematográfica em inglês, VERTICAL 9:16, sem texto
 
 Responda em JSON:
 {

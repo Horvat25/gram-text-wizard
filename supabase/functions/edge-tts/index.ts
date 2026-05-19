@@ -224,11 +224,11 @@ async function generateElevenLabs(text: string, apiKey: string): Promise<Uint8Ar
         // Turbo v2.5 = metade dos créditos do multilingual_v2, qualidade PT-BR ótima
         model_id: "eleven_turbo_v2_5",
         voice_settings: {
-          stability: 0.45,        // expressividade editorial
+          stability: 0.40,        // mais variação prosódica = humano
           similarity_boost: 0.82, // mantém timbre da Sarah
-          style: 0.35,            // estilo presente mas natural
+          style: 0.45,            // inflexão editorial marcada
           use_speaker_boost: true,
-          speed: 1.05,            // ritmo de Reels (5% mais rápido)
+          speed: 1.12,            // ritmo Reels viral (12% + rápido, ainda claro)
         },
       }),
     }
