@@ -185,6 +185,9 @@ const PublicationQueueTab = ({
   const viewDialogRef = useRef<HTMLDivElement | null>(null);
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
+  const [isBatchRendering, setIsBatchRendering] = useState(false);
+  const batchAbortRef = useRef(false);
+  
   
 
   // When opening the preview, always start at the top so the close (X) is reachable on mobile.
