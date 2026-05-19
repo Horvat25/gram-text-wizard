@@ -318,7 +318,7 @@ ${sizeRules}
       }
       if (response.status === 402) {
         console.warn("⚠️ Créditos insuficientes - usando fallback programático");
-        const fallbackCaption = generateFallbackCaption(topic, postType, mediaType);
+        const fallbackCaption = generateFallbackCaption(topic, postType, mediaType, sourceUrl, sourceName);
         return new Response(
           JSON.stringify(fallbackCaption),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -421,6 +421,17 @@ ${sizeRules}
     }
     if (blogBlock) {
       caption = `${caption}\n\n${blogBlock}`;
+    }
+
+    const captionWithoutTagsLength = caption.replace(/#[\p{L}\p{N}_]+/gu, '').trim().length;
+    const tooShallow = isDeepCaption && captionWithoutTagsLength < 650;
+    if (tooShallow) {
+      console.warn(`⚠️ Caption profunda veio rasa (${captionWithoutTagsLength} chars). Usando fallback editorial.`);
+      const fallbackCaption = generateFallbackCaption(topic, postType, mediaType, sourceUrl, sourceName);
+      return new Response(
+        JSON.stringify(fallbackCaption),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
