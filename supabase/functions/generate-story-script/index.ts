@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
-    const { topic, segmentCount = 4, wordsPerSegment = 12, totalDuration = 20, style, brandName } = await req.json();
+    const { topic, segmentCount = 6, wordsPerSegment = 22, totalDuration = 55, style, brandName } = await req.json();
 
     if (!topic) {
       throw new Error("Tópico é obrigatório");
@@ -113,7 +113,7 @@ serve(async (req) => {
             { role: "user", content: userPrompt },
           ],
           response_format: { type: "json_object" },
-          max_tokens: 3500,
+          max_tokens: 5000,
         }),
       });
 
@@ -158,42 +158,40 @@ DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
 Criar vídeos com POSICIONAMENTO e AUTORIDADE — não apenas informativos.
 Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em formato Reels.
 
-⚡ ESTRUTURA EDITORIAL (4 CENAS):
+⚡ ESTRUTURA EDITORIAL (${segmentCount} CENAS, total ~${totalDuration}s — Reels DENSO de tecnologia):
 
-1) 🔥 GANCHO (0-3s) — OBRIGATÓRIO ser impactante:
-   - Use PERGUNTA PROVOCATIVA ou AFIRMAÇÃO POLÊMICA
-   - Exemplos bons: "A OpenAI está mentindo pra você.", "Isso vai acabar com 40% dos empregos em 2 anos.", "Você está usando IA errado."
-   - Exemplos RUINS (PROIBIDO): "Vamos falar sobre...", "Hoje eu quero mostrar...", "Você sabia que..."
-   - O gancho deve criar TENSÃO e CURIOSIDADE imediata
+1) 🔥 GANCHO (cena 1, 2-3s) — MÁXIMO 10 PALAVRAS:
+   - PERGUNTA PROVOCATIVA ou AFIRMAÇÃO POLÊMICA
+   - Exemplos bons: "A OpenAI está mentindo pra você.", "Isso vai apagar 40% dos empregos."
+   - PROIBIDO: "Vamos falar sobre...", "Hoje eu quero mostrar...", "Você sabia que..."
 
-2) 📐 CONTEXTO + TESE (3-8s):
-   - Explique o fato brevemente
-   - Declare sua TESE: "E isso importa porque..." / "O problema real é..."
-   - NÃO seja neutro — tome uma posição clara
+2) 📐 CONTEXTO + FATO CONCRETO (cena 2):
+   - Nome real de empresa/produto/pessoa + número, data ou dado da notícia
+   - COMO funciona tecnicamente (1 frase explicativa, sem jargão vazio)
 
-3) 💡 PROVA + IMPACTO (8-15s):
-   - 1 argumento forte que sustente a tese
-   - Use comparação, dado concreto ou exemplo prático
-   - Mostre POR QUE isso muda algo na vida do espectador
+3) 💡 TESE + ARGUMENTO (cenas do meio):
+   - Tome POSIÇÃO clara — "O problema real é..." / "E isso importa porque..."
+   - Cada cena sustenta com 1 comparação, dado ou exemplo prático
+   - Cada cena entrega informação NOVA — nunca repita ideias
 
-4) 🎬 CONCLUSÃO + CTA ACIONÁVEL (final):
-   - PRIMEIRA METADE: reflexão forte, previsão ousada ou pergunta marcante
-   - SEGUNDA METADE: 1 CTA CURTO e ESPECÍFICO ligado ao tema (NUNCA genérico "siga/curta/compartilhe")
-   - Exemplos BONS de CTA editorial:
-     • "Salva esse vídeo antes que mudem tudo."
-     • "Comenta aqui: você confia ou não?"
-     • "Marca alguém que precisa ver isso hoje."
-     • "Link na bio pra ler a análise completa."
-   - Exemplos RUINS (PROIBIDO): "Siga para mais", "Curta e compartilhe", "Deixe seu like"
-   - A frase do CTA deve parecer natural, não comercial
+4) 🎯 IMPACTO PRÁTICO (penúltima cena):
+   - O que MUDA na vida do espectador (dev, profissional, usuário)
+   - Exemplo concreto de uso, oportunidade ou risco real
+
+5) 🎬 CONCLUSÃO + CTA ACIONÁVEL (última cena):
+   - Reflexão forte OU previsão ousada
+   - 1 CTA CURTO ligado ao tema (NUNCA "siga", "curta", "compartilhe", "link na bio" genéricos)
+   - Bons: "Salva antes que apaguem.", "Comenta: você usaria?", "Marca o dev que precisa ver."
 
 📝 REGRAS DE TEXTO:
-- Frases curtas (8-16 palavras por segmento)
+- Cada cena: ${wordsPerSegment}-${wordsPerSegment + 6} palavras (GANCHO = máx 10)
+- NÃO corte frases no meio — cada segmento é uma frase COMPLETA com começo, meio e fim
 - Português brasileiro PERFEITO com acentuação correta
-- Tom: confiante, direto, inteligente — NUNCA genérico
-- PROIBIDO inglês — tudo em PT-BR
+- Tom: confiante, denso, EXPLICATIVO — NUNCA superficial, NUNCA genérico
+- PROIBIDO inglês — tudo em PT-BR (exceto nomes próprios)
 - PROIBIDO anos anteriores a ${currentYear}
-- Acentos obrigatórios: você, através, é, está, já, até, revolução, atenção, decisão, diagnóstico, automático, análise, possível, próximo, inteligência, tecnologia, saúde
+- ZERO clichês: "futuro chegou", "revolução da IA", "mudou tudo"
+- Acentos obrigatórios: você, através, é, está, já, até, revolução, atenção, decisão, análise, possível, inteligência
 
 🖼️ KEYWORDS VISUAIS CINEMATOGRÁFICAS (OBRIGATÓRIO EM INGLÊS):
 Crie "visualKeywords": array de 2-4 termos ESPECÍFICOS em INGLÊS para busca no Pexels/Unsplash.
@@ -229,14 +227,14 @@ ESPECIFICAÇÕES:
 - Ano: ${currentYear} — NÃO mencione anos anteriores
 
 ⚡ CHECKLIST OBRIGATÓRIO:
-□ Cena 1 começa com pergunta provocativa OU afirmação polêmica (NUNCA "Vamos falar sobre...")
-□ Cena 2 declara uma TESE clara sobre o tema
-□ Cena 3 sustenta com 1 argumento/dado concreto
-□ Cena 4 termina com reflexão FORTE + CTA específico e acionável (NUNCA "Siga para mais")
+□ Cena 1 começa com pergunta provocativa OU afirmação polêmica (MÁX 10 palavras)
+□ Cenas do meio entregam fato concreto + tese + argumento (CADA UMA com info NOVA)
+□ Penúltima cena traz impacto prático na vida do espectador
+□ Última cena fecha com reflexão FORTE + CTA específico e acionável (NUNCA "Siga para mais")
+□ Total de ${segmentCount} cenas — NÃO entregue menos
+□ Cada cena ${wordsPerSegment}-${wordsPerSegment + 6} palavras, frase COMPLETA
 □ Todos os textos em PT-BR com ortografia perfeita
 □ visualKeywords são cinematográficas e específicas (NUNCA genéricas)
-
-PRIORIDADE: Melhor 2-3 imagens FORTES do que 4-5 genéricas. Se necessário, repita a mesma keyword cinematográfica forte em mais de uma cena.
 
 Responda APENAS com JSON:
 {

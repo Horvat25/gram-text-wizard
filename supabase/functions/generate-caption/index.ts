@@ -317,7 +317,12 @@ serve(async (req) => {
 - NUNCA mencione anos passados (2023, 2024, 2025) como se fossem atuais
 - Sempre use referências temporais corretas para ${currentYear}
 - Português brasileiro PERFEITO (sem erros ortográficos)
-- NÃO use termos em inglês - tudo deve ser em português brasileiro`;
+- NÃO use termos em inglês - tudo deve ser em português brasileiro
+
+📣 DIVULGAÇÃO OBRIGATÓRIA (encaixe natural no último parágrafo, NUNCA solto):
+- Mencione o blog "Neural Update" (neural-update.com.br) como fonte de aprofundamento
+- Termine com CTA para seguir @neuralupdate no Instagram
+- Exemplos de fechamento natural: "Análise completa no Neural Update — segue @neuralupdate pra não perder a próxima.", "Quer entender mais? Tem desdobramento no blog Neural Update e todo dia uma nova no @neuralupdate."`;
     
     if (customInstructions) {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;

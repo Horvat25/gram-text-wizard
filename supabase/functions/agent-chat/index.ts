@@ -1245,10 +1245,10 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         },
         body: JSON.stringify({
           topic,
-          segmentCount: 5,
-          wordsPerSegment: 20,
-          totalDuration: 40,
-          style: 'editorial denso de tecnologia, defenda uma tese com dados concretos, explique COMO funciona e POR QUE importa, CTA acionável forte'
+          segmentCount: 6,
+          wordsPerSegment: 22,
+          totalDuration: 55,
+          style: 'editorial denso de tecnologia, defenda uma tese com dados concretos, explique COMO funciona e POR QUE importa, divulga o blog Neural Update e termina com CTA acionável para seguir @neuralupdate'
         })
       }, __fast ? 6500 : 18000, 'generate-story-script');
       
