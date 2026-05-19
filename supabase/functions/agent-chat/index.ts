@@ -1099,9 +1099,136 @@ async function executeUpdateSettings(supabase: any, userId: string, workspaceId:
   };
 }
 
+const normalizeIntentText = (value: string) =>
+  (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+const cleanNarratedVideoTopic = (message: string) => {
+  const topicMatch = message.match(/(?:sobre|tema|assunto)\s+(.+)$/i);
+  const rawTopic = topicMatch?.[1]
+    || message
+      .replace(/^(cria|crie|faz|faca|gera|gere|monta|monte|produz|prepare|posta|publique|publica|coloca|bota|deixa)\s+/i, '')
+      .replace(/\b(um|uma|o|os|a|as|pra mim|para mim|na fila|já|ja|agora|por favor|renderizar|renderiza|gerar)\b/gi, ' ')
+      .replace(/\b(reels?|vídeo|video|videos|shorts?|stories?)\b/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  return rawTopic || 'tecnologia e inovação';
+};
+
+const buildCostAwareTechScript = (topic: string) => {
+  const topicClean = (topic || 'tecnologia e inovação').replace(/\s+/g, ' ').trim();
+  const shortTopic = topicClean.length > 52 ? topicClean.substring(0, 52).replace(/\s\S*$/, '') : topicClean;
+  const normalized = normalizeIntentText(topicClean);
+  const isUsChina = /(eua|estados unidos|china|pequim|washington|viagem|viajem)/.test(normalized);
+
+  if (isUsChina) {
+    return {
+      title: 'EUA x China: a viagem por trás dos chips',
+      thesis: 'A agenda entre EUA e China é menos sobre diplomacia tradicional e mais sobre quem controla a infraestrutura da IA.',
+      segments: [
+        {
+          text: 'Essa viagem dos EUA à China não é turismo: é negociação sobre chips, IA e poder industrial.',
+          imagePrompt: 'US China diplomacy meeting semiconductor chips, cinematic newsroom, vertical 9:16, no text',
+          visualKeywords: ['US China diplomacy meeting', 'semiconductor chip macro', 'global trade route map'],
+        },
+        {
+          text: 'O ponto central é simples: quem controla semicondutores avançados controla datacenters, fábricas e modelos de IA.',
+          imagePrompt: 'semiconductor wafer macro datacenter corridor, dramatic blue light, vertical 9:16, no text',
+          visualKeywords: ['semiconductor wafer macro', 'datacenter corridor blue lights', 'AI server rack close up'],
+        },
+        {
+          text: 'Washington quer limitar tecnologia sensível; Pequim quer reduzir dependência e acelerar sua cadeia própria.',
+          imagePrompt: 'geopolitical technology tension Washington Beijing skyline, cinematic split light, vertical 9:16, no text',
+          visualKeywords: ['Washington Beijing skyline', 'technology export controls', 'factory robotics assembly line'],
+        },
+        {
+          text: 'Para o mercado, o recado é prático: hardware, logística e nuvem ficaram mais estratégicos que software bonito.',
+          imagePrompt: 'cargo containers microchips cloud servers supply chain, cinematic dark gold, vertical 9:16, no text',
+          visualKeywords: ['cargo containers technology supply chain', 'cloud server infrastructure', 'microchip logistics'],
+        },
+        {
+          text: 'Observa os próximos acordos de chips e exportação. Comenta: isso vira trégua técnica ou guerra fria digital?',
+          imagePrompt: 'global digital cold war hologram map, dramatic newsroom style, vertical 9:16, no text',
+          visualKeywords: ['global digital cold war', 'semiconductor export agreement', 'hologram world map'],
+        },
+      ],
+      totalDuration: 40,
+      _fallback: true,
+      _costAware: true,
+    };
+  }
+
+  return {
+    title: `${shortTopic}: o detalhe que muda tudo`,
+    thesis: `O tema ${shortTopic} importa porque revela uma mudança prática na infraestrutura da tecnologia, não só uma tendência de momento.`,
+    segments: [
+      {
+        text: `Se você acha que ${shortTopic} é só mais uma notícia tech, o ponto principal passou batido.`,
+        imagePrompt: `specific technology breaking news about ${shortTopic}, cinematic newsroom, vertical 9:16, no text`,
+        visualKeywords: [`${shortTopic} technology news`, 'cinematic newsroom screens', 'future technology infrastructure'],
+      },
+      {
+        text: 'A tese é simples: a tecnologia vencedora não é a mais bonita, é a que vira infraestrutura invisível.',
+        imagePrompt: 'datacenter infrastructure servers dramatic corridor, vertical 9:16, no text',
+        visualKeywords: ['datacenter infrastructure servers', 'microchip macro detail', 'network cables close up'],
+      },
+      {
+        text: 'Quando empresas movem capital para isso, elas não estão testando moda; estão comprando vantagem operacional.',
+        imagePrompt: 'technology investment control room market data, cinematic dark lighting, vertical 9:16, no text',
+        visualKeywords: ['market data control room', 'technology investment boardroom', 'server rack blue lights'],
+      },
+      {
+        text: 'O impacto prático aparece em custo, velocidade, privacidade e no poder de quem controla a distribuição.',
+        imagePrompt: 'digital privacy speed cost infrastructure visualization, cinematic, vertical 9:16, no text',
+        visualKeywords: ['digital privacy infrastructure', 'fiber optic network macro', 'cloud computing control room'],
+      },
+      {
+        text: 'Salva este tema e observa os próximos movimentos. A próxima virada vai parecer pequena antes de ficar óbvia.',
+        imagePrompt: 'future technology horizon analyst desk, dramatic golden light, vertical 9:16, no text',
+        visualKeywords: ['future technology horizon', 'analyst desk monitors', 'dramatic innovation silhouette'],
+      },
+    ],
+    totalDuration: 40,
+    _fallback: true,
+    _costAware: true,
+  };
+};
+
+const buildNarratedVideoCaption = (topic: string, title: string) =>
+  `🎬 ${title}\n\n${topic} não é só notícia: é um sinal de como infraestrutura, dados e poder tecnológico estão se reorganizando em tempo real.\n\nNo vídeo, a leitura é direta: menos hype, mais consequência prática para IA, chips, nuvem e mercado.\n\nComenta: isso acelera uma trégua técnica ou abre uma nova fase da disputa digital?`;
+
+const buildDirectNarratedVideoArgs = (latestUserMessage: string) => {
+  const normalized = normalizeIntentText(latestUserMessage);
+  const topic = cleanNarratedVideoTopic(latestUserMessage);
+  const wantsPublishNow = /(poste|postar|publica|publique|publicar)/.test(normalized);
+
+  return {
+    topic,
+    caption: buildNarratedVideoCaption(topic, buildCostAwareTechScript(topic).title),
+    hashtags: ['#tecnologia', '#ia', '#chips', '#geopolitica', '#reels'],
+    platforms: ['instagram'],
+    style: 'editorial tech direto, explicativo, com tese e CTA acionável',
+    publish_now: wantsPublishNow,
+    __fast: true,
+  };
+};
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number, label: string) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(`${label} timeout`), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Execute create_narrated_video - creates a video post with script for frontend processing
 async function executeCreateNarratedVideo(supabase: any, userId: string, workspaceId: string, args: any) {
-  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style, article_url, article_image_url } = args;
+  const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style, article_url, article_image_url, __fast } = args;
   
   console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
   
@@ -1110,7 +1237,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     let script: any = null;
     
     try {
-      const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
+      const scriptResponse = await fetchWithTimeout(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1123,7 +1250,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
           totalDuration: 40,
           style: 'editorial denso de tecnologia, defenda uma tese com dados concretos, explique COMO funciona e POR QUE importa, CTA acionável forte'
         })
-      });
+      }, __fast ? 6500 : 18000, 'generate-story-script');
       
       if (scriptResponse.ok) {
         script = await scriptResponse.json();
@@ -1138,19 +1265,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     // FALLBACK: Generate local script template when AI credits are exhausted
     if (!script || !script.segments || script.segments.length === 0) {
       console.log('[VIDEO] Using LOCAL script fallback for topic:', topic);
-      const topicClean = topic.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').trim();
-      const shortTopic = topicClean.length > 40 ? topicClean.substring(0, 40).replace(/\s\S*$/, '') : topicClean;
-      script = {
-        title: `${shortTopic}: O Futuro Chegou`,
-        segments: [
-          { text: `Isso vai mudar tudo sobre ${shortTopic}.`, imagePrompt: `futuristic technology dramatic reveal, cinematic dark background, neon accents` },
-          { text: `Especialistas confirmam: é real e irreversível.`, imagePrompt: `innovation breakthrough, holographic displays, laboratory environment` },
-          { text: `Empresas inteiras já estão sendo transformadas.`, imagePrompt: `global market transformation, dramatic city skyline, data visualization` },
-          { text: `A pergunta é: você está preparado?`, imagePrompt: `future vision, person silhouette facing horizon, dramatic golden hour lighting` },
-        ],
-        totalDuration: 16,
-        _fallback: true,
-      };
+      script = buildCostAwareTechScript(topic);
     }
     
     // Step 2: Get thumbnail from Pexels (FREE, no AI credits needed)
@@ -1158,7 +1273,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     if (script.segments && script.segments.length > 0) {
       try {
         // Use search-images-for-video which uses Pexels/Unsplash (FREE)
-        const imgSearchResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
+        const imgSearchResponse = await fetchWithTimeout(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1168,7 +1283,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
             topic: topic,
             segments: [script.segments[0]],
           })
-        });
+        }, 5000, 'search-images-for-video');
         
         if (imgSearchResponse.ok) {
           const imgResult = await imgSearchResponse.json();
@@ -1199,7 +1314,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     const postData = {
       user_id: userId,
       workspace_id: workspaceId,
-      caption: caption || `🎬 ${script.title}\n\n${topic}`,
+      caption: caption || buildNarratedVideoCaption(topic, script.title),
       hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
       post_type: 'entretenimento',
       platforms: platforms || ['instagram', 'tiktok'],
@@ -1215,6 +1330,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         article_url: article_url || null,
         article_image_url: article_image_url || null,
         needs_processing: true,
+        render_status: 'queued',
         created_by_agent: true,
         publish_after_render: publish_now === true,
         requested_schedule: effectiveSchedule,
@@ -2775,7 +2891,7 @@ async function executeCreateMarketingVideo(supabase: any, userId: string, worksp
     const topic = `Review e apresentação do ${selectedAffiliate.product_name}: ${productInfo.substring(0, 300)}`;
     const caption = `🔥 Você precisa conhecer o ${selectedAffiliate.product_name}!\n\n${selectedAffiliate.description || 'Uma ferramenta incrível que vai transformar sua produtividade.'}\n\n👇 Confira o link:\n🔗 ${selectedAffiliate.affiliate_url}\n\n#marketing #tecnologia #review #dicatech`;
     
-    const videoResult = await executeCreateNarratedVideo(supabase, userId, workspaceId, {
+    const videoResult: any = await executeCreateNarratedVideo(supabase, userId, workspaceId, {
       topic,
       caption,
       hashtags: ['#marketing', '#tecnologia', '#review', '#dicatech', '#afiliado'],
@@ -2795,18 +2911,19 @@ async function executeCreateMarketingVideo(supabase: any, userId: string, worksp
         .eq('id', selectedAffiliate.id);
       
       // Update post type to 'afiliado'
-      if (videoResult.postId) {
+      const videoPostId = videoResult.postId || videoResult.post?.id;
+      if (videoPostId) {
         await supabase
           .from('posts')
           .update({ post_type: 'afiliado' })
-          .eq('id', videoResult.postId);
+          .eq('id', videoPostId);
       }
     }
     
     return {
       success: true,
       message: `🎬💰 Vídeo de marketing criado para **${selectedAffiliate.product_name}**!\n\n📎 Link de afiliado incluído na legenda\n🔗 ${selectedAffiliate.affiliate_url}\n\n${videoResult?.message || 'Vídeo em processamento...'}`,
-      postId: videoResult?.postId,
+      postId: videoResult?.postId || videoResult?.post?.id,
       affiliateProduct: selectedAffiliate.product_name
     };
   } catch (error: any) {
@@ -3067,6 +3184,30 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const latestUserMessageEarly =
+      [...validMessages].reverse().find((message) => message.role === 'user')?.content || '';
+    const normalizedLatestUserMessageEarly = normalizeIntentText(latestUserMessageEarly);
+    const asksToCreateSomethingEarly = /(cria|crie|faz|faca|gera|gere|monta|monte|produz|prepare|posta|publique|publica|coloca|bota|deixa)/.test(normalizedLatestUserMessageEarly);
+    const asksForVideoEarly = /(reels?|video|videos|shorts?|stories?)/.test(normalizedLatestUserMessageEarly);
+    const asksForMarketingEarly = /(marketing|afiliad)/.test(normalizedLatestUserMessageEarly);
+
+    if (asksToCreateSomethingEarly && asksForVideoEarly && !asksForMarketingEarly) {
+      console.log('[agent-chat] Fast path: explicit Reels request detected, skipping tool-selection roundtrip');
+      const directResult = await executeCreateNarratedVideo(
+        supabase,
+        userId,
+        workspaceId,
+        buildDirectNarratedVideoArgs(latestUserMessageEarly)
+      );
+
+      return new Response(JSON.stringify({
+        content: directResult.success
+          ? `Pronto! ${directResult.message}`
+          : directResult.message || 'Não consegui criar o Reels agora.',
+        actions: [{ tool: 'create_narrated_video', ...directResult }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+    }
 
     // Fetch context using workspaceId
     const { data: context } = await supabase
@@ -3663,7 +3804,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
       });
 
       if (!finalResponse.ok) {
-        const actionSummaries = executedActions.map(a => {
+        const actionSummaries = (executedActions as any[]).map((a: any) => {
           if (a.tool === 'create_rss_news_post' && a.success) {
             return `Criei um post de notícia sobre ${a.topic || 'tech'} com a headline "${a.headline || 'impactante'}"! ${a.scheduled ? `Agendei pra ${a.scheduled_for_brasilia || 'depois'}.` : ''}`;
           }
