@@ -231,7 +231,7 @@ ESPECIFICAÇÕES:
 □ Cena 1 começa com pergunta provocativa OU afirmação polêmica (NUNCA "Vamos falar sobre...")
 □ Cena 2 declara uma TESE clara sobre o tema
 □ Cena 3 sustenta com 1 argumento/dado concreto
-□ Cena 4 termina com reflexão forte (NUNCA "Siga para mais")
+□ Cena 4 termina com reflexão FORTE + CTA específico e acionável (NUNCA "Siga para mais")
 □ Todos os textos em PT-BR com ortografia perfeita
 □ visualKeywords são cinematográficas e específicas (NUNCA genéricas)
 
