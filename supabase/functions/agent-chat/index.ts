@@ -1118,10 +1118,10 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         },
         body: JSON.stringify({
           topic,
-          segmentCount: 4,
-          wordsPerSegment: 10,
-          totalDuration: 16,
-          style: 'editorial opinativo, defenda uma tese, impacto real'
+          segmentCount: 6,
+          wordsPerSegment: 22,
+          totalDuration: 50,
+          style: 'editorial denso de tecnologia, defenda uma tese com dados concretos, explique COMO funciona e POR QUE importa, CTA acionável forte'
         })
       });
       
