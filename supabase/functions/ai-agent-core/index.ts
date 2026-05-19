@@ -1613,8 +1613,9 @@ function getOptimalScheduleTime(): string {
   const brasiliaTime = new Date(now.getTime() + brasiliaOffset);
   const hour = brasiliaTime.getHours();
   
-  // Schedule for next optimal posting window
-  const optimalHours = [8, 12, 17, 20];
+  // Horários ótimos baseados em DADOS REAIS de alcance (analisado em 19/05/2026)
+  // 15h e 20h tiveram 10-30x mais reach que 9h/13h/17h/21h. 11h e 18h ficam de reserva.
+  const optimalHours = [11, 15, 18, 20];
   let nextHour = optimalHours.find(h => h > hour) || optimalHours[0];
   
   const scheduled = new Date(brasiliaTime);
