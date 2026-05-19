@@ -175,10 +175,16 @@ Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em 
    - Use comparação, dado concreto ou exemplo prático
    - Mostre POR QUE isso muda algo na vida do espectador
 
-4) 🎬 CONCLUSÃO PROVOCATIVA (final):
-   - NÃO use "Siga para mais" ou "Curta e compartilhe"
-   - Termine com: reflexão forte, previsão ousada, ou pergunta que fica na cabeça
-   - Exemplos: "A questão não é SE isso vai acontecer. É se você vai estar preparado.", "Daqui a 5 anos, você vai lembrar desse momento."
+4) 🎬 CONCLUSÃO + CTA ACIONÁVEL (final):
+   - PRIMEIRA METADE: reflexão forte, previsão ousada ou pergunta marcante
+   - SEGUNDA METADE: 1 CTA CURTO e ESPECÍFICO ligado ao tema (NUNCA genérico "siga/curta/compartilhe")
+   - Exemplos BONS de CTA editorial:
+     • "Salva esse vídeo antes que mudem tudo."
+     • "Comenta aqui: você confia ou não?"
+     • "Marca alguém que precisa ver isso hoje."
+     • "Link na bio pra ler a análise completa."
+   - Exemplos RUINS (PROIBIDO): "Siga para mais", "Curta e compartilhe", "Deixe seu like"
+   - A frase do CTA deve parecer natural, não comercial
 
 📝 REGRAS DE TEXTO:
 - Frases curtas (8-16 palavras por segmento)
