@@ -769,6 +769,7 @@ export default function ContentTestTab() {
         </div>
       ) : (
         <>
+          <ElevenLabsVoiceTest />
           <AgentVisionPanel />
 
           <div className="space-y-1">
