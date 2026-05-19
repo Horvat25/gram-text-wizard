@@ -73,9 +73,9 @@ export const VIDEO_CONFIG = {
   BRAND_COLOR_BG_DARK: '#1a1040',
 
   // ─── TTS ──────────────────────────────────────────
-  /** Voz ElevenLabs: Sarah (multilingual_v2) */
+  /** Voz ElevenLabs: Sarah (turbo_v2_5 = metade dos créditos, ótima qualidade PT-BR) */
   ELEVENLABS_VOICE_ID: 'EXAVITQu4vr4xnSDxMaL',
-  ELEVENLABS_MODEL: 'eleven_multilingual_v2',
+  ELEVENLABS_MODEL: 'eleven_turbo_v2_5',
 
   // ─── Script Generation ────────────────────────────
   SCRIPT_STYLE: 'informativo, envolvente, com começo-meio-fim',
