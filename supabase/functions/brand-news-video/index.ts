@@ -399,6 +399,34 @@ Deno.serve(async (req) => {
     const totalDuration = segments.reduce((sum, s) => sum + (s.audioDuration || 5), 0);
     console.log(`[BRAND-VIDEO] Duração total: ${totalDuration}s`);
 
+    // ─── STEP 4.5: Gerar legenda enriquecida (com blog link + CTA) ───
+    let enrichedCaption: string | null = null;
+    let enrichedHashtags: string[] | null = null;
+    try {
+      const capRes = await fetch(`${supabaseUrl}/functions/v1/generate-caption`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
+        body: JSON.stringify({
+          topic: `${title}\n\n${description || ""}`.slice(0, 1200),
+          postType: "noticia",
+          mediaType: "reel",
+          sourceUrl: articleUrl || null,
+          sourceName: "Atualização Neural",
+          customInstructions: "Reels: legenda MÉDIA (500-800 chars), 3 parágrafos, complementa o vídeo (não repete), entrega 1 dado/contexto que o vídeo não disse. OBRIGATÓRIO terminar com '📖 Aprofunda no blog 👉 neural-update.com.br' + '🔔 Segue @neuralupdate' + pergunta provocadora curta. Sem 'arraste pro lado', sem 'assista até o final'.",
+        }),
+      });
+      if (capRes.ok) {
+        const capData = await capRes.json();
+        enrichedCaption = capData.caption || null;
+        enrichedHashtags = capData.hashtags || null;
+        console.log(`[BRAND-VIDEO] ✅ Legenda enriquecida: ${enrichedCaption?.length || 0} chars`);
+      } else {
+        console.warn(`[BRAND-VIDEO] generate-caption falhou: ${capRes.status}`);
+      }
+    } catch (e) {
+      console.warn(`[BRAND-VIDEO] generate-caption erro:`, e);
+    }
+
     // ─── STEP 5: Try server-side video composition ───
     let finalVideoUrl: string | null = null;
 
@@ -414,10 +442,15 @@ Deno.serve(async (req) => {
       .map(s => s.brandedImageUrl || s.imageUrl)
       .filter(Boolean);
 
+    const captionUpdate: any = {};
+    if (enrichedCaption) captionUpdate.caption = enrichedCaption;
+    if (enrichedHashtags && enrichedHashtags.length) captionUpdate.hashtags = enrichedHashtags;
+
     if (finalVideoUrl) {
       // Full video composed
       console.log(`[BRAND-VIDEO] ✅ VÍDEO COMPLETO: ${finalVideoUrl}`);
       await supabase.from("posts").update({
+        ...captionUpdate,
         video_url: finalVideoUrl,
         image_url: brandedImages[0] || null,
         carousel_images: brandedImages,
@@ -449,6 +482,7 @@ Deno.serve(async (req) => {
       // Assets ready, needs client-side composition
       console.log(`[BRAND-VIDEO] ⚡ Assets prontos para composição client-side`);
       await supabase.from("posts").update({
+        ...captionUpdate,
         image_url: brandedImages[0] || null,
         carousel_images: brandedImages,
         status: "draft",
