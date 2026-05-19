@@ -535,8 +535,32 @@ const PublicationQueueTab = ({
       {pendingReelsCount > 0 && (
         <Alert>
           <Film className="h-4 w-4" />
-          <AlertDescription>
-            <strong>{pendingReelsCount} reels</strong> aguardando renderização manual. Use <strong>Gerar Vídeo</strong> em cada rascunho.
+          <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span>
+              <strong>{pendingReelsCount} reels</strong> aguardando renderização. Renderize um por um ou em lote.
+            </span>
+            <div className="flex gap-2">
+              {isBatchRendering ? (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => { batchAbortRef.current = true; }}
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Cancelar lote
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="default"
+                  disabled={isRendering}
+                  onClick={handleRenderAll}
+                >
+                  <Film className="h-3 w-3 mr-1" />
+                  Renderizar todos ({pendingReelsCount})
+                </Button>
+              )}
+            </div>
           </AlertDescription>
         </Alert>
       )}
