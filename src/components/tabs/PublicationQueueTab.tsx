@@ -295,6 +295,54 @@ const PublicationQueueTab = ({
     }
   };
 
+  // Renderiza TODOS os reels pendentes sequencialmente (um por vez, pois o pipeline é pesado)
+  const handleRenderAll = async () => {
+    const pending = queuedPosts.filter(p => needsVideoRendering(p));
+    if (pending.length === 0) {
+      toast.info("Nenhum reel pendente para renderizar");
+      return;
+    }
+    if (!confirm(`Renderizar ${pending.length} reels em sequência? Isso pode demorar alguns minutos. Eles serão agendados automaticamente nos melhores horários.`)) {
+      return;
+    }
+    setIsBatchRendering(true);
+    batchAbortRef.current = false;
+    let success = 0;
+    let failed = 0;
+    for (let i = 0; i < pending.length; i++) {
+      if (batchAbortRef.current) break;
+      const post = pending[i];
+      toast.info(`Renderizando ${i + 1}/${pending.length}...`, { duration: 3000 });
+      try {
+        // renderVideo retorna após enfileirar o pipeline; aguardamos isRendering virar false via polling do contexto
+        await renderVideo(post.id);
+        // Espera o ciclo terminar (max 5 min por vídeo)
+        const startedAt = Date.now();
+        while (Date.now() - startedAt < 5 * 60 * 1000) {
+          await new Promise(r => setTimeout(r, 2000));
+          // Verifica no banco se já tem video_url ou se mudou para falha
+          const { data: fresh } = await supabase
+            .from('posts')
+            .select('video_url, status')
+            .eq('id', post.id)
+            .maybeSingle();
+          if (fresh?.video_url) { success++; break; }
+          if (fresh?.status === 'render_failed') { failed++; break; }
+        }
+      } catch (e) {
+        console.error('[BatchRender] erro:', e);
+        failed++;
+      }
+    }
+    setIsBatchRendering(false);
+    if (batchAbortRef.current) {
+      toast.warning(`Renderização em lote cancelada. ${success} ok, ${failed} falharam.`);
+    } else {
+      toast.success(`Lote concluído: ${success} renderizados, ${failed} falharam.`);
+    }
+  };
+
+
   const getStatusColor = (status: string, isOverdue: boolean = false) => {
     if (isOverdue) return "bg-destructive text-destructive-foreground";
     switch (status) {
