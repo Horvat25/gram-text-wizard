@@ -78,7 +78,7 @@ Responda APENAS JSON válido completo:
 }`
         }],
         response_format: { type: "json_object" },
-        max_tokens: 1800,
+        max_tokens: 2800,
       }),
     });
 
@@ -88,8 +88,8 @@ Responda APENAS JSON válido completo:
       if (content) {
         const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
         const parsed = JSON.parse(cleaned);
-        if (parsed.segments?.length >= 4) {
-          return parsed.segments.slice(0, 5);
+        if (parsed.segments?.length >= 5) {
+          return parsed.segments.slice(0, 6);
         }
       }
     }
