@@ -93,6 +93,7 @@ export default function AgentGenieView() {
     reschedulePost,
     deletePost,
     updatePost,
+    fetchPosts,
   } = usePosts();
   
   const [igMessages, setIgMessages] = useState<Message[]>([]);
@@ -266,6 +267,9 @@ export default function AgentGenieView() {
 
       setMsgs(prev => [...prev, assistantMessage]);
       saveMessage(assistantMessage, platform);
+      if (executedActions.some((action: any) => action?.post?.id || action?.post_id)) {
+        await fetchPosts();
+      }
     } catch (error) {
       console.error('Error sending message to agent:', error);
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
