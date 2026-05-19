@@ -3184,6 +3184,30 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    const latestUserMessageEarly =
+      [...validMessages].reverse().find((message) => message.role === 'user')?.content || '';
+    const normalizedLatestUserMessageEarly = normalizeIntentText(latestUserMessageEarly);
+    const asksToCreateSomethingEarly = /(cria|crie|faz|faca|gera|gere|monta|monte|produz|prepare|posta|publique|publica|coloca|bota|deixa)/.test(normalizedLatestUserMessageEarly);
+    const asksForVideoEarly = /(reels?|video|videos|shorts?|stories?)/.test(normalizedLatestUserMessageEarly);
+    const asksForMarketingEarly = /(marketing|afiliad)/.test(normalizedLatestUserMessageEarly);
+
+    if (asksToCreateSomethingEarly && asksForVideoEarly && !asksForMarketingEarly) {
+      console.log('[agent-chat] Fast path: explicit Reels request detected, skipping tool-selection roundtrip');
+      const directResult = await executeCreateNarratedVideo(
+        supabase,
+        userId,
+        workspaceId,
+        buildDirectNarratedVideoArgs(latestUserMessageEarly)
+      );
+
+      return new Response(JSON.stringify({
+        content: directResult.success
+          ? `Pronto! ${directResult.message}`
+          : directResult.message || 'Não consegui criar o Reels agora.',
+        actions: [{ tool: 'create_narrated_video', ...directResult }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+    }
+
     // Fetch context using workspaceId
     const { data: context } = await supabase
       .from('agent_context')
