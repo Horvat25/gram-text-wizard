@@ -5,6 +5,64 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// 🚫 Hashtags SUPER-SATURADAS (bilhões de posts) — IG não distribui, viram lixo
+// Banidas: removidas e substituídas por equivalentes de nicho.
+const BANNED_HASHTAGS = new Set([
+  'tecnologia', 'inovacao', 'inovação', 'ia', 'tech', 'futuro', 'noticias', 'notícias',
+  'inteligenciaartificial', 'inteligênciaartificial', 'ai', 'techbrasil', 'brasil',
+  'instagram', 'instagood', 'fyp', 'viral', 'foryou', 'amor', 'love', 'follow',
+  'like4like', 'business', 'empreendedorismo', 'marketing', 'digital', 'startup',
+]);
+
+// 🎯 Hashtags de NICHO (poucos posts, audiência engajada) — IG distribui
+const NICHE_TECH_HASHTAGS = [
+  'PromptEngineering', 'LLMs', 'AgentesIA', 'GenAI', 'OpenSourceAI',
+  'NeuralNetworks', 'Robotica2026', 'IAGenerativa', 'IAEnterprise',
+  'AutomacaoIA', 'EdgeAI', 'IADevs', 'TechCriticism', 'NeuralUpdate',
+  'IAnoBrasil', 'IAParaNegocios', 'FuturoDoTrabalho', 'AIethics',
+];
+
+// 🎯 Hashtags MÉDIAS (centenas de milhares de posts) — bom equilíbrio
+const MEDIUM_TECH_HASHTAGS = [
+  'TecnologiaBR', 'NoticiasDeTech', 'MundoDigital', 'CienciaETecnologia',
+  'TransformacaoDigital', 'Cibersseguranca', 'BigData', 'CloudComputing',
+];
+
+// Receita ideal: 2 médias + 5 nicho (total 7) — Instagram 2026 favorece menos hashtags mas relevantes
+function sanitizeAndEnrichHashtags(raw: string[]): string[] {
+  const normalize = (t: string) => t.replace(/^#+/, '').replace(/[.,!?;:]$/, '').trim();
+  const incoming = (raw || []).map(normalize).filter(Boolean);
+  // Remove banidas (case-insensitive)
+  const filtered = incoming.filter(t => !BANNED_HASHTAGS.has(t.toLowerCase()));
+  // Dedup preservando ordem
+  const seen = new Set<string>();
+  const dedup: string[] = [];
+  for (const t of filtered) {
+    const k = t.toLowerCase();
+    if (!seen.has(k)) { seen.add(k); dedup.push(t); }
+  }
+  // Garante até 2 médias e completa com nicho
+  const result: string[] = [];
+  const lower = new Set(dedup.map(t => t.toLowerCase()));
+  // Mantém até 2 das incoming que sejam médias ou específicas (não-banidas)
+  for (const t of dedup) {
+    if (result.length >= 5) break;
+    result.push(t);
+  }
+  // Completa com nicho até 7 no total
+  for (const n of NICHE_TECH_HASHTAGS) {
+    if (result.length >= 7) break;
+    if (!lower.has(n.toLowerCase())) { result.push(n); lower.add(n.toLowerCase()); }
+  }
+  // Se ficou faltando (caso raro), adiciona 1 média
+  for (const m of MEDIUM_TECH_HASHTAGS) {
+    if (result.length >= 7) break;
+    if (!lower.has(m.toLowerCase())) { result.push(m); lower.add(m.toLowerCase()); }
+  }
+  return result.slice(0, 7);
+}
+
+
 const POST_TYPES = {
   engajamento: {
     name: "Engajamento",
