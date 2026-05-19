@@ -1237,7 +1237,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     let script: any = null;
     
     try {
-      const scriptResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
+      const scriptResponse = await fetchWithTimeout(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1250,7 +1250,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
           totalDuration: 40,
           style: 'editorial denso de tecnologia, defenda uma tese com dados concretos, explique COMO funciona e POR QUE importa, CTA acionável forte'
         })
-      });
+      }, __fast ? 6500 : 18000, 'generate-story-script');
       
       if (scriptResponse.ok) {
         script = await scriptResponse.json();
@@ -1265,19 +1265,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     // FALLBACK: Generate local script template when AI credits are exhausted
     if (!script || !script.segments || script.segments.length === 0) {
       console.log('[VIDEO] Using LOCAL script fallback for topic:', topic);
-      const topicClean = topic.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').trim();
-      const shortTopic = topicClean.length > 40 ? topicClean.substring(0, 40).replace(/\s\S*$/, '') : topicClean;
-      script = {
-        title: `${shortTopic}: O Futuro Chegou`,
-        segments: [
-          { text: `Isso vai mudar tudo sobre ${shortTopic}.`, imagePrompt: `futuristic technology dramatic reveal, cinematic dark background, neon accents` },
-          { text: `Especialistas confirmam: é real e irreversível.`, imagePrompt: `innovation breakthrough, holographic displays, laboratory environment` },
-          { text: `Empresas inteiras já estão sendo transformadas.`, imagePrompt: `global market transformation, dramatic city skyline, data visualization` },
-          { text: `A pergunta é: você está preparado?`, imagePrompt: `future vision, person silhouette facing horizon, dramatic golden hour lighting` },
-        ],
-        totalDuration: 16,
-        _fallback: true,
-      };
+      script = buildCostAwareTechScript(topic);
     }
     
     // Step 2: Get thumbnail from Pexels (FREE, no AI credits needed)
@@ -1285,7 +1273,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     if (script.segments && script.segments.length > 0) {
       try {
         // Use search-images-for-video which uses Pexels/Unsplash (FREE)
-        const imgSearchResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
+        const imgSearchResponse = await fetchWithTimeout(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1295,7 +1283,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
             topic: topic,
             segments: [script.segments[0]],
           })
-        });
+        }, 5000, 'search-images-for-video');
         
         if (imgSearchResponse.ok) {
           const imgResult = await imgSearchResponse.json();
@@ -1326,7 +1314,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
     const postData = {
       user_id: userId,
       workspace_id: workspaceId,
-      caption: caption || `🎬 ${script.title}\n\n${topic}`,
+      caption: caption || buildNarratedVideoCaption(topic, script.title),
       hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
       post_type: 'entretenimento',
       platforms: platforms || ['instagram', 'tiktok'],
@@ -1342,6 +1330,7 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         article_url: article_url || null,
         article_image_url: article_image_url || null,
         needs_processing: true,
+        render_status: 'queued',
         created_by_agent: true,
         publish_after_render: publish_now === true,
         requested_schedule: effectiveSchedule,
