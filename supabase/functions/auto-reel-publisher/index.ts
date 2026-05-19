@@ -44,6 +44,26 @@ serve(async (req) => {
       });
     }
 
+    // ── Análise: gap mínimo de 6h entre Reels (evita spam mesmo abaixo do limite) ──
+    const { data: lastReel } = await supabase
+      .from("posts")
+      .select("created_at, status")
+      .in("media_type", ["reels", "reel", "video"])
+      .in("status", ["scheduled", "published", "generating"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (lastReel?.created_at) {
+      const hoursSince = (Date.now() - new Date(lastReel.created_at).getTime()) / 3600000;
+      if (hoursSince < 6) {
+        console.log(`[AUTO-REEL] ⏭️ Reel recente (${hoursSince.toFixed(1)}h atrás, mínimo 6h)`);
+        return new Response(JSON.stringify({ skipped: true, reason: "min_gap", hoursSince }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // ── Pega notícia top: Neural Update first, depois ranqueada por data ──
     const { data: neural } = await supabase
       .from("rss_items")
