@@ -52,20 +52,19 @@ NOTÍCIA:
 TÍTULO: ${title}
 CONTEXTO: ${description}
 
-ESTRUTURA OBRIGATÓRIA (6 cenas, total ~45-55s — Reels DENSO de tecnologia):
+ESTRUTURA OBRIGATÓRIA (5 cenas, total ~35-42s — Reels DENSO de tecnologia):
 1. HOOK (2-3s) — MÁXIMO 8 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
    Exemplos: "Isso vai apagar 40% dos empregos.", "O Google acabou de perder a guerra."
-2. CONTEXTO (6-8s): O FATO concreto com nome de empresas, produtos e números reais da notícia. Direto.
-3. EXPLICAÇÃO TÉCNICA (8-10s): COMO funciona / o que mudou tecnicamente. Linguagem clara mas específica (modelo, arquitetura, capacidade, métrica).
-4. ANÁLISE (8-10s): TESE — POR QUE isso importa. Consequência prática, comparação com o estado anterior, dado de mercado.
-5. IMPACTO PRÁTICO (7-9s): O que MUDA para o usuário/profissional. Exemplo concreto de uso ou risco.
-6. CTA FORTE (4-6s): Frase de fechamento + CTA acionável. PROIBIDO "siga", "curta", "compartilhe", "link na bio" genérico.
+2. CONTEXTO + EXPLICAÇÃO (8-10s): O FATO concreto com nome de empresa, produto, número da notícia + COMO funciona tecnicamente.
+3. ANÁLISE (7-9s): TESE — POR QUE isso importa. Consequência prática + 1 dado/comparação com estado anterior.
+4. IMPACTO PRÁTICO (6-8s): O que MUDA para o usuário/profissional. Exemplo concreto de uso ou risco real.
+5. CTA FORTE (4-6s): Frase de fechamento + CTA acionável. PROIBIDO "siga", "curta", "compartilhe", "link na bio" genérico.
    CTAs bons: "Salva esse antes que apaguem.", "Comenta: você usaria?", "Marca o dev que precisa ver.", "Quer o passo a passo? Comenta 'quero'."
 
 REGRAS:
 - TOM: autoridade editorial densa, NUNCA robótico, NUNCA superficial. Cada segmento entrega INFORMAÇÃO nova.
 - PT-BR PERFEITO com acentos (você, é, está, já, até, inteligência, decisão)
-- 18-35 palavras por segmento (HOOK = máx 8). NÃO corte frases no meio.
+- 16-25 palavras por segmento (HOOK = máx 8). NÃO corte frases no meio.
 - ZERO inglês na narração (exceto nomes próprios: OpenAI, ChatGPT, etc)
 - ZERO clichês "futuro já chegou", "revolução da IA", "mudou tudo"
 - imagePrompt: cena cinematográfica EM INGLÊS, VERTICAL 9:16, sem texto
