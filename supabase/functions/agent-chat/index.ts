@@ -1198,7 +1198,7 @@ const buildCostAwareTechScript = (topic: string) => {
 };
 
 const buildNarratedVideoCaption = (topic: string, title: string) =>
-  `🎬 ${title}\n\n${topic} não é só notícia: é um sinal de como infraestrutura, dados e poder tecnológico estão se reorganizando em tempo real.\n\nNo vídeo, a leitura é direta: menos hype, mais consequência prática para IA, chips, nuvem e mercado.\n\nComenta: isso acelera uma trégua técnica ou abre uma nova fase da disputa digital?`;
+  `🎬 ${title}\n\n${topic} não é só mais uma notícia: é um sinal de como infraestrutura, dados e poder tecnológico estão se reorganizando agora. No vídeo, a leitura é direta — menos hype, mais consequência prática pra IA, chips e nuvem.\n\nO ponto que quase ninguém comenta: quem domina essa camada invisível define preço, velocidade e quem compete no próximo ciclo. É aí que o jogo realmente acontece.\n\n📖 Análise completa no blog 👉 neural-update.com.br\n🔔 Segue @neuralupdate pra não perder a próxima virada.\n\nComenta: você tá vendo evolução real ou só repaginação do mesmo?`;
 
 const buildDirectNarratedVideoArgs = (latestUserMessage: string) => {
   const normalized = normalizeIntentText(latestUserMessage);
