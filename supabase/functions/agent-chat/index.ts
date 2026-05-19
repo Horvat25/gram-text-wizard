@@ -3804,7 +3804,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
       });
 
       if (!finalResponse.ok) {
-        const actionSummaries = executedActions.map(a => {
+        const actionSummaries = (executedActions as any[]).map((a: any) => {
           if (a.tool === 'create_rss_news_post' && a.success) {
             return `Criei um post de notícia sobre ${a.topic || 'tech'} com a headline "${a.headline || 'impactante'}"! ${a.scheduled ? `Agendei pra ${a.scheduled_for_brasilia || 'depois'}.` : ''}`;
           }
