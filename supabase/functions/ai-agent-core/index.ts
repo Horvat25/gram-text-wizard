@@ -1770,7 +1770,7 @@ Responda em JSON:
   if (slideContents.length === 0) {
     console.warn('[AGENT] ⚠️ IA não gerou slides, usando fallback contextual');
     const topic = bestArticle.title;
-    const desc = bestArticle.description || topic;
+    const desc = sanitizeRssText(bestArticle.description || topic) || topic;
     const topicWords = topic.split(' ').slice(0, 5).join(' ').toUpperCase();
     slideContents = [
       { slideTitle: topicWords, slideText: desc, imagePrompt: `Dramatic tech scene about: ${topic}. Dark aesthetic, neon accents. NO TEXT.` },
