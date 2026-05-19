@@ -111,6 +111,29 @@ async function reviewText(
   return text;
 }
 
+function hasFullEditorialCaption(caption: string): boolean {
+  const body = (caption || '').replace(/#[\p{L}\p{N}_]+/gu, '').trim();
+  return body.length >= 650 && body.split(/\n\s*\n/).filter(Boolean).length >= 3;
+}
+
+function buildEditorialFallbackCaption(topic: string, description?: string, sourceUrl?: string, sourceName?: string): string {
+  const cleanTopic = (topic || 'Essa mudança na tecnologia').replace(/\s+/g, ' ').trim();
+  const cleanDescription = (description || cleanTopic).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const isNeuralUpdate = sourceName === 'Atualização Neural';
+  const sourceBlock = sourceUrl
+    ? isNeuralUpdate
+      ? `📖 Leia o artigo completo no Neural Update 👉 ${sourceUrl}`
+      : `📰 Fonte: ${sourceName || 'site original'} — ${sourceUrl}\n🧠 Acompanhe mais notícias de IA em neural-update.com.br`
+    : `🧠 Mais notícias de IA no nosso blog: neural-update.com.br`;
+
+  return [
+    `💡 ${cleanTopic} não é só uma manchete solta: é um sinal de como infraestrutura, acesso e poder digital estão sendo reorganizados em tempo real.`,
+    `O ponto central é este: ${cleanDescription.substring(0, 320)}. Quando uma mudança assim aparece, ela costuma mexer com preço, adoção, concorrência e com a dependência que pessoas e empresas têm dessas plataformas.`,
+    `A leitura mais importante é que tecnologia deixou de ser apenas produto. Virou território estratégico. Quem controla conexão, modelos, dados e distribuição passa a influenciar mercados inteiros — e isso exige atenção além do hype.`,
+    `A pergunta é simples: isso melhora a vida do usuário ou cria mais uma camada de dependência tecnológica?\n\n${sourceBlock}`,
+  ].join('\n\n');
+}
+
 async function sendChatMessage(supabase: any, userId: string, message: string): Promise<void> {
   try {
     await supabase.from('agent_chat_messages').insert({
