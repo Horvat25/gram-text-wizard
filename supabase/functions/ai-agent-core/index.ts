@@ -1013,7 +1013,7 @@ async function executeContentPlan(
         const rssArticle = {
           url: bestRssItem.item.link,
           title: bestRssItem.item.title,
-          description: bestRssItem.item.description || '',
+          description: sanitizeRssText(bestRssItem.item.description || ''),
           sourceName: bestRssItem.item.source_name || new URL(bestRssItem.item.link).hostname.replace('www.', ''),
         };
         await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
