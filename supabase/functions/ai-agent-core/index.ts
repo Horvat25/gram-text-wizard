@@ -1298,6 +1298,16 @@ Responda em JSON:
     hashtags = captionData.hashtags || hashtags;
   }
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  if (!hasFullEditorialCaption(caption)) {
+    console.warn(`[AGENT] ⚠️ Legenda de notícia rasa (${caption.length} chars). Aplicando fallback editorial local.`);
+    caption = buildEditorialFallbackCaption(
+      selectedArticle?.title || plan.theme,
+      selectedArticle?.description || '',
+      sourceUrl,
+      sourceDomain
+    );
+    hashtags = hashtags?.length ? hashtags : ['tecnologia', 'noticias', 'ia', 'futuro', 'neuralupdate'];
+  }
   
   // STEP 4: Create post
   const { data: post, error } = await supabase.from('posts').insert({
@@ -3020,6 +3030,7 @@ Estrutura OBRIGATÓRIA da legenda (3 blocos):
       original_title: selectedArticle?.title,
       used_real_image: !!selectedImage,
       text_applied_by_code: true,
+      generated_headline: generatedHeadline,
       overlay_status: overlayStatus,
       overlay_failure_reason: overlayFailureReason,
     },
