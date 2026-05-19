@@ -14,7 +14,7 @@
 export const VIDEO_CONFIG = {
   // ─── Estrutura do Script ────────────────────────────
   /** Número de segmentos (cenas) por vídeo */
-  SEGMENT_COUNT: 6,
+  SEGMENT_COUNT: 5,
   /** Duração base de cada segmento em segundos (usado como estimativa inicial;
    *  a duração REAL é definida pelo áudio após TTS) */
   SEGMENT_DURATION_BASE: 8,
