@@ -1,107 +1,74 @@
+# Plano: Narração ElevenLabs + Trilha Sonora Grátis nos Reels
+
 ## Objetivo
-
-Voltar a publicar Reels no @neuralupdate de forma automática (10h e 18h Brasília), zerando o custo de voz (Polly Camila grátis no lugar do ElevenLabs) e trocando imagens IA por imagens reais das notícias.
-
----
-
-## 1. Voz: trocar ElevenLabs por Polly Camila (grátis)
-
-**Problema hoje:** o `edge-tts` foi reescrito pra chamar SÓ ElevenLabs, exigindo créditos pagos. Quando acaba o crédito, o vídeo trava.
-
-**Solução:**
-- Reescrever `edge-tts` pra usar StreamElements/Polly Camila como voz primária (já temos rodando em `lovable-tts`).
-- Cadeia de fallback: Polly Camila → Polly Vitória → Google Translate (último recurso).
-- ElevenLabs vira opcional: só usa se `ELEVENLABS_API_KEY` existir E o caller passar `preferPaid: true` (pra testes pontuais que você quiser fazer).
-- Atualizar `brand-news-video` e `process-curated-video` pra continuarem chamando `edge-tts` (sem mudar interface — só o motor por baixo muda).
-- Deletar o nome enganoso "Sarah" das logs/UI e padronizar como "Camila (Polly Neural)".
-
-**Resultado:** custo de voz = R$ 0, qualidade neural natural em PT-BR.
+Subir a qualidade do Reels do Neural Update usando **ElevenLabs Sarah** (voz PT-BR realista) na narração e uma **trilha sonora royalty-free curada** (Pixabay/Mixkit, hospedada no Storage) misturada por baixo. Rodar **1 reel de teste** completo pra você aprovar antes de reabrir a produção automática.
 
 ---
 
-## 2. Imagens: reais ao invés de IA
+## 1. Narração com ElevenLabs (Sarah) em `brand-news-video`
 
-**Problema hoje:** `brand-news-video` chama `search-images-for-video`, que mistura Pexels/Unsplash com geração IA — e quando vai pra IA, sai cara robótica/mãos tortas.
+Hoje a narração de cada segmento vai pro `edge-tts` (voz Antonio robótica). Vou trocar pra ElevenLabs como **padrão** quando `ELEVENLABS_API_KEY` existir (já está nos secrets), com fallback automático pro `edge-tts` se a API falhar ou estourar quota.
 
-**Solução nova hierarquia (sem IA pra Reels de notícia):**
-1. **Capa principal (cena 1 + 4):** imagem do próprio artigo (`rss_items.image_url` / og:image). Para Neural Update já temos.
-2. **Cenas do meio (2 e 3):** B-roll do **Pexels** (foto + vídeo curto), buscado por palavras-chave reais da notícia (ex: "data center", "chip semiconductor", "Nvidia office"). Extraídas via Gemini Flash a partir do título.
-3. **Fallback** se Pexels não tiver match relevante: outra foto do mesmo artigo (scrape via Firecrawl pegando todas as `<img>`) ou foto da empresa mencionada.
-4. **Sem IA**: remover qualquer chamada a `generate-image` dentro do pipeline de Reels. IA continua liberada só pra carrosséis educativos onde faz sentido.
+- Voice ID: `EXAVITQu4vr4xnSDxMaL` (Sarah)
+- Modelo: `eleven_turbo_v2_5` — **gasta metade dos créditos** do `multilingual_v2` e ainda soa natural em PT-BR
+- Settings: `stability 0.45`, `similarity_boost 0.8`, `style 0.35`, `use_speaker_boost true` — perfil editorial pra notícia
+- Output: `mp3_44100_128` via query param (formato pedido na URL, não no body)
+- Upload do MP3 pro bucket `post-videos` em `{workspace_id}/narration-{postId}-{segIdx}.mp3` e gravar `audioUrl` + `audioDuration` no segmento
+- Concatenação dos 4 segmentos numa única chamada usando **request stitching** (`previous_text` / `next_text`) pra prosódia ficar contínua entre cortes — diferença audível em narração editorial
 
-**Branding:** mantém o overlay Neural Update (header preto + logo dourado + manchete via SVG/resvg) por cima das imagens reais — isso já funciona bem.
-
----
-
-## 3. Reel automático (2x/dia)
-
-**Pipeline novo `auto-reel-publisher` (edge function):**
-
-```text
-CRON 13:00 UTC (10h BRT) e 21:00 UTC (18h BRT)
-   │
-   ▼
-1. Pega notícia top não usada do pool prioritário
-   (Neural Update primeiro; senão, melhor ranqueada)
-   │
-   ▼
-2. Cria post em status='generating' já agendado
-   pra 30min depois (10:30 / 18:30)
-   │
-   ▼
-3. Dispara brand-news-video em background
-   (EdgeRuntime.waitUntil)
-   │
-   ├── ✅ Sucesso → status='scheduled', video_url salvo
-   │       scheduled-publisher pega no horário
-   │
-   └── ❌ Falha → status='draft', error_message,
-           notifica via realtime "Reel falhou,
-           revisar na Fila"
-```
-
-**Detalhes:**
-- Cron via `pg_cron` + `pg_net` (mesmo padrão do `auto-fetch-rss`).
-- Marca `rss_items.used_for_reel = true` (coluna nova) pra não repetir notícia.
-- Limite de segurança: máx 2 Reels/dia, ignora se já tem 2 publicados/agendados nas últimas 24h.
-- Mantém o `scheduled-publisher` atual fazendo o upload pro IG (já funciona pra Reels, só depende de `video_url` estar pronto).
+**Economia ElevenLabs**: o Starter ($5/mês = 30k chars) cobre ~25 reels/mês com Turbo v2.5. Adiciono log de caracteres consumidos por reel no `overlay_metadata.elevenlabs_chars_used` pra você acompanhar.
 
 ---
 
-## 4. Notificação de falha
+## 2. Trilha sonora gratuita (royalty-free curada)
 
-Como você falou que não tava recebendo notificação:
-- Toda falha de render vira linha em `agent_chat_messages` (tipo: `system_alert`) — aparece no chat do Agente automaticamente.
-- Push notification opcional (já temos `usePushNotifications`) — se você ativar nas configs, dispara também.
-- Botão "🎬 Re-renderizar" na Fila pra reprocessar manualmente sem ter que apagar/criar de novo.
+Em vez de gerar música com IA (caro e instável), vou usar **tracks curadas do Pixabay Music** (licença CC0, uso comercial liberado, sem atribuição obrigatória). Plano:
 
----
-
-## 5. Detalhes técnicos
-
-**Arquivos editados:**
-- `supabase/functions/edge-tts/index.ts` — reescrita: Polly primary, ElevenLabs opcional
-- `supabase/functions/brand-news-video/index.ts` — substitui `search-images-for-video` por nova função `fetch-real-news-images` (Pexels + scrape do artigo)
-- `supabase/functions/scheduled-publisher/index.ts` — só validação, já suporta Reels
-
-**Arquivos novos:**
-- `supabase/functions/auto-reel-publisher/index.ts` — cron handler
-- `supabase/functions/fetch-real-news-images/index.ts` — Pexels + Firecrawl scraping de imagens do artigo
-
-**Migração SQL:**
-- `rss_items.used_for_reel BOOLEAN DEFAULT false`
-- 2 jobs no `pg_cron` (10h e 18h BRT)
-- Tabela `agent_chat_messages` ganha tipo `system_alert` se ainda não tiver
-
-**Não muda:**
-- Pipeline de imagem/carrossel do Instagram (`ai-agent-core` continua igual)
-- Branding visual (header, logo dourado, watermark)
-- TikTok (fora de escopo)
+1. Criar pasta `public/music/` com 3 faixas baixadas:
+   - `tech-ambient.mp3` — sintetizador minimal, pra notícias de IA/tech
+   - `cinematic-news.mp3` — pulso editorial, pra grandes lançamentos
+   - `upbeat-future.mp3` — energia, pra hooks fortes
+2. Selecionar a faixa por **mood** que a IA já define no script (`urgent` / `editorial` / `hype`) — adiciono campo `mood` no `generateBroadcastScript`
+3. Passar `backgroundMusicUrl` no `overlay_metadata.script` — o `video-encoder.ts` cliente **já mixa** trilha (linha 435, 576), só estava sem URL. Volume da trilha: **-18 dB** (15% do gain) pra não competir com a Sarah
+4. Fade-in 0.5s no início e fade-out 1s no final automáticos
 
 ---
 
-## Fora de escopo (confirmar se quer incluir)
+## 3. Teste end-to-end (1 reel surpresa)
 
-- **Música de fundo nos Reels:** hoje não tem. Posso adicionar trilha grátis (Pixabay Music) num próximo passo.
-- **Legendas queimadas (ASS subtitles):** já existe no pipeline viral, mas não no `brand-news-video`. Posso portar.
-- **TikTok automático com mesmo Reel:** o vídeo final é compatível, mas precisa do TikTok sair do Sandbox primeiro.
+Pra você ver o resultado antes de liberar o cron:
+
+1. Reverter `content_distribution_videos: 0 → 1` e `news_video: 0 → 1` no `agent_context` (só pra esse teste)
+2. Pegar a notícia top não-usada da Atualização Neural e disparar `brand-news-video` manualmente
+3. Render client-side pelo `PublicationQueueTab` (você clica "Renderizar")
+4. Resultado fica em **draft** (não publica sozinho) — você revisa, aprova e publica quando quiser
+5. Se gostar: zero mudança extra. Se quiser ajustar voz/trilha, eu mexo nos settings antes de reativar o cron diário
+
+---
+
+## 4. Arquivos que vou tocar
+
+- `supabase/functions/brand-news-video/index.ts` — nova função `generateNarrationElevenLabs()` com fallback edge-tts, request stitching, seleção de trilha por mood, salvar `backgroundMusicUrl` no metadata
+- `src/lib/background-music.ts` — adicionar mapa `mood → trackUrl` apontando pras 3 faixas em `/public/music/`
+- `public/music/*.mp3` — 3 trilhas Pixabay baixadas (≈1-2 MB cada)
+- Migração SQL pequena pra atualizar `agent_context` do workspace e reativar 1 vídeo na quota
+
+Nenhuma mudança no fluxo de imagens/carrossel/legenda — só áudio do reel.
+
+---
+
+## 5. Dica sobre planos ElevenLabs (pra você decidir)
+
+| Plano | Preço | Créditos | Reels Neural Update/mês* | Observação |
+|---|---|---|---|---|
+| Free | $0 | 10k chars | ~8 reels | Bloqueia VPN/datacenter (Supabase Edge pode falhar) |
+| **Starter** | **$5** | **30k chars** | **~25 reels** | Recomendado — libera datacenter, voz comercial OK |
+| Creator | $22 | 100k chars | ~85 reels | Só se for postar 3x/dia |
+
+\* baseado em ~80 palavras (~1.2k chars) por reel com Turbo v2.5
+
+**Trilha sonora**: NÃO precisa pagar ElevenLabs Music ($22+). Pixabay/Mixkit cobrem 95% dos casos com qualidade editorial e zero custo. Só pensa em ElevenLabs Music se quiser trilha 100% única por vídeo, o que pra Reels de 25s não compensa.
+
+---
+
+Posso seguir? Se você confirmar, na build eu já entrego o reel de teste pronto pra você renderizar e julgar.

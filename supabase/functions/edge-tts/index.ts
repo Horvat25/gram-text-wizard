@@ -221,12 +221,14 @@ async function generateElevenLabs(text: string, apiKey: string): Promise<Uint8Ar
       },
       body: JSON.stringify({
         text,
-        model_id: "eleven_multilingual_v2",
+        // Turbo v2.5 = metade dos créditos do multilingual_v2, qualidade PT-BR ótima
+        model_id: "eleven_turbo_v2_5",
         voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.5,
+          stability: 0.45,        // expressividade editorial
+          similarity_boost: 0.82, // mantém timbre da Sarah
+          style: 0.35,            // estilo presente mas natural
           use_speaker_boost: true,
+          speed: 1.05,            // ritmo de Reels (5% mais rápido)
         },
       }),
     }
