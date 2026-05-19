@@ -77,7 +77,7 @@ Responda APENAS JSON válido completo:
 }`
         }],
         response_format: { type: "json_object" },
-        max_tokens: 2500,
+        max_tokens: 1800,
       }),
     });
 
