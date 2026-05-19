@@ -1232,21 +1232,41 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
   
   console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
 
-  // 🛡️ LIMITE: máximo 2 Reels nas últimas 24h (manual + cron contam juntos)
+  // 🛡️ LIMITE: máximo 2 Reels publicados/agendados POR DIA (data alvo de publicação)
+  // Se o usuário pedir agendamento para outro dia, o limite é checado naquele dia, não hoje.
   try {
-    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { count: reelsLast24h } = await supabase
+    const nowMs = Date.now();
+    // Determina a data-alvo de publicação (UTC). Se publish_now ou sem scheduled_for => hoje.
+    const targetDate = scheduled_for ? new Date(scheduled_for) : new Date(nowMs);
+    if (isNaN(targetDate.getTime())) throw new Error('invalid scheduled_for');
+
+    // Janela: dia em horário Brasília (UTC-3). Convertemos pra UTC para comparar com created_at/scheduled_for.
+    const brtOffsetMs = 3 * 60 * 60 * 1000; // BRT = UTC-3
+    const targetBrt = new Date(targetDate.getTime() - brtOffsetMs);
+    const y = targetBrt.getUTCFullYear(), m = targetBrt.getUTCMonth(), d = targetBrt.getUTCDate();
+    const dayStartUtc = new Date(Date.UTC(y, m, d, 0, 0, 0) + brtOffsetMs).toISOString();
+    const dayEndUtc = new Date(Date.UTC(y, m, d, 23, 59, 59) + brtOffsetMs).toISOString();
+
+    // Conta Reels agendados/publicados PARA aquele dia (usa scheduled_for OU published_at OU created_at p/ rascunhos do dia)
+    const { data: dayReels } = await supabase
       .from('posts')
-      .select('id', { count: 'exact', head: true })
+      .select('id, scheduled_for, published_at, created_at, status')
       .eq('workspace_id', workspaceId)
       .in('media_type', ['reels', 'reel', 'video'])
-      .in('status', ['scheduled', 'published', 'generating', 'draft'])
-      .gte('created_at', since24h);
-    if ((reelsLast24h || 0) >= 2) {
+      .in('status', ['scheduled', 'published', 'generating']);
+
+    const count = (dayReels || []).filter((p: any) => {
+      const ref = p.scheduled_for || p.published_at || p.created_at;
+      return ref >= dayStartUtc && ref <= dayEndUtc;
+    }).length;
+
+    if (count >= 2) {
+      const dataStr = targetBrt.toISOString().slice(0, 10);
       return {
         success: false,
-        message: `🛑 Limite diário de Reels atingido (${reelsLast24h}/2 nas últimas 24h). Para preservar qualidade e custo, aguarda o próximo ciclo. Posso criar um post de imagem ou carrossel no lugar?`,
+        message: `🛑 Já temos ${count} Reels para ${dataStr}. Posso agendar para o próximo dia livre? É só me dizer "agenda pra amanhã" ou uma data específica.`,
         skipped_reason: 'daily_reels_limit',
+        suggest_reschedule: true,
       };
     }
   } catch (e) {
