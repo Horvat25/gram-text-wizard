@@ -89,8 +89,8 @@ Responda APENAS JSON válido completo:
       if (content) {
         const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
         const parsed = JSON.parse(cleaned);
-        if (parsed.segments?.length >= 5) {
-          return parsed.segments.slice(0, 6);
+        if (parsed.segments?.length >= 4) {
+          return parsed.segments.slice(0, 5);
         }
       }
     }
