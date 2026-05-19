@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
-    const { topic, segmentCount = 4, wordsPerSegment = 12, totalDuration = 20, style, brandName } = await req.json();
+    const { topic, segmentCount = 6, wordsPerSegment = 22, totalDuration = 55, style, brandName } = await req.json();
 
     if (!topic) {
       throw new Error("Tópico é obrigatório");
