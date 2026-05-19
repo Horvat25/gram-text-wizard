@@ -116,9 +116,28 @@ function hasFullEditorialCaption(caption: string): boolean {
   return body.length >= 650 && body.split(/\n\s*\n/).filter(Boolean).length >= 3;
 }
 
+// 🧹 Remove lixo de RSS scraping (footer "O post X apareceu primeiro em Y", "Leia também", HTML, etc)
+function sanitizeRssText(raw?: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/<[^>]+>/g, ' ')
+    // Footer típico do WordPress/Olhar Digital/etc: "O post TITULO apareceu primeiro em SITE."
+    .replace(/O post .*? apareceu primeiro em [^.]+\.?/gi, '')
+    .replace(/The post .*? appeared first on [^.]+\.?/gi, '')
+    // "Leia mais em ...", "Confira no site...", "Continue lendo..."
+    .replace(/Leia (também|mais|tamb[eé]m)[^.]*\.?/gi, '')
+    .replace(/Confira (mais|no site)[^.]*\.?/gi, '')
+    .replace(/Continue lendo[^.]*\.?/gi, '')
+    .replace(/Saiba mais[^.]*\.?/gi, '')
+    // URLs soltas no final
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function buildEditorialFallbackCaption(topic: string, description?: string, sourceUrl?: string, sourceName?: string): string {
-  const cleanTopic = (topic || 'Essa mudança na tecnologia').replace(/\s+/g, ' ').trim();
-  const cleanDescription = (description || cleanTopic).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleanTopic = sanitizeRssText(topic || 'Essa mudança na tecnologia') || 'Essa mudança na tecnologia';
+  const cleanDescription = sanitizeRssText(description || cleanTopic) || cleanTopic;
   const isNeuralUpdate = sourceName === 'Atualização Neural';
   const sourceBlock = sourceUrl
     ? isNeuralUpdate
@@ -994,7 +1013,7 @@ async function executeContentPlan(
         const rssArticle = {
           url: bestRssItem.item.link,
           title: bestRssItem.item.title,
-          description: bestRssItem.item.description || '',
+          description: sanitizeRssText(bestRssItem.item.description || ''),
           sourceName: bestRssItem.item.source_name || new URL(bestRssItem.item.link).hostname.replace('www.', ''),
         };
         await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
@@ -1594,8 +1613,9 @@ function getOptimalScheduleTime(): string {
   const brasiliaTime = new Date(now.getTime() + brasiliaOffset);
   const hour = brasiliaTime.getHours();
   
-  // Schedule for next optimal posting window
-  const optimalHours = [8, 12, 17, 20];
+  // Horários ótimos baseados em DADOS REAIS de alcance (analisado em 19/05/2026)
+  // 15h e 20h tiveram 10-30x mais reach que 9h/13h/17h/21h. 11h e 18h ficam de reserva.
+  const optimalHours = [11, 15, 18, 20];
   let nextHour = optimalHours.find(h => h > hour) || optimalHours[0];
   
   const scheduled = new Date(brasiliaTime);
@@ -1688,7 +1708,7 @@ async function createCarouselContent(
       const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram em PT-BR.
 
 TEMA DO CARROSSEL: "${bestArticle.title}"
-CONTEXTO: ${bestArticle.description || bestArticle.title}
+CONTEXTO: ${sanitizeRssText(bestArticle.description || bestArticle.title)}
 FONTE: ${bestArticle.source_name || 'Tech News'}
 
 Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema, formando uma NARRATIVA CONTÍNUA:
@@ -1751,7 +1771,7 @@ Responda em JSON:
   if (slideContents.length === 0) {
     console.warn('[AGENT] ⚠️ IA não gerou slides, usando fallback contextual');
     const topic = bestArticle.title;
-    const desc = bestArticle.description || topic;
+    const desc = sanitizeRssText(bestArticle.description || topic) || topic;
     const topicWords = topic.split(' ').slice(0, 5).join(' ').toUpperCase();
     slideContents = [
       { slideTitle: topicWords, slideText: desc, imagePrompt: `Dramatic tech scene about: ${topic}. Dark aesthetic, neon accents. NO TEXT.` },
