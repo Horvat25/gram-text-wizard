@@ -203,7 +203,12 @@ const PublicationQueueTab = ({
 
   // Check if a post needs video rendering (any reels without video_url)
   const needsVideoRendering = (post: Post) => {
-    const isReels = post.media_type === "reels" || post.media_type === "reel";
+    const isReels =
+      post.media_type === "reels" ||
+      post.media_type === "reel" ||
+      post.media_type === "video" ||
+      post.post_type === "reel" ||
+      post.post_type === "reels";
     const hasNoVideo = !post.video_url;
     return isReels && hasNoVideo;
   };
