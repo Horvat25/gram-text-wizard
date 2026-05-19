@@ -52,19 +52,20 @@ NOTÍCIA:
 TÍTULO: ${title}
 CONTEXTO: ${description}
 
-ESTRUTURA OBRIGATÓRIA (5 cenas, total ~35-42s — Reels DENSO de tecnologia):
-1. HOOK (2-3s) — MÁXIMO 8 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
+ESTRUTURA OBRIGATÓRIA (6 cenas, total ~50-60s — Reels DENSO de tecnologia):
+1. HOOK (2-3s) — MÁXIMO 10 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
    Exemplos: "Isso vai apagar 40% dos empregos.", "O Google acabou de perder a guerra."
-2. CONTEXTO + EXPLICAÇÃO (8-10s): O FATO concreto com nome de empresa, produto, número da notícia + COMO funciona tecnicamente.
-3. ANÁLISE (7-9s): TESE — POR QUE isso importa. Consequência prática + 1 dado/comparação com estado anterior.
-4. IMPACTO PRÁTICO (6-8s): O que MUDA para o usuário/profissional. Exemplo concreto de uso ou risco real.
-5. CTA FORTE (4-6s): Frase de fechamento + CTA acionável. PROIBIDO "siga", "curta", "compartilhe", "link na bio" genérico.
-   CTAs bons: "Salva esse antes que apaguem.", "Comenta: você usaria?", "Marca o dev que precisa ver.", "Quer o passo a passo? Comenta 'quero'."
+2. CONTEXTO + FATO (8-10s): O FATO concreto com nome de empresa, produto, número da notícia.
+3. EXPLICAÇÃO TÉCNICA (8-10s): COMO funciona — explique de verdade, sem jargão vazio.
+4. TESE + ANÁLISE (8-10s): POR QUE isso importa. Consequência prática + 1 dado/comparação.
+5. IMPACTO PRÁTICO (7-9s): O que MUDA para o usuário/dev/profissional. Exemplo real de uso ou risco.
+6. CTA FORTE (4-6s): Reflexão + CTA acionável + menciona "Neural Update no blog". PROIBIDO "siga", "curta" genéricos.
+   CTAs bons: "Salva antes que apaguem — análise completa no Neural Update.", "Comenta: você usaria? Mais no blog Neural Update.", "Marca o dev que precisa ver."
 
 REGRAS:
 - TOM: autoridade editorial densa, NUNCA robótico, NUNCA superficial. Cada segmento entrega INFORMAÇÃO nova.
 - PT-BR PERFEITO com acentos (você, é, está, já, até, inteligência, decisão)
-- 16-25 palavras por segmento (HOOK = máx 8). NÃO corte frases no meio.
+- 18-28 palavras por segmento (HOOK = máx 10). NÃO corte frases no meio — cada cena é uma frase COMPLETA.
 - ZERO inglês na narração (exceto nomes próprios: OpenAI, ChatGPT, etc)
 - ZERO clichês "futuro já chegou", "revolução da IA", "mudou tudo"
 - imagePrompt: cena cinematográfica EM INGLÊS, VERTICAL 9:16, sem texto
