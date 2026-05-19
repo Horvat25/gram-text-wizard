@@ -116,9 +116,28 @@ function hasFullEditorialCaption(caption: string): boolean {
   return body.length >= 650 && body.split(/\n\s*\n/).filter(Boolean).length >= 3;
 }
 
+// 🧹 Remove lixo de RSS scraping (footer "O post X apareceu primeiro em Y", "Leia também", HTML, etc)
+function sanitizeRssText(raw?: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/<[^>]+>/g, ' ')
+    // Footer típico do WordPress/Olhar Digital/etc: "O post TITULO apareceu primeiro em SITE."
+    .replace(/O post .*? apareceu primeiro em [^.]+\.?/gi, '')
+    .replace(/The post .*? appeared first on [^.]+\.?/gi, '')
+    // "Leia mais em ...", "Confira no site...", "Continue lendo..."
+    .replace(/Leia (também|mais|tamb[eé]m)[^.]*\.?/gi, '')
+    .replace(/Confira (mais|no site)[^.]*\.?/gi, '')
+    .replace(/Continue lendo[^.]*\.?/gi, '')
+    .replace(/Saiba mais[^.]*\.?/gi, '')
+    // URLs soltas no final
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function buildEditorialFallbackCaption(topic: string, description?: string, sourceUrl?: string, sourceName?: string): string {
-  const cleanTopic = (topic || 'Essa mudança na tecnologia').replace(/\s+/g, ' ').trim();
-  const cleanDescription = (description || cleanTopic).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleanTopic = sanitizeRssText(topic || 'Essa mudança na tecnologia') || 'Essa mudança na tecnologia';
+  const cleanDescription = sanitizeRssText(description || cleanTopic) || cleanTopic;
   const isNeuralUpdate = sourceName === 'Atualização Neural';
   const sourceBlock = sourceUrl
     ? isNeuralUpdate
