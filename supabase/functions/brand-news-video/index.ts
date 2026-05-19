@@ -52,20 +52,21 @@ NOTÍCIA:
 TÍTULO: ${title}
 CONTEXTO: ${description}
 
-ESTRUTURA OBRIGATÓRIA (6 cenas, total ~50-60s — Reels DENSO de tecnologia):
+ESTRUTURA OBRIGATÓRIA (5 cenas, total ~45-55s — Reels DENSO de tecnologia, ritmo ÁGIL):
 1. HOOK (2-3s) — MÁXIMO 10 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
    Exemplos: "Isso vai apagar 40% dos empregos.", "O Google acabou de perder a guerra."
-2. CONTEXTO + FATO (8-10s): O FATO concreto com nome de empresa, produto, número da notícia.
-3. EXPLICAÇÃO TÉCNICA (8-10s): COMO funciona — explique de verdade, sem jargão vazio.
-4. TESE + ANÁLISE (8-10s): POR QUE isso importa. Consequência prática + 1 dado/comparação.
-5. IMPACTO PRÁTICO (7-9s): O que MUDA para o usuário/dev/profissional. Exemplo real de uso ou risco.
-6. CTA FORTE (4-6s): Reflexão + CTA acionável + menciona "Neural Update no blog". PROIBIDO "siga", "curta" genéricos.
-   CTAs bons: "Salva antes que apaguem — análise completa no Neural Update.", "Comenta: você usaria? Mais no blog Neural Update.", "Marca o dev que precisa ver."
+2. CONTEXTO + FATO CONCRETO (9-11s): Nome de empresa/produto + número/data + COMO funciona em 1 frase técnica.
+3. TESE + ANÁLISE (9-11s): POR QUE isso importa. Sua POSIÇÃO + 1 dado ou comparação que sustenta.
+4. IMPACTO PRÁTICO (8-10s): O que MUDA para usuário/dev/profissional. Exemplo real de uso, oportunidade ou risco.
+5. CTA FORTE (5-7s): Reflexão fechando a tese + CTA acionável + menciona "Neural Update no blog". PROIBIDO "siga", "curta" genéricos.
+   CTAs bons: "Salva antes que apaguem — análise completa no Neural Update.", "Comenta: você usaria? Mais no blog Neural Update."
 
-REGRAS:
-- TOM: autoridade editorial densa, NUNCA robótico, NUNCA superficial. Cada segmento entrega INFORMAÇÃO nova.
-- PT-BR PERFEITO com acentos (você, é, está, já, até, inteligência, decisão)
-- 18-28 palavras por segmento (HOOK = máx 10). NÃO corte frases no meio — cada cena é uma frase COMPLETA.
+REGRAS DE REDAÇÃO (CRÍTICO):
+- TOM: autoridade editorial densa, ritmo ÁGIL — direto, sem rodeios. Cada segmento entrega INFORMAÇÃO NOVA.
+- FRASES COMPLETAS: NUNCA termine uma cena no meio de uma ideia. Cada texto é uma frase fechada com começo, meio e fim.
+- CORTE muletas: "basicamente", "então", "vale lembrar", "tipo assim", "de certa forma".
+- PT-BR PERFEITO com acentos (você, é, está, já, até, inteligência, decisão, análise)
+- 22-28 palavras por segmento (HOOK = máx 10).
 - ZERO inglês na narração (exceto nomes próprios: OpenAI, ChatGPT, etc)
 - ZERO clichês "futuro já chegou", "revolução da IA", "mudou tudo"
 - imagePrompt: cena cinematográfica EM INGLÊS, VERTICAL 9:16, sem texto
