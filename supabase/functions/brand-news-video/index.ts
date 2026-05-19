@@ -450,6 +450,7 @@ Deno.serve(async (req) => {
       // Full video composed
       console.log(`[BRAND-VIDEO] ✅ VÍDEO COMPLETO: ${finalVideoUrl}`);
       await supabase.from("posts").update({
+        ...captionUpdate,
         video_url: finalVideoUrl,
         image_url: brandedImages[0] || null,
         carousel_images: brandedImages,
@@ -481,6 +482,7 @@ Deno.serve(async (req) => {
       // Assets ready, needs client-side composition
       console.log(`[BRAND-VIDEO] ⚡ Assets prontos para composição client-side`);
       await supabase.from("posts").update({
+        ...captionUpdate,
         image_url: brandedImages[0] || null,
         carousel_images: brandedImages,
         status: "draft",
