@@ -227,14 +227,14 @@ ESPECIFICAÇÕES:
 - Ano: ${currentYear} — NÃO mencione anos anteriores
 
 ⚡ CHECKLIST OBRIGATÓRIO:
-□ Cena 1 começa com pergunta provocativa OU afirmação polêmica (NUNCA "Vamos falar sobre...")
-□ Cena 2 declara uma TESE clara sobre o tema
-□ Cena 3 sustenta com 1 argumento/dado concreto
-□ Cena 4 termina com reflexão FORTE + CTA específico e acionável (NUNCA "Siga para mais")
+□ Cena 1 começa com pergunta provocativa OU afirmação polêmica (MÁX 10 palavras)
+□ Cenas do meio entregam fato concreto + tese + argumento (CADA UMA com info NOVA)
+□ Penúltima cena traz impacto prático na vida do espectador
+□ Última cena fecha com reflexão FORTE + CTA específico e acionável (NUNCA "Siga para mais")
+□ Total de ${segmentCount} cenas — NÃO entregue menos
+□ Cada cena ${wordsPerSegment}-${wordsPerSegment + 6} palavras, frase COMPLETA
 □ Todos os textos em PT-BR com ortografia perfeita
 □ visualKeywords são cinematográficas e específicas (NUNCA genéricas)
-
-PRIORIDADE: Melhor 2-3 imagens FORTES do que 4-5 genéricas. Se necessário, repita a mesma keyword cinematográfica forte em mais de uma cena.
 
 Responda APENAS com JSON:
 {
