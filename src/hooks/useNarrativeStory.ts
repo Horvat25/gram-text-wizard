@@ -304,36 +304,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       .filter(index => index >= 0);
 
     if (missingImageIndexes.length > 0) {
-      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem após busca principal, acionando fallback por cena...`);
+      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem — usando última real (SEM IA, custo $0)`);
 
-      const fallbackResults = await Promise.all(
-        missingImageIndexes.map(async (index) => {
-          const segment = updatedSegments[index];
-          const prompt = segment.imagePrompt || segment.text || topic || "tecnologia";
-
-          try {
-            const { data, error } = await supabase.functions.invoke("generate-image", {
-              body: {
-                prompt: `${prompt}. Vertical 9:16, cinematográfico, fotorrealista, coerente com notícia de tecnologia, sem texto.`,
-                format: "portrait",
-                applyWatermark: true,
-              },
-            });
-
-            if (error) throw error;
-            return { index, imageUrl: data?.imageUrl || "" };
-          } catch (error) {
-            console.error(`[IMAGES] Fallback falhou para cena ${index + 1}:`, error);
-            return { index, imageUrl: "" };
-          }
-        })
-      );
-
-      fallbackResults.forEach(({ index, imageUrl }) => {
-        if (imageUrl) {
-          updatedSegments[index] = { ...updatedSegments[index], imageUrl };
-        }
-      });
+      // Fallback SEM IA: pega a última imagem real disponível e replica
+      const lastReal = updatedSegments.find(s => s.imageUrl)?.imageUrl;
+      if (lastReal) {
+        missingImageIndexes.forEach(index => {
+          updatedSegments[index] = { ...updatedSegments[index], imageUrl: lastReal };
+        });
+      }
     }
 
     const unresolvedImages = updatedSegments
