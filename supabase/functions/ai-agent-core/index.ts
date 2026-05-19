@@ -1707,7 +1707,7 @@ async function createCarouselContent(
       const carouselPrompt = `Você é um criador de conteúdo educacional viral para Instagram em PT-BR.
 
 TEMA DO CARROSSEL: "${bestArticle.title}"
-CONTEXTO: ${bestArticle.description || bestArticle.title}
+CONTEXTO: ${sanitizeRssText(bestArticle.description || bestArticle.title)}
 FONTE: ${bestArticle.source_name || 'Tech News'}
 
 Crie um carrossel EDUCACIONAL de 3 slides sobre esse ÚNICO tema, formando uma NARRATIVA CONTÍNUA:
