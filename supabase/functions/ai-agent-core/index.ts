@@ -3160,6 +3160,7 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
   // Posts inspired by RSS topics should have the yellow headline for brand consistency
   if (imageUrl && inspirationTopic) {
     console.log('[AGENT] 🔥 Aplicando headline overlay no post de imagem...');
+    let imageHeadline: string | null = null;
     try {
       const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
@@ -3176,6 +3177,7 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
         const overlayResult = await overlayResponse.json();
         if (overlayResult.hasOverlay) {
           imageUrl = overlayResult.publicUrl;
+          imageHeadline = overlayResult.headline || null;
           console.log('[AGENT] ✅ Headline overlay aplicado em post de imagem:', overlayResult.headline);
         } else {
           console.log('[AGENT] ⚠️ Overlay retornou sem headline, tentando add-watermark...');
@@ -3204,6 +3206,7 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
     } catch (overlayErr) {
       console.log('[AGENT] Erro ao aplicar headline overlay em imagem:', overlayErr);
     }
+    (plan as any)._generatedHeadline = imageHeadline;
   }
   
   // STEP 3: Generate DEEP REFLECTION caption (4 blocks, 800-1500 chars)
@@ -3233,6 +3236,11 @@ LEMBRE: a headline na imagem já criou tensão. Você precisa ENTREGAR aqui — 
   
   // Review caption for spelling
   caption = await reviewText(caption, 'caption', supabaseUrl, headers);
+  if (!hasFullEditorialCaption(caption)) {
+    console.warn(`[AGENT] ⚠️ Legenda de imagem veio rasa (${caption.length} chars). Aplicando fallback editorial local.`);
+    caption = buildEditorialFallbackCaption(inspirationTopic, inspirationDesc, undefined, undefined);
+    hashtags = hashtags?.length ? hashtags : ['tecnologia', 'reflexao', 'futuro', 'ia', 'inovacao'];
+  }
   
   const canPublish = autoPublish && imageUrl;
   
@@ -3252,7 +3260,8 @@ LEMBRE: a headline na imagem já criou tensão. Você precisa ENTREGAR aqui — 
       inspiration_topic: inspirationTopic,
       ai_generated_image: true,
       created_by_agent: true,
-      text_applied_by_code: true
+      text_applied_by_code: true,
+      generated_headline: (plan as any)._generatedHeadline || null
     },
     ai_model_used: 'gemini-2.5-flash'
   }).select().single();
