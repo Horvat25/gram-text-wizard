@@ -2808,31 +2808,62 @@ async function createNewsContent(
   let imageUrl = null;
   let overlayStatus: 'success' | 'fallback_watermark_only' | 'fallback_no_overlay' | 'fallback_external_url' | 'neural_original' = 'fallback_external_url';
   let overlayFailureReason: string | null = null;
+  let generatedHeadline: string | null = null;
   const isNeuralUpdate = sourceDomain === 'Atualização Neural';
 
   if (selectedImage && isNeuralUpdate) {
-    console.log('[AGENT] 🟢 Notícia do Neural Update — reusando imagem original do blog (sem overlay)');
+    console.log('[AGENT] 🟢 Notícia do Neural Update — aplicando headline programática sobre imagem original');
     try {
-      const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+      const overlayResponse = await fetch(`${supabaseUrl}/functions/v1/apply-text-overlay`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ imageUrl: selectedImage })
+        body: JSON.stringify({
+          imageUrl: selectedImage,
+          title: selectedArticle.title,
+          watermarkText: 'Neural Update',
+          generateHeadline: true,
+          ctaText: 'LEIA A LEGENDA 👇'
+        })
       });
-      if (uploadResponse.ok) {
-        const uploadResult = await uploadResponse.json();
-        if (uploadResult.publicUrl) {
-          imageUrl = uploadResult.publicUrl;
-          overlayStatus = 'neural_original';
-          console.log('[AGENT] ✅ Imagem do Neural Update re-uploadada');
+      if (overlayResponse.ok) {
+        const overlayResult = await overlayResponse.json();
+        if (overlayResult.publicUrl && overlayResult.hasOverlay) {
+          imageUrl = overlayResult.publicUrl;
+          generatedHeadline = overlayResult.headline || null;
+          overlayStatus = 'success';
+          console.log('[AGENT] ✅ Headline Neural Update aplicada:', generatedHeadline);
         }
+      } else {
+        const errBody = await overlayResponse.text().catch(() => '');
+        overlayFailureReason = `neural_overlay_http_${overlayResponse.status}: ${errBody.substring(0, 120)}`;
       }
     } catch (e: any) {
-      console.warn('[AGENT] upload Neural Update falhou:', e?.message || e);
+      overlayFailureReason = `neural_overlay_exception: ${e?.message || e}`;
+      console.warn('[AGENT] overlay Neural Update falhou:', overlayFailureReason);
     }
-    // Último recurso: URL externa direta
-    if (!imageUrl && /^https?:\/\//.test(selectedImage)) {
-      imageUrl = selectedImage;
-      overlayStatus = 'neural_original';
+
+    if (!imageUrl) {
+      try {
+        const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ imageUrl: selectedImage })
+        });
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          if (uploadResult.publicUrl) {
+            imageUrl = uploadResult.publicUrl;
+            overlayStatus = 'neural_original';
+            console.log('[AGENT] ✅ Imagem do Neural Update re-uploadada sem headline após fallback');
+          }
+        }
+      } catch (e: any) {
+        console.warn('[AGENT] upload Neural Update falhou:', e?.message || e);
+      }
+      if (!imageUrl && /^https?:\/\//.test(selectedImage)) {
+        imageUrl = selectedImage;
+        overlayStatus = 'neural_original';
+      }
     }
   } else if (selectedImage && selectedArticle?.title) {
     // ── TENTATIVA 1: apply-text-overlay (headline + watermark) ──
@@ -2853,6 +2884,7 @@ async function createNewsContent(
         const overlayResult = await overlayResponse.json();
         if (overlayResult.publicUrl) {
           imageUrl = overlayResult.publicUrl;
+          generatedHeadline = overlayResult.headline || null;
           overlayStatus = overlayResult.hasOverlay ? 'success' : 'fallback_no_overlay';
           console.log(`[AGENT] ✅ Overlay aplicado (${overlayStatus}):`, overlayResult.headline);
         }
