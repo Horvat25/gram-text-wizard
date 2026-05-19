@@ -482,22 +482,29 @@ ${sizeRules}
     }
 
     const captionWithoutTagsLength = caption.replace(/#[\p{L}\p{N}_]+/gu, '').trim().length;
-    const tooShallow = isDeepCaption && captionWithoutTagsLength < 650;
+    // 🟢 FALLBACK EDITORIAL FORÇADO para TODOS os posts rasos (não só os profundos)
+    // Limite: 650 chars para deep, 400 chars para os demais. Posts rasos = baixo dwell-time = IG penaliza.
+    const minLength = isDeepCaption ? 650 : 400;
+    const tooShallow = captionWithoutTagsLength < minLength;
     if (tooShallow) {
-      console.warn(`⚠️ Caption profunda veio rasa (${captionWithoutTagsLength} chars). Usando fallback editorial.`);
+      console.warn(`⚠️ Caption rasa (${captionWithoutTagsLength}/${minLength} chars). Usando fallback editorial.`);
       const fallbackCaption = generateFallbackCaption(topic, postType, mediaType, sourceUrl, sourceName);
+      // Filtra hashtags do fallback também
+      fallbackCaption.hashtags = sanitizeAndEnrichHashtags(fallbackCaption.hashtags || []);
       return new Response(
         JSON.stringify(fallbackCaption),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Caption gerada com ${caption.length} caracteres e ${hashtags.length} hashtags`);
+    // 🎯 Hashtag intelligent: remove super-saturadas e enriquece com nicho
+    const smartHashtags = sanitizeAndEnrichHashtags(hashtags);
+    console.log(`Caption gerada com ${caption.length} caracteres e ${smartHashtags.length} hashtags inteligentes (${hashtags.length - smartHashtags.length} banidas)`);
 
     return new Response(
       JSON.stringify({
         caption,
-        hashtags,
+        hashtags: smartHashtags,
         postType,
         characterCount: caption.length,
       }),
