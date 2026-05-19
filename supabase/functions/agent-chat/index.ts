@@ -2891,7 +2891,7 @@ async function executeCreateMarketingVideo(supabase: any, userId: string, worksp
     const topic = `Review e apresentação do ${selectedAffiliate.product_name}: ${productInfo.substring(0, 300)}`;
     const caption = `🔥 Você precisa conhecer o ${selectedAffiliate.product_name}!\n\n${selectedAffiliate.description || 'Uma ferramenta incrível que vai transformar sua produtividade.'}\n\n👇 Confira o link:\n🔗 ${selectedAffiliate.affiliate_url}\n\n#marketing #tecnologia #review #dicatech`;
     
-    const videoResult = await executeCreateNarratedVideo(supabase, userId, workspaceId, {
+    const videoResult: any = await executeCreateNarratedVideo(supabase, userId, workspaceId, {
       topic,
       caption,
       hashtags: ['#marketing', '#tecnologia', '#review', '#dicatech', '#afiliado'],
@@ -2911,18 +2911,19 @@ async function executeCreateMarketingVideo(supabase: any, userId: string, worksp
         .eq('id', selectedAffiliate.id);
       
       // Update post type to 'afiliado'
-      if (videoResult.postId) {
+      const videoPostId = videoResult.postId || videoResult.post?.id;
+      if (videoPostId) {
         await supabase
           .from('posts')
           .update({ post_type: 'afiliado' })
-          .eq('id', videoResult.postId);
+          .eq('id', videoPostId);
       }
     }
     
     return {
       success: true,
       message: `🎬💰 Vídeo de marketing criado para **${selectedAffiliate.product_name}**!\n\n📎 Link de afiliado incluído na legenda\n🔗 ${selectedAffiliate.affiliate_url}\n\n${videoResult?.message || 'Vídeo em processamento...'}`,
-      postId: videoResult?.postId,
+      postId: videoResult?.postId || videoResult?.post?.id,
       affiliateProduct: selectedAffiliate.product_name
     };
   } catch (error: any) {
