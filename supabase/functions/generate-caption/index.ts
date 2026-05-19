@@ -143,13 +143,43 @@ REGRAS OBRIGATÓRIAS:
   },
 };
 
-// Fallback programático quando créditos acabam
-function generateFallbackCaption(topic: string, postType: string, mediaType?: string) {
+// Fallback programático quando créditos acabam ou a legenda vem rasa demais
+function generateFallbackCaption(topic: string, postType: string, mediaType?: string, sourceUrl?: string, sourceName?: string) {
   const topicClean = topic.length > 200 ? topic.substring(0, 200) : topic;
+  const isDeepFallback = postType === "noticia" || postType === "reflexao_profunda";
   
   // Extrair primeira frase como headline
   const firstSentence = topicClean.split(/[.!?]/)[0].trim();
   const headline = firstSentence.length > 80 ? firstSentence.substring(0, 77) + '...' : firstSentence;
+  const contextSeed = topic
+    .replace(/Contexto da notícia.*?:/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (isDeepFallback) {
+    const isNeuralUpdate = sourceName === 'Atualização Neural';
+    const blogBlock = postType === 'noticia' && sourceUrl && isNeuralUpdate
+      ? `📖 Leia o artigo completo no Neural Update 👉 ${sourceUrl}`
+      : postType === 'noticia' && sourceUrl
+      ? `📰 Fonte: ${sourceName || 'site original'} — ${sourceUrl}\n🧠 Acompanhe mais notícias de IA em neural-update.com.br`
+      : `🧠 Mais notícias de IA no nosso blog: neural-update.com.br`;
+
+    const caption = [
+      `💡 ${headline} não é só mais um movimento isolado no radar da tecnologia. É um sinal de como infraestrutura, acesso e poder digital estão ficando cada vez mais conectados.`,
+      `O ponto central: ${contextSeed.substring(0, 280)}. Quando uma mudança desse tipo aparece, ela costuma afetar preço, adoção, concorrência e a forma como as pessoas dependem desses serviços no dia a dia.`,
+      `A leitura mais importante é que tecnologia deixou de ser apenas produto: virou território estratégico. Quem controla conexão, modelos, dados e distribuição passa a influenciar mercados inteiros — e isso exige atenção além do hype.`,
+      `A pergunta é simples: estamos vendo uma melhoria para o usuário ou mais uma camada de dependência tecnológica sendo criada?\n\n${blogBlock}`,
+    ].join('\n\n');
+
+    return {
+      caption,
+      hashtags: ['tecnologia', 'inovacao', 'ia', 'futuro', 'noticias', 'neuralupdate', 'inteligenciaartificial', 'techbrasil'],
+      postType,
+      characterCount: caption.length,
+      fallback: true,
+    };
+  }
   
   const ctaMap: Record<string, string> = {
     engajamento: '💬 O que você acha? Comenta aqui!',
