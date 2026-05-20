@@ -112,7 +112,17 @@ export default function AgentMinimalChat({
               return (
                 <button
                   key={s.label}
-                  onClick={() => handleSend(s.prompt)}
+                  onClick={() => {
+                    setInput(s.prompt);
+                    setShowSuggestions(false);
+                    setTimeout(() => {
+                      const ta = textareaRef.current;
+                      if (ta) {
+                        ta.focus();
+                        ta.setSelectionRange(s.prompt.length, s.prompt.length);
+                      }
+                    }, 30);
+                  }}
                   disabled={isLoading}
                   className={cn(
                     'shrink-0 group flex items-center gap-1.5 px-2.5 py-1 rounded-full',
