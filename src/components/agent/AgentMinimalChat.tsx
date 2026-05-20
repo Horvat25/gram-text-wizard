@@ -30,9 +30,9 @@ interface AgentMinimalChatProps {
 
 const QUICK_SUGGESTIONS = [
   { icon: Sparkles, label: 'Gerar Reel agora', prompt: 'Gere um Reel agora sobre o tema mais quente de tecnologia/IA das últimas 24h.' },
-  { icon: CalendarDays, label: 'Agendar amanhã 11h', prompt: 'Crie e agende um post para amanhã às 11h.' },
+  { icon: CalendarDays, label: 'Agendar amanhã 11h', prompt: 'Crie e agende um post para amanhã às 11h sobre ' },
   { icon: Newspaper, label: 'Carrossel da semana', prompt: 'Crie um carrossel de 3 slides com o resumo das principais notícias de IA da semana.' },
-  { icon: ImageIcon, label: 'Post imagem editorial', prompt: 'Crie um post de imagem editorial sobre uma tendência emergente em IA.' },
+  { icon: ImageIcon, label: 'Post imagem editorial', prompt: 'Crie um post de imagem editorial sobre ' },
   { icon: ListTodo, label: 'Ver fila e próximos', prompt: 'Me mostre o que está na fila e quais são os próximos posts agendados.' },
 ];
 
