@@ -119,36 +119,17 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
 
   const handleClearHistory = async () => {
     if (!currentWorkspace || !user) return;
-    const labels: Record<typeof filter, string> = {
-      all: 'todos os relatórios e ações',
-      reports: 'todos os relatórios',
-      actions: 'todas as ações',
-      chat: 'todo o histórico do chat',
-    } as any;
-    if (!confirm(`Limpar ${labels[filter]}? Esta ação não pode ser desfeita.`)) return;
+    if (!confirm('Apagar TUDO da aba Agente (mensagens, relatórios e ações)? Vamos iniciar do zero. Esta ação não pode ser desfeita.')) return;
     setIsClearing(true);
     try {
-      const ops: PromiseLike<any>[] = [];
-      if (filter === 'all' || filter === 'reports') {
-        ops.push(supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id));
-      }
-      if (filter === 'all' || filter === 'actions') {
-        ops.push(supabase.from('agent_execution_reports').delete().eq('user_id', user.id));
-        // Clear action-bearing assistant messages
-        ops.push(
-          supabase
-            .from('agent_chat_messages')
-            .delete()
-            .eq('workspace_id', currentWorkspace.id)
-            .eq('role', 'assistant')
-            .not('actions', 'is', null)
-        );
-      }
-      if (filter === 'chat') {
-        ops.push(supabase.from('agent_chat_messages').delete().eq('workspace_id', currentWorkspace.id));
-      }
-      await Promise.all(ops);
-      toast.success('Histórico limpo');
+      await Promise.all([
+        supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id),
+        supabase.from('agent_execution_reports').delete().eq('user_id', user.id),
+        supabase.from('agent_chat_messages').delete().eq('workspace_id', currentWorkspace.id),
+      ]);
+      window.dispatchEvent(new CustomEvent('agent-chat-cleared'));
+      toast.success('Tudo limpo. Pronto para começar do zero.');
+      setTimeline([]);
       await loadAll();
     } catch (e: any) {
       console.error(e);
@@ -157,6 +138,26 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       setIsClearing(false);
     }
   };
+
+  const handleDeleteItem = async (item: TimelineItem) => {
+    try {
+      if (item.type === 'report') {
+        await supabase.from('agent_proactive_messages').delete().eq('id', item.data.id);
+      } else if (item.type === 'execution') {
+        await supabase.from('agent_execution_reports').delete().eq('id', item.data.id);
+      } else {
+        await supabase.from('agent_chat_messages').delete().eq('id', item.data.id);
+        if (item.type === 'chat') {
+          window.dispatchEvent(new CustomEvent('agent-chat-message-deleted', { detail: { id: item.data.id } }));
+        }
+      }
+      setTimeline(prev => prev.filter(t => t.data.id !== item.data.id));
+    } catch (e) {
+      console.error(e);
+      toast.error('Não foi possível apagar');
+    }
+  };
+
 
 
   useEffect(() => {
