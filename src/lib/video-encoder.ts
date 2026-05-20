@@ -192,14 +192,6 @@ function drawHookEffect(
   }
 }
 
-// ─── Draw CTA end screen ────────────────────────────────────
-function drawCTAScreen(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  progress: number,
-  brand: string
-) {
 // ─── Draw CTA end screen (editorial, sem botão) ──────────────
 function drawCTAScreen(
   ctx: CanvasRenderingContext2D,
