@@ -635,7 +635,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
                 onClick={handleClearHistory}
                 className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 disabled={isClearing || isLoading}
-                title="Limpar histórico"
+                title="Apagar TUDO — iniciar do zero"
               >
                 {isClearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
               </Button>
