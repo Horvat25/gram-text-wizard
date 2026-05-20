@@ -520,6 +520,13 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     return null;
   };
 
+  const FILTER_META = [
+    { key: 'all' as const, label: 'Tudo', Icon: LayoutGrid },
+    { key: 'reports' as const, label: 'Relatórios', Icon: FileText },
+    { key: 'actions' as const, label: 'Ações', Icon: Zap },
+    { key: 'chat' as const, label: 'Histórico', Icon: MessageSquare },
+  ];
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -528,25 +535,40 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -300 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed left-2 sm:left-4 top-4 bottom-24 w-[calc(100vw-1rem)] sm:w-[420px] sm:max-w-[calc(100vw-2rem)] z-30 flex flex-col bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl overflow-hidden"
+          className="fixed left-2 sm:left-4 top-4 bottom-24 w-[calc(100vw-1rem)] sm:w-[440px] sm:max-w-[calc(100vw-2rem)] z-30 flex flex-col bg-card/95 backdrop-blur-xl rounded-2xl border border-border/60 shadow-2xl overflow-hidden"
         >
+          {/* Subtle gradient glow on top */}
+          <div className="pointer-events-none absolute inset-x-0 -top-px h-24 [background:radial-gradient(ellipse_at_top,hsl(var(--portal-cyan)/0.18),transparent_70%)]" />
+
           {/* Header */}
-          <div className="flex items-center justify-between p-3 border-b border-border/50">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 border border-primary/30">
-                <AvatarImage src={agentAvatar || undefined} />
-                <AvatarFallback className="neural-gradient text-primary-foreground">
-                  <Bot className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold text-sm">{agentName}</h2>
-                <p className="text-xs text-muted-foreground">Relatórios, Decisões & Ações</p>
+          <div className="relative flex items-center justify-between p-3 border-b border-border/40">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative">
+                <Avatar className="h-10 w-10 border border-primary/40 ring-2 ring-primary/10">
+                  <AvatarImage src={agentAvatar || undefined} />
+                  <AvatarFallback className="neural-gradient text-primary-foreground">
+                    <Bot className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-card" />
+                </span>
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-semibold text-sm truncate flex items-center gap-1.5">
+                  {agentName}
+                  <Sparkles className="h-3 w-3 text-primary shrink-0" />
+                </h2>
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Activity className="h-2.5 w-2.5" />
+                  Auto-reporta 4×/dia · {counts.all + counts.chat} eventos
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" onClick={loadAll} className="h-8 w-8">
-                <RefreshCw className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-1 shrink-0">
+              <Button variant="ghost" size="icon" onClick={loadAll} className="h-8 w-8" disabled={isLoading}>
+                <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
               </Button>
               <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
                 <X className="h-4 w-4" />
@@ -554,49 +576,92 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
             </div>
           </div>
 
-          {/* Filter Tabs */}
-          <div className="flex items-center gap-1 px-3 py-2 border-b border-border/30">
-            {(['all', 'reports', 'actions', 'chat'] as const).map((f) => (
-              <Button
-                key={f}
-                variant={filter === f ? "default" : "ghost"}
-                size="sm"
-                className={cn(
-                  "h-6 text-[11px] px-2",
-                  filter === f && "neural-gradient border-0"
-                )}
-                onClick={() => setFilter(f)}
-              >
-                {f === 'all' ? 'Tudo' : f === 'reports' ? '📊 Relatórios' : f === 'actions' ? '⚡ Ações' : '💬 Histórico'}
-              </Button>
-            ))}
-            <span className="text-[10px] text-muted-foreground ml-auto">
-              {filteredTimeline.length} itens
-            </span>
+          {/* Filter Pills with counts */}
+          <div className="px-3 pt-2 pb-2 border-b border-border/30 space-y-2">
+            <div className="grid grid-cols-4 gap-1">
+              {FILTER_META.map(({ key, label, Icon }) => {
+                const active = filter === key;
+                const count = counts[key];
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setFilter(key)}
+                    className={cn(
+                      'group relative flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg transition-all',
+                      active
+                        ? 'bg-primary/10 border border-primary/40 shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_4px_16px_-4px_hsl(var(--primary)/0.4)]'
+                        : 'border border-transparent hover:bg-muted/50'
+                    )}
+                  >
+                    <Icon className={cn('h-3.5 w-3.5 transition-colors', active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground')} />
+                    <span className={cn('text-[10px] font-medium', active ? 'text-foreground' : 'text-muted-foreground')}>
+                      {label}
+                    </span>
+                    <span className={cn(
+                      'text-[9px] tabular-nums px-1 rounded-full leading-tight',
+                      active ? 'bg-primary/20 text-primary font-semibold' : 'text-muted-foreground/70'
+                    )}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/60" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar nos relatórios e ações…"
+                className="h-7 pl-7 pr-7 text-[11px] bg-muted/40 border-border/40 focus-visible:ring-1 focus-visible:ring-primary/40"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Timeline */}
           {isLoading ? (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex flex-col items-center justify-center gap-2">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <p className="text-xs text-muted-foreground">Carregando timeline…</p>
             </div>
           ) : filteredTimeline.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-              <Clock className="h-12 w-12 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Nenhuma atividade registrada</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                O agente reporta automaticamente 4x ao dia
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+              <div className="relative mb-3">
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                <Clock className="relative h-12 w-12 text-primary/60" />
+              </div>
+              <p className="text-sm font-medium">
+                {searchQuery ? 'Nada encontrado' : 'Nenhuma atividade ainda'}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
+                {searchQuery
+                  ? 'Tente outro termo ou troque o filtro acima.'
+                  : 'O agente reporta automaticamente 4× ao dia. Você também verá aqui cada ação executada pelo chat.'}
               </p>
             </div>
           ) : (
             <ScrollArea ref={scrollRef} className="flex-1 p-3">
-              <div className="space-y-3">
+              <div className="space-y-3 pb-2">
                 {filteredTimeline.map(renderItem)}
+              </div>
+              <div className="text-center text-[10px] text-muted-foreground/60 pt-2 pb-1">
+                · fim do feed ·
               </div>
             </ScrollArea>
           )}
         </motion.div>
       )}
     </AnimatePresence>
+
   );
 }
