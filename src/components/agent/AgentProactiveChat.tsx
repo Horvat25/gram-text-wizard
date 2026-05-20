@@ -1,12 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
+import { Input } from '@/components/ui/input';
+import {
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
-  CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb, 
-  Zap, Clock, Pause, User, MessageSquare, Newspaper, Instagram
+  CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb,
+  Zap, Clock, Pause, User, MessageSquare, Newspaper, Instagram, Search,
+  Activity, LayoutGrid
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
