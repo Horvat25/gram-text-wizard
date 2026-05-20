@@ -99,7 +99,65 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'reports' | 'actions' | 'chat'>('all');
+  const [isClearing, setIsClearing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleExpand = (id: string) => {
+    const next = expandedId === id ? null : id;
+    setExpandedId(next);
+    if (next) {
+      setTimeout(() => {
+        const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement | null;
+        const el = itemRefs.current[id];
+        if (viewport && el) {
+          viewport.scrollTo({ top: el.offsetTop - 8, behavior: 'smooth' });
+        }
+      }, 80);
+    }
+  };
+
+  const handleClearHistory = async () => {
+    if (!currentWorkspace || !user) return;
+    const labels: Record<typeof filter, string> = {
+      all: 'todos os relatórios e ações',
+      reports: 'todos os relatórios',
+      actions: 'todas as ações',
+      chat: 'todo o histórico do chat',
+    } as any;
+    if (!confirm(`Limpar ${labels[filter]}? Esta ação não pode ser desfeita.`)) return;
+    setIsClearing(true);
+    try {
+      const ops: Promise<any>[] = [];
+      if (filter === 'all' || filter === 'reports') {
+        ops.push(supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id));
+      }
+      if (filter === 'all' || filter === 'actions') {
+        ops.push(supabase.from('agent_execution_reports').delete().eq('user_id', user.id));
+        // Clear action-bearing assistant messages
+        ops.push(
+          supabase
+            .from('agent_chat_messages')
+            .delete()
+            .eq('workspace_id', currentWorkspace.id)
+            .eq('role', 'assistant')
+            .not('actions', 'is', null)
+        );
+      }
+      if (filter === 'chat') {
+        ops.push(supabase.from('agent_chat_messages').delete().eq('workspace_id', currentWorkspace.id));
+      }
+      await Promise.all(ops);
+      toast.success('Histórico limpo');
+      await loadAll();
+    } catch (e: any) {
+      console.error(e);
+      toast.error('Falha ao limpar histórico');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
 
   useEffect(() => {
     if (isOpen && currentWorkspace && user) {
