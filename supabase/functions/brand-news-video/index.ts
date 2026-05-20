@@ -432,9 +432,11 @@ Deno.serve(async (req) => {
     }
 
     // ─── STEP 6: Update post with results ───
-    const brandedImages = segments
-      .map(s => s.brandedImageUrl || s.imageUrl)
-      .filter(Boolean);
+    // Frames do vídeo: imagens REAIS sem headline overlay.
+    // carousel_images guarda os frames crus (pro client-renderer compor o reel).
+    // image_url (thumbnail) usa a versão brandada com headline pra exibição.
+    const rawFrames = segments.map(s => s.imageUrl).filter(Boolean) as string[];
+    const brandedImages = rawFrames;
 
     const captionUpdate: any = {};
     if (enrichedCaption) captionUpdate.caption = enrichedCaption;
