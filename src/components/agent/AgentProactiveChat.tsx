@@ -476,7 +476,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
           className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors"
         >
           <button
-            onClick={() => setExpandedId(isExpanded ? null : action.id)}
+            onClick={() => handleExpand(action.id)}
             className="w-full p-3 flex items-center justify-between bg-card hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-3">
