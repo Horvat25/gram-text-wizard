@@ -372,6 +372,26 @@ Deno.serve(async (req) => {
     const segments = await generateBroadcastScript(title, description || "", lovableApiKey);
     console.log(`[BRAND-VIDEO] ✅ Script: ${segments.length} segmentos`);
 
+    // ─── STEP 1.5: Revisão PT-BR (acentos, ortografia) em cada segmento ANTES do TTS ───
+    for (let i = 0; i < segments.length; i++) {
+      try {
+        const rev = await fetch(`${supabaseUrl}/functions/v1/review-portuguese`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
+          body: JSON.stringify({ text: segments[i].text, context: "narração de Reels editorial sobre tecnologia/IA" }),
+        });
+        if (rev.ok) {
+          const r = await rev.json();
+          if (r.corrected && r.corrected !== segments[i].text) {
+            console.log(`[BRAND-VIDEO] ✏️  Seg ${i+1} corrigido: "${segments[i].text}" → "${r.corrected}"`);
+            segments[i].text = r.corrected;
+          }
+        }
+      } catch (e) {
+        console.warn(`[BRAND-VIDEO] review-portuguese seg ${i+1} falhou:`, e);
+      }
+    }
+
     // ─── STEP 2: Generate images ───
     await fetchRealImages(segments, title, description || "", articleUrl, primaryImageUrl, supabaseUrl, serviceRoleKey);
 
