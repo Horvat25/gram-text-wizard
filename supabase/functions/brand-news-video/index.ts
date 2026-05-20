@@ -479,7 +479,7 @@ Deno.serve(async (req) => {
       console.log(`[BRAND-VIDEO] ⚡ Assets prontos para composição client-side`);
       await supabase.from("posts").update({
         ...captionUpdate,
-        image_url: brandedImages[0] || null,
+        image_url: thumbnailBranded || brandedImages[0] || null,
         carousel_images: brandedImages,
         status: "draft",
         overlay_metadata: {
