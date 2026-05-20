@@ -448,7 +448,7 @@ Deno.serve(async (req) => {
       await supabase.from("posts").update({
         ...captionUpdate,
         video_url: finalVideoUrl,
-        image_url: brandedImages[0] || null,
+        image_url: thumbnailBranded || brandedImages[0] || null,
         carousel_images: brandedImages,
         status: "scheduled",
         scheduled_for: getOptimalScheduleTime(),
