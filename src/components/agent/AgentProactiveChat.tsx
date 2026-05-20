@@ -117,27 +117,43 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     }
   };
 
-  const handleClearHistory = async () => {
+  const handleClearTab = async () => {
     if (!currentWorkspace || !user) return;
-    if (!confirm('Apagar TUDO da aba Agente (mensagens, relatórios e ações)? Vamos iniciar do zero. Esta ação não pode ser desfeita.')) return;
+    const tabLabel = filter === 'all' ? 'Tudo'
+      : filter === 'reports' ? 'Relatórios'
+      : filter === 'actions' ? 'Ações'
+      : 'Histórico';
+    const items = filteredTimelineRef.current;
+    if (items.length === 0) return;
+    if (!confirm(`Apagar ${items.length} item(s) da aba "${tabLabel}"? Esta ação não pode ser desfeita.`)) return;
     setIsClearing(true);
     try {
-      await Promise.all([
-        supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id),
-        supabase.from('agent_execution_reports').delete().eq('user_id', user.id),
-        supabase.from('agent_chat_messages').delete().eq('workspace_id', currentWorkspace.id),
+      const proIds = items.filter(i => i.type === 'report').map(i => i.data.id);
+      const execIds = items.filter(i => i.type === 'execution').map(i => i.data.id);
+      const chatIds = items.filter(i => i.type === 'chat' || i.type === 'action').map(i => i.data.id);
+
+      const results = await Promise.all([
+        proIds.length ? supabase.from('agent_proactive_messages').delete().in('id', proIds) : Promise.resolve({ error: null }),
+        execIds.length ? supabase.from('agent_execution_reports').delete().in('id', execIds) : Promise.resolve({ error: null }),
+        chatIds.length ? supabase.from('agent_chat_messages').delete().in('id', chatIds) : Promise.resolve({ error: null }),
       ]);
-      window.dispatchEvent(new CustomEvent('agent-chat-cleared'));
-      toast.success('Tudo limpo. Pronto para começar do zero.');
-      setTimeline([]);
-      await loadAll();
+      const firstErr = results.find(r => (r as any).error);
+      if (firstErr && (firstErr as any).error) throw (firstErr as any).error;
+
+      if (chatIds.length) {
+        window.dispatchEvent(new CustomEvent('agent-chat-cleared'));
+      }
+      const removed = new Set(items.map(i => i.data.id));
+      setTimeline(prev => prev.filter(t => !removed.has(t.data.id)));
+      toast.success(`${items.length} item(s) apagado(s)`);
     } catch (e: any) {
       console.error(e);
-      toast.error('Falha ao limpar histórico');
+      toast.error('Falha ao apagar: ' + (e?.message || 'erro desconhecido'));
     } finally {
       setIsClearing(false);
     }
   };
+
 
   const handleDeleteItem = async (item: TimelineItem) => {
     try {
