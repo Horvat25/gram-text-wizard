@@ -8,7 +8,7 @@ import {
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
   CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb,
   Zap, Clock, Pause, User, MessageSquare, Newspaper, Instagram, Search,
-  Activity, LayoutGrid, Trash2
+  Activity, LayoutGrid
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
