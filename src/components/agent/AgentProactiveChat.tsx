@@ -239,18 +239,38 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     }
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const counts = useMemo(() => ({
+    all: timeline.filter(i => i.type !== 'chat').length,
+    reports: timeline.filter(i => i.type === 'report').length,
+    actions: timeline.filter(i => i.type === 'execution' || i.type === 'action').length,
+    chat: timeline.filter(i => i.type === 'chat').length,
+  }), [timeline]);
+
   const filteredTimeline = (() => {
     const filtered = timeline.filter(item => {
-      if (filter === 'all') return item.type !== 'chat';
-      if (filter === 'reports') return item.type === 'report';
-      if (filter === 'actions') return item.type === 'execution' || item.type === 'action';
-      if (filter === 'chat') return item.type === 'chat';
-      return true;
+      // Filter by tab
+      let matchesFilter = true;
+      if (filter === 'all') matchesFilter = item.type !== 'chat';
+      else if (filter === 'reports') matchesFilter = item.type === 'report';
+      else if (filter === 'actions') matchesFilter = item.type === 'execution' || item.type === 'action';
+      else if (filter === 'chat') matchesFilter = item.type === 'chat';
+      if (!matchesFilter) return false;
+
+      // Filter by search
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const text = (item.type === 'report' ? item.data.content
+        : item.type === 'execution' ? `${item.data.summary || ''} ${item.data.decision_reason || ''} ${item.data.learning || ''}`
+        : item.type === 'action' ? item.data.content
+        : item.data.content) || '';
+      return text.toLowerCase().includes(q);
     });
-    // Chat should be chronological (oldest first)
     if (filter === 'chat') filtered.reverse();
     return filtered;
   })();
+
 
   const renderItem = (item: TimelineItem) => {
     const isExpanded = expandedId === item.data.id;
