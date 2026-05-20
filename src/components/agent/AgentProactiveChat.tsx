@@ -123,7 +123,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       : filter === 'reports' ? 'Relatórios'
       : filter === 'actions' ? 'Ações'
       : 'Histórico';
-    const items = filteredTimelineRef.current;
+    const items = computeFiltered();
     if (items.length === 0) return;
     if (!confirm(`Apagar ${items.length} item(s) da aba "${tabLabel}"? Esta ação não pode ser desfeita.`)) return;
     setIsClearing(true);
