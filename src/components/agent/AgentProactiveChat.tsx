@@ -472,9 +472,10 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       return (
         <motion.div
           key={`a-${action.id}`}
+          ref={(el) => { itemRefs.current[action.id] = el; }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors"
+          className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors scroll-mt-2"
         >
           <button
             onClick={() => handleExpand(action.id)}
