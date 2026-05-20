@@ -628,6 +628,16 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
               </div>
             </div>
             <div className="flex items-center gap-1 shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearHistory}
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                disabled={isClearing || isLoading}
+                title="Limpar histórico"
+              >
+                {isClearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+              </Button>
               <Button variant="ghost" size="icon" onClick={loadAll} className="h-8 w-8" disabled={isLoading}>
                 <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
               </Button>
