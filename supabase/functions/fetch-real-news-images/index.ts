@@ -214,21 +214,55 @@ Cada query: 2-4 palavras. Ex: "nvidia chip", "data center server", "smartphone s
   }
 }
 
-// ─── Pexels: foto vertical 9:16 quando possível ───
-async function searchPexels(query: string, apiKey: string): Promise<string | null> {
+// ─── Pexels: retorna múltiplos candidatos com metadata para ranqueamento ───
+async function searchPexelsMulti(
+  query: string,
+  apiKey: string,
+  perPage: number,
+): Promise<ImageCandidate[]> {
   try {
-    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&orientation=portrait&per_page=5`;
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&orientation=portrait&per_page=${perPage}`;
     const resp = await fetch(url, { headers: { Authorization: apiKey } });
-    if (!resp.ok) return null;
+    if (!resp.ok) return [];
     const data = await resp.json();
     const photos = data.photos || [];
-    if (photos.length === 0) return null;
-    // pega aleatória pra evitar repetição
-    const pick = photos[Math.floor(Math.random() * Math.min(photos.length, 3))];
-    return pick.src?.large2x || pick.src?.large || pick.src?.original || null;
+    return photos.map((p: any): ImageCandidate => ({
+      url: p.src?.large2x || p.src?.large || p.src?.original || "",
+      sourceId: String(p.id || p.url || ""),
+      source: "Pexels",
+      description: p.alt || "",
+      altDescription: p.alt || "",
+      tags: [],
+    })).filter((c: ImageCandidate) => c.url);
   } catch (e) {
     console.warn("[REAL-IMG] Pexels error:", e);
-    return null;
+    return [];
+  }
+}
+
+// ─── Unsplash: descrições/tags ricas → score muito melhor ───
+async function searchUnsplash(
+  query: string,
+  apiKey: string,
+  perPage: number,
+): Promise<ImageCandidate[]> {
+  try {
+    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&orientation=portrait&per_page=${perPage}`;
+    const resp = await fetch(url, { headers: { Authorization: `Client-ID ${apiKey}` } });
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    const results = data.results || [];
+    return results.map((p: any): ImageCandidate => ({
+      url: p.urls?.regular || p.urls?.full || "",
+      sourceId: String(p.id || ""),
+      source: "Unsplash",
+      description: p.description || "",
+      altDescription: p.alt_description || "",
+      tags: (p.tags || []).map((t: any) => t.title || ""),
+    })).filter((c: ImageCandidate) => c.url);
+  } catch (e) {
+    console.warn("[REAL-IMG] Unsplash error:", e);
+    return [];
   }
 }
 
