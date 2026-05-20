@@ -375,20 +375,14 @@ Deno.serve(async (req) => {
     // ─── STEP 2: Generate images ───
     await fetchRealImages(segments, title, description || "", articleUrl, primaryImageUrl, supabaseUrl, serviceRoleKey);
 
-    // ─── STEP 3: Brand each image with Neural Update style ───
-    for (let i = 0; i < segments.length; i++) {
-      if (segments[i].imageUrl) {
-        const branded = await brandImage(
-          segments[i].imageUrl!,
-          title,
-          supabaseUrl,
-          serviceRoleKey
-        );
-        if (branded) {
-          segments[i].brandedImageUrl = branded;
-          console.log(`[BRAND-VIDEO] ✅ Segmento ${i + 1} brandado`);
-        }
-      }
+    // ─── STEP 3: SEM headline em frames de vídeo (usuário pediu).
+    // Mantemos imageUrl cru — o video-encoder cliente adiciona header/watermark da marca.
+    // Apenas o thumbnail (image_url) recebe overlay com headline.
+    console.log("[BRAND-VIDEO] ⏭️  Pulando overlay de headline nos frames do vídeo.");
+    let thumbnailBranded: string | null = null;
+    const coverImage = segments.find(s => s.imageUrl)?.imageUrl;
+    if (coverImage) {
+      thumbnailBranded = await brandImage(coverImage, title, supabaseUrl, serviceRoleKey);
     }
 
     // ─── STEP 4: Generate narration for each segment ───
