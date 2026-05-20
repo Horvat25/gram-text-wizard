@@ -1,4 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import {
+  extractEntities,
+  containsForbidden,
+  scoreImage,
+  buildEntityQuery,
+  type ImageCandidate,
+} from "../_shared/image-relevance.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
