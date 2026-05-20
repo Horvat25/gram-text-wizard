@@ -8,7 +8,7 @@ import {
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
   CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb,
   Zap, Clock, Pause, User, MessageSquare, Newspaper, Instagram, Search,
-  Activity, LayoutGrid, Trash2
+  Activity, LayoutGrid
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,27 +117,43 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     }
   };
 
-  const handleClearHistory = async () => {
+  const handleClearTab = async () => {
     if (!currentWorkspace || !user) return;
-    if (!confirm('Apagar TUDO da aba Agente (mensagens, relatórios e ações)? Vamos iniciar do zero. Esta ação não pode ser desfeita.')) return;
+    const tabLabel = filter === 'all' ? 'Tudo'
+      : filter === 'reports' ? 'Relatórios'
+      : filter === 'actions' ? 'Ações'
+      : 'Histórico';
+    const items = computeFiltered();
+    if (items.length === 0) return;
+    if (!confirm(`Apagar ${items.length} item(s) da aba "${tabLabel}"? Esta ação não pode ser desfeita.`)) return;
     setIsClearing(true);
     try {
-      await Promise.all([
-        supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id),
-        supabase.from('agent_execution_reports').delete().eq('user_id', user.id),
-        supabase.from('agent_chat_messages').delete().eq('workspace_id', currentWorkspace.id),
+      const proIds = items.filter(i => i.type === 'report').map(i => i.data.id);
+      const execIds = items.filter(i => i.type === 'execution').map(i => i.data.id);
+      const chatIds = items.filter(i => i.type === 'chat' || i.type === 'action').map(i => i.data.id);
+
+      const results = await Promise.all([
+        proIds.length ? supabase.from('agent_proactive_messages').delete().in('id', proIds) : Promise.resolve({ error: null }),
+        execIds.length ? supabase.from('agent_execution_reports').delete().in('id', execIds) : Promise.resolve({ error: null }),
+        chatIds.length ? supabase.from('agent_chat_messages').delete().in('id', chatIds) : Promise.resolve({ error: null }),
       ]);
-      window.dispatchEvent(new CustomEvent('agent-chat-cleared'));
-      toast.success('Tudo limpo. Pronto para começar do zero.');
-      setTimeline([]);
-      await loadAll();
+      const firstErr = results.find(r => (r as any).error);
+      if (firstErr && (firstErr as any).error) throw (firstErr as any).error;
+
+      if (chatIds.length) {
+        window.dispatchEvent(new CustomEvent('agent-chat-cleared'));
+      }
+      const removed = new Set(items.map(i => i.data.id));
+      setTimeline(prev => prev.filter(t => !removed.has(t.data.id)));
+      toast.success(`${items.length} item(s) apagado(s)`);
     } catch (e: any) {
       console.error(e);
-      toast.error('Falha ao limpar histórico');
+      toast.error('Falha ao apagar: ' + (e?.message || 'erro desconhecido'));
     } finally {
       setIsClearing(false);
     }
   };
+
 
   const handleDeleteItem = async (item: TimelineItem) => {
     try {
@@ -308,9 +324,8 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     chat: timeline.filter(i => i.type === 'chat').length,
   }), [timeline]);
 
-  const filteredTimeline = (() => {
+  const computeFiltered = (): TimelineItem[] => {
     const filtered = timeline.filter(item => {
-      // Filter by tab
       let matchesFilter = true;
       if (filter === 'all') matchesFilter = item.type !== 'chat';
       else if (filter === 'reports') matchesFilter = item.type === 'report';
@@ -318,7 +333,6 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       else if (filter === 'chat') matchesFilter = item.type === 'chat';
       if (!matchesFilter) return false;
 
-      // Filter by search
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       const text = (item.type === 'report' ? item.data.content
@@ -329,7 +343,10 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     });
     if (filter === 'chat') filtered.reverse();
     return filtered;
-  })();
+  };
+
+  const filteredTimeline = computeFiltered();
+
 
 
   const renderItem = (item: TimelineItem) => {
@@ -629,16 +646,6 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
               </div>
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClearHistory}
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                disabled={isClearing || isLoading}
-                title="Apagar TUDO — iniciar do zero"
-              >
-                {isClearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-              </Button>
               <Button variant="ghost" size="icon" onClick={loadAll} className="h-8 w-8" disabled={isLoading}>
                 <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
               </Button>
@@ -647,6 +654,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
               </Button>
             </div>
           </div>
+
 
           {/* Filter Pills with counts */}
           <div className="px-3 pt-2 pb-2 border-b border-border/30 space-y-2">
@@ -698,7 +706,20 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
                 </button>
               )}
             </div>
+
+            {filteredTimeline.length > 0 && (
+              <button
+                onClick={handleClearTab}
+                disabled={isClearing}
+                className="w-full flex items-center justify-center gap-1.5 py-1 rounded-md text-[10px] text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors disabled:opacity-50"
+                title="Apagar todos os itens visíveis nesta aba"
+              >
+                {isClearing ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
+                Limpar esta aba ({filteredTimeline.length})
+              </button>
+            )}
           </div>
+
 
           {/* Timeline */}
           {isLoading ? (
