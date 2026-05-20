@@ -375,20 +375,14 @@ Deno.serve(async (req) => {
     // ─── STEP 2: Generate images ───
     await fetchRealImages(segments, title, description || "", articleUrl, primaryImageUrl, supabaseUrl, serviceRoleKey);
 
-    // ─── STEP 3: Brand each image with Neural Update style ───
-    for (let i = 0; i < segments.length; i++) {
-      if (segments[i].imageUrl) {
-        const branded = await brandImage(
-          segments[i].imageUrl!,
-          title,
-          supabaseUrl,
-          serviceRoleKey
-        );
-        if (branded) {
-          segments[i].brandedImageUrl = branded;
-          console.log(`[BRAND-VIDEO] ✅ Segmento ${i + 1} brandado`);
-        }
-      }
+    // ─── STEP 3: SEM headline em frames de vídeo (usuário pediu).
+    // Mantemos imageUrl cru — o video-encoder cliente adiciona header/watermark da marca.
+    // Apenas o thumbnail (image_url) recebe overlay com headline.
+    console.log("[BRAND-VIDEO] ⏭️  Pulando overlay de headline nos frames do vídeo.");
+    let thumbnailBranded: string | null = null;
+    const coverImage = segments.find(s => s.imageUrl)?.imageUrl;
+    if (coverImage) {
+      thumbnailBranded = await brandImage(coverImage, title, supabaseUrl, serviceRoleKey);
     }
 
     // ─── STEP 4: Generate narration for each segment ───
@@ -438,9 +432,11 @@ Deno.serve(async (req) => {
     }
 
     // ─── STEP 6: Update post with results ───
-    const brandedImages = segments
-      .map(s => s.brandedImageUrl || s.imageUrl)
-      .filter(Boolean);
+    // Frames do vídeo: imagens REAIS sem headline overlay.
+    // carousel_images guarda os frames crus (pro client-renderer compor o reel).
+    // image_url (thumbnail) usa a versão brandada com headline pra exibição.
+    const rawFrames = segments.map(s => s.imageUrl).filter(Boolean) as string[];
+    const brandedImages = rawFrames;
 
     const captionUpdate: any = {};
     if (enrichedCaption) captionUpdate.caption = enrichedCaption;
@@ -452,7 +448,7 @@ Deno.serve(async (req) => {
       await supabase.from("posts").update({
         ...captionUpdate,
         video_url: finalVideoUrl,
-        image_url: brandedImages[0] || null,
+        image_url: thumbnailBranded || brandedImages[0] || null,
         carousel_images: brandedImages,
         status: "scheduled",
         scheduled_for: getOptimalScheduleTime(),
@@ -483,7 +479,7 @@ Deno.serve(async (req) => {
       console.log(`[BRAND-VIDEO] ⚡ Assets prontos para composição client-side`);
       await supabase.from("posts").update({
         ...captionUpdate,
-        image_url: brandedImages[0] || null,
+        image_url: thumbnailBranded || brandedImages[0] || null,
         carousel_images: brandedImages,
         status: "draft",
         overlay_metadata: {
