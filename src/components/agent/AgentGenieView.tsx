@@ -130,6 +130,26 @@ export default function AgentGenieView() {
     }
   }, [user, currentWorkspace]);
 
+  useEffect(() => {
+    const onCleared = () => {
+      setIgMessages([]);
+      setTkMessages([]);
+    };
+    const onDeleted = (e: Event) => {
+      const id = (e as CustomEvent).detail?.id;
+      if (!id) return;
+      setIgMessages(prev => prev.filter(m => m.id !== id));
+      setTkMessages(prev => prev.filter(m => m.id !== id));
+    };
+    window.addEventListener('agent-chat-cleared', onCleared);
+    window.addEventListener('agent-chat-message-deleted', onDeleted as EventListener);
+    return () => {
+      window.removeEventListener('agent-chat-cleared', onCleared);
+      window.removeEventListener('agent-chat-message-deleted', onDeleted as EventListener);
+    };
+  }, []);
+
+
   const loadAgentConfig = async () => {
     if (!user || !currentWorkspace) return;
     try {
