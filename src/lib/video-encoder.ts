@@ -82,20 +82,32 @@ function drawGradientOverlays(ctx: CanvasRenderingContext2D, width: number, heig
   ctx.fillRect(0, height * 0.65, width, height * 0.35);
 }
 
-// ─── Draw watermark ──────────────────────────────────────────
+// ─── Draw watermark (editorial gold) ─────────────────────────
 function drawWatermark(ctx: CanvasRenderingContext2D, width: number, height: number, brand: string) {
   ctx.save();
-  ctx.globalAlpha = 0.6;
-  ctx.font = 'bold 28px sans-serif';
+  // Linha dourada fininha acima do brand
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = '#FFD700';
+  ctx.fillRect(width - 130, height - 58, 36, 2);
+
+  ctx.globalAlpha = 0.95;
+  ctx.font = '600 22px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'right';
-  ctx.shadowColor = `rgba(123, 44, 255, 0.5)`;
-  ctx.shadowBlur = 12;
-  ctx.fillText(brand, width - 40, height - 40);
+  ctx.textBaseline = 'alphabetic';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+  ctx.shadowBlur = 8;
+  ctx.fillText(brand.toUpperCase(), width - 40, height - 38);
+
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.55;
+  ctx.font = '500 13px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFD700';
+  ctx.fillText('IA • TECH • FUTURO', width - 40, height - 18);
   ctx.restore();
 }
 
-// ─── Draw animated caption (word-wrapped) ────────────────────
+// ─── Draw editorial caption (big, bold, no pill — broadcast style) ───
 function drawCaption(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -106,11 +118,15 @@ function drawCaption(
   if (!text || opacity <= 0) return;
   ctx.save();
   ctx.globalAlpha = Math.min(1, opacity);
-  ctx.font = 'bold 42px sans-serif';
-  ctx.textAlign = 'center';
+
+  // Tipografia: editorial bold, peso forte
+  const baseSize = 46;
+  ctx.font = `800 ${baseSize}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", sans-serif`;
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
 
-  const maxWidth = width - 120;
+  const sideMargin = 56;
+  const maxWidth = width - sideMargin * 2;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -125,37 +141,33 @@ function drawCaption(
   }
   if (currentLine) lines.push(currentLine);
 
-  const lineHeight = 54;
+  const lineHeight = baseSize + 14;
   const totalHeight = lines.length * lineHeight;
-  const startY = height - 180 - totalHeight;
+  const bottomMargin = 170;
+  const startY = height - bottomMargin - totalHeight;
 
-  // Background pill
-  ctx.fillStyle = 'rgba(11, 15, 26, 0.75)';
-  const padding = 20;
-  const bgWidth = Math.min(maxWidth + padding * 2, width - 60);
-  const rx = width / 2 - bgWidth / 2;
-  const ry = startY - padding;
-  const rw = bgWidth;
-  const rh = totalHeight + padding * 2;
-  const radius = 16;
-  ctx.beginPath();
-  ctx.moveTo(rx + radius, ry);
-  ctx.lineTo(rx + rw - radius, ry);
-  ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
-  ctx.lineTo(rx + rw, ry + rh - radius);
-  ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
-  ctx.lineTo(rx + radius, ry + rh);
-  ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
-  ctx.lineTo(rx, ry + radius);
-  ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
-  ctx.closePath();
-  ctx.fill();
+  // Faixa escura sutil (gradiente, sem pill arredondada) só atrás do texto
+  const bgPad = 28;
+  const bgY = startY - bgPad;
+  const bgH = totalHeight + bgPad * 2;
+  const bgGrad = ctx.createLinearGradient(0, bgY, 0, bgY + bgH);
+  bgGrad.addColorStop(0, 'rgba(11, 15, 26, 0)');
+  bgGrad.addColorStop(0.25, 'rgba(11, 15, 26, 0.55)');
+  bgGrad.addColorStop(1, 'rgba(11, 15, 26, 0.8)');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, bgY, width, bgH + 40);
 
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-  ctx.shadowBlur = 6;
+  // Barra amarela acento à esquerda (motif Neural Update)
+  ctx.fillStyle = '#FFD700';
+  ctx.fillRect(sideMargin - 18, startY + 6, 5, totalHeight - 12);
+
+  // Texto principal — branco forte com sombra densa pra legibilidade
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 2;
   ctx.fillStyle = '#FFFFFF';
   for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], width / 2, startY + i * lineHeight);
+    ctx.fillText(lines[i], sideMargin, startY + i * lineHeight);
   }
   ctx.restore();
 }
@@ -180,7 +192,7 @@ function drawHookEffect(
   }
 }
 
-// ─── Draw CTA end screen ────────────────────────────────────
+// ─── Draw CTA end screen (editorial, sem botão) ──────────────
 function drawCTAScreen(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -188,67 +200,78 @@ function drawCTAScreen(
   progress: number,
   brand: string
 ) {
-  const grad = ctx.createLinearGradient(0, 0, width, height);
-  grad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_BG);
-  grad.addColorStop(0.5, VIDEO_CONFIG.BRAND_COLOR_BG_DARK);
-  grad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_BG);
+  // Fundo gradient profundo
+  const grad = ctx.createLinearGradient(0, 0, 0, height);
+  grad.addColorStop(0, '#05070d');
+  grad.addColorStop(0.5, '#0B0F1A');
+  grad.addColorStop(1, '#000000');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
-  const pulse = 0.5 + 0.5 * Math.sin(progress * Math.PI * 4);
-  ctx.save();
-  const glowGrad = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 0.5);
-  glowGrad.addColorStop(0, `rgba(123, 44, 255, ${0.15 + pulse * 0.1})`);
-  glowGrad.addColorStop(1, 'rgba(123, 44, 255, 0)');
-  ctx.fillStyle = glowGrad;
+  // Glow dourado sutil no centro (vinheta invertida)
+  const glow = ctx.createRadialGradient(width / 2, height * 0.42, 0, width / 2, height * 0.42, width * 0.8);
+  glow.addColorStop(0, 'rgba(255, 215, 0, 0.10)');
+  glow.addColorStop(0.5, 'rgba(255, 215, 0, 0.03)');
+  glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
+
+  // Grain leve (linhas horizontais discretas pra textura editorial)
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.fillStyle = '#FFFFFF';
+  for (let y = 0; y < height; y += 3) ctx.fillRect(0, y, width, 1);
   ctx.restore();
 
-  const fadeIn = easeInOutCubic(Math.min(1, progress * 3));
+  const fadeIn = easeInOutCubic(Math.min(1, progress * 2.5));
+  const slideUp = (1 - easeInOutCubic(Math.min(1, progress * 2))) * 30;
 
+  // Linha dourada sobre o título
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 64px sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(123, 44, 255, 0.6)';
-  ctx.shadowBlur = 20;
-  ctx.fillText(brand, width / 2, height / 2 - 80);
+  ctx.fillStyle = '#FFD700';
+  ctx.fillRect(width / 2 - 32, height / 2 - 170 + slideUp, 64, 3);
   ctx.restore();
 
-  ctx.save();
-  ctx.globalAlpha = fadeIn * 0.8;
-  ctx.font = '32px sans-serif';
-  ctx.fillStyle = '#A78BFA';
-  ctx.textAlign = 'center';
-  ctx.fillText(VIDEO_CONFIG.BRAND_SUBTITLE, width / 2, height / 2 - 20);
-  ctx.restore();
-
+  // Título grande NEURAL UPDATE (caixa alta, peso máximo)
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  const btnW = 380, btnH = 70;
-  const btnX = width / 2 - btnW / 2, btnY = height / 2 + 40;
-  const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
-  btnGrad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_PRIMARY);
-  btnGrad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_ACCENT);
-  ctx.fillStyle = btnGrad;
-  ctx.beginPath();
-  const br = 35;
-  ctx.moveTo(btnX + br, btnY);
-  ctx.lineTo(btnX + btnW - br, btnY);
-  ctx.quadraticCurveTo(btnX + btnW, btnY, btnX + btnW, btnY + br);
-  ctx.lineTo(btnX + btnW, btnY + btnH - br);
-  ctx.quadraticCurveTo(btnX + btnW, btnY + btnH, btnX + btnW - br, btnY + btnH);
-  ctx.lineTo(btnX + br, btnY + btnH);
-  ctx.quadraticCurveTo(btnX, btnY + btnH, btnX, btnY + btnH - br);
-  ctx.lineTo(btnX, btnY + br);
-  ctx.quadraticCurveTo(btnX, btnY, btnX + br, btnY);
-  ctx.closePath();
-  ctx.fill();
-  ctx.font = 'bold 32px sans-serif';
+  ctx.font = '900 78px ui-sans-serif, system-ui, -apple-system, "Inter", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
-  ctx.fillText('SEGUIR AGORA', width / 2, btnY + 46);
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(255, 215, 0, 0.25)';
+  ctx.shadowBlur = 30;
+  ctx.fillText(brand.toUpperCase(), width / 2, height / 2 - 100 + slideUp);
+  ctx.restore();
+
+  // Subtítulo / tagline
+  ctx.save();
+  ctx.globalAlpha = fadeIn * 0.85;
+  ctx.font = '500 26px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFD700';
+  ctx.textAlign = 'center';
+  ctx.fillText('IA • TECNOLOGIA • FUTURO', width / 2, height / 2 - 40 + slideUp);
+  ctx.restore();
+
+  // CTA editorial (sem botão — texto puro com chamada forte)
+  const fadeIn2 = easeInOutCubic(Math.max(0, Math.min(1, (progress - 0.25) * 2.5)));
+  ctx.save();
+  ctx.globalAlpha = fadeIn2;
+  ctx.font = '700 38px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.fillText('Análise completa no blog', width / 2, height / 2 + 60);
+
+  ctx.font = '800 36px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFD700';
+  ctx.fillText('neural-update.com.br', width / 2, height / 2 + 120);
+
+  // Linha de instagram
+  ctx.globalAlpha = fadeIn2 * 0.7;
+  ctx.font = '500 22px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('@neuralupdate', width / 2, height / 2 + 180);
   ctx.restore();
 }
 
