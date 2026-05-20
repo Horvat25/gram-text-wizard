@@ -200,67 +200,86 @@ function drawCTAScreen(
   progress: number,
   brand: string
 ) {
-  const grad = ctx.createLinearGradient(0, 0, width, height);
-  grad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_BG);
-  grad.addColorStop(0.5, VIDEO_CONFIG.BRAND_COLOR_BG_DARK);
-  grad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_BG);
+// ─── Draw CTA end screen (editorial, sem botão) ──────────────
+function drawCTAScreen(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  progress: number,
+  brand: string
+) {
+  // Fundo gradient profundo
+  const grad = ctx.createLinearGradient(0, 0, 0, height);
+  grad.addColorStop(0, '#05070d');
+  grad.addColorStop(0.5, '#0B0F1A');
+  grad.addColorStop(1, '#000000');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
-  const pulse = 0.5 + 0.5 * Math.sin(progress * Math.PI * 4);
-  ctx.save();
-  const glowGrad = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 0.5);
-  glowGrad.addColorStop(0, `rgba(123, 44, 255, ${0.15 + pulse * 0.1})`);
-  glowGrad.addColorStop(1, 'rgba(123, 44, 255, 0)');
-  ctx.fillStyle = glowGrad;
+  // Glow dourado sutil no centro (vinheta invertida)
+  const glow = ctx.createRadialGradient(width / 2, height * 0.42, 0, width / 2, height * 0.42, width * 0.8);
+  glow.addColorStop(0, 'rgba(255, 215, 0, 0.10)');
+  glow.addColorStop(0.5, 'rgba(255, 215, 0, 0.03)');
+  glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
+
+  // Grain leve (linhas horizontais discretas pra textura editorial)
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.fillStyle = '#FFFFFF';
+  for (let y = 0; y < height; y += 3) ctx.fillRect(0, y, width, 1);
   ctx.restore();
 
-  const fadeIn = easeInOutCubic(Math.min(1, progress * 3));
+  const fadeIn = easeInOutCubic(Math.min(1, progress * 2.5));
+  const slideUp = (1 - easeInOutCubic(Math.min(1, progress * 2))) * 30;
 
+  // Linha dourada sobre o título
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 64px sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(123, 44, 255, 0.6)';
-  ctx.shadowBlur = 20;
-  ctx.fillText(brand, width / 2, height / 2 - 80);
+  ctx.fillStyle = '#FFD700';
+  ctx.fillRect(width / 2 - 32, height / 2 - 170 + slideUp, 64, 3);
   ctx.restore();
 
-  ctx.save();
-  ctx.globalAlpha = fadeIn * 0.8;
-  ctx.font = '32px sans-serif';
-  ctx.fillStyle = '#A78BFA';
-  ctx.textAlign = 'center';
-  ctx.fillText(VIDEO_CONFIG.BRAND_SUBTITLE, width / 2, height / 2 - 20);
-  ctx.restore();
-
+  // Título grande NEURAL UPDATE (caixa alta, peso máximo)
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  const btnW = 380, btnH = 70;
-  const btnX = width / 2 - btnW / 2, btnY = height / 2 + 40;
-  const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
-  btnGrad.addColorStop(0, VIDEO_CONFIG.BRAND_COLOR_PRIMARY);
-  btnGrad.addColorStop(1, VIDEO_CONFIG.BRAND_COLOR_ACCENT);
-  ctx.fillStyle = btnGrad;
-  ctx.beginPath();
-  const br = 35;
-  ctx.moveTo(btnX + br, btnY);
-  ctx.lineTo(btnX + btnW - br, btnY);
-  ctx.quadraticCurveTo(btnX + btnW, btnY, btnX + btnW, btnY + br);
-  ctx.lineTo(btnX + btnW, btnY + btnH - br);
-  ctx.quadraticCurveTo(btnX + btnW, btnY + btnH, btnX + btnW - br, btnY + btnH);
-  ctx.lineTo(btnX + br, btnY + btnH);
-  ctx.quadraticCurveTo(btnX, btnY + btnH, btnX, btnY + btnH - br);
-  ctx.lineTo(btnX, btnY + br);
-  ctx.quadraticCurveTo(btnX, btnY, btnX + br, btnY);
-  ctx.closePath();
-  ctx.fill();
-  ctx.font = 'bold 32px sans-serif';
+  ctx.font = '900 78px ui-sans-serif, system-ui, -apple-system, "Inter", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
-  ctx.fillText('SEGUIR AGORA', width / 2, btnY + 46);
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(255, 215, 0, 0.25)';
+  ctx.shadowBlur = 30;
+  ctx.fillText(brand.toUpperCase(), width / 2, height / 2 - 100 + slideUp);
+  ctx.restore();
+
+  // Subtítulo / tagline
+  ctx.save();
+  ctx.globalAlpha = fadeIn * 0.85;
+  ctx.font = '500 26px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFD700';
+  ctx.textAlign = 'center';
+  ctx.fillText('IA • TECNOLOGIA • FUTURO', width / 2, height / 2 - 40 + slideUp);
+  ctx.restore();
+
+  // CTA editorial (sem botão — texto puro com chamada forte)
+  const fadeIn2 = easeInOutCubic(Math.max(0, Math.min(1, (progress - 0.25) * 2.5)));
+  ctx.save();
+  ctx.globalAlpha = fadeIn2;
+  ctx.font = '700 38px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.fillText('Análise completa no blog', width / 2, height / 2 + 60);
+
+  ctx.font = '800 36px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFD700';
+  ctx.fillText('neural-update.com.br', width / 2, height / 2 + 120);
+
+  // Linha de instagram
+  ctx.globalAlpha = fadeIn2 * 0.7;
+  ctx.font = '500 22px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('@neuralupdate', width / 2, height / 2 + 180);
   ctx.restore();
 }
 
