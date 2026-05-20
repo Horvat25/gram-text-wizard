@@ -128,7 +128,7 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     if (!confirm(`Limpar ${labels[filter]}? Esta ação não pode ser desfeita.`)) return;
     setIsClearing(true);
     try {
-      const ops: Promise<any>[] = [];
+      const ops: PromiseLike<any>[] = [];
       if (filter === 'all' || filter === 'reports') {
         ops.push(supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id));
       }
