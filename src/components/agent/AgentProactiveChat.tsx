@@ -724,7 +724,21 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
           ) : (
             <ScrollArea ref={scrollRef} className="flex-1 p-3">
               <div className="space-y-3 pb-2">
-                {filteredTimeline.map(renderItem)}
+                {filteredTimeline.map((item) => (
+                  <div key={`wrap-${item.type}-${item.data.id}`} className="group/item relative">
+                    {renderItem(item)}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteItem(item);
+                      }}
+                      className="absolute -top-1 -right-1 z-10 h-6 w-6 rounded-full bg-card border border-border/60 text-muted-foreground hover:text-destructive hover:border-destructive/60 hover:bg-destructive/10 shadow-sm opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center"
+                      title="Apagar esta mensagem"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
               </div>
               <div className="text-center text-[10px] text-muted-foreground/60 pt-2 pb-1">
                 · fim do feed ·
