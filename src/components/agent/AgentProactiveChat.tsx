@@ -706,7 +706,20 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
                 </button>
               )}
             </div>
+
+            {filteredTimeline.length > 0 && (
+              <button
+                onClick={handleClearTab}
+                disabled={isClearing}
+                className="w-full flex items-center justify-center gap-1.5 py-1 rounded-md text-[10px] text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors disabled:opacity-50"
+                title="Apagar todos os itens visíveis nesta aba"
+              >
+                {isClearing ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
+                Limpar esta aba ({filteredTimeline.length})
+              </button>
+            )}
           </div>
+
 
           {/* Timeline */}
           {isLoading ? (
