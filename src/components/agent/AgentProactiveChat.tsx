@@ -8,8 +8,9 @@ import {
   Bot, TrendingUp, Megaphone, AlertCircle, FileText, X, RefreshCw, Loader2,
   CheckCircle2, XCircle, ChevronDown, ChevronRight, Sparkles, Lightbulb,
   Zap, Clock, Pause, User, MessageSquare, Newspaper, Instagram, Search,
-  Activity, LayoutGrid
+  Activity, LayoutGrid, Trash2
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -98,7 +99,65 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'reports' | 'actions' | 'chat'>('all');
+  const [isClearing, setIsClearing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleExpand = (id: string) => {
+    const next = expandedId === id ? null : id;
+    setExpandedId(next);
+    if (next) {
+      setTimeout(() => {
+        const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement | null;
+        const el = itemRefs.current[id];
+        if (viewport && el) {
+          viewport.scrollTo({ top: el.offsetTop - 8, behavior: 'smooth' });
+        }
+      }, 80);
+    }
+  };
+
+  const handleClearHistory = async () => {
+    if (!currentWorkspace || !user) return;
+    const labels: Record<typeof filter, string> = {
+      all: 'todos os relatórios e ações',
+      reports: 'todos os relatórios',
+      actions: 'todas as ações',
+      chat: 'todo o histórico do chat',
+    } as any;
+    if (!confirm(`Limpar ${labels[filter]}? Esta ação não pode ser desfeita.`)) return;
+    setIsClearing(true);
+    try {
+      const ops: PromiseLike<any>[] = [];
+      if (filter === 'all' || filter === 'reports') {
+        ops.push(supabase.from('agent_proactive_messages').delete().eq('workspace_id', currentWorkspace.id));
+      }
+      if (filter === 'all' || filter === 'actions') {
+        ops.push(supabase.from('agent_execution_reports').delete().eq('user_id', user.id));
+        // Clear action-bearing assistant messages
+        ops.push(
+          supabase
+            .from('agent_chat_messages')
+            .delete()
+            .eq('workspace_id', currentWorkspace.id)
+            .eq('role', 'assistant')
+            .not('actions', 'is', null)
+        );
+      }
+      if (filter === 'chat') {
+        ops.push(supabase.from('agent_chat_messages').delete().eq('workspace_id', currentWorkspace.id));
+      }
+      await Promise.all(ops);
+      toast.success('Histórico limpo');
+      await loadAll();
+    } catch (e: any) {
+      console.error(e);
+      toast.error('Falha ao limpar histórico');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
 
   useEffect(() => {
     if (isOpen && currentWorkspace && user) {
@@ -312,12 +371,13 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       return (
         <motion.div
           key={`e-${report.id}`}
+          ref={(el) => { itemRefs.current[report.id] = el; }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors"
+          className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors scroll-mt-2"
         >
           <button
-            onClick={() => setExpandedId(isExpanded ? null : report.id)}
+            onClick={() => handleExpand(report.id)}
             className="w-full p-3 flex items-center justify-between bg-card hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -412,12 +472,13 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       return (
         <motion.div
           key={`a-${action.id}`}
+          ref={(el) => { itemRefs.current[action.id] = el; }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors"
+          className="border rounded-xl overflow-hidden border-border/50 hover:border-primary/30 transition-colors scroll-mt-2"
         >
           <button
-            onClick={() => setExpandedId(isExpanded ? null : action.id)}
+            onClick={() => handleExpand(action.id)}
             className="w-full p-3 flex items-center justify-between bg-card hover:bg-muted/30 transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -567,6 +628,16 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
               </div>
             </div>
             <div className="flex items-center gap-1 shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearHistory}
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                disabled={isClearing || isLoading}
+                title="Limpar histórico"
+              >
+                {isClearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+              </Button>
               <Button variant="ghost" size="icon" onClick={loadAll} className="h-8 w-8" disabled={isLoading}>
                 <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
               </Button>
