@@ -324,9 +324,8 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     chat: timeline.filter(i => i.type === 'chat').length,
   }), [timeline]);
 
-  const filteredTimeline = (() => {
+  const computeFiltered = (): TimelineItem[] => {
     const filtered = timeline.filter(item => {
-      // Filter by tab
       let matchesFilter = true;
       if (filter === 'all') matchesFilter = item.type !== 'chat';
       else if (filter === 'reports') matchesFilter = item.type === 'report';
@@ -334,7 +333,6 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
       else if (filter === 'chat') matchesFilter = item.type === 'chat';
       if (!matchesFilter) return false;
 
-      // Filter by search
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       const text = (item.type === 'report' ? item.data.content
@@ -345,7 +343,10 @@ export default function AgentProactiveChat({ isOpen, onClose, agentName, agentAv
     });
     if (filter === 'chat') filtered.reverse();
     return filtered;
-  })();
+  };
+
+  const filteredTimeline = computeFiltered();
+
 
 
   const renderItem = (item: TimelineItem) => {
