@@ -73,33 +73,76 @@ serve(async (req) => {
       }
     }
 
-    // 2) Pexels: extrai 2-3 keywords via Gemini e busca fotos reais
+    // 2) BUSCA INTELIGENTE: extrai entidades + busca em múltiplas queries + Pexels & Unsplash + ranqueia
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
     const pexelsKey = Deno.env.get("PEXELS_API_KEY");
+    const unsplashKey = Deno.env.get("UNSPLASH_ACCESS_KEY");
 
+    const entities = extractEntities(`${title} ${description}`);
+    console.log(`[REAL-IMG] 🧠 Entidades: ${entities.join(", ") || "(nenhuma)"}`);
+
+    const queries = await extractKeywords(title, description, lovableApiKey);
+    const entityQuery = buildEntityQuery(entities, queries[0] || "technology");
+    // Combina: query principal de entidade + queries Gemini + entidades soltas como queries extras
+    const allQueries = Array.from(new Set([
+      entityQuery,
+      ...queries,
+      ...entities.slice(0, 3).filter(e => e.length > 3),
+    ])).slice(0, 5);
+    console.log(`[REAL-IMG] 🔎 Queries: ${allQueries.join(" | ")}`);
+
+    const candidates: ImageCandidate[] = [];
+
+    // Pexels: 8 fotos por query
     if (pexelsKey) {
-      const queries = await extractKeywords(title, description, lovableApiKey);
-      console.log(`[REAL-IMG] 🔎 Pexels queries: ${queries.join(" | ")}`);
-
-      for (const q of queries) {
-        if (images.length >= count) break;
-        const pic = await searchPexels(q, pexelsKey);
-        if (pic) push({ url: pic, source: "pexels", credit: "Pexels", query: q });
+      for (const q of allQueries) {
+        const photos = await searchPexelsMulti(q, pexelsKey, 8);
+        for (const p of photos) candidates.push({ ...p, query: q });
       }
     } else {
       console.warn("[REAL-IMG] ⚠️ PEXELS_API_KEY não configurada");
     }
 
-    // 3) Fallback: scrape de imagens do próprio artigo
+    // Unsplash: 6 fotos por query (descrições mais ricas → melhor score)
+    if (unsplashKey) {
+      for (const q of allQueries.slice(0, 3)) {
+        const photos = await searchUnsplash(q, unsplashKey, 6);
+        for (const p of photos) candidates.push({ ...p, query: q });
+      }
+    }
+
+    console.log(`[REAL-IMG] 📦 ${candidates.length} candidatos brutos`);
+
+    // Filtra forbidden + ranqueia
+    const ranked = candidates
+      .filter(c => !containsForbidden(c, entities))
+      .map(c => ({ ...c, score: scoreImage(c, entities, entityQuery) }))
+      .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+    // Dedup por URL + pega top N
+    const slotsLeft = Math.max(0, count - images.length);
+    for (const c of ranked) {
+      if (images.length >= count) break;
+      if (seen.has(c.url)) continue;
+      push({
+        url: c.url,
+        source: "pexels",
+        credit: c.source || "Stock",
+        query: c.query,
+      });
+      console.log(`[REAL-IMG]   ✅ score=${c.score} q="${c.query}" ${c.url.substring(0, 60)}...`);
+    }
+
+    // 3) Fallback: scrape do artigo
     if (images.length < count && articleUrl) {
       const scraped = await scrapeArticleImages(articleUrl, count - images.length);
       for (const url of scraped) push({ url, source: "scrape", credit: "Artigo" });
     }
 
-    console.log(`[REAL-IMG] ✅ Total: ${images.length} imagens reais`);
+    console.log(`[REAL-IMG] ✅ Total: ${images.length} imagens (top ranqueadas de ${candidates.length})`);
 
     return new Response(
-      JSON.stringify({ success: true, images: images.slice(0, count) }),
+      JSON.stringify({ success: true, images: images.slice(0, count), entities, queries: allQueries }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e: any) {
