@@ -146,15 +146,31 @@ async function fetchRealImages(
     const data = await resp.json();
     const images = data.images || [];
 
-    // Capa (article) sempre na cena 1; demais distribuídas em ordem
-    const articleImg = images.find((i: any) => i.source === "article");
-    const others = images.filter((i: any) => i.source !== "article");
+    // Capa (article) abre o vídeo; depois usa imagens únicas e evita repetição consecutiva.
+    const seen = new Set<string>();
+    const uniqueImages = images.filter((img: any) => {
+      if (!img?.url || seen.has(img.url)) return false;
+      seen.add(img.url);
+      return true;
+    });
+    const articleImg = uniqueImages.find((i: any) => i.source === "article");
+    const others = uniqueImages.filter((i: any) => i.source !== "article");
+    const pool = articleImg ? [articleImg, ...others] : others;
     const ordered: any[] = [];
+
     if (articleImg) ordered.push(articleImg);
-    ordered.push(...others);
-    // Se sobrou espaço e existe capa, repete na última cena pra fechar
-    while (ordered.length < segments.length && articleImg) ordered.push(articleImg);
-    while (ordered.length < segments.length && others.length > 0) ordered.push(others[ordered.length % others.length]);
+    for (const img of others) {
+      if (ordered.length >= segments.length) break;
+      ordered.push(img);
+    }
+    let cursor = articleImg ? 1 : 0;
+    while (ordered.length < segments.length && pool.length > 0) {
+      const next = pool[cursor % pool.length];
+      const previous = ordered[ordered.length - 1];
+      cursor++;
+      if (pool.length > 1 && previous?.url === next?.url) continue;
+      ordered.push(next);
+    }
 
     for (let i = 0; i < segments.length && i < ordered.length; i++) {
       segments[i].imageUrl = ordered[i].url;
