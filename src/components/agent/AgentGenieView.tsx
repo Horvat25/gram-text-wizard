@@ -31,6 +31,7 @@ import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
 
 import ContentTestTab from '@/components/tabs/ContentTestTab';
+import ArticleDistributionPanel from './ArticleDistributionPanel';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
