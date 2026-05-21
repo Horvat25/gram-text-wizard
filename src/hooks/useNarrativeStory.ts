@@ -911,7 +911,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       audioResult?.backgroundMusicUrl || ""
     );
     setIsGenerating(false);
-  }, [segmentDuration, generateImages, generateAudio, generateVideo]);
+  }, [segmentCount, segmentDuration, generateImages, generateAudio, generateVideo]);
 
   return {
     state,
