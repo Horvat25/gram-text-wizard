@@ -317,6 +317,7 @@ export default function AgentGenieView() {
     setShowQueue(false);
     setShowPostHistory(false);
     setShowContentTest(false);
+    setShowDistribution(false);
     
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
