@@ -17,9 +17,9 @@ export const VIDEO_CONFIG = {
   SEGMENT_COUNT: 5,
   /** Duração base de cada segmento em segundos (usado como estimativa inicial;
    *  a duração REAL é definida pelo áudio após TTS) */
-  SEGMENT_DURATION_BASE: 8,
+  SEGMENT_DURATION_BASE: 6,
   /** Palavras por segmento (controla o tamanho do texto gerado pela IA) */
-  WORDS_PER_SEGMENT: 24,
+  WORDS_PER_SEGMENT: 14,
 
   // ─── Limites de Segurança ──────────────────────────
   /** Duração mínima de um segmento (segundos) — áudio mais curto usa este piso */
@@ -38,7 +38,7 @@ export const VIDEO_CONFIG = {
   HEIGHT: 1280,
   FPS: 24,
   /** Duração do crossfade entre imagens (segundos) */
-  TRANSITION_DURATION: 0.35,
+  TRANSITION_DURATION: 0.7,
   /** Duração do efeito hook no primeiro segmento (segundos) */
   HOOK_DURATION: 2.5,
   /** Bitrate do vídeo WebM (bps) */

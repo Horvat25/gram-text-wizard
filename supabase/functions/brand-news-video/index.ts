@@ -52,13 +52,14 @@ NOTÍCIA:
 TÍTULO: ${title}
 CONTEXTO: ${description}
 
-ESTRUTURA OBRIGATÓRIA (5 cenas, total ~45-55s — Reels DENSO de tecnologia, ritmo ÁGIL):
-1. HOOK (2-3s) — MÁXIMO 10 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
+ESTRUTURA OBRIGATÓRIA (6 cenas, total ~30-42s — cortes rápidos, editorial, sem imagem parada tempo demais):
+1. HOOK (2-3s) — MÁXIMO 8 PALAVRAS. Afirmação polêmica/provocativa. PROIBIDO "Vamos falar", "Você sabia", "Hoje", "Atenção".
    Exemplos: "Isso vai apagar 40% dos empregos.", "O Google acabou de perder a guerra."
-2. CONTEXTO + FATO CONCRETO (9-11s): Nome de empresa/produto + número/data + COMO funciona em 1 frase técnica.
-3. TESE + ANÁLISE (9-11s): POR QUE isso importa. Sua POSIÇÃO + 1 dado ou comparação que sustenta.
-4. IMPACTO PRÁTICO (8-10s): O que MUDA para usuário/dev/profissional. Exemplo real de uso, oportunidade ou risco.
-5. CTA FORTE (5-7s): Reflexão fechando a tese + CTA acionável + menciona "Neural Update no blog". PROIBIDO "siga", "curta" genéricos.
+2. FATO CONCRETO (4-6s): Nome da empresa/produto + o que aconteceu em 1 frase fechada.
+3. COMO FUNCIONA (4-6s): mecanismo técnico simples, sem enrolação.
+4. TESE (4-6s): por que isso importa agora.
+5. IMPACTO PRÁTICO (4-6s): o que muda para usuário/dev/profissional.
+6. CTA FORTE (4-6s): fecha a tese + menciona "Neural Update no blog". PROIBIDO "siga", "curta" genéricos.
    CTAs bons: "Salva antes que apaguem — análise completa no Neural Update.", "Comenta: você usaria? Mais no blog Neural Update."
 
 REGRAS DE REDAÇÃO (CRÍTICO):
@@ -66,10 +67,10 @@ REGRAS DE REDAÇÃO (CRÍTICO):
 - FRASES COMPLETAS: NUNCA termine uma cena no meio de uma ideia. Cada texto é uma frase fechada com começo, meio e fim.
 - CORTE muletas: "basicamente", "então", "vale lembrar", "tipo assim", "de certa forma".
 - PT-BR PERFEITO com acentos (você, é, está, já, até, inteligência, decisão, análise)
-- 22-28 palavras por segmento (HOOK = máx 10).
+- 10-14 palavras por segmento (HOOK = máx 8). Nunca passe disso.
 - ZERO inglês na narração (exceto nomes próprios: OpenAI, ChatGPT, etc)
 - ZERO clichês "futuro já chegou", "revolução da IA", "mudou tudo"
-- imagePrompt: cena cinematográfica EM INGLÊS, VERTICAL 9:16, sem texto
+- imagePrompt: cena cinematográfica EM INGLÊS, VERTICAL 9:16, sem texto, com sujeito visual específico do trecho; evite hologramas genéricos quando houver empresa/produto/pessoa/robô/data center.
 
 Responda APENAS JSON válido completo:
 {
@@ -90,7 +91,7 @@ Responda APENAS JSON válido completo:
         const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
         const parsed = JSON.parse(cleaned);
         if (parsed.segments?.length >= 4) {
-          return parsed.segments.slice(0, 5);
+          return parsed.segments.slice(0, 6);
         }
       }
     }
@@ -101,10 +102,11 @@ Responda APENAS JSON válido completo:
   // Fallback
   const shortTitle = title.length > 40 ? title.substring(0, 40).replace(/\s\S*$/, "") : title;
   return [
-    { text: `Atenção: essa notícia muda tudo na tecnologia.`, imagePrompt: `Breaking news technology, dramatic lighting, vertical 9:16` },
-    { text: `${shortTitle}. O mercado já sentiu o impacto.`, imagePrompt: `Technology innovation, futuristic interfaces, vertical 9:16` },
-    { text: `Milhões de pessoas serão impactadas em breve.`, imagePrompt: `Global impact visualization, dramatic scale, vertical 9:16` },
-    { text: `O futuro está sendo escrito agora.`, imagePrompt: `Futuristic cityscape, symbolic, vertical 9:16` },
+    { text: `${shortTitle} virou sinal de alerta no mercado.`, imagePrompt: `technology newsroom, dramatic editorial lighting, vertical 9:16, no text` },
+    { text: `A disputa agora é por infraestrutura, dados e distribuição.`, imagePrompt: `modern data center infrastructure, cinematic, vertical 9:16, no text` },
+    { text: `Quem controlar essa camada controla a próxima onda da IA.`, imagePrompt: `AI infrastructure control room, realistic, vertical 9:16, no text` },
+    { text: `Para profissionais, isso muda custo, acesso e velocidade.`, imagePrompt: `professionals using AI tools, realistic office, vertical 9:16, no text` },
+    { text: `A análise completa está no blog Neural Update.`, imagePrompt: `premium tech editorial desk, cinematic, vertical 9:16, no text` },
   ];
 }
 
@@ -144,15 +146,31 @@ async function fetchRealImages(
     const data = await resp.json();
     const images = data.images || [];
 
-    // Capa (article) sempre na cena 1; demais distribuídas em ordem
-    const articleImg = images.find((i: any) => i.source === "article");
-    const others = images.filter((i: any) => i.source !== "article");
+    // Capa (article) abre o vídeo; depois usa imagens únicas e evita repetição consecutiva.
+    const seen = new Set<string>();
+    const uniqueImages = images.filter((img: any) => {
+      if (!img?.url || seen.has(img.url)) return false;
+      seen.add(img.url);
+      return true;
+    });
+    const articleImg = uniqueImages.find((i: any) => i.source === "article");
+    const others = uniqueImages.filter((i: any) => i.source !== "article");
+    const pool = articleImg ? [articleImg, ...others] : others;
     const ordered: any[] = [];
+
     if (articleImg) ordered.push(articleImg);
-    ordered.push(...others);
-    // Se sobrou espaço e existe capa, repete na última cena pra fechar
-    while (ordered.length < segments.length && articleImg) ordered.push(articleImg);
-    while (ordered.length < segments.length && others.length > 0) ordered.push(others[ordered.length % others.length]);
+    for (const img of others) {
+      if (ordered.length >= segments.length) break;
+      ordered.push(img);
+    }
+    let cursor = articleImg ? 1 : 0;
+    while (ordered.length < segments.length && pool.length > 0) {
+      const next = pool[cursor % pool.length];
+      const previous = ordered[ordered.length - 1];
+      cursor++;
+      if (pool.length > 1 && previous?.url === next?.url) continue;
+      ordered.push(next);
+    }
 
     for (let i = 0; i < segments.length && i < ordered.length; i++) {
       segments[i].imageUrl = ordered[i].url;
@@ -441,14 +459,12 @@ Deno.serve(async (req) => {
       console.warn(`[BRAND-VIDEO] generate-caption erro:`, e);
     }
 
-    // ─── STEP 5: Try server-side video composition ───
+    // ─── STEP 5: Não usar image-to-video de 1 imagem ───
+    // O render profissional precisa de múltiplas cenas, legendas sincronizadas e transições.
+    // Replicate aqui animava só a primeira imagem e deixava o Reels com cara de travado.
     let finalVideoUrl: string | null = null;
-
     if (replicateApiKey) {
-      const replicateVideo = await composeVideoViaReplicate(segments, replicateApiKey);
-      if (replicateVideo) {
-        finalVideoUrl = await uploadVideoToStorage(replicateVideo, workspaceId, supabase);
-      }
+      console.log("[BRAND-VIDEO] ⏭️  Replicate ignorado: usando render multi-cena no cliente.");
     }
 
     // ─── STEP 6: Update post with results ───
