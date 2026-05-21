@@ -863,13 +863,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
     const normalizedScript = existingSegments.slice(0, segmentCount);
+    const usableImageUrls = dedupeImageUrls(preExistingImageUrls);
     let currentTime = 0;
     const segments: StorySegment[] = normalizedScript.map((seg, index) => {
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: seg.text,
         imagePrompt: seg.imagePrompt,
-        imageUrl: preExistingImageUrls?.[index] || "",
+        imageUrl: usableImageUrls[index % usableImageUrls.length] || "",
         duration: segmentDuration,
         startTime: currentTime,
       };
