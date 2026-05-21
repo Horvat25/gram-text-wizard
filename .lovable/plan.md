@@ -1,74 +1,97 @@
-# Plano: Narração ElevenLabs + Trilha Sonora Grátis nos Reels
+## O que JÁ existe (não vou tocar)
 
-## Objetivo
-Subir a qualidade do Reels do Neural Update usando **ElevenLabs Sarah** (voz PT-BR realista) na narração e uma **trilha sonora royalty-free curada** (Pixabay/Mixkit, hospedada no Storage) misturada por baixo. Rodar **1 reel de teste** completo pra você aprovar antes de reabrir a produção automática.
+Mapeei o código antes de propor mudanças. Já está implementado:
 
----
+- **Fonte prioritária Neural Update**: `fetch-rss` traz o RSS do blog próprio com `priority: true`; `ai-agent-core` (linhas 1686-1689 e 2702-2705) já filtra `source_name === 'Atualização Neural'` e prioriza esses itens tanto pra carrossel quanto pra post normal.
+- **Carrossel IG**: `ai-agent-core` gera carrossel a partir do pool Neural (com imagem original sem overlay quando vem do blog próprio — linhas 2859-2867).
+- **Reels automáticos**: `auto-reel-publisher` (cron 2x/dia) puxa Neural primeiro, cria post `generating` e dispara `brand-news-video` → renderiza vídeo 9:16 com voz Sarah, manchete SVG, headline gold, watermark Neural Update.
+- **CTA fixo no blog**: `ai-agent-core` linhas 141-146 já injeta `🧠 Acompanhe mais notícias de IA em neural-update.com.br` automaticamente em todo conteúdo derivado de RSS.
+- **Imagens reais por tema**: `fetch-real-news-images` com ranking por entidade (Pexels + Unsplash + og:image).
+- **Revisão PT-BR obrigatória**: `review-portuguese` bloqueia publicação se script/legenda falha.
+- **Métricas IG**: `sync-instagram-metrics` sincroniza likes/comments/reach por post.
 
-## 1. Narração com ElevenLabs (Sarah) em `brand-news-video`
-
-Hoje a narração de cada segmento vai pro `edge-tts` (voz Antonio robótica). Vou trocar pra ElevenLabs como **padrão** quando `ELEVENLABS_API_KEY` existir (já está nos secrets), com fallback automático pro `edge-tts` se a API falhar ou estourar quota.
-
-- Voice ID: `EXAVITQu4vr4xnSDxMaL` (Sarah)
-- Modelo: `eleven_turbo_v2_5` — **gasta metade dos créditos** do `multilingual_v2` e ainda soa natural em PT-BR
-- Settings: `stability 0.45`, `similarity_boost 0.8`, `style 0.35`, `use_speaker_boost true` — perfil editorial pra notícia
-- Output: `mp3_44100_128` via query param (formato pedido na URL, não no body)
-- Upload do MP3 pro bucket `post-videos` em `{workspace_id}/narration-{postId}-{segIdx}.mp3` e gravar `audioUrl` + `audioDuration` no segmento
-- Concatenação dos 4 segmentos numa única chamada usando **request stitching** (`previous_text` / `next_text`) pra prosódia ficar contínua entre cortes — diferença audível em narração editorial
-
-**Economia ElevenLabs**: o Starter ($5/mês = 30k chars) cobre ~25 reels/mês com Turbo v2.5. Adiciono log de caracteres consumidos por reel no `overlay_metadata.elevenlabs_chars_used` pra você acompanhar.
+**Não vou mexer em nada disso.** Vou só adicionar a camada de *distribuição multi-formato por artigo* em cima do que já existe.
 
 ---
 
-## 2. Trilha sonora gratuita (royalty-free curada)
+## O que vou construir (novo, sem quebrar nada)
 
-Em vez de gerar música com IA (caro e instável), vou usar **tracks curadas do Pixabay Music** (licença CC0, uso comercial liberado, sem atribuição obrigatória). Plano:
+### 1. Tabela `article_distributions` (nova)
+Liga 1 artigo do blog (`rss_items`) a N posts derivados. Sem isso não dá pra rastrear "este artigo já virou carrossel + reels + snippets?".
 
-1. Criar pasta `public/music/` com 3 faixas baixadas:
-   - `tech-ambient.mp3` — sintetizador minimal, pra notícias de IA/tech
-   - `cinematic-news.mp3` — pulso editorial, pra grandes lançamentos
-   - `upbeat-future.mp3` — energia, pra hooks fortes
-2. Selecionar a faixa por **mood** que a IA já define no script (`urgent` / `editorial` / `hype`) — adiciono campo `mood` no `generateBroadcastScript`
-3. Passar `backgroundMusicUrl` no `overlay_metadata.script` — o `video-encoder.ts` cliente **já mixa** trilha (linha 435, 576), só estava sem URL. Volume da trilha: **-18 dB** (15% do gain) pra não competir com a Sarah
-4. Fade-in 0.5s no início e fade-out 1s no final automáticos
+Campos: `rss_item_id`, `workspace_id`, `format` (`carousel|reels|story|snippet|tweet`), `post_id` (FK opcional pra `posts`), `status`, `cta_clicks`, `created_at`.
+
+### 2. Edge function `article-to-instagram` (nova)
+Recebe `rss_item_id` e dispara em paralelo os formatos pedidos. **Reusa** funções existentes:
+- Carrossel → mesmo fluxo do `ai-agent-core` (extrai pra helper compartilhado)
+- Reels → chama `auto-reel-publisher` lógica de criação + `brand-news-video`
+- Snippets → nova chamada Gemini Flash Lite com schema fixo (3 hooks de Story + 3 frases de Tweet + 1 TL;DR)
+
+Tudo grava em `article_distributions` pra dedup.
+
+### 3. Estrutura editorial do carrossel (refinada, dentro do gerador já existente)
+Em vez de slides livres, vou impor o template que pediu via prompt estruturado:
+- **Slide 1**: hook (banco de 8 padrões: "Você ainda…?", "X coisas que…", "O ChatGPT consegue ISSO?", etc.)
+- **Slides 2-6**: insights extraídos de TL;DR + subtítulos + FAQ do artigo
+- **Slide 7**: CTA "Link na bio → neural-update.com.br"
+
+Visual já é dark/gold (memória "Branding Direction") — só ajusto tipografia dos slides 2-6 pra um destaque neon/gradiente nas palavras-chave (extraídas via Gemini).
+
+### 4. Roteiro Reels estruturado (refinado, dentro de `generate-story-script`)
+Template fixo de 30-45s:
+- 0-3s: hook (mesma lib de hooks do carrossel)
+- 3-30s: 3 insights do artigo (TL;DR/pontos-chave)
+- 30-45s: CTA blog
+
+### 5. Social Snippets (novo endpoint leve)
+`generate-social-snippets` — Gemini Flash Lite, schema JSON:
+```
+{ stories: [3], tweets: [3], tldr: string, hooks: [5] }
+```
+Salvos como rows em `article_distributions` com `format='snippet'`. UI mostra na aba do artigo pra copiar/agendar.
+
+### 6. Tracking de tráfego IG → Blog
+- UTM automático em todos CTAs: `?utm_source=instagram&utm_medium=<carousel|reels|story>&utm_campaign=<rss_item_id>`
+- Coluna `cta_clicks` populada via webhook do blog (você cola um pixel/edge endpoint).
+- View `article_performance` agrega: posts gerados, reach, comments, CTR estimado.
+
+### 7. Trigger automático
+Quando `fetch-rss` insere um item novo com `source_name='Atualização Neural'`:
+- Trigger Postgres chama `article-to-instagram` via `pg_net` com `formats=['carousel','reels','snippets']`.
+- Respeita limites já existentes (2 reels/24h, gap 6h).
+
+### 8. UI mínima
+Nova aba **"Artigos → IG"** dentro de Agente:
+- Lista artigos Neural Update
+- Status de cada formato (verde = gerado, cinza = pendente, vermelho = falhou)
+- Botão "Gerar tudo" e botões individuais por formato
+- Preview dos snippets pra copiar
 
 ---
 
-## 3. Teste end-to-end (1 reel surpresa)
+## Ordem de implementação (sua prioridade: carrossel + reels dos artigos existentes primeiro)
 
-Pra você ver o resultado antes de liberar o cron:
+```text
+Fase 1 (esta entrega)
+├── Migration: article_distributions + view article_performance
+├── Edge: article-to-instagram (carousel + reels reusando código atual)
+├── Refino prompt: hooks + estrutura 7-slides + CTA UTM
+└── UI: aba "Artigos → IG" com botões manuais
 
-1. Reverter `content_distribution_videos: 0 → 1` e `news_video: 0 → 1` no `agent_context` (só pra esse teste)
-2. Pegar a notícia top não-usada da Atualização Neural e disparar `brand-news-video` manualmente
-3. Render client-side pelo `PublicationQueueTab` (você clica "Renderizar")
-4. Resultado fica em **draft** (não publica sozinho) — você revisa, aprova e publica quando quiser
-5. Se gostar: zero mudança extra. Se quiser ajustar voz/trilha, eu mexo nos settings antes de reativar o cron diário
-
----
-
-## 4. Arquivos que vou tocar
-
-- `supabase/functions/brand-news-video/index.ts` — nova função `generateNarrationElevenLabs()` com fallback edge-tts, request stitching, seleção de trilha por mood, salvar `backgroundMusicUrl` no metadata
-- `src/lib/background-music.ts` — adicionar mapa `mood → trackUrl` apontando pras 3 faixas em `/public/music/`
-- `public/music/*.mp3` — 3 trilhas Pixabay baixadas (≈1-2 MB cada)
-- Migração SQL pequena pra atualizar `agent_context` do workspace e reativar 1 vídeo na quota
-
-Nenhuma mudança no fluxo de imagens/carrossel/legenda — só áudio do reel.
+Fase 2 (próxima)
+├── generate-social-snippets
+├── Trigger automático no fetch-rss
+└── Tracking real de cliques (endpoint /track-click)
+```
 
 ---
 
-## 5. Dica sobre planos ElevenLabs (pra você decidir)
+## Detalhes técnicos
 
-| Plano | Preço | Créditos | Reels Neural Update/mês* | Observação |
-|---|---|---|---|---|
-| Free | $0 | 10k chars | ~8 reels | Bloqueia VPN/datacenter (Supabase Edge pode falhar) |
-| **Starter** | **$5** | **30k chars** | **~25 reels** | Recomendado — libera datacenter, voz comercial OK |
-| Creator | $22 | 100k chars | ~85 reels | Só se for postar 3x/dia |
+- **Sem duplicação**: helper `buildCarouselFromArticle()` extraído de `ai-agent-core` pra `_shared/article-to-content.ts`. `ai-agent-core` continua chamando o mesmo helper — comportamento atual idêntico.
+- **Custo**: snippets usam `google/gemini-3.1-flash-lite-preview` (memória "Cost Optimization"). Carrossel/Reels já têm orçamento próprio.
+- **PT-BR**: `review-portuguese` aplicado em hooks, snippets e CTAs.
+- **Dedup**: antes de gerar, checa `article_distributions` pra não recriar formato que já existe.
+- **Workspace isolation**: tudo via RLS no `workspace_id` (memória "Multi-workspace").
 
-\* baseado em ~80 palavras (~1.2k chars) por reel com Turbo v2.5
-
-**Trilha sonora**: NÃO precisa pagar ElevenLabs Music ($22+). Pixabay/Mixkit cobrem 95% dos casos com qualidade editorial e zero custo. Só pensa em ElevenLabs Music se quiser trilha 100% única por vídeo, o que pra Reels de 25s não compensa.
-
----
-
-Posso seguir? Se você confirmar, na build eu já entrego o reel de teste pronto pra você renderizar e julgar.
+Confirma que posso seguir com Fase 1?
