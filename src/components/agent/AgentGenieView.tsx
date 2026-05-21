@@ -9,6 +9,7 @@ import {
   CalendarDays,
   Instagram,
   FlaskConical,
+  Share2,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +31,7 @@ import { PostHistoryTab } from '@/components/tabs/PostHistoryTab';
 import TikTokContentCreation from '@/components/TikTokContentCreation';
 
 import ContentTestTab from '@/components/tabs/ContentTestTab';
+import ArticleDistributionPanel from './ArticleDistributionPanel';
 import { Platform } from '@/components/PlatformSelector';
 
 // Small TikTok icon
@@ -116,6 +118,9 @@ export default function AgentGenieView() {
   const [showQueue, setShowQueue] = useState(false);
   const [showPostHistory, setShowPostHistory] = useState(false);
   const [showContentTest, setShowContentTest] = useState(false);
+  const [showDistribution, setShowDistribution] = useState(false);
+  
+
   
   
   // TikTok panel states
@@ -312,6 +317,7 @@ export default function AgentGenieView() {
     setShowQueue(false);
     setShowPostHistory(false);
     setShowContentTest(false);
+    setShowDistribution(false);
     
     setShowTikTokQueue(false);
     setShowTikTokHistory(false);
@@ -326,6 +332,7 @@ export default function AgentGenieView() {
       queue: showQueue,
       postHistory: showPostHistory,
       contentTest: showContentTest,
+      distribution: showDistribution,
       
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
@@ -341,6 +348,7 @@ export default function AgentGenieView() {
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
         case 'contentTest': setShowContentTest(true); break;
+        case 'distribution': setShowDistribution(true); break;
         
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
@@ -600,6 +608,19 @@ export default function AgentGenieView() {
               <span className="hidden xs:inline sm:inline">Teste</span>
             </Button>
 
+            <Button
+              variant={showDistribution ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showDistribution && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('distribution')}
+            >
+              <Share2 className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Distribuir</span>
+            </Button>
+
             {/* Portal removido — agora é a 3ª plataforma "Blog" no toggle à direita */}
 
             {/* Histórico por último — separado visualmente */}
@@ -749,6 +770,26 @@ export default function AgentGenieView() {
             </ScrollArea>
           </div>
         )}
+
+        {/* Article Distribution Panel */}
+        {showDistribution && (
+          <div className="absolute inset-x-0 bottom-14 top-12 z-30 bg-background/95 backdrop-blur-md border-t border-border/50 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-semibold text-sm">Distribuição — Artigos → IG</h2>
+                    <p className="text-xs text-muted-foreground">Cada artigo do Neural Update em múltiplos formatos</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowDistribution(false)} className="h-7 w-7 p-0">✕</Button>
+                </div>
+                <ArticleDistributionPanel />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+
+
 
       </div>
     )}

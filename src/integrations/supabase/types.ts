@@ -513,6 +513,51 @@ export type Database = {
           },
         ]
       }
+      article_distributions: {
+        Row: {
+          created_at: string
+          cta_clicks: number
+          cta_url: string | null
+          error_message: string | null
+          format: string
+          id: string
+          payload: Json | null
+          post_id: string | null
+          rss_item_id: string
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          cta_clicks?: number
+          cta_url?: string | null
+          error_message?: string | null
+          format: string
+          id?: string
+          payload?: Json | null
+          post_id?: string | null
+          rss_item_id: string
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          cta_clicks?: number
+          cta_url?: string | null
+          error_message?: string | null
+          format?: string
+          id?: string
+          payload?: Json | null
+          post_id?: string | null
+          rss_item_id?: string
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       backups: {
         Row: {
           backup_type: string
@@ -1047,7 +1092,32 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      article_performance: {
+        Row: {
+          formats_generated: number | null
+          has_carousel: number | null
+          has_reels: number | null
+          has_snippets: number | null
+          link: string | null
+          published_at: string | null
+          rss_item_id: string | null
+          source_name: string | null
+          title: string | null
+          total_cta_clicks: number | null
+          total_engagement: number | null
+          total_reach: number | null
+          workspace_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rss_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       can_edit_workspace: {
