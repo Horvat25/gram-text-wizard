@@ -608,6 +608,19 @@ export default function AgentGenieView() {
               <span className="hidden xs:inline sm:inline">Teste</span>
             </Button>
 
+            <Button
+              variant={showDistribution ? "default" : "ghost"}
+              size="sm"
+              className={cn(
+                "h-7 gap-1 px-1.5 sm:px-2 text-[11px] sm:text-xs shrink-0",
+                showDistribution && "neural-gradient border-0"
+              )}
+              onClick={() => togglePanel('distribution')}
+            >
+              <Share2 className="h-3 w-3" />
+              <span className="hidden xs:inline sm:inline">Distribuir</span>
+            </Button>
+
             {/* Portal removido — agora é a 3ª plataforma "Blog" no toggle à direita */}
 
             {/* Histórico por último — separado visualmente */}
