@@ -76,6 +76,18 @@ interface UseNarrativeStoryOptions {
 
 const normalizeNarrationText = (text: string) => text.replace(/\s+/g, " ").trim();
 
+const dedupeImageUrls = (urls?: string[]) => {
+  if (!urls?.length) return [];
+
+  const unique = urls.filter((url, index, array) => {
+    if (!url) return false;
+    if (index === 0) return true;
+    return url !== array[index - 1] && array.slice(0, index).filter(existing => existing === url).length < 1;
+  });
+
+  return unique.length >= 2 ? unique : urls.filter(Boolean);
+};
+
 const trimNarrationText = (text: string, maxWords: number) => {
   const normalized = normalizeNarrationText(text);
   if (!normalized) return "";
@@ -109,7 +121,7 @@ const buildNarrationCandidates = (text: string) => {
   return Array.from(new Set(budgets.map((budget) => trimNarrationText(normalized, budget)).filter(Boolean)));
 };
 
-const DEFAULT_NARRATION_PADDING = 0.18;
+const DEFAULT_NARRATION_PADDING = 0.45;
 
 async function audioUrlToArrayBuffer(audioUrl: string): Promise<ArrayBuffer> {
   if (audioUrl.startsWith("data:")) {
