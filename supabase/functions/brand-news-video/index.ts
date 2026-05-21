@@ -459,14 +459,12 @@ Deno.serve(async (req) => {
       console.warn(`[BRAND-VIDEO] generate-caption erro:`, e);
     }
 
-    // ─── STEP 5: Try server-side video composition ───
+    // ─── STEP 5: Não usar image-to-video de 1 imagem ───
+    // O render profissional precisa de múltiplas cenas, legendas sincronizadas e transições.
+    // Replicate aqui animava só a primeira imagem e deixava o Reels com cara de travado.
     let finalVideoUrl: string | null = null;
-
     if (replicateApiKey) {
-      const replicateVideo = await composeVideoViaReplicate(segments, replicateApiKey);
-      if (replicateVideo) {
-        finalVideoUrl = await uploadVideoToStorage(replicateVideo, workspaceId, supabase);
-      }
+      console.log("[BRAND-VIDEO] ⏭️  Replicate ignorado: usando render multi-cena no cliente.");
     }
 
     // ─── STEP 6: Update post with results ───
