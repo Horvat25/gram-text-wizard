@@ -204,11 +204,15 @@ export default function ArticleDistributionPanel() {
                         }}
                         title={d?.error_message || label}
                       >
-                        {isRunning ? <Loader2 className="h-3 w-3 animate-spin" /> :
-                          status === 'ready' || status === 'published' ? <CheckCircle2 className="h-3 w-3" /> :
-                          status === 'failed' ? <XCircle className="h-3 w-3" /> :
-                          status === 'generating' ? <Clock className="h-3 w-3" /> :
-                          <Icon className="h-3 w-3" />}
+                        {isRunning ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : status === 'ready' || status === 'published' ? (
+                          <CheckCircle2 className="h-3 w-3" />
+                        ) : status === 'failed' ? (
+                          <XCircle className="h-3 w-3" />
+                        ) : (
+                          <Icon className="h-3 w-3" />
+                        )}
                         {label}
                       </Button>
                     );
