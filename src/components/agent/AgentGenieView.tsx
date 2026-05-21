@@ -332,6 +332,7 @@ export default function AgentGenieView() {
       queue: showQueue,
       postHistory: showPostHistory,
       contentTest: showContentTest,
+      distribution: showDistribution,
       
       tiktokQueue: showTikTokQueue,
       tiktokHistory: showTikTokHistory,
@@ -347,6 +348,7 @@ export default function AgentGenieView() {
         case 'queue': setShowQueue(true); break;
         case 'postHistory': setShowPostHistory(true); break;
         case 'contentTest': setShowContentTest(true); break;
+        case 'distribution': setShowDistribution(true); break;
         
         case 'tiktokQueue': setShowTikTokQueue(true); break;
         case 'tiktokHistory': setShowTikTokHistory(true); break;
