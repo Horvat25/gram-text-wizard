@@ -91,7 +91,14 @@ Responda APENAS JSON válido completo:
         const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
         const parsed = JSON.parse(cleaned);
         if (parsed.segments?.length >= 4) {
-          return parsed.segments.slice(0, 6);
+          const generated = parsed.segments.slice(0, 6);
+          while (generated.length < 6) {
+            generated.push({
+              text: "A análise completa está no blog Neural Update.",
+              imagePrompt: "premium technology editorial newsroom, cinematic vertical 9:16, no text",
+            });
+          }
+          return generated;
         }
       }
     }
@@ -106,6 +113,7 @@ Responda APENAS JSON válido completo:
     { text: `A disputa agora é por infraestrutura, dados e distribuição.`, imagePrompt: `modern data center infrastructure, cinematic, vertical 9:16, no text` },
     { text: `Quem controlar essa camada controla a próxima onda da IA.`, imagePrompt: `AI infrastructure control room, realistic, vertical 9:16, no text` },
     { text: `Para profissionais, isso muda custo, acesso e velocidade.`, imagePrompt: `professionals using AI tools, realistic office, vertical 9:16, no text` },
+    { text: `O impacto real aparece na rotina, não no hype.`, imagePrompt: `professional workflow with AI tools, cinematic, vertical 9:16, no text` },
     { text: `A análise completa está no blog Neural Update.`, imagePrompt: `premium tech editorial desk, cinematic, vertical 9:16, no text` },
   ];
 }
