@@ -50,20 +50,18 @@ function drawImageKenBurns(
   segIndex: number,
   progress: number
 ) {
+  if (!img?.naturalWidth || !img?.naturalHeight) return;
+
   const kb = getKenBurns(segIndex, progress);
-  const imgRatio = img.width / img.height;
-  const canvasRatio = width / height;
-  let drawW: number, drawH: number;
-  if (imgRatio > canvasRatio) {
-    drawH = img.height;
-    drawW = drawH * canvasRatio;
-  } else {
-    drawW = img.width;
-    drawH = drawW / canvasRatio;
-  }
-  const sx = (img.width - drawW) / 2 + kb.x * drawW;
-  const sy = (img.height - drawH) / 2 + kb.y * drawH;
-  ctx.drawImage(img, sx, sy, drawW, drawH, 0, 0, width, height);
+  const coverScale = Math.max(width / img.naturalWidth, height / img.naturalHeight) * kb.scale;
+  const drawW = img.naturalWidth * coverScale;
+  const drawH = img.naturalHeight * coverScale;
+  const overflowX = Math.max(0, drawW - width);
+  const overflowY = Math.max(0, drawH - height);
+  const dx = -overflowX / 2 + kb.x * overflowX;
+  const dy = -overflowY / 2 + kb.y * overflowY;
+
+  ctx.drawImage(img, dx, dy, drawW, drawH);
 }
 
 // ─── Draw cinematic gradient overlays ────────────────────────
@@ -382,10 +380,10 @@ function renderFrame(
     if (captionText) {
       let captionOpacity = isHoldingLastFrame ? 1 : 1;
       if (!isHoldingLastFrame) {
-        if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
-        if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
+        if (segProgress < 0.06) captionOpacity = 0.92 + (segProgress / 0.06) * 0.08;
+        if (segProgress > 0.9) captionOpacity = Math.max(0.92, (1 - segProgress) / 0.1);
       }
-      captionOpacity = Math.max(0, Math.min(1, captionOpacity));
+      captionOpacity = Math.max(0.92, Math.min(1, captionOpacity));
       drawCaption(ctx, captionText, width, height, captionOpacity);
     }
 
