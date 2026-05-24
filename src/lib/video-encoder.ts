@@ -117,8 +117,9 @@ function drawCaption(
   ctx.save();
   ctx.globalAlpha = Math.min(1, opacity);
 
-  // Tipografia: editorial bold, peso forte
-  const baseSize = 46;
+  // Tipografia editorial com tamanho seguro para frases maiores
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  const baseSize = wordCount > 16 ? 38 : wordCount > 12 ? 42 : 46;
   ctx.font = `800 ${baseSize}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", sans-serif`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
@@ -139,8 +140,13 @@ function drawCaption(
   }
   if (currentLine) lines.push(currentLine);
 
+  const visibleLines = lines.slice(0, 4);
+  if (lines.length > 4) {
+    visibleLines[3] = `${visibleLines[3].replace(/[.…]+$/g, '')}…`;
+  }
+
   const lineHeight = baseSize + 14;
-  const totalHeight = lines.length * lineHeight;
+  const totalHeight = visibleLines.length * lineHeight;
   const bottomMargin = 170;
   const startY = height - bottomMargin - totalHeight;
 
@@ -164,8 +170,8 @@ function drawCaption(
   ctx.shadowBlur = 14;
   ctx.shadowOffsetY = 2;
   ctx.fillStyle = '#FFFFFF';
-  for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], sideMargin, startY + i * lineHeight);
+  for (let i = 0; i < visibleLines.length; i++) {
+    ctx.fillText(visibleLines[i], sideMargin, startY + i * lineHeight);
   }
   ctx.restore();
 }
