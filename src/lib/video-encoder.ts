@@ -510,8 +510,9 @@ export async function generateVideoFromSegments(
   renderFrame(ctx, 0, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
 
   const videoStream = canvas.captureStream(fps);
+  const canvasVideoTrack = videoStream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack | undefined;
   const combinedStream = new MediaStream();
-  videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
+  if (canvasVideoTrack) combinedStream.addTrack(canvasVideoTrack);
   dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
 
   const codecPriority = [
@@ -629,7 +630,16 @@ export async function generateVideoFromSegments(
       const renderTime = Math.min(totalDuration, elapsed);
 
       if (now - lastRenderedAt >= frameIntervalMs - 1 || renderTime >= totalDuration) {
-        renderFrame(ctx, renderTime, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
+        try {
+          renderFrame(ctx, renderTime, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
+          canvasVideoTrack?.requestFrame?.();
+        } catch (error: any) {
+          stopped = true;
+          clearTimeout(hardTimeout);
+          if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+          reject(new Error(`Falha ao desenhar frame do vídeo: ${error?.message || 'erro desconhecido'}`));
+          return;
+        }
         lastRenderedAt = now;
 
         const progress = Math.min(100, Math.round((renderTime / totalDuration) * 100));
