@@ -1015,6 +1015,7 @@ async function executeContentPlan(
           title: bestRssItem.item.title,
           description: sanitizeRssText(bestRssItem.item.description || ''),
           sourceName: bestRssItem.item.source_name || new URL(bestRssItem.item.link).hostname.replace('www.', ''),
+          imageUrl: bestRssItem.item.image_url || null,
         };
         await supabase.from('rss_items').update({ is_used: true }).eq('id', bestRssItem.item.id);
         plan.theme = bestRssItem.item.title;
@@ -1088,6 +1089,7 @@ async function executeContentPlan(
             workspaceId,
             userId,
             articleUrl: rssArticle.url,
+            primaryImageUrl: rssArticle.imageUrl,
           }),
         }).then(res => {
           console.log(`[AGENT] brand-news-video response: ${res.status}`);

@@ -50,20 +50,18 @@ function drawImageKenBurns(
   segIndex: number,
   progress: number
 ) {
+  if (!img?.naturalWidth || !img?.naturalHeight) return;
+
   const kb = getKenBurns(segIndex, progress);
-  const imgRatio = img.width / img.height;
-  const canvasRatio = width / height;
-  let drawW: number, drawH: number;
-  if (imgRatio > canvasRatio) {
-    drawH = img.height;
-    drawW = drawH * canvasRatio;
-  } else {
-    drawW = img.width;
-    drawH = drawW / canvasRatio;
-  }
-  const sx = (img.width - drawW) / 2 + kb.x * drawW;
-  const sy = (img.height - drawH) / 2 + kb.y * drawH;
-  ctx.drawImage(img, sx, sy, drawW, drawH, 0, 0, width, height);
+  const coverScale = Math.max(width / img.naturalWidth, height / img.naturalHeight) * kb.scale;
+  const drawW = img.naturalWidth * coverScale;
+  const drawH = img.naturalHeight * coverScale;
+  const overflowX = Math.max(0, drawW - width);
+  const overflowY = Math.max(0, drawH - height);
+  const dx = -overflowX / 2 + kb.x * overflowX;
+  const dy = -overflowY / 2 + kb.y * overflowY;
+
+  ctx.drawImage(img, dx, dy, drawW, drawH);
 }
 
 // ─── Draw cinematic gradient overlays ────────────────────────
@@ -119,8 +117,9 @@ function drawCaption(
   ctx.save();
   ctx.globalAlpha = Math.min(1, opacity);
 
-  // Tipografia: editorial bold, peso forte
-  const baseSize = 46;
+  // Tipografia editorial com tamanho seguro para frases maiores
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  const baseSize = wordCount > 16 ? 38 : wordCount > 12 ? 42 : 46;
   ctx.font = `800 ${baseSize}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", sans-serif`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
@@ -141,8 +140,13 @@ function drawCaption(
   }
   if (currentLine) lines.push(currentLine);
 
+  const visibleLines = lines.slice(0, 4);
+  if (lines.length > 4) {
+    visibleLines[3] = `${visibleLines[3].replace(/[.…]+$/g, '')}…`;
+  }
+
   const lineHeight = baseSize + 14;
-  const totalHeight = lines.length * lineHeight;
+  const totalHeight = visibleLines.length * lineHeight;
   const bottomMargin = 170;
   const startY = height - bottomMargin - totalHeight;
 
@@ -166,8 +170,8 @@ function drawCaption(
   ctx.shadowBlur = 14;
   ctx.shadowOffsetY = 2;
   ctx.fillStyle = '#FFFFFF';
-  for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], sideMargin, startY + i * lineHeight);
+  for (let i = 0; i < visibleLines.length; i++) {
+    ctx.fillText(visibleLines[i], sideMargin, startY + i * lineHeight);
   }
   ctx.restore();
 }
@@ -382,10 +386,10 @@ function renderFrame(
     if (captionText) {
       let captionOpacity = isHoldingLastFrame ? 1 : 1;
       if (!isHoldingLastFrame) {
-        if (segProgress < 0.1) captionOpacity = segProgress / 0.1;
-        if (segProgress > 0.85) captionOpacity = (1 - segProgress) / 0.15;
+        if (segProgress < 0.06) captionOpacity = 0.92 + (segProgress / 0.06) * 0.08;
+        if (segProgress > 0.9) captionOpacity = Math.max(0.92, (1 - segProgress) / 0.1);
       }
-      captionOpacity = Math.max(0, Math.min(1, captionOpacity));
+      captionOpacity = Math.max(0.92, Math.min(1, captionOpacity));
       drawCaption(ctx, captionText, width, height, captionOpacity);
     }
 
@@ -512,8 +516,9 @@ export async function generateVideoFromSegments(
   renderFrame(ctx, 0, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
 
   const videoStream = canvas.captureStream(fps);
+  const canvasVideoTrack = videoStream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack | undefined;
   const combinedStream = new MediaStream();
-  videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
+  if (canvasVideoTrack) combinedStream.addTrack(canvasVideoTrack);
   dest.stream.getAudioTracks().forEach(t => combinedStream.addTrack(t));
 
   const codecPriority = [
@@ -631,7 +636,16 @@ export async function generateVideoFromSegments(
       const renderTime = Math.min(totalDuration, elapsed);
 
       if (now - lastRenderedAt >= frameIntervalMs - 1 || renderTime >= totalDuration) {
-        renderFrame(ctx, renderTime, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
+        try {
+          renderFrame(ctx, renderTime, segments, images, width, height, visualContentDuration, ctaStartTime, CTA_DURATION, BRAND, fps);
+          canvasVideoTrack?.requestFrame?.();
+        } catch (error: any) {
+          stopped = true;
+          clearTimeout(hardTimeout);
+          if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+          reject(new Error(`Falha ao desenhar frame do vídeo: ${error?.message || 'erro desconhecido'}`));
+          return;
+        }
         lastRenderedAt = now;
 
         const progress = Math.min(100, Math.round((renderTime / totalDuration) * 100));
