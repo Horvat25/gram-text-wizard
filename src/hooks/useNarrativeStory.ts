@@ -414,9 +414,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const maxNarrationDuration = VIDEO_CONFIG.MAX_TOTAL_DURATION - VIDEO_CONFIG.NARRATION_CTA_GAP - VIDEO_CONFIG.CTA_MAX_DURATION;
     
     const ctaTexts = [
-      "E aí, curtiu? Então segue a gente pra não perder nenhuma novidade!",
-      "Gostou do conteúdo? Segue pra ficar por dentro das últimas notícias!",
-      "Quer mais conteúdo assim? Então já segue a gente!",
+      "A análise completa está no blog Neural Update. Salva esse Reels e confere o contexto inteiro.",
+      "No blog Neural Update tem a leitura completa. Salva agora para voltar com calma.",
+      "Quer entender o impacto real? A análise completa está no blog Neural Update.",
     ];
     const ctaScript = ctaTexts[Math.floor(Math.random() * ctaTexts.length)];
     
@@ -853,7 +853,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
   // ═══ Render from existing script ═══
   const renderFromScript = useCallback(async (
-    existingSegments: Array<{ text: string; imagePrompt: string }>, 
+    existingSegments: Array<{ text: string; imagePrompt: string; imageUrl?: string | null }>, 
     title?: string, 
     articleInfo?: { articleUrl?: string; articleImageUrl?: string },
     preExistingImageUrls?: string[]
@@ -870,7 +870,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         id: `seg-${index}`,
         text: seg.text,
         imagePrompt: seg.imagePrompt,
-        imageUrl: usableImageUrls[index % usableImageUrls.length] || "",
+        imageUrl: seg.imageUrl || usableImageUrls[index % usableImageUrls.length] || "",
         duration: segmentDuration,
         startTime: currentTime,
       };
