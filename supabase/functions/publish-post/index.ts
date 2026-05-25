@@ -34,16 +34,20 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Hoist postId/supabase so catch can update post even after req.body is consumed
+  let postId: string | undefined;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
-    const { postId, accountId } = await req.json();
+    const body = await req.json();
+    postId = body.postId;
+    const accountId = body.accountId;
 
     if (!postId) {
       throw new Error("postId é obrigatório");
     }
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: post, error: fetchError } = await supabase
       .from("posts")
