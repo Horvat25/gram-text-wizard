@@ -295,21 +295,15 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Erro em publish-post:", error);
-    // 🚨 Garante que o erro fique gravado no banco — antes vários carousels falhavam silenciosamente
-    try {
-      const body = await req.clone().json().catch(() => ({}));
-      const failedPostId = body?.postId;
-      if (failedPostId) {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        const sb = createClient(supabaseUrl, supabaseKey);
-        await sb.from("posts").update({
+    if (postId) {
+      try {
+        await supabase.from("posts").update({
           status: "failed",
           error_message: (error?.message || "Erro desconhecido em publish-post").substring(0, 500),
-        }).eq("id", failedPostId);
+        }).eq("id", postId);
+      } catch (logErr) {
+        console.error("Falha ao gravar error_message no post:", logErr);
       }
-    } catch (logErr) {
-      console.error("Falha ao gravar error_message no post:", logErr);
     }
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao publicar post" }),
