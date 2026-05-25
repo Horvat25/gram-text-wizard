@@ -727,7 +727,6 @@ export type Database = {
           scheduled_for: string | null
           shares_count: number | null
           status: string
-          tiktok_post_id: string | null
           updated_at: string | null
           user_id: string | null
           video_url: string | null
@@ -761,7 +760,6 @@ export type Database = {
           scheduled_for?: string | null
           shares_count?: number | null
           status?: string
-          tiktok_post_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           video_url?: string | null
@@ -795,7 +793,6 @@ export type Database = {
           scheduled_for?: string | null
           shares_count?: number | null
           status?: string
-          tiktok_post_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           video_url?: string | null
@@ -944,59 +941,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "settings_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tiktok_accounts: {
-        Row: {
-          access_token: string
-          avatar_url: string | null
-          connected_at: string | null
-          display_name: string | null
-          expires_at: string | null
-          id: string
-          open_id: string
-          refresh_token: string | null
-          updated_at: string | null
-          user_id: string
-          username: string | null
-          workspace_id: string | null
-        }
-        Insert: {
-          access_token: string
-          avatar_url?: string | null
-          connected_at?: string | null
-          display_name?: string | null
-          expires_at?: string | null
-          id?: string
-          open_id: string
-          refresh_token?: string | null
-          updated_at?: string | null
-          user_id: string
-          username?: string | null
-          workspace_id?: string | null
-        }
-        Update: {
-          access_token?: string
-          avatar_url?: string | null
-          connected_at?: string | null
-          display_name?: string | null
-          expires_at?: string | null
-          id?: string
-          open_id?: string
-          refresh_token?: string | null
-          updated_at?: string | null
-          user_id?: string
-          username?: string | null
-          workspace_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tiktok_accounts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
