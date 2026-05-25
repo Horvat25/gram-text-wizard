@@ -34,16 +34,20 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Hoist postId/supabase so catch can update post even after req.body is consumed
+  let postId: string | undefined;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
-    const { postId, accountId } = await req.json();
+    const body = await req.json();
+    postId = body.postId;
+    const accountId = body.accountId;
 
     if (!postId) {
       throw new Error("postId é obrigatório");
     }
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: post, error: fetchError } = await supabase
       .from("posts")
@@ -208,35 +212,65 @@ serve(async (req) => {
       creationId = mediaData.id;
     }
 
-    // Wait for media processing
+    // Wait for media processing — videos/Reels REALMENTE precisam de FINISHED explícito
     console.log("Aguardando processamento da mídia...");
     let status = "IN_PROGRESS";
     let attempts = 0;
-    const maxAttempts = isVideo ? 60 : 15;
-    
-    while (status === "IN_PROGRESS" && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 5000));
+    const maxAttempts = isVideo ? 90 : 20; // até ~7.5min para reels
+    const pollDelay = isVideo ? 5000 : 3000;
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, pollDelay));
+      attempts++;
       const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
       statusUrl.searchParams.set('fields', 'status_code');
       statusUrl.searchParams.set('access_token', accessToken);
       const statusResponse = await fetch(statusUrl.toString());
       const statusData = await statusResponse.json();
-      status = statusData.status_code || "FINISHED";
-      attempts++;
-      if (statusData.error || !statusData.status_code || statusData.status_code === "FINISHED") { status = "FINISHED"; break; }
-    }
-    
-    if (status === "ERROR") throw new Error("Erro no processamento da mídia pelo Instagram");
-    if (attempts >= maxAttempts && status === "IN_PROGRESS") throw new Error("Timeout: Mídia ainda processando.");
 
-    // Publish
+      if (statusData.error) {
+        console.warn(`[publish-post] status check error (attempt ${attempts}):`, statusData.error?.message);
+        continue; // mantém tentando
+      }
+
+      const code = statusData.status_code;
+      console.log(`[publish-post] status attempt ${attempts}: ${code || 'sem código'}`);
+
+      if (code === "FINISHED") { status = "FINISHED"; break; }
+      if (code === "ERROR") { status = "ERROR"; break; }
+      if (code === "EXPIRED") { status = "ERROR"; break; }
+      // IN_PROGRESS, PUBLISHED ou sem código => continua aguardando
+    }
+
+    if (status === "ERROR") throw new Error("Erro no processamento da mídia pelo Instagram (status ERROR/EXPIRED)");
+    if (status !== "FINISHED") throw new Error(`Timeout: mídia ainda processando após ${attempts} tentativas.`);
+
+    // Publish — com retry em caso de "Media ID is not available" (IG ainda indexando)
     const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);
     publishUrl.searchParams.set('creation_id', creationId);
     publishUrl.searchParams.set('access_token', accessToken);
 
-    const publishResponse = await fetch(publishUrl.toString(), { method: 'POST' });
-    const publishData = await publishResponse.json();
-    if (publishData.error) throw new Error(`Instagram API: ${publishData.error.message}`);
+    let publishData: any = null;
+    let publishAttempts = 0;
+    const maxPublishAttempts = isVideo ? 6 : 3;
+    while (publishAttempts < maxPublishAttempts) {
+      publishAttempts++;
+      const publishResponse = await fetch(publishUrl.toString(), { method: 'POST' });
+      publishData = await publishResponse.json();
+
+      if (!publishData.error) break;
+
+      const msg = String(publishData.error?.message || '');
+      const transient = /Media ID is not available|temporarily|try again/i.test(msg);
+      console.warn(`[publish-post] publish attempt ${publishAttempts} falhou: ${msg}`);
+
+      if (!transient || publishAttempts >= maxPublishAttempts) {
+        throw new Error(`Instagram API: ${msg}`);
+      }
+      await new Promise(r => setTimeout(r, 8000)); // back-off antes de tentar de novo
+    }
+
+    if (publishData?.error) throw new Error(`Instagram API: ${publishData.error.message}`);
 
     const instagramPostId = publishData.id;
     const mediaTypeLabel = isCarousel ? "Carrossel" : isVideo ? "Vídeo" : "Imagem";
@@ -261,21 +295,15 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Erro em publish-post:", error);
-    // 🚨 Garante que o erro fique gravado no banco — antes vários carousels falhavam silenciosamente
-    try {
-      const body = await req.clone().json().catch(() => ({}));
-      const failedPostId = body?.postId;
-      if (failedPostId) {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        const sb = createClient(supabaseUrl, supabaseKey);
-        await sb.from("posts").update({
+    if (postId) {
+      try {
+        await supabase.from("posts").update({
           status: "failed",
           error_message: (error?.message || "Erro desconhecido em publish-post").substring(0, 500),
-        }).eq("id", failedPostId);
+        }).eq("id", postId);
+      } catch (logErr) {
+        console.error("Falha ao gravar error_message no post:", logErr);
       }
-    } catch (logErr) {
-      console.error("Falha ao gravar error_message no post:", logErr);
     }
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao publicar post" }),
