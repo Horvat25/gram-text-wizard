@@ -14,7 +14,6 @@ import NotFound from "./pages/NotFound";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 
-const Settings = lazy(() => import("./pages/Settings"));
 const Install = lazy(() => import("./pages/Install"));
 const InstagramCallback = lazy(() => import("./pages/InstagramCallback"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
