@@ -247,7 +247,7 @@ export function PostHistoryTab({ platform = 'instagram' }: PostHistoryTabProps) 
         <div>
       <h2 className="text-2xl font-bold neural-gradient-text">Histórico de Publicações</h2>
           <p className="text-muted-foreground text-sm">
-            {posts.length} post{posts.length !== 1 ? 's' : ''} no {platform === 'tiktok' ? 'TikTok' : 'Instagram'}
+            {posts.length} post{posts.length !== 1 ? 's' : ''} no Instagram
           </p>
         </div>
         {platform === 'instagram' && (
@@ -418,9 +418,6 @@ export function PostHistoryTab({ platform = 'instagram' }: PostHistoryTabProps) 
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Ver no Instagram
                   </Button>
-                )}
-                {selectedPost.tiktok_post_id && platform === 'tiktok' && (
-                  <Badge variant="secondary">TikTok</Badge>
                 )}
               </div>
             </div>
