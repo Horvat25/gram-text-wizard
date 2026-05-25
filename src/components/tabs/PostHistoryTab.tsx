@@ -39,7 +39,6 @@ interface PublishedPost {
   hashtags: string[] | null;
   image_url: string | null;
   instagram_post_id: string | null;
-  tiktok_post_id: string | null;
   platforms: string[] | null;
   published_at: string | null;
   likes_count: number | null;
@@ -52,7 +51,7 @@ interface PublishedPost {
 type ViewMode = 'daily' | 'weekly' | 'monthly';
 
 interface PostHistoryTabProps {
-  platform?: 'instagram' | 'tiktok';
+  platform?: 'instagram';
 }
 
 export function PostHistoryTab({ platform = 'instagram' }: PostHistoryTabProps) {
@@ -71,12 +70,7 @@ export function PostHistoryTab({ platform = 'instagram' }: PostHistoryTabProps) 
         .eq('status', 'published')
         .order('published_at', { ascending: false });
 
-      // Filter by platform
-      if (platform === 'tiktok') {
-        query = query.not('tiktok_post_id', 'is', null);
-      } else {
-        query = query.not('instagram_post_id', 'is', null);
-      }
+      query = query.not('instagram_post_id', 'is', null);
 
       const { data, error } = await query;
       if (error) throw error;
