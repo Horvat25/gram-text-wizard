@@ -38,7 +38,7 @@ const TermsOfService = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>Criar legendas e conteúdo com auxílio de inteligência artificial</li>
               <li>Gerar imagens e vídeos para publicação</li>
-              <li>Agendar e publicar conteúdo automaticamente no Instagram e TikTok</li>
+              <li>Agendar e publicar conteúdo automaticamente no Instagram</li>
               <li>Visualizar métricas e análises de desempenho</li>
             </ul>
           </section>
@@ -50,7 +50,7 @@ const TermsOfService = () => {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Ter pelo menos 18 anos de idade</li>
-              <li>Possuir uma conta comercial ou de criador no Instagram e/ou TikTok</li>
+              <li>Possuir uma conta comercial ou de criador no Instagram</li>
               <li>Ser o proprietário legítimo das contas que conectar ao Serviço</li>
               <li>Concordar com estes Termos de Serviço</li>
             </ul>
@@ -82,7 +82,7 @@ const TermsOfService = () => {
               <li>Tentar acessar sistemas ou dados não autorizados</li>
               <li>Interferir com a operação normal do Serviço</li>
               <li>Revender ou redistribuir o Serviço sem autorização</li>
-              <li>Violar os termos de uso do Instagram, TikTok ou outras plataformas conectadas</li>
+              <li>Violar os termos de uso do Instagram ou outras plataformas conectadas</li>
             </ul>
           </section>
 
@@ -112,10 +112,6 @@ const TermsOfService = () => {
               <li>
                 <strong>Instagram/Meta:</strong> Para publicação de conteúdo e acesso a métricas. 
                 O uso está sujeito aos Termos de Uso da Meta.
-              </li>
-              <li>
-                <strong>TikTok:</strong> Para publicação de vídeos. O uso está sujeito aos 
-                Termos de Serviço do TikTok.
               </li>
             </ul>
             <p>

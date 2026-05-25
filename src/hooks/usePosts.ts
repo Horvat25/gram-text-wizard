@@ -17,7 +17,6 @@ export interface Post {
   media_type: string | null;
   ai_model_used: string | null;
   instagram_post_id: string | null;
-  tiktok_post_id: string | null;
   platforms: string[] | null;
   likes_count: number | null;
   comments_count: number | null;

@@ -14,10 +14,8 @@ import NotFound from "./pages/NotFound";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 
-const Settings = lazy(() => import("./pages/Settings"));
 const Install = lazy(() => import("./pages/Install"));
 const InstagramCallback = lazy(() => import("./pages/InstagramCallback"));
-const TikTokCallback = lazy(() => import("./pages/TikTokCallback"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const DataDeletion = lazy(() => import("./pages/DataDeletion"));
@@ -59,7 +57,6 @@ const App = () => (
                 <Route path="/admin" element={<Navigate to="/" replace />} />
                 <Route path="/settings" element={<Navigate to="/" replace />} />
                 <Route path="/instagram/callback" element={<InstagramCallback />} />
-                <Route path="/tiktok-callback" element={<TikTokCallback />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/data-deletion" element={<DataDeletion />} />

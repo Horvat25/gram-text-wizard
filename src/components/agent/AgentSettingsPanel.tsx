@@ -35,7 +35,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useInstagramAccounts } from '@/hooks/useInstagramAccounts';
-import { useTikTokAccounts } from '@/hooks/useTikTokAccounts';
+
 import { useBrandSettings } from '@/hooks/useBrandSettings';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -46,14 +46,14 @@ interface AgentSettingsPanelProps {
   trigger?: React.ReactNode;
   onConfigChange?: (config: any) => void;
   onClearChat?: () => void;
-  activePlatform?: 'instagram' | 'tiktok' | 'blog';
+  activePlatform?: 'instagram' | 'blog';
 }
 
 export default function AgentSettingsPanel({ trigger, onConfigChange, onClearChat, activePlatform = 'instagram' }: AgentSettingsPanelProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { accounts: igAccounts, fetchAccounts: fetchIgAccounts, disconnectAccount: disconnectIg, getTokenStatus: getIgTokenStatus, getDaysUntilExpiry: getIgDaysUntilExpiry } = useInstagramAccounts();
-  const { accounts: tiktokAccounts, fetchAccounts: fetchTkAccounts, disconnectAccount: disconnectTk, getTokenStatus: getTkTokenStatus, getDaysUntilExpiry: getTkDaysUntilExpiry } = useTikTokAccounts();
+
   const { settings: brandSettings, updateSettings: updateBrandSettings } = useBrandSettings();
   
   const [context, setContext] = useState<AgentContext | null>(null);
@@ -63,7 +63,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const [activeSection, setActiveSection] = useState<'connections' | 'general'>('connections');
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [connecting, setConnecting] = useState(false);
-  const [connectingTikTok, setConnectingTikTok] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState("camila");
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
   
@@ -209,32 +208,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
     } catch (e: any) { toast.error(e.message); setConnecting(false); }
   };
 
-  const startTikTokOAuth = async () => {
-    setConnectingTikTok(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error('Você precisa estar logado'); setConnectingTikTok(false); return; }
-      localStorage.removeItem('tiktok_oauth_result');
-      localStorage.setItem('tiktok_oauth_user_id', user.id);
-      if (currentWorkspace?.id) localStorage.setItem('tiktok_oauth_workspace_id', currentWorkspace.id);
-      const redirectUri = `${window.location.origin}/tiktok-callback`;
-      const { data, error } = await supabase.functions.invoke('start-tiktok-oauth', { body: { redirectUri, userId: user.id } });
-      if (error) throw error;
-      sessionStorage.setItem('tiktok_oauth_state', data.state);
-      const popup = window.open(data.authUrl, 'tiktok_oauth', 'width=600,height=700,scrollbars=yes,resizable=yes');
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        toast.info('Redirecionando para o TikTok...');
-        window.location.href = data.authUrl;
-        return;
-      }
-      const checkPopup = setInterval(() => {
-        const r = localStorage.getItem('tiktok_oauth_result');
-        if (r) { clearInterval(checkPopup); localStorage.removeItem('tiktok_oauth_result'); const res = JSON.parse(r); if (res.success) { toast.success('TikTok conectado!'); fetchTkAccounts(); } else { toast.error(res.error); } setConnectingTikTok(false); }
-        try { if (popup.closed) { clearInterval(checkPopup); setConnectingTikTok(false); fetchTkAccounts(); } } catch {}
-      }, 500);
-      setTimeout(() => { clearInterval(checkPopup); setConnectingTikTok(false); }, 300000);
-    } catch (e: any) { toast.error(e.message); setConnectingTikTok(false); }
-  };
 
   const handleVoiceSelect = (voiceId: string) => {
     setSelectedVoice(voiceId);
@@ -350,7 +323,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
             <ScrollArea className="flex-1 px-4">
               <div className="py-4 space-y-6">
                 <AnimatePresence mode="wait">
-                  {/* CONNECTIONS Section — Instagram, TikTok, Voice */}
+                  {/* CONNECTIONS Section — Instagram */}
                   {activeSection === 'connections' && (
                     <motion.div 
                       key="connections"
@@ -399,42 +372,6 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
                           )}
                         </div>
 
-                        <div className="space-y-3">
-                          <Label className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                            <Video className="h-3.5 w-3.5" /> TikTok
-                          </Label>
-                          {tiktokAccounts.length > 0 ? (
-                            <div className="space-y-2">
-                              {tiktokAccounts.map(acc => (
-                                <div key={acc.id} className="flex items-center justify-between p-3 rounded-xl border border-primary/20 bg-primary/5">
-                                  <div className="flex items-center gap-3">
-                                    {acc.avatar_url ? (
-                                      <img src={acc.avatar_url} alt={acc.username || acc.display_name || ''} className="w-10 h-10 rounded-full object-cover border-2 border-primary/30" />
-                                    ) : (
-                                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
-                                        <Video className="w-5 h-5 text-white" />
-                                      </div>
-                                    )}
-                                    <div>
-                                      <p className="text-sm font-medium">@{acc.username || acc.display_name || 'TikTok'}</p>
-                                      <Badge variant={getTkTokenStatus(acc.expires_at) === 'active' ? 'default' : 'destructive'} className="text-[10px] h-4">
-                                        {getTkTokenStatus(acc.expires_at) === 'active' ? '✅ Ativo' : '❌ Expirado'}
-                                      </Badge>
-                                    </div>
-                                  </div>
-                                  <Button variant="ghost" size="sm" className="text-destructive text-xs h-7" onClick={() => disconnectTk(acc.id)}>
-                                    Desconectar
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <Button onClick={startTikTokOAuth} disabled={connectingTikTok} className="w-full gap-2" variant="outline">
-                              {connectingTikTok ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                              Conectar TikTok
-                            </Button>
-                          )}
-                        </div>
                     </motion.div>
                   )}
 
