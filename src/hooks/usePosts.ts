@@ -176,18 +176,20 @@ export const usePosts = () => {
 
   const publishPost = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await supabase.functions.invoke("publish-post", {
+      const { data, error } = await supabase.functions.invoke("publish-post", {
         body: { postId: id },
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       await fetchPosts();
-      toast.success("Post publicado com sucesso!");
+      toast.success(data?.message || "Post publicado com sucesso!");
       return true;
     } catch (err: any) {
       console.error("Error publishing post:", err);
-      toast.error("Erro ao publicar post");
+      const message = err?.context?.error || err?.message || "Erro ao publicar post";
+      toast.error(message);
       return false;
     }
   };
