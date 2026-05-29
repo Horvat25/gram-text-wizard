@@ -288,13 +288,19 @@ const PublicationQueueTab = ({
       if (error) throw error;
       
       if (data.processed > 0) {
-        toast.success(`${data.successCount} post(s) publicado(s)!`);
+        if (data.failCount > 0) {
+          const firstError = data.results?.find((result: any) => !result.success)?.error;
+          toast.error(firstError || `${data.failCount} post(s) falharam ao publicar`);
+        }
+        if (data.successCount > 0) {
+          toast.success(`${data.successCount} post(s) publicado(s)!`);
+        }
       } else {
         toast.info("Nenhum post pronto para publicar");
       }
     } catch (err: any) {
       console.error("Error processing scheduled posts:", err);
-      toast.error("Erro ao processar posts agendados");
+      toast.error(err?.message || "Erro ao processar posts agendados");
     } finally {
       setIsCheckingScheduler(false);
     }
