@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const REELS_PAUSED_UNTIL_UTC = new Date("2026-06-01T03:00:00.000Z"); // Segunda 00:00 em Brasília
+
 /**
  * auto-reel-publisher
  *
@@ -27,6 +29,17 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     console.log("[AUTO-REEL] 🎬 Disparado:", new Date().toISOString());
+
+    if (new Date() < REELS_PAUSED_UNTIL_UTC) {
+      console.log("[AUTO-REEL] ⏸️ Criação automática de Reels pausada até segunda-feira em Brasília");
+      return new Response(JSON.stringify({
+        skipped: true,
+        reason: "paused_until_monday_brt",
+        pausedUntil: REELS_PAUSED_UNTIL_UTC.toISOString(),
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // ── Limite: máx 2 Reels nas últimas 24h ──
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

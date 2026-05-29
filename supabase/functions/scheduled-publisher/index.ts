@@ -72,195 +72,50 @@ serve(async (req) => {
 
     console.log(`📬 Encontrados ${scheduledPosts.length} posts para publicar`);
 
-    const { data: accounts, error: accountError } = await supabase
-      .from("instagram_accounts")
-      .select("*")
-      .limit(1);
-
-    const hasConnectedAccount = !accountError && accounts && accounts.length > 0;
-
     const results = [];
 
     for (const post of scheduledPosts) {
-      console.log(`📝 Processando post ${post.id}: ${post.caption?.substring(0, 50)}...`);
+      console.log(`📝 Disparando publicação centralizada para post ${post.id}: ${post.caption?.substring(0, 50)}...`);
 
       try {
-        const isReels = post.media_type === "reels" || post.media_type === "reel";
-        const isVideo = post.media_type === "video" || isReels;
-        const isCarousel = post.media_type === "carousel";
-        let carouselImages = [...(post.carousel_images as string[] || [])];
-        let mediaUrl = isVideo ? post.video_url : post.image_url;
-        
-        // Block Reels without video_url
-        if (isReels && !post.video_url) {
-          console.log(`⚠️ Reels ${post.id} não tem video_url`);
-          await supabase
-            .from("posts")
-            .update({
-              status: "draft",
-              error_message: "Reels precisa ser renderizado antes de publicar. Acesse a Fila e clique em 'Gerar Vídeo'.",
-            })
-            .eq("id", post.id);
-          results.push({ postId: post.id, success: false, error: "Reels sem vídeo renderizado" });
+        const publishResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({ postId: post.id }),
+        });
+
+        const publishText = await publishResponse.text();
+        let publishData: any = null;
+        try {
+          publishData = publishText ? JSON.parse(publishText) : null;
+        } catch (_) {
+          publishData = { raw: publishText };
+        }
+
+        if (!publishResponse.ok || publishData?.error) {
+          const message = publishData?.error || publishData?.message || publishText || `Falha HTTP ${publishResponse.status}`;
+          console.error(`❌ publish-post falhou para ${post.id}:`, message);
+          results.push({ postId: post.id, success: false, error: message });
           continue;
         }
-        
-        const hasMedia = isCarousel ? carouselImages.length >= 2 : !!mediaUrl;
 
-        if (hasConnectedAccount && hasMedia) {
-          const account = accounts[0];
-          const accessToken = account.access_token;
-          const instagramUserId = account.instagram_user_id;
-
-          // ── RESIZE IMAGES FOR INSTAGRAM COMPATIBILITY ──
-          if (!isVideo && mediaUrl) {
-            console.log(`📐 Resizing image for Instagram: ${post.media_type}`);
-            mediaUrl = await resizeForInstagram(supabaseUrl, supabaseKey, mediaUrl, post.media_type || 'image');
-          }
-          if (isCarousel && carouselImages.length > 0) {
-            console.log(`📐 Resizing ${carouselImages.length} carousel images...`);
-            for (let i = 0; i < carouselImages.length; i++) {
-              carouselImages[i] = await resizeForInstagram(supabaseUrl, supabaseKey, carouselImages[i], 'carousel');
-            }
-          }
-
-          console.log(`📸 Publicando no Instagram para @${account.username}...`);
-          const caption = `${post.caption}\n\n${(post.hashtags || []).map((h: string) => `#${h}`).join(' ')}`;
-          let creationId: string;
-
-          if (isCarousel) {
-            console.log(`🎠 Criando carrossel com ${carouselImages.length} imagens...`);
-            const childrenIds: string[] = [];
-            for (let i = 0; i < carouselImages.length; i++) {
-              const itemUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-              itemUrl.searchParams.set('image_url', carouselImages[i]);
-              itemUrl.searchParams.set('is_carousel_item', 'true');
-              itemUrl.searchParams.set('access_token', accessToken);
-              
-              const itemResponse = await fetch(itemUrl.toString(), { method: 'POST' });
-              const itemData = await itemResponse.json();
-              if (itemData.error) throw new Error(`Carousel item ${i + 1}: ${itemData.error.message}`);
-              childrenIds.push(itemData.id);
-              await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            
-            const carouselUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-            carouselUrl.searchParams.set('media_type', 'CAROUSEL');
-            carouselUrl.searchParams.set('caption', caption);
-            carouselUrl.searchParams.set('children', childrenIds.join(','));
-            carouselUrl.searchParams.set('access_token', accessToken);
-            
-            const carouselResponse = await fetch(carouselUrl.toString(), { method: 'POST' });
-            const carouselData = await carouselResponse.json();
-            if (carouselData.error) throw new Error(`Carousel: ${carouselData.error.message}`);
-            creationId = carouselData.id;
-          } else {
-            const createMediaUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media`);
-            if (isVideo) {
-              createMediaUrl.searchParams.set('video_url', mediaUrl);
-              createMediaUrl.searchParams.set('caption', caption);
-              createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
-            } else {
-              createMediaUrl.searchParams.set('image_url', mediaUrl);
-              createMediaUrl.searchParams.set('caption', caption);
-            }
-            createMediaUrl.searchParams.set('access_token', accessToken);
-
-            const mediaResponse = await fetch(createMediaUrl.toString(), { method: 'POST' });
-            const mediaData = await mediaResponse.json();
-            if (mediaData.error) throw new Error(`Instagram API: ${mediaData.error.message}`);
-            creationId = mediaData.id;
-          }
-
-          console.log(`✅ Container criado: ${creationId}`);
-
-          // Wait for media processing
-          console.log("⏳ Aguardando processamento da mídia...");
-          let status = "IN_PROGRESS";
-          let attempts = 0;
-          const maxAttempts = isVideo ? 60 : 15;
-
-          while (status === "IN_PROGRESS" && attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            const statusUrl = new URL(`https://graph.facebook.com/v18.0/${creationId}`);
-            statusUrl.searchParams.set('fields', 'status_code');
-            statusUrl.searchParams.set('access_token', accessToken);
-            
-            const statusResponse = await fetch(statusUrl.toString());
-            const statusData = await statusResponse.json();
-            status = statusData.status_code || "FINISHED";
-            attempts++;
-            console.log(`📊 Status: ${status} (tentativa ${attempts}/${maxAttempts})`);
-            if (statusData.error || !statusData.status_code || statusData.status_code === "FINISHED") {
-              status = "FINISHED";
-              break;
-            }
-          }
-
-          if (status === "ERROR") throw new Error("Erro no processamento da mídia pelo Instagram");
-
-          // Publish
-          const publishUrl = new URL(`https://graph.facebook.com/v18.0/${instagramUserId}/media_publish`);
-          publishUrl.searchParams.set('creation_id', creationId);
-          publishUrl.searchParams.set('access_token', accessToken);
-
-          const publishResponse = await fetch(publishUrl.toString(), { method: 'POST' });
-          const publishData = await publishResponse.json();
-          if (publishData.error) throw new Error(`Instagram API: ${publishData.error.message}`);
-
-          // Save with instagram_post_id — no fake metrics, sync will fill them later
-          await supabase
-            .from("posts")
-            .update({
-              status: "published",
-              published_at: new Date().toISOString(),
-              instagram_post_id: publishData.id,
-            })
-            .eq("id", post.id);
-
-          const typeLabel = isCarousel ? "Carrossel" : isVideo ? "Vídeo" : "Imagem";
-          results.push({
-            postId: post.id,
-            success: true,
-            instagramPostId: publishData.id,
-            message: `${typeLabel} publicado no Instagram @${account.username}`,
-          });
-          console.log(`🎉 Post ${post.id} publicado com sucesso no Instagram!`);
-
-        } else {
-          // Simulation mode
-          const reason = !hasConnectedAccount 
-            ? "Nenhuma conta Instagram conectada" 
-            : "Post sem mídia";
-          console.log(`⚠️ Modo simulação para post ${post.id}: ${reason}`);
-
-          await supabase
-            .from("posts")
-            .update({
-              status: "published",
-              published_at: new Date().toISOString(),
-              likes_count: 0,
-              comments_count: 0,
-              saves_count: 0,
-              reach: 0,
-            })
-            .eq("id", post.id);
-
-          results.push({
-            postId: post.id,
-            success: true,
-            simulated: true,
-            message: `Publicado (simulação - ${reason})`,
-          });
-          console.log(`✅ Post ${post.id} publicado (simulação)`);
-        }
+        results.push({
+          postId: post.id,
+          success: true,
+          instagramPostId: publishData?.instagramPostId,
+          message: publishData?.message || "Publicado com sucesso",
+        });
+        console.log(`🎉 Post ${post.id} publicado via publish-post!`);
       } catch (postError: any) {
-        console.error(`❌ Erro ao publicar post ${post.id}:`, postError);
+        console.error(`❌ Erro ao chamar publish-post para ${post.id}:`, postError);
         await supabase
           .from("posts")
-          .update({ status: "failed", error_message: postError.message })
+          .update({ status: "failed", error_message: (postError?.message || "Erro ao publicar").substring(0, 500) })
           .eq("id", post.id);
-        results.push({ postId: post.id, success: false, error: postError.message });
+        results.push({ postId: post.id, success: false, error: postError?.message || "Erro ao publicar" });
       }
     }
 

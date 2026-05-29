@@ -757,10 +757,10 @@ async function makeStrategicDecision(state: AgentState, lovableApiKey: string): 
     // Weekly content goals met - override with best-performing type to maintain cadence
     // This ensures the agent NEVER stops posting during active hours if daily limit allows
     const bestType = state.historical30d.bestMediaType;
-    const overrideType: ContentType = bestType === 'reels' ? 'video' 
+    const overrideType: ContentType = bestType === 'reels' ? 'carousel' 
       : bestType === 'carousel' ? 'carousel'
       : bestType === 'news' ? 'news'
-      : (goalType === 'growth' || goalType === 'reach') ? 'video' : 'news';
+      : (goalType === 'growth' || goalType === 'reach') ? 'carousel' : 'news';
     
     console.log(`[AGENT] 🔄 Meta semanal atingida mas ainda dentro do limite diário (${state.postsToday}/${dynamicDailyLimit}) - continuando com ${overrideType} (melhor tipo: ${bestType || 'N/A'})`);
     state.nextContentType = overrideType;
