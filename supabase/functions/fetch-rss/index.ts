@@ -318,12 +318,13 @@ serve(async (req) => {
           .lt('fetched_at', fiveDaysAgo);
         
         // 2. Delete items older than 7 days (even unused - stale news)
+        //    Use fetched_at as fallback when published_at is NULL (many feeds don't expose it).
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         const { count: deletedOld } = await supabase
           .from('rss_items')
           .delete({ count: 'exact' })
           .eq('workspace_id', workspaceId)
-          .lt('published_at', sevenDaysAgo);
+          .or(`published_at.lt.${sevenDaysAgo},and(published_at.is.null,fetched_at.lt.${sevenDaysAgo})`);
         
         // 3. Cap total items per workspace to 150 (keep newest)
         const { data: totalItems } = await supabase
