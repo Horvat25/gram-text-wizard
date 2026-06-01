@@ -33,12 +33,11 @@ serve(async (req) => {
 
     console.log("[AUTO-REEL] 🎬 Disparado:", new Date().toISOString());
 
-    if (new Date() < REELS_PAUSED_UNTIL_UTC) {
-      console.log("[AUTO-REEL] ⏸️ Criação automática de Reels pausada até segunda-feira em Brasília");
+    if (REELS_AUTO_DISABLED || new Date() < REELS_PAUSED_UNTIL_UTC) {
+      console.log("[AUTO-REEL] ⛔ Criação automática de Reels DESLIGADA permanentemente (até pedido manual do usuário)");
       return new Response(JSON.stringify({
         skipped: true,
-        reason: "paused_until_monday_brt",
-        pausedUntil: REELS_PAUSED_UNTIL_UTC.toISOString(),
+        reason: "auto_reels_disabled",
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
