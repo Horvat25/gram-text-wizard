@@ -78,10 +78,39 @@ serve(async (req) => {
       ? Math.abs(currentRatio - targetRatio) < ratioTolerance
       : currentRatio >= FEED_MIN_RATIO && currentRatio <= FEED_MAX_RATIO;
 
-    if (isAcceptable && originalWidth >= 320) {
-      console.log(`[resize] ✅ Aspect ratio acceptable, skipping resize`);
+    // Detect external (non-Supabase) URLs — Instagram rejects URLs with query strings
+    // and unstable hosts (e.g. Pexels CDN with ?auto=compress), so we always re-host.
+    const isExternal = !imageUrl.includes("/storage/v1/object/public/");
+
+    if (isAcceptable && originalWidth >= 320 && !isExternal) {
+      console.log(`[resize] ✅ Aspect ratio acceptable and already hosted, skipping resize`);
       return new Response(
         JSON.stringify({ url: imageUrl, skipped: true, reason: "acceptable_ratio" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (isAcceptable && originalWidth >= 320 && isExternal) {
+      // No crop needed, but re-host to get a clean Supabase URL (no query string)
+      console.log(`[resize] 🔁 External URL — re-hosting without crop`);
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const ext = (response.headers.get("content-type") || "image/jpeg").includes("png") ? "png" : "jpg";
+      const filename = `rehosted/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("post-images")
+        .upload(filename, buffer, { contentType: response.headers.get("content-type") || "image/jpeg", upsert: true });
+      if (upErr) {
+        console.error("[resize] Re-host upload failed:", upErr);
+        return new Response(
+          JSON.stringify({ url: imageUrl, skipped: true, reason: "rehost_failed" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const { data: pub } = supabase.storage.from("post-images").getPublicUrl(filename);
+      return new Response(
+        JSON.stringify({ url: pub.publicUrl, original: imageUrl, skipped: false, reason: "rehosted" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
