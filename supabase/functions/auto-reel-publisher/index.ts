@@ -6,7 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const REELS_PAUSED_UNTIL_UTC = new Date("2026-06-01T03:00:00.000Z"); // Segunda 00:00 em Brasília
+// ⛔ PAUSA PERMANENTE até o usuário pedir reativação no chat.
+// Não cria Reels automáticos. Reels só via solicitação manual (chat / aba Teste).
+const REELS_AUTO_DISABLED = true;
+const REELS_PAUSED_UNTIL_UTC = new Date("2099-12-31T00:00:00.000Z");
 
 /**
  * auto-reel-publisher
