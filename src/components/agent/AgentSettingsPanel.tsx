@@ -230,7 +230,7 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
     } catch (e: any) { toast.error(e.message); setTestingVoice(null); }
   };
 
-  useEffect(() => { setSelectedVoice(brandSettings.preferredVoice || 'camila'); }, [brandSettings]);
+  useEffect(() => { setSelectedVoice(brandSettings.preferredVoice || 'thalita'); }, [brandSettings]);
 
   const sections = [
     { id: 'connections' as const, label: 'Contas', icon: Link2 },
