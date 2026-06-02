@@ -228,7 +228,7 @@ async function generateElevenLabs(text: string, apiKey: string): Promise<Uint8Ar
           similarity_boost: 0.82, // mantém timbre da Sarah
           style: 0.45,            // inflexão editorial marcada
           use_speaker_boost: true,
-          speed: 1.12,            // ritmo Reels viral (12% + rápido, ainda claro)
+          speed: 1.22,            // ritmo Reels viral (22% + rápido, ainda claro)
         },
       }),
     }
