@@ -189,10 +189,12 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   };
 
   const VOICE_OPTIONS = [
-    { id: 'camila', name: 'Camila', gender: 'Feminino', description: 'Calorosa e profissional' },
-    { id: 'vitoria', name: 'Vitória', gender: 'Feminino', description: 'Suave e gentil' },
-    { id: 'thiago', name: 'Thiago', gender: 'Masculino', description: 'Dinâmica e envolvente' },
-    { id: 'ricardo', name: 'Ricardo', gender: 'Masculino', description: 'Grave e autoritária' },
+    { id: 'thalita', name: 'Thalita Neural', gender: 'Feminino', description: 'Microsoft Edge Neural — natural e moderna (recomendada)' },
+    { id: 'francisca', name: 'Francisca Neural', gender: 'Feminino', description: 'Microsoft Edge Neural — calorosa e expressiva' },
+    { id: 'antonio', name: 'Antônio Neural', gender: 'Masculino', description: 'Microsoft Edge Neural — voz de locutor de podcast' },
+    { id: 'camila', name: 'Camila (Polly)', gender: 'Feminino', description: 'Amazon Polly — calorosa e profissional' },
+    { id: 'vitoria', name: 'Vitória (Polly)', gender: 'Feminino', description: 'Amazon Polly — suave e gentil' },
+    { id: 'ricardo', name: 'Ricardo (Polly)', gender: 'Masculino', description: 'Amazon Polly — grave e autoritária' },
   ];
 
   const startOAuth = async () => {
