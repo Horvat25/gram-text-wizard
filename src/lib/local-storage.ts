@@ -65,7 +65,7 @@ const getDefaultData = (): LocalData => ({
     brandName: "NeuralUpdate",
     brandLogoUrl: null,
     preferredPostTimes: [],
-    preferredVoice: "camila",
+    preferredVoice: "thalita",
   },
 });
 
