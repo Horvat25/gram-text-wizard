@@ -138,7 +138,7 @@ async function generateEdgeTTS(text: string, voice: string): Promise<Uint8Array>
       const ssml =
         `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='pt-BR'>` +
         `<voice name='${voice}'>` +
-        `<prosody rate='+5%' pitch='+0Hz'>${safeText}</prosody>` +
+        `<prosody rate='+22%' pitch='+2Hz'>${safeText}</prosody>` +
         `</voice></speak>`;
 
       const ssmlMsg =

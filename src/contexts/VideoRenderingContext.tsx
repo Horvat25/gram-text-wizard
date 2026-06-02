@@ -142,6 +142,7 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
     brandName: brandSettings.brandName || VIDEO_CONFIG.BRAND_NAME,
     segmentCount: VIDEO_CONFIG.SEGMENT_COUNT,
     segmentDuration: VIDEO_CONFIG.SEGMENT_DURATION_BASE,
+    preferredVoice: brandSettings.preferredVoice,
   });
 
   const notify = useCallback(
