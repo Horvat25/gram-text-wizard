@@ -6,25 +6,27 @@ const corsHeaders = {
 };
 
 /**
- * FREE TTS using StreamElements (Amazon Polly voices)
- * 
- * Portuguese Brazilian voices available:
- * - Camila (female, neural) - Natural and warm
- * - Vitoria (female, standard) - Clear and professional
- * - Ricardo (male, standard) - Deep and authoritative
+ * FREE TTS:
+ *  1) Microsoft Edge Neural TTS (WebSocket, sem API key)  → Thalita / Antonio / Francisca
+ *  2) StreamElements (Amazon Polly)                       → Camila / Vitoria / Ricardo
+ *  3) Google Translate TTS                                → fallback final
  */
 
-// Map our voice IDs to StreamElements/Polly voices
-const VOICE_MAPPING: Record<string, string> = {
-  // Female voices
-  "camila": "Camila",      // Neural, warm (best quality)
-  "vitoria": "Vitoria",    // Standard, clear
-  "fernanda": "Camila",    // Map to Camila
-  // Male voices
-  "thiago": "Ricardo",     // Standard male
-  "ricardo": "Ricardo",    // Standard male
-  // Fallback
-  "default": "Camila",
+type VoiceCfg = { provider: "edge" | "polly"; voice: string };
+
+const VOICE_MAPPING: Record<string, VoiceCfg> = {
+  // Microsoft Edge Neural (qualidade premium, grátis)
+  thalita:    { provider: "edge",  voice: "pt-BR-ThalitaMultilingualNeural" },
+  thalita_br: { provider: "edge",  voice: "pt-BR-ThalitaNeural" },
+  francisca:  { provider: "edge",  voice: "pt-BR-FranciscaNeural" },
+  antonio:    { provider: "edge",  voice: "pt-BR-AntonioNeural" },
+  // Amazon Polly (StreamElements)
+  camila:     { provider: "polly", voice: "Camila" },
+  vitoria:    { provider: "polly", voice: "Vitoria" },
+  fernanda:   { provider: "polly", voice: "Camila" },
+  thiago:     { provider: "polly", voice: "Ricardo" },
+  ricardo:    { provider: "polly", voice: "Ricardo" },
+  default:    { provider: "edge",  voice: "pt-BR-ThalitaMultilingualNeural" },
 };
 
 serve(async (req) => {
@@ -42,154 +44,183 @@ serve(async (req) => {
       );
     }
 
-    // Map voice to Polly voice
-    const requestedVoice = voice || "camila";
-    const pollyVoice = VOICE_MAPPING[requestedVoice] || VOICE_MAPPING["default"];
-    
-    console.log(`[TTS] Voice: ${requestedVoice} -> Polly: ${pollyVoice}`);
-    console.log(`[TTS] Text length: ${text.length} chars`);
+    const requestedVoice = voice || "thalita";
+    const cfg = VOICE_MAPPING[requestedVoice] || VOICE_MAPPING["default"];
+    console.log(`[TTS] Voice: ${requestedVoice} -> ${cfg.provider}:${cfg.voice} (${text.length} chars)`);
 
-    // Use StreamElements API (free Amazon Polly)
-    const encodedText = encodeURIComponent(text);
-    const ttsUrl = `https://api.streamelements.com/kappa/v2/speech?voice=${pollyVoice}&text=${encodedText}`;
-    
-    console.log(`[TTS] Calling StreamElements API...`);
-    
-    const response = await fetch(ttsUrl, {
-      method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    let audioBytes: Uint8Array | null = null;
+    let usedProvider = "";
+
+    // 1) Edge Neural
+    if (cfg.provider === "edge") {
+      try {
+        audioBytes = await generateEdgeTTS(text, cfg.voice);
+        usedProvider = "edge-neural";
+      } catch (e: any) {
+        console.warn(`[TTS] Edge falhou: ${e.message}. Fallback Polly Camila.`);
       }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[TTS] StreamElements Error: ${response.status} - ${errorText}`);
-      
-      // Fallback to Google Translate TTS
-      console.log(`[TTS] Trying Google TTS fallback...`);
-      return await googleTTSFallback(text, corsHeaders);
     }
 
-    const audioBuffer = await response.arrayBuffer();
-    const audioArray = new Uint8Array(audioBuffer);
-    
-    // Convert to base64
-    let binary = '';
-    for (let i = 0; i < audioArray.length; i++) {
-      binary += String.fromCharCode(audioArray[i]);
+    // 2) Polly via StreamElements
+    if (!audioBytes) {
+      try {
+        const pollyVoice = cfg.provider === "polly" ? cfg.voice : "Camila";
+        audioBytes = await generatePolly(text, pollyVoice);
+        usedProvider = "polly-" + pollyVoice;
+      } catch (e: any) {
+        console.warn(`[TTS] Polly falhou: ${e.message}. Fallback Google.`);
+      }
     }
-    const base64Audio = btoa(binary);
 
-    console.log(`[TTS] ✅ Success! Size: ${(audioBuffer.byteLength / 1024).toFixed(1)}KB`);
+    // 3) Google Translate
+    if (!audioBytes) {
+      audioBytes = await generateGoogleTTS(text);
+      usedProvider = "google-translate";
+    }
+
+    const base64Audio = bytesToBase64(audioBytes);
+    console.log(`[TTS] ✅ ${usedProvider}: ${(audioBytes.length / 1024).toFixed(1)}KB`);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         audioContent: base64Audio,
         format: "mp3",
         voice: requestedVoice,
-        pollyVoice: pollyVoice,
+        provider: usedProvider,
         duration_estimate: Math.ceil(text.length / 15),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("[TTS] Error:", error);
-    
-    // Try Google TTS as ultimate fallback
-    try {
-      const { text } = await req.clone().json();
-      if (text) {
-        return await googleTTSFallback(text, corsHeaders);
-      }
-    } catch {}
-    
     return new Response(
       JSON.stringify({ error: error.message || "Erro ao gerar narração" }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
-      }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
 
-async function googleTTSFallback(text: string, corsHeaders: Record<string, string>): Promise<Response> {
-  try {
-    // Split text into chunks (Google TTS has a limit)
-    const maxLength = 200;
-    const chunks: string[] = [];
-    
-    let remaining = text;
-    while (remaining.length > 0) {
-      if (remaining.length <= maxLength) {
-        chunks.push(remaining);
-        break;
-      }
-      
-      // Find a good break point
-      let breakPoint = remaining.lastIndexOf('.', maxLength);
-      if (breakPoint === -1) breakPoint = remaining.lastIndexOf(' ', maxLength);
-      if (breakPoint === -1) breakPoint = maxLength;
-      
-      chunks.push(remaining.substring(0, breakPoint + 1));
-      remaining = remaining.substring(breakPoint + 1).trim();
-    }
-    
-    console.log(`[TTS] Google fallback: ${chunks.length} chunks`);
-    
-    // Get audio for each chunk
-    const audioChunks: Uint8Array[] = [];
-    
-    for (const chunk of chunks) {
-      const encodedChunk = encodeURIComponent(chunk);
-      const googleUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=pt-BR&client=tw-ob&q=${encodedChunk}`;
-      
-      const response = await fetch(googleUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+// =============== Microsoft Edge Neural TTS (WebSocket) ===============
+
+const EDGE_TRUSTED_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
+
+async function generateEdgeTTS(text: string, voice: string): Promise<Uint8Array> {
+  const reqId = crypto.randomUUID().replace(/-/g, "");
+  const url = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${EDGE_TRUSTED_TOKEN}&ConnectionId=${reqId}`;
+
+  return await new Promise<Uint8Array>((resolve, reject) => {
+    const ws = new WebSocket(url);
+    ws.binaryType = "arraybuffer";
+    const chunks: Uint8Array[] = [];
+    let settled = false;
+
+    const fail = (msg: string) => {
+      if (settled) return;
+      settled = true;
+      try { ws.close(); } catch {}
+      reject(new Error(msg));
+    };
+
+    const timeout = setTimeout(() => fail("Edge TTS timeout 20s"), 20000);
+
+    ws.onopen = () => {
+      const ts = new Date().toISOString();
+      const cfg =
+        `X-Timestamp:${ts}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n` +
+        `{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}`;
+      ws.send(cfg);
+
+      const safeText = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      const ssml =
+        `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='pt-BR'>` +
+        `<voice name='${voice}'>` +
+        `<prosody rate='+5%' pitch='+0Hz'>${safeText}</prosody>` +
+        `</voice></speak>`;
+
+      const ssmlMsg =
+        `X-RequestId:${reqId}\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:${ts}\r\nPath:ssml\r\n\r\n${ssml}`;
+      ws.send(ssmlMsg);
+    };
+
+    ws.onmessage = (ev) => {
+      if (typeof ev.data === "string") {
+        if (ev.data.includes("Path:turn.end")) {
+          clearTimeout(timeout);
+          if (settled) return;
+          settled = true;
+          ws.close();
+          const total = chunks.reduce((s, c) => s + c.length, 0);
+          if (total === 0) return reject(new Error("Edge TTS sem áudio"));
+          const out = new Uint8Array(total);
+          let off = 0;
+          for (const c of chunks) { out.set(c, off); off += c.length; }
+          resolve(out);
         }
-      });
-      
-      if (response.ok) {
-        const buffer = await response.arrayBuffer();
-        audioChunks.push(new Uint8Array(buffer));
+      } else {
+        // binary frame: header (txt) + 0x0D 0x0A 0x0D 0x0A + mp3 chunk
+        const bytes = new Uint8Array(ev.data as ArrayBuffer);
+        // first 2 bytes are header length (big endian)
+        const headerLen = (bytes[0] << 8) | bytes[1];
+        const audio = bytes.slice(2 + headerLen);
+        if (audio.length > 0) chunks.push(audio);
       }
-    }
-    
-    if (audioChunks.length === 0) {
-      throw new Error("No audio generated");
-    }
-    
-    // Combine all chunks
-    const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
-    const combined = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const chunk of audioChunks) {
-      combined.set(chunk, offset);
-      offset += chunk.length;
-    }
-    
-    // Convert to base64
-    let binary = '';
-    for (let i = 0; i < combined.length; i++) {
-      binary += String.fromCharCode(combined[i]);
-    }
-    const base64Audio = btoa(binary);
-    
-    console.log(`[TTS] ✅ Google fallback success! Size: ${(combined.length / 1024).toFixed(1)}KB`);
-    
-    return new Response(
-      JSON.stringify({ 
-        audioContent: base64Audio,
-        format: "mp3",
-        voice: "google",
-        duration_estimate: Math.ceil(text.length / 15),
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch (error: any) {
-    console.error("[TTS] Google fallback error:", error);
-    throw error;
+    };
+
+    ws.onerror = () => fail("Edge TTS ws error");
+    ws.onclose = (ev) => {
+      if (!settled) fail(`Edge TTS ws closed (${ev.code})`);
+    };
+  });
+}
+
+// =============== Polly via StreamElements ===============
+
+async function generatePolly(text: string, pollyVoice: string): Promise<Uint8Array> {
+  const url = `https://api.streamelements.com/kappa/v2/speech?voice=${pollyVoice}&text=${encodeURIComponent(text)}`;
+  const resp = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+  });
+  if (!resp.ok) throw new Error(`StreamElements ${resp.status}`);
+  return new Uint8Array(await resp.arrayBuffer());
+}
+
+// =============== Google Translate fallback ===============
+
+async function generateGoogleTTS(text: string): Promise<Uint8Array> {
+  const maxLen = 180;
+  const chunks: string[] = [];
+  let rem = text;
+  while (rem.length > 0) {
+    if (rem.length <= maxLen) { chunks.push(rem); break; }
+    let bp = rem.lastIndexOf(".", maxLen);
+    if (bp === -1) bp = rem.lastIndexOf(" ", maxLen);
+    if (bp === -1) bp = maxLen;
+    chunks.push(rem.slice(0, bp + 1));
+    rem = rem.slice(bp + 1).trim();
   }
+  const parts: Uint8Array[] = [];
+  for (const c of chunks) {
+    const u = `https://translate.google.com/translate_tts?ie=UTF-8&tl=pt-BR&client=tw-ob&q=${encodeURIComponent(c)}`;
+    const r = await fetch(u, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" } });
+    if (r.ok) parts.push(new Uint8Array(await r.arrayBuffer()));
+  }
+  if (parts.length === 0) throw new Error("Google TTS sem áudio");
+  const total = parts.reduce((s, p) => s + p.length, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const p of parts) { out.set(p, off); off += p.length; }
+  return out;
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
 }
