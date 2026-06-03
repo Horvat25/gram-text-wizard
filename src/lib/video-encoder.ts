@@ -147,7 +147,7 @@ function drawCaption(
 
   const lineHeight = baseSize + 14;
   const totalHeight = visibleLines.length * lineHeight;
-  const bottomMargin = 170;
+  const bottomMargin = 220; // antes 170 — colidia com a watermark dourada quando tinha 3-4 linhas
   const startY = height - bottomMargin - totalHeight;
 
   // Faixa escura sutil (gradiente, sem pill arredondada) só atrás do texto
@@ -378,19 +378,17 @@ function renderFrame(
 
     drawGradientOverlays(ctx, width, height);
 
-    if (segIndex === 0 && currentTime < VIDEO_CONFIG.HOOK_DURATION) {
-      drawHookEffect(ctx, width, height, currentTime / VIDEO_CONFIG.HOOK_DURATION);
+    // Hook flash adapta a duração ao segmento (evita piscar a cena inteira em segmentos curtos)
+    const hookCap = Math.min(VIDEO_CONFIG.HOOK_DURATION, segments[0].duration * 0.55);
+    if (segIndex === 0 && currentTime < hookCap && hookCap > 0.4) {
+      drawHookEffect(ctx, width, height, currentTime / hookCap);
     }
 
     const captionText = segments[segIndex].text;
     if (captionText) {
-      let captionOpacity = isHoldingLastFrame ? 1 : 1;
-      if (!isHoldingLastFrame) {
-        if (segProgress < 0.06) captionOpacity = 0.92 + (segProgress / 0.06) * 0.08;
-        if (segProgress > 0.9) captionOpacity = Math.max(0.92, (1 - segProgress) / 0.1);
-      }
-      captionOpacity = Math.max(0.92, Math.min(1, captionOpacity));
-      drawCaption(ctx, captionText, width, height, captionOpacity);
+      // Mantém legenda totalmente legível por toda a cena (antes oscilava entre 0.92 e 1.0
+      // e ainda chegava a 0 no final por causa de (1-segProgress)/0.1, dando "piscadinhas")
+      drawCaption(ctx, captionText, width, height, 1);
     }
 
     drawWatermark(ctx, width, height, brand);
