@@ -1,0 +1,1 @@
+DELETE FROM public.posts WHERE status = 'draft' AND media_type IN ('video','reels');
