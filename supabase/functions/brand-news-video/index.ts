@@ -389,7 +389,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { postId, title, description, workspaceId, userId, articleUrl, primaryImageUrl } = await req.json();
+    const { postId, title, description, workspaceId, userId, articleUrl, primaryImageUrl, voice } = await req.json();
+    const preferredVoice = (voice || "thalita").toString().toLowerCase();
 
     if (!postId || !title) {
       throw new Error("postId e title são obrigatórios");
@@ -451,7 +452,7 @@ Deno.serve(async (req) => {
 
     // ─── STEP 4: Generate narration for each segment ───
     for (const segment of segments) {
-      await generateNarration(segment, supabaseUrl, serviceRoleKey);
+      await generateNarration(segment, supabaseUrl, serviceRoleKey, preferredVoice);
     }
 
     const totalDuration = segments.reduce((sum, s) => sum + (s.audioDuration || 5), 0);
