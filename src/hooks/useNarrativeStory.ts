@@ -88,6 +88,65 @@ const dedupeImageUrls = (urls?: string[]) => {
   return unique.length >= 2 ? unique : urls.filter(Boolean);
 };
 
+const countUniqueImageUrls = (urls: string[]) => new Set(urls.filter(Boolean)).size;
+
+const buildProgrammaticFallbackFrame = (topic: string | undefined, index: number) => {
+  if (typeof document === "undefined") return "";
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 720;
+  canvas.height = 1280;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+
+  const palettes = [
+    ["#05070d", "#12343b", "#ffd700"],
+    ["#06111f", "#243b6b", "#45f3ff"],
+    ["#090b12", "#3b1d5f", "#ffd700"],
+    ["#07130d", "#1f5a42", "#8affc1"],
+    ["#120709", "#6b2438", "#ffcf5a"],
+    ["#070a14", "#314159", "#ffffff"],
+  ];
+  const [bg, mid, accent] = palettes[index % palettes.length];
+  const grad = ctx.createLinearGradient(0, 0, 720, 1280);
+  grad.addColorStop(0, bg);
+  grad.addColorStop(0.55, mid);
+  grad.addColorStop(1, "#000000");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 720, 1280);
+
+  ctx.globalAlpha = 0.16;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  for (let y = 120; y < 1180; y += 120) {
+    ctx.beginPath();
+    ctx.moveTo(50, y + Math.sin(index + y) * 28);
+    ctx.bezierCurveTo(220, y - 90, 480, y + 100, 680, y - 20);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 0.22;
+  ctx.fillStyle = accent;
+  ctx.fillRect(74 + index * 7, 220, 86, 4);
+  ctx.fillRect(560 - index * 9, 980, 88, 4);
+
+  ctx.globalAlpha = 0.08;
+  ctx.font = '900 86px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.fillText("NEURAL", 360, 560);
+  ctx.fillText("UPDATE", 360, 650);
+
+  ctx.globalAlpha = 0.75;
+  ctx.font = '700 24px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = accent;
+  ctx.textAlign = "left";
+  ctx.fillText((topic || "TECNOLOGIA").slice(0, 34).toUpperCase(), 74, 1080);
+  ctx.globalAlpha = 1;
+
+  return canvas.toDataURL("image/png");
+};
+
 const trimNarrationText = (text: string, maxWords: number) => {
   const normalized = normalizeNarrationText(text);
   if (!normalized) return "";

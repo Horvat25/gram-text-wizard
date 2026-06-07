@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useAgentContext } from '@/hooks/useAgentContext';
 import { usePosts } from '@/hooks/usePosts';
+import { useVideoRendering } from '@/contexts/VideoRenderingContext';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -57,6 +58,7 @@ export default function AgentGenieView() {
     updatePost,
     fetchPosts,
   } = usePosts();
+  const { renderVideo } = useVideoRendering();
   
   const [igMessages, setIgMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
