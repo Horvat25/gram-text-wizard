@@ -438,14 +438,13 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   
   const hasAffiliateLinks = (activeAffiliateLinks?.length || 0) > 0;
   
-  // ⛔ REELS AUTOMÁTICOS DESLIGADOS (decisão do usuário)
-  // Agente só cria Reels quando solicitado manualmente via chat ou aba Teste.
-  // Foco: imagem, carrossel, notícia (formatos com 0 falhas no histórico).
-  // Para reativar, descomente os tipos 'video' / 'video_curated' / 'news_video' abaixo.
-  console.log('[AGENT] ⛔ Reels automáticos DESLIGADOS - foco em imagem/carrossel/notícia');
+  // ✅ REELS REATIVADOS (pedido do usuário)
+  // Mantém guard de backlog abaixo, mas volta a considerar vídeo/notícia em vídeo na rotação.
+  console.log('[AGENT] ✅ Reels automáticos ATIVOS - rotação inclui vídeo e vídeo notícia');
   
   const typeStats = [
-    // ❌ video, video_curated, news_video DESABILITADOS para auto-rotação
+    { type: 'news_video' as ContentType, ...getCompletionStats('news_video'), priority: 5 },
+    { type: 'video' as ContentType, ...getCompletionStats('video'), priority: 4 },
     { type: 'carousel' as ContentType, ...getCompletionStats('carousel'), priority: 3 },
     { type: 'news' as ContentType, ...getCompletionStats('news'), priority: 2 },
     { type: 'image' as ContentType, ...getCompletionStats('image'), priority: 1 },

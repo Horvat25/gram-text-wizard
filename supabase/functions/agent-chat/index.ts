@@ -1235,6 +1235,10 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
   // 🛡️ LIMITE: máximo 2 Reels publicados/agendados POR DIA (data alvo de publicação)
   // Se o usuário pedir agendamento para outro dia, o limite é checado naquele dia, não hoje.
   try {
+    if (__fast) {
+      console.log('[create_narrated_video] Pedido manual explícito — pulando limite diário de Reels.');
+      throw new Error('skip_manual_limit');
+    }
     const nowMs = Date.now();
     // Determina a data-alvo de publicação (UTC). Se publish_now ou sem scheduled_for => hoje.
     const targetDate = scheduled_for ? new Date(scheduled_for) : new Date(nowMs);
@@ -1269,8 +1273,10 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         suggest_reschedule: true,
       };
     }
-  } catch (e) {
-    console.warn('[create_narrated_video] limit check failed (continuing):', e);
+  } catch (e: any) {
+    if (e?.message !== 'skip_manual_limit') {
+      console.warn('[create_narrated_video] limit check failed (continuing):', e);
+    }
   }
   
   
@@ -3309,7 +3315,7 @@ serve(async (req) => {
       marketing: publishableWeek.filter((p: any) => p.post_type === 'afiliado').length,
     };
 
-    // Próximo tipo (mesma lógica do cron — Reels desligados, marketing intercalado a cada 4)
+    // Próximo tipo (mesma lógica do cron — Reels ativos, marketing intercalado a cada 4)
     const totalRegular = weeklyProgress.videos + weeklyProgress.carousels + weeklyProgress.news + weeklyProgress.news_videos + weeklyProgress.images;
     const { data: affLinks } = await supabase
       .from('affiliate_links').select('id').eq('workspace_id', workspaceId).eq('is_active', true).limit(1);
@@ -3317,6 +3323,8 @@ serve(async (req) => {
     const marketingDue = hasAffiliates && totalRegular >= 4 && weeklyProgress.marketing === 0;
 
     const autoRotation = [
+      { key: 'news_videos', label: 'news_video', goal: weeklyGoals.news_videos, prog: weeklyProgress.news_videos },
+      { key: 'videos', label: 'video', goal: weeklyGoals.videos, prog: weeklyProgress.videos },
       { key: 'images', label: 'image', goal: weeklyGoals.images, prog: weeklyProgress.images },
       { key: 'news', label: 'news', goal: weeklyGoals.news, prog: weeklyProgress.news },
       { key: 'carousels', label: 'carousel', goal: weeklyGoals.carousels, prog: weeklyProgress.carousels },
