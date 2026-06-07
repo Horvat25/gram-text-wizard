@@ -88,6 +88,65 @@ const dedupeImageUrls = (urls?: string[]) => {
   return unique.length >= 2 ? unique : urls.filter(Boolean);
 };
 
+const countUniqueImageUrls = (urls: string[]) => new Set(urls.filter(Boolean)).size;
+
+const buildProgrammaticFallbackFrame = (topic: string | undefined, index: number) => {
+  if (typeof document === "undefined") return "";
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 720;
+  canvas.height = 1280;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+
+  const palettes = [
+    ["#05070d", "#12343b", "#ffd700"],
+    ["#06111f", "#243b6b", "#45f3ff"],
+    ["#090b12", "#3b1d5f", "#ffd700"],
+    ["#07130d", "#1f5a42", "#8affc1"],
+    ["#120709", "#6b2438", "#ffcf5a"],
+    ["#070a14", "#314159", "#ffffff"],
+  ];
+  const [bg, mid, accent] = palettes[index % palettes.length];
+  const grad = ctx.createLinearGradient(0, 0, 720, 1280);
+  grad.addColorStop(0, bg);
+  grad.addColorStop(0.55, mid);
+  grad.addColorStop(1, "#000000");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 720, 1280);
+
+  ctx.globalAlpha = 0.16;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  for (let y = 120; y < 1180; y += 120) {
+    ctx.beginPath();
+    ctx.moveTo(50, y + Math.sin(index + y) * 28);
+    ctx.bezierCurveTo(220, y - 90, 480, y + 100, 680, y - 20);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 0.22;
+  ctx.fillStyle = accent;
+  ctx.fillRect(74 + index * 7, 220, 86, 4);
+  ctx.fillRect(560 - index * 9, 980, 88, 4);
+
+  ctx.globalAlpha = 0.08;
+  ctx.font = '900 86px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.fillText("NEURAL", 360, 560);
+  ctx.fillText("UPDATE", 360, 650);
+
+  ctx.globalAlpha = 0.75;
+  ctx.font = '700 24px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = accent;
+  ctx.textAlign = "left";
+  ctx.fillText((topic || "TECNOLOGIA").slice(0, 34).toUpperCase(), 74, 1080);
+  ctx.globalAlpha = 1;
+
+  return canvas.toDataURL("image/png");
+};
+
 const trimNarrationText = (text: string, maxWords: number) => {
   const normalized = normalizeNarrationText(text);
   if (!normalized) return "";
@@ -316,15 +375,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       .filter(index => index >= 0);
 
     if (missingImageIndexes.length > 0) {
-      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem — usando última real (SEM IA, custo $0)`);
+      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem — criando frames editoriais locais para manter transições.`);
 
-      // Fallback SEM IA: pega a última imagem real disponível e replica
-      const lastReal = updatedSegments.find(s => s.imageUrl)?.imageUrl;
-      if (lastReal) {
-        missingImageIndexes.forEach(index => {
-          updatedSegments[index] = { ...updatedSegments[index], imageUrl: lastReal };
-        });
-      }
+      missingImageIndexes.forEach(index => {
+        const fallbackFrame = buildProgrammaticFallbackFrame(topic || segments[index]?.text, index);
+        if (fallbackFrame) {
+          updatedSegments[index] = { ...updatedSegments[index], imageUrl: fallbackFrame };
+        }
+      });
+    }
+
+    if (countUniqueImageUrls(updatedSegments.map(segment => segment.imageUrl)) < 2 && updatedSegments.length > 1) {
+      console.warn('[IMAGES] Só havia 1 imagem única — adicionando frames editoriais para o vídeo não ficar travado.');
+      updatedSegments.forEach((segment, index) => {
+        if (index === 0 && segment.imageUrl) return;
+        const fallbackFrame = buildProgrammaticFallbackFrame(topic || segment.text, index);
+        if (fallbackFrame) {
+          updatedSegments[index] = { ...segment, imageUrl: fallbackFrame };
+        }
+      });
     }
 
     const unresolvedImages = updatedSegments
@@ -876,7 +945,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const normalizedScript = existingSegments.slice(0, segmentCount);
     const usableImageUrls = dedupeImageUrls(preExistingImageUrls);
     let currentTime = 0;
-    const segments: StorySegment[] = normalizedScript.map((seg, index) => {
+    let segments: StorySegment[] = normalizedScript.map((seg, index) => {
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: seg.text,
@@ -888,6 +957,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       currentTime += segmentDuration;
       return segment;
     });
+
+    if (segments.some(segment => !!segment.imageUrl) && countUniqueImageUrls(segments.map(segment => segment.imageUrl)) < 2 && segments.length > 1) {
+      segments = segments.map((segment, index) => {
+        if (index === 0 && segment.imageUrl) return segment;
+        const fallbackFrame = buildProgrammaticFallbackFrame(title || segment.text, index);
+        return fallbackFrame ? { ...segment, imageUrl: fallbackFrame } : segment;
+      });
+    }
 
     setState(prev => ({ 
       ...prev, 

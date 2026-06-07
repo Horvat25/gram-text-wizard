@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useAgentContext } from '@/hooks/useAgentContext';
 import { usePosts } from '@/hooks/usePosts';
+import { useVideoRendering } from '@/contexts/VideoRenderingContext';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -57,6 +58,7 @@ export default function AgentGenieView() {
     updatePost,
     fetchPosts,
   } = usePosts();
+  const { renderVideo } = useVideoRendering();
   
   const [igMessages, setIgMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -220,6 +222,14 @@ export default function AgentGenieView() {
       saveMessage(assistantMessage);
       if (executedActions.some((action: any) => action?.post?.id || action?.post_id)) {
         await fetchPosts();
+      }
+      const renderAction = executedActions.find((action: any) => action?.requires_frontend_action?.type === 'render_video');
+      const renderPostId = renderAction?.requires_frontend_action?.post_id || renderAction?.post?.id || renderAction?.post_id;
+      if (renderPostId) {
+        setShowQueue(true);
+        void renderVideo(renderPostId)
+          .then(fetchPosts)
+          .catch((renderError) => console.error('[AgentGenieView] Auto render failed:', renderError));
       }
     } catch (error) {
       console.error('Error sending message to agent:', error);
