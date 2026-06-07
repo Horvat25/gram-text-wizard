@@ -361,17 +361,17 @@ function renderFrame(
     }
 
     const safeDuration = Math.max(segments[segIndex].duration, 0.001);
-    const segProgress = Math.min(1, Math.max(0, (clampedContentTime - elapsed) / safeDuration));
-    const transitionFrames = VIDEO_CONFIG.TRANSITION_DURATION * fps;
-    const segFrames = Math.round(safeDuration * fps);
-    const frameInSeg = Math.round(Math.max(0, clampedContentTime - elapsed) * fps);
+    const localTime = Math.max(0, clampedContentTime - elapsed);
+    const segProgress = Math.min(1, Math.max(0, localTime / safeDuration));
     const isHoldingLastFrame = currentTime > visualContentDuration;
-    const isInTransition = !isHoldingLastFrame && segIndex < segments.length - 1 && frameInSeg > segFrames - transitionFrames;
+    const transitionDuration = Math.min(VIDEO_CONFIG.TRANSITION_DURATION, safeDuration * 0.28);
+    const isEnteringTransition = !isHoldingLastFrame && segIndex > 0 && localTime < transitionDuration;
 
-    if (isInTransition) {
-      const transProgress = (frameInSeg - (segFrames - transitionFrames)) / transitionFrames;
-      const blendT = easeInOutCubic(Math.min(1, Math.max(0, transProgress)));
-      drawCrossfade(ctx, images[segIndex], images[segIndex + 1], width, height, blendT, segIndex, segIndex + 1, segProgress, 0);
+    if (isEnteringTransition) {
+      // A transição começa no MESMO instante em que a legenda muda de cena.
+      // Antes ela acontecia no fim da legenda anterior, dando impressão de imagem travada/descompassada.
+      const blendT = easeInOutCubic(Math.min(1, Math.max(0, localTime / transitionDuration)));
+      drawCrossfade(ctx, images[segIndex - 1], images[segIndex], width, height, blendT, segIndex - 1, segIndex, 1, segProgress);
     } else {
       drawImageKenBurns(ctx, images[segIndex], width, height, segIndex, segProgress);
     }
