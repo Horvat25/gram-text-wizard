@@ -958,7 +958,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return segment;
     });
 
-    if (countUniqueImageUrls(segments.map(segment => segment.imageUrl)) < 2 && segments.length > 1) {
+    if (segments.some(segment => !!segment.imageUrl) && countUniqueImageUrls(segments.map(segment => segment.imageUrl)) < 2 && segments.length > 1) {
       segments = segments.map((segment, index) => {
         if (index === 0 && segment.imageUrl) return segment;
         const fallbackFrame = buildProgrammaticFallbackFrame(title || segment.text, index);
