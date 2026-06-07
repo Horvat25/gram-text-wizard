@@ -6,10 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ⛔ PAUSA PERMANENTE até o usuário pedir reativação no chat.
-// Não cria Reels automáticos. Reels só via solicitação manual (chat / aba Teste).
-const REELS_AUTO_DISABLED = true;
-const REELS_PAUSED_UNTIL_UTC = new Date("2099-12-31T00:00:00.000Z");
+// ✅ Reels reativados por pedido do usuário.
+// Mantém os limites abaixo para evitar backlog/custo, mas o cron pode voltar a criar Reels.
+const REELS_AUTO_DISABLED = false;
+const REELS_PAUSED_UNTIL_UTC = new Date("2000-01-01T00:00:00.000Z");
 
 /**
  * auto-reel-publisher
@@ -34,7 +34,7 @@ serve(async (req) => {
     console.log("[AUTO-REEL] 🎬 Disparado:", new Date().toISOString());
 
     if (REELS_AUTO_DISABLED || new Date() < REELS_PAUSED_UNTIL_UTC) {
-      console.log("[AUTO-REEL] ⛔ Criação automática de Reels DESLIGADA permanentemente (até pedido manual do usuário)");
+      console.log("[AUTO-REEL] ⛔ Criação automática de Reels temporariamente desligada");
       return new Response(JSON.stringify({
         skipped: true,
         reason: "auto_reels_disabled",
