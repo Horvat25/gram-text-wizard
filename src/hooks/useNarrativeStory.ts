@@ -375,15 +375,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       .filter(index => index >= 0);
 
     if (missingImageIndexes.length > 0) {
-      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem — usando última real (SEM IA, custo $0)`);
+      console.warn(`[IMAGES] ${missingImageIndexes.length} cena(s) sem imagem — criando frames editoriais locais para manter transições.`);
 
-      // Fallback SEM IA: pega a última imagem real disponível e replica
-      const lastReal = updatedSegments.find(s => s.imageUrl)?.imageUrl;
-      if (lastReal) {
-        missingImageIndexes.forEach(index => {
-          updatedSegments[index] = { ...updatedSegments[index], imageUrl: lastReal };
-        });
-      }
+      missingImageIndexes.forEach(index => {
+        const fallbackFrame = buildProgrammaticFallbackFrame(topic || segments[index]?.text, index);
+        if (fallbackFrame) {
+          updatedSegments[index] = { ...updatedSegments[index], imageUrl: fallbackFrame };
+        }
+      });
+    }
+
+    if (countUniqueImageUrls(updatedSegments.map(segment => segment.imageUrl)) < 2 && updatedSegments.length > 1) {
+      console.warn('[IMAGES] Só havia 1 imagem única — adicionando frames editoriais para o vídeo não ficar travado.');
+      updatedSegments.forEach((segment, index) => {
+        if (index === 0 && segment.imageUrl) return;
+        const fallbackFrame = buildProgrammaticFallbackFrame(topic || segment.text, index);
+        if (fallbackFrame) {
+          updatedSegments[index] = { ...segment, imageUrl: fallbackFrame };
+        }
+      });
     }
 
     const unresolvedImages = updatedSegments
