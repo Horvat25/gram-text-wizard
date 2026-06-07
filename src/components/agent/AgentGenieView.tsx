@@ -223,6 +223,14 @@ export default function AgentGenieView() {
       if (executedActions.some((action: any) => action?.post?.id || action?.post_id)) {
         await fetchPosts();
       }
+      const renderAction = executedActions.find((action: any) => action?.requires_frontend_action?.type === 'render_video');
+      const renderPostId = renderAction?.requires_frontend_action?.post_id || renderAction?.post?.id || renderAction?.post_id;
+      if (renderPostId) {
+        setShowQueue(true);
+        void renderVideo(renderPostId)
+          .then(fetchPosts)
+          .catch((renderError) => console.error('[AgentGenieView] Auto render failed:', renderError));
+      }
     } catch (error) {
       console.error('Error sending message to agent:', error);
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
