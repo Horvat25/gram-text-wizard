@@ -945,7 +945,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const normalizedScript = existingSegments.slice(0, segmentCount);
     const usableImageUrls = dedupeImageUrls(preExistingImageUrls);
     let currentTime = 0;
-    const segments: StorySegment[] = normalizedScript.map((seg, index) => {
+    let segments: StorySegment[] = normalizedScript.map((seg, index) => {
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: seg.text,
@@ -957,6 +957,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       currentTime += segmentDuration;
       return segment;
     });
+
+    if (countUniqueImageUrls(segments.map(segment => segment.imageUrl)) < 2 && segments.length > 1) {
+      segments = segments.map((segment, index) => {
+        if (index === 0 && segment.imageUrl) return segment;
+        const fallbackFrame = buildProgrammaticFallbackFrame(title || segment.text, index);
+        return fallbackFrame ? { ...segment, imageUrl: fallbackFrame } : segment;
+      });
+    }
 
     setState(prev => ({ 
       ...prev, 
