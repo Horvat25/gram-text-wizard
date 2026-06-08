@@ -176,7 +176,7 @@ function drawCaption(
   ctx.restore();
 }
 
-// ─── Draw Hook flash effect ─────────────────────────────────
+// ─── Draw Hook flash effect — mais dramático: flash + barra dourada + vinheta ───
 function drawHookEffect(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -184,13 +184,41 @@ function drawHookEffect(
   hookProgress: number
 ) {
   if (hookProgress <= 0 || hookProgress >= 1) return;
-  const flashIntensity = hookProgress < 0.15
+
+  // Flash branco inicial (0-15%)
+  const flash1 = hookProgress < 0.15
     ? hookProgress / 0.15
-    : Math.max(0, 1 - (hookProgress - 0.15) / 0.3);
-  if (flashIntensity > 0) {
+    : Math.max(0, 1 - (hookProgress - 0.15) / 0.25);
+  if (flash1 > 0) {
     ctx.save();
-    ctx.globalAlpha = flashIntensity * 0.3;
+    ctx.globalAlpha = flash1 * 0.45;
     ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+  }
+
+  // Barra dourada que cruza a tela (energia visual no início)
+  if (hookProgress < 0.55) {
+    const barT = Math.min(1, hookProgress / 0.55);
+    ctx.save();
+    ctx.globalAlpha = (1 - barT) * 0.9;
+    ctx.fillStyle = '#FFD700';
+    const barH = 6;
+    const barY = height * 0.5 - barH / 2;
+    const barW = width * barT;
+    ctx.fillRect(0, barY, barW, barH);
+    ctx.restore();
+  }
+
+  // Vinheta pulsante pra focar atenção no centro
+  if (hookProgress < 0.8) {
+    ctx.save();
+    const vAlpha = (1 - hookProgress / 0.8) * 0.4;
+    ctx.globalAlpha = vAlpha;
+    const vg = ctx.createRadialGradient(width / 2, height / 2, width * 0.25, width / 2, height / 2, width * 0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,1)');
+    ctx.fillStyle = vg;
     ctx.fillRect(0, 0, width, height);
     ctx.restore();
   }
