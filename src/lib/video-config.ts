@@ -54,12 +54,12 @@ export const VIDEO_CONFIG = {
   NARRATION_VOLUME: 1.0,
   /** Volume do áudio CTA (0-1) */
   CTA_VOLUME: 0.9,
-  /** Volume da trilha sonora COM narração (0-1) */
-  MUSIC_VOLUME_WITH_NARRATION: 0.22,
+  /** Volume da trilha sonora COM narração (0-1) — mais alta pra dar energia */
+  MUSIC_VOLUME_WITH_NARRATION: 0.42,
   /** Volume da trilha sonora SEM narração (0-1) */
-  MUSIC_VOLUME_WITHOUT_NARRATION: 0.45,
+  MUSIC_VOLUME_WITHOUT_NARRATION: 0.7,
   /** Duração do fade-out da trilha (segundos antes do fim) */
-  MUSIC_FADEOUT_SECONDS: 3,
+  MUSIC_FADEOUT_SECONDS: 2,
   /** Gap entre narração e CTA (segundos) */
   NARRATION_CTA_GAP: 0.3,
 
