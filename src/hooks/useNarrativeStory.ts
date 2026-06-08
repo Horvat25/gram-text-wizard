@@ -529,7 +529,10 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     };
 
     const EDGE_VOICES = new Set(["thalita", "thalita_br", "francisca", "antonio"]);
-    const userVoice = options.preferredVoice || "";
+    // Thalita Edge Neural é a voz padrão — só usa ElevenLabs se o usuário escolher explicitamente "sarah"
+    const userVoice = (options.preferredVoice && options.preferredVoice !== "default")
+      ? options.preferredVoice
+      : "thalita";
     const preferEdgeNeural = EDGE_VOICES.has(userVoice);
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
@@ -540,15 +543,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         console.warn(`[TTS] Edge Neural (${userVoice}) falhou, caindo para ElevenLabs...`);
       }
 
-      let result = await invokeTTS("edge-tts", { text }, "elevenlabs");
+      // Padrão Thalita: tenta Edge Neural primeiro mesmo sem preferência explícita
+      let result = await invokeTTS("lovable-tts", { text, voice: userVoice }, `edge-${userVoice}`);
       if (result.audioUrl) return result;
 
-      console.warn("[TTS] ElevenLabs falhou, repetindo uma vez antes do fallback...");
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      console.warn("[TTS] Edge Neural falhou, caindo para ElevenLabs Sarah...");
+      result = await invokeTTS("edge-tts", { text }, "elevenlabs");
+      if (result.audioUrl) return result;
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
       result = await invokeTTS("edge-tts", { text }, "elevenlabs-retry");
-      if (result.audioUrl) return result;
-
-      result = await invokeTTS("lovable-tts", { text, voice: userVoice || "thalita" }, "lovable-tts");
       if (result.audioUrl) return result;
 
       result = await invokeTTS("free-tts", { text, language: "pt-BR" }, "free-tts");
