@@ -1198,20 +1198,17 @@ const buildCostAwareTechScript = (topic: string) => {
   };
 };
 
-const buildNarratedVideoCaption = (topic: string, title: string) =>
-  `🎬 ${title}\n\n${topic} não é só mais uma notícia: é um sinal de como infraestrutura, dados e poder tecnológico estão se reorganizando agora. No vídeo, a leitura é direta — menos hype, mais consequência prática pra IA, chips e nuvem.\n\nO ponto que quase ninguém comenta: quem domina essa camada invisível define preço, velocidade e quem compete no próximo ciclo. É aí que o jogo realmente acontece.\n\n📖 Análise completa no blog 👉 neural-update.com.br\n🔔 Segue @neuralupdate pra não perder a próxima virada.\n\nComenta: você tá vendo evolução real ou só repaginação do mesmo?`;
-
 const buildDirectNarratedVideoArgs = (latestUserMessage: string) => {
   const normalized = normalizeIntentText(latestUserMessage);
   const topic = cleanNarratedVideoTopic(latestUserMessage);
   const wantsPublishNow = /(poste|postar|publica|publique|publicar)/.test(normalized);
 
+  // SEM legenda/hashtag enlatada — o pipeline (brand-news-video + generate-caption)
+  // escreve a legenda real com base no TEMA do usuário. Template fixo aqui era a
+  // causa do "não é só mais uma notícia" em todo post.
   return {
     topic,
-    caption: buildNarratedVideoCaption(topic, buildCostAwareTechScript(topic).title),
-    hashtags: ['#tecnologia', '#ia', '#chips', '#geopolitica', '#reels'],
     platforms: ['instagram'],
-    style: 'editorial tech direto, explicativo, com tese e CTA acionável',
     publish_now: wantsPublishNow,
     __fast: true,
   };
@@ -3295,13 +3292,13 @@ serve(async (req) => {
 
     if (asksToCreateSomethingEarly && asksForVideoEarly && !asksForMarketingEarly) {
       console.log('[agent-chat] Fast path: explicit Reels request detected, skipping tool-selection roundtrip');
-      const directResult = await executeUnifiedAgentContent(
+      // Pipeline ÚNICO: mesmo caminho do cron (brand-news-video) — roteiro editorial
+      // com conhecimento de IA 2026 + imagens do banco + legenda enriquecida.
+      const directResult = await executeCreateNarratedVideo(
         supabase,
         userId,
         workspaceId,
-        buildDirectNarratedVideoArgs(latestUserMessageEarly),
-        'video',
-        'Reels narrado'
+        buildDirectNarratedVideoArgs(latestUserMessageEarly)
       );
 
       return new Response(JSON.stringify({
@@ -3864,10 +3861,7 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
 
       return {
         topic,
-        caption: `🎬 ${topic}\n\n${topic} em foco agora.`,
-        hashtags: ['#tecnologia', '#ia', '#inovacao', '#reels'],
         platforms: ['instagram'],
-        style: 'impactante',
         publish_now: wantsQueue,
       };
     };

@@ -255,54 +255,8 @@ async function brandImage(
   return null;
 }
 
-// ─── STEP 4: Generate narration audio per segment ───
-// Usa lovable-tts (Edge Neural — voz padrão Thalita) com edge-tts (ElevenLabs Sarah) como fallback.
-// Antes estava hardcoded em pt-BR-AntonioNeural via edge-tts (que nem respeitava o parâmetro).
-async function generateNarration(
-  segment: ScriptSegment,
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  voiceId: string = "thalita"
-): Promise<void> {
-  // 1) Tenta lovable-tts (Edge Neural gratuito, respeita voz)
-  try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/lovable-tts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
-      body: JSON.stringify({ text: segment.text, voice: voiceId }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.audioUrl || data.audioContent) {
-        segment.audioUrl = data.audioUrl || `data:audio/mp3;base64,${data.audioContent}`;
-        segment.audioDuration = data.duration || Math.max(3, segment.text.split(/\s+/).length / 2.6);
-        console.log(`[BRAND-VIDEO] 🎙️ Narração ${voiceId} (${data.provider || 'edge-neural'}): ${segment.audioDuration.toFixed(1)}s`);
-        return;
-      }
-    }
-    console.warn(`[BRAND-VIDEO] lovable-tts ${response.status}, fallback edge-tts`);
-  } catch (e) {
-    console.warn("[BRAND-VIDEO] lovable-tts erro:", e);
-  }
-
-  // 2) Fallback ElevenLabs Sarah via edge-tts
-  try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/edge-tts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
-      body: JSON.stringify({ text: segment.text }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      segment.audioUrl = data.audioUrl || (data.audioContent ? `data:audio/mp3;base64,${data.audioContent}` : undefined);
-      segment.audioDuration = data.duration || Math.max(3, segment.text.split(/\s+/).length / 2.6);
-      console.log(`[BRAND-VIDEO] 🎙️ Narração fallback ElevenLabs: ${segment.audioDuration.toFixed(1)}s`);
-    }
-  } catch (e) {
-    console.warn("[BRAND-VIDEO] Erro na narração:", e);
-  }
-}
+// ─── STEP 4 removido: narração é SEMPRE do Neural Voice no cliente ───
+// (decisão do usuário: nenhum TTS server-side, nenhum fallback de voz)
 
 // ─── STEP 5: Compose video via Replicate (image-to-video with motion) ───
 async function composeVideoViaReplicate(

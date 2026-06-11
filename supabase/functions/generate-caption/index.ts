@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { AI_KNOWLEDGE_2026 } from "../_shared/brand-intelligence.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -322,7 +323,8 @@ serve(async (req) => {
 📣 DIVULGAÇÃO OBRIGATÓRIA (encaixe natural no último parágrafo, NUNCA solto):
 - Mencione o blog "Neural Update" (neural-update.com.br) como fonte de aprofundamento
 - Termine com CTA para seguir @neuralupdate no Instagram
-- Exemplos de fechamento natural: "Análise completa no Neural Update — segue @neuralupdate pra não perder a próxima.", "Quer entender mais? Tem desdobramento no blog Neural Update e todo dia uma nova no @neuralupdate."`;
+- Exemplos de fechamento natural: "Análise completa no Neural Update — segue @neuralupdate pra não perder a próxima.", "Quer entender mais? Tem desdobramento no blog Neural Update e todo dia uma nova no @neuralupdate."
+${AI_KNOWLEDGE_2026}`;
     
     if (customInstructions) {
       systemPrompt += `\n\nINSTRUÇÕES PERSONALIZADAS DO USUÁRIO:\n${customInstructions}`;
