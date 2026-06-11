@@ -23,8 +23,8 @@ export const VIDEO_CONFIG = {
   // ─── Limites de Segurança ──────────────────────────
   /** Duração mínima de um segmento (segundos) */
   MIN_SEGMENT_DURATION: 3,
-  /** Duração máxima esperada de um segmento */
-  MAX_SEGMENT_DURATION: 9,
+  /** Duração máxima esperada de um segmento — folga para a voz falar a frase INTEIRA */
+  MAX_SEGMENT_DURATION: 11,
   /** Máximo de segmentos por vídeo */
   MAX_SEGMENTS: 6,
   /** Duração total máxima (conteúdo + CTA) — Reels curtos performam melhor */
@@ -46,8 +46,8 @@ export const VIDEO_CONFIG = {
   // ─── CTA ──────────────────────────────────────────
   /** Duração mínima do CTA (segundos) */
   CTA_MIN_DURATION: 3.5,
-  /** Duração máxima do CTA (segundos) */
-  CTA_MAX_DURATION: 5,
+  /** Duração máxima do CTA (segundos) — folga para a voz fechar a frase inteira */
+  CTA_MAX_DURATION: 6.5,
 
   // ─── Áudio ────────────────────────────────────────
   /** Volume da narração principal (0-1) */
