@@ -344,7 +344,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     try {
       const imageQuery = [
         topic,
-        articleInfo?.articleUrl,
         ...segments.map(segment => `${segment.text} ${segment.imagePrompt}`),
       ].filter(Boolean).join(" ");
       const bankImages = await pickLocalImageBankImages(imageQuery || "tecnologia inteligencia artificial", updatedSegments.length);
@@ -703,7 +702,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           if (measuredDuration > 0) {
             const safePadding = Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration));
             const visualDuration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding);
-            if (visualDuration <= maxAllowedForCurrent + 0.5) {
+            if (visualDuration <= maxAllowedForCurrent + 0.05) {
               selectedAudioUrl = prebuiltAudio;
               selectedAudioBuffer = decodedBuffer;
               selectedProvider = "prebuilt-server";
@@ -916,11 +915,16 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
       const visualContentDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
       const narrationAudioDuration = await getAudioDuration(narrationUrl);
-      const narrationDuration = Math.max(visualContentDuration, narrationAudioDuration || visualContentDuration);
+      // Cap narration at its budget so CTA always fits within MAX_TOTAL_DURATION
+      const maxNarrationBudget = VIDEO_CONFIG.MAX_TOTAL_DURATION - VIDEO_CONFIG.NARRATION_CTA_GAP - VIDEO_CONFIG.CTA_MIN_DURATION;
+      const narrationDuration = Math.min(
+        Math.max(visualContentDuration, narrationAudioDuration || visualContentDuration),
+        maxNarrationBudget,
+      );
       const ctaAudioDuration = ctaNarrationUrl ? await getAudioDuration(ctaNarrationUrl) : 0;
       const ctaDuration = Math.min(
         ctaNarrationUrl
-          ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaAudioDuration + 1.5)
+          ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaAudioDuration + 0.5)
           : VIDEO_CONFIG.CTA_MIN_DURATION,
         VIDEO_CONFIG.CTA_MAX_DURATION,
       );
@@ -1044,17 +1048,21 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     toast.success(`Usando roteiro existente: ${segments.length} cenas`);
 
-    const allHaveImages = segments.every(s => !!s.imageUrl);
-    let segmentsWithImages: StorySegment[];
-    
-    if (allHaveImages) {
-      setState(prev => ({ ...prev, step: "images", progress: 70 }));
-      segmentsWithImages = segments;
-    } else {
-      const result = await generateImages(segments, title, articleInfo);
-      if (!result || abortRef.current) { setIsGenerating(false); return; }
-      segmentsWithImages = result;
-    }
+    // Always search local image bank first — server images (Pexels) are a fallback only.
+    // Strip server imageUrls so generateImages prioritises the bank, then restore them
+    // for any scene the bank or Pexels couldn't fill.
+    const serverImageFallbacks = segments.map(s => s.imageUrl || "");
+    const segmentsForBank = segments.map(s => ({ ...s, imageUrl: "" }));
+
+    setState(prev => ({ ...prev, step: "images", progress: 20 }));
+    const bankResult = await generateImages(segmentsForBank, title, articleInfo);
+    if (!bankResult || abortRef.current) { setIsGenerating(false); return; }
+
+    // Merge: prefer bank/search result, fall back to server image, then programmatic frame
+    let segmentsWithImages: StorySegment[] = bankResult.map((seg, i) => ({
+      ...seg,
+      imageUrl: seg.imageUrl || serverImageFallbacks[i] || "",
+    }));
 
     const audioResult = await generateAudio(segmentsWithImages);
     if (abortRef.current) { setIsGenerating(false); return; }

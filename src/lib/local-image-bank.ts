@@ -46,8 +46,8 @@ function scoreAsset(asset: LocalImageBankAsset, queryTokens: string[], index: nu
   if (asset.category === "logos") score += 2;
   if (/scene_0?1|hook/i.test(asset.relativePath)) score += 2;
 
-  // Stable variety without pure randomness.
-  score += ((index * 17) % 11) / 10;
+  // Shuffle variety: deterministic base + small random offset so each render picks different images.
+  score += ((index * 17) % 11) / 10 + Math.random() * 1.5;
   return score;
 }
 
