@@ -1299,7 +1299,9 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         hashtags: hashtags || [],
         post_type: 'noticia',
         platforms: platforms || ['instagram'],
-        status: 'generating',
+        // 'draft' (não 'generating'): a Fila só lista draft/scheduled/render_failed —
+        // post em 'generating' fica invisível se o pipeline falhar no arranque.
+        status: 'draft',
         scheduled_for: effectiveSchedule,
         media_type: 'reels',
         overlay_metadata: {
