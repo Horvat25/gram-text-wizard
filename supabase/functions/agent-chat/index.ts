@@ -1294,9 +1294,9 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
         body: JSON.stringify({
           topic,
           segmentCount: 5,
-          wordsPerSegment: 24,
-          totalDuration: 50,
-          style: 'editorial denso de tecnologia com ritmo ágil, defenda uma tese com dados concretos, frases COMPLETAS (nunca cortadas no meio), explique COMO funciona e POR QUE importa, divulga o blog Neural Update e termina com CTA acionável para seguir @neuralupdate'
+          wordsPerSegment: 11,
+          totalDuration: 40,
+          style: 'gancho explosivo nos primeiros 3 segundos, ritmo acelerado, frases curtas e diretas, divulga o blog Neural Update'
         })
       }, __fast ? 6500 : 18000, 'generate-story-script');
       
@@ -1395,7 +1395,28 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
       console.error('Error creating video post:', error);
       return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
     }
-    
+
+    // Fire brand-news-video in background to pre-build TTS audio + images per segment.
+    // Client render will reuse this data instead of generating TTS from scratch.
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (supabaseUrl && serviceKey) {
+      fetch(`${supabaseUrl}/functions/v1/brand-news-video`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceKey}` },
+        body: JSON.stringify({
+          postId: post.id,
+          title: script.title || topic,
+          description: caption || '',
+          workspaceId,
+          userId,
+          articleUrl: article_url || null,
+          voice: 'thalita',
+        }),
+      }).catch(e => console.warn('[create_narrated_video] brand-news-video background call failed:', e));
+      console.log(`[create_narrated_video] brand-news-video fired in background for post ${post.id}`);
+    }
+
     // Determine next step message
     let nextStepMessage = '';
     if (publish_now) {

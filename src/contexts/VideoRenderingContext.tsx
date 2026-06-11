@@ -294,6 +294,24 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
         const metadata = post.overlay_metadata as any;
         let script = metadata?.script;
 
+        // If brand-news-video is still building assets in background, wait up to 30s
+        if (metadata?.render_status === 'rendering' || metadata?.pipeline === 'brand-news-video' && metadata?.render_status !== 'assets_ready') {
+          toast.info('Aguardando pré-processamento do servidor...');
+          for (let waited = 0; waited < 30; waited += 3) {
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            const { data: refreshed } = await supabase
+              .from('posts')
+              .select('overlay_metadata')
+              .eq('id', postId)
+              .single();
+            const refreshedMeta = (refreshed as any)?.overlay_metadata as any;
+            if (refreshedMeta?.render_status === 'assets_ready') {
+              script = refreshedMeta.script;
+              break;
+            }
+          }
+        }
+
         if (!script?.segments?.length) {
           const topic = metadata?.topic || post.caption;
           if (!topic) {
