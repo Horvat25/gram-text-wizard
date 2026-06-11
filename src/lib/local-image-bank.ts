@@ -46,8 +46,9 @@ function scoreAsset(asset: LocalImageBankAsset, queryTokens: string[], index: nu
   if (asset.category === "logos") score += 2;
   if (/scene_0?1|hook/i.test(asset.relativePath)) score += 2;
 
-  // Shuffle variety: deterministic base + small random offset so each render picks different images.
-  score += ((index * 17) % 11) / 10 + Math.random() * 1.5;
+  // Small random tie-breaker so renders don't always pick the same images.
+  // Kept tiny (0.4) so token-match score (8 pts/token) always dominates.
+  score += ((index * 17) % 11) / 10 + Math.random() * 0.4;
   return score;
 }
 
@@ -61,12 +62,16 @@ export async function pickLocalImageBankImages(query: string, count: number): Pr
     .filter((token) => token.length >= 3)
     .slice(0, 16);
 
-  return assets
+  const scored = assets
     .map((asset, index) => ({ asset, score: scoreAsset(asset, queryTokens, index) }))
     .filter(({ asset }) => asset.category !== "icons" || count > 4)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, count)
-    .map(({ asset }) => asset);
+    .sort((a, b) => b.score - a.score);
+
+  // Prefer assets with at least one token match; fall back to best-effort if not enough.
+  const relevant = scored.filter(({ score }) => score >= 8);
+  const pool = relevant.length >= count ? relevant : scored;
+
+  return pool.slice(0, count).map(({ asset }) => asset);
 }
 
 export async function getLocalImageBankStatus() {

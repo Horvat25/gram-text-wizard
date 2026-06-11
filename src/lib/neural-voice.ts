@@ -12,14 +12,19 @@ export async function synthesizeWithNeuralVoice(
   text: string,
   options: { postId?: string; voice?: string; platform?: string; channel?: string } = {},
 ): Promise<{ audioUrl: string; duration: number; provider: string } | null> {
-  const baseUrl = (import.meta.env.VITE_NEURAL_VOICE_URL || "").replace(/\/+$/, "");
-  if (!baseUrl) return null;
-  if (!baseUrl || !text.trim()) return null;
+  // Use env override or fall back to local agent running on the user's machine.
+  // Browsers allow http://localhost from HTTPS pages (secure-context exception).
+  const baseUrl = (import.meta.env.VITE_NEURAL_VOICE_URL || "http://localhost:3032").replace(/\/+$/, "");
+  if (!text.trim()) return null;
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 700); // fast-fail if server not running
+
     const response = await fetch(`${baseUrl}/synthesize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
       body: JSON.stringify({
         text,
         engine: "edge",
@@ -31,6 +36,8 @@ export async function synthesizeWithNeuralVoice(
       }),
     });
 
+    clearTimeout(timeout);
+
     if (!response.ok) return null;
     const data = (await response.json()) as NeuralVoiceResponse;
     if (!data.ok || !data.audioUrl) return null;
@@ -40,8 +47,10 @@ export async function synthesizeWithNeuralVoice(
       duration: data.duration || 0,
       provider: `neural-voice:${data.engine || "edge"}`,
     };
-  } catch (error) {
-    console.warn("[neural-voice] local agent unavailable, falling back to Supabase TTS", error);
+  } catch (error: any) {
+    if (error?.name !== "AbortError") {
+      console.warn("[neural-voice] local agent unavailable, falling back to Supabase TTS", error);
+    }
     return null;
   }
 }

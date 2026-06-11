@@ -857,7 +857,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const segDuration = segmentDurations[i] || VIDEO_CONFIG.SEGMENT_DURATION_BASE;
           const updated = {
             ...seg,
-            text: finalSegmentTexts[i] || seg.text,
+            // Keep original text for video overlay — trimmed text was for TTS timing only
             duration: segDuration,
             startTime: currentTime,
           };
