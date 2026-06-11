@@ -477,13 +477,11 @@ Deno.serve(async (req) => {
       thumbnailBranded = await brandImage(coverImage, title, supabaseUrl, serviceRoleKey);
     }
 
-    // ─── STEP 4: Generate narration for each segment ───
-    for (const segment of segments) {
-      await generateNarration(segment, supabaseUrl, serviceRoleKey, preferredVoice);
-    }
-
+    // ─── STEP 4: TTS desativado — áudio gerado pelo Neural Voice no cliente ───
+    // O cliente usa localhost:3032 (Neural Voice) para narração de alta qualidade.
+    // Manter TTS server-side sobrescrevia o Neural Voice e gerava voz genérica.
     const totalDuration = segments.reduce((sum, s) => sum + (s.audioDuration || 5), 0);
-    console.log(`[BRAND-VIDEO] Duração total: ${totalDuration}s`);
+    console.log(`[BRAND-VIDEO] Duração estimada: ${totalDuration}s (sem TTS server-side)`);
 
     // ─── STEP 4.5: Gerar legenda enriquecida (com blog link + CTA) ───
     let enrichedCaption: string | null = null;

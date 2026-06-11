@@ -563,7 +563,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       : "thalita";
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // 1) Agente local (só se VITE_NEURAL_VOICE_URL estiver configurado)
+      // Único provedor: Neural Voice local (localhost:3032 ou VITE_NEURAL_VOICE_URL).
+      // Se não estiver rodando → retorna null → erro claro para o usuário iniciar o servidor.
       const localVoice = await synthesizeWithNeuralVoice(text, {
         voice: userVoice === "antonio" ? "male" : "female",
         channel: "instagram",
@@ -572,24 +573,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       if (localVoice?.audioUrl) {
         return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
       }
-
-      // 2) Edge Neural via lovable-tts (Thalita/Francisca/Antônio — sem API key)
-      let result = await invokeTTS("lovable-tts", { text, voice: userVoice }, `edge-${userVoice}`);
-      if (result.audioUrl) return result;
-
-      // 3) ElevenLabs Sarah
-      console.warn("[TTS] Edge Neural falhou, tentando ElevenLabs Sarah...");
-      result = await invokeTTS("edge-tts", { text }, "elevenlabs");
-      if (result.audioUrl) return result;
-
-      await new Promise(resolve => setTimeout(resolve, 800));
-      result = await invokeTTS("edge-tts", { text }, "elevenlabs-retry");
-      if (result.audioUrl) return result;
-
-      // 4) Google Translate TTS (último recurso)
-      result = await invokeTTS("free-tts", { text, language: "pt-BR" }, "free-tts");
-      if (result.audioUrl) return result;
-
       return { audioUrl: null, provider: "none" };
     };
     
@@ -747,7 +730,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
 
         if (!selectedAudioUrl) {
-          throw new Error(`Falha na narração da cena ${i + 1}. Nenhum provedor de voz respondeu com áudio válido.`);
+          throw new Error(`Neural Voice não respondeu na cena ${i + 1}. Inicie o servidor local com iniciar.ps1 e tente novamente.`);
         }
 
         segmentAudioUrls.push(selectedAudioUrl);
