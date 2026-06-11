@@ -291,24 +291,32 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           } as any)
           .eq('id', postId);
 
-        const metadata = post.overlay_metadata as any;
+        let metadata = post.overlay_metadata as any;
         let script = metadata?.script;
 
-        // If brand-news-video is still building assets in background, wait up to 30s
-        if (metadata?.render_status === 'rendering' || metadata?.pipeline === 'brand-news-video' && metadata?.render_status !== 'assets_ready') {
-          toast.info('Aguardando pré-processamento do servidor...');
-          for (let waited = 0; waited < 30; waited += 3) {
-            await new Promise(resolve => setTimeout(resolve, 3000));
+        // Pipeline brand-news-video ainda preparando assets (script + imagens do banco)?
+        // Espera até 2 min — gerar script local aqui quebraria o pipeline unificado.
+        const pipelineBusy = () =>
+          metadata?.pipeline === 'brand-news-video' &&
+          metadata?.render_status !== 'assets_ready' &&
+          metadata?.render_status !== 'completed';
+
+        if (pipelineBusy() && !script?.segments?.length) {
+          toast.info('Preparando roteiro e imagens do banco Neural Update...');
+          for (let waited = 0; waited < 120; waited += 4) {
+            await new Promise(resolve => setTimeout(resolve, 4000));
             const { data: refreshed } = await supabase
               .from('posts')
               .select('overlay_metadata')
               .eq('id', postId)
               .single();
-            const refreshedMeta = (refreshed as any)?.overlay_metadata as any;
-            if (refreshedMeta?.render_status === 'assets_ready') {
-              script = refreshedMeta.script;
+            metadata = (refreshed as any)?.overlay_metadata as any;
+            if (metadata?.render_status === 'assets_ready' && metadata?.script?.segments?.length) {
+              script = metadata.script;
+              toast.success('Assets prontos! Iniciando renderização...');
               break;
             }
+            if (metadata?.render_status !== 'rendering' && metadata?.render_status !== 'queued') break;
           }
         }
 

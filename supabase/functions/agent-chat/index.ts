@@ -1281,165 +1281,114 @@ async function executeCreateNarratedVideo(supabase: any, userId: string, workspa
   
   
   try {
-    // Step 1: Generate the story script using AI (with local fallback)
-    let script: any = null;
-    
-    try {
-      const scriptResponse = await fetchWithTimeout(`${Deno.env.get('SUPABASE_URL')}/functions/v1/generate-story-script`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-        },
-        body: JSON.stringify({
-          topic,
-          segmentCount: 5,
-          wordsPerSegment: 11,
-          totalDuration: 40,
-          style: 'gancho explosivo nos primeiros 3 segundos, ritmo acelerado, frases curtas e diretas, divulga o blog Neural Update'
-        })
-      }, __fast ? 6500 : 18000, 'generate-story-script');
-      
-      if (scriptResponse.ok) {
-        script = await scriptResponse.json();
-        console.log('Script generated via AI:', script.title, '- Segments:', script.segments?.length);
-      } else {
-        console.warn('Script generation failed (possibly no credits), using local fallback');
-      }
-    } catch (e) {
-      console.warn('Script generation error, using local fallback:', e);
-    }
-    
-    // FALLBACK: Generate local script template when AI credits are exhausted
-    if (!script || !script.segments || script.segments.length === 0) {
-      console.log('[VIDEO] Using LOCAL script fallback for topic:', topic);
-      script = buildCostAwareTechScript(topic);
-    }
-    
-    // Step 2: Get thumbnail from Pexels (FREE, no AI credits needed)
-    let thumbnailUrl = null;
-    if (script.segments && script.segments.length > 0) {
-      try {
-        // Use search-images-for-video which uses Pexels/Unsplash (FREE)
-        const imgSearchResponse = await fetchWithTimeout(`${Deno.env.get('SUPABASE_URL')}/functions/v1/search-images-for-video`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
-          },
-          body: JSON.stringify({
-            topic: topic,
-            segments: [script.segments[0]],
-          })
-        }, 5000, 'search-images-for-video');
-        
-        if (imgSearchResponse.ok) {
-          const imgResult = await imgSearchResponse.json();
-          if (imgResult.images && imgResult.images.length > 0) {
-            thumbnailUrl = imgResult.images[0].imageUrl;
-            console.log('Thumbnail from stock photos:', thumbnailUrl);
-          }
-        }
-      } catch (imgError) {
-        console.error('Thumbnail search failed:', imgError);
-      }
-    }
-    
-    // Step 3: Create the post with video metadata
+    // ═══ PIPELINE ÚNICO: mesmo caminho do cron (auto-reel-publisher) ═══
+    // O brand-news-video é a ÚNICA fonte de script + imagens (banco Neural Update
+    // primeiro, Pexels como fallback) + legenda enriquecida. O chat só cria o post
+    // e dispara o pipeline — idêntico ao fluxo automático.
     const scheduledForUTC = scheduled_for ? convertBrasiliaToUTC(scheduled_for) : null;
-    
-    // If user wants to schedule or publish, set status to 'scheduled' so it appears in the queue
-    // The scheduled-publisher will check for video_url before publishing reels
-    const postStatus = (scheduledForUTC || publish_now) ? 'scheduled' : 'draft';
-    
-    // If publish_now but no scheduled_for, schedule for 5 minutes from now to allow rendering
-    const effectiveSchedule = scheduledForUTC 
-      ? scheduledForUTC 
-      : publish_now 
-        ? new Date(Date.now() + 5 * 60 * 1000).toISOString() 
+    const effectiveSchedule = scheduledForUTC
+      ? scheduledForUTC
+      : publish_now
+        ? new Date(Date.now() + 30 * 60 * 1000).toISOString()
         : null;
 
-    const postData = {
-      user_id: userId,
-      workspace_id: workspaceId,
-      caption: caption || buildNarratedVideoCaption(topic, script.title),
-      hashtags: hashtags || ['#tecnologia', '#inovacao', '#futuro', '#ia', '#reels'],
-      post_type: 'entretenimento',
-      platforms: platforms || ['instagram', 'tiktok'],
-      status: postStatus,
-      scheduled_for: effectiveSchedule,
-      media_type: 'reels',
-      image_url: thumbnailUrl,
-      overlay_metadata: {
-        type: 'narrated_video',
-        script: script,
-        topic: topic,
-        style: style,
-        article_url: article_url || null,
-        article_image_url: article_image_url || null,
-        needs_processing: true,
-        render_status: 'queued',
-        created_by_agent: true,
-        publish_after_render: publish_now === true,
-        requested_schedule: effectiveSchedule,
-      }
-    };
-    
     const { data: post, error } = await supabase
       .from('posts')
-      .insert(postData)
+      .insert({
+        user_id: userId,
+        workspace_id: workspaceId,
+        caption: caption || topic, // brand-news-video substitui pela legenda enriquecida
+        hashtags: hashtags || [],
+        post_type: 'noticia',
+        platforms: platforms || ['instagram'],
+        status: 'generating',
+        scheduled_for: effectiveSchedule,
+        media_type: 'reels',
+        overlay_metadata: {
+          render_status: 'queued',
+          pipeline: 'brand-news-video',
+          topic,
+          style: style || null,
+          article_url: article_url || null,
+          article_image_url: article_image_url || null,
+          created_by_agent: true,
+          publish_after_render: publish_now === true,
+          requested_schedule: effectiveSchedule,
+        },
+      })
       .select()
       .single();
-    
+
     if (error) {
       console.error('Error creating video post:', error);
       return { success: false, message: `❌ Erro ao criar post: ${error.message}` };
     }
 
-    // Fire brand-news-video in background to pre-build TTS audio + images per segment.
-    // Client render will reuse this data instead of generating TTS from scratch.
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    if (supabaseUrl && serviceKey) {
-      fetch(`${supabaseUrl}/functions/v1/brand-news-video`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceKey}` },
-        body: JSON.stringify({
-          postId: post.id,
-          title: script.title || topic,
-          description: caption || '',
-          workspaceId,
-          userId,
-          articleUrl: article_url || null,
-          voice: 'thalita',
-        }),
-      }).catch(e => console.warn('[create_narrated_video] brand-news-video background call failed:', e));
-      console.log(`[create_narrated_video] brand-news-video fired in background for post ${post.id}`);
+    // Dispara o pipeline em background (mesmo padrão do auto-reel-publisher)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const pipelineTask = (async () => {
+      try {
+        const resp = await fetch(`${supabaseUrl}/functions/v1/brand-news-video`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceKey}` },
+          body: JSON.stringify({
+            postId: post.id,
+            title: topic,
+            description: style || caption || '',
+            workspaceId,
+            userId,
+            articleUrl: article_url || null,
+            primaryImageUrl: article_image_url || null,
+            voice: 'thalita',
+          }),
+        });
+        if (!resp.ok) {
+          const err = await resp.text();
+          console.error(`[create_narrated_video] pipeline falhou: ${err.substring(0, 300)}`);
+          await supabase.from('posts').update({
+            status: 'draft',
+            error_message: `Pipeline falhou: ${err.substring(0, 200)}`,
+          }).eq('id', post.id);
+        } else {
+          console.log(`[create_narrated_video] pipeline ok para post ${post.id}`);
+        }
+      } catch (e: any) {
+        console.error('[create_narrated_video] pipeline exception:', e);
+        await supabase.from('posts').update({
+          status: 'draft',
+          error_message: `Pipeline exception: ${e.message}`,
+        }).eq('id', post.id);
+      }
+    })();
+
+    // @ts-ignore Deno EdgeRuntime
+    if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(pipelineTask);
+    } else {
+      pipelineTask.catch(() => {});
     }
 
-    // Determine next step message
     let nextStepMessage = '';
     if (publish_now) {
-      nextStepMessage = '✅ **Enviado para a fila!** O vídeo será renderizado e publicado automaticamente.\n⚡ Acesse a aba "Fila" para acompanhar o progresso.';
+      nextStepMessage = '✅ Preparando roteiro, imagens do banco Neural Update e legenda. Em ~1 min aparece na **Fila** — clica em "Gerar Vídeo" (com o Neural Voice rodando) e ele publica no horário.';
     } else if (effectiveSchedule) {
-      nextStepMessage = `📅 **Agendado para ${formatBrasiliaTime(effectiveSchedule)}** e enviado para a fila!\n⚡ Acesse a aba "Fila" e clique em "Gerar Vídeo" para renderizar antes do horário.`;
+      nextStepMessage = `📅 Agendado para ${formatBrasiliaTime(effectiveSchedule)}. Preparando assets — em ~1 min abre a **Fila** e clica em "Gerar Vídeo".`;
     } else {
-      nextStepMessage = '📝 Salvo como rascunho.\n⚡ Acesse a aba "Fila" e clique em "Gerar Vídeo" para renderizar o Reels!';
+      nextStepMessage = '📝 Preparando roteiro + imagens do banco. Em ~1 min abre a **Fila** e clica em "Gerar Vídeo" para renderizar com o Neural Voice.';
     }
-    
+
     return {
       success: true,
-      message: `🎬 Vídeo narrado criado!\n\n📜 Título: "${script.title}"\n🎞️ ${script.segments?.length || 4} cenas cinematográficas\n${thumbnailUrl ? '🖼️ Thumbnail gerada' : ''}\n\n${nextStepMessage}`,
+      message: `🎬 Reels em produção!\n\n📜 Tema: "${topic}"\n🏭 Pipeline editorial Neural Update (mesmo do automático)\n\n${nextStepMessage}`,
       post: {
         id: post.id,
-        title: script.title,
-        segments: script.segments?.length || 4,
+        title: topic,
         status: post.status,
-        has_thumbnail: !!thumbnailUrl,
         needs_rendering: true,
         publish_after_render: publish_now === true,
       },
-      // Special action for frontend to handle
       requires_frontend_action: {
         type: 'render_video',
         post_id: post.id,

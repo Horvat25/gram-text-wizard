@@ -433,11 +433,18 @@ Deno.serve(async (req) => {
     const replicateApiKey = Deno.env.get("REPLICATE_API_KEY");
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Mark post as rendering
+    // Mark post as rendering — preservando flags do criador (chat/cron)
+    const { data: existingPost } = await supabase
+      .from("posts")
+      .select("overlay_metadata")
+      .eq("id", postId)
+      .single();
+    const preservedMeta = (existingPost?.overlay_metadata as Record<string, unknown>) || {};
+
     await supabase.from("posts").update({
       status: "draft",
       error_message: null,
-      overlay_metadata: { render_status: "rendering", pipeline: "brand-news-video" },
+      overlay_metadata: { ...preservedMeta, render_status: "rendering", pipeline: "brand-news-video" },
     }).eq("id", postId);
 
     // ─── STEP 1: Generate broadcast script ───
@@ -571,15 +578,16 @@ Deno.serve(async (req) => {
         carousel_images: brandedImages,
         status: "draft",
         overlay_metadata: {
+          ...preservedMeta,
           type: "narrated_video",
           pipeline: "brand-news-video",
           render_status: "assets_ready",
           topic: title,
-          article_url: articleUrl || null,
+          article_url: articleUrl || (preservedMeta.article_url as string | null) || null,
           is_news_broadcast: true,
           needs_processing: true,
           created_by_agent: true,
-          publish_after_render: false,
+          publish_after_render: preservedMeta.publish_after_render === true,
           script: {
             title,
             segments: segments.map(s => ({

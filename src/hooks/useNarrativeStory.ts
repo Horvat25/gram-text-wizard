@@ -5,7 +5,7 @@ import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-enc
 import { VIDEO_CONFIG } from "@/lib/video-config";
 import { getRandomTrack, preloadTrack } from "@/lib/background-music";
 import { pickLocalImageBankImages } from "@/lib/local-image-bank";
-import { synthesizeWithNeuralVoice } from "@/lib/neural-voice";
+import { synthesizeWithNeuralVoice, getNeuralVoiceStatus } from "@/lib/neural-voice";
 
 // Helper to convert AudioBuffer to WAV Blob for concatenated narration
 function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
@@ -994,6 +994,13 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
+    // Fail-fast: sem Neural Voice não há narração — aborta ANTES de gastar tempo com imagens.
+    const voiceUp = await getNeuralVoiceStatus();
+    if (!voiceUp) {
+      setError("Neural Voice não está rodando. Execute iniciar.ps1 (ou npm start em neural-voice) e tente de novo.");
+      return;
+    }
+
     const normalizedScript = existingSegments.slice(0, segmentCount);
     const usableImageUrls = dedupeImageUrls(preExistingImageUrls);
     let currentTime = 0;
@@ -1057,7 +1064,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       audioResult?.backgroundMusicUrl || ""
     );
     setIsGenerating(false);
-  }, [segmentCount, segmentDuration, generateImages, generateAudio, generateVideo]);
+  }, [segmentCount, segmentDuration, generateImages, generateAudio, generateVideo, setError]);
 
   return {
     state,
