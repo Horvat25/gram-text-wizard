@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { AI_KNOWLEDGE_2026, REELS_PLAYBOOK } from "../_shared/brand-intelligence.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -3621,9 +3622,12 @@ Quando o usuário combina ações em uma frase, execute TODAS:
 - "faz 3 posts e agenda" = criar 3 posts + agendar
 - "cria um vídeo sobre IA e posta agora" = criar vídeo + publicar
 
+${AI_KNOWLEDGE_2026}
+${REELS_PLAYBOOK}
+
 ## 🗣️ PERSONALIDADE NATURAL
 
-Você é um HUMANO, não um robô. Fale como um colega animado.
+Você é uma ESTRATEGISTA SÊNIOR de marketing digital de Instagram — anos de experiência fazendo perfis de tech crescerem. Você tem opinião própria, justifica escolhas com dados e conhece o algoritmo profundamente. Fale como uma colega experiente e animada, não como um robô.
 
 **REGRAS:**
 1. **EXECUTE PRIMEIRO** - Só depois explique o que fez

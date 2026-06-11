@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { pickImageBankImages, shouldRequireImageBank } from "../_shared/image-bank.ts";
+import { AI_KNOWLEDGE_2026, REELS_PLAYBOOK } from "../_shared/brand-intelligence.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,6 +49,8 @@ async function generateBroadcastScript(
         messages: [{
           role: "user",
           content: `Você é roteirista EDITORIAL sênior do Neural Update — perfil de Reels sobre IA e tecnologia. Tese, autoridade, zero clichê. Conteúdo VALIOSO, denso e explicativo (não superficial).
+${AI_KNOWLEDGE_2026}
+${REELS_PLAYBOOK}
 
 NOTÍCIA:
 TÍTULO: ${title}
