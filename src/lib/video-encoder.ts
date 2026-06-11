@@ -495,15 +495,19 @@ export async function generateVideoFromSegments(
   });
 
   const CTA_DURATION = Math.min(
-    ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 1.5) : VIDEO_CONFIG.CTA_MIN_DURATION,
+    ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 0.5) : VIDEO_CONFIG.CTA_MIN_DURATION,
     VIDEO_CONFIG.CTA_MAX_DURATION
   );
   const visualContentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
-  const narrationDuration = narrationBuf ? Math.max(visualContentDuration, narrationBuf.duration) : visualContentDuration;
+  const maxNarrationBudget = VIDEO_CONFIG.MAX_TOTAL_DURATION - VIDEO_CONFIG.NARRATION_CTA_GAP - VIDEO_CONFIG.CTA_MIN_DURATION;
+  const narrationDuration = Math.min(
+    narrationBuf ? Math.max(visualContentDuration, narrationBuf.duration) : visualContentDuration,
+    maxNarrationBudget,
+  );
   const ctaStartTime = narrationDuration + VIDEO_CONFIG.NARRATION_CTA_GAP;
   const rawTotal = ctaStartTime + CTA_DURATION;
 
-  if (rawTotal > VIDEO_CONFIG.MAX_TOTAL_DURATION) {
+  if (rawTotal > VIDEO_CONFIG.MAX_TOTAL_DURATION + 0.1) {
     throw new Error(`Duração final de ${rawTotal.toFixed(1)}s excede o limite seguro de ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s.`);
   }
 
