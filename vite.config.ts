@@ -9,6 +9,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    fs: {
+      allow: [
+        path.resolve(__dirname),
+        "C:/Users/Mateus Horvat/neural-image-agent/bank",
+        "C:/Users/Mateus Horvat/neural-update-tiktok/exports/video-images",
+      ],
+    },
   },
   plugins: [
     react(),

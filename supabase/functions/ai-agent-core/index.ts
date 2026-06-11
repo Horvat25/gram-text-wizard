@@ -2108,7 +2108,14 @@ REGRAS:
   }
   
   // 4. Get product image (use affiliate's image, or generate via AI)
-  let imageUrl = selectedAffiliate.image_url || null;
+  let imageUrl = await pickHostedImageBankImage(`${selectedAffiliate.product_name} ${selectedAffiliate.description || ''} ${productResearch || ''}`);
+  if (imageUrl) {
+    console.log('[AGENT] Banco de imagem selecionado para afiliado:', imageUrl.substring(0, 100));
+  } else if (shouldRequireHostedImageBank()) {
+    console.warn('[AGENT] Banco de imagem obrigatorio, mas nenhuma imagem hospedada foi encontrada para afiliado.');
+  } else {
+    imageUrl = selectedAffiliate.image_url || null;
+  }
   
   // If affiliate has an image, upload it to storage
   if (imageUrl) {
@@ -2130,7 +2137,7 @@ REGRAS:
   
   // FALLBACK: Generate AI image WITHOUT TEXT, then apply text overlay programmatically
   // This prevents spelling errors from AI-generated text in images
-  if (!imageUrl) {
+  if (!imageUrl && !shouldRequireHostedImageBank()) {
     console.log('[AGENT] 🎨 Gerando imagem AI para post de afiliado (SEM TEXTO)...');
     try {
       const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
@@ -2784,6 +2791,15 @@ async function createNewsContent(
   console.log('[AGENT] Artigo selecionado:', selectedArticle?.title || 'nenhum');
   console.log('[AGENT] Imagem real encontrada:', selectedImage ? 'sim' : 'não');
   
+  const bankNewsImage = await pickHostedImageBankImage(`${selectedArticle?.title || plan.theme} ${selectedArticle?.description || ''}`);
+  if (bankNewsImage) {
+    selectedImage = bankNewsImage;
+    console.log('[AGENT] Banco de imagem selecionado para noticia:', bankNewsImage.substring(0, 100));
+  } else if (shouldRequireHostedImageBank()) {
+    console.warn('[AGENT] Banco de imagem obrigatorio, mas nenhuma imagem hospedada foi encontrada para noticia.');
+    selectedImage = null;
+  }
+
   // Validate image accessibility (HEAD request to check for 404/broken images)
   if (selectedImage) {
     try {
@@ -3104,6 +3120,54 @@ Estrutura OBRIGATÓRIA da legenda (3 blocos):
 
 // Create IMAGE content - USES AI-GENERATED IMAGE for original visual content
 // DIFERENTE de news: image posts são conteúdo ORIGINAL de reflexão/opinião com imagem IA
+function tokenizeImageBankQuery(value: string): string[] {
+  return (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .match(/[a-z0-9]{3,}/g) || [];
+}
+
+async function pickHostedImageBankImage(query: string): Promise<string | null> {
+  const manifestUrl = Deno.env.get('LOCAL_IMAGE_BANK_MANIFEST_URL');
+  if (!manifestUrl) return null;
+
+  try {
+    const response = await fetch(manifestUrl);
+    if (!response.ok) {
+      console.log('[AGENT] Banco de imagem hospedado indisponivel:', response.status);
+      return null;
+    }
+
+    const manifest = await response.json();
+    const assets = Array.isArray(manifest?.assets) ? manifest.assets : [];
+    if (!assets.length) return null;
+
+    const queryTokens = new Set(tokenizeImageBankQuery(query));
+    const scored = assets
+      .map((asset: any, index: number) => {
+        const tokens = Array.isArray(asset.tokens) ? asset.tokens : tokenizeImageBankQuery(`${asset.relativePath || ''} ${asset.category || ''}`);
+        const overlap = tokens.reduce((sum: number, token: string) => sum + (queryTokens.has(token) ? 1 : 0), 0);
+        const categoryBoost = asset.category === 'concepts' ? 2 : asset.category === 'video-scenes' ? 1 : 0;
+        return { asset, index, score: overlap * 4 + categoryBoost };
+      })
+      .sort((a: any, b: any) => b.score - a.score || a.index - b.index);
+
+    const selected = scored[0]?.asset;
+    const url = selected?.publicUrl || selected?.url;
+    if (!url) return null;
+
+    return new URL(url, manifestUrl).toString();
+  } catch (error) {
+    console.log('[AGENT] Falha ao ler banco de imagem hospedado:', error);
+    return null;
+  }
+}
+
+function shouldRequireHostedImageBank(): boolean {
+  return ['1', 'true', 'yes', 'only'].includes((Deno.env.get('IMAGE_BANK_REQUIRED') || '').toLowerCase());
+}
+
 async function createImageContent(
   supabase: any,
   plan: ContentPlan,
@@ -3165,7 +3229,12 @@ Apenas a descrição visual, sem introdução.`
     console.log('[AGENT] Falha ao extrair conceito visual, usando título:', conceptErr);
   }
 
-  let imageUrl = null;
+  let imageUrl = await pickHostedImageBankImage(`${visualConcept} ${inspirationTopic} ${inspirationDesc}`);
+  if (imageUrl) {
+    console.log('[AGENT] Imagem do banco hospedado selecionada:', imageUrl.substring(0, 120));
+  }
+
+  if (!imageUrl && !shouldRequireHostedImageBank()) {
   try {
     console.log('[AGENT] 🎨 Gerando imagem IA específica ao tema...');
     const imageResponse = await fetch(`${supabaseUrl}/functions/v1/generate-image`, {
@@ -3191,9 +3260,10 @@ ESTILO OBRIGATÓRIO: Editorial tech premium, fotorrealista ou ilustração 3D ci
   } catch (e) {
     console.log('[AGENT] Erro ao gerar imagem IA:', e);
   }
+  }
   
   // Fallback: use RSS image if AI generation failed
-  if (!imageUrl && bestItem?.item?.image_url) {
+  if (!imageUrl && !shouldRequireHostedImageBank() && bestItem?.item?.image_url) {
     console.log('[AGENT] Fallback: usando imagem RSS');
     try {
       const uploadResponse = await fetch(`${supabaseUrl}/functions/v1/upload-external-image`, {

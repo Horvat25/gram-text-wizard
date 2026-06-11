@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "image-bank:manifest": "node scripts/build-cloud-image-bank-manifest.mjs",
+    "image-bank:manifest:local": "node scripts/build-local-image-bank-manifest.mjs",
+    "image-bank:upload": "node scripts/upload-image-bank-to-supabase.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

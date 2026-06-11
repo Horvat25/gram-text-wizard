@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { pickImageBankImages, shouldRequireImageBank } from "../_shared/image-bank.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -128,6 +129,32 @@ async function fetchRealImages(
   supabaseUrl: string,
   serviceRoleKey: string
 ): Promise<void> {
+  console.log("[BRAND-VIDEO] Buscando imagens no banco local/hospedado...");
+
+  const bankQuery = [
+    title,
+    description,
+    segments.map(segment => `${segment.text} ${segment.imagePrompt}`).join(" "),
+  ].filter(Boolean).join(" ");
+  const bankImages = await pickImageBankImages(bankQuery, segments.length);
+  if (bankImages.length > 0) {
+    bankImages.forEach((img, index) => {
+      if (index < segments.length) {
+        segments[index].imageUrl = img.imageUrl;
+        segments[index].imageSource = "scrape";
+      }
+    });
+    console.log(`[BRAND-VIDEO] Banco de imagem: ${bankImages.length}/${segments.length}`);
+    if (bankImages.length >= segments.length || shouldRequireImageBank()) {
+      return;
+    }
+  }
+
+  if (shouldRequireImageBank()) {
+    console.warn("[BRAND-VIDEO] Banco de imagem obrigatorio, sem imagens suficientes.");
+    return;
+  }
+
   console.log("[BRAND-VIDEO] 📸 Buscando imagens REAIS (Pexels + artigo)...");
 
   try {

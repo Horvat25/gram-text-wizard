@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
 import { VIDEO_CONFIG } from "@/lib/video-config";
 import { getRandomTrack, preloadTrack } from "@/lib/background-music";
+import { pickLocalImageBankImages } from "@/lib/local-image-bank";
+import { synthesizeWithNeuralVoice } from "@/lib/neural-voice";
 
 // Helper to convert AudioBuffer to WAV Blob for concatenated narration
 function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
@@ -52,6 +54,7 @@ export interface StorySegment {
   imagePrompt: string;
   duration: number;
   startTime: number;
+  audioUrl?: string;
 }
 
 export interface NarrativeStoryState {
@@ -339,31 +342,59 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const updatedSegments = segments.map(segment => ({ ...segment }));
     
     try {
-      const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
-        body: {
-          topic: topic || segments[0]?.text || 'tecnologia',
-          segments: segments.map(s => ({ text: s.text, imagePrompt: s.imagePrompt })),
+      const imageQuery = [
+        topic,
+        articleInfo?.articleUrl,
+        ...segments.map(segment => `${segment.text} ${segment.imagePrompt}`),
+      ].filter(Boolean).join(" ");
+      const bankImages = await pickLocalImageBankImages(imageQuery || "tecnologia inteligencia artificial", updatedSegments.length);
+
+      bankImages.forEach((asset, index) => {
+        if (index < updatedSegments.length && !updatedSegments[index].imageUrl) {
+          updatedSegments[index] = { ...updatedSegments[index], imageUrl: asset.url };
         }
       });
-      
-      if (searchError) throw new Error(searchError.message || 'Erro na busca de imagens');
 
-      if (searchResult?.success && searchResult.images?.length > 0) {
-        searchResult.images.forEach((img: any, index: number) => {
-          if (index < updatedSegments.length) {
+      if (bankImages.length > 0) {
+        console.log(`[IMAGES] Banco local: ${bankImages.length} imagem(ns) selecionada(s)`);
+      }
+    } catch (e) {
+      console.warn("[IMAGES] Local image bank failed:", e);
+    }
+
+    try {
+      const missingBeforeSearch = updatedSegments
+        .map((segment, index) => (!segment.imageUrl ? index : -1))
+        .filter(index => index >= 0);
+
+      if (missingBeforeSearch.length > 0) {
+        const { data: searchResult, error: searchError } = await supabase.functions.invoke('search-images-for-video', {
+          body: {
+            topic: topic || segments[0]?.text || 'tecnologia',
+            segments: missingBeforeSearch.map(index => ({ text: segments[index].text, imagePrompt: segments[index].imagePrompt })),
+          }
+        });
+        
+        if (searchError) throw new Error(searchError.message || 'Erro na busca de imagens');
+
+        if (searchResult?.success && searchResult.images?.length > 0) {
+          searchResult.images.forEach((img: any, resultIndex: number) => {
+            const index = missingBeforeSearch[resultIndex];
+            if (index < updatedSegments.length) {
             const imageUrl = typeof img === 'string' ? img : img.imageUrl;
             if (imageUrl) {
               updatedSegments[index] = { ...updatedSegments[index], imageUrl };
             }
           }
-        });
-        
-        if (searchResult.imageIds?.length > 0) {
-          try {
-            const stored = JSON.parse(localStorage.getItem('usedImageIds') || '[]');
-            const updated = [...new Set([...stored, ...searchResult.imageIds])].slice(-100);
-            localStorage.setItem('usedImageIds', JSON.stringify(updated));
-          } catch (e) { /* ignore */ }
+          });
+          
+          if (searchResult.imageIds?.length > 0) {
+            try {
+              const stored = JSON.parse(localStorage.getItem('usedImageIds') || '[]');
+              const updated = [...new Set([...stored, ...searchResult.imageIds])].slice(-100);
+              localStorage.setItem('usedImageIds', JSON.stringify(updated));
+            } catch (e) { /* ignore */ }
+          }
         }
       }
     } catch (e) {
@@ -528,33 +559,35 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       return { audioUrl: null, provider };
     };
 
-    const EDGE_VOICES = new Set(["thalita", "thalita_br", "francisca", "antonio"]);
-    // Thalita Edge Neural é a voz padrão — só usa ElevenLabs se o usuário escolher explicitamente "sarah"
     const userVoice = (options.preferredVoice && options.preferredVoice !== "default")
       ? options.preferredVoice
       : "thalita";
-    const preferEdgeNeural = EDGE_VOICES.has(userVoice);
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // Se o usuário escolheu uma voz Edge Neural (Thalita/Francisca/Antônio), prioriza lovable-tts
-      if (preferEdgeNeural) {
-        let result = await invokeTTS("lovable-tts", { text, voice: userVoice }, `edge-${userVoice}`);
-        if (result.audioUrl) return result;
-        console.warn(`[TTS] Edge Neural (${userVoice}) falhou, caindo para ElevenLabs...`);
+      // 1) Agente local (só se VITE_NEURAL_VOICE_URL estiver configurado)
+      const localVoice = await synthesizeWithNeuralVoice(text, {
+        voice: userVoice === "antonio" ? "male" : "female",
+        channel: "instagram",
+        platform: "reels",
+      });
+      if (localVoice?.audioUrl) {
+        return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
       }
 
-      // Padrão Thalita: tenta Edge Neural primeiro mesmo sem preferência explícita
+      // 2) Edge Neural via lovable-tts (Thalita/Francisca/Antônio — sem API key)
       let result = await invokeTTS("lovable-tts", { text, voice: userVoice }, `edge-${userVoice}`);
       if (result.audioUrl) return result;
 
-      console.warn("[TTS] Edge Neural falhou, caindo para ElevenLabs Sarah...");
+      // 3) ElevenLabs Sarah
+      console.warn("[TTS] Edge Neural falhou, tentando ElevenLabs Sarah...");
       result = await invokeTTS("edge-tts", { text }, "elevenlabs");
       if (result.audioUrl) return result;
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       result = await invokeTTS("edge-tts", { text }, "elevenlabs-retry");
       if (result.audioUrl) return result;
 
+      // 4) Google Translate TTS (último recurso)
       result = await invokeTTS("free-tts", { text, language: "pt-BR" }, "free-tts");
       if (result.audioUrl) return result;
 
@@ -563,6 +596,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     
     // ─── Background music: ElevenLabs Music → MusicGen → Procedural ───
     const generateBackgroundMusic = async (mood?: string): Promise<string> => {
+      if (abortRef.current) return "";
+
+      try {
+        const track = getRandomTrack(mood);
+        const musicUrl = await preloadTrack(track);
+        if (musicUrl) return musicUrl;
+      } catch (e) { console.warn("[Music] Procedural error:", e); }
+
       if (abortRef.current) return "";
       
       // 1️⃣ ElevenLabs Music
@@ -648,39 +689,62 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           ),
         );
 
-        const narrationCandidates = buildNarrationCandidates(segments[i].text);
         let selectedAudioUrl: string | null = null;
         let selectedAudioBuffer: AudioBuffer | null = null;
         let selectedProvider = "none";
-        let selectedText = narrationCandidates[0] || trimNarrationText(segments[i].text, VIDEO_CONFIG.WORDS_PER_SEGMENT);
+        let selectedText = segments[i].text;
         let selectedDuration = 0;
 
-        for (const candidateText of narrationCandidates) {
-          const { audioUrl, provider } = await callNarrationTTS(candidateText);
-          if (!audioUrl) continue;
-
-          const decodedBuffer = await decodeAudioBuffer(audioUrl);
-          const measuredDuration = decodedBuffer?.duration || await getAudioDuration(audioUrl);
-          const safePadding = measuredDuration > 0
-            ? Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration))
-            : DEFAULT_NARRATION_PADDING;
-          const visualDuration = measuredDuration > 0
-            ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding)
-            : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, candidateText.split(/\s+/).length / 2.0);
-
-          selectedAudioUrl = audioUrl;
-          selectedAudioBuffer = decodedBuffer;
-          selectedProvider = provider;
-          selectedText = candidateText;
-          selectedDuration = visualDuration;
-
-          if (visualDuration <= maxAllowedForCurrent + 0.05) {
-            break;
+        // Reutiliza áudio pré-gerado pelo servidor (brand-news-video) quando disponível
+        const prebuiltAudio = segments[i].audioUrl || null;
+        if (prebuiltAudio) {
+          const decodedBuffer = await decodeAudioBuffer(prebuiltAudio);
+          const measuredDuration = decodedBuffer?.duration || await getAudioDuration(prebuiltAudio);
+          if (measuredDuration > 0) {
+            const safePadding = Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration));
+            const visualDuration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding);
+            if (visualDuration <= maxAllowedForCurrent + 0.5) {
+              selectedAudioUrl = prebuiltAudio;
+              selectedAudioBuffer = decodedBuffer;
+              selectedProvider = "prebuilt-server";
+              selectedDuration = visualDuration;
+              console.log(`[TTS] Segment ${i + 1}: reutilizando áudio do servidor (${visualDuration.toFixed(1)}s)`);
+            }
           }
+        }
 
-          console.warn(
-            `[TTS] Segment ${i + 1} excedeu o teto seguro (${visualDuration.toFixed(1)}s > ${maxAllowedForCurrent.toFixed(1)}s). Encurtando texto...`,
-          );
+        // Se não tem áudio pré-existente ou era inválido, gera novo via TTS
+        if (!selectedAudioUrl) {
+          const narrationCandidates = buildNarrationCandidates(segments[i].text);
+          selectedText = narrationCandidates[0] || trimNarrationText(segments[i].text, VIDEO_CONFIG.WORDS_PER_SEGMENT);
+
+          for (const candidateText of narrationCandidates) {
+            const { audioUrl, provider } = await callNarrationTTS(candidateText);
+            if (!audioUrl) continue;
+
+            const decodedBuffer = await decodeAudioBuffer(audioUrl);
+            const measuredDuration = decodedBuffer?.duration || await getAudioDuration(audioUrl);
+            const safePadding = measuredDuration > 0
+              ? Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration))
+              : DEFAULT_NARRATION_PADDING;
+            const visualDuration = measuredDuration > 0
+              ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding)
+              : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, candidateText.split(/\s+/).length / 2.0);
+
+            selectedAudioUrl = audioUrl;
+            selectedAudioBuffer = decodedBuffer;
+            selectedProvider = provider;
+            selectedText = candidateText;
+            selectedDuration = visualDuration;
+
+            if (visualDuration <= maxAllowedForCurrent + 0.05) {
+              break;
+            }
+
+            console.warn(
+              `[TTS] Segment ${i + 1} excedeu o teto seguro (${visualDuration.toFixed(1)}s > ${maxAllowedForCurrent.toFixed(1)}s). Encurtando texto...`,
+            );
+          }
         }
 
         if (!selectedAudioUrl) {
@@ -709,7 +773,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       // ─── Concatenate segment audios into single narration ───
       if (segmentAudioUrls.some(url => url)) {
         try {
-          const offlineCtx = new AudioContext();
           const buffers: (AudioBuffer | null)[] = [];
           const speechDurations: number[] = [];
           
@@ -773,8 +836,6 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           const wavBlob = audioBufferToWavBlob(renderedBuffer);
           narrationUrl = URL.createObjectURL(wavBlob);
           console.log(`[TTS] 🎵 Concatenated narration: ${totalNarrationDuration.toFixed(1)}s (reconciled durations)`);
-          
-          offlineCtx.close().catch(() => {});
         } catch (e) {
           console.warn("[TTS] Concatenation failed, using first segment:", e);
           narrationUrl = segmentAudioUrls.find(url => url) || "";
@@ -937,8 +998,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
   // ═══ Render from existing script ═══
   const renderFromScript = useCallback(async (
-    existingSegments: Array<{ text: string; imagePrompt: string; imageUrl?: string | null }>, 
-    title?: string, 
+    existingSegments: Array<{ text: string; imagePrompt: string; imageUrl?: string | null; audioUrl?: string | null; duration?: number }>,
+    title?: string,
     articleInfo?: { articleUrl?: string; articleImageUrl?: string },
     preExistingImageUrls?: string[]
   ) => {
@@ -950,15 +1011,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const usableImageUrls = dedupeImageUrls(preExistingImageUrls);
     let currentTime = 0;
     let segments: StorySegment[] = normalizedScript.map((seg, index) => {
+      const dur = seg.duration && seg.duration > 0 ? seg.duration : segmentDuration;
       const segment: StorySegment = {
         id: `seg-${index}`,
         text: seg.text,
         imagePrompt: seg.imagePrompt,
         imageUrl: seg.imageUrl || usableImageUrls[index % usableImageUrls.length] || "",
-        duration: segmentDuration,
+        audioUrl: seg.audioUrl || undefined,
+        duration: dur,
         startTime: currentTime,
       };
-      currentTime += segmentDuration;
+      currentTime += dur;
       return segment;
     });
 

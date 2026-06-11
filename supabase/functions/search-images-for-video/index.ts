@@ -8,6 +8,7 @@ import {
   selectBestImages,
   ImageCandidate,
 } from "../_shared/image-relevance.ts";
+import { pickImageBankImages, shouldRequireImageBank } from "../_shared/image-bank.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -328,6 +329,34 @@ serve(async (req) => {
       );
     }
 
+    const neededCount = segments?.length || 4;
+    const bankQuery = [
+      searchQuery,
+      articleTitle,
+      articleDescription,
+      segments?.map((s: any) => `${s.text || ""} ${s.imagePrompt || ""}`).join(" "),
+    ].filter(Boolean).join(" ");
+    const bankImages = await pickImageBankImages(bankQuery, neededCount);
+    if (bankImages.length >= neededCount || (bankImages.length > 0 && shouldRequireImageBank())) {
+      console.log(`[images] image-bank mode: ${bankImages.length}/${neededCount}`);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          images: bankImages.slice(0, neededCount).map(r => ({ imageUrl: r.imageUrl, source: r.source, relativePath: r.relativePath })),
+          imageIds: bankImages.slice(0, neededCount).map(r => r.sourceId),
+          stats: { total: bankImages.length, mode: 'image_bank', aiGenerated: 0 },
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (shouldRequireImageBank()) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Banco de imagem obrigatorio, mas nenhuma imagem publica foi encontrada.' }),
+        { status: 424, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // ============= INTELLIGENT POOL-BASED MODE =============
     if ((articleUrl || useArticleMode) && (articleUrl || articleTitle || articleImageUrl)) {
       console.log('[images] 🎯 POOL MODE — engine: extractEntities + containsForbidden + scoreImage');
@@ -485,7 +514,6 @@ serve(async (req) => {
 
     // ============= REAL IMAGES MODE (Pexels + scrape, ZERO IA) =============
     // Mudança 05/2026: removida geração por IA (~$0,10/reel). Sempre usa imagens reais.
-    const neededCount = segments?.length || 4;
     console.log(`[images] 📸 REAL IMAGES MODE (Pexels): ${neededCount} images for: "${searchQuery}"`);
 
     const realRes = await fetch(`${supabaseUrl}/functions/v1/fetch-real-news-images`, {

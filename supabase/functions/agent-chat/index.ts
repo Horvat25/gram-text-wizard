@@ -3080,12 +3080,94 @@ async function executeCreateAiImagePost(supabase: any, userId: string, workspace
   }
 }
 
+async function executeUnifiedAgentContent(
+  supabase: any,
+  userId: string,
+  workspaceId: string,
+  args: any,
+  forceContentType: string,
+  label: string,
+) {
+  console.log('[UNIFIED_AGENT_CONTENT] Delegating to ai-agent-core:', forceContentType, args || {});
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const isReel = ['video', 'news_video', 'marketing_video', 'video_curated'].includes(forceContentType);
+    const isCarousel = forceContentType === 'carousel';
+
+    const { data: placeholder, error: insertErr } = await supabase
+      .from('posts')
+      .insert({
+        workspace_id: workspaceId,
+        user_id: userId,
+        caption: `Gerando ${label} pelo agente unificado...`,
+        status: 'generating',
+        media_type: isReel ? 'reels' : isCarousel ? 'carousel' : 'image',
+        post_type: forceContentType.includes('marketing') ? 'afiliado' : forceContentType.includes('news') ? 'noticia' : 'reflexão',
+        scheduled_for: args?.scheduled_for || null,
+      })
+      .select()
+      .single();
+
+    if (insertErr) throw insertErr;
+
+    const feedbackParts = [
+      args?.topic || args?.topic_filter || args?.product_name ? `Tema/pedido: ${args.topic || args.topic_filter || args.product_name}` : '',
+      args?.caption ? `Legenda sugerida: ${args.caption}` : '',
+      args?.headline_text ? `Headline sugerida: ${args.headline_text}` : '',
+      args?.scheduled_for ? `Agendar para: ${args.scheduled_for}` : '',
+    ].filter(Boolean);
+
+    const backgroundTask = fetch(`${supabaseUrl}/functions/v1/ai-agent-core`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceRoleKey}`,
+      },
+      body: JSON.stringify({
+        workspaceId,
+        userId,
+        trigger: 'chat',
+        forceContentType,
+        skipScheduleCheck: true,
+        skipLimitCheck: true,
+        placeholderPostId: placeholder.id,
+        feedback: feedbackParts.length ? feedbackParts.join('\n') : undefined,
+      }),
+    }).catch(async (err) => {
+      console.error('[UNIFIED_AGENT_CONTENT] Background fetch error:', err?.message || err);
+      await supabase.from('posts').update({
+        status: 'failed',
+        error_message: `Erro no agente unificado: ${err?.message || 'unknown'}`,
+      }).eq('id', placeholder.id);
+    });
+
+    // @ts-ignore - keep runtime alive until agent finishes
+    if (typeof EdgeRuntime !== 'undefined' && (EdgeRuntime as any)?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(backgroundTask);
+    }
+
+    return {
+      success: true,
+      message: `${label} entrou no mesmo fluxo do agente central. Vai aparecer na Fila/Histórico assim que o core terminar.`,
+      post_id: placeholder.id,
+      status: 'generating',
+      unified_agent: true,
+    };
+  } catch (error: any) {
+    console.error('[UNIFIED_AGENT_CONTENT] Error:', error);
+    return { success: false, message: `Erro ao iniciar ${label}: ${error?.message || 'unknown'}` };
+  }
+}
+
 // Execute a tool call
 async function executeTool(supabase: any, userId: string, workspaceId: string, toolName: string, args: any) {
   switch (toolName) {
     // RSS-based tools (NEW - PRIMARY)
     case 'create_rss_news_post':
-      return executeCreateRssNewsPost(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'news', 'post de notícia');
     case 'refresh_rss_feeds':
       return executeRefreshRssFeeds(supabase, userId, workspaceId, args);
     case 'list_available_news':
@@ -3093,7 +3175,7 @@ async function executeTool(supabase: any, userId: string, workspaceId: string, t
     
     // Video tool (MAINTAINED)
     case 'create_narrated_video':
-      return executeCreateNarratedVideo(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'video', 'Reels narrado');
     
     // Utility tools
     case 'schedule_post':
@@ -3119,25 +3201,25 @@ async function executeTool(supabase: any, userId: string, workspaceId: string, t
     case 'explain_capabilities':
       return executeExplainCapabilities();
     case 'create_affiliate_post':
-      return executeCreateAffiliatePost(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'marketing_image', 'post de afiliado');
     case 'list_affiliate_links':
       return executeListAffiliateLinks(supabase, workspaceId);
     case 'create_marketing_video':
-      return executeCreateMarketingVideo(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'marketing_video', 'Reels de marketing');
     case 'create_ai_image_post':
-      return executeCreateAiImagePost(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'image', 'post de imagem');
     
     // Legacy tools (kept for backwards compatibility, but won't be suggested)
     case 'create_posts':
-      return executeCreatePosts(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'image', 'post');
     case 'generate_image_for_post':
-      return executeGenerateImage(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'image', 'post de imagem');
     case 'create_carousel':
-      return executeCreateCarousel(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'carousel', 'carrossel');
     case 'create_news_post':
-      return executeCreateNewsPost(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'news', 'post de notícia');
     case 'create_curated_post':
-      return executeCreateCuratedPost(supabase, userId, workspaceId, args);
+      return executeUnifiedAgentContent(supabase, userId, workspaceId, args, 'image', 'post curado');
     
     default:
       return { success: false, message: `Ferramenta desconhecida: ${toolName}` };
@@ -3242,11 +3324,13 @@ serve(async (req) => {
 
     if (asksToCreateSomethingEarly && asksForVideoEarly && !asksForMarketingEarly) {
       console.log('[agent-chat] Fast path: explicit Reels request detected, skipping tool-selection roundtrip');
-      const directResult = await executeCreateNarratedVideo(
+      const directResult = await executeUnifiedAgentContent(
         supabase,
         userId,
         workspaceId,
-        buildDirectNarratedVideoArgs(latestUserMessageEarly)
+        buildDirectNarratedVideoArgs(latestUserMessageEarly),
+        'video',
+        'Reels narrado'
       );
 
       return new Response(JSON.stringify({
@@ -3930,11 +4014,13 @@ ${customPrompt ? `## 📝 INSTRUÇÕES PERSONALIZADAS\n${customPrompt}` : ''}`;
     if (forcedToolName === 'create_narrated_video') {
       console.warn('[agent-chat] Falling back to direct narrated video execution for explicit creation request');
 
-      const directResult = await executeCreateNarratedVideo(
+      const directResult = await executeUnifiedAgentContent(
         supabase,
         userId,
         workspaceId,
-        buildDirectVideoFallbackArgs()
+        buildDirectVideoFallbackArgs(),
+        'video',
+        'Reels narrado'
       );
 
       return new Response(JSON.stringify({
