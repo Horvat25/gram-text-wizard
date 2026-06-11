@@ -677,25 +677,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         let selectedText = segments[i].text;
         let selectedDuration = 0;
 
-        // Reutiliza áudio pré-gerado pelo servidor (brand-news-video) quando disponível
-        const prebuiltAudio = segments[i].audioUrl || null;
-        if (prebuiltAudio) {
-          const decodedBuffer = await decodeAudioBuffer(prebuiltAudio);
-          const measuredDuration = decodedBuffer?.duration || await getAudioDuration(prebuiltAudio);
-          if (measuredDuration > 0) {
-            const safePadding = Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration));
-            const visualDuration = Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding);
-            if (visualDuration <= maxAllowedForCurrent + 0.05) {
-              selectedAudioUrl = prebuiltAudio;
-              selectedAudioBuffer = decodedBuffer;
-              selectedProvider = "prebuilt-server";
-              selectedDuration = visualDuration;
-              console.log(`[TTS] Segment ${i + 1}: reutilizando áudio do servidor (${visualDuration.toFixed(1)}s)`);
-            }
-          }
-        }
-
-        // Se não tem áudio pré-existente ou era inválido, gera novo via TTS
+        // Narração SEMPRE via Neural Voice — áudio do servidor (se existir) é ignorado
+        // para garantir a voz premium local em todos os vídeos.
         if (!selectedAudioUrl) {
           const narrationCandidates = buildNarrationCandidates(segments[i].text);
           selectedText = narrationCandidates[0] || trimNarrationText(segments[i].text, VIDEO_CONFIG.WORDS_PER_SEGMENT);
