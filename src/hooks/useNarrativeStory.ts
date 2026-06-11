@@ -150,37 +150,21 @@ const buildProgrammaticFallbackFrame = (topic: string | undefined, index: number
   return canvas.toDataURL("image/png");
 };
 
-const trimNarrationText = (text: string, maxWords: number) => {
-  const normalized = normalizeNarrationText(text);
-  if (!normalized) return "";
-
-  const trimmed = normalized.split(/\s+/).slice(0, maxWords).join(" ");
-  const cleaned = trimmed.replace(/[,:;\-–—\s]+$/g, "").trim();
-  if (!cleaned) return "";
-
-  return /[.!?…]$/.test(cleaned) ? cleaned : `${cleaned}.`;
-};
-
 const buildNarrationCandidates = (text: string) => {
   const normalized = normalizeNarrationText(text);
   if (!normalized) return [""];
 
-  const totalWords = normalized.split(/\s+/).length;
-  const budgets = Array.from(
-    new Set([
-      Math.min(totalWords, VIDEO_CONFIG.WORDS_PER_SEGMENT + 2),
-      Math.min(totalWords, VIDEO_CONFIG.WORDS_PER_SEGMENT),
-      Math.min(totalWords, Math.max(8, VIDEO_CONFIG.WORDS_PER_SEGMENT - 2)),
-      Math.min(totalWords, 5),
-      Math.min(totalWords, 6),
-      Math.min(totalWords, 4),
-      Math.min(totalWords, 3),
-    ]),
-  )
-    .filter((budget) => budget > 0)
-    .sort((a, b) => b - a);
+  // SEMPRE tenta o texto COMPLETO primeiro — a voz deve falar a legenda inteira.
+  // Só encurta se o áudio estourar o teto de tempo, e mesmo assim cortando
+  // por FRONTEIRA DE FRASE (nunca no meio de uma ideia).
+  const candidates = [normalized];
+  const sentences = normalized.split(/(?<=[.!?…])\s+/).filter(Boolean);
+  for (let keep = sentences.length - 1; keep >= 1; keep--) {
+    const candidate = sentences.slice(0, keep).join(" ").trim();
+    if (candidate) candidates.push(candidate);
+  }
 
-  return Array.from(new Set(budgets.map((budget) => trimNarrationText(normalized, budget)).filter(Boolean)));
+  return Array.from(new Set(candidates));
 };
 
 const DEFAULT_NARRATION_PADDING = 0.45;
@@ -681,7 +665,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         // para garantir a voz premium local em todos os vídeos.
         if (!selectedAudioUrl) {
           const narrationCandidates = buildNarrationCandidates(segments[i].text);
-          selectedText = narrationCandidates[0] || trimNarrationText(segments[i].text, VIDEO_CONFIG.WORDS_PER_SEGMENT);
+          selectedText = narrationCandidates[0] || normalizeNarrationText(segments[i].text);
 
           for (const candidateText of narrationCandidates) {
             const { audioUrl, provider } = await callNarrationTTS(candidateText);
