@@ -14,7 +14,7 @@ const REELS_PAUSED_UNTIL_UTC = new Date("2000-01-01T00:00:00.000Z");
 /**
  * auto-reel-publisher
  *
- * Cron disparado 2x/dia (10h e 18h Brasília) — cria UM Reel automático:
+ * Cron disparado 3x/dia (09h, 14h e 20h Brasília) — cria UM Reel automático:
  *   1. Pega notícia top não usada (Neural Update primeiro)
  *   2. Cria post em status='generating', agendado pra 30min depois
  *   3. Dispara brand-news-video em background (EdgeRuntime.waitUntil)
