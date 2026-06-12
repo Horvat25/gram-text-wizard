@@ -73,7 +73,7 @@ export const VIDEO_CONFIG = {
 
   // ─── TTS ──────────────────────────────────────────
   /** Voz padrão: Kokoro Dora (nativa PT-BR, roda no navegador, custo zero) */
-  DEFAULT_VOICE: 'thalita',
+  DEFAULT_VOICE: 'dora',
 
   // ─── Script Generation ────────────────────────────
   SCRIPT_STYLE: 'gancho explosivo nos primeiros 3 segundos, ritmo acelerado, frases curtas e diretas',
