@@ -6,6 +6,7 @@ import { VIDEO_CONFIG } from "@/lib/video-config";
 import { getRandomTrack, preloadTrack } from "@/lib/background-music";
 import { pickLocalImageBankImages } from "@/lib/local-image-bank";
 import { synthesizeWithNeuralVoice, getNeuralVoiceStatus } from "@/lib/neural-voice";
+import { synthesizeWithKokoro, preloadKokoro } from "@/lib/kokoro-voice";
 
 // Helper to convert AudioBuffer to WAV Blob for concatenated narration
 function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
@@ -558,7 +559,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
       }
 
-      // 2) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
+      // 2) Kokoro no navegador — mesma voz neural do servidor local, baixada e
+      // executada direto no browser (sem custo, sem servidor). Cache após 1º download.
+      try {
+        const kokoro = await synthesizeWithKokoro(text, {
+          voice: userVoice === "antonio" ? "male" : "female",
+        });
+        if (kokoro?.audioUrl) {
+          return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
+        }
+      } catch (e) {
+        console.warn("[TTS] kokoro-browser falhou:", e);
+      }
+
+      // 3) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
       // Evita travar o render quando o Neural Voice local está offline.
       try {
         const { data, error } = await supabase.functions.invoke("lovable-tts", {
@@ -983,11 +997,12 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
     // Probe rápido: avisa se Neural Voice local está offline, mas NÃO aborta —
-    // o pipeline tem fallback automático para Edge Neural TTS (lovable-tts).
+    // o pipeline tem fallback automático: Kokoro no navegador → Edge Neural TTS.
     const voiceUp = await getNeuralVoiceStatus();
     if (!voiceUp) {
-      console.warn("[Render] Neural Voice local offline — usando fallback Edge Neural TTS.");
-      toast.info("🎙️ Neural Voice offline — usando voz Edge Neural (grátis) como fallback.");
+      console.warn("[Render] Neural Voice local offline — usando Kokoro no navegador.");
+      toast.info("🎙️ Servidor de voz offline — baixando voz neural Kokoro no navegador (1ª vez pode demorar ~1min).");
+      preloadKokoro(); // começa o download do modelo já, em paralelo com roteiro/imagens
     }
 
     const normalizedScript = existingSegments.slice(0, segmentCount);
