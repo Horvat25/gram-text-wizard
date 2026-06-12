@@ -123,10 +123,31 @@ function floatToWav(samples: Float32Array, sampleRate: number): Blob {
   return new Blob([buffer], { type: "audio/wav" });
 }
 
+// Fonemiza PT-BR com espeak-ng WASM (dados completos de idiomas).
+// Cada chamada cria uma instância CLI; o .wasm fica em cache do browser.
+async function phonemizePtBr(text: string): Promise<string> {
+  const [{ default: ESpeakNg }, { default: wasmUrl }] = await Promise.all([
+    import("espeak-ng"),
+    import("espeak-ng/dist/espeak-ng.wasm?url" as any),
+  ]);
+
+  const espeak = await ESpeakNg({
+    arguments: ["--phonout", "generated", '--sep=""', "-q", "-b", "1", "--ipa=3", "-v", "pt-br", "-f", "input.txt"],
+    locateFile: () => wasmUrl as string,
+    preRun: [(mod: any) => mod.FS.writeFile("input.txt", text)],
+  });
+
+  const raw: string = espeak.FS.readFile("generated", { encoding: "utf8" });
+  return raw
+    .replace(/\u200d/g, "")          // remove "ties" (zero-width joiner) que o tokenizer não conhece
+    .replace(/\([a-z-]+\)/g, "")     // remove marcadores de troca de idioma, ex: (en)
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function synthesizeChunkPtBr(tts: any, text: string, kokoroVoice: string): Promise<Float32Array> {
-  const { phonemize } = await import("phonemizer");
-  const phonemeParts = await phonemize(text, "pt-br");
-  const phonemes = (Array.isArray(phonemeParts) ? phonemeParts.join(" ") : String(phonemeParts)).trim();
+  const phonemes = await phonemizePtBr(text);
   if (!phonemes) return new Float32Array(0);
 
   const { input_ids } = tts.tokenizer(phonemes, { truncation: true });
