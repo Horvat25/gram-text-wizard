@@ -761,9 +761,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
             }
           }
 
-           const adjustedDurations = fitSegmentDurationsToBudget(segmentDurations, speechDurations, maxNarrationDuration);
+           let adjustedDurations = fitSegmentDurationsToBudget(segmentDurations, speechDurations, maxNarrationDuration);
            if (!adjustedDurations) {
-             throw new Error("A narração final ainda ficou longa demais para o formato atual.");
+             // Não coube com CTA máximo — tenta o orçamento estendido (CTA mínimo)
+             const extendedBudget = VIDEO_CONFIG.MAX_TOTAL_DURATION - VIDEO_CONFIG.NARRATION_CTA_GAP - VIDEO_CONFIG.CTA_MIN_DURATION;
+             console.warn(`[TTS] Narração não coube no orçamento padrão — usando orçamento estendido de ${extendedBudget.toFixed(1)}s (CTA mínimo).`);
+             adjustedDurations = fitSegmentDurationsToBudget(segmentDurations, speechDurations, extendedBudget);
+           }
+           if (!adjustedDurations) {
+             // Último recurso: remove todos os respiros e usa a duração exata da fala — NUNCA falha
+             console.warn("[TTS] Fala pura excede o orçamento — usando durações exatas da fala; o CTA será comprimido no render.");
+             adjustedDurations = speechDurations.map(d => Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, d));
            }
 
            if (adjustedDurations.some((duration, index) => Math.abs(duration - segmentDurations[index]) > 0.01)) {
