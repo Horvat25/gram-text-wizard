@@ -982,11 +982,12 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
-    // Fail-fast: sem Neural Voice não há narração — aborta ANTES de gastar tempo com imagens.
+    // Probe rápido: avisa se Neural Voice local está offline, mas NÃO aborta —
+    // o pipeline tem fallback automático para Edge Neural TTS (lovable-tts).
     const voiceUp = await getNeuralVoiceStatus();
     if (!voiceUp) {
-      setError("Neural Voice não está rodando. Execute iniciar.ps1 (ou npm start em neural-voice) e tente de novo.");
-      return;
+      console.warn("[Render] Neural Voice local offline — usando fallback Edge Neural TTS.");
+      toast.info("🎙️ Neural Voice offline — usando voz Edge Neural (grátis) como fallback.");
     }
 
     const normalizedScript = existingSegments.slice(0, segmentCount);
