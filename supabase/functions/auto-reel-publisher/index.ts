@@ -43,7 +43,7 @@ serve(async (req) => {
       });
     }
 
-    // ── Limite: máx 2 Reels nas últimas 24h ──
+    // ── Limite: máx 3 Reels nas últimas 24h ──
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { count: recent } = await supabase
       .from("posts")
@@ -52,8 +52,8 @@ serve(async (req) => {
       .in("media_type", ["reels", "reel", "video"])
       .gte("created_at", since);
 
-    if ((recent || 0) >= 2) {
-      console.log(`[AUTO-REEL] ⏭️ Limite atingido (${recent}/2 últimas 24h)`);
+    if ((recent || 0) >= 3) {
+      console.log(`[AUTO-REEL] ⏭️ Limite atingido (${recent}/3 últimas 24h)`);
       return new Response(JSON.stringify({ skipped: true, reason: "daily_limit", recent }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
