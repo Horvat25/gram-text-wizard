@@ -548,8 +548,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       : "thalita";
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // Único provedor: Neural Voice local (localhost:3032 ou VITE_NEURAL_VOICE_URL).
-      // Se não estiver rodando → retorna null → erro claro para o usuário iniciar o servidor.
+      // 1) Neural Voice local (premium, sem custo) — só se o servidor local estiver de pé.
       const localVoice = await synthesizeWithNeuralVoice(text, {
         voice: userVoice === "antonio" ? "male" : "female",
         channel: "instagram",
@@ -558,6 +557,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       if (localVoice?.audioUrl) {
         return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
       }
+
+      // 2) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
+      // Evita travar o render quando o Neural Voice local está offline.
+      try {
+        const { data, error } = await supabase.functions.invoke("lovable-tts", {
+          body: { text, voice: userVoice || "thalita" },
+        });
+        if (!error && typeof data?.audioContent === "string" && data.audioContent.length > 100) {
+          const format = data.format || "mp3";
+          return {
+            audioUrl: `data:audio/${format};base64,${data.audioContent}`,
+            provider: data.provider || "lovable-tts",
+          };
+        }
+        console.warn("[TTS] lovable-tts fallback falhou:", error || data);
+      } catch (e) {
+        console.warn("[TTS] lovable-tts fallback exception:", e);
+      }
+
       return { audioUrl: null, provider: "none" };
     };
     
@@ -698,7 +716,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
 
         if (!selectedAudioUrl) {
-          throw new Error(`Neural Voice não respondeu na cena ${i + 1}. Inicie o servidor local com iniciar.ps1 e tente novamente.`);
+          throw new Error(`Nenhuma voz disponível para a cena ${i + 1}. Verifique o Neural Voice local ou tente novamente.`);
         }
 
         segmentAudioUrls.push(selectedAudioUrl);
@@ -964,11 +982,12 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     setIsGenerating(true);
     setState(prev => ({ ...prev, step: "idle", progress: 0, error: null, videoUrl: "" }));
 
-    // Fail-fast: sem Neural Voice não há narração — aborta ANTES de gastar tempo com imagens.
+    // Probe rápido: avisa se Neural Voice local está offline, mas NÃO aborta —
+    // o pipeline tem fallback automático para Edge Neural TTS (lovable-tts).
     const voiceUp = await getNeuralVoiceStatus();
     if (!voiceUp) {
-      setError("Neural Voice não está rodando. Execute iniciar.ps1 (ou npm start em neural-voice) e tente de novo.");
-      return;
+      console.warn("[Render] Neural Voice local offline — usando fallback Edge Neural TTS.");
+      toast.info("🎙️ Neural Voice offline — usando voz Edge Neural (grátis) como fallback.");
     }
 
     const normalizedScript = existingSegments.slice(0, segmentCount);
