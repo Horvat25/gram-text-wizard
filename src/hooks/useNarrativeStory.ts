@@ -6,6 +6,7 @@ import { VIDEO_CONFIG } from "@/lib/video-config";
 import { getRandomTrack, preloadTrack } from "@/lib/background-music";
 import { pickLocalImageBankImages } from "@/lib/local-image-bank";
 import { synthesizeWithNeuralVoice, getNeuralVoiceStatus } from "@/lib/neural-voice";
+import { synthesizeWithKokoro, preloadKokoro } from "@/lib/kokoro-voice";
 
 // Helper to convert AudioBuffer to WAV Blob for concatenated narration
 function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
@@ -558,7 +559,20 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
       }
 
-      // 2) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
+      // 2) Kokoro no navegador — mesma voz neural do servidor local, baixada e
+      // executada direto no browser (sem custo, sem servidor). Cache após 1º download.
+      try {
+        const kokoro = await synthesizeWithKokoro(text, {
+          voice: userVoice === "antonio" ? "male" : "female",
+        });
+        if (kokoro?.audioUrl) {
+          return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
+        }
+      } catch (e) {
+        console.warn("[TTS] kokoro-browser falhou:", e);
+      }
+
+      // 3) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
       // Evita travar o render quando o Neural Voice local está offline.
       try {
         const { data, error } = await supabase.functions.invoke("lovable-tts", {
