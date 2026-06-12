@@ -72,11 +72,8 @@ export const VIDEO_CONFIG = {
   BRAND_COLOR_BG_DARK: '#1a1040',
 
   // ─── TTS ──────────────────────────────────────────
-  /** Voz padrão: Thalita (Microsoft Edge Neural, 100% grátis, PT-BR natural) */
+  /** Voz padrão: Kokoro Dora (nativa PT-BR, roda no navegador, custo zero) */
   DEFAULT_VOICE: 'thalita',
-  /** Voz ElevenLabs Sarah (fallback) */
-  ELEVENLABS_VOICE_ID: 'EXAVITQu4vr4xnSDxMaL',
-  ELEVENLABS_MODEL: 'eleven_turbo_v2_5',
 
   // ─── Script Generation ────────────────────────────
   SCRIPT_STYLE: 'gancho explosivo nos primeiros 3 segundos, ritmo acelerado, frases curtas e diretas',

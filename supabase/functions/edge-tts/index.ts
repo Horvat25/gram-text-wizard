@@ -7,12 +7,13 @@ const corsHeaders = {
 };
 
 /**
- * TTS — Voz padrão: ElevenLabs Sarah (PT-BR neural premium via free tier).
+ * TTS de apoio (CTA e usos pontuais) — 100% gratuito, sem APIs pagas.
  *
  * Cadeia:
- *   1. ElevenLabs Sarah (free tier ~10k chars/mês = ~30 reels)
- *   2. HuggingFace MMS-TTS Portuguese (se a chave HF responder)
- *   3. Google Translate TTS (último recurso quando o free estoura)
+ *   1. HuggingFace MMS-TTS Portuguese (se a chave HF responder)
+ *   2. Google Translate TTS (último recurso)
+ *
+ * Obs.: a narração principal dos Reels usa Kokoro TTS no navegador (kokoro-voice.ts).
  */
 
 serve(async (req) => {
@@ -37,40 +38,25 @@ serve(async (req) => {
     let provider = "";
     let voice = "";
 
-    // ── 1) Padrão: ElevenLabs Sarah (free tier) ──
-    const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
-    if (ELEVENLABS_API_KEY) {
+    // ── 1) HuggingFace MMS-TTS PT (neural, grátis) ──
+    const HF_API_KEY = Deno.env.get("HF_API_KEY");
+    if (HF_API_KEY) {
       try {
-        audioData = await generateElevenLabs(cleanedText, ELEVENLABS_API_KEY);
-        provider = "ElevenLabs Neural";
-        voice = "Sarah";
-        console.log(`[TTS] ✅ ElevenLabs Sarah: ${(audioData.length / 1024).toFixed(1)}KB`);
+        audioData = await generateHuggingFaceTTS(cleanedText, HF_API_KEY);
+        provider = "HuggingFace MMS Neural";
+        voice = "mms-tts-por";
+        console.log(`[TTS] ✅ HF MMS-TTS: ${(audioData.length / 1024).toFixed(1)}KB`);
       } catch (e: any) {
-        console.warn(`[TTS] ElevenLabs falhou (provável quota free): ${e.message}`);
+        console.warn(`[TTS] HF MMS falhou, fallback Google: ${e.message}`);
       }
     }
 
-    // ── 2) Fallback: HuggingFace MMS-TTS PT ──
-    if (!audioData) {
-      const HF_API_KEY = Deno.env.get("HF_API_KEY");
-      if (HF_API_KEY) {
-        try {
-          audioData = await generateHuggingFaceTTS(cleanedText, HF_API_KEY);
-          provider = "HuggingFace MMS Neural";
-          voice = "mms-tts-por";
-          console.log(`[TTS] ✅ HF MMS-TTS: ${(audioData.length / 1024).toFixed(1)}KB`);
-        } catch (e: any) {
-          console.warn(`[TTS] HF MMS falhou, fallback Google: ${e.message}`);
-        }
-      }
-    }
-
-    // ── 3) Último recurso: Google Translate TTS ──
+    // ── 2) Último recurso: Google Translate TTS ──
     if (!audioData) {
       audioData = await generateGoogleTTS(cleanedText);
       provider = "Google Translate TTS";
       voice = "pt-BR";
-      console.log(`[TTS] ⚠️ Google fallback (quota ElevenLabs free provavelmente estourou)`);
+      console.log(`[TTS] ⚠️ Google fallback`);
     }
 
     const base64Audio = base64Encode(audioData);
@@ -203,43 +189,6 @@ async function generateGoogleTTS(text: string): Promise<Uint8Array> {
 
   if (buffers.length === 0) throw new Error("Google TTS retornou vazio");
   return concatBuffers(buffers);
-}
-
-// ========== ElevenLabs Sarah (opcional, pago) ==========
-
-async function generateElevenLabs(text: string, apiKey: string): Promise<Uint8Array> {
-  const voiceId = "EXAVITQu4vr4xnSDxMaL"; // Sarah
-
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-    {
-      method: "POST",
-      headers: {
-        "Accept": "audio/mpeg",
-        "Content-Type": "application/json",
-        "xi-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        text,
-        // Turbo v2.5 = metade dos créditos do multilingual_v2, qualidade PT-BR ótima
-        model_id: "eleven_turbo_v2_5",
-        voice_settings: {
-          stability: 0.40,        // mais variação prosódica = humano
-          similarity_boost: 0.82, // mantém timbre da Sarah
-          style: 0.45,            // inflexão editorial marcada
-          use_speaker_boost: true,
-          speed: 1.22,            // ritmo Reels viral (22% + rápido, ainda claro)
-        },
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`ElevenLabs ${response.status}: ${errorText.substring(0, 200)}`);
-  }
-
-  return new Uint8Array(await response.arrayBuffer());
 }
 
 // ========== HELPERS ==========

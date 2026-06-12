@@ -32,21 +32,14 @@ async function loadKokoro(onProgress?: ProgressCallback): Promise<any | null> {
     ttsPromise = (async () => {
       const { KokoroTTS } = await import("kokoro-js");
 
-      // Tenta WebGPU (mais rápido) e cai para WASM (compatível com tudo).
-      try {
-        return await KokoroTTS.from_pretrained("onnx-community/Kokoro-82M-v1.0-ONNX", {
-          dtype: "fp32",
-          device: "webgpu",
-          progress_callback: onProgress as any,
-        });
-      } catch {
-        console.warn("[kokoro] WebGPU indisponível, usando WASM (q8)...");
-        return await KokoroTTS.from_pretrained("onnx-community/Kokoro-82M-v1.0-ONNX", {
-          dtype: "q8",
-          device: "wasm",
-          progress_callback: onProgress as any,
-        });
-      }
+      // SEMPRE WASM q8: o WebGPU do Kokoro gera ruído/estática ("zumbido") em
+      // várias GPUs. O caminho WASM q8 foi validado de ponta a ponta (áudio
+      // PT-BR limpo com pf_dora). Não reativar WebGPU.
+      return await KokoroTTS.from_pretrained("onnx-community/Kokoro-82M-v1.0-ONNX", {
+        dtype: "q8",
+        device: "wasm",
+        progress_callback: onProgress as any,
+      });
     })();
     ttsPromise.catch((e) => {
       console.warn("[kokoro] falha ao carregar o modelo:", e);

@@ -1555,7 +1555,7 @@ Responda em JSON: { "headline": "...", "caption": "...", "hashtags": ["#tag1"] }
     platforms: plan.platforms || ['instagram'],
     status: 'draft', // Start as draft, processing will update
     ai_model_used: `gemini-2.5-flash-lite+${videoSource.platform}`,
-    cost_estimate: isAuthorized ? 0.015 : 0.002, // Higher cost for ElevenLabs narration
+    cost_estimate: 0, // Narração Kokoro roda no navegador — custo zero
   }).select().single();
   
   if (postError) throw postError;

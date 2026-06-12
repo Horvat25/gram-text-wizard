@@ -13,7 +13,7 @@ const corsHeaders = {
  * 1. Research the video topic (YouTube API + Firecrawl)
  * 2. Generate narration script that MATCHES the video content
  * 3. Add CTA segment at the end
- * 4. Narrate with ElevenLabs (Sarah) + Edge TTS for CTA
+ * 4. Narrate with Edge TTS (gratuito) + Edge TTS for CTA
  * 5. Prepare render job with per-segment timing
  */
 
@@ -116,7 +116,6 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    const elevenLabsKey = Deno.env.get("ELEVENLABS_API_KEY");
     const renderServiceUrl = Deno.env.get("RENDER_SERVICE_URL");
     const youtubeApiKey = Deno.env.get("YOUTUBE_API_KEY");
     const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
@@ -232,71 +231,45 @@ Responda em JSON:
     }
 
     // =========================================
-    // Step 3: Generate narration audio (ElevenLabs)
+    // Step 3: Generate narration audio (Edge TTS — gratuito)
     // =========================================
     let narrationAudioUrl = "";
 
-    if (elevenLabsKey && narrationScript) {
-      console.log("[process-curated-video] 🎙️ Generating ElevenLabs narration...");
+    if (narrationScript) {
+      console.log("[process-curated-video] 🎙️ Generating narration (edge-tts)...");
       try {
-        const voiceId = "EXAVITQu4vr4xnSDxMaL"; // Sarah
-
-        const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        const edgeTtsRes = await fetch(`${supabaseUrl}/functions/v1/edge-tts`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "xi-api-key": elevenLabsKey,
+            Authorization: `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({
             text: narrationScript,
-            model_id: "eleven_multilingual_v2",
-            voice_settings: {
-              stability: 0.6,
-              similarity_boost: 0.8,
-              style: 0.3,
-              use_speaker_boost: true,
-            },
+            voice: "pt-BR-FranciscaNeural",
+            rate: "+5%",
           }),
         });
 
-        if (ttsRes.ok) {
-          const audioBlob = await ttsRes.arrayBuffer();
-          const audioBytes = new Uint8Array(audioBlob);
-
-          const audioPath = `${workspace_id}/narration-${post_id}-${Date.now()}.mp3`;
-          const { error: uploadErr } = await supabase.storage
-            .from("post-videos")
-            .upload(audioPath, audioBytes, {
-              contentType: "audio/mpeg",
-              upsert: true,
-            });
-
-          if (!uploadErr) {
-            const { data: pubUrl } = supabase.storage
+        if (edgeTtsRes.ok) {
+          const edgeTtsData = await edgeTtsRes.json();
+          if (edgeTtsData.audioContent) {
+            const audioBytes = Uint8Array.from(atob(edgeTtsData.audioContent), (c) => c.charCodeAt(0));
+            const audioPath = `${workspace_id}/narration-${post_id}-${Date.now()}.mp3`;
+            const { error: uploadErr } = await supabase.storage
               .from("post-videos")
-              .getPublicUrl(audioPath);
-            narrationAudioUrl = pubUrl.publicUrl;
-            console.log(`[process-curated-video] ✅ Narration audio uploaded`);
-          }
-        } else {
-          console.warn("[process-curated-video] ElevenLabs failed:", ttsRes.status);
-
-          // Fallback to Edge TTS
-          const edgeTtsRes = await fetch(`${supabaseUrl}/functions/v1/edge-tts`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${supabaseKey}`,
-            },
-            body: JSON.stringify({
-              text: narrationScript,
-              voice: "pt-BR-FranciscaNeural",
-              rate: "+5%",
-            }),
-          });
-
-          if (edgeTtsRes.ok) {
-            const edgeTtsData = await edgeTtsRes.json();
+              .upload(audioPath, audioBytes, {
+                contentType: "audio/mpeg",
+                upsert: true,
+              });
+            if (!uploadErr) {
+              const { data: pubUrl } = supabase.storage
+                .from("post-videos")
+                .getPublicUrl(audioPath);
+              narrationAudioUrl = pubUrl.publicUrl;
+              console.log(`[process-curated-video] ✅ Narration audio uploaded`);
+            }
+          } else {
             narrationAudioUrl = edgeTtsData.audioUrl || "";
           }
         }
