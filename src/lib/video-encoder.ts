@@ -494,10 +494,6 @@ export async function generateVideoFromSegments(
     music: musicBuf ? `${musicBuf.duration.toFixed(1)}s` : 'none',
   });
 
-  const CTA_DURATION = Math.min(
-    ctaBuf ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 0.5) : VIDEO_CONFIG.CTA_MIN_DURATION,
-    VIDEO_CONFIG.CTA_MAX_DURATION
-  );
   const visualContentDuration = segments.reduce((sum, s) => sum + s.duration, 0);
   const maxNarrationBudget = VIDEO_CONFIG.MAX_TOTAL_DURATION - VIDEO_CONFIG.NARRATION_CTA_GAP - VIDEO_CONFIG.CTA_MIN_DURATION;
   const narrationDuration = Math.min(
@@ -505,10 +501,19 @@ export async function generateVideoFromSegments(
     maxNarrationBudget,
   );
   const ctaStartTime = narrationDuration + VIDEO_CONFIG.NARRATION_CTA_GAP;
+  // CTA se comprime no espaço restante — nunca derruba o render
+  const remainingForCta = VIDEO_CONFIG.MAX_TOTAL_DURATION - ctaStartTime;
+  const desiredCta = ctaBuf
+    ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaBuf.duration + 0.5)
+    : VIDEO_CONFIG.CTA_MIN_DURATION;
+  const CTA_DURATION = Math.max(
+    VIDEO_CONFIG.CTA_MIN_DURATION,
+    Math.min(desiredCta, VIDEO_CONFIG.CTA_MAX_DURATION, remainingForCta),
+  );
   const rawTotal = ctaStartTime + CTA_DURATION;
 
   if (rawTotal > VIDEO_CONFIG.MAX_TOTAL_DURATION + 0.1) {
-    throw new Error(`Duração final de ${rawTotal.toFixed(1)}s excede o limite seguro de ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s.`);
+    console.warn(`[video-encoder] Duração ${rawTotal.toFixed(1)}s acima do alvo de ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s — seguindo com CTA comprimido.`);
   }
 
   const totalDuration = rawTotal;
