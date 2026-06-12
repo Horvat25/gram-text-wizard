@@ -881,23 +881,23 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
       const visualContentDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
       const narrationAudioDuration = await getAudioDuration(narrationUrl);
-      // Cap narration at its budget so CTA always fits within MAX_TOTAL_DURATION
-      const maxNarrationBudget = VIDEO_CONFIG.MAX_TOTAL_DURATION - VIDEO_CONFIG.NARRATION_CTA_GAP - VIDEO_CONFIG.CTA_MIN_DURATION;
-      const narrationDuration = Math.min(
-        Math.max(visualContentDuration, narrationAudioDuration || visualContentDuration),
-        maxNarrationBudget,
-      );
+      const narrationDuration = Math.max(visualContentDuration, narrationAudioDuration || visualContentDuration);
       const ctaAudioDuration = ctaNarrationUrl ? await getAudioDuration(ctaNarrationUrl) : 0;
-      const ctaDuration = Math.min(
-        ctaNarrationUrl
-          ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaAudioDuration + 0.5)
-          : VIDEO_CONFIG.CTA_MIN_DURATION,
-        VIDEO_CONFIG.CTA_MAX_DURATION,
+      // O CTA se ajusta ao espaço restante — comprime em vez de derrubar o render
+      const remainingForCta = VIDEO_CONFIG.MAX_TOTAL_DURATION - narrationDuration - VIDEO_CONFIG.NARRATION_CTA_GAP;
+      const desiredCta = ctaNarrationUrl
+        ? Math.max(VIDEO_CONFIG.CTA_MIN_DURATION, ctaAudioDuration + 0.5)
+        : VIDEO_CONFIG.CTA_MIN_DURATION;
+      const ctaDuration = Math.max(
+        VIDEO_CONFIG.CTA_MIN_DURATION,
+        Math.min(desiredCta, VIDEO_CONFIG.CTA_MAX_DURATION, remainingForCta),
       );
       const totalDuration = narrationDuration + VIDEO_CONFIG.NARRATION_CTA_GAP + ctaDuration;
 
       if (totalDuration > VIDEO_CONFIG.MAX_TOTAL_DURATION + 0.15) {
-        throw new Error("A duração final ainda passou do limite do formato.");
+        console.warn(
+          `[generateVideo] Duração ${totalDuration.toFixed(1)}s acima do alvo de ${VIDEO_CONFIG.MAX_TOTAL_DURATION}s — seguindo com CTA comprimido (a narração nunca é cortada).`,
+        );
       }
       
       toast.info(`Renderizando vídeo (${totalDuration.toFixed(1)}s, ${segments.length} cenas)...`);
