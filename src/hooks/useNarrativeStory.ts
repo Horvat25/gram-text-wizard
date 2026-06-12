@@ -560,7 +560,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       throw new Error("Kokoro não retornou áudio. Recarregue a página para baixar o modelo novamente.");
     };
     
-    // ─── Background music: ElevenLabs Music → MusicGen → Procedural ───
+    // ─── Background music: Procedural → MusicGen (sem APIs pagas) ───
     const generateBackgroundMusic = async (mood?: string): Promise<string> => {
       if (abortRef.current) return "";
 
@@ -571,43 +571,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       } catch (e) { console.warn("[Music] Procedural error:", e); }
 
       if (abortRef.current) return "";
-      
-      // 1️⃣ ElevenLabs Music
-      try {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        
-        const musicPrompt = "Modern electronic background music for technology news video, professional and engaging, subtle beats, clean synths, cinematic feel";
-        
-        const response = await fetch(`${supabaseUrl}/functions/v1/elevenlabs-music`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
-          },
-          body: JSON.stringify({ prompt: musicPrompt, duration: 30 }),
-        });
-        
-        if (response.ok) {
-          const contentType = response.headers.get("content-type") || "";
-          if (contentType.includes("audio")) {
-            const audioBlob = await response.blob();
-            console.log("[Music] ✅ ElevenLabs Music generated!");
-            toast.success("🎵 Trilha sonora profissional gerada!");
-            return URL.createObjectURL(audioBlob);
-          }
-        }
-        // Consume response body to prevent resource leaks
-        await response.text().catch(() => {});
-        console.warn(`[Music] ElevenLabs Music unavailable (${response.status}), trying fallback...`);
-      } catch (e) {
-        console.warn("[Music] ElevenLabs Music error:", e);
-      }
-      
-      if (abortRef.current) return "";
-      
-      // 2️⃣ MusicGen (HuggingFace)
+
+      // Fallback: MusicGen (HuggingFace, grátis)
       try {
         const musicResult = await supabase.functions.invoke("huggingface-musicgen", {
           body: { mood: mood || "technology", duration: 15 },
@@ -619,16 +584,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           return `data:audio/${format};base64,${audioContent}`;
         }
       } catch (e) { console.warn("[Music] MusicGen error:", e); }
-      
-      if (abortRef.current) return "";
-      
-      // 3️⃣ Procedural Web Audio (always works)
-      try {
-        const track = getRandomTrack(mood);
-        const musicUrl = await preloadTrack(track);
-        if (musicUrl) return musicUrl;
-      } catch (e) { console.warn("[Music] Procedural error:", e); }
-      
+
       return "";
     };
     
