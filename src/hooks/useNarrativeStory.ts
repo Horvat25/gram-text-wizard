@@ -549,48 +549,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       : "thalita";
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // 1) Neural Voice local (premium, sem custo) — só se o servidor local estiver de pé.
-      const localVoice = await synthesizeWithNeuralVoice(text, {
+      // Voz ÚNICA: Kokoro rodando 100% no navegador (open source, sem custo, sem servidor).
+      // Sem fallbacks — se falhar, o erro sobe e o render é cancelado para evitar voz ruim.
+      const kokoro = await synthesizeWithKokoro(text, {
         voice: userVoice === "antonio" ? "male" : "female",
-        channel: "instagram",
-        platform: "reels",
       });
-      if (localVoice?.audioUrl) {
-        return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
+      if (kokoro?.audioUrl) {
+        return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
       }
-
-      // 2) Kokoro no navegador — mesma voz neural do servidor local, baixada e
-      // executada direto no browser (sem custo, sem servidor). Cache após 1º download.
-      try {
-        const kokoro = await synthesizeWithKokoro(text, {
-          voice: userVoice === "antonio" ? "male" : "female",
-        });
-        if (kokoro?.audioUrl) {
-          return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
-        }
-      } catch (e) {
-        console.warn("[TTS] kokoro-browser falhou:", e);
-      }
-
-      // 3) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
-      // Evita travar o render quando o Neural Voice local está offline.
-      try {
-        const { data, error } = await supabase.functions.invoke("lovable-tts", {
-          body: { text, voice: userVoice || "thalita" },
-        });
-        if (!error && typeof data?.audioContent === "string" && data.audioContent.length > 100) {
-          const format = data.format || "mp3";
-          return {
-            audioUrl: `data:audio/${format};base64,${data.audioContent}`,
-            provider: data.provider || "lovable-tts",
-          };
-        }
-        console.warn("[TTS] lovable-tts fallback falhou:", error || data);
-      } catch (e) {
-        console.warn("[TTS] lovable-tts fallback exception:", e);
-      }
-
-      return { audioUrl: null, provider: "none" };
+      throw new Error("Kokoro não retornou áudio. Recarregue a página para baixar o modelo novamente.");
     };
     
     // ─── Background music: ElevenLabs Music → MusicGen → Procedural ───
