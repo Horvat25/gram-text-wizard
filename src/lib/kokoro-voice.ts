@@ -63,9 +63,11 @@ export async function synthesizeWithKokoro(
   if (!tts) return null;
 
   try {
-    // Vozes disponíveis no Kokoro v1.0 ONNX (alta qualidade).
-    // af_heart = feminina natural / am_michael = masculina natural.
-    const voice = options.voice === "male" ? "am_michael" : "af_heart";
+    // Vozes PT-BR oficiais do Kokoro v1.0 ONNX:
+    //   pf_dora  = feminina editorial (padrão)
+    //   pm_alex  = masculina tech
+    //   pm_santa = masculina grave/personagem
+    const voice = options.voice === "male" ? "pm_alex" : "pf_dora";
     const audio = await tts.generate(text, { voice });
 
     const blob: Blob = typeof audio.toBlob === "function"
