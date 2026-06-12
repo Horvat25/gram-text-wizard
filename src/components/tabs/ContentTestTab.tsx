@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import CostSummaryPanel from './CostSummaryPanel';
-import ElevenLabsVoiceTest from '@/components/ElevenLabsVoiceTest';
+import KokoroVoiceTest from '@/components/KokoroVoiceTest';
 import StrategyPanel from './StrategyPanel';
 import AgentVisionPanel from './AgentVisionPanel';
 import { DollarSign, Brain } from 'lucide-react';
@@ -770,7 +770,7 @@ export default function ContentTestTab() {
         </div>
       ) : (
         <>
-          <ElevenLabsVoiceTest />
+          <KokoroVoiceTest />
           <AgentVisionPanel />
 
           <div className="space-y-1">
