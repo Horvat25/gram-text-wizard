@@ -109,7 +109,7 @@ export async function synthesizeWithNeuralVoice(
 
     // Baixa o MP3 AGORA (única outra chamada a localhost) e vira blob URL —
     // o resto do pipeline (decode, encoder) nunca mais toca a rede local.
-    const audioRes = await fetch(remoteUrl, localFetchInit());
+    const audioRes = await localFetch(remoteUrl);
     if (!audioRes.ok) {
       console.warn("[neural-voice] falha ao baixar o MP3:", audioRes.status);
       return null;
