@@ -71,8 +71,8 @@ serve(async (req) => {
 
     if (lastReel?.created_at) {
       const hoursSince = (Date.now() - new Date(lastReel.created_at).getTime()) / 3600000;
-      if (hoursSince < 6) {
-        console.log(`[AUTO-REEL] ⏭️ Reel recente (${hoursSince.toFixed(1)}h atrás, mínimo 6h)`);
+      if (hoursSince < 4) {
+        console.log(`[AUTO-REEL] ⏭️ Reel recente (${hoursSince.toFixed(1)}h atrás, mínimo 4h)`);
         return new Response(JSON.stringify({ skipped: true, reason: "min_gap", hoursSince }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
