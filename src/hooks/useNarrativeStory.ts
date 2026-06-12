@@ -548,8 +548,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       : "thalita";
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // Único provedor: Neural Voice local (localhost:3032 ou VITE_NEURAL_VOICE_URL).
-      // Se não estiver rodando → retorna null → erro claro para o usuário iniciar o servidor.
+      // 1) Neural Voice local (premium, sem custo) — só se o servidor local estiver de pé.
       const localVoice = await synthesizeWithNeuralVoice(text, {
         voice: userVoice === "antonio" ? "male" : "female",
         channel: "instagram",
@@ -558,6 +557,25 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       if (localVoice?.audioUrl) {
         return { audioUrl: localVoice.audioUrl, provider: localVoice.provider };
       }
+
+      // 2) Fallback: Edge Neural TTS (lovable-tts) — gratuito, roda no servidor.
+      // Evita travar o render quando o Neural Voice local está offline.
+      try {
+        const { data, error } = await supabase.functions.invoke("lovable-tts", {
+          body: { text, voice: userVoice || "thalita" },
+        });
+        if (!error && typeof data?.audioContent === "string" && data.audioContent.length > 100) {
+          const format = data.format || "mp3";
+          return {
+            audioUrl: `data:audio/${format};base64,${data.audioContent}`,
+            provider: data.provider || "lovable-tts",
+          };
+        }
+        console.warn("[TTS] lovable-tts fallback falhou:", error || data);
+      } catch (e) {
+        console.warn("[TTS] lovable-tts fallback exception:", e);
+      }
+
       return { audioUrl: null, provider: "none" };
     };
     
