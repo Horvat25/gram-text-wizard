@@ -546,14 +546,21 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
     const userVoice = (options.preferredVoice && options.preferredVoice !== "default")
       ? options.preferredVoice
-      : "thalita";
+      : "dora";
+
+    // Mapa de qualquer preferência antiga (thalita/antonio/etc) para vozes Kokoro PT-BR reais.
+    const KOKORO_MAP: Record<string, "dora" | "alex" | "santa"> = {
+      dora: "dora", alex: "alex", santa: "santa",
+      // legados → equivalentes Kokoro
+      thalita: "dora", francisca: "dora", camila: "dora", vitoria: "dora",
+      antonio: "alex", ricardo: "santa",
+    };
+    const kokoroVoice = KOKORO_MAP[userVoice] ?? "dora";
 
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
       // Voz ÚNICA: Kokoro rodando 100% no navegador (open source, sem custo, sem servidor).
       // Sem fallbacks — se falhar, o erro sobe e o render é cancelado para evitar voz ruim.
-      const kokoro = await synthesizeWithKokoro(text, {
-        voice: userVoice === "antonio" ? "male" : "female",
-      });
+      const kokoro = await synthesizeWithKokoro(text, { voice: kokoroVoice });
       if (kokoro?.audioUrl) {
         return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
       }
