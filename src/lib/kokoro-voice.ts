@@ -4,8 +4,8 @@
 // VOZES NATIVAS PT-BR: pf_dora (feminina editorial), pm_alex (masculino tech),
 // pm_santa (grave/personagem). O pacote kokoro-js só lista vozes em inglês na
 // validação, mas os arquivos pt-br EXISTEM no repositório do modelo. Então:
-//   1. Fonemizamos o texto em "pt-br" (espeak-ng via phonemizer — mesmo motor
-//      que o kokoro-js usa internamente para inglês);
+//   1. Fonemizamos o texto em "pt-br" com espeak-ng WASM (dados completos de
+//      idiomas — o pacote "phonemizer" usado pelo kokoro-js só traz inglês);
 //   2. Tokenizamos com o tokenizer do próprio modelo;
 //   3. Chamamos tts.generate_from_ids(), que NÃO valida o nome da voz e baixa
 //      o pf_dora.bin/pm_alex.bin direto do repositório.
