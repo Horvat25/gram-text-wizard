@@ -189,12 +189,9 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   };
 
   const VOICE_OPTIONS = [
-    { id: 'thalita', name: 'Thalita Neural', gender: 'Feminino', description: 'Microsoft Edge Neural — natural e moderna (recomendada)' },
-    { id: 'francisca', name: 'Francisca Neural', gender: 'Feminino', description: 'Microsoft Edge Neural — calorosa e expressiva' },
-    { id: 'antonio', name: 'Antônio Neural', gender: 'Masculino', description: 'Microsoft Edge Neural — voz de locutor de podcast' },
-    { id: 'camila', name: 'Camila (Polly)', gender: 'Feminino', description: 'Amazon Polly — calorosa e profissional' },
-    { id: 'vitoria', name: 'Vitória (Polly)', gender: 'Feminino', description: 'Amazon Polly — suave e gentil' },
-    { id: 'ricardo', name: 'Ricardo (Polly)', gender: 'Masculino', description: 'Amazon Polly — grave e autoritária' },
+    { id: 'dora', name: 'Dora', gender: 'Feminino', description: 'Kokoro PT-BR — feminina editorial (recomendada para Reels)' },
+    { id: 'alex', name: 'Alex', gender: 'Masculino', description: 'Kokoro PT-BR — voz tech, ritmo de locutor' },
+    { id: 'santa', name: 'Santa', gender: 'Masculino grave', description: 'Kokoro PT-BR — grave e dramática, para narrações marcantes' },
   ];
 
   const startOAuth = async () => {
@@ -220,10 +217,13 @@ export default function AgentSettingsPanel({ trigger, onConfigChange, onClearCha
   const testVoice = async (voiceId: string) => {
     setTestingVoice(voiceId);
     try {
-      const { data, error } = await supabase.functions.invoke('lovable-tts', { body: { text: 'Olá! Esta é uma demonstração da voz neural.', voice: voiceId } });
-      if (error) throw error;
-      if (!data?.audioContent) throw new Error('Sem áudio');
-      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+      const { synthesizeWithKokoro } = await import('@/lib/kokoro-voice');
+      const result = await synthesizeWithKokoro(
+        'Olá! Esta é a voz que vai narrar os seus Reels.',
+        { voice: voiceId as 'dora' | 'alex' | 'santa' },
+      );
+      if (!result?.audioUrl) throw new Error('Kokoro não retornou áudio.');
+      const audio = new Audio(result.audioUrl);
       audio.onended = () => setTestingVoice(null);
       audio.onerror = () => setTestingVoice(null);
       await audio.play();
