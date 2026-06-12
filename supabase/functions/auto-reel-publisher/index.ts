@@ -20,7 +20,7 @@ const REELS_PAUSED_UNTIL_UTC = new Date("2000-01-01T00:00:00.000Z");
  *   3. Dispara brand-news-video em background (EdgeRuntime.waitUntil)
  *   4. Marca rss_items.used_for_reel = true
  *
- * Limite de segurança: máx 2 Reels (scheduled+published) nas últimas 24h.
+ * Limite de segurança: máx 3 Reels (scheduled+published) nas últimas 24h.
  */
 
 serve(async (req) => {
