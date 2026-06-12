@@ -63,7 +63,9 @@ export async function synthesizeWithKokoro(
   if (!tts) return null;
 
   try {
-    const voice = options.voice === "male" ? "pm_alex" : "pf_dora";
+    // Vozes disponíveis no Kokoro v1.0 ONNX (alta qualidade).
+    // af_heart = feminina natural / am_michael = masculina natural.
+    const voice = options.voice === "male" ? "am_michael" : "af_heart";
     const audio = await tts.generate(text, { voice });
 
     const blob: Blob = typeof audio.toBlob === "function"
@@ -82,6 +84,6 @@ export async function synthesizeWithKokoro(
     };
   } catch (e) {
     console.warn("[kokoro] síntese falhou:", e);
-    return null;
+    throw e;
   }
 }
