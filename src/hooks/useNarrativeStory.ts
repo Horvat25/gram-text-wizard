@@ -647,11 +647,15 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
 
         const remainingSegments = segments.length - i - 1;
         const remainingMinimumDuration = remainingSegments * VIDEO_CONFIG.MIN_SEGMENT_DURATION;
+        const remainingBudget = maxNarrationDuration - accumulatedNarrationDuration;
+        // Cota justa: cada cena pode usar sua fatia do orçamento restante (+35% de folga),
+        // evitando que as primeiras cenas consumam todo o tempo das últimas.
+        const fairShare = (remainingBudget / (remainingSegments + 1)) * 1.35;
         const maxAllowedForCurrent = Math.min(
           VIDEO_CONFIG.MAX_SEGMENT_DURATION,
           Math.max(
             VIDEO_CONFIG.MIN_SEGMENT_DURATION,
-            maxNarrationDuration - accumulatedNarrationDuration - remainingMinimumDuration,
+            Math.min(fairShare, remainingBudget - remainingMinimumDuration),
           ),
         );
 
