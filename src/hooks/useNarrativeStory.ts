@@ -714,7 +714,9 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       }
 
       if (accumulatedNarrationDuration > maxNarrationDuration + 0.1) {
-        throw new Error("Mesmo após encurtar a narração, o vídeo ainda passou do limite seguro de duração.");
+        console.warn(
+          `[TTS] Narração total ${accumulatedNarrationDuration.toFixed(1)}s > limite ${maxNarrationDuration.toFixed(1)}s — fitSegmentDurationsToBudget vai aparar os respiros entre cenas.`,
+        );
       }
       
       console.log(`[TTS] ✅ Per-segment durations: ${segmentDurations.map(d => d.toFixed(1) + 's').join(', ')}`);
