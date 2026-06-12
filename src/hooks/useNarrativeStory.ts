@@ -489,7 +489,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     }
   }, []);
 
-  // ═══ Step 3: Generate per-segment narration — ElevenLabs first, with safe fallbacks ═══
+  // ═══ Step 3: Generate per-segment narration — Kokoro PT-BR no navegador (custo zero) ═══
   const generateAudio = useCallback(async (segments: StorySegment[]) => {
     if (abortRef.current) return { narrationUrl: "", ctaNarrationUrl: "", backgroundMusicUrl: "", fullScript: "", segmentDurations: [] as number[] };
     setState(prev => ({ ...prev, step: "audio", progress: 72 }));
@@ -761,7 +761,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
       }
       
-      // ─── CTA narration (also ElevenLabs Sarah) ───
+      // ─── CTA narration (também Kokoro) ───
        if (narrationUrl) {
          const { audioUrl: ctaUrl } = await callNarrationTTS(ctaScript);
          ctaNarrationUrl = ctaUrl || "";

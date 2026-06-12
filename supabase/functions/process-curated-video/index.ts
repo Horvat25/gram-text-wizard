@@ -13,7 +13,7 @@ const corsHeaders = {
  * 1. Research the video topic (YouTube API + Firecrawl)
  * 2. Generate narration script that MATCHES the video content
  * 3. Add CTA segment at the end
- * 4. Narrate with ElevenLabs (Sarah) + Edge TTS for CTA
+ * 4. Narrate with Edge TTS (gratuito) + Edge TTS for CTA
  * 5. Prepare render job with per-segment timing
  */
 
