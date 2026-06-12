@@ -14,13 +14,13 @@ const REELS_PAUSED_UNTIL_UTC = new Date("2000-01-01T00:00:00.000Z");
 /**
  * auto-reel-publisher
  *
- * Cron disparado 2x/dia (10h e 18h Brasília) — cria UM Reel automático:
+ * Cron disparado 3x/dia (09h, 14h e 20h Brasília) — cria UM Reel automático:
  *   1. Pega notícia top não usada (Neural Update primeiro)
  *   2. Cria post em status='generating', agendado pra 30min depois
  *   3. Dispara brand-news-video em background (EdgeRuntime.waitUntil)
  *   4. Marca rss_items.used_for_reel = true
  *
- * Limite de segurança: máx 2 Reels (scheduled+published) nas últimas 24h.
+ * Limite de segurança: máx 3 Reels (scheduled+published) nas últimas 24h.
  */
 
 serve(async (req) => {
@@ -43,7 +43,7 @@ serve(async (req) => {
       });
     }
 
-    // ── Limite: máx 2 Reels nas últimas 24h ──
+    // ── Limite: máx 3 Reels nas últimas 24h ──
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { count: recent } = await supabase
       .from("posts")
@@ -52,8 +52,8 @@ serve(async (req) => {
       .in("media_type", ["reels", "reel", "video"])
       .gte("created_at", since);
 
-    if ((recent || 0) >= 2) {
-      console.log(`[AUTO-REEL] ⏭️ Limite atingido (${recent}/2 últimas 24h)`);
+    if ((recent || 0) >= 3) {
+      console.log(`[AUTO-REEL] ⏭️ Limite atingido (${recent}/3 últimas 24h)`);
       return new Response(JSON.stringify({ skipped: true, reason: "daily_limit", recent }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -71,8 +71,8 @@ serve(async (req) => {
 
     if (lastReel?.created_at) {
       const hoursSince = (Date.now() - new Date(lastReel.created_at).getTime()) / 3600000;
-      if (hoursSince < 6) {
-        console.log(`[AUTO-REEL] ⏭️ Reel recente (${hoursSince.toFixed(1)}h atrás, mínimo 6h)`);
+      if (hoursSince < 4) {
+        console.log(`[AUTO-REEL] ⏭️ Reel recente (${hoursSince.toFixed(1)}h atrás, mínimo 4h)`);
         return new Response(JSON.stringify({ skipped: true, reason: "min_gap", hoursSince }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
