@@ -11,33 +11,51 @@ interface NeuralVoiceResponse {
 const BASE_URL = (import.meta.env.VITE_NEURAL_VOICE_URL || "http://localhost:3032").replace(/\/+$/, "");
 
 // Chrome 2026 (Local Network Access): páginas HTTPS públicas só podem chamar
-// http://localhost se o fetch declarar targetAddressSpace. Sem isso a requisição
-// é bloqueada como mixed content ANTES do preflight — parece "servidor desligado".
-const localFetchInit = (init: RequestInit = {}): RequestInit =>
-  ({ ...init, targetAddressSpace: "loopback" }) as RequestInit;
+// http://localhost se o fetch declarar targetAddressSpace E o servidor responder
+// com `Access-Control-Allow-Private-Network: true` no preflight. Tentamos primeiro
+// com a flag, depois sem (browsers que ainda não suportam LNA quebram com ela).
+async function localFetch(url: string, init: RequestInit = {}): Promise<Response> {
+  try {
+    return await fetch(url, { ...init, targetAddressSpace: "loopback" } as RequestInit);
+  } catch (e) {
+    // Fallback: tenta sem a flag (Firefox/Safari, ou Chrome com LNA desabilitado)
+    return await fetch(url, init);
+  }
+}
 
-// Health-check result cached per page load — one fast probe, then synthesis
-// calls go straight through without racing an abort timer.
+// Health-check result cached per page load, mas com re-probe rápido em caso de falha
 let healthPromise: Promise<boolean> | null = null;
+let lastHealthCheck = 0;
 
 async function isNeuralVoiceUp(): Promise<boolean> {
-  if (!healthPromise) {
+  const now = Date.now();
+  // Re-probe a cada 5s se a última falhou
+  if (!healthPromise || (now - lastHealthCheck > 5000)) {
+    lastHealthCheck = now;
     healthPromise = (async () => {
       try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 3000);
-        const res = await fetch(`${BASE_URL}/health`, localFetchInit({ signal: controller.signal }));
+        const res = await localFetch(`${BASE_URL}/health`, { signal: controller.signal });
         clearTimeout(timer);
         const data = await res.json().catch(() => null);
         return !!data?.ok;
-      } catch (e) {
-        console.warn("[neural-voice] health falhou:", e);
+      } catch (e: any) {
+        const msg = String(e?.message || e);
+        if (msg.includes("Failed to fetch")) {
+          console.warn(
+            `[neural-voice] bloqueado pelo browser (${BASE_URL}). ` +
+            `O servidor local precisa responder preflight com header ` +
+            `'Access-Control-Allow-Private-Network: true' OU você precisa rodar a página em http://localhost / túnel HTTPS (ngrok).`
+          );
+        } else {
+          console.warn("[neural-voice] health falhou:", msg);
+        }
         return false;
       }
     })();
-    // Allow a re-probe if the first check failed (user may start the server mid-session)
     healthPromise.then((up) => {
-      if (!up) setTimeout(() => { healthPromise = null; }, 10_000);
+      if (!up) healthPromise = null; // permite re-probe imediato na próxima chamada após 5s
     });
   }
   return healthPromise;
@@ -63,7 +81,7 @@ export async function synthesizeWithNeuralVoice(
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 90_000); // generous: real synthesis time
 
-    const response = await fetch(`${BASE_URL}/synthesize`, localFetchInit({
+    const response = await localFetch(`${BASE_URL}/synthesize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
@@ -76,7 +94,7 @@ export async function synthesizeWithNeuralVoice(
         postId: options.postId,
         withTimings: true,
       }),
-    }));
+    });
 
     clearTimeout(timer);
 
@@ -91,7 +109,7 @@ export async function synthesizeWithNeuralVoice(
 
     // Baixa o MP3 AGORA (única outra chamada a localhost) e vira blob URL —
     // o resto do pipeline (decode, encoder) nunca mais toca a rede local.
-    const audioRes = await fetch(remoteUrl, localFetchInit());
+    const audioRes = await localFetch(remoteUrl);
     if (!audioRes.ok) {
       console.warn("[neural-voice] falha ao baixar o MP3:", audioRes.status);
       return null;
