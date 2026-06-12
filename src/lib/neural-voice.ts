@@ -81,7 +81,7 @@ export async function synthesizeWithNeuralVoice(
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 90_000); // generous: real synthesis time
 
-    const response = await fetch(`${BASE_URL}/synthesize`, localFetchInit({
+    const response = await localFetch(`${BASE_URL}/synthesize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
@@ -94,7 +94,7 @@ export async function synthesizeWithNeuralVoice(
         postId: options.postId,
         withTimings: true,
       }),
-    }));
+    });
 
     clearTimeout(timer);
 
