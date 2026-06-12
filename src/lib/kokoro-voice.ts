@@ -63,11 +63,9 @@ export async function synthesizeWithKokoro(
   if (!tts) return null;
 
   try {
-    // Vozes PT-BR oficiais do Kokoro v1.0 ONNX:
-    //   pf_dora  = feminina editorial (padrão)
-    //   pm_alex  = masculina tech
-    //   pm_santa = masculina grave/personagem
-    const voice = options.voice === "male" ? "pm_alex" : "pf_dora";
+    // kokoro-js v1.0 só expõe vozes en/* e br/* (pf_/pm_ não estão no pacote JS).
+    // Para PT-BR usamos af_heart (feminina mais natural) e am_michael (masculina).
+    const voice = options.voice === "male" ? "am_michael" : "af_heart";
     const audio = await tts.generate(text, { voice });
 
     const blob: Blob = typeof audio.toBlob === "function"
