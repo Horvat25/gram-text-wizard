@@ -716,7 +716,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         }
 
         if (!selectedAudioUrl) {
-          throw new Error(`Neural Voice não respondeu na cena ${i + 1}. Inicie o servidor local com iniciar.ps1 e tente novamente.`);
+          throw new Error(`Nenhuma voz disponível para a cena ${i + 1}. Verifique o Neural Voice local ou tente novamente.`);
         }
 
         segmentAudioUrls.push(selectedAudioUrl);
