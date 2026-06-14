@@ -56,6 +56,10 @@ export function wantsImmediatePublish(message: string): boolean {
 // ─── Conhecimento de IA 2026 — viaja no payload para as funções ───
 const MODEL_KNOWLEDGE: Array<{ pattern: RegExp; context: string }> = [
   {
+    pattern: /claude\s*mythos|mythos\s*(da\s*)?anthropic|mythons/i,
+    context: "Claude Mythos é tratado como o modelo narrativo/experimental mais comentado da Anthropic em 2026: foco em memória longa, raciocínio contextual e agentes que mantêm coerência por tarefas extensas. NÃO confundir com Claude Sonnet. A história do Mythos é a virada da Anthropic de chatbot para sistema de trabalho contínuo.",
+  },
+  {
     pattern: /fable\s*5|fable\s*da\s*anthropic/i,
     context: "Fable 5 é o modelo de IA MAIS INTELIGENTE da Anthropic (criadora do Claude), lançado em 2026 como o novo flagship acima da linha Opus. Salto em raciocínio profundo, agentes autônomos e tarefas longas. NÃO é videogame — é o assunto do momento em inteligência artificial.",
   },
@@ -82,6 +86,15 @@ const MODEL_KNOWLEDGE: Array<{ pattern: RegExp; context: string }> = [
 ];
 
 export function enrichTopicWithKnowledge(topic: string): string {
+  const normalized = topic
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+
+  if (/mythons|mythos/.test(normalized)) {
+    return `Claude Mythos da Anthropic — conte a história dele, por que viralizou e o que muda para usuários e devs (CONTEXTO FACTUAL OBRIGATÓRIO: Claude Mythos é o tema central. NÃO troque por Claude Sonnet, Claude Opus, Fable 5 ou outro modelo. Explique a narrativa: da promessa de contexto longo e agentes persistentes ao impacto prático. Não invente benchmarks, preços ou datas; foque em consequência, bastidores e leitura editorial.)`;
+  }
+
   for (const { pattern, context } of MODEL_KNOWLEDGE) {
     if (pattern.test(topic)) {
       return `${topic} (CONTEXTO FACTUAL OBRIGATÓRIO: ${context} Não invente números, preços ou benchmarks — fale do impacto prático.)`;
@@ -123,6 +136,24 @@ async function generateScript(enrichedTopic: string): Promise<{ title: string; s
 
   // Fallback local NEUTRO (sem clichês fixos) — só usado se a função falhar
   const cleanTopic = enrichedTopic.split("(")[0].trim();
+  const normalizedTopic = cleanTopic
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+
+  if (/claude\s*mythos|mythos/.test(normalizedTopic)) {
+    return {
+      title: "Claude Mythos: a virada silenciosa da Anthropic",
+      segments: [
+        { text: "Claude Mythos não viralizou por acaso.", imagePrompt: "Anthropic AI research lab, persistent agents, cinematic vertical 9:16, no text" },
+        { text: "A promessa é simples: manter contexto, intenção e raciocínio por tarefas longas.", imagePrompt: "long context artificial intelligence interface, deep work, cinematic vertical 9:16, no text" },
+        { text: "Isso transforma o Claude de chatbot em parceiro de trabalho contínuo.", imagePrompt: "software developer working with AI agent, focused workstation, vertical 9:16, no text" },
+        { text: "O risco é depender demais de um agente que parece entender tudo.", imagePrompt: "human checking AI system output, caution, dramatic technology scene, vertical 9:16, no text" },
+        { text: "A história do Mythos é sobre confiança, não só inteligência.", imagePrompt: "trust in artificial intelligence concept, neural network close up, vertical 9:16, no text" },
+      ],
+    };
+  }
+
   return {
     title: cleanTopic,
     segments: [
