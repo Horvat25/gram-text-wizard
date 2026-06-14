@@ -13,7 +13,7 @@
 
 export const VIDEO_CONFIG = {
   // ─── Estrutura do Script ────────────────────────────
-  /** Número de segmentos (cenas) por vídeo — Reels enxuto de até 40s */
+  /** Número de segmentos (cenas) por vídeo — Reels editorial enxuto por padrão */
   SEGMENT_COUNT: 5,
   /** Duração base de cada segmento em segundos (estimativa; áudio define a real) */
   SEGMENT_DURATION_BASE: 5,
@@ -27,10 +27,10 @@ export const VIDEO_CONFIG = {
   MAX_SEGMENT_DURATION: 11,
   /** Máximo de segmentos por vídeo */
   MAX_SEGMENTS: 6,
-  /** Duração total máxima (conteúdo + CTA) — Reels curtos performam melhor */
-  MAX_TOTAL_DURATION: 40,
+  /** Duração total máxima (conteúdo + CTA) — limite técnico seguro: 2 minutos */
+  MAX_TOTAL_DURATION: 120,
   /** Buffer extra de timeout para renderização (segundos) */
-  RENDER_TIMEOUT_BUFFER: 10,
+  RENDER_TIMEOUT_BUFFER: 20,
 
   // ─── Renderização Visual ──────────────────────────
   WIDTH: 720,

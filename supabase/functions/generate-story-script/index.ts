@@ -96,8 +96,43 @@ serve(async (req) => {
           .map((s: any) => s?.text || "")
           .join(" ")}`
       );
+
+      if (/mythos|mythons/.test(normalize(originalTopic))) {
+        return /mythos/.test(hay) && !/sonnet/.test(hay);
+      }
+
       return kws.some((kw) => hay.includes(kw));
     };
+
+    const isClaudeMythosTopic = /mythos|mythons/.test(normalize(topic));
+    const topicSpecificRules = isClaudeMythosTopic ? `
+🚨 REGRA ESPECÍFICA — CLAUDE MYTHOS:
+- O tema central é CLAUDE MYTHOS. NUNCA substitua por Claude Sonnet, Opus, Haiku ou Fable.
+- NÃO invente ficha técnica, benchmark, preço, arquitetura interna, relação com Claude 4, data de treino ou "modelo base".
+- Conte a HISTÓRIA editorial: por que viralizou, promessa de contexto longo, agentes persistentes, impacto para devs/usuários e o risco de confiança excessiva.
+- Se faltar dado técnico confirmado, fale de CONSEQUÊNCIA PRÁTICA, não de especificação inventada.
+` : "";
+
+    if (isClaudeMythosTopic) {
+      const mythosSegments = [
+        { text: "Claude Mythos não viralizou por acaso.", imagePrompt: "Anthropic AI research lab, persistent agents, cinematic vertical 9:16, no text", visualKeywords: ["Anthropic AI research lab", "persistent AI agents", "neural network close up"] },
+        { text: "A promessa é manter contexto, intenção e raciocínio por tarefas longas.", imagePrompt: "long context artificial intelligence interface, deep work, cinematic vertical 9:16, no text", visualKeywords: ["long context AI interface", "developer deep work", "data flow corridor"] },
+        { text: "Isso transforma o Claude de chatbot em parceiro de trabalho contínuo.", imagePrompt: "software developer working with AI agent, focused workstation, vertical 9:16, no text", visualKeywords: ["developer AI workstation", "software coding screen", "human computer collaboration"] },
+        { text: "O risco é depender demais de um agente que parece entender tudo.", imagePrompt: "human checking AI system output, caution, dramatic technology scene, vertical 9:16, no text", visualKeywords: ["AI trust warning", "human checking output", "digital risk interface"] },
+        { text: "A história do Mythos é sobre confiança, não só inteligência.", imagePrompt: "trust in artificial intelligence concept, neural network close up, vertical 9:16, no text", visualKeywords: ["trust artificial intelligence", "neural network close up", "future technology reflection"] },
+      ].slice(0, segmentCount);
+
+      return new Response(
+        JSON.stringify({
+          title: "Claude Mythos: a história por trás do viral",
+          thesis: "Claude Mythos viralizou porque representa a passagem do chatbot para agentes persistentes, mas a confiança ainda é o ponto decisivo.",
+          segments: mythosSegments,
+          totalDuration,
+          segmentCount: mythosSegments.length,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     const callModel = async (systemPrompt: string, userPrompt: string, attempt = 1): Promise<any> => {
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -157,6 +192,7 @@ DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
 🎯 MISSÃO:
 Criar vídeos com POSICIONAMENTO e AUTORIDADE — não apenas informativos.
 Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em formato Reels.
+${topicSpecificRules}
 
 ⚡ ESTRUTURA EDITORIAL (${segmentCount} CENAS, total ~${totalDuration}s — Reels DENSO de tecnologia):
 
@@ -313,6 +349,7 @@ LEMBRE-SE:
 - Comece com pergunta provocativa ou afirmação polêmica
 - Declare uma TESE clara — tome posição
 - Estamos em ${currentYear}, não mencione anos passados
+- Mantenha as regras específicas do tema original, sem inventar detalhe técnico não confirmado
 - Tudo em PORTUGUÊS BRASILEIRO com ortografia PERFEITA
 - visualKeywords devem ser cinematográficas e específicas
 - REVISE acentos: ã, é, ê, í, ó, ô, ú, ç

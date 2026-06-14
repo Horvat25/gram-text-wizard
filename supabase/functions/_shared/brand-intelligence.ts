@@ -9,6 +9,7 @@ export const AI_KNOWLEDGE_2026 = `
 ## 🧠 CONHECIMENTO ATUAL DE IA (junho 2026) — USE COM AUTORIDADE
 
 **Anthropic (Claude):**
+- **Claude Mythos**: modelo narrativo/experimental citado pelo público em 2026, associado a memória longa, raciocínio contextual e agentes persistentes. Quando o tema for Mythos, NUNCA troque por Sonnet, Opus ou Fable 5; conte a história e o impacto prático sem inventar benchmarks.
 - **Fable 5** (claude-fable-5): o modelo MAIS INTELIGENTE da Anthropic, lançado em 2026. Sucessor da linha Opus no topo da gama. Salto em raciocínio profundo, agentes autônomos e trabalho de longa duração. É O assunto do momento em IA.
 - Família Claude 4.x ainda ativa: Opus 4.8 (flagship 4.x), Sonnet 4.6 (equilíbrio custo/inteligência), Haiku 4.5 (rápido e barato).
 - Claude Code: agente de programação da Anthropic em CLI, desktop, web e IDEs — referência em coding agents.
