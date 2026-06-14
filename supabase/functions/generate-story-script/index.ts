@@ -104,6 +104,15 @@ serve(async (req) => {
       return kws.some((kw) => hay.includes(kw));
     };
 
+    const isClaudeMythosTopic = /mythos|mythons/.test(normalize(topic));
+    const topicSpecificRules = isClaudeMythosTopic ? `
+🚨 REGRA ESPECÍFICA — CLAUDE MYTHOS:
+- O tema central é CLAUDE MYTHOS. NUNCA substitua por Claude Sonnet, Opus, Haiku ou Fable.
+- NÃO invente ficha técnica, benchmark, preço, arquitetura interna, relação com Claude 4, data de treino ou "modelo base".
+- Conte a HISTÓRIA editorial: por que viralizou, promessa de contexto longo, agentes persistentes, impacto para devs/usuários e o risco de confiança excessiva.
+- Se faltar dado técnico confirmado, fale de CONSEQUÊNCIA PRÁTICA, não de especificação inventada.
+` : "";
+
     const callModel = async (systemPrompt: string, userPrompt: string, attempt = 1): Promise<any> => {
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
