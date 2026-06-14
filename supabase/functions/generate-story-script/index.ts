@@ -171,6 +171,7 @@ DATA ATUAL: ${new Date().toLocaleDateString('pt-BR')} (ANO ${currentYear})
 🎯 MISSÃO:
 Criar vídeos com POSICIONAMENTO e AUTORIDADE — não apenas informativos.
 Cada vídeo deve DEFENDER UMA TESE sobre o tema, como um editorial de jornal em formato Reels.
+${topicSpecificRules}
 
 ⚡ ESTRUTURA EDITORIAL (${segmentCount} CENAS, total ~${totalDuration}s — Reels DENSO de tecnologia):
 
@@ -327,6 +328,7 @@ LEMBRE-SE:
 - Comece com pergunta provocativa ou afirmação polêmica
 - Declare uma TESE clara — tome posição
 - Estamos em ${currentYear}, não mencione anos passados
+- Mantenha as regras específicas do tema original, sem inventar detalhe técnico não confirmado
 - Tudo em PORTUGUÊS BRASILEIRO com ortografia PERFEITA
 - visualKeywords devem ser cinematográficas e específicas
 - REVISE acentos: ã, é, ê, í, ó, ô, ú, ç
