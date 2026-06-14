@@ -113,6 +113,27 @@ serve(async (req) => {
 - Se faltar dado técnico confirmado, fale de CONSEQUÊNCIA PRÁTICA, não de especificação inventada.
 ` : "";
 
+    if (isClaudeMythosTopic) {
+      const mythosSegments = [
+        { text: "Claude Mythos não viralizou por acaso.", imagePrompt: "Anthropic AI research lab, persistent agents, cinematic vertical 9:16, no text", visualKeywords: ["Anthropic AI research lab", "persistent AI agents", "neural network close up"] },
+        { text: "A promessa é manter contexto, intenção e raciocínio por tarefas longas.", imagePrompt: "long context artificial intelligence interface, deep work, cinematic vertical 9:16, no text", visualKeywords: ["long context AI interface", "developer deep work", "data flow corridor"] },
+        { text: "Isso transforma o Claude de chatbot em parceiro de trabalho contínuo.", imagePrompt: "software developer working with AI agent, focused workstation, vertical 9:16, no text", visualKeywords: ["developer AI workstation", "software coding screen", "human computer collaboration"] },
+        { text: "O risco é depender demais de um agente que parece entender tudo.", imagePrompt: "human checking AI system output, caution, dramatic technology scene, vertical 9:16, no text", visualKeywords: ["AI trust warning", "human checking output", "digital risk interface"] },
+        { text: "A história do Mythos é sobre confiança, não só inteligência.", imagePrompt: "trust in artificial intelligence concept, neural network close up, vertical 9:16, no text", visualKeywords: ["trust artificial intelligence", "neural network close up", "future technology reflection"] },
+      ].slice(0, segmentCount);
+
+      return new Response(
+        JSON.stringify({
+          title: "Claude Mythos: a história por trás do viral",
+          thesis: "Claude Mythos viralizou porque representa a passagem do chatbot para agentes persistentes, mas a confiança ainda é o ponto decisivo.",
+          segments: mythosSegments,
+          totalDuration,
+          segmentCount: mythosSegments.length,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const callModel = async (systemPrompt: string, userPrompt: string, attempt = 1): Promise<any> => {
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
