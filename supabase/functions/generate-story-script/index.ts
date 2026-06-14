@@ -96,6 +96,11 @@ serve(async (req) => {
           .map((s: any) => s?.text || "")
           .join(" ")}`
       );
+
+      if (/mythos|mythons/.test(normalize(originalTopic))) {
+        return /mythos/.test(hay) && !/sonnet/.test(hay);
+      }
+
       return kws.some((kw) => hay.includes(kw));
     };
 
