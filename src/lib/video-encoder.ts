@@ -19,21 +19,26 @@ export interface GenerateVideoOptions {
   onProgress?: (progress: number) => void;
 }
 
-// ─── Easing ──────────────────────────────────────────────────
 function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-// ─── Ken Burns effect ────────────────────────────────────────
+function easeOutQuint(t: number): number {
+  return 1 - Math.pow(1 - t, 5);
+}
+
+// ─── Ken Burns effect (dynamic cinematique zoom) ─────────────
 function getKenBurns(segIndex: number, progress: number) {
   const patterns = [
-    { startScale: 1.0, endScale: 1.22, startX: 0, startY: 0, endX: -0.06, endY: -0.04 },
-    { startScale: 1.18, endScale: 1.0, startX: -0.06, startY: -0.03, endX: 0, endY: 0 },
-    { startScale: 1.0, endScale: 1.16, startX: 0.04, startY: 0, endX: -0.04, endY: -0.05 },
-    { startScale: 1.14, endScale: 1.0, startX: -0.04, startY: -0.04, endX: 0.03, endY: 0 },
+    { startScale: 1.0, endScale: 1.25, startX: 0, startY: 0, endX: -0.08, endY: -0.05 },
+    { startScale: 1.22, endScale: 1.0, startX: -0.08, startY: -0.04, endX: 0, endY: 0 },
+    { startScale: 1.0, endScale: 1.20, startX: 0.05, startY: 0, endX: -0.05, endY: -0.06 },
+    { startScale: 1.18, endScale: 1.0, startX: -0.05, startY: -0.05, endX: 0.04, endY: 0 },
   ];
   const p = patterns[segIndex % patterns.length];
-  const t = easeInOutCubic(progress);
+  // Usamos easeOutQuint para que o zoom de transição comece com impacto rápido nos primeiros milissegundos
+  // e suavize progressivamente à medida que a cena avança.
+  const t = easeOutQuint(progress);
   return {
     scale: p.startScale + (p.endScale - p.startScale) * t,
     x: p.startX + (p.endX - p.startX) * t,

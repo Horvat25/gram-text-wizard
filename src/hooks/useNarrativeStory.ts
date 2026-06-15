@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateVideoFromSegments, uploadVideoToStorage } from "@/lib/video-encoder";
+import { convertWebMToMP4 } from "@/lib/video-converter";
 import { VIDEO_CONFIG } from "@/lib/video-config";
 import { getRandomTrack, preloadTrack } from "@/lib/background-music";
 import { pickLocalImageBankImages } from "@/lib/local-image-bank";
@@ -327,23 +328,34 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const updatedSegments = segments.map(segment => ({ ...segment }));
     
     try {
-      const imageQuery = [
-        topic,
-        ...segments.map(segment => `${segment.text} ${segment.imagePrompt}`),
-      ].filter(Boolean).join(" ");
-      const bankImages = await pickLocalImageBankImages(imageQuery || "tecnologia inteligencia artificial", updatedSegments.length);
+      const usedUrls = new Set<string>();
+      let foundCount = 0;
 
-      bankImages.forEach((asset, index) => {
-        if (index < updatedSegments.length && !updatedSegments[index].imageUrl) {
-          updatedSegments[index] = { ...updatedSegments[index], imageUrl: asset.url };
+      for (let i = 0; i < updatedSegments.length; i++) {
+        if (updatedSegments[i].imageUrl) {
+          usedUrls.add(updatedSegments[i].imageUrl);
+          continue;
         }
-      });
 
-      if (bankImages.length > 0) {
-        console.log(`[IMAGES] Banco local: ${bankImages.length} imagem(ns) selecionada(s)`);
+        // Query focada e contextualizada com o tema geral e o texto específico desta cena
+        const sceneQuery = `${topic || ""} ${updatedSegments[i].text} ${updatedSegments[i].imagePrompt}`;
+        const candidates = await pickLocalImageBankImages(sceneQuery, 12);
+
+        // Encontra a melhor imagem que não foi repetida no mesmo vídeo
+        const bestAsset = candidates.find(asset => !usedUrls.has(asset.url));
+        if (bestAsset) {
+          updatedSegments[i].imageUrl = bestAsset.url;
+          usedUrls.add(bestAsset.url);
+          foundCount++;
+          console.log(`[IMAGES] Cena ${i + 1} associada com imagem do banco: ${bestAsset.fileName} (categoria: ${bestAsset.category})`);
+        }
+      }
+
+      if (foundCount > 0) {
+        console.log(`[IMAGES] Banco local: ${foundCount} imagem(ns) associada(s) individualmente`);
       }
     } catch (e) {
-      console.warn("[IMAGES] Local image bank failed:", e);
+      console.warn("[IMAGES] Local image bank per-scene selection failed:", e);
     }
 
     try {
@@ -884,10 +896,14 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       });
       
       console.log("[generateVideo] WebM:", (videoBlob.size / 1024 / 1024).toFixed(2), "MB");
-      setState(prev => ({ ...prev, progress: 96 }));
+      setState(prev => ({ ...prev, progress: 93 }));
       
+      toast.info("Formatando vídeo para Instagram (MP4)...");
+      const mp4Blob = await convertWebMToMP4(videoBlob);
+      
+      setState(prev => ({ ...prev, progress: 97 }));
       toast.info("Enviando vídeo...");
-      const videoUrl = await uploadVideoToStorage(videoBlob, supabase, "post-videos");
+      const videoUrl = await uploadVideoToStorage(mp4Blob, supabase, "post-videos");
       
       setState(prev => ({ 
         ...prev, 

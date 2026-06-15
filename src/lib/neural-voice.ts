@@ -87,7 +87,7 @@ export async function synthesizeWithNeuralVoice(
       signal: controller.signal,
       body: JSON.stringify({
         text,
-        engine: "edge",
+        engine: "kokoro",
         voice: options.voice || "female",
         platform: options.platform || "reels",
         channel: options.channel || "instagram",
