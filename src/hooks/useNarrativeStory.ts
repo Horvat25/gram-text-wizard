@@ -573,15 +573,47 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       antonio: "alex", ricardo: "santa",
     };
     const kokoroVoice = KOKORO_MAP[userVoice] ?? "dora";
+    const isMale = /alex|antonio|santa|ricardo|thiago/i.test(userVoice);
+    const edgeVoice = isMale ? "antonio" : "thalita";
 
+    // Cadeia de voz: Thalita (Edge Neural — fluida, respeita vírgula) primeiro;
+    // Kokoro no navegador é a REDE DE SEGURANÇA offline (nunca falha por rede).
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // Voz ÚNICA: Kokoro rodando 100% no navegador (open source, sem custo, sem servidor).
-      // Sem fallbacks — se falhar, o erro sobe e o render é cancelado para evitar voz ruim.
-      const kokoro = await synthesizeWithKokoro(text, { voice: kokoroVoice });
-      if (kokoro?.audioUrl) {
-        return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
-      }
-      throw new Error("Kokoro não retornou áudio. Recarregue a página para baixar o modelo novamente.");
+      // 1) Neural Voice local (Edge Thalita) — premium/instantâneo, se o servidor local estiver de pé
+      try {
+        const local = await synthesizeWithNeuralVoice(text, {
+          voice: isMale ? "male" : "female",
+          channel: "instagram",
+          platform: "reels",
+        });
+        if (local?.audioUrl) return { audioUrl: local.audioUrl, provider: local.provider };
+      } catch (e) { console.warn("[TTS] neural-voice local indisponível:", e); }
+
+      // 2) Edge Neural via lovable-tts (cloud) — Thalita natural, sem depender de localhost.
+      // ACEITA SÓ se vier do Edge Neural. Se a função cair no Google Translate
+      // (token Bing expirado) → REJEITA (é a voz robótica) e usa o Kokoro abaixo.
+      try {
+        const { data, error } = await supabase.functions.invoke("lovable-tts", {
+          body: { text, voice: edgeVoice },
+        });
+        const provider = String(data?.provider || "").toLowerCase();
+        const isRobotic = /google|translate|polly|streamelements/.test(provider);
+        if (!error && typeof data?.audioContent === "string" && data.audioContent.length > 100 && !isRobotic) {
+          return {
+            audioUrl: `data:audio/${data.format || "mp3"};base64,${data.audioContent}`,
+            provider: data.provider || "lovable-tts",
+          };
+        }
+        if (isRobotic) console.warn(`[TTS] lovable-tts caiu em voz robótica (${provider}) — pulando para Kokoro`);
+      } catch (e) { console.warn("[TTS] lovable-tts exceção:", e); }
+
+      // 3) Kokoro no navegador — rede de segurança offline (open source, sem custo, neural limpo)
+      try {
+        const kokoro = await synthesizeWithKokoro(text, { voice: kokoroVoice });
+        if (kokoro?.audioUrl) return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
+      } catch (e) { console.warn("[TTS] Kokoro browser falhou:", e); }
+
+      return { audioUrl: null, provider: "none" };
     };
     
     // ─── Background music: Procedural → MusicGen (sem APIs pagas) ───
