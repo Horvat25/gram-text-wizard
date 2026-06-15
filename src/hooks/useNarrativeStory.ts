@@ -337,17 +337,22 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
           continue;
         }
 
-        // Query focada e contextualizada com o tema geral e o texto específico desta cena
-        const sceneQuery = `${topic || ""} ${updatedSegments[i].text} ${updatedSegments[i].imagePrompt}`;
+        // O imagePrompt é em INGLÊS (igual aos tokens do banco) — é o sinal forte
+        // de relevância. O topic entra como contexto leve. O texto PT é ruído pra
+        // o matcher, então fica de fora da query do banco.
+        const sceneQuery = `${updatedSegments[i].imagePrompt || ""} ${topic || ""}`;
         const candidates = await pickLocalImageBankImages(sceneQuery, 12);
 
-        // Encontra a melhor imagem que não foi repetida no mesmo vídeo
+        // Melhor imagem RELEVANTE ainda não usada neste vídeo (candidates já vêm
+        // só com casamento real de token; se vazio, a cena segue pro próximo nível).
         const bestAsset = candidates.find(asset => !usedUrls.has(asset.url));
         if (bestAsset) {
           updatedSegments[i].imageUrl = bestAsset.url;
           usedUrls.add(bestAsset.url);
           foundCount++;
-          console.log(`[IMAGES] Cena ${i + 1} associada com imagem do banco: ${bestAsset.fileName} (categoria: ${bestAsset.category})`);
+          console.log(`[IMAGES] Cena ${i + 1} → banco: ${bestAsset.fileName} (${bestAsset.category})`);
+        } else {
+          console.log(`[IMAGES] Cena ${i + 1}: sem imagem relevante no banco, tentará busca externa`);
         }
       }
 

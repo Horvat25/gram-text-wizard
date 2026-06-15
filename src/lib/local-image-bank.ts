@@ -33,43 +33,53 @@ async function loadManifest() {
   return manifestPromise;
 }
 
-function scoreAsset(asset: LocalImageBankAsset, queryTokens: string[], index: number) {
+// Conta QUANTOS tokens distintos da query casam com a imagem (relevância real).
+// Os tokens do banco são em inglês — então a query precisa conter o imagePrompt
+// (inglês) da cena, não só o texto em português.
+function matchScore(asset: LocalImageBankAsset, queryTokens: string[]) {
   const haystack = normalize(`${asset.category} ${asset.relativePath} ${asset.fileName} ${(asset.tokens || []).join(" ")}`);
-  let score = 0;
-
+  let matches = 0;
   for (const token of queryTokens) {
-    if (haystack.includes(token)) score += 8;
+    if (haystack.includes(token)) matches++;
   }
-
-  if (asset.category === "concepts") score += 4;
-  if (asset.category === "video-scenes") score += 3;
-  if (asset.category === "logos") score += 2;
-  if (/scene_0?1|hook/i.test(asset.relativePath)) score += 2;
-
-  // Small random tie-breaker so renders don't always pick the same images.
-  // Kept tiny (0.4) so token-match score (8 pts/token) always dominates.
-  score += ((index * 17) % 11) / 10 + Math.random() * 0.4;
-  return score;
+  return matches;
 }
 
-export async function pickLocalImageBankImages(query: string, count: number): Promise<LocalImageBankAsset[]> {
+/**
+ * Devolve imagens do banco que REALMENTE casam com a query (≥1 token em comum).
+ * Nunca devolve imagem genérica/aleatória: se nada casa, devolve [] e o chamador
+ * cai para a próxima fonte. `relaxed=true` permite preencher com as melhores
+ * disponíveis quando o chamador aceita aproximação (ex.: completar lacunas).
+ */
+export async function pickLocalImageBankImages(
+  query: string,
+  count: number,
+  opts: { relaxed?: boolean } = {},
+): Promise<LocalImageBankAsset[]> {
   const manifest = await loadManifest();
   const assets = manifest?.assets || [];
   if (!assets.length) return [];
 
-  const queryTokens = normalize(query)
-    .split(/\s+/)
-    .filter((token) => token.length >= 3)
-    .slice(0, 16);
+  const queryTokens = Array.from(new Set(
+    normalize(query)
+      .split(/\s+/)
+      .filter((token) => token.length >= 3),
+  )).slice(0, 24);
 
   const scored = assets
-    .map((asset, index) => ({ asset, score: scoreAsset(asset, queryTokens, index) }))
-    .filter(({ asset }) => asset.category !== "icons" || count > 4)
+    .map((asset, index) => {
+      const matches = matchScore(asset, queryTokens);
+      const categoryBoost = asset.category === "concepts" ? 0.3 : asset.category === "video-scenes" ? 0.2 : 0;
+      // Desempate estável + leve variedade (nunca supera 1 token de match = 1.0).
+      const jitter = ((index * 17) % 11) / 100 + Math.random() * 0.15;
+      return { asset, matches, score: matches + categoryBoost + jitter };
+    })
+    .filter(({ asset }) => asset.category !== "icons")
     .sort((a, b) => b.score - a.score);
 
-  // Prefer assets with at least one token match; fall back to best-effort if not enough.
-  const relevant = scored.filter(({ score }) => score >= 8);
-  const pool = relevant.length >= count ? relevant : scored;
+  // Só imagens com casamento real de token.
+  const relevant = scored.filter(({ matches }) => matches >= 1);
+  const pool = relevant.length > 0 ? relevant : (opts.relaxed ? scored : []);
 
   return pool.slice(0, count).map(({ asset }) => asset);
 }
