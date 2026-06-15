@@ -576,10 +576,17 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const isMale = /alex|antonio|santa|ricardo|thiago/i.test(userVoice);
     const edgeVoice = isMale ? "antonio" : "thalita";
 
-    // Cadeia de voz: Thalita (Edge Neural — fluida, respeita vírgula) primeiro;
-    // Kokoro no navegador é a REDE DE SEGURANÇA offline (nunca falha por rede).
+    // Cadeia de voz: KOKORO primeiro (voz preferida do usuário). O Edge fica só
+    // como último socorro — e mesmo assim REJEITA o Google Translate robótico.
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
-      // 1) Neural Voice local (Edge Thalita) — premium/instantâneo, se o servidor local estiver de pé
+      // 1) Kokoro no navegador (kokoro-js) — A VOZ BOA, open source, sem custo, sem servidor
+      try {
+        const kokoro = await synthesizeWithKokoro(text, { voice: kokoroVoice });
+        if (kokoro?.audioUrl) return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
+      } catch (e) { console.warn("[TTS] Kokoro browser indisponível:", e); }
+
+      // 2) Neural Voice local com engine Kokoro (pf_dora) — MESMA família de voz,
+      // se o servidor local estiver de pé. Mantém a voz boa sem cair no Edge.
       try {
         const local = await synthesizeWithNeuralVoice(text, {
           voice: isMale ? "male" : "female",
@@ -589,9 +596,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (local?.audioUrl) return { audioUrl: local.audioUrl, provider: local.provider };
       } catch (e) { console.warn("[TTS] neural-voice local indisponível:", e); }
 
-      // 2) Edge Neural via lovable-tts (cloud) — Thalita natural, sem depender de localhost.
-      // ACEITA SÓ se vier do Edge Neural. Se a função cair no Google Translate
-      // (token Bing expirado) → REJEITA (é a voz robótica) e usa o Kokoro abaixo.
+      // 3) Último socorro: Edge via lovable-tts — só se NÃO for o Google robótico.
       try {
         const { data, error } = await supabase.functions.invoke("lovable-tts", {
           body: { text, voice: edgeVoice },
@@ -604,14 +609,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
             provider: data.provider || "lovable-tts",
           };
         }
-        if (isRobotic) console.warn(`[TTS] lovable-tts caiu em voz robótica (${provider}) — pulando para Kokoro`);
+        if (isRobotic) console.warn(`[TTS] lovable-tts caiu em voz robótica (${provider}) — descartado`);
       } catch (e) { console.warn("[TTS] lovable-tts exceção:", e); }
-
-      // 3) Kokoro no navegador — rede de segurança offline (open source, sem custo, neural limpo)
-      try {
-        const kokoro = await synthesizeWithKokoro(text, { voice: kokoroVoice });
-        if (kokoro?.audioUrl) return { audioUrl: kokoro.audioUrl, provider: kokoro.provider };
-      } catch (e) { console.warn("[TTS] Kokoro browser falhou:", e); }
 
       return { audioUrl: null, provider: "none" };
     };
@@ -652,7 +651,7 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
       const segmentAudioBuffers: (AudioBuffer | null)[] = [];
       const finalSegmentTexts: string[] = [];
       let accumulatedNarrationDuration = 0;
-      
+
       for (let i = 0; i < segments.length; i++) {
         if (abortRef.current) break;
         console.log(`[TTS] Segment ${i + 1}/${segments.length}: "${segments[i].text.substring(0, 40)}..."`);
@@ -677,39 +676,32 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         let selectedText = segments[i].text;
         let selectedDuration = 0;
 
-        // Narração SEMPRE via Neural Voice — áudio do servidor (se existir) é ignorado
-        // para garantir a voz premium local em todos os vídeos.
-        if (!selectedAudioUrl) {
-          const narrationCandidates = buildNarrationCandidates(segments[i].text);
-          selectedText = narrationCandidates[0] || normalizeNarrationText(segments[i].text);
+        // Narração via cadeia de voz (Kokoro primeiro). Texto completo primeiro;
+        // só encurta por frase se a fala estourar o teto de tempo desta cena.
+        const narrationCandidates = buildNarrationCandidates(segments[i].text);
+        selectedText = narrationCandidates[0] || normalizeNarrationText(segments[i].text);
 
-          for (const candidateText of narrationCandidates) {
-            const { audioUrl, provider } = await callNarrationTTS(candidateText);
-            if (!audioUrl) continue;
+        for (const candidateText of narrationCandidates) {
+          const { audioUrl, provider } = await callNarrationTTS(candidateText);
+          if (!audioUrl) continue;
 
-            const decodedBuffer = await decodeAudioBuffer(audioUrl);
-            const measuredDuration = decodedBuffer?.duration || await getAudioDuration(audioUrl);
-            const safePadding = measuredDuration > 0
-              ? Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration))
-              : DEFAULT_NARRATION_PADDING;
-            const visualDuration = measuredDuration > 0
-              ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding)
-              : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, candidateText.split(/\s+/).length / 2.0);
+          const decodedBuffer = await decodeAudioBuffer(audioUrl);
+          const measuredDuration = decodedBuffer?.duration || await getAudioDuration(audioUrl);
+          const safePadding = measuredDuration > 0
+            ? Math.min(DEFAULT_NARRATION_PADDING, Math.max(0, maxAllowedForCurrent - measuredDuration))
+            : DEFAULT_NARRATION_PADDING;
+          const visualDuration = measuredDuration > 0
+            ? Math.max(VIDEO_CONFIG.MIN_SEGMENT_DURATION, measuredDuration + safePadding)
+            : Math.max(VIDEO_CONFIG.SEGMENT_DURATION_BASE, candidateText.split(/\s+/).length / 2.0);
 
-            selectedAudioUrl = audioUrl;
-            selectedAudioBuffer = decodedBuffer;
-            selectedProvider = provider;
-            selectedText = candidateText;
-            selectedDuration = visualDuration;
+          selectedAudioUrl = audioUrl;
+          selectedAudioBuffer = decodedBuffer;
+          selectedProvider = provider;
+          selectedText = candidateText;
+          selectedDuration = visualDuration;
 
-            if (visualDuration <= maxAllowedForCurrent + 0.05) {
-              break;
-            }
-
-            console.warn(
-              `[TTS] Segment ${i + 1} excedeu o teto seguro (${visualDuration.toFixed(1)}s > ${maxAllowedForCurrent.toFixed(1)}s). Encurtando texto...`,
-            );
-          }
+          if (visualDuration <= maxAllowedForCurrent + 0.05) break;
+          console.warn(`[TTS] Segment ${i + 1} excedeu o teto (${visualDuration.toFixed(1)}s > ${maxAllowedForCurrent.toFixed(1)}s). Encurtando...`);
         }
 
         if (!selectedAudioUrl) {

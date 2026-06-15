@@ -87,9 +87,9 @@ export async function synthesizeWithNeuralVoice(
       signal: controller.signal,
       body: JSON.stringify({
         text,
-        // Edge Neural (Thalita) — voz pt-BR mais fluida e que respeita pontuação.
-        // Mais natural que o Kokoro pf_dora para narração editorial.
-        engine: "edge",
+        // Kokoro (pf_dora) — voz preferida do usuário. Fallback local do Kokoro
+        // do navegador, mantendo a MESMA família de voz (não cai pro Edge robótico).
+        engine: "kokoro",
         voice: options.voice || "female",
         platform: options.platform || "reels",
         channel: options.channel || "instagram",
