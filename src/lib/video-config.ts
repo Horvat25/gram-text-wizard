@@ -29,8 +29,8 @@ export const VIDEO_CONFIG = {
   MAX_SEGMENTS: 6,
   /** Duração total máxima (conteúdo + CTA) — limite técnico seguro: 2 minutos */
   MAX_TOTAL_DURATION: 120,
-  /** Buffer extra de timeout para renderização (segundos) */
-  RENDER_TIMEOUT_BUFFER: 20,
+  /** Buffer extra de timeout para renderização (segundos) — vídeos longos precisam de folga contra throttling do navegador */
+  RENDER_TIMEOUT_BUFFER: 45,
 
   // ─── Renderização Visual ──────────────────────────
   WIDTH: 720,
