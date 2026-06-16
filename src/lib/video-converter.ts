@@ -45,7 +45,9 @@ export async function convertWebMToMP4(webmBlob: Blob): Promise<Blob> {
     ]);
     
     const outputData = (await ffmpeg.readFile('output.mp4')) as Uint8Array;
-    const mp4Blob = new Blob([outputData], { type: 'video/mp4' });
+    const safeOutput = new Uint8Array(outputData.byteLength);
+    safeOutput.set(outputData);
+    const mp4Blob = new Blob([safeOutput.buffer], { type: 'video/mp4' });
     
     console.log(`[video-converter] Conversion complete! MP4 size: ${(mp4Blob.size / 1024 / 1024).toFixed(2)} MB`);
     

@@ -1156,7 +1156,7 @@ const buildCostAwareTechScript = (topic: string) => {
           visualKeywords: ['global digital cold war', 'semiconductor export agreement', 'hologram world map'],
         },
       ],
-      totalDuration: 40,
+      totalDuration: 120,
       _fallback: true,
       _costAware: true,
     };
@@ -1192,7 +1192,7 @@ const buildCostAwareTechScript = (topic: string) => {
         visualKeywords: ['future technology horizon', 'analyst desk monitors', 'dramatic innovation silhouette'],
       },
     ],
-    totalDuration: 40,
+    totalDuration: 120,
     _fallback: true,
     _costAware: true,
   };
