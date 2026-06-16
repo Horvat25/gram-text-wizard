@@ -161,6 +161,12 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
       if (!videoId) return;
 
       try {
+        const { data: currentPost } = await supabase
+          .from('posts')
+          .select('overlay_metadata')
+          .eq('id', videoId)
+          .maybeSingle();
+        const currentMetadata = ((currentPost as any)?.overlay_metadata || {}) as Record<string, unknown>;
         const workspaceId = currentWorkspace?.id;
         const scheduledFor = workspaceId
           ? await findOptimalScheduleTime(workspaceId)
@@ -170,7 +176,11 @@ export function VideoRenderingProvider({ children }: VideoRenderingProviderProps
           .from('posts')
           .update({
             video_url: videoUrl,
-            overlay_metadata: null,
+            overlay_metadata: {
+              ...currentMetadata,
+              render_status: 'completed',
+              rendered_at: new Date().toISOString(),
+            },
             status: 'scheduled',
             scheduled_for: scheduledFor,
             error_message: null,
