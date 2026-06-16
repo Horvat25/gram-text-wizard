@@ -577,7 +577,8 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
     const edgeVoice = isMale ? "antonio" : "thalita";
 
     // Cadeia de voz: KOKORO primeiro (voz preferida do usuário). O Edge fica só
-    // como último socorro — e mesmo assim REJEITA o Google Translate robótico.
+    // como último socorro. O áudio NUNCA trava o vídeo: se a voz boa falhar,
+    // uma voz de emergência é aceita só pra o render concluir.
     const callNarrationTTS = async (text: string): Promise<{ audioUrl: string | null; provider: string }> => {
       // 1) Kokoro no navegador (kokoro-js) — A VOZ BOA, open source, sem custo, sem servidor
       try {
@@ -596,21 +597,32 @@ export function useNarrativeStory(options: UseNarrativeStoryOptions = {}) {
         if (local?.audioUrl) return { audioUrl: local.audioUrl, provider: local.provider };
       } catch (e) { console.warn("[TTS] neural-voice local indisponível:", e); }
 
-      // 3) Último socorro: Edge via lovable-tts — só se NÃO for o Google robótico.
+      // 3) Edge via lovable-tts. Preferimos Edge Neural; o Google Translate
+      // (robótico) fica guardado SÓ como emergência pra não travar o render.
+      let emergency: { audioUrl: string; provider: string } | null = null;
       try {
         const { data, error } = await supabase.functions.invoke("lovable-tts", {
           body: { text, voice: edgeVoice },
         });
-        const provider = String(data?.provider || "").toLowerCase();
-        const isRobotic = /google|translate|polly|streamelements/.test(provider);
-        if (!error && typeof data?.audioContent === "string" && data.audioContent.length > 100 && !isRobotic) {
-          return {
-            audioUrl: `data:audio/${data.format || "mp3"};base64,${data.audioContent}`,
-            provider: data.provider || "lovable-tts",
-          };
+        if (!error && typeof data?.audioContent === "string" && data.audioContent.length > 100) {
+          const provider = String(data.provider || "").toLowerCase();
+          const audioUrl = `data:audio/${data.format || "mp3"};base64,${data.audioContent}`;
+          const isRobotic = /google|translate|polly|streamelements/.test(provider);
+          if (!isRobotic) {
+            return { audioUrl, provider: data.provider || "lovable-tts" };
+          }
+          // robótico → guarda como emergência, não retorna ainda
+          emergency = { audioUrl, provider: data.provider || "emergency" };
+          console.warn(`[TTS] lovable-tts veio robótico (${provider}) — guardado só como emergência`);
         }
-        if (isRobotic) console.warn(`[TTS] lovable-tts caiu em voz robótica (${provider}) — descartado`);
       } catch (e) { console.warn("[TTS] lovable-tts exceção:", e); }
+
+      // 4) EMERGÊNCIA: nada de voz boa funcionou. Usa o que tiver pra o vídeo SAIR
+      // (melhor um vídeo com voz fraca do que render cancelado).
+      if (emergency) {
+        console.warn("[TTS] ⚠️ Usando voz de emergência pra não travar o vídeo. Verifique o Kokoro.");
+        return emergency;
+      }
 
       return { audioUrl: null, provider: "none" };
     };
