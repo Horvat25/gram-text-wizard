@@ -577,13 +577,22 @@ export async function generateVideoFromSegments(
   });
 
   const chunks: Blob[] = [];
+  let wakeLock: { release: () => Promise<void> } | null = null;
   mediaRecorder.ondataavailable = (e) => {
     if (e.data.size > 0) chunks.push(e.data);
   };
 
   return new Promise<Blob>((resolve, reject) => {
+    let forcedStopReason: string | null = null;
+
     mediaRecorder.onstop = async () => {
       audioCtx.close().catch(() => {});
+      wakeLock?.release().catch(() => {});
+
+      if (forcedStopReason) {
+        reject(new Error(forcedStopReason));
+        return;
+      }
 
       if (chunks.length === 0) {
         reject(new Error('MediaRecorder produced no data'));
@@ -607,6 +616,7 @@ export async function generateVideoFromSegments(
 
     mediaRecorder.onerror = (e: any) => {
       console.error('[video-encoder] MediaRecorder error:', e);
+      wakeLock?.release().catch(() => {});
       reject(new Error(`MediaRecorder error: ${e.error?.message || 'unknown'}`));
     };
 
@@ -615,6 +625,15 @@ export async function generateVideoFromSegments(
     let lastRenderedAt = -Infinity;
     let lastProgress = -1;
     let stopped = false;
+
+    void (async () => {
+      try {
+        const lockApi = (navigator as any).wakeLock;
+        wakeLock = lockApi?.request ? await lockApi.request('screen') : null;
+      } catch (e) {
+        console.warn('[video-encoder] Wake Lock indisponível; mantenha a aba aberta durante o render.', e);
+      }
+    })();
 
     mediaRecorder.start(200);
 
@@ -661,6 +680,7 @@ export async function generateVideoFromSegments(
       if (!stopped) {
         console.error('[video-encoder] ⛔ HARD TIMEOUT — forcing stop');
         stopped = true;
+        forcedStopReason = `Render passou do limite seguro (${totalDuration.toFixed(1)}s + ${VIDEO_CONFIG.RENDER_TIMEOUT_BUFFER}s). Tente novamente mantendo a aba aberta.`;
         try {
           if (mediaRecorder.state === 'recording') mediaRecorder.stop();
         } catch (e) {
