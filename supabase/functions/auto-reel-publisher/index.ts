@@ -8,8 +8,9 @@ const corsHeaders = {
 
 // ✅ Reels reativados por pedido do usuário.
 // Mantém os limites abaixo para evitar backlog/custo, mas o cron pode voltar a criar Reels.
-const REELS_AUTO_DISABLED = false;
-const REELS_PAUSED_UNTIL_UTC = new Date("2000-01-01T00:00:00.000Z");
+// 🚧 Pausado manualmente pelo usuário até o pipeline automático estar estável.
+const REELS_AUTO_DISABLED = true;
+const REELS_PAUSED_UNTIL_UTC = new Date("2099-01-01T00:00:00.000Z");
 
 /**
  * auto-reel-publisher
