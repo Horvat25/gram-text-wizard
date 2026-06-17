@@ -33,6 +33,58 @@ interface ReviewResponse {
   error?: string;
 }
 
+// ─── Corretor determinístico PT-BR (SEM IA, SEM crédito) ───
+// Conserta os erros de acento mais comuns em vocabulário de tech/notícias.
+// Roda SEMPRE como baseline — garante PT decente mesmo se a IA falhar (ex.:
+// créditos esgotados). Palavra inteira, preservando MAIÚSCULA/Capitalização.
+const PT_ACCENT_FIXES: Record<string, string> = {
+  inteligencia: "inteligência", tecnologico: "tecnológico", tecnologia: "tecnologia",
+  lancamento: "lançamento", lancou: "lançou", lanca: "lança",
+  revolucao: "revolução", revolucionar: "revolucionar",
+  analise: "análise", analises: "análises", usuario: "usuário", usuarios: "usuários",
+  experiencia: "experiência", inovacao: "inovação", inovacoes: "inovações",
+  bilhoes: "bilhões", milhoes: "milhões", bilhao: "bilhão", milhao: "milhão",
+  voce: "você", video: "vídeo", videos: "vídeos", audio: "áudio",
+  codigo: "código", codigos: "códigos", grafico: "gráfico", graficos: "gráficos",
+  automatico: "automático", automatica: "automática", estrategia: "estratégia",
+  proprio: "próprio", propria: "própria", ultimo: "último", ultima: "última",
+  proximo: "próximo", proxima: "próxima", rapido: "rápido", rapida: "rápida",
+  facil: "fácil", dificil: "difícil", possivel: "possível", impossivel: "impossível",
+  nivel: "nível", numero: "número", numeros: "números", publico: "público",
+  politica: "política", ciencia: "ciência", eficiencia: "eficiência",
+  referencia: "referência", tendencia: "tendência", consequencia: "consequência",
+  seguranca: "segurança", mudanca: "mudança", mudancas: "mudanças",
+  avanco: "avanço", avancos: "avanços", comeco: "começo", servico: "serviço",
+  servicos: "serviços", preco: "preço", precos: "preços", decisao: "decisão",
+  versao: "versão", versoes: "versões", geracao: "geração", geracoes: "gerações",
+  criacao: "criação", automacao: "automação", aplicacao: "aplicação",
+  aplicacoes: "aplicações", informacao: "informação", informacoes: "informações",
+  programacao: "programação", padrao: "padrão", padroes: "padrões",
+  amanha: "amanhã", nao: "não", entao: "então", tambem: "também", alem: "além",
+  porem: "porém", ninguem: "ninguém", alguem: "alguém", historia: "história",
+  memoria: "memória", industria: "indústria", maquina: "máquina", maquinas: "máquinas",
+  pagina: "página", paginas: "páginas", robo: "robô", robos: "robôs",
+  unico: "único", unica: "única", obvio: "óbvio", logica: "lógica",
+  metrica: "métrica", metricas: "métricas", dolar: "dólar", dolares: "dólares",
+  modelos: "modelos", algoritmo: "algoritmo", privacidade: "privacidade",
+};
+
+function applyCasePattern(original: string, replacement: string): string {
+  if (original === original.toUpperCase()) return replacement.toUpperCase();
+  if (original[0] === original[0].toUpperCase()) {
+    return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+  }
+  return replacement;
+}
+
+function localPtBrFix(text: string): string {
+  return text.replace(/[A-Za-zÀ-ÿ]+/g, (word) => {
+    const key = word.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const fix = PT_ACCENT_FIXES[key];
+    return fix ? applyCasePattern(word, fix) : word;
+  });
+}
+
 // Sistema de prompt para revisão de português
 function buildReviewPrompt(text: string, type: string, maxLength?: number, context?: string): string {
   const typeInstructions: Record<string, string> = {
@@ -161,15 +213,19 @@ serve(async (req) => {
       );
     }
 
+    // Baseline determinístico: corrige acentos comuns SEM IA. Usado em todos os
+    // fallbacks pra que, mesmo sem créditos, a headline não saia com erro de PT.
+    const baseline = localPtBrFix(text);
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      console.warn("[review-portuguese] No API key, returning original text");
+      console.warn("[review-portuguese] Sem API key — aplicando correção local determinística");
       return new Response(
         JSON.stringify({
           success: true,
           original: text,
-          corrected: text,
-          wasModified: false
+          corrected: baseline,
+          wasModified: baseline !== text
         } as ReviewResponse),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -198,15 +254,15 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("[review-portuguese] API error:", response.status, errorText);
-      
-      // Fallback: retornar texto original
+
+      // Fallback: correção local determinística (créditos esgotados, etc.)
       return new Response(
         JSON.stringify({
           success: true,
           original: text,
-          corrected: text,
-          wasModified: false,
-          error: `API error: ${response.status}`
+          corrected: baseline,
+          wasModified: baseline !== text,
+          error: `API error: ${response.status} (usando correção local)`
         } as ReviewResponse),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -225,13 +281,13 @@ serve(async (req) => {
     const wasTruncated = finishReason === 'length' || finishReason === 'MAX_TOKENS';
     const lostTooMuch = corrected.length < text.length * 0.7;
     if (wasTruncated || lostTooMuch) {
-      console.warn(`[review-portuguese] ⚠️ Truncamento detectado (finish=${finishReason}, original=${text.length}, corrigido=${corrected.length}). Mantendo texto original.`);
+      console.warn(`[review-portuguese] ⚠️ Truncamento detectado (finish=${finishReason}, original=${text.length}, corrigido=${corrected.length}). Usando correção local.`);
       return new Response(
         JSON.stringify({
           success: true,
           original: text,
-          corrected: text,
-          wasModified: false,
+          corrected: baseline,
+          wasModified: baseline !== text,
           error: `truncated_response (finish_reason=${finishReason})`,
         } as ReviewResponse),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -241,8 +297,9 @@ serve(async (req) => {
     // Verificar se houve mudança significativa
     const wasModified = corrected.toLowerCase().trim() !== text.toLowerCase().trim();
 
-    // Aplicar limite de caracteres se especificado
-    let finalText = corrected;
+    // Rede de segurança: passa o resultado da IA pelo corretor local também
+    // (idempotente — pega qualquer acento comum que a IA tenha deixado passar).
+    let finalText = localPtBrFix(corrected);
     if (maxLength && finalText.length > maxLength) {
       // Truncar de forma inteligente (não cortar palavras)
       finalText = finalText.substring(0, maxLength);
@@ -271,18 +328,19 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("[review-portuguese] Error:", error);
     
-    // Em caso de erro, retornar texto original para não bloquear o fluxo
+    // Em caso de erro, aplicar correção local pra não soltar PT errado
     const text = (await req.json().catch(() => ({ text: '' }))).text || '';
-    
+    const fixed = text ? localPtBrFix(text) : '';
+
     return new Response(
       JSON.stringify({
-        success: false,
+        success: true,
         original: text,
-        corrected: text,
-        wasModified: false,
-        error: error.message || "Erro ao revisar texto"
+        corrected: fixed,
+        wasModified: fixed !== text,
+        error: error.message || "Erro ao revisar texto (usando correção local)"
       } as ReviewResponse),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
