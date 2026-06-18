@@ -203,7 +203,6 @@ export default function AgentGenieView() {
       saveMessage(pausedMessage);
       setIsLoading(false);
       return;
-      return;
     }
 
     try {
