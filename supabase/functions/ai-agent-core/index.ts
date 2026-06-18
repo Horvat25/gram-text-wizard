@@ -491,28 +491,16 @@ async function analyzeCurrentState(supabase: any, userId: string, workspaceId: s
   }
   console.log('[AGENT] ➡️ NEXT CONTENT TYPE SELECTED:', nextContentType);
 
-  // ===== 🛑 GUARD: PENDING REELS BACKLOG =====
-  // Se já existem 3+ reels rascunho sem vídeo renderizado, NÃO cria mais reels.
-  // O usuário precisa renderizar (manualmente) antes que o agente acumule mais backlog.
+  // ===== 🛑 GUARD: REELS ANTIGOS DESATIVADOS =====
+  // O pipeline antigo de Reels (render no browser com Kokoro) foi pausado.
+  // O novo pipeline será via Higgsfield. Até lá, o agente NÃO cria nenhum tipo de reel/vídeo automaticamente.
   const REEL_TYPES: ContentType[] = ['video', 'video_curated', 'news_video', 'marketing'];
   const isReelType = (t: ContentType | null) => !!t && REEL_TYPES.includes(t);
   if (isReelType(nextContentType)) {
-    const { data: pendingReels } = await supabase
-      .from('posts')
-      .select('id, media_type, video_url, status, post_type')
-      .eq('workspace_id', workspaceId)
-      .in('status', ['draft', 'render_failed'])
-      .in('media_type', ['reels', 'reel', 'video'])
-      .is('video_url', null);
-    const pendingReelsCount = (pendingReels || []).length;
-    console.log(`[AGENT] 🎬 Pending reels sem vídeo: ${pendingReelsCount}`);
-    if (pendingReelsCount >= 3) {
-      // Troca para o primeiro tipo NÃO-reel disponível na lista de remanescentes
-      const fallback = remainingByType.find(t => !REEL_TYPES.includes(t.type));
-      const previous = nextContentType;
-      nextContentType = fallback ? fallback.type : null;
-      console.log(`[AGENT] ⛔ Backlog de ${pendingReelsCount} reels não renderizados — pulando ${previous}, escolhendo ${nextContentType || 'NENHUM'}`);
-    }
+    const fallback = remainingByType.find(t => !REEL_TYPES.includes(t.type));
+    const previous = nextContentType;
+    nextContentType = fallback ? fallback.type : null;
+    console.log(`[AGENT] ⛔ Reels antigos desativados (migração p/ Higgsfield) — pulando ${previous}, escolhendo ${nextContentType || 'NENHUM'}`);
   }
   
   // ===== 30-DAY HISTORICAL ANALYSIS (like a senior marketer would do) =====
