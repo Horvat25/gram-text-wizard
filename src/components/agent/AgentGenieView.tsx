@@ -188,46 +188,21 @@ export default function AgentGenieView() {
     saveMessage(userMessage);
     setIsLoading(true);
 
-    // ═══ REELS: criação 100% client-side ═══
-    // O agent-chat do servidor está congelado (Lovable Cloud não redeploya
-    // functions via GitHub) e respondia com template enlatado. Pedidos de
-    // Reels são resolvidos AQUI no frontend: roteiro + legenda informados,
-    // imagens do banco Neural Update e render com Neural Voice.
+    // ═══ REELS (fluxo antigo) DESATIVADO ═══
+    // A criação de Reels via pipeline antigo (roteiro local + imagens do banco
+    // + render no browser com Kokoro) foi pausada. O novo pipeline usará
+    // Higgsfield. Qualquer pedido de Reels responde com aviso e NÃO cria post.
     if (isReelsRequest(content)) {
-      try {
-        const result = await createReelsClientSide({
-          message: content.trim(),
-          userId: user.id,
-          workspaceId: currentWorkspace.id,
-        });
-
-        const assistantMessage: Message = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: `🎬 Reels criado!\n\n📜 "${result.title}"\n🎞️ ${result.sceneCount} cenas | 🖼️ ${result.imagesFromBank} imagens do banco Neural Update\n\nAbrindo a Fila e iniciando a renderização com o Neural Voice...`,
-          timestamp: new Date(),
-          actions: [{ tool: 'create_narrated_video_client', post_id: result.postId }],
-        };
-        setIgMessages(prev => [...prev, assistantMessage]);
-        saveMessage(assistantMessage);
-
-        await fetchPosts();
-        setShowQueue(true);
-        void renderVideo(result.postId)
-          .then(fetchPosts)
-          .catch((renderError) => console.error('[AgentGenieView] Auto render failed:', renderError));
-      } catch (creationError) {
-        const errorMsg = creationError instanceof Error ? creationError.message : 'Erro desconhecido';
-        const errorMessage: Message = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: `❌ Não consegui criar o Reels: ${errorMsg}`,
-          timestamp: new Date(),
-        };
-        setIgMessages(prev => [...prev, errorMessage]);
-      } finally {
-        setIsLoading(false);
-      }
+      const pausedMessage: Message = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: '🚧 A criação de Reels pelo fluxo antigo foi desativada.\n\nEstamos migrando para o **Higgsfield**. Enquanto isso, posso criar **imagem**, **carrossel** ou **notícia** normalmente. Me peça em outro formato e eu sigo. 🙌',
+        timestamp: new Date(),
+      };
+      setIgMessages(prev => [...prev, pausedMessage]);
+      saveMessage(pausedMessage);
+      setIsLoading(false);
+      return;
       return;
     }
 
