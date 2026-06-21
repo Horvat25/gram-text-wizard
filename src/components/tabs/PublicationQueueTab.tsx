@@ -34,6 +34,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useVideoRendering } from "@/contexts/VideoRenderingContext";
 import { Progress } from "@/components/ui/progress";
+import { ImportReelDialog } from "@/components/ImportReelDialog";
 
 interface PublicationQueueTabProps {
   posts: Post[];
@@ -186,6 +187,7 @@ const PublicationQueueTab = ({
   const [showViewDialogScrollTop, setShowViewDialogScrollTop] = useState(false);
   const [isCheckingScheduler, setIsCheckingScheduler] = useState(false);
   const [isBatchRendering, setIsBatchRendering] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const batchAbortRef = useRef(false);
   
   
@@ -202,15 +204,12 @@ const PublicationQueueTab = ({
   const { isRendering, currentVideoId, currentStep, progress, renderVideo, cancelRendering } = useVideoRendering();
 
   // Check if a post needs video rendering (any reels without video_url)
-  const needsVideoRendering = (post: Post) => {
-    const isReels =
-      post.media_type === "reels" ||
-      post.media_type === "reel" ||
-      post.media_type === "video" ||
-      post.post_type === "reel" ||
-      post.post_type === "reels";
-    const hasNoVideo = !post.video_url;
-    return isReels && hasNoVideo;
+  const needsVideoRendering = (_post: Post) => {
+    // GERAÇÃO DE REELS DESATIVADA (jun/2026): os Reels não são mais renderizados no navegador
+    // (pipeline buggy: FFmpeg.wasm + Remotion + voz Kokoro). Agora os Reels vêm PRONTOS do
+    // YouTube/Higgsfield e são injetados na fila via import-shorts-to-reels.mjs (já com video_url).
+    // Retornar false esconde "Gerar Vídeo" e "Renderizar Todos" sem quebrar o resto da fila.
+    return false;
   };
 
   // Filter scheduled and draft posts
@@ -500,25 +499,33 @@ const PublicationQueueTab = ({
   return (
     <div className="space-y-6">
 
+      <ImportReelDialog open={showImport} onOpenChange={setShowImport} />
+
       {/* Timezone Info */}
       <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Globe className="h-4 w-4" />
           <span>Fuso horário: <strong>Brasília (UTC-3)</strong></span>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleProcessScheduled}
-          disabled={isCheckingScheduler}
-        >
-          {isCheckingScheduler ? (
-            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4 mr-2" />
-          )}
-          Processar Agendados
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="default" onClick={() => setShowImport(true)}>
+            <Film className="h-4 w-4 mr-2" />
+            Importar Reels
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleProcessScheduled}
+            disabled={isCheckingScheduler}
+          >
+            {isCheckingScheduler ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-2" />
+            )}
+            Processar Agendados
+          </Button>
+        </div>
       </div>
 
       {/* Render Status (shown only when rendering) */}
