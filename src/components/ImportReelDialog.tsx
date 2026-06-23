@@ -95,11 +95,15 @@ export function ImportReelDialog({ open, onOpenChange }: Props) {
   };
 
   const handleImport = async () => {
+    console.log("[ImportReel] click Import", { files: files.length, workspace: currentWorkspace?.id });
     if (files.length === 0) { toast.error("Escolha um ou mais arquivos MP4"); return; }
     if (!currentWorkspace) { toast.error("Selecione um workspace primeiro"); return; }
     setBusy(true);
+    setProgress("Preparando...");
+    toast.info(`Iniciando importação de ${files.length} arquivo(s)...`);
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log("[ImportReel] user:", user?.id);
       if (!user) { toast.error("Você precisa estar logado"); setBusy(false); return; }
 
       // Manifesto com legendas/hashtags/orientação reais dos sidecars.
