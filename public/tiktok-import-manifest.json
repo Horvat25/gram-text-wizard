@@ -200,6 +200,48 @@
     "orientation": "vertical",
     "format": "conhecimento"
   },
+  "espaguetificacao.mp4": {
+    "caption": "Você acha que cair num buraco negro vai te esmagar de uma vez. Não é bem assim — a gravidade desigual estica seu corpo até virar um fio de átomos. Isso se chama espaguetificação.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#buracoNegro", "#espaguetificacao", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "ondas-gravitacionais.mp4": {
+    "caption": "Em 2015, o detector LIGO captou uma vibração que atravessou mais de 1 bilhão de anos-luz: dois buracos negros se chocando e deformando o espaço-tempo. Essa onda gravitacional foi transformada em som.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#espaco", "#fisica", "#ciencia", "#buracoNegro", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "paradoxo-informacao.mp4": {
+    "caption": "Quando algo cai num buraco negro, a informação desaparece para sempre? A física quântica diz que isso é impossível. Foi esse conflito que dominou a física teórica por mais de 30 anos.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#hawking", "#buracoNegro", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "efeito-zeno.mp4": {
+    "caption": "Você acha que só observar algo nunca muda o resultado. Na física quântica isso é falso. O Efeito Zeno Quântico mostra que observar uma partícula instável pode literalmente impedir ela de decair.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#fisica", "#quantica", "#ciencia", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "big-rip.mp4": {
+    "caption": "Você imagina o fim do universo como um colapso silencioso? Existe uma teoria que diz o contrário: o Big Rip. A energia escura pode rasgar galáxias, planetas e até o próprio espaço.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#universo", "#fisica", "#ciencia", "#cosmologia", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "anatomia-buraco-negro.mp4": {
+    "caption": "Você acha que um buraco negro é só um buraco vazio? Na borda existe o horizonte de eventos. No centro, a singularidade — onde as leis da física deixam de fazer sentido.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#buracoNegro", "#singularidade", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "einstein-tempo.mp4": {
+    "caption": "O tempo não corre igual pra todo mundo. Quanto mais rápido você se move, mais lento ele passa pra você — e isso já foi comprovado com relógios atômicos em aviões e satélites de GPS. E pensar que tudo começou com Einstein imaginando o que veria se corresse ao lado de um raio de luz.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": ["#einstein", "#relatividade", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
   "soul-space-reels.mp4": {
     "caption": "No espaco, o perigo nao e explodir como nos filmes. Em poucos segundos, o vacuo tira o ar dos seus pulmoes, a agua na superficie do corpo comeca a ferver e a consciencia vai embora rapido. Um Reels curto no padrao economico Soul V2, feito para testar retencao com visual cinematografico. Veja mais curiosidades de ciencia e tecnologia em https://neural-update.com.br",
     "hashtags": [
