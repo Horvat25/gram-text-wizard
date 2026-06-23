@@ -254,6 +254,15 @@ async function buildReels(
   supabase: any, supabaseUrl: string, serviceRoleKey: string,
   article: Article, workspaceId: string, userId: string,
 ) {
+  // 🚧 PIPELINE ANTIGO DESATIVADO (brand-news-video). Reels agora só via
+  // importação de vídeo pronto do Higgsfield (import-shorts-to-reels.mjs).
+  await supabase.from("article_distributions").upsert({
+    rss_item_id: article.id, workspace_id: workspaceId, format: "reels",
+    status: "skipped_legacy_pipeline_disabled",
+  }, { onConflict: "rss_item_id,format" });
+  return;
+
+  // eslint-disable-next-line no-unreachable
   await supabase.from("article_distributions").upsert({
     rss_item_id: article.id, workspace_id: workspaceId, format: "reels",
     status: "generating",

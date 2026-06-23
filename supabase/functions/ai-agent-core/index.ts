@@ -966,7 +966,11 @@ async function executeContentPlan(
   // Route to appropriate content creation based on contentType
   switch (plan.contentType) {
     case 'video': {
-      // CREATIVE VIDEO: AI-generated themes from internet trends (NEVER uses RSS)
+      // 🚧 PIPELINE ANTIGO DESATIVADO (brand-news-video). Reels agora só via
+      // importação de vídeo pronto do Higgsfield. Cai pra notícia normal.
+      console.log(`[AGENT] 🚧 video (pipeline antigo) desativado — usando createNewsContent`);
+      return await createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+      // eslint-disable-next-line no-unreachable
       console.log(`[AGENT] 🎬 Creating CREATIVE video Reel (AI-generated theme)...`);
       try {
         return await createVideoContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
@@ -988,7 +992,11 @@ async function executeContentPlan(
       }
     }
     case 'news_video': {
-      // NEWS VIDEO: Pipeline Neural Update automatizado via brand-news-video
+      // 🚧 PIPELINE ANTIGO DESATIVADO (brand-news-video). Reels agora só via
+      // importação de vídeo pronto do Higgsfield. Cai pra notícia normal.
+      console.log(`[AGENT] 🚧 news_video (pipeline antigo) desativado — usando createNewsContent`);
+      return await createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+      // eslint-disable-next-line no-unreachable
       console.log(`[AGENT] 📺 Creating NEWS BROADCAST video Reel (Neural Update pipeline)...`);
       try {
         const bestRssItem = await selectBestRssItem(supabase, workspaceId, supabaseUrl, headers, userId);
@@ -1103,7 +1111,11 @@ async function executeContentPlan(
       }
     }
     case 'video_curated': {
-      // CURATED VIDEO: Download stock video from Pexels + branded template
+      // 🚧 PIPELINE ANTIGO DESATIVADO (Pexels stock). Reels agora só via
+      // importação de vídeo pronto do Higgsfield. Cai pra notícia normal.
+      console.log(`[AGENT] 🚧 video_curated (pipeline antigo) desativado — usando createNewsContent`);
+      return await createNewsContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);
+      // eslint-disable-next-line no-unreachable
       console.log(`[AGENT] 🎥 Creating CURATED video from Pexels stock...`);
       try {
         return await createVideoCuratedContent(supabase, plan, userId, workspaceId, supabaseUrl, headers, autoPublish);

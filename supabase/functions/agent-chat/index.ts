@@ -1226,8 +1226,18 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
 
 // Execute create_narrated_video - creates a video post with script for frontend processing
 async function executeCreateNarratedVideo(supabase: any, userId: string, workspaceId: string, args: any) {
+  // 🚧 PIPELINE ANTIGO DESATIVADO (brand-news-video / banco de imagens local).
+  // Criação de Reels agora é só via importação de vídeos prontos do Higgsfield
+  // (import-shorts-to-reels.mjs / ImportReelDialog). Não cria post nem dispara render.
+  return {
+    success: false,
+    message: '🚧 A criação automática de Reels pelo pipeline antigo foi desativada. Use o Higgsfield e importe o vídeo pronto pela fila (Importar Reel).',
+    skipped_reason: 'legacy_pipeline_disabled',
+  };
+
+  // eslint-disable-next-line no-unreachable
   const { topic, caption, hashtags, scheduled_for, publish_now, platforms, style, article_url, article_image_url, __fast } = args;
-  
+
   console.log('Creating narrated video for topic:', topic, '| workspace:', workspaceId, '| publish_now:', publish_now);
 
   // 🛡️ LIMITE: máximo 2 Reels publicados/agendados POR DIA (data alvo de publicação)
