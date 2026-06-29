@@ -13,6 +13,32 @@
     "orientation": "vertical",
     "format": "conhecimento"
   },
+  "anatomia-buraco-negro.mp4": {
+    "caption": "Você acha que buraco negro é só um vazio que engole tudo? O que existe lá dentro é muito mais perturbador do que parece. 🕳️ A explicação completa tá no nosso blog Neural Update, link na bio. 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#buracoNegro",
+      "#espaço",
+      "#ciência",
+      "#universo",
+      "#curiosidades",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "big-rip.mp4": {
+    "caption": "E se o universo não morresse no escuro e no frio, mas se DESPEDAÇASSE? Essa é a teoria do Big Rip. 💥 Entenda como tudo terminaria no nosso blog Neural Update, link na bio. 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#bigRip",
+      "#universo",
+      "#espaço",
+      "#ciência",
+      "#cosmologia",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
   "buraco-negro.mp4": {
     "caption": "Se você caísse num buraco negro, seria muito pior do que morrer. O tempo ao seu redor desacelera até parar. A gravidade estica seu corpo num fio fino de átomos — a espaguetificação. E no centro, o futuro deixa de ser tempo e vira uma direção no espaço: você cairia, pra sempre, no fim do tempo.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
     "hashtags": [
@@ -21,6 +47,18 @@
       "#ciencia",
       "#universo",
       "#fisica",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "colisao-buracos-negros.mp4": {
+    "caption": "A 750 milhões de anos-luz, dois buracos negros gigantes estão numa espiral da morte, girando um pro outro. Quando colidirem, vão sacudir o tecido do espaço-tempo e mandar ondas por todo o universo.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#buraconegro",
+      "#espaco",
+      "#fisica",
+      "#universo",
       "#neuralupdate"
     ],
     "orientation": "vertical",
@@ -47,6 +85,69 @@
       "#espaco",
       "#universo",
       "#ciencia",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "efeito-zeno.mp4": {
+    "caption": "Só de OLHAR pra uma partícula, você pode impedir ela de mudar. Parece mágica, mas é física quântica de verdade: o Efeito Zeno. ⚛️ Saiba mais no nosso blog Neural Update, link na bio. 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#físicaQuântica",
+      "#quântica",
+      "#ciência",
+      "#universo",
+      "#curiosidades",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "einstein-equacao.mp4": {
+    "caption": "Nos últimos 30 anos de vida, Einstein tentou resolver a Teoria do Campo Unificado — uma fórmula que juntaria todas as forças do universo. Morreu em 1955 ainda tentando. Até hoje ninguém terminou.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#einstein",
+      "#fisica",
+      "#ciencia",
+      "#universo",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "einstein-tempo.mp4": {
+    "caption": "O tempo não corre igual pra todo mundo. Quanto mais rápido você se move, mais lento ele passa pra você — e isso já foi comprovado com relógios atômicos em aviões e satélites de GPS. Um astronauta que passa um ano no espaço envelhece, de verdade, uma fração de segundo mais lento que você aqui na Terra. E pensar que tudo começou com Einstein imaginando o que veria se corresse ao lado de um raio de luz.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#einstein",
+      "#relatividade",
+      "#fisica",
+      "#ciencia",
+      "#curiosidades",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "espaguetificacao.mp4": {
+    "caption": "Cair num buraco negro não te esmaga — ele te estica num fio fino de átomos. Chamam isso de espaguetificação. 🍝 A ciência por trás tá no nosso blog Neural Update, link na bio. 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#buracoNegro",
+      "#espaço",
+      "#ciência",
+      "#universo",
+      "#física",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "estrela-hipervelocidade.mp4": {
+    "caption": "Uma estrela inteira está sendo expulsa da Via Láctea a 1.700 km/s — rápido o bastante pra ir da Terra à Lua em 4 minutos. O culpado? Provavelmente o buraco negro gigante no centro da galáxia, que a cuspiu pro espaço.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#estrela",
+      "#espaco",
+      "#astronomia",
+      "#universo",
       "#neuralupdate"
     ],
     "orientation": "vertical",
@@ -91,28 +192,80 @@
     "orientation": "vertical",
     "format": "noticia_tech"
   },
-  "longo-misterios.mp4": {
-    "caption": "Uma viagem pelos mistérios mais perturbadores do universo — e tudo é REAL. 🌌\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+  "marie-curie.mp4": {
+    "caption": "Marie Curie descobriu a radioatividade e ganhou 2 Nobel — mas manuseava material radioativo sem proteção. Hoje, 90 anos após a morte, o corpo e os cadernos dela ainda são tão radioativos que ficam em caixões forrados de chumbo.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
     "hashtags": [
-      "#universo",
-      "#espaco",
+      "#mariecurie",
+      "#radioatividade",
       "#ciencia",
-      "#astronomia",
+      "#historia",
       "#neuralupdate"
     ],
-    "orientation": "horizontal",
+    "orientation": "vertical",
     "format": "conhecimento"
   },
-  "longo-quantica.mp4": {
-    "caption": "Bem-vindo ao lugar mais bizarro do universo: o mundo quântico. Sete fenômenos reais, comprovados em laboratório, que desafiam tudo o que você aprendeu. ⚛️🌌\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+  "nunca-toca-nada.mp4": {
+    "caption": "Você acha que toca nas coisas, mas não toca. Os elétrons da sua mão e os de tudo ao redor se repelem — sempre sobra um espaço minúsculo. Todo abraço, todo aperto de mão, é força eletromagnética, nunca contato real.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
     "hashtags": [
-      "#quantica",
       "#fisica",
+      "#ciencia",
+      "#curiosidades",
+      "#universo",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "ondas-gravitacionais.mp4": {
+    "caption": "Quando dois buracos negros colidem, o próprio espaço-tempo vibra — e a gente já conseguiu OUVIR isso. 🌊 Descubra como no nosso blog Neural Update, link na bio. 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#ondasGravitacionais",
+      "#espaço",
+      "#ciência",
+      "#universo",
+      "#einstein",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "oumuamua.mp4": {
+    "caption": "Em 2017, 'Oumuamua entrou no nosso sistema solar vindo de outra estrela. Formato de charuto, 400 metros, e acelerou sozinho ao passar pelo Sol. Um físico de Harvard levantou a hipótese: e se for uma sonda alienígena? Já foi embora — e nunca vamos saber.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#oumuamua",
+      "#aliens",
+      "#espaco",
       "#ciencia",
       "#universo",
       "#neuralupdate"
     ],
-    "orientation": "horizontal",
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "paradoxo-informacao.mp4": {
+    "caption": "O que acontece com a informação que cai num buraco negro? Essa pergunta atormentou Stephen Hawking por décadas. 🕳️ Entenda o paradoxo no nosso blog Neural Update, link na bio. 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#hawking",
+      "#buracoNegro",
+      "#ciência",
+      "#universo",
+      "#física",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
+    "format": "conhecimento"
+  },
+  "planeta-vidro.mp4": {
+    "caption": "A 64 anos-luz daqui existe um planeta azul lindo que parece a Terra de longe. Mas nele chove vidro derretido — e o vento de 7.000 km/h faz o vidro voar de lado, cortando tudo. O azul bonito é só o brilho dos cacos.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
+    "hashtags": [
+      "#planeta",
+      "#espaco",
+      "#astronomia",
+      "#ciencia",
+      "#universo",
+      "#neuralupdate"
+    ],
+    "orientation": "vertical",
     "format": "conhecimento"
   },
   "portais.mp4": {
@@ -200,55 +353,14 @@
     "orientation": "vertical",
     "format": "conhecimento"
   },
-  "espaguetificacao.mp4": {
-    "caption": "Você acha que cair num buraco negro vai te esmagar de uma vez. Não é bem assim — a gravidade desigual estica seu corpo até virar um fio de átomos. Isso se chama espaguetificação.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#buracoNegro", "#espaguetificacao", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "ondas-gravitacionais.mp4": {
-    "caption": "Em 2015, o detector LIGO captou uma vibração que atravessou mais de 1 bilhão de anos-luz: dois buracos negros se chocando e deformando o espaço-tempo. Essa onda gravitacional foi transformada em som.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#espaco", "#fisica", "#ciencia", "#buracoNegro", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "paradoxo-informacao.mp4": {
-    "caption": "Quando algo cai num buraco negro, a informação desaparece para sempre? A física quântica diz que isso é impossível. Foi esse conflito que dominou a física teórica por mais de 30 anos.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#hawking", "#buracoNegro", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "efeito-zeno.mp4": {
-    "caption": "Você acha que só observar algo nunca muda o resultado. Na física quântica isso é falso. O Efeito Zeno Quântico mostra que observar uma partícula instável pode literalmente impedir ela de decair.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#fisica", "#quantica", "#ciencia", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "big-rip.mp4": {
-    "caption": "Você imagina o fim do universo como um colapso silencioso? Existe uma teoria que diz o contrário: o Big Rip. A energia escura pode rasgar galáxias, planetas e até o próprio espaço.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#universo", "#fisica", "#ciencia", "#cosmologia", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "anatomia-buraco-negro.mp4": {
-    "caption": "Você acha que um buraco negro é só um buraco vazio? Na borda existe o horizonte de eventos. No centro, a singularidade — onde as leis da física deixam de fazer sentido.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#buracoNegro", "#singularidade", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "einstein-tempo.mp4": {
-    "caption": "O tempo não corre igual pra todo mundo. Quanto mais rápido você se move, mais lento ele passa pra você — e isso já foi comprovado com relógios atômicos em aviões e satélites de GPS. E pensar que tudo começou com Einstein imaginando o que veria se corresse ao lado de um raio de luz.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
-    "hashtags": ["#einstein", "#relatividade", "#fisica", "#ciencia", "#curiosidades", "#neuralupdate"],
-    "orientation": "vertical",
-    "format": "conhecimento"
-  },
-  "soul-space-reels.mp4": {
-    "caption": "No espaco, o perigo nao e explodir como nos filmes. Em poucos segundos, o vacuo tira o ar dos seus pulmoes, a agua na superficie do corpo comeca a ferver e a consciencia vai embora rapido. Um Reels curto no padrao economico Soul V2, feito para testar retencao com visual cinematografico. Veja mais curiosidades de ciencia e tecnologia em https://neural-update.com.br",
+  "wow-signal.mp4": {
+    "caption": "Em 1977, um radiotelescópio captou um sinal do espaço tão forte e estranho que o cientista escreveu só uma palavra no papel: Wow. Veio de Sagitário, durou 72 segundos, e nunca mais se repetiu. Até hoje ninguém explicou.\n\nMais ciência e tecnologia no nosso blog Neural Update 👉 https://neural-update.com.br",
     "hashtags": [
+      "#sinalwow",
+      "#aliens",
       "#espaco",
       "#ciencia",
-      "#curiosidades",
-      "#astronomia",
+      "#universo",
       "#neuralupdate"
     ],
     "orientation": "vertical",
