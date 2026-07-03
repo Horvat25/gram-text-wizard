@@ -121,14 +121,42 @@ export function ImportReelDialog({ open, onOpenChange }: Props) {
       }
       if (toImport.length === 0) { toast.error("Nenhum vídeo vertical (9:16) para importar."); setBusy(false); return; }
 
-      const schedule = buildSchedule(toImport.length);
+      // DEDUP: pula vídeos já importados (mesmo de remessas antigas, antes da
+      // marcação). Casa por overlay_metadata.import_source (novo) E por LEGENDA
+      // (as antigas têm a mesma legenda do sidecar). Assim dá pra selecionar
+      // todos sem recriar os que já estão no Instagram.
+      const sig = (s: string) =>
+        (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim().slice(0, 60);
+      const { data: prior } = await supabase
+        .from("posts")
+        .select("caption, overlay_metadata")
+        .eq("workspace_id", currentWorkspace.id)
+        .in("media_type", ["reels", "reel", "video"]);
+      const bySource = new Set<string>();
+      const byCaption = new Set<string>();
+      for (const p of (prior || []) as any[]) {
+        const src = p.overlay_metadata?.import_source;
+        if (src) bySource.add(src);
+        if (p.caption) byCaption.add(sig(p.caption));
+      }
+      const newOnes = toImport.filter((f) => {
+        if (bySource.has(f.name)) return false;
+        const cap = manifest[f.name]?.caption;
+        if (cap && byCaption.has(sig(cap))) return false;
+        return true;
+      });
+      const dupes = toImport.length - newOnes.length;
+      if (dupes > 0) toast.info(`Pulando ${dupes} vídeo(s) já importado(s) antes.`);
+      if (newOnes.length === 0) { toast.success("Tudo já estava importado — nada novo pra adicionar. 👍"); setBusy(false); onOpenChange(false); return; }
+
+      const schedule = buildSchedule(newOnes.length);
       let ok = 0;
       const failures: string[] = [];
 
-      for (let i = 0; i < toImport.length; i++) {
-        const f = toImport[i];
+      for (let i = 0; i < newOnes.length; i++) {
+        const f = newOnes[i];
         const meta = manifest[f.name];
-        setProgress(`Subindo ${i + 1}/${toImport.length}: ${f.name}`);
+        setProgress(`Subindo ${i + 1}/${newOnes.length}: ${f.name}`);
         try {
           const video_url = await uploadVideoToStorage(f, supabase, "post-videos");
           const cap = (files.length === 1 && caption.trim())
@@ -148,6 +176,7 @@ export function ImportReelDialog({ open, onOpenChange }: Props) {
             platforms: ["instagram"],
             user_id: user.id,
             workspace_id: currentWorkspace.id,
+            overlay_metadata: { import_source: f.name, import_kind: "tiktok", imported_at: new Date().toISOString() },
           } as any);
           if (error) throw error;
           ok++;
