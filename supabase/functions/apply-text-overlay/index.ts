@@ -18,8 +18,8 @@ const corsHeaders = {
  * 4. Render SVG → PNG via resvg-wasm
  * 5. Upload to storage
  * 
- * ✅ Zero spelling errors — text is rendered character-by-character by code
- * ✅ No AI image editing — eliminates "TECTIOLOGIA" type hallucinations
+ *  Zero spelling errors — text is rendered character-by-character by code
+ *  No AI image editing — eliminates "TECTIOLOGIA" type hallucinations
  */
 
 const USER_AGENTS = [
@@ -155,24 +155,24 @@ async function reviewPortuguese(
     });
 
     if (!response.ok) {
-      console.error(`[review] ❌ HTTP ${response.status}`);
+      console.error(`[review]  HTTP ${response.status}`);
       return { corrected: text, wasModified: false, success: false };
     }
 
     const result = await response.json();
     if (!result.success) {
-      console.error("[review] ❌ Review failed:", result.error);
+      console.error("[review]  Review failed:", result.error);
       return { corrected: text, wasModified: false, success: false };
     }
 
     if (result.wasModified) {
-      console.log(`[review] ✅ Corrigido: "${text}" → "${result.corrected}"`);
+      console.log(`[review]  Corrigido: "${text}" → "${result.corrected}"`);
     } else {
-      console.log("[review] ✅ Sem correções necessárias");
+      console.log("[review]  Sem correções necessárias");
     }
     return { corrected: result.corrected, wasModified: result.wasModified, success: true };
   } catch (e) {
-    console.error("[review] ❌ Exception:", e);
+    console.error("[review]  Exception:", e);
     return { corrected: text, wasModified: false, success: false };
   }
 }
@@ -204,15 +204,23 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   return lines;
 }
 
+// A fonte do resvg não tem glifos acentuados maiúsculos (Á, Ô, Ê...) nem emoji →
+// viravam "≡" / "??" na imagem. Sanitiza SÓ o texto do overlay (a legenda do post
+// mantém acentos/emoji normais). Á→A, Ô→O, Ç→C, remove emoji/setas.
+function stripGlyphs(s) {
+  const noAccent = (s || '').normalize('NFD').split('').filter(c => c.codePointAt(0) < 0x0300 || c.codePointAt(0) > 0x036f).join('');
+  return noAccent.split('').filter(c => { const n = c.codePointAt(0); return n >= 32 && n <= 126; }).join('').replace(/s+/g, ' ').trim();
+}
+
 function buildOverlaySvg(
   headline: string,
   watermark: string,
-  ctaText: string | null = 'LEIA A LEGENDA 👇',
+  ctaText: string | null = 'LEIA A LEGENDA',
   width = 1080,
   height = 1350,
   showWatermark: boolean = true,
 ): string {
-  const headlineUpper = headline.toUpperCase();
+  const headlineUpper = stripGlyphs(headline.toUpperCase());
   
   // Calculate font size and line wrapping based on text length
   let fontSize = 56;
@@ -242,13 +250,13 @@ function buildOverlaySvg(
   const ctaElement = ctaText
     ? `<text x="${width / 2}" y="${textStartY + totalTextHeight + 40}" text-anchor="middle"
          font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700"
-         fill="#FF6B35">${escapeXml(ctaText)}</text>`
+         fill="#FF6B35">${escapeXml(stripGlyphs(ctaText))}</text>`
     : '';
 
   const watermarkBottomElement = showWatermark
     ? `<text x="${width - 40}" y="${height - 45}" text-anchor="end"
          font-family="Arial Black, Impact, Arial, Helvetica, sans-serif" font-size="28" font-weight="900"
-         fill="#FFD700" opacity="0.95">⚡ ${escapeXml(watermark.toUpperCase())}</text>`
+         fill="#FFD700" opacity="0.95"> ${escapeXml(watermark.toUpperCase())}</text>`
     : '';
 
   // Top-left small watermark sempre presente (branding sutil)
@@ -286,7 +294,7 @@ function buildOverlaySvg(
 async function renderSvgToPng(svgString: string): Promise<Uint8Array> {
   const { render } = await import("https://deno.land/x/resvg_wasm/mod.ts");
   const pngData = await render(svgString);
-  console.log(`[resvg] ✅ Overlay SVG rendered: ${pngData.length} bytes`);
+  console.log(`[resvg]  Overlay SVG rendered: ${pngData.length} bytes`);
   return pngData;
 }
 
@@ -318,7 +326,7 @@ async function composeImageWithOverlay(
 
   console.log(`[compose] Encoding final PNG...`);
   const out = await base.encode(2); // PNG, fast compression
-  console.log(`[compose] ✅ Final image: ${out.length} bytes`);
+  console.log(`[compose]  Final image: ${out.length} bytes`);
   return out;
 }
 
@@ -411,11 +419,11 @@ serve(async (req) => {
     const review = await reviewPortuguese(headlineText, supabaseUrl, supabaseKey);
     let reviewWarning: string | null = null;
     if (!review.success) {
-      console.warn("[apply-text-overlay] ⚠️ Revisão ortográfica falhou — prosseguindo com headline original.");
+      console.warn("[apply-text-overlay] ️ Revisão ortográfica falhou — prosseguindo com headline original.");
       reviewWarning = "Revisão ortográfica indisponível; usando texto original.";
     } else {
       headlineText = review.corrected;
-      console.log("[apply-text-overlay] ✅ Headline revisada:", headlineText);
+      console.log("[apply-text-overlay]  Headline revisada:", headlineText);
     }
 
     // ── STEP 3: Download original image ──
@@ -456,18 +464,18 @@ serve(async (req) => {
     try {
       const overlayPng = await renderSvgToPng(svgString);
       finalImageData = await composeImageWithOverlay(imageData, overlayPng, 1080, 1350);
-      console.log("[apply-text-overlay] ✅ Composite ready:", finalImageData.length, "bytes");
+      console.log("[apply-text-overlay]  Composite ready:", finalImageData.length, "bytes");
     } catch (svgError) {
       console.warn("[apply-text-overlay] Composite failed, using Gemini fallback:", svgError);
       const fallbackResult = await burnTextWithGeminiFallback(imageData, contentType, headlineText, watermarkText, lovableApiKey);
       if (fallbackResult && fallbackResult.length > 1000) {
         finalImageData = fallbackResult;
         renderMethod = 'gemini-fallback';
-        console.log("[apply-text-overlay] ✅ Gemini fallback succeeded:", fallbackResult.length, "bytes");
+        console.log("[apply-text-overlay]  Gemini fallback succeeded:", fallbackResult.length, "bytes");
       } else {
         finalImageData = imageData;
         renderMethod = 'original-no-overlay';
-        console.warn("[apply-text-overlay] ⚠️ All render methods failed, using original image");
+        console.warn("[apply-text-overlay] ️ All render methods failed, using original image");
       }
     }
 
@@ -488,7 +496,7 @@ serve(async (req) => {
       .from('post-images')
       .getPublicUrl(filename);
 
-    console.log(`[apply-text-overlay] ✅ Done! ${renderMethod} → ${publicUrl}`);
+    console.log(`[apply-text-overlay]  Done! ${renderMethod} → ${publicUrl}`);
 
     return new Response(
       JSON.stringify({
