@@ -6,26 +6,31 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ✅ Reels reativados por pedido do usuário.
-// Mantém os limites abaixo para evitar backlog/custo, mas o cron pode voltar a criar Reels.
-// 🚧 Pausado manualmente pelo usuário até o pipeline automático estar estável.
-const REELS_AUTO_DISABLED = true;
-const REELS_PAUSED_UNTIL_UTC = new Date("2099-01-01T00:00:00.000Z");
+// ⛔ APOSENTADO PERMANENTEMENTE (12/jul/2026).
+// O conteúdo do Neural Update mudou de IA/tech para ASTRONOMIA, e agora os Reels vêm
+// PRONTOS do YouTube (importados via "Importar Reels"). Este gerador automático pegava
+// notícia de IA do RSS + imagem aleatória da notícia = fora do tema. DESLIGADO DE VEZ.
+// Não reativar sem trocar as fontes RSS (auto-fetch-rss) para feeds de espaço/ciência.
+const RETIRED = true;
 
 /**
- * auto-reel-publisher
- *
- * Cron disparado 3x/dia (09h, 14h e 20h Brasília) — cria UM Reel automático:
- *   1. Pega notícia top não usada (Neural Update primeiro)
- *   2. Cria post em status='generating', agendado pra 30min depois
- *   3. Dispara brand-news-video em background (EdgeRuntime.waitUntil)
- *   4. Marca rss_items.used_for_reel = true
- *
- * Limite de segurança: máx 3 Reels (scheduled+published) nas últimas 24h.
+ * auto-reel-publisher — GERADOR AUTOMÁTICO APOSENTADO (não cria mais nada).
+ * Mantido como no-op só para o cron antigo (se ainda existir) não dar erro 404.
+ * Fluxo atual: Reels de astronomia são importados prontos do YouTube; publicação
+ * é feita pela função scheduled-publisher. NÃO gerar conteúdo por RSS aqui.
  */
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  // HARD STOP no topo absoluto — antes de qualquer acesso ao banco.
+  // Zero geração de post. Content strategy = astronomia via reels importados.
+  if (RETIRED) {
+    console.log("[AUTO-REEL] ⛔ APOSENTADO — não cria posts (estratégia mudou p/ astronomia importada)");
+    return new Response(JSON.stringify({ skipped: true, reason: "retired_permanently" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -33,16 +38,6 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     console.log("[AUTO-REEL] 🎬 Disparado:", new Date().toISOString());
-
-    if (REELS_AUTO_DISABLED || new Date() < REELS_PAUSED_UNTIL_UTC) {
-      console.log("[AUTO-REEL] ⛔ Criação automática de Reels temporariamente desligada");
-      return new Response(JSON.stringify({
-        skipped: true,
-        reason: "auto_reels_disabled",
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     // ── Limite: máx 3 Reels nas últimas 24h ──
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
