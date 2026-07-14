@@ -153,7 +153,7 @@ const Auth = () => {
       }
 
       // Code is valid, proceed with signup
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}${nextPath}`;
       
       const { error } = await supabase.auth.signUp({
         email: signupEmail.trim(),
@@ -176,7 +176,7 @@ const Auth = () => {
       }
 
       toast.success("Conta criada com sucesso!");
-      navigate("/");
+      window.location.href = nextPath;
     } catch (err: any) {
       setError(err.message || "Erro ao criar conta");
     } finally {
