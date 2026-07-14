@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "sdk_version": "0.21.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://vtvvmikilbcalohutsmf.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "neural-update-mcp",
+      "version": "0.1.0",
+      "title": "Neural Update — Agente Horvat"
+    },
+    "tools": [
+      {
+        "name": "list_posts",
+        "title": "Listar posts",
+        "description": "Lista os posts do usuário autenticado (título, tipo, status, agendamento e métricas).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "scheduled",
+                "published",
+                "failed"
+              ],
+              "description": "Filtra por status do post."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_stats",
+        "title": "Estatísticas agregadas",
+        "description": "Retorna totais de likes, comentários, alcance e impressões dos posts publicados do usuário nos últimos N dias.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 90,
+              "default": 30
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "schedule_post",
+        "title": "Agendar post existente",
+        "description": "Atualiza um post em rascunho para status 'scheduled' em um horário ISO 8601 (UTC).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "post_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "ID do post (rascunho)."
+            },
+            "scheduled_for": {
+              "type": "string",
+              "description": "Data/hora ISO 8601 em UTC, ex.: 2026-07-15T20:00:00Z."
+            }
+          },
+          "required": [
+            "post_id",
+            "scheduled_for"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
