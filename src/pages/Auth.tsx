@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +34,11 @@ const resetSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Preserve consent redirects (e.g. /.lovable/oauth/consent?authorization_id=...)
+  // as a same-origin relative path only.
+  const rawNext = searchParams.get("next");
+  const nextPath = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showResetForm, setShowResetForm] = useState(false);
@@ -58,19 +63,21 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
-          navigate("/");
+          if (nextPath.startsWith("/")) window.location.href = nextPath;
+          else navigate("/");
         }
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate("/");
+        if (nextPath.startsWith("/")) window.location.href = nextPath;
+        else navigate("/");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, nextPath]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +107,7 @@ const Auth = () => {
       }
 
       toast.success("Login realizado com sucesso!");
-      navigate("/");
+      window.location.href = nextPath;
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login");
     } finally {
@@ -146,7 +153,7 @@ const Auth = () => {
       }
 
       // Code is valid, proceed with signup
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}${nextPath}`;
       
       const { error } = await supabase.auth.signUp({
         email: signupEmail.trim(),
@@ -169,7 +176,7 @@ const Auth = () => {
       }
 
       toast.success("Conta criada com sucesso!");
-      navigate("/");
+      window.location.href = nextPath;
     } catch (err: any) {
       setError(err.message || "Erro ao criar conta");
     } finally {
