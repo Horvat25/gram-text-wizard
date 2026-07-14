@@ -63,19 +63,21 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
-          navigate("/");
+          if (nextPath.startsWith("/")) window.location.href = nextPath;
+          else navigate("/");
         }
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate("/");
+        if (nextPath.startsWith("/")) window.location.href = nextPath;
+        else navigate("/");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, nextPath]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +107,7 @@ const Auth = () => {
       }
 
       toast.success("Login realizado com sucesso!");
-      navigate("/");
+      window.location.href = nextPath;
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login");
     } finally {
