@@ -97,6 +97,7 @@ serve(async (req) => {
     const isReels = post.media_type === "reels" || post.media_type === "reel";
     const isVideo = post.media_type === "video" || isReels;
     const isCarousel = post.media_type === "carousel";
+    const isStory = post.media_type === "story" || post.media_type === "stories";
 
     if (isReels && !post.video_url) {
       throw new Error("Este Reels ainda não foi renderizado (video_url ausente). Gere o vídeo antes de publicar.");
@@ -145,8 +146,8 @@ serve(async (req) => {
       let mediaUrl = isVideo ? post.video_url : post.image_url;
       let actuallyIsVideo = isVideo;
 
-      // Resize image for Instagram if not video
-      if (!isVideo && mediaUrl) {
+      // Resize image for Instagram if not video (stories ficam 9:16, não redimensiona pra feed)
+      if (!isVideo && !isStory && mediaUrl) {
         console.log(`📐 Resizing image for Instagram: ${post.media_type}`);
         mediaUrl = await resizeForInstagram(supabaseUrl, supabaseKey, mediaUrl, post.media_type || 'image');
       }
@@ -157,6 +158,9 @@ serve(async (req) => {
         const isWebM = lowerUrl.endsWith('.webm');
         
         if (isActuallyImage) {
+          if (isReels) {
+            throw new Error("Reels com video_url de imagem bloqueado. Gere/importe um MP4 pelo Higgsfield antes de publicar.");
+          }
           console.log("video_url contains an image file, switching to image post...");
           actuallyIsVideo = false;
         } else if (isWebM) {
@@ -170,20 +174,20 @@ serve(async (req) => {
             const convertData = await convertResponse.json();
             if (convertData.videoUrl && !convertData.error) {
               mediaUrl = convertData.videoUrl;
-            } else if (post.image_url) {
+            } else if (!isReels && post.image_url) {
               actuallyIsVideo = false;
               mediaUrl = post.image_url;
             } else {
               throw new Error("Falha na conversão do vídeo WebM para MP4.");
             }
           } catch (convError: any) {
-            if (post.image_url) { actuallyIsVideo = false; mediaUrl = post.image_url; }
+            if (!isReels && post.image_url) { actuallyIsVideo = false; mediaUrl = post.image_url; }
             else throw new Error(`Erro na conversão do vídeo: ${convError.message}`);
           }
         }
       }
 
-      if (actuallyIsVideo && !mediaUrl && post.image_url) {
+      if (!isReels && actuallyIsVideo && !mediaUrl && post.image_url) {
         actuallyIsVideo = false;
         mediaUrl = post.image_url;
       }
@@ -200,6 +204,11 @@ serve(async (req) => {
         createMediaUrl.searchParams.set('video_url', mediaUrl);
         createMediaUrl.searchParams.set('caption', caption);
         createMediaUrl.searchParams.set('media_type', post.media_type === "reels" ? 'REELS' : 'VIDEO');
+      } else if (isStory) {
+        // Story de imagem: media_type=STORIES, sem caption (a API do Insta ignora
+        // texto/sticker via API — o CTA já vem bakeado na imagem).
+        createMediaUrl.searchParams.set('image_url', mediaUrl);
+        createMediaUrl.searchParams.set('media_type', 'STORIES');
       } else {
         createMediaUrl.searchParams.set('image_url', mediaUrl);
         createMediaUrl.searchParams.set('caption', caption);
