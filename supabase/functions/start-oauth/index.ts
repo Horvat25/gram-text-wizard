@@ -32,6 +32,9 @@ serve(async (req) => {
       'public_profile',
       'pages_show_list',
       'pages_read_engagement',
+      // Publicar na PÁGINA do Facebook. Sem isso o token lê a Página mas o
+      // POST /{page-id}/videos volta "(#100) No permission to publish the video".
+      'pages_manage_posts',
       'instagram_basic',
       'instagram_content_publish',
       'instagram_manage_insights'
