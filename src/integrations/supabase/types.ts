@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      _backup_ig_account_20260717: {
+        Row: {
+          access_token: string | null
+          connected_at: string | null
+          expires_at: string | null
+          id: string | null
+          instagram_user_id: string | null
+          page_id: string | null
+          profile_picture_url: string | null
+          updated_at: string | null
+          user_id: string | null
+          username: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          connected_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          instagram_user_id?: string | null
+          page_id?: string | null
+          profile_picture_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          username?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          connected_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          instagram_user_id?: string | null
+          page_id?: string | null
+          profile_picture_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          username?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: []
+      }
       affiliate_links: {
         Row: {
           affiliate_url: string
@@ -585,6 +627,102 @@ export type Database = {
           id?: string
           metadata?: Json | null
           project_id?: string
+        }
+        Relationships: []
+      }
+      fb_chk: {
+        Row: {
+          k: string
+          req: number | null
+        }
+        Insert: {
+          k: string
+          req?: number | null
+        }
+        Update: {
+          k?: string
+          req?: number | null
+        }
+        Relationships: []
+      }
+      fb_reel_batch: {
+        Row: {
+          caption: string | null
+          cdn_url: string | null
+          fin_req: number | null
+          note: string | null
+          post_id: string | null
+          sched: number | null
+          slug: string
+          start_req: number | null
+          up_req: number | null
+          upload_url: string | null
+          video_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          cdn_url?: string | null
+          fin_req?: number | null
+          note?: string | null
+          post_id?: string | null
+          sched?: number | null
+          slug: string
+          start_req?: number | null
+          up_req?: number | null
+          upload_url?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          cdn_url?: string | null
+          fin_req?: number | null
+          note?: string | null
+          post_id?: string | null
+          sched?: number | null
+          slug?: string
+          start_req?: number | null
+          up_req?: number | null
+          upload_url?: string | null
+          video_id?: string | null
+        }
+        Relationships: []
+      }
+      fb_today3: {
+        Row: {
+          caption: string | null
+          cdn_url: string | null
+          fin_req: number | null
+          note: string | null
+          post_id: string | null
+          sched: number | null
+          slug: string
+          start_req: number | null
+          up_req: number | null
+          video_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          cdn_url?: string | null
+          fin_req?: number | null
+          note?: string | null
+          post_id?: string | null
+          sched?: number | null
+          slug: string
+          start_req?: number | null
+          up_req?: number | null
+          video_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          cdn_url?: string | null
+          fin_req?: number | null
+          note?: string | null
+          post_id?: string | null
+          sched?: number | null
+          slug?: string
+          start_req?: number | null
+          up_req?: number | null
+          video_id?: string | null
         }
         Relationships: []
       }
