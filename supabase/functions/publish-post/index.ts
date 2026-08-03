@@ -58,37 +58,53 @@ serve(async (req) => {
     if (fetchError) throw new Error(`Erro ao buscar post: ${fetchError.message}`);
     if (!post) throw new Error("Post não encontrado");
 
-    let accountQuery = supabase.from("instagram_accounts").select("*");
-    if (accountId) accountQuery = accountQuery.eq("id", accountId);
-    const { data: accounts, error: accountError } = await accountQuery.limit(1);
+    // ── Resolução da conta: NUNCA "escolher a primeira". ──
+    // Com accountId explícito, respeita. Sem accountId, resolve pelo workspace_id DO POST.
+    let account: any;
 
-    if (accountError || !accounts || accounts.length === 0) {
-      console.log("Nenhuma conta Instagram conectada, simulando publicação...");
-      
-      const { error: updateError } = await supabase
-        .from("posts")
-        .update({
-          status: "published",
-          published_at: new Date().toISOString(),
-          likes_count: 0,
-          comments_count: 0,
-          saves_count: 0,
-          reach: 0,
-        })
-        .eq("id", postId);
+    if (accountId) {
+      const { data: acc, error: accErr } = await supabase
+        .from("instagram_accounts")
+        .select("*")
+        .eq("id", accountId)
+        .maybeSingle();
+      if (accErr) throw new Error(`Erro ao buscar conta Instagram: ${accErr.message}`);
+      if (!acc) throw new Error(`Conta Instagram ${accountId} não encontrada.`);
+      account = acc;
+    } else {
+      if (!post.workspace_id) {
+        throw new Error(
+          `Post ${postId} não tem workspace_id — impossível determinar com segurança em qual conta do Instagram publicar. Publicação abortada.`
+        );
+      }
 
-      if (updateError) throw new Error(`Erro ao atualizar post: ${updateError.message}`);
+      const { data: wsAccounts, error: accErr } = await supabase
+        .from("instagram_accounts")
+        .select("*")
+        .eq("workspace_id", post.workspace_id);
 
-      return new Response(
-        JSON.stringify({
-          success: true, postId, simulated: true,
-          message: "Post publicado (simulação - nenhuma conta conectada)",
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      if (accErr) throw new Error(`Erro ao buscar contas do workspace: ${accErr.message}`);
+
+      if (!wsAccounts || wsAccounts.length === 0) {
+        throw new Error(
+          `Nenhuma conta do Instagram conectada no workspace ${post.workspace_id}. Conecte uma conta antes de publicar.`
+        );
+      }
+      if (wsAccounts.length > 1) {
+        throw new Error(
+          `Workspace ${post.workspace_id} tem ${wsAccounts.length} contas do Instagram conectadas. Informe accountId explicitamente — publicação abortada para evitar postar no perfil errado.`
+        );
+      }
+      account = wsAccounts[0];
+    }
+
+    // Guarda extra: conta explícita não pode ser de outro workspace
+    if (accountId && post.workspace_id && account.workspace_id && account.workspace_id !== post.workspace_id) {
+      throw new Error(
+        `Conta ${accountId} pertence a outro workspace (${account.workspace_id}) e não pode publicar o post do workspace ${post.workspace_id}.`
       );
     }
 
-    const account = accounts[0];
     const accessToken = account.access_token;
     const instagramUserId = account.instagram_user_id;
 

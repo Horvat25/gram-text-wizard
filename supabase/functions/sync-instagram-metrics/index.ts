@@ -36,47 +36,32 @@ serve(async (req) => {
       accountsQuery = accountsQuery.eq("workspace_id", workspaceId);
     }
 
-    let { data: accounts, error: accountError } = await accountsQuery;
+    const { data: accounts, error: accountError } = await accountsQuery;
 
-    // Fallback: if no accounts found for this workspace, try accounts with null workspace_id
-    // This handles cases where the Instagram account was connected before workspace assignment
-    if (!accountError && (!accounts || accounts.length === 0) && workspaceId) {
-      console.log(`⚠️ No accounts for workspace ${workspaceId}, checking unassigned accounts...`);
-      const { data: unassigned, error: unassignedError } = await supabase
-        .from("instagram_accounts")
-        .select("*")
-        .is("workspace_id", null);
-      
-      if (!unassignedError && unassigned && unassigned.length > 0) {
-        // Auto-assign the first unassigned account to this workspace
-        const accountToAssign = unassigned[0];
-        console.log(`🔗 Auto-assigning account @${accountToAssign.username} to workspace ${workspaceId}`);
-        
-        await supabase
-          .from("instagram_accounts")
-          .update({ workspace_id: workspaceId })
-          .eq("id", accountToAssign.id);
-        
-        accountToAssign.workspace_id = workspaceId;
-        accounts = [accountToAssign];
-      }
+    if (accountError) {
+      return new Response(
+        JSON.stringify({ error: `Erro ao buscar contas: ${accountError.message}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    if (accountError || !accounts?.length) {
+    if (!accounts?.length) {
       return new Response(
         JSON.stringify({ error: "Nenhuma conta do Instagram conectada para este workspace" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!workspaceId && accounts.length > 1) {
+    // Nunca escolher conta por conta própria: exige exatamente 1 candidata.
+    if (accounts.length > 1) {
       return new Response(
-        JSON.stringify({ error: "workspace_id é obrigatório quando há múltiplas contas conectadas" }),
+        JSON.stringify({ error: "workspace_id é obrigatório: há múltiplas contas do Instagram conectadas" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const account = accounts[0];
+
     const accessToken = account.access_token;
 
     // Save snapshots only on first batch
