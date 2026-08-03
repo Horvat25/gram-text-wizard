@@ -75,7 +75,21 @@ serve(async (req) => {
     const results = [];
 
     for (const post of scheduledPosts) {
+      if (!post.workspace_id) {
+        console.warn(`⛔ Post ${post.id} ignorado: sem workspace_id — não é possível resolver a conta do Instagram com segurança.`);
+        await supabase
+          .from("posts")
+          .update({
+            status: "failed",
+            error_message: "Post sem workspace_id: impossível determinar a conta do Instagram. Publicação abortada.",
+          })
+          .eq("id", post.id);
+        results.push({ postId: post.id, success: false, error: "sem workspace_id" });
+        continue;
+      }
+
       console.log(`📝 Disparando publicação centralizada para post ${post.id}: ${post.caption?.substring(0, 50)}...`);
+
 
       try {
         const publishResponse = await fetch(`${supabaseUrl}/functions/v1/publish-post`, {
