@@ -107,19 +107,27 @@ serve(async (req) => {
 
     console.log(`[AUTO-REEL] 📰 ${item.source_name}: ${item.title.substring(0, 60)}...`);
 
-    // ── Conta Instagram (workspace + user) ──
-    const { data: account } = await supabase
-      .from("instagram_accounts")
-      .select("user_id, workspace_id")
-      .limit(1)
-      .single();
-
-    if (!account) {
-      console.warn("[AUTO-REEL] ❌ Nenhuma conta Instagram conectada");
-      return new Response(JSON.stringify({ skipped: true, reason: "no_account" }), {
+    // ── Conta Instagram: resolve pelo workspace do rss_item, nunca "a primeira" ──
+    if (!item.workspace_id) {
+      console.warn("[AUTO-REEL] ❌ rss_item sem workspace_id — abortado");
+      return new Response(JSON.stringify({ skipped: true, reason: "no_workspace" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const { data: wsAccounts } = await supabase
+      .from("instagram_accounts")
+      .select("user_id, workspace_id")
+      .eq("workspace_id", item.workspace_id);
+
+    if (!wsAccounts || wsAccounts.length !== 1) {
+      console.warn(`[AUTO-REEL] ❌ ${wsAccounts?.length || 0} contas no workspace ${item.workspace_id} (esperado exatamente 1)`);
+      return new Response(JSON.stringify({ skipped: true, reason: "account_ambiguous", count: wsAccounts?.length || 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const account = wsAccounts[0];
+
 
     // ── Agenda pra 30min depois (tempo de renderizar) ──
     const scheduledFor = new Date(Date.now() + 30 * 60 * 1000).toISOString();
