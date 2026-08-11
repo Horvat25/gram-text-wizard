@@ -1,0 +1,48 @@
+name: Publicador Instagram
+
+# Substitui o pg_cron que morava dentro do Supabase. A lição de 10/ago/2026:
+# fila e carteiro não podem morar no mesmo lugar — quando o banco caiu, os dois
+# sumiram juntos e o canal parou no meio do dia.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # UTC. O horário de cada post está na fila.json.
+  workflow_dispatch:          # botão de disparo manual na aba Actions
+
+# Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
+# que travou o publicador antigo.
+concurrency:
+  group: publicador-instagram
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # pra escrever de volta a fila.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Publicar o que venceu
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_CONTA: neuralupdate
+        run: node publicador/publicar.mjs
+
+      - name: Guardar o estado da fila
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain publicador/fila.json)" ]; then
+            git config user.name  "publicador"
+            git config user.email "publicador@users.noreply.github.com"
+            git add publicador/fila.json
+            git commit -m "fila: estado após a rodada de $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          else
+            echo "nada mudou na fila"
+          fi
