@@ -35,7 +35,7 @@ jobs:
 
       - name: Publicar o que venceu
         env:
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador publico, nao e segredo
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_CONTA: neuralupdate
         run: node publicador/publicar.mjs

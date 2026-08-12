@@ -20,7 +20,7 @@ jobs:
 
       - name: Token vivo e com prazo?
         env:
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador publico, nao e segredo
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: node publicador/conferir-token.mjs
 
