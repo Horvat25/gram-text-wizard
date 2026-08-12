@@ -24,14 +24,6 @@
     "status": "agendado"
   },
   {
-    "quando": "2026-08-13T14:00:00.000Z",
-    "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/24827950-71ae-4ca7-8804-87c7fa738554.mp4",
-    "legenda": "No aglomerado de Perseu, um buraco negro supermassivo empurra o gás quente ao redor e cria ondas de pressão — som de verdade, propagando num meio. A nota corresponde a um si bemol cerca de 57 oitavas abaixo do dó central do piano: um trilhão de vezes mais grave do que o ouvido humano alcança.\n\n🔭 Segue o @neuralupdate pra não perder — ciência de verdade, sem enrolação.\n\n#som #buraconegro #astronomia #ciência #neuralupdate #neuralupdate",
-    "slug": "v38-tom-do-universo",
-    "status": "agendado"
-  },
-  {
     "quando": "2026-08-13T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/652aafc3-fddf-41cf-82e9-d6557141c2db.mp4",
@@ -42,9 +34,9 @@
   {
     "quando": "2026-08-13T21:00:00.000Z",
     "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0d4a3c39-4b60-47e4-a679-efda22c0eff3.mp4",
-    "legenda": "A Lua se afasta da Terra cerca de 3,8 centímetros por ano. Hoje o disco lunar cobre o Sol quase com exatidão — uma coincidência de tamanho e distância que não é permanente. Daqui a algumas centenas de milhões de anos ela ficará pequena demais no céu e os eclipses totais acabarão para sempre.\n\n📩 Comenta COSMOS que eu te mando o PDF grátis com 5 fenômenos do universo.\n\n#eclipse #lua #astronomia #ciência #neuralupdate #neuralupdate",
-    "slug": "v39-lua-se-afastando",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/24827950-71ae-4ca7-8804-87c7fa738554.mp4",
+    "legenda": "No aglomerado de Perseu, um buraco negro supermassivo empurra o gás quente ao redor e cria ondas de pressão — som de verdade, propagando num meio. A nota corresponde a um si bemol cerca de 57 oitavas abaixo do dó central do piano: um trilhão de vezes mais grave do que o ouvido humano alcança.\n\n🔭 Segue o @neuralupdate pra não perder — ciência de verdade, sem enrolação.\n\n#som #buraconegro #astronomia #ciência #neuralupdate #neuralupdate",
+    "slug": "v38-tom-do-universo",
     "status": "agendado"
   },
   {
@@ -61,6 +53,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f840ed57-1afe-4d85-b4d5-0760e0172e05.mp4",
     "legenda": "A gravidade de um buraco negro cai muito rápido com a distância. Nos seus pés ela é bem mais forte do que na sua cabeça, e essa diferença estica o corpo enquanto o comprime lateralmente. Os físicos chamam o processo de espaguetificação — e num buraco negro pequeno ele começa antes mesmo do horizonte de eventos.\n\n📕 O ebook \"O Lado Sombrio do Universo\" — 21 fenômenos ilustrados, 7 dias de garantia. Link na bio.\n\n#buraconegro #física #ciência #universo #neuralupdate #neuralupdate",
     "slug": "vsl16-espaguetificacao",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-14T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0d4a3c39-4b60-47e4-a679-efda22c0eff3.mp4",
+    "legenda": "A Lua se afasta da Terra cerca de 3,8 centímetros por ano. Hoje o disco lunar cobre o Sol quase com exatidão — uma coincidência de tamanho e distância que não é permanente. Daqui a algumas centenas de milhões de anos ela ficará pequena demais no céu e os eclipses totais acabarão para sempre.\n\n📩 Comenta COSMOS que eu te mando o PDF grátis com 5 fenômenos do universo.\n\n#eclipse #lua #astronomia #ciência #neuralupdate #neuralupdate",
+    "slug": "v39-lua-se-afastando",
     "status": "agendado"
   }
 ]
