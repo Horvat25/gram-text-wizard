@@ -9,6 +9,11 @@ on:
     # mesmo se o GitHub atrasar o início do job.
     - cron: '0,15,30 12 * * *'
     - cron: '0,15,30 16 * * *'
+    # Segunda tentativa do slot do meio, uma hora depois (14h BRT). Se o slot
+    # das 13h já saiu, o histórico anti-repetição faz esta rodada não fazer
+    # nada. Serve para o dia em que o GitHub atrasa ou a rodada falha: melhor
+    # o story sair às 14h do que não sair.
+    - cron: '0,15,30 17 * * *'
     - cron: '0,15,30 20 * * *'
   workflow_dispatch:
     inputs:
@@ -61,6 +66,8 @@ jobs:
           elif [ "$CRON_AGENDADO" = "0,15,30 12 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 09
           elif [ "$CRON_AGENDADO" = "0,15,30 16 * * *" ]; then
+            node publicador/reparum-stories.mjs --slot 13
+          elif [ "$CRON_AGENDADO" = "0,15,30 17 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 13
           elif [ "$CRON_AGENDADO" = "0,15,30 20 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 17
