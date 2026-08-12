@@ -21,6 +21,7 @@ const posSlot = argumentos.indexOf('--slot');
 const slotForcado = posSlot >= 0 ? argumentos[posSlot + 1] : null;
 const apenasValidar = argumentos.includes('--validar') || slotForcado === 'validar';
 const apenasConferirToken = argumentos.includes('--conferir-token') || slotForcado === 'conferir-token';
+const auditar = argumentos.includes('--auditar') || slotForcado === 'auditar';
 const seco = argumentos.includes('--seco');
 
 if (!apenasValidar && !seco && (!IG_USER_ID || !IG_TOKEN)) {
@@ -33,12 +34,14 @@ const estado = fs.existsSync(ESTADO_PATH)
   : { publicados: {}, falhas: {} };
 
 function agoraLocal() {
+  const instante = process.env.REPARUM_NOW ? new Date(process.env.REPARUM_NOW) : new Date();
+  if (Number.isNaN(instante.getTime())) throw new Error('REPARUM_NOW inválido');
   const partes = Object.fromEntries(
     new Intl.DateTimeFormat('en-CA', {
       timeZone: agenda.timezone,
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
-    }).formatToParts(new Date()).filter(p => p.type !== 'literal').map(p => [p.type, p.value])
+    }).formatToParts(instante).filter(p => p.type !== 'literal').map(p => [p.type, p.value])
   );
   return {
     data: `${partes.year}-${partes.month}-${partes.day}`,
@@ -139,6 +142,12 @@ async function publicaStory(item) {
 }
 
 function salvaEstado() {
+  // O ciclo é diário e só precisa do dia atual para impedir repetição. Guardar
+  // 90 dias dá rastreabilidade sem fazer o JSON crescer para sempre.
+  const limite = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  for (const grupo of [estado.publicados, estado.falhas]) {
+    for (const data of Object.keys(grupo || {})) if (data < limite) delete grupo[data];
+  }
   fs.writeFileSync(ESTADO_PATH, JSON.stringify(estado, null, 2) + '\n', 'utf8');
 }
 
@@ -156,6 +165,19 @@ if (apenasConferirToken) {
   for (const slot of slots) for (const item of agenda.slots[slot]) await validaMidia(item);
   await confereConta();
   console.log('token e agenda conferidos; nenhuma publicação foi feita');
+  process.exit(0);
+}
+
+if (auditar) {
+  for (const slot of slots) for (const item of agenda.slots[slot]) await validaMidia(item);
+  await confereConta();
+  estado.ultima_auditoria = {
+    em: new Date().toISOString(),
+    conta: `@${CONTA}`,
+    itens_validos: slots.flatMap(slot => agenda.slots[slot]).length
+  };
+  salvaEstado();
+  console.log('auditoria gravada; nenhuma publicação foi feita');
   process.exit(0);
 }
 
