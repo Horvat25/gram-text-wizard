@@ -1,6 +1,16 @@
 {
   "publicados": {
     "2026-08-12": {
+      "14": {
+        "galaxy-a53-1000": {
+          "id_instagram": "18087677579670184",
+          "publicado_em": "2026-08-12T17:59:44.166Z"
+        },
+        "xiaomi-mi8-lite-550": {
+          "id_instagram": "18019614710916220",
+          "publicado_em": "2026-08-12T17:59:54.903Z"
+        }
+      },
       "09": {
         "galaxy-a55-5g-1150": {
           "id_instagram": "18352002544247481",
@@ -15,7 +25,11 @@
       }
     }
   },
-  "falhas": {},
+  "falhas": {
+    "2026-08-12": {
+      "14": {}
+    }
+  },
   "ultima_auditoria": {
     "em": "2026-08-12T14:41:41.509Z",
     "conta": "@reparumtech",
