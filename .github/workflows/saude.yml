@@ -1,0 +1,28 @@
+name: Saúde do publicador
+
+# O apagão de 10/ago/2026 durou dez horas porque NINGUÉM estava olhando: os posts
+# das 14h e 18h simplesmente não saíram e só foi notado à noite, pelo feed.
+# Este workflow é o batimento cardíaco. Quando ele falha, o GitHub manda email.
+
+on:
+  schedule:
+    - cron: '0 12 * * *'    # 09h BRT, todo dia
+  workflow_dispatch:
+
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Token vivo e com prazo?
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node publicador/conferir-token.mjs
+
+      - name: Ficou algum post pra trás?
+        run: node publicador/conferir-fila.mjs

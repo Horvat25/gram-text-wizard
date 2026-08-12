@@ -2,12 +2,18 @@ name: Publicador Instagram
 
 # Substitui o pg_cron que morava dentro do Supabase. A lição de 10/ago/2026:
 # fila e carteiro não podem morar no mesmo lugar — quando o banco caiu, os dois
-# sumiram juntos e o canal parou no meio do dia.
+# sumiram juntos e o canal parou no meio do dia sem ninguém perceber.
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # UTC. O horário de cada post está na fila.json.
-  workflow_dispatch:          # botão de disparo manual na aba Actions
+    # Os posts saem 08h, 14h e 18h BRT = 11:00, 17:00 e 21:00 UTC.
+    # Três disparos por horário cobrem o atraso normal do agendador do GitHub.
+    #
+    # ⚠️ NÃO voltar pra '*/15 * * * *'. O GitHub cobra cada execução arredondada
+    # pra 1 minuto: */15 dá 2.880 min/mês e o plano grátis em repo privado tem
+    # 2.000. Estourava a cota e o publicador morria no meio do mês.
+    - cron: '0,15,30 11,17,21 * * *'
+  workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
 # que travou o publicador antigo.
@@ -19,7 +25,7 @@ jobs:
   publicar:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # pra escrever de volta a fila.json
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
