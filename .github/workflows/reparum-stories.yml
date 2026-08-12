@@ -2,12 +2,13 @@ name: Stories Reparum Tech
 
 on:
   schedule:
-    # Piracicaba (BRT, UTC-3): 09h, 14h e 17h.
+    # Piracicaba (BRT, UTC-3): 09h, 13h e 17h.
+    # 13h e nao 14h: e o horario que o Marcelo pediu (almoco), 16:00 UTC.
     # :15 e :30 são tentativas de segurança; o estado impede duplicação.
     # As expressões ficam separadas para o workflow saber qual slot executar
     # mesmo se o GitHub atrasar o início do job.
     - cron: '0,15,30 12 * * *'
-    - cron: '0,15,30 17 * * *'
+    - cron: '0,15,30 16 * * *'
     - cron: '0,15,30 20 * * *'
   workflow_dispatch:
     inputs:
@@ -21,7 +22,7 @@ on:
           - conferir-token
           - auditar
           - '09'
-          - '14'
+          - '13'
           - '17'
 
 # Usa o mesmo grupo do publicador do canal porque os dois gravam estado no main.
@@ -59,8 +60,8 @@ jobs:
             node publicador/reparum-stories.mjs --slot "$SLOT_MANUAL"
           elif [ "$CRON_AGENDADO" = "0,15,30 12 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 09
-          elif [ "$CRON_AGENDADO" = "0,15,30 17 * * *" ]; then
-            node publicador/reparum-stories.mjs --slot 14
+          elif [ "$CRON_AGENDADO" = "0,15,30 16 * * *" ]; then
+            node publicador/reparum-stories.mjs --slot 13
           elif [ "$CRON_AGENDADO" = "0,15,30 20 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 17
           else
