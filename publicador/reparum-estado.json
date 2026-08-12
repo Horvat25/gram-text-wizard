@@ -15,5 +15,10 @@
       }
     }
   },
-  "falhas": {}
+  "falhas": {},
+  "ultima_auditoria": {
+    "em": "2026-08-12T14:41:41.509Z",
+    "conta": "@reparumtech",
+    "itens_validos": 6
+  }
 }
