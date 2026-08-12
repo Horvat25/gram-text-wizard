@@ -1,0 +1,67 @@
+name: Stories Reparum Tech
+
+on:
+  schedule:
+    # Piracicaba (BRT, UTC-3): 09h, 14h e 17h.
+    # :15 e :30 são tentativas de segurança; o estado impede duplicação.
+    - cron: '0,15,30 12,17,20 * * *'
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: Horário a executar; conferir-token não publica
+        required: true
+        default: validar
+        type: choice
+        options:
+          - validar
+          - conferir-token
+          - '09'
+          - '14'
+          - '17'
+
+# Usa o mesmo grupo do publicador do canal porque os dois gravam estado no main.
+concurrency:
+  group: publicador-instagram
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validar ou publicar o slot
+        env:
+          IG_USER_ID: '17841433241008922'
+          IG_TOKEN: ${{ secrets.IG_TOKEN_REPARUM }}
+          IG_CONTA: reparumtech
+          SLOT_MANUAL: ${{ github.event.inputs.slot }}
+        run: |
+          if [ "$SLOT_MANUAL" = "validar" ]; then
+            node publicador/reparum-stories.mjs --validar
+          elif [ "$SLOT_MANUAL" = "conferir-token" ]; then
+            node publicador/reparum-stories.mjs --conferir-token
+          elif [ -n "$SLOT_MANUAL" ]; then
+            node publicador/reparum-stories.mjs --slot "$SLOT_MANUAL"
+          else
+            node publicador/reparum-stories.mjs
+          fi
+
+      - name: Guardar histórico anti-repetição
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain publicador/reparum-estado.json)" ]; then
+            git config user.name "publicador"
+            git config user.email "publicador@users.noreply.github.com"
+            git add publicador/reparum-estado.json
+            git commit -m "reparum: estado após $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          else
+            echo "estado sem alteração"
+          fi

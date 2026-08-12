@@ -1,0 +1,43 @@
+{
+  "conta": "reparumtech",
+  "timezone": "America/Sao_Paulo",
+  "dimensao_story": "1080x1920",
+  "slots": {
+    "09": [
+      {
+        "id": "galaxy-a55-5g-1150",
+        "nome": "Galaxy A55 5G · R$ 1.150",
+        "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8348dad7-03ec-4304-8691-a033afa33fbd.png"
+      },
+      {
+        "id": "moto-g20-550",
+        "nome": "Moto G20 · R$ 550",
+        "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/eb2e0851-f6e1-46c8-a4b5-45fe251fd457.png"
+      }
+    ],
+    "14": [
+      {
+        "id": "galaxy-a53-1000",
+        "nome": "Galaxy A53 · R$ 1.000",
+        "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cd178f4a-2914-45b7-93ab-56f7f3ddbc01.png"
+      },
+      {
+        "id": "xiaomi-mi8-lite-550",
+        "nome": "Xiaomi Mi 8 Lite · R$ 550",
+        "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f6372c4d-c420-4918-aaf8-1d7331374691.png"
+      }
+    ],
+    "17": [
+      {
+        "id": "galaxy-a07-800",
+        "nome": "Galaxy A07 · R$ 800",
+        "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3a2e796b-9895-4ab9-b0f5-994aa403d0e8.png"
+      },
+      {
+        "id": "moto-g23-600",
+        "nome": "Moto G23 · R$ 600",
+        "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3a0a028b-028a-4f64-8884-2a1043c00a3f.png"
+      }
+    ]
+  }
+}
