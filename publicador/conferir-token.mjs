@@ -32,14 +32,26 @@ const d = new URL(`${API}/debug_token`);
 d.searchParams.set('input_token', IG_TOKEN);
 d.searchParams.set('access_token', IG_TOKEN);
 const info = await (await fetch(d)).json();
-const exp = info?.data?.expires_at;
+// A Meta tem DOIS prazos e eles são independentes:
+//   expires_at            — validade do token em si (pode ser 0 = nunca)
+//   data_access_expires_at — validade do ACESSO AOS DADOS, 90 dias
+// Um token "que nunca expira" para de funcionar quando o segundo vence. Foi
+// quase a armadilha de 12/ago/2026: o depurador da Meta anuncia só o primeiro.
+const prazos = [
+  ['token', info?.data?.expires_at],
+  ['acesso aos dados', info?.data?.data_access_expires_at],
+].filter(([, v]) => v);   // 0 e undefined saem: não têm prazo
 
-if (!exp) { console.log('sem data de expiração declarada (token de vida longa)'); process.exit(0); }
-if (exp === 0) { console.log('token não expira'); process.exit(0); }
+if (!prazos.length) { console.log('sem prazo declarado em nenhum dos dois campos'); process.exit(0); }
 
-const dias = Math.floor((exp * 1000 - Date.now()) / 86400000);
-console.log(`vence em ${dias} dia(s) — ${new Date(exp * 1000).toISOString().slice(0, 10)}`);
-if (dias < 10) {
-  console.error(`ATENÇÃO: faltam ${dias} dias. Gere um token novo AGORA, antes que pare sozinho.`);
-  process.exit(1);
+let alarme = false;
+for (const [nome, quando] of prazos) {
+  const dias = Math.floor((quando * 1000 - Date.now()) / 86400000);
+  const data = new Date(quando * 1000).toISOString().slice(0, 10);
+  console.log(`${nome}: vence em ${dias} dia(s) — ${data}`);
+  if (dias < 10) {
+    console.error(`ATENÇÃO: ${nome} vence em ${dias} dias. Gere um token novo AGORA.`);
+    alarme = true;
+  }
 }
+if (alarme) process.exit(1);
