@@ -23,6 +23,7 @@ const apenasValidar = argumentos.includes('--validar') || slotForcado === 'valid
 const apenasConferirToken = argumentos.includes('--conferir-token') || slotForcado === 'conferir-token';
 const auditar = argumentos.includes('--auditar') || slotForcado === 'auditar';
 const seco = argumentos.includes('--seco');
+const conferirDia = argumentos.includes('--conferir-dia') || slotForcado === 'conferir-dia';
 
 if (!apenasValidar && !seco && (!IG_USER_ID || !IG_TOKEN)) {
   throw new Error('faltam IG_USER_ID ou IG_TOKEN');
@@ -179,6 +180,36 @@ if (auditar) {
   salvaEstado();
   console.log('auditoria gravada; nenhuma publicação foi feita');
   process.exit(0);
+}
+
+// --conferir-dia: alarme de falha silenciosa.
+//
+// Em 14/08/2026 o bloco das 9h simplesmente não saiu: o agendador do GitHub
+// atrasou além da janela e NADA quebrou — sem erro, sem log, sem aviso. O
+// Marcelo descobriu olhando o perfil. Falha silenciosa é pior que falha
+// barulhenta, porque some até alguém reparar.
+//
+// Este modo confere se todo slot cujo horário já passou de folga foi mesmo
+// publicado hoje. Se faltar, sai com erro — o run fica vermelho no Actions e o
+// GitHub manda e-mail. É o canal de aviso que já existe, de graça.
+if (conferirDia) {
+  const TOLERANCIA_H = 2;
+  const agora = Number(local.hora) + Number(local.minuto) / 60;
+  const faltando = [];
+  for (const s of Object.keys(agenda.slots)) {
+    if (agora < Number(s) + TOLERANCIA_H) continue;   // ainda dentro da folga
+    const feitos = (estado.publicados[local.data] || {})[s] || {};
+    const ausentes = agenda.slots[s].filter(item => !feitos[item.id]);
+    if (ausentes.length) faltando.push(`${s}h: ${ausentes.map(i => i.nome).join(', ')}`);
+  }
+  if (!faltando.length) {
+    console.log(`ok: todo slot vencido de ${local.data} foi publicado`);
+    process.exit(0);
+  }
+  console.error(`ALARME — ${local.data} tem slot vencido sem publicar:`);
+  for (const f of faltando) console.error(`  ${f}`);
+  console.error('Rode o workflow a mão escolhendo o horário, ou confira o token.');
+  process.exit(1);
 }
 
 const slot = slotForcado || local.hora;

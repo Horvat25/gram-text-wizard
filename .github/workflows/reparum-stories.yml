@@ -27,6 +27,7 @@ on:
           - validar
           - conferir-token
           - auditar
+          - conferir-dia
           - '09'
           - '14'
           - '17'
@@ -60,6 +61,8 @@ jobs:
             node publicador/reparum-stories.mjs --validar
           elif [ "$SLOT_MANUAL" = "conferir-token" ]; then
             node publicador/reparum-stories.mjs --conferir-token
+          elif [ "$SLOT_MANUAL" = "conferir-dia" ]; then
+            node publicador/reparum-stories.mjs --conferir-dia
           elif [ "$SLOT_MANUAL" = "auditar" ]; then
             node publicador/reparum-stories.mjs --auditar
           elif [ -n "$SLOT_MANUAL" ]; then
@@ -85,6 +88,17 @@ jobs:
           IG_TOKEN: ${{ secrets.IG_TOKEN_REPARUM }}
           IG_CONTA: reparumtech
         run: node publicador/reparum-feed.mjs
+
+      # Roda depois de tudo: se algum slot do dia venceu há mais de 2h e não
+      # foi publicado, este passo falha de propósito. Run vermelho no Actions =
+      # e-mail do GitHub. Sem isso a falha some até alguém olhar o perfil.
+      - name: Conferir se o dia saiu inteiro
+        if: always()
+        env:
+          IG_USER_ID: '17841433241008922'
+          IG_TOKEN: ${{ secrets.IG_TOKEN_REPARUM }}
+          IG_CONTA: reparumtech
+        run: node publicador/reparum-stories.mjs --conferir-dia
 
       - name: Guardar histórico anti-repetição
         if: always()
