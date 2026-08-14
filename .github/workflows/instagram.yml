@@ -1,4 +1,4 @@
-name: Publicador Instagram
+﻿name: Publicador Instagram
 
 # Substitui o pg_cron que morava dentro do Supabase. A lição de 10/ago/2026:
 # fila e carteiro não podem morar no mesmo lugar — quando o banco caiu, os dois
@@ -10,15 +10,23 @@ on:
     # horários do YouTube, porque o Instagram ESPELHA o YouTube (mesmo vídeo,
     # mesmo dia, mesma hora).
     #
-    # 01:00 UTC = 22h BRT: horário que o YouTube NÃO usa, reservado pros posts
-    # atrasados. Assim o backlog escoa sem atropelar o espelhamento do dia.
+    # ⏰ MEDIDO em 13/08/2026, depois de o Marcelo ver post saindo à meia-noite:
+    # o agendador do GitHub SEMPRE atrasa. Nos posts reais o atraso foi de 42 a
+    # 57 min nos horários normais — e de 145 min no disparo de 01:00 UTC, porque
+    # 01:00 é pico de cron no mundo todo. O post das 22h saiu 00:24 e 00:25.
     #
-    # Três disparos por horário cobrem o atraso normal do agendador do GitHub.
+    # 1) O SLOT DAS 22h FOI REMOVIDO. Madrugada é onde está todo flop histórico
+    #    do canal (PLAYBOOK-SHORTS). Atrasado agora espera o próximo slot normal.
+    # 2) Os disparos começam na HORA ANTERIOR ao post. Assim, com o atraso
+    #    habitual, a primeira execução cai logo DEPOIS da hora marcada em vez de
+    #    quase uma hora depois. O publicador só solta o que já venceu, então
+    #    disparo adiantado não publica nada cedo — só fica pronto.
     #
-    # ⚠️ NÃO voltar pra '*/15 * * * *'. O GitHub cobra cada execução arredondada
-    # pra 1 minuto: */15 dá 2.880 min/mês e o plano grátis em repo privado tem
-    # 2.000. Estourava a cota e o publicador morria no meio do mês.
-    - cron: '0,15,30 1,11,17,21 * * *'
+    # Alvos: 08h, 14h e 18h BRT = 11:00, 17:00 e 21:00 UTC.
+    # ⚠️ NÃO voltar pra '*/15 * * * *': o GitHub cobra cada execução arredondada
+    # pra 1 minuto, */15 dá 2.880 min/mês e o plano grátis tem 2.000.
+    # Isto aqui dá 18 execuções/dia ≈ 540 min/mês.
+    - cron: '5,25,45 10,11,16,17,20,21 * * *'
   workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
