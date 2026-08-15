@@ -14,6 +14,11 @@ on:
     # Agora são 6 tentativas cobrindo 100 minutos. O histórico anti-repetição
     # garante que só a primeira que pegar publica; as outras não fazem nada.
     - cron: '0,20,40 12,13 * * *'
+    # 15,16 UTC = 12h e 13h BRT. Não tem slot de Story nesse horário: existe
+    # só para o publicador de FEED, que roda em todas as rodadas. Sem isto um
+    # post marcado para o meio-dia caía no vão entre os gatilhos e só saía às
+    # 14h — foi o que aconteceu com o carrossel em 14/08.
+    - cron: '0,20,40 15,16 * * *'
     - cron: '0,20,40 17,18 * * *'
     - cron: '0,20,40 20,21 * * *'
   workflow_dispatch:
@@ -69,6 +74,8 @@ jobs:
             node publicador/reparum-stories.mjs --slot "$SLOT_MANUAL"
           elif [ "$CRON_AGENDADO" = "0,20,40 12,13 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 09
+          elif [ "$CRON_AGENDADO" = "0,20,40 15,16 * * *" ]; then
+            echo 'gatilho do meio-dia: sem slot de Story, segue só para o feed'
           elif [ "$CRON_AGENDADO" = "0,20,40 17,18 * * *" ]; then
             node publicador/reparum-stories.mjs --slot 14
           elif [ "$CRON_AGENDADO" = "0,20,40 20,21 * * *" ]; then
