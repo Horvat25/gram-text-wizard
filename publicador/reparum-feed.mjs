@@ -69,6 +69,16 @@ async function validaMidia(url) {
   const resposta = await fetch(url, { cache: 'no-store' });
   if (!resposta.ok) throw new Error(`URL respondeu HTTP ${resposta.status}`);
   const tipo = (resposta.headers.get('content-type') || '').toLowerCase();
+  // Vídeo não passa pela checagem de JPEG: conferimos que é mp4 de verdade e que
+  // a Meta consegue baixar. O resto (codec, duração) ela valida no processamento
+  // e devolve status ERROR, que o publicador já trata.
+  if (tipo.includes('video/')) {
+    const tam = Number(resposta.headers.get('content-length') || 0);
+    if (!tipo.includes('mp4')) throw new Error(`vídeo não é mp4: ${tipo}`);
+    if (tam && tam > 100 * 1024 * 1024) throw new Error(`vídeo com ${(tam/1e6).toFixed(0)} MB; o limite de Reels é 100 MB`);
+    console.log(`  OK vídeo mp4 · ${(tam/1e6).toFixed(1)} MB`);
+    return;
+  }
   if (!tipo.includes('image/jpeg')) throw new Error(`Content-Type inesperado: ${tipo || 'ausente'}`);
   const buffer = Buffer.from(await resposta.arrayBuffer());
   const { largura, altura } = leDimensoesJpeg(buffer);
@@ -119,6 +129,30 @@ async function publicaContainer(creationId) {
 
 async function publica(item) {
   const midias = Array.isArray(item.midia) ? item.midia : [item.midia];
+
+  // REELS: o container precisa terminar de processar antes do publish. Aqui a
+  // espera é barata — segura só este job do Actions, não um banco.
+  if (item.tipo === 'reels' || /\.mp4($|\?)/i.test(midias[0])) {
+    const url = new URL(`${API}/${IG_USER_ID}/media`);
+    url.searchParams.set('media_type', 'REELS');
+    url.searchParams.set('video_url', midias[0]);
+    url.searchParams.set('caption', item.legenda || '');
+    url.searchParams.set('access_token', IG_TOKEN);
+    const { id: creation } = await json(url, { method: 'POST' });
+    for (let i = 1; i <= 60; i++) {
+      await dorme(5000);
+      const st = new URL(`${API}/${creation}`);
+      st.searchParams.set('fields', 'status_code');
+      st.searchParams.set('access_token', IG_TOKEN);
+      const { status_code } = await json(st);
+      if (status_code === 'FINISHED') break;
+      if (status_code === 'ERROR' || status_code === 'EXPIRED') {
+        throw new Error(`processamento do vídeo: ${status_code}`);
+      }
+      if (i === 60) throw new Error('vídeo não ficou pronto em 5 min');
+    }
+    return publicaContainer(creation);
+  }
 
   if (midias.length === 1) {
     const creation = await criaContainer(midias[0], { caption: item.legenda || '' });
