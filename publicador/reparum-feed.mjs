@@ -110,20 +110,27 @@ async function criaContainer(midia, extras) {
   return id;
 }
 
-async function publicaContainer(creationId) {
+// ⚠️ Os números aqui (6 tentativas, 8s, esta regex) NÃO são chute: vieram de
+// clientes/_lib/insta-publica.js, que é o caminho que já publicou Reels de
+// verdade neste perfil (14/08/2026, 10h11). Vídeo indexa mais devagar que foto,
+// por isso 6 e não 2.
+async function publicaContainer(creationId, video = false) {
   const url = new URL(`${API}/${IG_USER_ID}/media_publish`);
   url.searchParams.set('creation_id', creationId);
   url.searchParams.set('access_token', IG_TOKEN);
-  try {
-    const { id } = await json(url, { method: 'POST' });
-    return id;
-  } catch (erro) {
-    // "Media ID is not available" é transitório: o Instagram ainda está
-    // indexando o container. Uma segunda tentativa resolve.
-    if (!/not available/i.test(erro.message)) throw erro;
-    await dorme(8000);
-    const { id } = await json(url, { method: 'POST' });
-    return id;
+  const max = video ? 6 : 3;
+  for (let i = 1; i <= max; i++) {
+    try {
+      const { id } = await json(url, { method: 'POST' });
+      return id;
+    } catch (erro) {
+      // "Media ID is not available" é transitório: o Instagram ainda está
+      // indexando o container. Insistir resolve.
+      const passageiro = /Media ID is not available|not available|temporarily|try again/i.test(erro.message);
+      if (!passageiro || i === max) throw erro;
+      console.warn(`  publish tentativa ${i}: ${erro.message}`);
+      await dorme(8000);
+    }
   }
 }
 
@@ -139,19 +146,26 @@ async function publica(item) {
     url.searchParams.set('caption', item.legenda || '');
     url.searchParams.set('access_token', IG_TOKEN);
     const { id: creation } = await json(url, { method: 'POST' });
-    for (let i = 1; i <= 60; i++) {
+    // 90 tentativas de 5s = 7min30. O insta-publica.js usa 90 e é o número que
+    // já deu certo; 60 era aperto meu, sem medida por trás.
+    let pronto = false;
+    for (let i = 1; i <= 90; i++) {
       await dorme(5000);
       const st = new URL(`${API}/${creation}`);
       st.searchParams.set('fields', 'status_code');
       st.searchParams.set('access_token', IG_TOKEN);
-      const { status_code } = await json(st);
-      if (status_code === 'FINISHED') break;
+      let status_code;
+      // Falha de LEITURA do status não é falha do vídeo: segue tentando. Se
+      // isto virasse throw, um soluço de rede jogaria fora um upload pronto.
+      try { ({ status_code } = await json(st)); } catch { continue; }
+      if (i % 6 === 0) console.log(`  vídeo: ${status_code || '...'} (${i})`);
+      if (status_code === 'FINISHED') { pronto = true; break; }
       if (status_code === 'ERROR' || status_code === 'EXPIRED') {
         throw new Error(`processamento do vídeo: ${status_code}`);
       }
-      if (i === 60) throw new Error('vídeo não ficou pronto em 5 min');
     }
-    return publicaContainer(creation);
+    if (!pronto) throw new Error('vídeo não ficou pronto em 7min30');
+    return publicaContainer(creation, true);
   }
 
   if (midias.length === 1) {
