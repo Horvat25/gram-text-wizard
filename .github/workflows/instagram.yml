@@ -26,7 +26,10 @@ on:
     # ⚠️ NÃO voltar pra '*/15 * * * *': o GitHub cobra cada execução arredondada
     # pra 1 minuto, */15 dá 2.880 min/mês e o plano grátis tem 2.000.
     # Isto aqui dá 18 execuções/dia ≈ 540 min/mês.
-    - cron: '5,25,45 10,11,16,17,20,21 * * *'
+    # 16/08/2026: entraram os STORIES (8h/16h/20h BRT = 11/19/23 UTC), entao o
+    # cron passou a cobrir tambem 19, 20, 23 e 0 UTC. As horas "a mais" de cada
+    # bloco sao catch-up: o cron do GitHub atrasa — ja foi medido atraso de 145min.
+    - cron: '5,25,45 10,11,16,17,19,20,21,23,0 * * *'
   workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
