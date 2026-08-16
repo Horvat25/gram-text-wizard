@@ -378,5 +378,13 @@
     "legenda": "",
     "slug": "story-kindle-2026-08-20-23",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-08-16T14:31:44.700Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ea7d6fe6-11ec-4e67-bb3e-27bc1c2b4c19.png",
+    "legenda": "",
+    "slug": "story-kindle-TESTE-manual",
+    "status": "agendado"
   }
 ]
