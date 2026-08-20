@@ -41,39 +41,41 @@
     ]
   },
   "_comentario": [
-    "RODIZIO DE TEMA (20/08/2026). Antes: os mesmos 6 celulares, todo dia, nos mesmos horarios.",
-    "Em 8 dias de automacao o story virou repeticao e o alcance ficou em 7 a 8 pessoas por peca.",
-    "O dia escolhe o cardapio: indice = dias desde a epoca (meio-dia UTC da data local) % total.",
-    "O indice 0 e IGUAL a agenda antiga de proposito — em 20/08 o bloco das 9h ja tinha publicado,",
-    "e mudar o cardapio do dia corrente faria o script achar que faltava publicar itens.",
-    "slots continua aqui como reserva: se rodizio sumir, a automacao volta ao comportamento antigo."
+    "VITRINE ROTATIVA (20/08/2026). 17 pecas: 6 celulares, 9 acessorios e 2 produtos novos.",
+    "Cada dia mostra as tres familias, e nenhuma peca repete dentro do ciclo de 3 dias",
+    "(so o kit, que e o lancamento da semana e sai duas vezes).",
+    "Indice do dia = dias desde a epoca (meio-dia UTC da data local) % 3.",
+    "O bloco das 09h do indice 0 e INTOCAVEL enquanto for o dia corrente: em 20/08 ele",
+    "ja tinha publicado A55 e G20, e trocar item de slot ja cumprido faz o script achar",
+    "que ficou faltando publicar e disparar fora de hora.",
+    "slots continua como reserva: sem rodizio, a automacao volta ao comportamento antigo."
   ],
   "rodizio": [
     {
-      "nome": "celulares",
+      "nome": "lancamentos",
       "slots": {
         "14": [
           {
-            "id": "galaxy-a53-1000",
-            "nome": "Galaxy A53 · R$ 1.000",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cd178f4a-2914-45b7-93ab-56f7f3ddbc01.png"
+            "id": "produto-kit-gamer-150",
+            "nome": "Kit teclado + mouse gamer · R$ 150",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4afd5706-1f12-4757-be49-f0b07fa46303.jpg"
           },
           {
-            "id": "xiaomi-mi8-lite-550",
-            "nome": "Xiaomi Mi 8 Lite · R$ 550",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f6372c4d-c420-4918-aaf8-1d7331374691.png"
+            "id": "acessorio-cabo-tipoc",
+            "nome": "Cabo tipo C · R$ 26,90",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/28f1ad83-9960-49a9-ac97-c70d0ade337e.jpg"
           }
         ],
         "17": [
           {
-            "id": "galaxy-a07-800",
-            "nome": "Galaxy A07 · R$ 800",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3a2e796b-9895-4ab9-b0f5-994aa403d0e8.png"
+            "id": "produto-radio-retro",
+            "nome": "Radio retro Tomate MTJ-2013",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10d3fd83-5761-441d-9cad-f5bb748ce89a.jpg"
           },
           {
-            "id": "moto-g23-600",
-            "nome": "Moto G23 · R$ 600",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3a0a028b-028a-4f64-8884-2a1043c00a3f.png"
+            "id": "acessorio-capinhas",
+            "nome": "Capinhas",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7fd5888a-d8d8-4127-8e8d-438808f2a59f.jpg"
           }
         ],
         "09": [
@@ -91,37 +93,37 @@
       }
     },
     {
-      "nome": "acessorios do dia a dia",
+      "nome": "acessorios e seminovos",
       "slots": {
         "14": [
           {
-            "id": "acessorio-fone-tws",
-            "nome": "Fone sem fio · R$ 54,90",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f91d6b66-6529-4664-8cad-273aa7546cff.jpg"
+            "id": "galaxy-a53-1000",
+            "nome": "Galaxy A53 · R$ 1.000",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cd178f4a-2914-45b7-93ab-56f7f3ddbc01.png"
           },
           {
-            "id": "acessorio-capinhas",
-            "nome": "Capinhas",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7fd5888a-d8d8-4127-8e8d-438808f2a59f.jpg"
+            "id": "xiaomi-mi8-lite-550",
+            "nome": "Xiaomi Mi 8 Lite · R$ 550",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f6372c4d-c420-4918-aaf8-1d7331374691.png"
           }
         ],
         "17": [
           {
+            "id": "acessorio-carregador-veicular",
+            "nome": "Carregador veicular",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e03d0646-a57c-482d-ba11-385e43347251.jpg"
+          },
+          {
             "id": "acessorio-suporte-painel",
             "nome": "Suporte de painel · R$ 24,90",
             "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/81b83a82-4f13-4785-9d09-3b75251174db.jpg"
-          },
-          {
-            "id": "galaxy-a55-5g-1150",
-            "nome": "Galaxy A55 5G · R$ 1.150",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8348dad7-03ec-4304-8691-a033afa33fbd.png"
           }
         ],
         "09": [
           {
-            "id": "acessorio-cabo-tipoc",
-            "nome": "Cabo tipo C · R$ 26,90",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/28f1ad83-9960-49a9-ac97-c70d0ade337e.jpg"
+            "id": "acessorio-fone-tws",
+            "nome": "Fone sem fio · R$ 54,90",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f91d6b66-6529-4664-8cad-273aa7546cff.jpg"
           },
           {
             "id": "acessorio-carregador-turbo",
@@ -132,30 +134,30 @@
       }
     },
     {
-      "nome": "vitrine mista",
+      "nome": "vitrine da loja",
       "slots": {
         "14": [
           {
-            "id": "acessorio-suporte-bike",
-            "nome": "Suporte de bike",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f107bd26-4cde-4fca-9c41-599164365c26.jpg"
+            "id": "galaxy-a07-800",
+            "nome": "Galaxy A07 · R$ 800",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3a2e796b-9895-4ab9-b0f5-994aa403d0e8.png"
           },
-          {
-            "id": "acessorio-suporte-ventosa",
-            "nome": "Suporte ventosa",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9ba4c75c-37d8-4cbc-8f36-fff27ac21952.jpg"
-          }
-        ],
-        "17": [
           {
             "id": "moto-g23-600",
             "nome": "Moto G23 · R$ 600",
             "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3a0a028b-028a-4f64-8884-2a1043c00a3f.png"
+          }
+        ],
+        "17": [
+          {
+            "id": "acessorio-suporte-ventosa",
+            "nome": "Suporte ventosa",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9ba4c75c-37d8-4cbc-8f36-fff27ac21952.jpg"
           },
           {
-            "id": "galaxy-a53-1000",
-            "nome": "Galaxy A53 · R$ 1.000",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cd178f4a-2914-45b7-93ab-56f7f3ddbc01.png"
+            "id": "produto-kit-gamer-150",
+            "nome": "Kit teclado + mouse gamer · R$ 150",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4afd5706-1f12-4757-be49-f0b07fa46303.jpg"
           }
         ],
         "09": [
@@ -165,9 +167,9 @@
             "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f881f181-1d45-4977-a957-d8a375b7e9f7.jpg"
           },
           {
-            "id": "acessorio-carregador-veicular",
-            "nome": "Carregador veicular",
-            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e03d0646-a57c-482d-ba11-385e43347251.jpg"
+            "id": "acessorio-suporte-bike",
+            "nome": "Suporte de bike",
+            "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f107bd26-4cde-4fca-9c41-599164365c26.jpg"
           }
         ]
       }
