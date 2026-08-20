@@ -30,6 +30,25 @@ if (!SECO && (!IG_USER_ID || !IG_TOKEN)) {
 
 const dorme = ms => new Promise(r => setTimeout(r, ms));
 
+// ── Primeiro comentário (20/08/2026, pedido do Marcelo) ────────────────────────
+// O Kindle SAIU de dentro do vídeo (a medição de 19/08 mostrou que o cartaz de CTA
+// derrubava a retenção de 100%+ pra 48% e quase ninguém chegava a vê-lo). A oferta
+// passou a viver na legenda e no PRIMEIRO COMENTÁRIO.
+//
+// Fixar não tem endpoint na API — quem fixa é o Marcelo, na mão, todo dia. Aqui a
+// gente só garante que o comentário exista, e exista PRIMEIRO (postado segundos
+// depois da publicação, antes de qualquer outro).
+//
+// ⚠️ Falhar aqui NUNCA pode marcar o post como falho: o vídeo já está no ar. O erro
+// fica registrado no item pra aparecer no log e no saude.yml.
+const COMENTARIO = '📚 Curtiu? Isso aqui vira livro: dá pra testar o Kindle Unlimited de graça e ler o quanto quiser — link na bio. (link de afiliado)';
+
+async function comenta(idMidia) {
+  const r = await post(`${API}/${idMidia}/comments`, { message: COMENTARIO, access_token: IG_TOKEN });
+  if (!r.id) throw new Error(JSON.stringify(r).slice(0, 300));
+  return r.id;
+}
+
 async function post(url, params) {
   const u = new URL(url);
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
@@ -128,6 +147,17 @@ for (const item of vencidos) {
     item.publicado_em = new Date().toISOString();
     mudou = true;
     console.log(`  PUBLICADO: ${id}`);
+
+    // Story não aceita comentário — só reels/feed.
+    if (item.tipo !== 'story') {
+      try {
+        item.id_comentario = await comenta(id);
+        console.log(`  COMENTADO: ${item.id_comentario}`);
+      } catch (e) {
+        item.erro_comentario = String(e.message || e).slice(0, 300);
+        console.error(`  ⚠️ comentário falhou (o post está no ar): ${item.erro_comentario}`);
+      }
+    }
   } catch (e) {
     item.status = 'falhou';
     item.erro = String(e.message || e).slice(0, 400);
