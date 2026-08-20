@@ -26,10 +26,7 @@ on:
     # ⚠️ NÃO voltar pra '*/15 * * * *': o GitHub cobra cada execução arredondada
     # pra 1 minuto, */15 dá 2.880 min/mês e o plano grátis tem 2.000.
     # Isto aqui dá 18 execuções/dia ≈ 540 min/mês.
-    # 16/08/2026: entraram os STORIES (8h/16h/20h BRT = 11/19/23 UTC), entao o
-    # cron passou a cobrir tambem 19, 20, 23 e 0 UTC. As horas "a mais" de cada
-    # bloco sao catch-up: o cron do GitHub atrasa — ja foi medido atraso de 145min.
-    - cron: '5,25,45 10,11,16,17,19,20,21,23,0 * * *'
+    - cron: '5,25,45 10,11,16,17,20,21 * * *'
   workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
@@ -60,12 +57,29 @@ jobs:
       - name: Guardar o estado da fila
         if: always()
         run: |
-          if [ -n "$(git status --porcelain publicador/fila.json)" ]; then
-            git config user.name  "publicador"
-            git config user.email "publicador@users.noreply.github.com"
-            git add publicador/fila.json
-            git commit -m "fila: estado após a rodada de $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
-          else
-            echo "nada mudou na fila"
+          set -e
+          if [ -z "$(git status --porcelain publicador/fila.json)" ]; then
+            echo "nada mudou na fila"; exit 0
           fi
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+
+          # ⚠️ NAO empurrar por cima. Em 20/08/2026 um Reels saiu DUPLICADO: o push
+          # desta etapa foi rejeitado (o agente commitou 1 min antes), o registro de
+          # "publicado" se perdeu, e a rodada seguinte postou o mesmo video de novo.
+          # Agora a gente RECONCILIA a cada tentativa: quem ja foi publicado ganha.
+          cp publicador/fila.json /tmp/fila-minha.json
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            git show origin/main:publicador/fila.json > /tmp/fila-remota.json
+            node publicador/funde-fila.mjs /tmp/fila-minha.json /tmp/fila-remota.json publicador/fila.json
+            git add publicador/fila.json
+            if git diff --cached --quiet; then echo "ja estava igual ao que ha no GitHub"; exit 0; fi
+            git commit -q -m "fila: estado apos a rodada de $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "estado salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado — alguem chegou antes; refazendo a fusao"
+            sleep 5
+          done
+          echo "::error::nao consegui salvar o estado da fila em 5 tentativas"
+          exit 1
