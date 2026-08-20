@@ -41,7 +41,7 @@ const dorme = ms => new Promise(r => setTimeout(r, ms));
 //
 // ⚠️ Falhar aqui NUNCA pode marcar o post como falho: o vídeo já está no ar. O erro
 // fica registrado no item pra aparecer no log e no saude.yml.
-const COMENTARIO = '📚 Curtiu? Isso aqui vira livro: dá pra testar o Kindle Unlimited de graça e ler o quanto quiser — link na bio. (link de afiliado)';
+const COMENTARIO = '📚 Curtiu? Isso aqui vira livro: dá pra testar o Kindle Unlimited de graça e ler o quanto quiser — link na bio.';
 
 async function comenta(idMidia) {
   const r = await post(`${API}/${idMidia}/comments`, { message: COMENTARIO, access_token: IG_TOKEN });
