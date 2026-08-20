@@ -51,6 +51,25 @@ function agoraLocal() {
   };
 }
 
+// RODIZIO DE TEMA (20/08/2026). A agenda antiga tinha um cardapio fixo: os
+// mesmos seis celulares, todo dia, nos mesmos horarios. Em oito dias o story
+// virou repeticao — e o alcance media 7 a 8 pessoas por peca.
+//
+// A mudanca e de PROPOSITO minima: o dia escolhe o cardapio e sobrescreve
+// `agenda.slots` UMA vez, aqui. Validacao, alarme do dia e publicacao seguem
+// lendo `agenda.slots` exatamente como liam antes — nenhuma delas mudou.
+// Sem `rodizio` no JSON, nada disso roda e o comportamento antigo volta.
+//
+// ⚠️ O indice 0 tem que ser o cardapio que ja esta no ar quando isto entrar.
+// Trocar o cardapio do dia CORRENTE faz o script achar que os itens novos
+// ficaram por publicar e disparar o bloco fora de hora.
+if (Array.isArray(agenda.rodizio) && agenda.rodizio.length) {
+  const dias = Math.floor(Date.parse(`${agoraLocal().data}T12:00:00Z`) / 86400000);
+  const cardapio = agenda.rodizio[dias % agenda.rodizio.length];
+  agenda.slots = cardapio.slots;
+  console.log(`cardapio de hoje: ${cardapio.nome} (dia ${dias % agenda.rodizio.length + 1} de ${agenda.rodizio.length})`);
+}
+
 function leDimensoesJpeg(buffer) {
   if (buffer.length < 4 || buffer[0] !== 0xff || buffer[1] !== 0xd8) {
     throw new Error('arquivo remoto não é JPEG');
