@@ -474,7 +474,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a69161f6-1826-48a6-b0df-c523c35a049d.png",
     "legenda": "",
     "slug": "story-blog-2026-08-21",
-    "status": "agendado"
+    "status": "falhou",
+    "erro": "publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"type\":\"OAuthException\",\"code\":24,\"error_subcode\":2207006,\"is_transient\":false,\"error_user_title\":\"Mídia não encontrada\",\"error_user_msg\":\"Não foi possível encontrar a mídia com 17.874.018.996.629.830.\",\"fbtrace_id\":\"AmGG9XkA5Y6O2pur5VT9hrm\"}}"
   },
   {
     "quando": "2026-08-21T21:00:00.000Z",
