@@ -26,7 +26,13 @@ on:
     # ⚠️ NÃO voltar pra '*/15 * * * *': o GitHub cobra cada execução arredondada
     # pra 1 minuto, */15 dá 2.880 min/mês e o plano grátis tem 2.000.
     # Isto aqui dá 18 execuções/dia ≈ 540 min/mês.
-    - cron: '5,25,45 10,11,16,17,20,21 * * *'
+    # ⚠️ 21/08/2026: as horas 22 e 23 entraram porque o STORY DAS 20h BRT (23:00Z) nao
+    # tinha cobertura nenhuma — o ultimo disparo do dia era 21:45Z. Ele so seria visto
+    # as 10:05Z do dia seguinte, 11h depois, e o publicador descarta o que venceu ha
+    # mais de 6h. Resultado: o story das 20h era marcado PERDIDO todo dia, em silencio.
+    # Achado na fila: story-kindle-2026-08-20-23 -> perdido.
+    # 24 execucoes/dia ~ 720 min/mes, dentro dos 2.000 do plano gratis.
+    - cron: '5,25,45 10,11,16,17,20,21,22,23 * * *'
   workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
