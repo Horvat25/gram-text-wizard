@@ -54,6 +54,25 @@ jobs:
           IG_CONTA: neuralupdate
         run: node publicador/publicar.mjs
 
+
+      # Comentario do Kindle nos videos do YouTube que acabaram de ficar publicos.
+      # Roda aqui, pendurado no workflow que ja existe, pra nao gastar minuto novo do
+      # plano gratis. Leva `continue-on-error` porque falha no YouTube NUNCA pode travar
+      # a fila do Instagram — o publicador e o que nao pode parar.
+      #
+      # O robo nunca comenta duas vezes: antes de escrever ele PERGUNTA ao YouTube se o
+      # nosso proprio canal ja comentou naquele video. Checar a fonte e mais confiavel que
+      # guardar estado em arquivo — arquivo se perde, e comentario repetido e vexame.
+      #
+      # ⚠️ Exige o escopo `youtube.force-ssl` no YT_REFRESH_TOKEN. Sem ele a API nega ate
+      # a LEITURA dos comentarios (insufficientPermissions). Reautorizado em 21/08/2026.
+      - name: Comentar nos Shorts que sairam
+        continue-on-error: true
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: node publicador/comenta-youtube.mjs
       - name: Guardar o estado da fila
         if: always()
         run: |
