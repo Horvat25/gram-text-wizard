@@ -433,7 +433,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2582fa63-4a08-406b-9137-ef622809187a.png",
     "legenda": "",
     "slug": "story-kindle-2026-08-20-23",
-    "status": "agendado"
+    "status": "perdido",
+    "erro": "venceu há mais de 6h"
   },
   {
     "quando": "2026-08-21T11:00:00.000Z",
