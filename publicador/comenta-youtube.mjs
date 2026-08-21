@@ -37,17 +37,42 @@ const JANELA_HORAS = 30;
 // depois vira assinatura paga, e que dá pra cancelar antes. Protege a conta também —
 // prometer "grátis" sem qualificar é o que vira reclamação.
 //
-// ⚠️ E aqui o aviso de afiliado FICA, ao contrário da legenda do Instagram: lá o link
-// mora na bio (que já exibe o aviso), aqui o link está DENTRO do comentário. A regra é
-// exibir onde o link aparece.
-const TEXTO = [
-  '📚 Se você curte esses assuntos: o primeiro mês do Kindle Unlimited é grátis.',
-  'Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada.',
+//
+// ⚠️ DUAS SUPERFÍCIES, DOIS TEXTOS (21/08/2026, correção do Marcelo).
+//
+// No player de SHORTS o link do comentário NÃO é clicável — no celular ele aparece
+// como texto morto. (Eu tinha "verificado" na página de computador, onde ele vira
+// <a href> de verdade, e concluí errado. Conferir na superfície onde a pessoa está.)
+// Então no Short o comentário manda pra BIO DO CANAL, igual ao "link na bio" do
+// Instagram — e o link do canal já existe e já aponta pra /links?o=yt.
+//
+// No vídeo LONGO o link é clicável de verdade, então lá vai a URL inteira.
+//
+// ⚠️ O aviso de afiliado só aparece onde o LINK aparece (contrato dos Associados,
+// cláusula 5). No texto do Short não há link, então ele não vai — igual à legenda
+// do Instagram.
+const TEXTO_CURTO = [
+  '📚 O primeiro mês do Kindle Unlimited é grátis.',
+  'O link está na bio do canal: toca em Neural Update aqui em cima e vai em "Links".',
   '',
+  'Depois vira assinatura paga — se não quiser continuar, cancela antes de o mês acabar e não paga nada.',
+].join('\n');
+
+const TEXTO_LONGO = [
+  '📚 O primeiro mês do Kindle Unlimited é grátis:',
   'https://neural-update.com.br/links?o=yt',
+  '',
+  'Depois vira assinatura paga — se não quiser continuar, cancela antes de o mês acabar e não paga nada.',
   '',
   '(link de afiliado — como participante do Programa de Associados da Amazon, sou remunerado pelas compras qualificadas, sem custo a mais pra você)',
 ].join('\n');
+
+// Short vai até 3 min em 2026. Acima disso é vídeo comum, onde o link funciona.
+const ehShort = v => {
+  const m = (v.contentDetails?.duration || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/) || [];
+  const seg = (+(m[1] || 0)) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0));
+  return seg > 0 && seg <= 185;
+};
 
 async function token() {
   const r = await fetch('https://oauth2.googleapis.com/token', {
@@ -82,7 +107,7 @@ async function main() {
   const ids = (lista.items || []).map(i => i.contentDetails.videoId);
   if (!ids.length) { console.log('nenhum vídeo no canal'); return; }
 
-  const detalhes = await get(tk, '/videos', { part: 'status,snippet', id: ids.join(',') });
+  const detalhes = await get(tk, '/videos', { part: 'status,snippet,contentDetails', id: ids.join(',') });
   const corte = Date.now() - JANELA_HORAS * 3600 * 1000;
 
   const candidatos = (detalhes.items || []).filter(v =>
@@ -110,7 +135,7 @@ async function main() {
     const r = await fetch(`${API}/commentThreads?part=snippet`, {
       method: 'POST',
       headers: { authorization: `Bearer ${tk}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ snippet: { videoId: v.id, topLevelComment: { snippet: { textOriginal: TEXTO } } } }),
+      body: JSON.stringify({ snippet: { videoId: v.id, topLevelComment: { snippet: { textOriginal: ehShort(v) ? TEXTO_CURTO : TEXTO_LONGO } } } }),
     });
     const j = await r.json();
     if (j.id) console.log(`✓ ${titulo} — comentado`);
