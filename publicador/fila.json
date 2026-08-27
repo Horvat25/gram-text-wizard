@@ -869,5 +869,182 @@
     "slug": "nw-onda-choque-estrela-morta",
     "origem": "atrasado",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-08-28T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5e415001-0c74-45a5-9696-1f71f3753cb0.mp4",
+    "legenda": "Tempestade geomagnética a caminho: em 25 de agosto de 2026, às 10h02 UTC, a região ativa 4513 do Sol liberou uma explosão classe M6.9, que causou um apagão de rádio R2 no lado iluminado da Terra. A explosão lançou uma ejeção de massa coronal com componente direcionada ao nosso planeta, seguida por uma segunda nuvem ligada a um filamento. A NOAA emitiu alerta de tempestade geomagnética G2 para 28 de agosto, com condições G1 a G2 entre 27 e 28 e índice Kp previsto em até 5,67. Efeitos esperados: auroras visíveis em latitudes mais baixas que o normal, alarmes de voltagem em redes elétricas de alta latitude e satélites precisando corrigir órbita por causa do arrasto atmosférico.\n\n#sol #aurora #neuralupdate",
+    "slug": "nw-tempestade-solar-g2",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-28T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c1839832-8316-4e59-91a6-b5d7b31cc1e5.mp4",
+    "legenda": "A energia escura pode estar enfraquecendo. O levantamento DESI, no Observatório Kitt Peak, montou o maior mapa tridimensional do universo já feito, com cerca de 15 milhões de galáxias e quasares. Sozinhos, os dados ainda cabem no modelo padrão. Mas combinados com a radiação cósmica de fundo, com supernovas e com lentes gravitacionais fracas, aparecem indícios de que a energia escura vem perdendo força nos últimos bilhões de anos, em vez de ser a constante cosmológica que o modelo assume. Se confirmado, muda o destino previsto para a expansão do universo. Um novo mapa, com 50 milhões de galáxias, é esperado até o início de 2027.\n\n#energiaescura #astronomia #neuralupdate",
+    "slug": "nw-energia-escura-enfraquecendo",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-28T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a9ecca7c-ede9-41b7-93b3-6ff36c8822d3.mp4",
+    "legenda": "Três buracos negros supermassivos na mesma galáxia: anunciado em 12 de agosto de 2026 pelo Instituto Max Planck de Física Extraterrestre, com dados do telescópio James Webb. A galáxia J0148-4214 está a mais de 12,5 bilhões de anos-luz, e a vemos como era cerca de 1,2 bilhão de anos depois do Big Bang. Os três estão ativos, devorando matéria. Dois ficam perto do centro, separados por apenas 620 anos-luz, e devem se fundir em algumas centenas de milhões de anos. O terceiro está a cerca de 5.500 anos-luz do centro. É a primeira vez que três buracos negros supermassivos são detectados numa única galáxia, e sugere que fusões foram um atalho para eles crescerem tão rápido no universo jovem.\n\n#buraconegro #astronomia #neuralupdate",
+    "slug": "nw-tres-buracos-negros",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-29T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e47e52ca-9fbe-4b26-913f-810843387213.mp4",
+    "legenda": "O Nancy Grace Roman Space Telescope deixa a Terra para nunca mais voltar. O espelho dele veio de um satélite de espionagem que olhava para baixo. Ele não enxerga mais fundo que o Hubble — enxerga cem vezes mais largo, e deve medir a luz de um bilhão de galáxias.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
+    "slug": "nw-flow-roman-lancamento",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-29T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f57ad844-83ba-4151-a8a7-22b291273306.mp4",
+    "legenda": "A missão TESS da NASA anunciou em 24 de junho de 2026 dois planetas gigantes de densidade comparável à de algodão-doce. Os dois orbitam uma estrela parecida com o Sol a cerca de 1.113 anos-luz. Um tem quase o tamanho de Júpiter, mas 3% da sua massa; o outro é maior e tem 5,9%. Sete anos de dados permitiram medir como eles alteram o tempo das passagens diante da estrela e, assim, confirmar suas massas extremamente baixas.\n\n#exoplanetas #astronomia #neuralupdate",
+    "slug": "nw-planetas-algodao-doce",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-29T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9dee2bc9-1611-4215-b229-5241ad76f25d.mp4",
+    "legenda": "A Terra vista do céu de Marte: em 2 de julho de 2026, no sol 1.907 da missão, o rover Perseverance apontou a câmera Mastcam-Z para o céu do entardecer marciano e registrou a Terra desaparecendo atrás de Fobos, a maior das duas luas de Marte. Astrônomos chamam isso de ocultação. A imagem final é a composição de sete fotos, e nosso planeta aparece como um único pixel brilhante a 314 milhões de quilômetros de distância. É a primeira vez na história que uma câmera na superfície de outro planeta registra a Terra sumindo atrás de outro corpo.\n\n#marte #astronomia #neuralupdate",
+    "slug": "nw-terra-sumiu-ceu-de-marte",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-30T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/71efda94-0c77-4645-9fbd-84a7f3d94bf0.mp4",
+    "legenda": "Em 5 de agosto o estágio superior de um Falcon 9 caiu sem controle na Lua e abriu um buraco de 18 metros. A sonda da NASA fotografou seis dias depois — os raios claros em volta são material que nunca tinha visto a luz do Sol.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
+    "slug": "nw-flow-cratera-falcon9",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-30T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0bc4471a-3230-45a5-9ed9-48f51aabf466.mp4",
+    "legenda": "A missão IXPE da NASA observou por mais de 140 horas uma estrela de nêutrons altamente magnetizada e encontrou um padrão de polarização compatível com uma previsão de 90 anos da eletrodinâmica quântica. Em campos magnéticos extremos, o vácuo pode se comportar como um meio que altera a luz. O resultado, publicado em 5 de agosto de 2026, é apresentado pela NASA como a primeira medição desse tipo e ainda será testado por novas observações.\n\n#astronomia #fisicaquantica #neuralupdate",
+    "slug": "nw-vacuo-quantico-estrela-morta",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-30T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e04eff00-03c4-4380-995d-8a3f6feb5a95.mp4",
+    "legenda": "Sagitário A* tem 4 milhões de massas solares e faz estrelas dispararem ao redor — mas menos de 1% do gás que chega nele chega a cruzar o horizonte de eventos. O resto escapa em clarões. Estamos a 26 mil anos-luz dele.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
+    "slug": "nw-flow-sagitario-a-jejum",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-31T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ec92b739-da00-47e5-96b3-187d3a00f40f.mp4",
+    "legenda": "Pela primeira vez, astrônomos acompanharam o nascimento de um magnetar. Na supernova SN 2024afav, a curva de luz apresentou uma variação repetida, descrita como um chirp, atribuída à precessão de Lense-Thirring prevista pela relatividade geral: o núcleo recém-formado gira inclinado e arrasta o espaço-tempo ao redor. É a primeira evidência direta de que magnetares, estrelas de nêutrons com campo magnético extremo e rotação rápida, alimentam pelo menos parte das supernovas superluminosas, as explosões estelares mais brilhantes já registradas. Estudo divulgado pela Universidade da Califórnia em Berkeley em março de 2026.\n\n#magnetar #astronomia #neuralupdate",
+    "slug": "nw-nascimento-de-um-magnetar",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-31T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/525804f4-1b47-49f1-804f-8ce82cf66ee5.mp4",
+    "legenda": "A maior fusão de buracos negros já detectada: o evento GW231123, registrado pela rede LIGO-Virgo-KAGRA, deixou como resultado um buraco negro de cerca de 225 massas solares. O problema é que essa massa cai no chamado vão de massa superior, uma faixa que a teoria de evolução estelar considera proibida: estrelas nessa escala terminam em explosão de instabilidade de pares e não deixam buraco negro. A explicação mais aceita é a fusão hierárquica, ou seja, os dois objetos que se fundiram já seriam eles próprios resultado de fusões anteriores, algo esperado em ambientes densos como aglomerados globulares.\n\n#buraconegro #astronomia #neuralupdate",
+    "slug": "nw-fusao-proibida-buracos-negros",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-31T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/90ffb655-5797-49dd-81c0-cb3088d7a0d6.mp4",
+    "legenda": "A colisão entre a Via Láctea e Andrômeda deixou de ser certeza. Um estudo publicado na Nature Astronomy, usando dados combinados dos telescópios Hubble e Gaia, refez as contas incluindo a influência gravitacional das galáxias vizinhas do Grupo Local, como a Grande Nuvem de Magalhães. O resultado: em cerca de metade das simulações as duas galáxias passam uma pela outra sem se fundir nos próximos 10 bilhões de anos. Ao mesmo tempo, o mapeamento do halo de Andrômeda feito com o Hubble mostra que a auréola de gás dela já se estende até cerca de metade do caminho até nós e encosta na nossa.\n\n#andromeda #astronomia #neuralupdate",
+    "slug": "nw-andromeda-pode-nao-bater",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-01T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d4e695a1-0950-4e72-8d69-73b160e67e38.mp4",
+    "legenda": "A missão Psyche, da NASA, está a caminho do asteroide 16 Psyche, no cinturão principal, um corpo rico em metal que pode ser o núcleo exposto de um planetesimal que nunca chegou a virar planeta. A sonda concluiu recentemente um sobrevoo de Marte para ganho gravitacional, com imagens já divulgadas, e retomou o uso dos motores elétricos rumo ao destino. A chegada está prevista para 2029. Se a hipótese do núcleo exposto se confirmar, será a primeira vez que a humanidade observa de perto o interior metálico de um corpo planetário, algo que na Terra está a milhares de quilômetros de profundidade e é inacessível.\n\n#asteroide #astronomia #neuralupdate",
+    "slug": "nw-asteroide-de-metal",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-01T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7d7b4ec1-1a37-425d-a201-661532925136.mp4",
+    "legenda": "Imagens divulgadas em 6 de agosto de 2026 pela American Physical Society mostram a superfície solar em escala de 20 quilômetros, mais de duas vezes menor que a alcançada em observações anteriores. A nova resolução revelou espirais de plasma extensas nas fronteiras entre regiões magnéticas e não magnéticas. Os pesquisadores as interpretam como instabilidades de Kelvin-Helmholtz e avaliam que a mistura contínua pode ajudar a transportar energia pela atmosfera solar e aquecer a coroa. O mecanismo ainda está sob investigação.\n\n#sol #astronomia #neuralupdate",
+    "slug": "nw-sol-girinhos-plasma-calor",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-01T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/208fd463-a801-4996-bf1b-a61e8a8a1dce.mp4",
+    "legenda": "Buracos de minhoca aparecem nas equações da relatividade, mas nenhum jamais foi observado. Para continuar aberto, um túnel desses precisaria de energia negativa — algo que nunca conseguimos controlar. Sem ela, colapsaria antes da travessia.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
+    "slug": "nw-flow-portal-minhoca",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-02T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e780f3e-4e6b-424a-aed8-fa02e1c15184.mp4",
+    "legenda": "Em 26 de agosto de 2026, o rover Curiosity da NASA completou um ganho de elevação de um quilômetro desde a cratera Gale, na subida do Monte Sharp em Marte. A missão, em atividade há 14 anos, registrou a vista com um mosaico de 323 imagens capturadas no início de agosto. A montanha tem cerca de cinco quilômetros de altura; o rover a escala desde 2014 para investigar as camadas geológicas que registram os antigos ambientes marcianos.\n\n#marte #nasa #neuralupdate",
+    "slug": "nw-robo-subiu-marte",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-02T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f04693c5-9f14-48c8-af7c-9445004bf5dc.mp4",
+    "legenda": "Um estudo publicado em 18 de agosto de 2026 na Nature Astronomy indica que algumas das galáxias mais massivas do universo jovem abrigavam muito mais estrelas de baixa massa do que os modelos supunham. Como essas estrelas são fracas, grande parte da massa ficava escondida: a análise sugere que as precursoras de certas galáxias primordiais podem ter sido cerca de quatro vezes mais massivas do que as estimativas anteriores. Isso amplia o desafio de explicar como galáxias enormes se formaram tão cedo.\n\n#galaxias #astronomia #neuralupdate",
+    "slug": "nw-galaxias-escondiam-massa",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-02T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4b30f6b8-639e-47bf-9d97-0efeea57e10b.mp4",
+    "legenda": "Chuva de pedras preciosas em outro mundo: observações do telescópio James Webb sobre o exoplaneta WASP-121b, um Júpiter ultraquente, indicam ventos de cerca de 18 mil quilômetros por hora e precipitação de metal líquido no lado noturno, com condensação de minerais como corindo, a mesma substância que forma rubis e safiras. O planeta orbita tão perto da estrela que um ano dele dura aproximadamente 30,5 horas, e mantém sempre a mesma face voltada para ela: o lado do dia derrete a rocha, o vento supersônico carrega o vapor para o lado da noite, e lá o material esfria e se condensa.\n\n#exoplaneta #astronomia #neuralupdate",
+    "slug": "nw-planeta-chove-rubi",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-03T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3e701241-524f-4dea-a0cd-65fee9fa6667.mp4",
+    "legenda": "A maior erupção vulcânica já registrada no sistema solar aconteceu em Io, a lua mais interna das quatro grandes de Júpiter. Io é o corpo com mais vulcanismo ativo conhecido, e o motor não é calor residual de formação: é aquecimento de maré. A gravidade de Júpiter, somada ao puxão das luas Europa e Ganimedes, deforma Io continuamente, e o atrito interno derrete a rocha. Dados recentes da sonda Juno indicam um interior que se comporta menos como um oceano de magma contínuo e mais como uma estrutura porosa, tipo esponja, com bolsões de rocha derretida distribuídos.\n\n#jupiter #astronomia #neuralupdate",
+    "slug": "nw-maior-erupcao-em-io",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-03T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/20bfabb6-c137-49d9-901f-0214ca478cfe.mp4",
+    "legenda": "Um artigo publicado em 12 de agosto de 2026 na Nature apresenta evidência para a primeira corrente estelar de um aglomerado globular observada fora da Via Láctea. A estrutura foi identificada em imagens profundas do telescópio Hubble da galáxia ultradifusa UGC 9050-Dw1. Ao modelar a forma da corrente, a equipe obteve a primeira restrição de halo baseada em uma corrente para uma galáxia ultradifusa; os modelos sugerem um halo de matéria escura massivo. Trata-se de evidência, não de uma detecção definitiva isolada.\n\n#materiaescura #astronomia #neuralupdate",
+    "slug": "nw-corrente-estelar-materia-escura",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-03T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2de98b6e-5dfc-4501-82cf-ce02fcc0b23d.mp4",
+    "legenda": "Júpiter é uma esfera de gás sem superfície nenhuma. Descendo pelas nuvens a luz some e a pressão esmaga qualquer nave. A Grande Mancha Vermelha é uma tempestade maior que a Terra girando há séculos.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
+    "slug": "nw-flow-jupiter-sem-chao",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-04T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5a60f88a-66dd-462c-9be9-1d9e0c8f17e4.mp4",
+    "legenda": "O Very Large Telescope registrou uma onda de choque em volta de uma estrela morta — e a imagem deixou os astrônomos intrigados. O formato não bate com o que os modelos previam para o material expelido por uma estrela no fim da vida.\n\n📩 Manda pro amigo que gosta de imagem de telescópio que ninguém consegue explicar.\n\n📚 Gosta desses assuntos? O primeiro mês do Kindle Unlimited é grátis (depois vira assinatura paga, e dá pra cancelar antes de acabar o mês) — link na bio.\n\n🎥 As aulas e os documentários completos ficam no nosso canal do YouTube: Neural Update.\n\n#estrela #astronomia #ciência",
+    "slug": "nw-onda-choque-estrela-morta",
+    "origem": "atrasado",
+    "status": "agendado"
   }
 ]
