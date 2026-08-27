@@ -877,6 +877,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-28T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d3f532fc-2201-4f41-8485-947b72ea49ee.mp4",
+    "legenda": "AULA da escola Universo do Zero. O tempo não é igual para todos: ele depende da velocidade de quem mede. Quanto mais rápido alguém se move, mais devagar o relógio dele anda — já foi medido com relógios atômicos em avião. Na velocidade da luz o tempo pararia, mas nada com massa chega lá. Quem chega é a própria luz, e para ela o tempo não passa.\n\n#relatividade #física #neuralupdate",
+    "slug": "pl27-espaco-tempo",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-28T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a9ecca7c-ede9-41b7-93b3-6ff36c8822d3.mp4",
@@ -893,6 +901,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-29T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/dc8a76d6-7ff6-40f7-b522-1dc31fd29c8f.mp4",
+    "legenda": "AULA da escola Universo do Zero. Massa entorta o espaço, e a luz que passa perto segue esse desvio. Um aglomerado de galáxias na frente vira uma lente natural: ele espalha em arcos a imagem do que está atrás, às vezes em várias cópias da mesma galáxia — e amplifica objetos fracos demais para qualquer telescópio sozinho.\n\n#relatividade #astronomia #neuralupdate",
+    "slug": "pl28-lentes-gravitacionais",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-29T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9dee2bc9-1611-4215-b229-5241ad76f25d.mp4",
@@ -906,6 +922,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/71efda94-0c77-4645-9fbd-84a7f3d94bf0.mp4",
     "legenda": "Em 5 de agosto o estágio superior de um Falcon 9 caiu sem controle na Lua e abriu um buraco de 18 metros. A sonda da NASA fotografou seis dias depois — os raios claros em volta são material que nunca tinha visto a luz do Sol.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
     "slug": "nw-flow-cratera-falcon9",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-30T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5e8cf383-c9dc-4655-9b3e-3ee318d4a695.mp4",
+    "legenda": "AULA da escola Universo do Zero. Buraco negro não é uma coisa pesada, é uma coisa apertada. Para cada massa existe um raio crítico: se ela couber dentro dele, nada mais escapa. O da Terra tem cerca de nove milímetros; o do Sol, cerca de três quilômetros.\n\n#buraconegro #física #neuralupdate",
+    "slug": "pl29-raio-de-schwarzschild",
     "status": "agendado"
   },
   {
