@@ -877,7 +877,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5e415001-0c74-45a5-9696-1f71f3753cb0.mp4",
     "legenda": "Tempestade geomagnética a caminho: em 25 de agosto de 2026, às 10h02 UTC, a região ativa 4513 do Sol liberou uma explosão classe M6.9, que causou um apagão de rádio R2 no lado iluminado da Terra. A explosão lançou uma ejeção de massa coronal com componente direcionada ao nosso planeta, seguida por uma segunda nuvem ligada a um filamento. A NOAA emitiu alerta de tempestade geomagnética G2 para 28 de agosto, com condições G1 a G2 entre 27 e 28 e índice Kp previsto em até 5,67. Efeitos esperados: auroras visíveis em latitudes mais baixas que o normal, alarmes de voltagem em redes elétricas de alta latitude e satélites precisando corrigir órbita por causa do arrasto atmosférico.\n\n#sol #aurora #neuralupdate",
     "slug": "nw-tempestade-solar-g2",
-    "status": "agendado"
+    "status": "perdido",
+    "erro": "venceu há mais de 6h"
   },
   {
     "quando": "2026-08-28T17:00:00.000Z",
@@ -885,7 +886,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d3f532fc-2201-4f41-8485-947b72ea49ee.mp4",
     "legenda": "AULA da escola Universo do Zero. O tempo não é igual para todos: ele depende da velocidade de quem mede. Quanto mais rápido alguém se move, mais devagar o relógio dele anda — já foi medido com relógios atômicos em avião. Na velocidade da luz o tempo pararia, mas nada com massa chega lá. Quem chega é a própria luz, e para ela o tempo não passa.\n\n#relatividade #física #neuralupdate",
     "slug": "pl27-espaco-tempo",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18118217875924333",
+    "publicado_em": "2026-08-28T17:28:44.974Z",
+    "id_comentario": "18110340647046348"
   },
   {
     "quando": "2026-08-28T21:00:00.000Z",
