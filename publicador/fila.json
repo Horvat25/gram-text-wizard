@@ -949,6 +949,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-31T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/84e1ea04-e7a7-4d21-b778-5cdce478dff0.mp4",
+    "legenda": "AULA da escola Universo do Zero. Quando uma estrela grande colapsa e não vira buraco negro, a gravidade aperta tanto que os elétrons são empurrados para dentro dos prótons. Sobra uma esfera de cerca de vinte quilômetros carregando mais massa que o Sol inteiro.\n\n#estreladeneutrons #astrofísica #neuralupdate",
+    "slug": "pl30-estrelas-de-neutrons",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-31T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e04eff00-03c4-4380-995d-8a3f6feb5a95.mp4",
@@ -962,6 +970,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d4e695a1-0950-4e72-8d69-73b160e67e38.mp4",
     "legenda": "A missão Psyche, da NASA, está a caminho do asteroide 16 Psyche, no cinturão principal, um corpo rico em metal que pode ser o núcleo exposto de um planetesimal que nunca chegou a virar planeta. A sonda concluiu recentemente um sobrevoo de Marte para ganho gravitacional, com imagens já divulgadas, e retomou o uso dos motores elétricos rumo ao destino. A chegada está prevista para 2029. Se a hipótese do núcleo exposto se confirmar, será a primeira vez que a humanidade observa de perto o interior metálico de um corpo planetário, algo que na Terra está a milhares de quilômetros de profundidade e é inacessível.\n\n#asteroide #astronomia #neuralupdate",
     "slug": "nw-asteroide-de-metal",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-01T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ebc35dfb-5547-4707-88c6-d3e27aa54613.mp4",
+    "legenda": "AULA da escola Universo do Zero. Um pulsar é uma estrela de nêutrons girando: ela dispara dois feixes pelos polos e, se um deles varre a Terra, chega um pulso a cada volta. Farol, não mensagem. Alguns giram centenas de vezes por segundo, sempre no mesmo compasso.\n\n#pulsar #astronomia #neuralupdate",
+    "slug": "pl31-pulsares",
     "status": "agendado"
   },
   {
@@ -981,6 +997,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-02T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/91173f0d-83b1-4a73-9bf7-a4c1b836bf41.mp4",
+    "legenda": "AULA da escola Universo do Zero. Um magnetar é uma estrela de nêutrons com o campo magnético mais intenso que se conhece. Ele é tão forte que deforma átomos e faz a própria crosta da estrela rachar — e cada rachadura solta um surto de raios gama que atravessa a galáxia.\n\n#magnetar #astrofísica #neuralupdate",
+    "slug": "pl32-magnetares",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-02T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2de98b6e-5dfc-4501-82cf-ce02fcc0b23d.mp4",
@@ -994,6 +1018,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3e701241-524f-4dea-a0cd-65fee9fa6667.mp4",
     "legenda": "A maior erupção vulcânica já registrada no sistema solar aconteceu em Io, a lua mais interna das quatro grandes de Júpiter. Io é o corpo com mais vulcanismo ativo conhecido, e o motor não é calor residual de formação: é aquecimento de maré. A gravidade de Júpiter, somada ao puxão das luas Europa e Ganimedes, deforma Io continuamente, e o atrito interno derrete a rocha. Dados recentes da sonda Juno indicam um interior que se comporta menos como um oceano de magma contínuo e mais como uma estrutura porosa, tipo esponja, com bolsões de rocha derretida distribuídos.\n\n#jupiter #astronomia #neuralupdate",
     "slug": "nw-maior-erupcao-em-io",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-03T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4917f917-beed-472b-bc5a-8ade1a545e27.mp4",
+    "legenda": "AULA da escola Universo do Zero. Por dentro, uma estrela massiva é como uma cebola: cada camada funde um elemento diferente, e toda fusão até o ferro libera energia — é essa energia que sustenta a estrela contra a própria gravidade. Fundir ferro, porém, consome energia em vez de liberar. No instante em que o núcleo vira ferro, o apoio desaparece e a estrela colapsa em menos de um segundo.\n\n#astrofísica #supernova #neuralupdate",
+    "slug": "pl33-nucleossintese-estelar",
     "status": "agendado"
   },
   {
