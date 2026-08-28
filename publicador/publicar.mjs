@@ -114,12 +114,59 @@ async function publica(item) {
   return pub.id;
 }
 
+// Os horários da grade, em UTC: 08h, 14h, 18h e 21h BRT.
+// É para cá que vai um post que perdeu a hora — nunca para um horário fora da grade.
+const SLOTS_UTC = [11, 17, 21, 0];
+
+// Primeiro horário da grade, depois de `apartir`, que ainda não tem nada marcado.
+// Procura por 7 dias; se não achar (fila cheia), aí sim o item é dado como perdido.
+function proximoSlotLivre(fila, apartir) {
+  const ocupado = new Set(fila.filter(i => i.status !== 'perdido').map(i => i.quando));
+  for (let d = 0; d <= 7; d++) {
+    for (const h of SLOTS_UTC) {
+      const t = new Date(apartir);
+      t.setUTCHours(0, 0, 0, 0);
+      t.setUTCDate(t.getUTCDate() + d);
+      t.setUTCHours(h, 0, 0, 0);
+      const iso = t.toISOString();
+      // margem de 20 min: não adianta marcar para daqui a 1 minuto e perder de novo
+      if (t.getTime() < apartir + 20 * 60 * 1000) continue;
+      if (!ocupado.has(iso)) return iso;
+    }
+  }
+  return null;
+}
+
 const fila = JSON.parse(fs.readFileSync(FILA, 'utf8'));
 const agora = Date.now();
 const vencidos = fila.filter(i => i.status === 'agendado' && new Date(i.quando).getTime() <= agora);
 
+// ── BATIMENTO (28/08/2026) ───────────────────────────────────────────────────
+// O `saude.yml` deveria avisar quando post fica para trás, mas ele roda pelo MESMO
+// cron do GitHub que às vezes engasga — quando o publicador para, o vigia para junto
+// e ninguém é avisado. Foi o que houve em 27 e 28/08: 4 posts perdidos em silêncio.
+// Aqui o próprio publicador registra quando rodou e grita no retorno se ficou tempo
+// demais fora do ar. Não previne a falha do GitHub, mas garante que ela seja VISTA.
+const BATIMENTO = new URL('./ultima-rodada.json', import.meta.url);
+const MAX_GAP_H = 4;   // o cron dispara de 20 em 20 min nas horas ativas
+let gapAviso = null;
+try {
+  const ant = JSON.parse(fs.readFileSync(BATIMENTO, 'utf8'));
+  const gapH = (agora - new Date(ant.em).getTime()) / 3600000;
+  if (gapH > MAX_GAP_H) {
+    gapAviso = `⚠️ O publicador ficou ${gapH.toFixed(1)}h sem rodar (última: ${ant.em}). ` +
+      `O cron do GitHub não disparou nesse intervalo — confira se algum post foi reagendado.`;
+    console.error(gapAviso);
+  }
+} catch { /* primeira execução: não há batimento anterior */ }
+try {
+  fs.writeFileSync(BATIMENTO, JSON.stringify({ em: new Date(agora).toISOString() }, null, 2) + '\n', 'utf8');
+} catch (e) { console.error('não deu para gravar o batimento:', e.message); }
+
 console.log(`fila: ${fila.length} · vencidos agora: ${vencidos.length}`);
-if (!vencidos.length) process.exit(0);
+// Sai cedo quando não há nada vencido — mas se o cron ficou horas fora do ar, o job
+// precisa FALHAR mesmo assim, senão o e-mail de alerta não chega.
+if (!vencidos.length) process.exit(gapAviso ? 1 : 0);
 
 if (SECO) {
   for (const i of vencidos) console.log(`[seco] ${i.quando} ${i.tipo} ${i.midia.slice(0, 60)}…`);
@@ -130,13 +177,23 @@ await confereConta();
 
 let mudou = false;
 for (const item of vencidos) {
-  // Item vencido há mais de 6h não sai atrasado: post fora de hora atrapalha
-  // mais do que ajuda, e mascara a falha. Vira 'perdido' pra aparecer no log.
+  // Item vencido há mais de 6h não sai atrasado: post fora de hora atrapalha mais do
+  // que ajuda. Mas DESCARTAR também não serve — em 27 e 28/08/2026 o cron do GitHub
+  // engasgou dois dias seguidos e isso custou 4 posts, que simplesmente morreram.
+  // Agora ele vai para o próximo slot LIVRE da grade em vez de virar lixo.
   if (agora - new Date(item.quando).getTime() > 6 * 3600 * 1000) {
-    item.status = 'perdido';
-    item.erro = 'venceu há mais de 6h';
+    const novo = proximoSlotLivre(fila, agora);
+    if (novo) {
+      console.log(`REAGENDADO (venceu há mais de 6h): ${item.quando} -> ${novo}`);
+      item.quando = novo;
+      item.reagendado_em = new Date().toISOString();
+      item.motivo_reagendamento = 'cron nao disparou no horario original';
+    } else {
+      item.status = 'perdido';
+      item.erro = 'venceu há mais de 6h e não havia slot livre em 7 dias';
+      console.log(`PERDIDO (sem slot livre): ${item.quando}`);
+    }
     mudou = true;
-    console.log(`PERDIDO (atrasado demais): ${item.quando}`);
     continue;
   }
   try {
@@ -169,4 +226,7 @@ for (const item of vencidos) {
 if (mudou) fs.writeFileSync(FILA, JSON.stringify(fila, null, 2) + '\n', 'utf8');
 const falhas = fila.filter(i => i.status === 'falhou').length;
 console.log(`\nresumo: ${fila.filter(i => i.status === 'publicado').length} publicados · ${falhas} falhas · ${fila.filter(i => i.status === 'agendado').length} na fila`);
-if (falhas) process.exitCode = 1;
+// O e-mail do GitHub só chega quando o job falha — então um buraco no cron precisa
+// derrubar o job, senão continua sendo descoberto pelo Marcelo olhando o feed.
+if (gapAviso) console.error(`\n${gapAviso}`);
+if (falhas || gapAviso) process.exitCode = 1;

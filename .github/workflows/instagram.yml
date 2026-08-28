@@ -88,11 +88,15 @@ jobs:
         if: always()
         run: |
           set -e
-          if [ -z "$(git status --porcelain publicador/fila.json)" ]; then
+          if [ -z "$(git status --porcelain publicador/fila.json publicador/ultima-rodada.json)" ]; then
             echo "nada mudou na fila"; exit 0
           fi
           git config user.name  "publicador"
           git config user.email "publicador@users.noreply.github.com"
+
+          # O batimento (ultima-rodada.json) precisa sobreviver ao reset da reconciliação
+          # abaixo, senão o publicador nunca enxerga o buraco no cron — ver publicar.mjs.
+          cp publicador/ultima-rodada.json /tmp/batimento.json 2>/dev/null || true
 
           # ⚠️ NAO empurrar por cima. Em 20/08/2026 um Reels saiu DUPLICADO: o push
           # desta etapa foi rejeitado (o agente commitou 1 min antes), o registro de
@@ -104,7 +108,8 @@ jobs:
             git reset --hard -q origin/main
             git show origin/main:publicador/fila.json > /tmp/fila-remota.json
             node publicador/funde-fila.mjs /tmp/fila-minha.json /tmp/fila-remota.json publicador/fila.json
-            git add publicador/fila.json
+            cp /tmp/batimento.json publicador/ultima-rodada.json 2>/dev/null || true
+            git add publicador/fila.json publicador/ultima-rodada.json
             if git diff --cached --quiet; then echo "ja estava igual ao que ha no GitHub"; exit 0; fi
             git commit -q -m "fila: estado apos a rodada de $(date -u +%Y-%m-%dT%H:%MZ)"
             if git push -q origin HEAD:main; then echo "estado salvo (tentativa $tentativa)"; exit 0; fi

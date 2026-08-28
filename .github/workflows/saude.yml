@@ -6,7 +6,12 @@ name: Saúde do publicador
 
 on:
   schedule:
-    - cron: '0 12 * * *'    # 09h BRT, todo dia
+    # ⚠️ 28/08/2026: era um disparo só por dia (12:00Z) e isso deixou o canal cego.
+    # Em 27 e 28/08 o cron do GitHub engasgou, o publicador parou — e o vigia parou
+    # junto, porque depende do MESMO cron. Resultado: 4 posts morreram sem aviso, e
+    # quem descobriu foi o Marcelo olhando o feed.
+    # Três disparos espalhados pelo dia: se um for engolido, os outros ainda gritam.
+    - cron: '0 12,19,2 * * *'    # 09h, 16h e 23h BRT
   workflow_dispatch:
 
 jobs:
