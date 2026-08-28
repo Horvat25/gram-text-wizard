@@ -514,6 +514,16 @@
           "id_instagram": "18028428254853814",
           "publicado_em": "2026-08-28T04:00:54.469Z"
         }
+      },
+      "09": {
+        "acessorio-parede": {
+          "id_instagram": "17943904680338168",
+          "publicado_em": "2026-08-28T21:58:37.592Z"
+        },
+        "acessorio-suporte-bike": {
+          "id_instagram": "17942166678341268",
+          "publicado_em": "2026-08-28T21:58:50.339Z"
+        }
       }
     }
   },
@@ -597,7 +607,8 @@
       "09": {}
     },
     "2026-08-28": {
-      "17": {}
+      "17": {},
+      "09": {}
     }
   },
   "ultima_auditoria": {
