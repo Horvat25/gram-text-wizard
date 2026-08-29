@@ -925,11 +925,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-29T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/36b716c4-b0c4-4962-a146-7c57d5d3d699.png",
+    "legenda": "",
+    "slug": "story-blog-2026-08-29",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-29T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9dee2bc9-1611-4215-b229-5241ad76f25d.mp4",
     "legenda": "A Terra vista do céu de Marte: em 2 de julho de 2026, no sol 1.907 da missão, o rover Perseverance apontou a câmera Mastcam-Z para o céu do entardecer marciano e registrou a Terra desaparecendo atrás de Fobos, a maior das duas luas de Marte. Astrônomos chamam isso de ocultação. A imagem final é a composição de sete fotos, e nosso planeta aparece como um único pixel brilhante a 314 milhões de quilômetros de distância. É a primeira vez na história que uma câmera na superfície de outro planeta registra a Terra sumindo atrás de outro corpo.\n\n#marte #astronomia #neuralupdate",
     "slug": "nw-terra-sumiu-ceu-de-marte",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-29T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3db65290-36f6-4bbc-a781-e7ec80289d13.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-08-29",
     "status": "agendado"
   },
   {
@@ -941,11 +957,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-30T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ceb2409f-7ee2-4ce7-98b6-9bb90b438476.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-08-30",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-30T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5e8cf383-c9dc-4655-9b3e-3ee318d4a695.mp4",
     "legenda": "AULA da escola Universo do Zero. Buraco negro não é uma coisa pesada, é uma coisa apertada. Para cada massa existe um raio crítico: se ela couber dentro dele, nada mais escapa. O da Terra tem cerca de nove milímetros; o do Sol, cerca de três quilômetros.\n\n#buraconegro #física #neuralupdate",
     "slug": "pl29-raio-de-schwarzschild",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-30T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d4869871-e2a7-49ee-bb0a-88a835d9225d.png",
+    "legenda": "",
+    "slug": "story-blog-2026-08-30",
     "status": "agendado"
   },
   {
@@ -957,11 +989,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-30T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/95e0bb4d-e4d8-4ece-aa3a-6893c4f3eba7.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-08-30",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-31T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ec92b739-da00-47e5-96b3-187d3a00f40f.mp4",
     "legenda": "Pela primeira vez, astrônomos acompanharam o nascimento de um magnetar. Na supernova SN 2024afav, a curva de luz apresentou uma variação repetida, descrita como um chirp, atribuída à precessão de Lense-Thirring prevista pela relatividade geral: o núcleo recém-formado gira inclinado e arrasta o espaço-tempo ao redor. É a primeira evidência direta de que magnetares, estrelas de nêutrons com campo magnético extremo e rotação rápida, alimentam pelo menos parte das supernovas superluminosas, as explosões estelares mais brilhantes já registradas. Estudo divulgado pela Universidade da Califórnia em Berkeley em março de 2026.\n\n#magnetar #astronomia #neuralupdate",
     "slug": "nw-nascimento-de-um-magnetar",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-31T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2530e3c6-2dbd-4354-b648-b5d9e5bcdd09.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-08-31",
     "status": "agendado"
   },
   {
@@ -973,11 +1021,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-08-31T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6b5f709d-0f19-4b92-9794-0920d2b98e8f.png",
+    "legenda": "",
+    "slug": "story-blog-2026-08-31",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-08-31T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e04eff00-03c4-4380-995d-8a3f6feb5a95.mp4",
     "legenda": "Sagitário A* tem 4 milhões de massas solares e faz estrelas dispararem ao redor — mas menos de 1% do gás que chega nele chega a cruzar o horizonte de eventos. O resto escapa em clarões. Estamos a 26 mil anos-luz dele.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
     "slug": "nw-flow-sagitario-a-jejum",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-08-31T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/84999a06-b783-465d-b05a-9ab87ccc5550.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-08-31",
     "status": "agendado"
   },
   {
@@ -989,11 +1053,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-01T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e979205e-8ee5-4ec0-9f2d-2024fa1bf49b.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-01",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-01T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ebc35dfb-5547-4707-88c6-d3e27aa54613.mp4",
     "legenda": "AULA da escola Universo do Zero. Um pulsar é uma estrela de nêutrons girando: ela dispara dois feixes pelos polos e, se um deles varre a Terra, chega um pulso a cada volta. Farol, não mensagem. Alguns giram centenas de vezes por segundo, sempre no mesmo compasso.\n\n#pulsar #astronomia #neuralupdate",
     "slug": "pl31-pulsares",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-01T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/63d42750-90ca-4e29-813e-2e73a4448d7e.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-01",
     "status": "agendado"
   },
   {
@@ -1005,11 +1085,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-01T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6659cb0e-e646-4fb1-aa14-da198d9e7364.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-01",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-02T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e780f3e-4e6b-424a-aed8-fa02e1c15184.mp4",
     "legenda": "Em 26 de agosto de 2026, o rover Curiosity da NASA completou um ganho de elevação de um quilômetro desde a cratera Gale, na subida do Monte Sharp em Marte. A missão, em atividade há 14 anos, registrou a vista com um mosaico de 323 imagens capturadas no início de agosto. A montanha tem cerca de cinco quilômetros de altura; o rover a escala desde 2014 para investigar as camadas geológicas que registram os antigos ambientes marcianos.\n\n#marte #nasa #neuralupdate",
     "slug": "nw-robo-subiu-marte",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-02T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/364afc23-3a8b-4945-ad1a-f1f16e90f39f.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-02",
     "status": "agendado"
   },
   {
@@ -1021,11 +1117,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-02T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/156d036e-6360-4bff-8526-bbc7eb433f94.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-02",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-02T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2de98b6e-5dfc-4501-82cf-ce02fcc0b23d.mp4",
     "legenda": "Júpiter é uma esfera de gás sem superfície nenhuma. Descendo pelas nuvens a luz some e a pressão esmaga qualquer nave. A Grande Mancha Vermelha é uma tempestade maior que a Terra girando há séculos.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
     "slug": "nw-flow-jupiter-sem-chao",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-02T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b1225628-7be4-42af-91f6-0b37edc7372c.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-02",
     "status": "agendado"
   },
   {
@@ -1037,6 +1149,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-03T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b5456931-37d4-4c04-af2a-c43db062b381.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-03",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-03T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4917f917-beed-472b-bc5a-8ade1a545e27.mp4",
@@ -1045,11 +1165,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-03T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/71830e24-9a40-4ffc-b437-ebb35158f826.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-03",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-03T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4b30f6b8-639e-47bf-9d97-0efeea57e10b.mp4",
     "legenda": "Chuva de pedras preciosas em outro mundo: observações do telescópio James Webb sobre o exoplaneta WASP-121b, um Júpiter ultraquente, indicam ventos de cerca de 18 mil quilômetros por hora e precipitação de metal líquido no lado noturno, com condensação de minerais como corindo, a mesma substância que forma rubis e safiras. O planeta orbita tão perto da estrela que um ano dele dura aproximadamente 30,5 horas, e mantém sempre a mesma face voltada para ela: o lado do dia derrete a rocha, o vento supersônico carrega o vapor para o lado da noite, e lá o material esfria e se condensa.\n\n#exoplaneta #astronomia #neuralupdate",
     "slug": "nw-planeta-chove-rubi",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-03T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/753bfc0c-1659-4efd-83d4-6c5820265161.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-03",
     "status": "agendado"
   },
   {
@@ -1062,6 +1198,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-04T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/01e79a56-2b6e-4241-81cd-6177d183005c.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-04",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-04T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9f3450c8-0125-488e-bf26-cb51f5174f6a.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-04",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-04T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0bc4471a-3230-45a5-9ed9-48f51aabf466.mp4",
@@ -1070,11 +1222,43 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-04T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1aa6ee40-ef23-4aef-8c22-a6aba377d606.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-04",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-05T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b79bd8fe-af17-4a91-95d8-8939c0e3d328.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-05",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-05T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4e0abbd9-44f7-4f1a-bd10-e1f5e004e501.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-05",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-05T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/525804f4-1b47-49f1-804f-8ce82cf66ee5.mp4",
     "legenda": "A maior fusão de buracos negros já detectada: o evento GW231123, registrado pela rede LIGO-Virgo-KAGRA, deixou como resultado um buraco negro de cerca de 225 massas solares. O problema é que essa massa cai no chamado vão de massa superior, uma faixa que a teoria de evolução estelar considera proibida: estrelas nessa escala terminam em explosão de instabilidade de pares e não deixam buraco negro. A explicação mais aceita é a fusão hierárquica, ou seja, os dois objetos que se fundiram já seriam eles próprios resultado de fusões anteriores, algo esperado em ambientes densos como aglomerados globulares.\n\n#buraconegro #astronomia #neuralupdate",
     "slug": "nw-fusao-proibida-buracos-negros",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-05T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d310dd2d-4e63-4d86-b34e-092cff121af1.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-05",
     "status": "agendado"
   },
   {
