@@ -15,18 +15,31 @@ const agora = Date.now();
 let problema = false;
 
 const atrasados = fila.filter(i => i.status === 'agendado' && new Date(i.quando).getTime() < agora - 3600e3);
-const falhados = fila.filter(i => i.status === 'falhou' || i.status === 'perdido');
 const futuros = fila.filter(i => i.status === 'agendado' && new Date(i.quando).getTime() >= agora);
+
+// ⚠️ 29/08/2026 — O BUG QUE CEGOU O VIGIA.
+// Antes, QUALQUER item com falha derrubava o workflow. Como falha antiga nunca é
+// limpa da fila, o vigia passou a falhar nas três rodadas de todo dia desde 19/08.
+// Alarme que toca todo dia é alarme que ninguém abre: quando o cron comeu as manhãs
+// de 27, 28 e 29, o e-mail de alerta chegou igual aos outros e se perdeu no meio.
+// Agora só falha o que é ACIONÁVEL — falha recente. O histórico vira linha informativa.
+const JANELA_H = 48;
+const falhados = fila.filter(i => i.status === 'falhou' || i.status === 'perdido');
+const recentes = falhados.filter(i => agora - new Date(i.quando).getTime() <= JANELA_H * 3600e3);
+const antigos = falhados.length - recentes.length;
 
 if (atrasados.length) {
   problema = true;
   console.error(`${atrasados.length} post(s) venceram há mais de 1h e NÃO saíram:`);
   for (const i of atrasados) console.error(`  ${i.quando}`);
 }
-if (falhados.length) {
+if (recentes.length) {
   problema = true;
-  console.error(`${falhados.length} post(s) com falha:`);
-  for (const i of falhados) console.error(`  ${i.quando} — ${i.erro || i.status}`);
+  console.error(`${recentes.length} post(s) com falha nas últimas ${JANELA_H}h:`);
+  for (const i of recentes) console.error(`  ${i.quando} — ${i.slug || '?'} — ${i.erro || i.status}`);
+}
+if (antigos) {
+  console.log(`(${antigos} falha(s) antiga(s) na fila, fora da janela de ${JANELA_H}h — histórico, não alarme)`);
 }
 
 // Fila curta também é um problema: sem aviso, o canal fica mudo de um dia pro outro.

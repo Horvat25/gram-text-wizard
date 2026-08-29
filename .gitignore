@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# log do gatilho local (maquina do Marcelo)
+publicador/gatilho-local.log
