@@ -37,7 +37,15 @@ on:
     # 10:05Z do dia seguinte — 10h depois, além da janela de 6h, ou seja, PERDIDO em silêncio.
     # É o mesmo buraco que matava o story das 20h. Não confundir com 01:00Z, que continua
     # fora de propósito: aquele horário é pico de cron no mundo todo e mediu 145 min de atraso.
-    - cron: '5,25,45 0,10,11,16,17,20,21,22,23 * * *'
+    # ⚠️ 29/08/2026: o post das 08h nao saiu pela SEGUNDA manha seguida. O cron do GitHub
+    # nao engole disparos soltos — ele engole PERIODOS INTEIROS. Hoje comeu as horas 10 e 11
+    # inteiras (os seis disparos); ontem comeu a manha toda. Historico de rodadas efetivas:
+    #   01h:1  04h:1  11h:4  17h:5  19h:1  20h:5  21h:4  23h:5
+    # Reagendar (conserto de 28/08) nao basta: se o publicador nao RODA, nada acontece.
+    # As horas 12,13,14,15 entraram como RECUPERACAO — se a janela das 10-11 falhar, o post
+    # das 08h BRT sai com ~1h de atraso em vez de esperar as 16h (5h de buraco).
+    # 39 disparos/dia ~1.170/mes. Uso medido em 28/08: 691 min de 2.000 (34%) -> vai a ~52%.
+    - cron: '5,25,45 0,10,11,12,13,14,15,16,17,20,21,22,23 * * *'
   workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
