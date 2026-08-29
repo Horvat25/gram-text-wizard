@@ -888,7 +888,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a9ecca7c-ede9-41b7-93b3-6ff36c8822d3.mp4",
     "legenda": "Três buracos negros supermassivos na mesma galáxia: anunciado em 12 de agosto de 2026 pelo Instituto Max Planck de Física Extraterrestre, com dados do telescópio James Webb. A galáxia J0148-4214 está a mais de 12,5 bilhões de anos-luz, e a vemos como era cerca de 1,2 bilhão de anos depois do Big Bang. Os três estão ativos, devorando matéria. Dois ficam perto do centro, separados por apenas 620 anos-luz, e devem se fundir em algumas centenas de milhões de anos. O terceiro está a cerca de 5.500 anos-luz do centro. É a primeira vez que três buracos negros supermassivos são detectados numa única galáxia, e sugere que fusões foram um atalho para eles crescerem tão rápido no universo jovem.\n\n#buraconegro #astronomia #neuralupdate",
     "slug": "nw-tres-buracos-negros",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17901849042572339",
+    "publicado_em": "2026-08-29T01:09:12.959Z",
+    "id_comentario": "18030436283852473"
   },
   {
     "quando": "2026-08-29T00:00:00.000Z",
@@ -896,8 +899,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5e415001-0c74-45a5-9696-1f71f3753cb0.mp4",
     "legenda": "Tempestade geomagnética a caminho: em 25 de agosto de 2026, às 10h02 UTC, a região ativa 4513 do Sol liberou uma explosão classe M6.9, que causou um apagão de rádio R2 no lado iluminado da Terra. A explosão lançou uma ejeção de massa coronal com componente direcionada ao nosso planeta, seguida por uma segunda nuvem ligada a um filamento. A NOAA emitiu alerta de tempestade geomagnética G2 para 28 de agosto, com condições G1 a G2 entre 27 e 28 e índice Kp previsto em até 5,67. Efeitos esperados: auroras visíveis em latitudes mais baixas que o normal, alarmes de voltagem em redes elétricas de alta latitude e satélites precisando corrigir órbita por causa do arrasto atmosférico.\n\n#sol #aurora #neuralupdate",
     "slug": "nw-tempestade-solar-g2",
-    "status": "agendado",
-    "erro": "venceu há mais de 6h"
+    "status": "publicado",
+    "erro": "venceu há mais de 6h",
+    "id_instagram": "18147310129556417",
+    "publicado_em": "2026-08-29T01:10:02.903Z",
+    "id_comentario": "18230140519320680"
   },
   {
     "quando": "2026-08-29T11:00:00.000Z",
