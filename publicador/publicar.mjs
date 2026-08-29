@@ -159,9 +159,14 @@ try {
     console.error(gapAviso);
   }
 } catch { /* primeira execução: não há batimento anterior */ }
-try {
-  fs.writeFileSync(BATIMENTO, JSON.stringify({ em: new Date(agora).toISOString() }, null, 2) + '\n', 'utf8');
-} catch (e) { console.error('não deu para gravar o batimento:', e.message); }
+// ⚠️ NUNCA gravar o batimento em ensaio a seco (29/08/2026): rodar `--seco` na máquina
+// carimbaria "o publicador rodou agora" e APAGARIA a prova de um buraco real no cron —
+// o alarme mentiria justamente no dia em que ele importa. Teste não altera evidência.
+if (!SECO) {
+  try {
+    fs.writeFileSync(BATIMENTO, JSON.stringify({ em: new Date(agora).toISOString() }, null, 2) + '\n', 'utf8');
+  } catch (e) { console.error('não deu para gravar o batimento:', e.message); }
+}
 
 console.log(`fila: ${fila.length} · vencidos agora: ${vencidos.length}`);
 // Sai cedo quando não há nada vencido — mas se o cron ficou horas fora do ar, o job
