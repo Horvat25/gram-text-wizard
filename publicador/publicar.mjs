@@ -176,6 +176,11 @@ if (SECO) {
 await confereConta();
 
 let mudou = false;
+// ⚠️ 29/08/2026: o job media sucesso pelo TOTAL de falhas da fila — e falha antiga
+// nunca sai de lá. Com duas falhas de 19 e 21/08 paradas, TODA rodada que publicava
+// terminava vermelha (39 de 100). Vermelho constante = ninguém olha, e foi assim que
+// as manhãs comidas pelo cron passaram batido. Agora só conta o que falhou AGORA.
+let falhasAgora = 0;
 for (const item of vencidos) {
   // Item vencido há mais de 6h não sai atrasado: post fora de hora atrapalha mais do
   // que ajuda. Mas DESCARTAR também não serve — em 27 e 28/08/2026 o cron do GitHub
@@ -219,14 +224,15 @@ for (const item of vencidos) {
     item.status = 'falhou';
     item.erro = String(e.message || e).slice(0, 400);
     mudou = true;
+    falhasAgora++;
     console.error(`  FALHOU: ${item.erro}`);
   }
 }
 
 if (mudou) fs.writeFileSync(FILA, JSON.stringify(fila, null, 2) + '\n', 'utf8');
-const falhas = fila.filter(i => i.status === 'falhou').length;
+const falhas = fila.filter(i => i.status === 'falhou').length;   // histórico, só para o resumo
 console.log(`\nresumo: ${fila.filter(i => i.status === 'publicado').length} publicados · ${falhas} falhas · ${fila.filter(i => i.status === 'agendado').length} na fila`);
 // O e-mail do GitHub só chega quando o job falha — então um buraco no cron precisa
 // derrubar o job, senão continua sendo descoberto pelo Marcelo olhando o feed.
 if (gapAviso) console.error(`\n${gapAviso}`);
-if (falhas || gapAviso) process.exitCode = 1;
+if (falhasAgora || gapAviso) process.exitCode = 1;
