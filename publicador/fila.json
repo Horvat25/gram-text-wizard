@@ -996,7 +996,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d4869871-e2a7-49ee-bb0a-88a835d9225d.png",
     "legenda": "",
     "slug": "story-blog-2026-08-30",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17901510702578221",
+    "publicado_em": "2026-08-30T21:10:40.921Z"
   },
   {
     "quando": "2026-08-30T21:00:00.000Z",
@@ -1004,7 +1006,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/90ffb655-5797-49dd-81c0-cb3088d7a0d6.mp4",
     "legenda": "A colisão entre a Via Láctea e Andrômeda deixou de ser certeza. Um estudo publicado na Nature Astronomy, usando dados combinados dos telescópios Hubble e Gaia, refez as contas incluindo a influência gravitacional das galáxias vizinhas do Grupo Local, como a Grande Nuvem de Magalhães. O resultado: em cerca de metade das simulações as duas galáxias passam uma pela outra sem se fundir nos próximos 10 bilhões de anos. Ao mesmo tempo, o mapeamento do halo de Andrômeda feito com o Hubble mostra que a auréola de gás dela já se estende até cerca de metade do caminho até nós e encosta na nossa.\n\n#andromeda #astronomia #neuralupdate",
     "slug": "nw-andromeda-pode-nao-bater",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18127979713781410",
+    "publicado_em": "2026-08-30T21:11:20.483Z",
+    "id_comentario": "18090768794395977"
   },
   {
     "quando": "2026-08-30T23:00:00.000Z",
