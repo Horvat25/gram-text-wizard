@@ -1121,7 +1121,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/63d42750-90ca-4e29-813e-2e73a4448d7e.png",
     "legenda": "",
     "slug": "story-blog-2026-09-01",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17967484404153065",
+    "publicado_em": "2026-09-01T21:10:36.979Z"
   },
   {
     "quando": "2026-09-01T21:00:00.000Z",
@@ -1129,7 +1131,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/208fd463-a801-4996-bf1b-a61e8a8a1dce.mp4",
     "legenda": "Buracos de minhoca aparecem nas equações da relatividade, mas nenhum jamais foi observado. Para continuar aberto, um túnel desses precisaria de energia negativa — algo que nunca conseguimos controlar. Sem ela, colapsaria antes da travessia.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
     "slug": "nw-flow-portal-minhoca",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17904238635516419",
+    "publicado_em": "2026-09-01T21:11:17.254Z",
+    "id_comentario": "18095504858425722"
   },
   {
     "quando": "2026-09-01T23:00:00.000Z",
