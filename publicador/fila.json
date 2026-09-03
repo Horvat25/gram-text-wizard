@@ -1247,7 +1247,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/71830e24-9a40-4ffc-b437-ebb35158f826.png",
     "legenda": "",
     "slug": "story-blog-2026-09-03",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18127350739687591",
+    "publicado_em": "2026-09-03T21:10:45.348Z"
   },
   {
     "quando": "2026-09-03T21:00:00.000Z",
@@ -1255,7 +1257,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4b30f6b8-639e-47bf-9d97-0efeea57e10b.mp4",
     "legenda": "Chuva de pedras preciosas em outro mundo: observações do telescópio James Webb sobre o exoplaneta WASP-121b, um Júpiter ultraquente, indicam ventos de cerca de 18 mil quilômetros por hora e precipitação de metal líquido no lado noturno, com condensação de minerais como corindo, a mesma substância que forma rubis e safiras. O planeta orbita tão perto da estrela que um ano dele dura aproximadamente 30,5 horas, e mantém sempre a mesma face voltada para ela: o lado do dia derrete a rocha, o vento supersônico carrega o vapor para o lado da noite, e lá o material esfria e se condensa.\n\n#exoplaneta #astronomia #neuralupdate",
     "slug": "nw-planeta-chove-rubi",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18095510330086906",
+    "publicado_em": "2026-09-03T21:11:23.978Z",
+    "id_comentario": "18076834433372066"
   },
   {
     "quando": "2026-09-03T23:00:00.000Z",
