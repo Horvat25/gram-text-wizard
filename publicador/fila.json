@@ -1339,7 +1339,7 @@
   {
     "quando": "2026-09-05T17:00:00.000Z",
     "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/97ae6553-6c6f-45d8-8810-d19ee6d99f02.mp4",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e40e2d98-48c8-4dc8-b39b-c7544ac60d0a.mp4",
     "legenda": "AULA da escola Universo do Zero. Quase nada cai direto num buraco negro: a matéria chega girando e entra em órbita, formando um disco. O atrito entre as camadas aquece o gás a milhões de graus — e ele passa a brilhar mais que a galáxia inteira.\n\n#buraconegro #astrofísica #neuralupdate",
     "slug": "pl35-disco-de-acrecao",
     "status": "agendado"
@@ -1387,7 +1387,7 @@
   {
     "quando": "2026-09-06T17:00:00.000Z",
     "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8ee53d52-b6a9-46ed-aa48-eb0467be2f12.mp4",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/28a827ac-6a23-4ffa-ae48-d11e0a43b589.mp4",
     "legenda": "AULA da escola Universo do Zero. Nem tudo que chega ao disco atravessa o horizonte: parte é lançada pelos polos em dois jatos. O campo magnético torcido do disco funciona como uma mangueira que aperta o material e atira.\n\n#buraconegro #astrofísica #neuralupdate",
     "slug": "pl36-jatos-relativisticos",
     "status": "agendado"
@@ -1435,7 +1435,7 @@
   {
     "quando": "2026-09-07T17:00:00.000Z",
     "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e3036280-7f55-490f-b1cf-a2654ba6cddc.mp4",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/76132237-f2e7-4915-a33d-f44093c8f277.mp4",
     "legenda": "AULA da escola Universo do Zero. Um quasar é um buraco negro supermassivo se alimentando depressa demais, com o disco em brasa. Quando foram descobertos pareciam estrelas no telescópio — mas a luz vinha de bilhões de anos-luz de distância.\n\n#quasar #astronomia #neuralupdate",
     "slug": "pl37-quasares",
     "status": "agendado"
@@ -1483,7 +1483,7 @@
   {
     "quando": "2026-09-08T17:00:00.000Z",
     "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9946d9c5-8ba8-4f9c-8f5d-09b9e8b10513.mp4",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8235453a-bfb5-49da-846a-2b5a65f48cb4.mp4",
     "legenda": "AULA da escola Universo do Zero. Matéria bariônica é a matéria comum, a de átomos — a que forma estrela, planeta e você. Ela responde por cerca de cinco por cento do universo, e mesmo dentro desses cinco por cento a maior parte não está em estrelas.\n\n#cosmologia #astronomia #neuralupdate",
     "slug": "pl38-materia-barionica",
     "status": "agendado"
@@ -1521,6 +1521,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-09T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/513210d7-8380-4bd8-9e32-5db17b482093.mp4",
+    "legenda": "A NASA informa que o telescópio espacial Roman, previsto para lançamento em 30 de agosto de 2026, terá campo de visão ao menos 100 vezes maior que o do Hubble, mantendo sensibilidade e resolução parecidas no infravermelho. Assim, poderá pesquisar o céu até mil vezes mais rápido e observar bilhões de objetos cósmicos. Seu espelho de 2,4 metros e o instrumento de campo amplo vão mapear galáxias, matéria escura e expansão cósmica. Uma das pesquisas deve monitorar 100 milhões de estrelas para detectar cerca de 2.500 planetas pela microlente gravitacional, inclusive mundos menores que Marte.\n\n#telescopio #espaco #neuralupdate",
+    "slug": "nw-telescopio-nao-ve-mais-nitido",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-09T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ddd9bffa-ce6b-45e8-aab7-cf4ce054971c.mp4",
@@ -1534,6 +1542,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/72b542df-364f-437d-a5bc-658c4280a722.png",
     "legenda": "",
     "slug": "story-blog-2026-09-09",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-09T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/832f5d1d-0933-4a5d-8eb0-b67863fd288b.mp4",
+    "legenda": "Pesquisa destacada pela NASA propõe uma solução para o paradoxo do Sol jovem fraco: há 3 bilhões de anos, o Sol brilhava com cerca de 70% da intensidade atual, embora a Terra já tivesse água líquida. Ao estudar estrelas jovens parecidas com o Sol, cientistas viram que elas lançam grandes supererupções com frequência. Em simulações de laboratório, partículas dessas explosões produziram óxido nitroso na atmosfera antiga; esse gás é cerca de 300 vezes mais potente que o dióxido de carbono como gás de efeito estufa. O mecanismo é uma hipótese, não uma reconstrução observada diretamente da Terra jovem.\n\n#sol #terra #neuralupdate",
+    "slug": "nw-sol-fraco-terra-nao-congelou",
     "status": "agendado"
   },
   {
@@ -1553,6 +1569,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-10T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8ae634be-4946-4b2b-b680-1cdfdf1d626b.mp4",
+    "legenda": "O cometa interestelar 3I/ATLAS, o terceiro já confirmado vindo de fora do Sistema Solar, foi analisado pelo telescópio espacial James Webb depois de passar perto do Sol. A Agência Espacial Europeia informou em 22 de junho de 2026 que o objeto tem uma proporção de deutério — hidrogênio pesado — cerca de 30 vezes maior que a dos cometas do nosso sistema, e pouco carbono-13. As assinaturas químicas sugerem que ele se formou em uma nuvem muito fria, num sistema estelar antigo, possivelmente há 10 a 12 bilhões de anos. A idade é uma estimativa, não uma medição direta.\n\n#cometa #astronomia #neuralupdate",
+    "slug": "nw-cometa-nao-nasceu-aqui",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-10T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/42075f14-ec28-44cd-ad7c-b72667dce8b0.mp4",
@@ -1566,6 +1590,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/388eb9ad-b308-43da-a100-6c86c46940d3.png",
     "legenda": "",
     "slug": "story-blog-2026-09-10",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-10T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7241588a-5592-424d-9ce7-0b3987ce46cb.mp4",
+    "legenda": "Dados do Hubble e da missão Gaia deram evidência definitiva de que a jovem Via Láctea absorveu uma galáxia anã há cerca de 11,8 bilhões de anos, apenas 2 bilhões de anos após o Big Bang. Pesquisadores estudaram 39 aglomerados globulares no interior da galáxia e identificaram uma terceira população: mais velha que a de uma fusão posterior, mas mais jovem que os grupos nascidos na própria Via Láctea. A galáxia absorvida, batizada de Low-energy-Kraken-Heracles, tinha cerca de 500 milhões de massas solares em estrelas.\n\n#galaxia #astronomia #neuralupdate",
+    "slug": "nw-galaxia-devorada-nossa",
     "status": "agendado"
   },
   {
