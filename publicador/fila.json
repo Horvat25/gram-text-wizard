@@ -1327,6 +1327,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-05T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/af9f1e00-f618-401c-9fa6-b93d9550f580.mp4",
+    "legenda": "A missão Proba-3 da ESA usa duas naves em voo de formação a 60 mil quilômetros da Terra para criar eclipses artificiais do Sol. A nave Occulter bloqueia o disco solar como uma Lua artificial, permitindo que o Coronagraph observe a coroa por horas. Em 12 de agosto de 2026, durante o eclipse solar natural, a Lua atravessou o campo de visão do instrumento por 8 minutos e 40 segundos enquanto as duas naves mantinham seu próprio alinhamento. A missão estuda a coroa, região onde o vento solar ganha velocidade.\n\n#sol #astronomia #neuralupdate",
+    "slug": "nw-eclipse-artificial-duas-naves",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-05T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/97ae6553-6c6f-45d8-8810-d19ee6d99f02.mp4",
+    "legenda": "AULA da escola Universo do Zero. Quase nada cai direto num buraco negro: a matéria chega girando e entra em órbita, formando um disco. O atrito entre as camadas aquece o gás a milhões de graus — e ele passa a brilhar mais que a galáxia inteira.\n\n#buraconegro #astrofísica #neuralupdate",
+    "slug": "pl35-disco-de-acrecao",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-05T19:00:00.000Z",
     "tipo": "story",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4e0abbd9-44f7-4f1a-bd10-e1f5e004e501.png",
@@ -1351,6 +1367,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-06T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/61f916ef-d296-45c6-a55d-64b73c09923a.mp4",
+    "legenda": "Uma equipe liderada pela Carnegie Mellon acompanhou a supernova SN 2026gzf desde o primeiro clarão de raios X, detectado em março de 2026. Divulgado em 5 de agosto, o estudo descreve apenas o segundo caso claro em mais de 20 anos de uma onda de choque vista saindo de uma estrela moribunda. A explosão tinha características associadas a jatos e rajadas de raios gama, mas observações de rádio e raios X não encontraram o jato relativístico esperado. Uma hipótese é que ele tenha ficado preso na estrela ou no material ao redor.\n\n#supernova #astronomia #neuralupdate",
+    "slug": "nw-estrela-explodiu-sem-jato",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-06T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8ee53d52-b6a9-46ed-aa48-eb0467be2f12.mp4",
+    "legenda": "AULA da escola Universo do Zero. Nem tudo que chega ao disco atravessa o horizonte: parte é lançada pelos polos em dois jatos. O campo magnético torcido do disco funciona como uma mangueira que aperta o material e atira.\n\n#buraconegro #astrofísica #neuralupdate",
+    "slug": "pl36-jatos-relativisticos",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-06T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7d7b4ec1-1a37-425d-a201-661532925136.mp4",
@@ -1364,6 +1396,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c1839832-8316-4e59-91a6-b5d7b31cc1e5.mp4",
     "legenda": "A energia escura pode estar enfraquecendo. O levantamento DESI, no Observatório Kitt Peak, montou o maior mapa tridimensional do universo já feito, com cerca de 15 milhões de galáxias e quasares. Sozinhos, os dados ainda cabem no modelo padrão. Mas combinados com a radiação cósmica de fundo, com supernovas e com lentes gravitacionais fracas, aparecem indícios de que a energia escura vem perdendo força nos últimos bilhões de anos, em vez de ser a constante cosmológica que o modelo assume. Se confirmado, muda o destino previsto para a expansão do universo. Um novo mapa, com 50 milhões de galáxias, é esperado até o início de 2027.\n\n#energiaescura #astronomia #neuralupdate",
     "slug": "nw-energia-escura-enfraquecendo",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-07T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e3036280-7f55-490f-b1cf-a2654ba6cddc.mp4",
+    "legenda": "AULA da escola Universo do Zero. Um quasar é um buraco negro supermassivo se alimentando depressa demais, com o disco em brasa. Quando foram descobertos pareciam estrelas no telescópio — mas a luz vinha de bilhões de anos-luz de distância.\n\n#quasar #astronomia #neuralupdate",
+    "slug": "pl37-quasares",
     "status": "agendado"
   },
   {
@@ -1383,11 +1423,35 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-08T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9946d9c5-8ba8-4f9c-8f5d-09b9e8b10513.mp4",
+    "legenda": "AULA da escola Universo do Zero. Matéria bariônica é a matéria comum, a de átomos — a que forma estrela, planeta e você. Ela responde por cerca de cinco por cento do universo, e mesmo dentro desses cinco por cento a maior parte não está em estrelas.\n\n#cosmologia #astronomia #neuralupdate",
+    "slug": "pl38-materia-barionica",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-08T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/20bfabb6-c137-49d9-901f-0214ca478cfe.mp4",
     "legenda": "Um artigo publicado em 12 de agosto de 2026 na Nature apresenta evidência para a primeira corrente estelar de um aglomerado globular observada fora da Via Láctea. A estrutura foi identificada em imagens profundas do telescópio Hubble da galáxia ultradifusa UGC 9050-Dw1. Ao modelar a forma da corrente, a equipe obteve a primeira restrição de halo baseada em uma corrente para uma galáxia ultradifusa; os modelos sugerem um halo de matéria escura massivo. Trata-se de evidência, não de uma detecção definitiva isolada.\n\n#materiaescura #astronomia #neuralupdate",
     "slug": "nw-corrente-estelar-materia-escura",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-09T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ddd9bffa-ce6b-45e8-aab7-cf4ce054971c.mp4",
+    "legenda": "AULA da escola Universo do Zero. Ninguém pode repetir o universo para ver o que mudaria, então os cosmólogos constroem um dentro do computador: partem de pequenas diferenças de densidade no começo, deixam a gravidade agir e comparam o resultado com o céu real.\n\n#cosmologia #astronomia #neuralupdate",
+    "slug": "pl39-simulacoes-cosmologicas",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-10T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/42075f14-ec28-44cd-ad7c-b72667dce8b0.mp4",
+    "legenda": "AULA da escola Universo do Zero. A inflação cósmica propõe que, numa fração minúscula do primeiro segundo, o próprio espaço se esticou de forma extrema. Isso explica por que regiões opostas do céu têm quase a mesma temperatura e de onde vieram as irregularidades que formaram as galáxias.\n\n#cosmologia #astronomia #neuralupdate",
+    "slug": "pl40-inflacao-cosmica",
     "status": "agendado"
   }
 ]
