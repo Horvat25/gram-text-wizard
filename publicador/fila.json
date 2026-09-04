@@ -1375,11 +1375,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-06T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1e754500-fdf9-4988-91f5-cac1c5dfdc48.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-06",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-06T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8ee53d52-b6a9-46ed-aa48-eb0467be2f12.mp4",
     "legenda": "AULA da escola Universo do Zero. Nem tudo que chega ao disco atravessa o horizonte: parte é lançada pelos polos em dois jatos. O campo magnético torcido do disco funciona como uma mangueira que aperta o material e atira.\n\n#buraconegro #astrofísica #neuralupdate",
     "slug": "pl36-jatos-relativisticos",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-06T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f758ae26-4545-43d1-9c6d-4a31ef8413af.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-06",
     "status": "agendado"
   },
   {
@@ -1391,11 +1407,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-06T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/32d7b7d3-a352-4c47-978b-58289a109f32.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-06",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-07T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c1839832-8316-4e59-91a6-b5d7b31cc1e5.mp4",
     "legenda": "A energia escura pode estar enfraquecendo. O levantamento DESI, no Observatório Kitt Peak, montou o maior mapa tridimensional do universo já feito, com cerca de 15 milhões de galáxias e quasares. Sozinhos, os dados ainda cabem no modelo padrão. Mas combinados com a radiação cósmica de fundo, com supernovas e com lentes gravitacionais fracas, aparecem indícios de que a energia escura vem perdendo força nos últimos bilhões de anos, em vez de ser a constante cosmológica que o modelo assume. Se confirmado, muda o destino previsto para a expansão do universo. Um novo mapa, com 50 milhões de galáxias, é esperado até o início de 2027.\n\n#energiaescura #astronomia #neuralupdate",
     "slug": "nw-energia-escura-enfraquecendo",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-07T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3c88835c-0518-4839-9cc4-8f0c249b3a35.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-07",
     "status": "agendado"
   },
   {
@@ -1407,11 +1439,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-07T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7c776a2a-eeb3-430d-82c2-766c38ad5847.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-07",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-07T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f04693c5-9f14-48c8-af7c-9445004bf5dc.mp4",
     "legenda": "Um estudo publicado em 18 de agosto de 2026 na Nature Astronomy indica que algumas das galáxias mais massivas do universo jovem abrigavam muito mais estrelas de baixa massa do que os modelos supunham. Como essas estrelas são fracas, grande parte da massa ficava escondida: a análise sugere que as precursoras de certas galáxias primordiais podem ter sido cerca de quatro vezes mais massivas do que as estimativas anteriores. Isso amplia o desafio de explicar como galáxias enormes se formaram tão cedo.\n\n#galaxias #astronomia #neuralupdate",
     "slug": "nw-galaxias-escondiam-massa",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-07T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a1f83f3b-ee7f-4097-8f1b-c79fc09e0465.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-07",
     "status": "agendado"
   },
   {
@@ -1423,11 +1471,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-08T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0bc64a77-7623-4b57-b1bc-eb8b420e3c0e.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-08",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-08T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9946d9c5-8ba8-4f9c-8f5d-09b9e8b10513.mp4",
     "legenda": "AULA da escola Universo do Zero. Matéria bariônica é a matéria comum, a de átomos — a que forma estrela, planeta e você. Ela responde por cerca de cinco por cento do universo, e mesmo dentro desses cinco por cento a maior parte não está em estrelas.\n\n#cosmologia #astronomia #neuralupdate",
     "slug": "pl38-materia-barionica",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-08T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/92e9ebc9-167a-4d23-b717-f3c745c66665.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-08",
     "status": "agendado"
   },
   {
@@ -1439,6 +1503,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-08T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bfee586d-01c6-4dea-81ad-fd9a5cafef1f.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-08",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-09T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9193f343-6a0c-40b5-818b-ef2dcc06667c.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-09",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-09T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ddd9bffa-ce6b-45e8-aab7-cf4ce054971c.mp4",
@@ -1447,11 +1527,51 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-09T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/72b542df-364f-437d-a5bc-658c4280a722.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-09",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-09T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1ad26a3b-becb-4023-85ea-d92737b82fb5.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-09",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-10T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c17c4029-e850-499f-8fe4-85ef78c3ef87.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-10",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-10T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/42075f14-ec28-44cd-ad7c-b72667dce8b0.mp4",
     "legenda": "AULA da escola Universo do Zero. A inflação cósmica propõe que, numa fração minúscula do primeiro segundo, o próprio espaço se esticou de forma extrema. Isso explica por que regiões opostas do céu têm quase a mesma temperatura e de onde vieram as irregularidades que formaram as galáxias.\n\n#cosmologia #astronomia #neuralupdate",
     "slug": "pl40-inflacao-cosmica",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-10T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/388eb9ad-b308-43da-a100-6c86c46940d3.png",
+    "legenda": "",
+    "slug": "story-blog-2026-09-10",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-10T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bdeca821-1c16-431f-baee-e0afc7d31d19.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-10",
     "status": "agendado"
   }
 ]
