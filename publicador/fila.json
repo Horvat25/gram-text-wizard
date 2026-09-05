@@ -1331,7 +1331,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b79bd8fe-af17-4a91-95d8-8939c0e3d328.png",
     "legenda": "",
     "slug": "story-noticia-2026-09-05",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17908187547532123",
+    "publicado_em": "2026-09-05T12:16:08.285Z"
   },
   {
     "quando": "2026-09-05T11:00:00.000Z",
@@ -1339,7 +1341,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/af9f1e00-f618-401c-9fa6-b93d9550f580.mp4",
     "legenda": "A missão Proba-3 da ESA usa duas naves em voo de formação a 60 mil quilômetros da Terra para criar eclipses artificiais do Sol. A nave Occulter bloqueia o disco solar como uma Lua artificial, permitindo que o Coronagraph observe a coroa por horas. Em 12 de agosto de 2026, durante o eclipse solar natural, a Lua atravessou o campo de visão do instrumento por 8 minutos e 40 segundos enquanto as duas naves mantinham seu próprio alinhamento. A missão estuda a coroa, região onde o vento solar ganha velocidade.\n\n#sol #astronomia #neuralupdate",
     "slug": "nw-eclipse-artificial-duas-naves",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18183428527412217",
+    "publicado_em": "2026-09-05T12:16:43.857Z",
+    "id_comentario": "18112215143280027"
   },
   {
     "quando": "2026-09-05T17:00:00.000Z",
