@@ -1363,7 +1363,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4e0abbd9-44f7-4f1a-bd10-e1f5e004e501.png",
     "legenda": "",
     "slug": "story-blog-2026-09-05",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18150883858517484",
+    "publicado_em": "2026-09-05T21:10:34.669Z"
   },
   {
     "quando": "2026-09-05T21:00:00.000Z",
@@ -1371,7 +1373,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/525804f4-1b47-49f1-804f-8ce82cf66ee5.mp4",
     "legenda": "A maior fusão de buracos negros já detectada: o evento GW231123, registrado pela rede LIGO-Virgo-KAGRA, deixou como resultado um buraco negro de cerca de 225 massas solares. O problema é que essa massa cai no chamado vão de massa superior, uma faixa que a teoria de evolução estelar considera proibida: estrelas nessa escala terminam em explosão de instabilidade de pares e não deixam buraco negro. A explicação mais aceita é a fusão hierárquica, ou seja, os dois objetos que se fundiram já seriam eles próprios resultado de fusões anteriores, algo esperado em ambientes densos como aglomerados globulares.\n\n#buraconegro #astronomia #neuralupdate",
     "slug": "nw-fusao-proibida-buracos-negros",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18110048714111499",
+    "publicado_em": "2026-09-05T21:11:22.431Z",
+    "id_comentario": "17961773849985129"
   },
   {
     "quando": "2026-09-05T23:00:00.000Z",
