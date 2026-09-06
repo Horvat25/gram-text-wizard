@@ -1426,7 +1426,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f758ae26-4545-43d1-9c6d-4a31ef8413af.png",
     "legenda": "",
     "slug": "story-blog-2026-09-06",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17945915532336255",
+    "publicado_em": "2026-09-06T21:10:30.702Z"
   },
   {
     "quando": "2026-09-06T21:00:00.000Z",
@@ -1434,7 +1436,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7d7b4ec1-1a37-425d-a201-661532925136.mp4",
     "legenda": "Imagens divulgadas em 6 de agosto de 2026 pela American Physical Society mostram a superfície solar em escala de 20 quilômetros, mais de duas vezes menor que a alcançada em observações anteriores. A nova resolução revelou espirais de plasma extensas nas fronteiras entre regiões magnéticas e não magnéticas. Os pesquisadores as interpretam como instabilidades de Kelvin-Helmholtz e avaliam que a mistura contínua pode ajudar a transportar energia pela atmosfera solar e aquecer a coroa. O mecanismo ainda está sob investigação.\n\n#sol #astronomia #neuralupdate",
     "slug": "nw-sol-girinhos-plasma-calor",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18021896576874733",
+    "publicado_em": "2026-09-06T21:11:07.195Z",
+    "id_comentario": "18143661673560954"
   },
   {
     "quando": "2026-09-06T23:00:00.000Z",
