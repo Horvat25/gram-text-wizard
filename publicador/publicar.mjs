@@ -30,6 +30,42 @@ if (!SECO && (!IG_USER_ID || !IG_TOKEN)) {
 
 const dorme = ms => new Promise(r => setTimeout(r, ms));
 
+// O terceiro Story diário deixou de divulgar o Kindle Unlimited. Qualquer lote
+// novo que ainda chegue com o slug legado `story-kindle-AAAA-MM-DD` é convertido
+// aqui, antes da seleção dos vencidos, em uma das três peças do Projetor
+// Astronauta. A data decide a variação, então a rotação 1 -> 2 -> 3 continua
+// determinística entre execuções e não depende de estado externo.
+const STORY_PROJETOR_BASE = 'https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/public/stories/projetor-astronauta';
+const STORY_PROJETOR_VARIACOES = [
+  { arquivo: '01-transformacao-quarto.png', nome: 'transformacao-quarto' },
+  { arquivo: '02-presente-universo.png', nome: 'presente-universo' },
+  { arquivo: '03-atmosfera-noturna.png', nome: 'atmosfera-noturna' },
+];
+const DIA_INICIAL_ROTACAO = Date.UTC(2026, 8, 8); // 08/09/2026 = variação 1
+
+function substituiKindlePorProjetor(fila) {
+  let total = 0;
+  for (const item of fila) {
+    if (item.tipo !== 'story' || !/^story-kindle-\d{4}-\d{2}-\d{2}/u.test(item.slug || '')) continue;
+    if (!['agendado', 'pausado'].includes(item.status)) continue;
+
+    const data = item.slug.match(/\d{4}-\d{2}-\d{2}/u)?.[0] || item.quando.slice(0, 10);
+    if (Date.parse(`${data}T00:00:00.000Z`) < DIA_INICIAL_ROTACAO) continue;
+    const numeroDoDia = Math.floor((Date.parse(`${data}T00:00:00.000Z`) - DIA_INICIAL_ROTACAO) / 86400000);
+    const indice = ((numeroDoDia % STORY_PROJETOR_VARIACOES.length) + STORY_PROJETOR_VARIACOES.length) % STORY_PROJETOR_VARIACOES.length;
+    const variacao = STORY_PROJETOR_VARIACOES[indice];
+
+    item.midia = `${STORY_PROJETOR_BASE}/${variacao.arquivo}`;
+    item.slug = `story-projetor-astronauta-${data}-v${indice + 1}`;
+    item.status = 'agendado';
+    item.campanha = 'projetor-astronauta';
+    item.variacao = variacao.nome;
+    delete item.motivo_pausa;
+    total++;
+  }
+  return total;
+}
+
 // ── Primeiro comentário (20/08/2026, pedido do Marcelo) ────────────────────────
 // O Kindle SAIU de dentro do vídeo (a medição de 19/08 mostrou que o cartaz de CTA
 // derrubava a retenção de 100%+ pra 48% e quase ninguém chegava a vê-lo). A oferta
@@ -138,6 +174,7 @@ function proximoSlotLivre(fila, apartir) {
 }
 
 const fila = JSON.parse(fs.readFileSync(FILA, 'utf8'));
+const substituicoesProjetor = substituiKindlePorProjetor(fila);
 const agora = Date.now();
 const vencidos = fila.filter(i => i.status === 'agendado' && new Date(i.quando).getTime() <= agora);
 
@@ -180,7 +217,7 @@ if (SECO) {
 
 await confereConta();
 
-let mudou = false;
+let mudou = substituicoesProjetor > 0;
 // ⚠️ 29/08/2026: o job media sucesso pelo TOTAL de falhas da fila — e falha antiga
 // nunca sai de lá. Com duas falhas de 19 e 21/08 paradas, TODA rodada que publicava
 // terminava vermelha (39 de 100). Vermelho constante = ninguém olha, e foi assim que
