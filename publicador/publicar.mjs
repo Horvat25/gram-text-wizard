@@ -35,7 +35,7 @@ const dorme = ms => new Promise(r => setTimeout(r, ms));
 // aqui, antes da seleção dos vencidos, em uma das três peças do Projetor
 // Astronauta. A data decide a variação, então a rotação 1 -> 2 -> 3 continua
 // determinística entre execuções e não depende de estado externo.
-const STORY_PROJETOR_BASE = 'https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/public/stories/projetor-astronauta';
+const STORY_PROJETOR_BASE = 'https://neural-update.com.br/stories/projetor-astronauta';
 const STORY_PROJETOR_VARIACOES = [
   { arquivo: '01-transformacao-quarto.png', nome: 'transformacao-quarto' },
   { arquivo: '02-presente-universo.png', nome: 'presente-universo' },
