@@ -867,6 +867,16 @@
           "publicado_em": "2026-09-08T17:10:43.428Z"
         }
       },
+      "17": {
+        "acessorio-carregador-veicular": {
+          "id_instagram": "17979253881089859",
+          "publicado_em": "2026-09-08T20:10:31.339Z"
+        },
+        "acessorio-suporte-painel": {
+          "id_instagram": "17877199644545808",
+          "publicado_em": "2026-09-08T20:10:44.209Z"
+        }
+      },
       "09": {
         "acessorio-fone-tws": {
           "id_instagram": "18379498981227690",
@@ -1015,6 +1025,7 @@
     },
     "2026-09-08": {
       "14": {},
+      "17": {},
       "09": {}
     }
   },
