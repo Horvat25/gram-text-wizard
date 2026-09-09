@@ -899,6 +899,16 @@
           "publicado_em": "2026-09-09T18:28:09.883Z"
         }
       },
+      "17": {
+        "acessorio-suporte-ventosa": {
+          "id_instagram": "18078858974361395",
+          "publicado_em": "2026-09-09T20:10:43.601Z"
+        },
+        "produto-kit-gamer-150": {
+          "id_instagram": "18112829888100407",
+          "publicado_em": "2026-09-09T20:10:57.063Z"
+        }
+      },
       "09": {
         "acessorio-parede": {
           "id_instagram": "17905488687474895",
@@ -1052,6 +1062,7 @@
     },
     "2026-09-09": {
       "14": {},
+      "17": {},
       "09": {}
     }
   },
