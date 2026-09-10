@@ -1650,7 +1650,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c17c4029-e850-499f-8fe4-85ef78c3ef87.png",
     "legenda": "",
     "slug": "story-noticia-2026-09-10",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17925233856410044",
+    "publicado_em": "2026-09-10T11:10:24.059Z"
   },
   {
     "quando": "2026-09-10T11:00:00.000Z",
@@ -1658,7 +1660,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8ae634be-4946-4b2b-b680-1cdfdf1d626b.mp4",
     "legenda": "O cometa interestelar 3I/ATLAS, o terceiro já confirmado vindo de fora do Sistema Solar, foi analisado pelo telescópio espacial James Webb depois de passar perto do Sol. A Agência Espacial Europeia informou em 22 de junho de 2026 que o objeto tem uma proporção de deutério — hidrogênio pesado — cerca de 30 vezes maior que a dos cometas do nosso sistema, e pouco carbono-13. As assinaturas químicas sugerem que ele se formou em uma nuvem muito fria, num sistema estelar antigo, possivelmente há 10 a 12 bilhões de anos. A idade é uma estimativa, não uma medição direta.\n\n🌌 Quer levar uma experiência do universo para o seu quarto? Veja o projetor astronauta que selecionamos.\n🔗 Link na bio.\n\nPublicidade: este é um link de afiliado; podemos receber comissão sem custo extra para você.\n\n#cometa #astronomia #neuralupdate",
     "slug": "nw-cometa-nao-nasceu-aqui",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17945299929335298",
+    "publicado_em": "2026-09-10T11:11:23.839Z",
+    "id_comentario": "18074697368404954"
   },
   {
     "quando": "2026-09-10T17:00:00.000Z",
@@ -1743,6 +1748,16 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-11T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/01-transformacao-quarto.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-11-v1",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
+  },
+  {
     "quando": "2026-09-12T11:00:00.000Z",
     "tipo": "story",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2f0153bd-b4de-43a5-a5eb-0c16053d8a76.png",
@@ -1789,6 +1804,16 @@
     "legenda": "",
     "slug": "story-kindle-2026-09-12",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-12T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/02-presente-universo.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-12-v2",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   },
   {
     "quando": "2026-09-13T11:00:00.000Z",
@@ -1839,6 +1864,16 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-13T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/03-atmosfera-noturna.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-13-v3",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
+  },
+  {
     "quando": "2026-09-14T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/49f7cfc0-0a6a-4f16-8a21-7195157c7cd3.mp4",
@@ -1885,6 +1920,16 @@
     "legenda": "",
     "slug": "story-kindle-2026-09-14",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-14T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/01-transformacao-quarto.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-14-v1",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   },
   {
     "quando": "2026-09-15T11:00:00.000Z",
@@ -1935,6 +1980,16 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-15T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/02-presente-universo.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-15-v2",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
+  },
+  {
     "quando": "2026-09-16T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/760641cf-45d7-48f6-92fd-1f9f046b2e36.mp4",
@@ -1983,6 +2038,16 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-16T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/03-atmosfera-noturna.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-16-v3",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
+  },
+  {
     "quando": "2026-09-17T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4fc91035-a305-4aa4-b2c3-a87bcc4b2e9d.mp4",
@@ -2029,5 +2094,15 @@
     "legenda": "",
     "slug": "story-kindle-2026-09-17",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-17T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/01-transformacao-quarto.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-17-v1",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   }
 ]
