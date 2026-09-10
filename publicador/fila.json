@@ -1671,7 +1671,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e465cf3b-045b-49e2-b590-f7cf6f7ddf1a.mp4",
     "legenda": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos microscópicos e os ampliou até virarem as regiões mais densas de onde nasceram as galáxias. O que hoje é uma galáxia inteira já foi uma ondulação menor que um átomo.\n\n#cosmologia #astronomia #neuralupdate",
     "slug": "pl40-inflacao-cosmica",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18390982177205779",
+    "publicado_em": "2026-09-10T17:11:39.101Z",
+    "id_comentario": "17906650695502552"
   },
   {
     "quando": "2026-09-10T19:00:00.000Z",
@@ -1746,6 +1749,16 @@
     "legenda": "",
     "slug": "story-kindle-2026-09-11",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-11T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/01-transformacao-quarto.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-11-v1",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   },
   {
     "quando": "2026-09-12T11:00:00.000Z",
@@ -1846,6 +1859,16 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-13T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/03-atmosfera-noturna.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-13-v3",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
+  },
+  {
     "quando": "2026-09-14T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d39cc989-5ba3-4866-b1bf-546ba86038c8.mp4",
@@ -1944,6 +1967,16 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-15T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/02-presente-universo.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-15-v2",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
+  },
+  {
     "quando": "2026-09-16T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2c129d7e-85c3-4dae-a60f-a5305e467937.mp4",
@@ -2040,5 +2073,15 @@
     "legenda": "",
     "slug": "story-kindle-2026-09-17",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-17T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/01-transformacao-quarto.png",
+    "legenda": "",
+    "slug": "story-projetor-astronauta-2026-09-17-v1",
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   }
 ]
