@@ -1703,9 +1703,11 @@
     "midia": "https://neural-update.com.br/stories/projetor-astronauta/03-atmosfera-noturna.png",
     "legenda": "",
     "slug": "story-projetor-astronauta-2026-09-10-v3",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "projetor-astronauta",
-    "variacao": "atmosfera-noturna"
+    "variacao": "atmosfera-noturna",
+    "id_instagram": "17939530752346788",
+    "publicado_em": "2026-09-11T00:10:28.837Z"
   },
   {
     "quando": "2026-09-11T11:00:00.000Z",
