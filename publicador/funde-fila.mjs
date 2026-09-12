@@ -32,12 +32,32 @@ const remoto = JSON.parse(fs.readFileSync(remotoPath, 'utf8'));
 
 // A chave é slug+horário: o mesmo slug pode legitimamente aparecer em dois horários.
 const chave = i => `${i.slug || ''}|${i.quando}`;
-const PESO = { publicado: 3, falhou: 2, perdido: 2, agendado: 1 };
+// `cancelado` (12/09/2026): story-kindle que o publicar.mjs recusou porque o horário já tinha
+// outro story. Pesa mais que `agendado` para o cancelamento não ser desfeito pela fila remota.
+const PESO = { publicado: 3, falhou: 2, perdido: 2, cancelado: 2, agendado: 1 };
+
+// ⚠️ 12/09/2026: item REAGENDADO troca de horário, então a chave dele muda e a cópia do
+// horário velho, que ainda está no GitHub, não casa com nada — ela voltava viva e saía de
+// novo na rodada seguinte. O publicar.mjs grava `quando_anterior` ao mover; aqui a cópia
+// velha é descartada. Se a velha já tiver sido PUBLICADA, ela ganha e a movida é que sai.
+const movidos = new Map();
+for (const i of meu) {
+  if (i.quando_anterior && i.quando_anterior !== i.quando) movidos.set(`${i.slug || ''}|${i.quando_anterior}`, i);
+}
+const pular = new Set();
 
 const juntos = new Map();
-for (const i of remoto) juntos.set(chave(i), i);
+for (const i of remoto) {
+  const movido = movidos.get(chave(i));
+  if (movido) {
+    if (i.status === 'publicado') pular.add(movido);   // outra rodada já publicou no horário velho
+    else continue;                                      // a versão movida substitui a velha
+  }
+  juntos.set(chave(i), i);
+}
 
 for (const i of meu) {
+  if (pular.has(i)) continue;
   const k = chave(i);
   const outro = juntos.get(k);
   if (!outro) { juntos.set(k, i); continue; }                    // item novo meu

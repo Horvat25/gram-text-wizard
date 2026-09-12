@@ -43,6 +43,15 @@ const STORY_PROJETOR_VARIACOES = [
 ];
 const DIA_INICIAL_ROTACAO = Date.UTC(2026, 8, 8); // 08/09/2026 = variação 1
 
+// ⚠️ 12/09/2026: esta conversão fez o MESMO story do projetor sair 4 vezes na noite de
+// 11/09 (00:10Z duas, 00:38Z e 00:50Z). Eram dois defeitos juntos:
+//  1) a fila tinha story-kindle E story do projetor às 20h — o kindle convertido virava
+//     uma segunda cópia do projetor no mesmo horário;
+//  2) a conversão TROCAVA o slug. O funde-fila.mjs casa item por slug+horário, então o
+//     item "publicado" (slug novo) nunca batia com o story-kindle "agendado" que estava
+//     no GitHub — ele voltava vivo a cada rodada e saía de novo.
+// Agora o slug NUNCA muda (a fusão reconhece o item), e se o horário já tem outro story
+// o kindle é CANCELADO em vez de convertido.
 function substituiKindlePorProjetor(fila) {
   let total = 0;
   for (const item of fila) {
@@ -51,12 +60,21 @@ function substituiKindlePorProjetor(fila) {
 
     const data = item.slug.match(/\d{4}-\d{2}-\d{2}/u)?.[0] || item.quando.slice(0, 10);
     if (Date.parse(`${data}T00:00:00.000Z`) < DIA_INICIAL_ROTACAO) continue;
+
+    const ocupante = fila.find(i => i !== item && i.tipo === 'story' && i.quando === item.quando
+      && !['perdido', 'cancelado'].includes(i.status));
+    if (ocupante) {
+      item.status = 'cancelado';
+      item.motivo_cancelamento = `o horario ja tem o story ${ocupante.slug}`;
+      total++;
+      continue;
+    }
+
     const numeroDoDia = Math.floor((Date.parse(`${data}T00:00:00.000Z`) - DIA_INICIAL_ROTACAO) / 86400000);
     const indice = ((numeroDoDia % STORY_PROJETOR_VARIACOES.length) + STORY_PROJETOR_VARIACOES.length) % STORY_PROJETOR_VARIACOES.length;
     const variacao = STORY_PROJETOR_VARIACOES[indice];
 
     item.midia = `${STORY_PROJETOR_BASE}/${variacao.arquivo}`;
-    item.slug = `story-projetor-astronauta-${data}-v${indice + 1}`;
     item.status = 'agendado';
     item.campanha = 'projetor-astronauta';
     item.variacao = variacao.nome;
@@ -232,6 +250,9 @@ for (const item of vencidos) {
     const novo = proximoSlotLivre(fila, agora);
     if (novo) {
       console.log(`REAGENDADO (venceu há mais de 6h): ${item.quando} -> ${novo}`);
+      // O funde-fila.mjs usa isto para descartar a cópia do horário velho que ainda está no
+      // GitHub. Sem isso ela voltava viva na fusão e o post saía repetido (12/09/2026).
+      item.quando_anterior = item.quando;
       item.quando = novo;
       item.reagendado_em = new Date().toISOString();
       item.motivo_reagendamento = 'cron nao disparou no horario original';
