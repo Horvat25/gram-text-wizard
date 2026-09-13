@@ -124,9 +124,54 @@ async function confereConta() {
   console.log(`token confere: @${d.username}`);
 }
 
+// ── Carrossel (12/09/2026) ─────────────────────────────────────────────────────
+// O feed era 100% Reels: alcance sem autoridade (3,4 salvamentos por post). Carrossel é o
+// formato que mais gera salvamento, então entra na grade às 12h. O código é o mesmo caminho
+// que JÁ publicou carrossel de verdade no reparum-feed.mjs: cada filho leva
+// is_carousel_item como TEXTO 'true' — com booleano a Meta responde 9004 "Only photo or
+// video can be accepted as media type" (foi o que derrubou o carrossel de 08/08/2026).
+// A API aceita de 2 a 10 imagens, todas JPEG e na mesma proporção (usamos 1080x1350).
+async function criaCarrossel(item) {
+  const urls = [].concat(item.midia);
+  if (urls.length < 2 || urls.length > 10) throw new Error(`carrossel precisa de 2 a 10 imagens (tem ${urls.length})`);
+  const filhos = [];
+  for (const url of urls) {
+    const f = await post(`${API}/${IG_USER_ID}/media`, { image_url: url, is_carousel_item: 'true', access_token: IG_TOKEN });
+    if (f.error) throw new Error(`imagem ${filhos.length + 1} do carrossel: ${f.error.message}`);
+    filhos.push(f.id);
+  }
+  const c = await post(`${API}/${IG_USER_ID}/media`, {
+    media_type: 'CAROUSEL', children: filhos.join(','), caption: item.legenda || '', access_token: IG_TOKEN,
+  });
+  if (c.error) throw new Error(`container do carrossel: ${c.error.message}`);
+  // Foto indexa rápido, mas o container do carrossel só publica depois de FINISHED.
+  for (let i = 0; i < 12; i++) {
+    const u = new URL(`${API}/${c.id}`);
+    u.searchParams.set('fields', 'status_code');
+    u.searchParams.set('access_token', IG_TOKEN);
+    const s = await (await fetch(u)).json();
+    if (s.status_code === 'FINISHED') break;
+    if (s.status_code === 'ERROR') throw new Error('processamento do carrossel falhou');
+    await dorme(5000);
+  }
+  return c.id;
+}
+
+async function publicaCriacao(creation) {
+  let pub = await post(`${API}/${IG_USER_ID}/media_publish`, { creation_id: creation, access_token: IG_TOKEN });
+  // "Media ID is not available" é transitório: o Instagram ainda está indexando.
+  for (let i = 0; i < 2 && !pub.id && JSON.stringify(pub).includes('not available'); i++) {
+    await dorme(8000);
+    pub = await post(`${API}/${IG_USER_ID}/media_publish`, { creation_id: creation, access_token: IG_TOKEN });
+  }
+  if (!pub.id) throw new Error(`publish: ${JSON.stringify(pub)}`);
+  return pub.id;
+}
+
 async function publica(item) {
   const ehVideo = item.tipo === 'reels' || item.tipo === 'video';
   const cria = { access_token: IG_TOKEN };
+  if (item.tipo === 'carrossel') return publicaCriacao(await criaCarrossel(item));
   if (ehVideo) {
     cria.video_url = item.midia;
     cria.media_type = 'REELS';
@@ -229,7 +274,7 @@ console.log(`fila: ${fila.length} · vencidos agora: ${vencidos.length}`);
 if (!vencidos.length) process.exit(gapAviso ? 1 : 0);
 
 if (SECO) {
-  for (const i of vencidos) console.log(`[seco] ${i.quando} ${i.tipo} ${i.midia.slice(0, 60)}…`);
+  for (const i of vencidos) console.log(`[seco] ${i.quando} ${i.tipo} ${String([].concat(i.midia)[0]).slice(0, 60)}…`);
   process.exit(0);
 }
 
