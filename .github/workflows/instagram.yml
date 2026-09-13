@@ -71,6 +71,7 @@ jobs:
           IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador publico, nao e segredo
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_CONTA: neuralupdate
+          FB_PAGE_ID: '962589380261249'     # Pagina Neural Update (13/09/2026: todo Reel sai tambem no Facebook)
         run: node publicador/publicar.mjs
 
 

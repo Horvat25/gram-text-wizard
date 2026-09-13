@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { legendaFacebook } from './legenda-facebook.mjs';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const FILA = path.join(AQUI, 'fila.json');
@@ -213,6 +214,51 @@ async function publica(item) {
   return pub.id;
 }
 
+// ── Facebook Reels (13/09/2026, pedido do Marcelo) ────────────────────────────
+// A Página do Facebook existia com 0 seguidores e nada postado. No Facebook, Reels é o
+// formato que o algoritmo entrega pra quem NÃO segue — então cada Reel do Insta sai também
+// lá. A opção "compartilhar no Facebook" do app NÃO vale pra post feito por API; por isso
+// é feito aqui, pela API de Reels da Página (start → upload por file_url → finish).
+// O IG_TOKEN é token de USUÁRIO com pages_manage_posts (medido no saude.yml em 13/09);
+// dele sai o token da Página. ⚠️ Falha aqui NUNCA marca o post como falho: o Reel do
+// Insta já está no ar. O erro fica no item (erro_facebook).
+const PAGINA_FB = process.env.FB_PAGE_ID;   // só o instagram.yml define → outra conta nunca posta aqui
+let tokenPagina = null;
+
+async function tokenDaPagina() {
+  if (tokenPagina) return tokenPagina;
+  const u = new URL(`${API}/${PAGINA_FB}`);
+  u.searchParams.set('fields', 'access_token');
+  u.searchParams.set('access_token', IG_TOKEN);
+  const d = await (await fetch(u)).json();
+  if (!d.access_token) throw new Error(`token da Página: ${d.error?.message || 'não veio'}`);
+  tokenPagina = d.access_token;
+  return tokenPagina;
+}
+
+// Só Reels publicados a partir do das 18h de 13/09 (o primeiro teste). Sem esse corte o
+// robô repostaria o acervo inteiro do Insta de uma vez.
+const FB_DESDE = '2026-09-13T20:00:00.000Z';
+// Uma tentativa por Reel: se falhou, o erro fica no item e ele não é tentado de novo sozinho.
+const pendenteFb = i => Boolean(PAGINA_FB) && (i.tipo === 'reels' || i.tipo === 'video')
+  && i.status === 'publicado' && !i.id_facebook && !i.erro_facebook && (i.publicado_em || '') >= FB_DESDE;
+
+async function publicaNoFacebook(item) {
+  const tk = await tokenDaPagina();
+  const ini = await post(`${API}/${PAGINA_FB}/video_reels`, { upload_phase: 'start', access_token: tk });
+  if (!ini.video_id) throw new Error(`start: ${JSON.stringify(ini).slice(0, 200)}`);
+  const up = await (await fetch(`https://rupload.facebook.com/video-upload/v21.0/${ini.video_id}`, {
+    method: 'POST', headers: { Authorization: `OAuth ${tk}`, file_url: item.midia },
+  })).json();
+  if (!up.success) throw new Error(`upload: ${JSON.stringify(up).slice(0, 200)}`);
+  const fim = await post(`${API}/${PAGINA_FB}/video_reels`, {
+    upload_phase: 'finish', video_id: ini.video_id, video_state: 'PUBLISHED',
+    description: legendaFacebook(item.legenda), access_token: tk,
+  });
+  if (!fim.success) throw new Error(`finish: ${JSON.stringify(fim).slice(0, 200)}`);
+  return ini.video_id;
+}
+
 // Os horários da grade, em UTC: 08h, 14h, 18h e 21h BRT.
 // É para cá que vai um post que perdeu a hora — nunca para um horário fora da grade.
 const SLOTS_UTC = [11, 17, 21, 0];
@@ -271,10 +317,11 @@ if (!SECO) {
 console.log(`fila: ${fila.length} · vencidos agora: ${vencidos.length}`);
 // Sai cedo quando não há nada vencido — mas se o cron ficou horas fora do ar, o job
 // precisa FALHAR mesmo assim, senão o e-mail de alerta não chega.
-if (!vencidos.length) process.exit(gapAviso ? 1 : 0);
+if (!vencidos.length && !fila.some(pendenteFb)) process.exit(gapAviso ? 1 : 0);
 
 if (SECO) {
   for (const i of vencidos) console.log(`[seco] ${i.quando} ${i.tipo} ${String([].concat(i.midia)[0]).slice(0, 60)}…`);
+  for (const i of fila.filter(pendenteFb)) console.log(`[seco] facebook: ${i.slug}`);
   process.exit(0);
 }
 
@@ -335,6 +382,19 @@ for (const item of vencidos) {
     falhasAgora++;
     console.error(`  FALHOU: ${item.erro}`);
   }
+}
+
+// Facebook depois do Insta: pega o que acabou de sair E o que saiu numa rodada anterior
+// sem ter ido pro Facebook (foi assim que o Reel das 18h de 13/09 virou o primeiro).
+for (const item of fila.filter(pendenteFb)) {
+  try {
+    item.id_facebook = await publicaNoFacebook(item);
+    console.log(`  FACEBOOK: ${item.slug} → ${item.id_facebook}`);
+  } catch (e) {
+    item.erro_facebook = String(e.message || e).slice(0, 300);
+    console.error(`  ⚠️ Facebook falhou (o Reel do Insta está no ar): ${item.erro_facebook}`);
+  }
+  mudou = true;
 }
 
 if (mudou) fs.writeFileSync(FILA, JSON.stringify(fila, null, 2) + '\n', 'utf8');
