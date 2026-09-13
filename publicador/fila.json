@@ -1909,6 +1909,23 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-14T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/01.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/02.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/03.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/04.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/05.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/06.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2026-09-14/07.jpg"
+    ],
+    "legenda": "Mito ou verdade? 5 frases sobre o espaço que quase todo mundo já ouviu. 🚀\n\nA da gravidade engana até gente grande: a Estação Espacial está DENTRO da gravidade da Terra. Os astronautas flutuam por outro motivo.\n\n💬 Comenta quantas você acertou.\n🔖 Salva pra usar na próxima discussão.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFontes: NASA · Scientific American\n\n#curiosidades #espaco #astronomia #ciencia #neuralupdate",
+    "slug": "car-mito-ou-verdade-2026-09-14",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-14T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/dc7928fa-f2e3-4918-8481-50d61edc9a06.mp4",
@@ -1959,6 +1976,15 @@
     "legenda": "",
     "slug": "story-noticia-2026-09-15",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-15T15:00:00.000Z",
+    "tipo": "post",
+    "midia": "https://neural-update.com.br/carrossel/post-luz-do-sol-8-minutos-2026-09-15/01.jpg",
+    "legenda": "A luz do Sol que bate na sua pele agora saiu dele há 8 minutos e 20 segundos. ☀️\n\nOu seja: você nunca vê o Sol como ele é, vê como ele ERA. Com as estrelas do céu é ainda mais extremo: algumas você vê como eram há milhares de anos.\n\n📤 Manda pra alguém que precisa saber disso hoje.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA\n\n#sol #luz #astronomia #curiosidades #neuralupdate",
+    "slug": "post-luz-do-sol-8-minutos-2026-09-15",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-15T17:00:00.000Z",
@@ -2013,6 +2039,23 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-16T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/01.jpg",
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/02.jpg",
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/03.jpg",
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/04.jpg",
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/05.jpg",
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/06.jpg",
+      "https://neural-update.com.br/carrossel/car-onde-procurar-vida-2026-09-16/07.jpg"
+    ],
+    "legenda": "Se existe vida perto de nós, a NASA já sabe onde procurar. 🔭\n\nOs quatro candidatos têm uma coisa em comum: água, agora ou no passado. E dois deles são luas de Saturno.\n\n💬 Qual é a sua aposta? Comenta aí.\n🔖 Salva pra acompanhar as missões.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA\n\n#vidaforadaterra #nasa #astronomia #espaco #neuralupdate",
+    "slug": "car-onde-procurar-vida-2026-09-16",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-16T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e61c2f6b-bb98-43ee-a40e-f616793f7664.mp4",
@@ -2063,6 +2106,24 @@
     "legenda": "",
     "slug": "story-noticia-2026-09-17",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-17T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/01.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/02.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/03.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/04.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/05.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/06.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/07.jpg",
+      "https://neural-update.com.br/carrossel/car-peso-nos-planetas-2026-09-17/08.jpg"
+    ],
+    "legenda": "Quanto você pesaria em cada planeta? 🪐\n\nA conta usa a gravidade de cada mundo (dados da NASA) pra uma pessoa de 70 kg. A maior surpresa é Saturno: 95 vezes a massa da Terra, e mesmo assim você pesaria quase o mesmo que aqui.\n\n📤 Manda pra quem vive dizendo que tá de dieta.\n🔖 Salva pra fazer a conta com o seu peso.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Planetary Fact Sheet\n\n#planetas #sistemasolar #astronomia #curiosidades #neuralupdate",
+    "slug": "car-peso-nos-planetas-2026-09-17",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-17T17:00:00.000Z",
