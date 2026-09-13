@@ -32,6 +32,24 @@ const d = new URL(`${API}/debug_token`);
 d.searchParams.set('input_token', IG_TOKEN);
 d.searchParams.set('access_token', IG_TOKEN);
 const info = await (await fetch(d)).json();
+
+// 13/09/2026: permissões da chave (só os NOMES — o token nunca é impresso). Serve pra
+// saber se o mesmo token consegue postar os Reels também na Página do Facebook, que
+// precisa de token de PÁGINA com pages_manage_posts. Só informa, nunca falha o job.
+const PAGINA_FB = '962589380261249';
+const escopos = info?.data?.scopes || [];
+console.log(`tipo: ${info?.data?.type || '?'} · permissões: ${escopos.join(', ') || '(nenhuma listada)'}`);
+try {
+  const p = new URL(`${API}/${PAGINA_FB}`);
+  p.searchParams.set('fields', 'name,followers_count');
+  p.searchParams.set('access_token', IG_TOKEN);
+  const pag = await (await fetch(p)).json();
+  console.log(pag.error
+    ? `página do Facebook: sem acesso (${pag.error.message})`
+    : `página do Facebook: ${pag.name} · ${pag.followers_count ?? '?'} seguidores`);
+} catch (e) { console.log(`página do Facebook: erro ao consultar (${e.message})`); }
+const podeReelsFb = info?.data?.type === 'PAGE' && escopos.includes('pages_manage_posts');
+console.log(`postar Reels na Página do Facebook com este token: ${podeReelsFb ? 'SIM' : 'NÃO'}`);
 // A Meta tem DOIS prazos e eles são independentes:
 //   expires_at            — validade do token em si (pode ser 0 = nunca)
 //   data_access_expires_at — validade do ACESSO AOS DADOS, 90 dias
