@@ -37,7 +37,7 @@ painel da Shopee um link com Sub ID `dm` e trocar na mensagem (precisa do login 
 ### v1 — 12/09/2026 (no ar)
 
 Vendedor: benefício → prova → link → urgência honesta → aviso de afiliado → pergunta que abre
-conversa. Só o astronauta (sem Kindle). Resposta pública: "Te mandei no direct ✨".
+conversa. Só o astronauta (sem Kindle). **Vai com a foto do projetor** (arte "seu quarto pode virar isso" sem o botão de bio). Resposta pública: "Te mandei no direct ✨".
 
 ```
 Oi! 🌌 Que bom que você quer esse céu em casa.
@@ -63,5 +63,5 @@ Link de afiliado: posso receber comissão, sem custo extra pra você.
 Recursos citados = só os do anúncio (VSL v1). Nota 4,9 / 20 mil+ vendidos = print do Marcelo de
 10/09 — **reconferir a cada versão**, os números envelhecem. Nunca citar preço fixo.
 
-**Próximos candidatos (um por semana, na ordem):** foto do projetor junto da mensagem · abrir
+**Próximos candidatos (um por semana, na ordem):** abrir
 com a pergunta (presente × pra você) · prova social primeiro · link com Sub ID `dm`.
