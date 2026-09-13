@@ -65,9 +65,28 @@ const midias = await get(`/${IG_USER_ID}/media`, {
 });
 if (midias.error) { console.error('mídias: ' + JSON.stringify(midias.error).slice(0, 300)); process.exit(1); }
 
+// 12/09/2026: funil por direct. A automação do Business Suite responde a quem comenta
+// QUERO/CÉU com o link do projetor. Pra melhorar a mensagem com DADO, e não com opinião,
+// cada reel dos últimos 14 dias ganha a contagem de comentários com a palavra-chave
+// (= quantos directs de venda saíram). Cliques e vendas vêm do painel da Shopee.
+const PALAVRA = /(^|[^\p{L}])(quero|c[ée]u|cosmos)([^\p{L}]|$)/iu;
+const JANELA_DM = 14 * 24 * 3600 * 1000;
+async function pedidosDm(idMidia) {
+  let n = 0, pagina = await get(`/${idMidia}/comments`, { fields: 'text', limit: '100' });
+  for (let i = 0; i < 5; i++) {
+    if (pagina.error) return { _erro_comentarios: (pagina.error.message || '').slice(0, 160) };
+    n += (pagina.data || []).filter(c => PALAVRA.test(c.text || '')).length;
+    if (!pagina.paging?.next) break;
+    pagina = await (await fetch(pagina.paging.next)).json();
+  }
+  return { pedidos_dm: n };
+}
+
 const itens = [];
 for (const m of (midias.data || [])) {
   const n = SECO ? {} : await insights(m.id);
+  const recente = Date.now() - new Date(m.timestamp).getTime() < JANELA_DM;
+  const dm = SECO || !recente ? {} : await pedidosDm(m.id);
   itens.push({
     id: m.id,
     quando: m.timestamp,
@@ -75,7 +94,9 @@ for (const m of (midias.data || [])) {
     link: m.permalink,
     // a legenda inteira polui o arquivo; a primeira linha basta pra reconhecer o vídeo
     titulo: (m.caption || '').split('\n')[0].slice(0, 110),
+    pede_quero: /comenta quero/i.test(m.caption || ''),
     ...n,
+    ...dm,
   });
   if (SECO) continue;
 }
