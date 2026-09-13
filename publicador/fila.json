@@ -1834,9 +1834,11 @@
     "midia": "https://neural-update.com.br/stories/projetor-astronauta/02-presente-universo.png",
     "legenda": "",
     "slug": "story-projetor-astronauta-2026-09-12-v2",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "projetor-astronauta",
-    "variacao": "presente-universo"
+    "variacao": "presente-universo",
+    "id_instagram": "18112760069321194",
+    "publicado_em": "2026-09-13T00:03:46.403Z"
   },
   {
     "quando": "2026-09-13T11:00:00.000Z",
