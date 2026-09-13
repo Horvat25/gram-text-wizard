@@ -45,7 +45,7 @@ on:
     # As horas 12,13,14,15 entraram como RECUPERACAO — se a janela das 10-11 falhar, o post
     # das 08h BRT sai com ~1h de atraso em vez de esperar as 16h (5h de buraco).
     # 39 disparos/dia ~1.170/mes. Uso medido em 28/08: 691 min de 2.000 (34%) -> vai a ~52%.
-    - cron: '5,25,45 0,10,11,12,13,14,15,16,17,20,21,22,23 * * *'
+    - cron: '5,25,45 0,1,10,11,12,13,14,15,16,17,20,21,22,23 * * *'
   workflow_dispatch:
 
 # Uma execução por vez. Foi exatamente a falta disso (rodadas se sobrepondo)
