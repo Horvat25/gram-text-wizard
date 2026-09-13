@@ -48,8 +48,9 @@ try {
     ? `página do Facebook: sem acesso (${pag.error.message})`
     : `página do Facebook: ${pag.name} · ${pag.followers_count ?? '?'} seguidores`);
 } catch (e) { console.log(`página do Facebook: erro ao consultar (${e.message})`); }
-const podeReelsFb = info?.data?.type === 'PAGE' && escopos.includes('pages_manage_posts');
-console.log(`postar Reels na Página do Facebook com este token: ${podeReelsFb ? 'SIM' : 'NÃO'}`);
+// O token é de USUÁRIO; o publicar.mjs tira dele o token da Página. Basta a permissão.
+const podeReelsFb = escopos.includes('pages_manage_posts');
+console.log(`postar Reels na Página do Facebook: ${podeReelsFb ? 'SIM' : 'NÃO — falta pages_manage_posts'}`);
 // A Meta tem DOIS prazos e eles são independentes:
 //   expires_at            — validade do token em si (pode ser 0 = nunca)
 //   data_access_expires_at — validade do ACESSO AOS DADOS, 90 dias
