@@ -1993,6 +1993,15 @@
     "variacao": "transformacao-quarto"
   },
   {
+    "quando": "2026-09-15T01:00:00.000Z",
+    "tipo": "post",
+    "midia": "https://neural-update.com.br/carrossel/post-blog-lente-gravitacional-2026-09-14/01.jpg",
+    "legenda": "A gravidade consegue dobrar a luz. E isso vira uma lupa do tamanho de uma galáxia. 🔭\n\nMassa curva o espaço-tempo, e a luz que passa perto segue essa curva.\nUma galáxia na frente pode ampliar, distorcer e até multiplicar a imagem de outra que está atrás.\nÉ assim que os astrônomos enxergam matéria que ninguém vê.\n\n📖 A explicação completa está no blog: link na bio.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA (Hubble) — science.nasa.gov\n\n#lentegravitacional #astronomia #neuralupdate",
+    "slug": "post-blog-lente-gravitacional-2026-09-14",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-15T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8ffaa2f4-4555-4e85-9ab9-0ae100af53ba.mp4",
@@ -2052,6 +2061,15 @@
     "status": "agendado",
     "campanha": "projetor-astronauta",
     "variacao": "presente-universo"
+  },
+  {
+    "quando": "2026-09-16T01:00:00.000Z",
+    "tipo": "post",
+    "midia": "https://neural-update.com.br/carrossel/post-blog-estrelas-tremem-2026-09-15/01.jpg",
+    "legenda": "Estrelas tremem, e dá pra ouvir o que acontece lá dentro. ⭐\n\nOndas atravessam o interior das estrelas e fazem o brilho oscilar um pouquinho.\nMedindo essas oscilações, os cientistas descobrem densidade, rotação e até a idade da estrela.\nÉ um exame por dentro de um lugar que nenhum telescópio fotografa.\n\n📖 O artigo completo está no blog: link na bio.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Stars) — science.nasa.gov\n\n#estrelas #astronomia #neuralupdate",
+    "slug": "post-blog-estrelas-tremem-2026-09-15",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-16T11:00:00.000Z",
@@ -2123,6 +2141,15 @@
     "variacao": "atmosfera-noturna"
   },
   {
+    "quando": "2026-09-17T01:00:00.000Z",
+    "tipo": "post",
+    "midia": "https://neural-update.com.br/carrossel/post-blog-bioassinatura-2026-09-16/01.jpg",
+    "legenda": "Achar um gás não prova que existe vida. Entenda por quê. 🧪\n\nBioassinatura é um sinal que pode ter sido feito por vida: um gás, um pigmento, uma química fora do lugar.\nO problema é que vulcões e a luz da própria estrela também produzem vários desses sinais.\nPor isso os cientistas procuram combinações difíceis de explicar sem vida.\n\n📖 O artigo completo está no blog: link na bio.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science — science.nasa.gov\n\n#vidaforadaterra #astrobiologia #neuralupdate",
+    "slug": "post-blog-bioassinatura-2026-09-16",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-17T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4a7ba352-b9eb-430c-b0cd-94ee2ee14e54.mp4",
@@ -2191,5 +2218,14 @@
     "status": "agendado",
     "campanha": "projetor-astronauta",
     "variacao": "transformacao-quarto"
+  },
+  {
+    "quando": "2026-09-18T01:00:00.000Z",
+    "tipo": "post",
+    "midia": "https://neural-update.com.br/carrossel/post-blog-eclipse-todo-mes-2026-09-17/01.jpg",
+    "legenda": "Se a Lua passa entre a Terra e o Sol todo mês, por que não tem eclipse todo mês? 🌘\n\nA órbita da Lua é inclinada uns 5 graus em relação à da Terra.\nNa maioria dos meses, Sol, Terra e Lua passam desalinhados.\nEclipse só acontece quando a Lua nova ou cheia cai perto do cruzamento das duas órbitas.\n\n📖 A explicação completa está no blog: link na bio.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Solar System Facts) — science.nasa.gov\n\n#eclipse #lua #neuralupdate",
+    "slug": "post-blog-eclipse-todo-mes-2026-09-17",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   }
 ]
