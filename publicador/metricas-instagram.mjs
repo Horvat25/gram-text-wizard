@@ -153,7 +153,7 @@ async function acervo(recentes) {
   const agora = new Date().toISOString();
   for (const i of recentes) {
     mapa.set(i.id, { id: i.id, quando: i.quando, tipo: i.tipo, link: i.link, titulo: i.titulo,
-      views: i.views ?? i.plays ?? null, reach: i.reach ?? null, shares: i.shares ?? null,
+      views: i.views ?? i.plays ?? null, reach: i.reach ?? null, shares: i.shares ?? null, likes: i.likes ?? null,
       saved: i.saved ?? null, comments: i.comments ?? null, atualizado: agora });
   }
   let pag = midias, paginas = 0;   // continua a lista além das 50, até passar de 17/06
@@ -172,7 +172,7 @@ async function acervo(recentes) {
     .sort((a, b) => String(a.atualizado || '').localeCompare(String(b.atualizado || ''))).slice(0, 40);
   for (const a of vez) {
     const n = await insights(a.id);
-    if (!n._erro) Object.assign(a, { views: n.views ?? n.plays ?? a.views, reach: n.reach ?? a.reach, shares: n.shares ?? a.shares,
+    if (!n._erro) Object.assign(a, { views: n.views ?? n.plays ?? a.views, reach: n.reach ?? a.reach, shares: n.shares ?? a.shares, likes: n.likes ?? a.likes ?? null,
       saved: n.saved ?? a.saved, comments: n.comments ?? a.comments, atualizado: agora });
   }
   const lista = [...mapa.values()].filter(a => String(a.quando) >= INICIO_ASTRONOMIA).sort((a, b) => String(a.quando).localeCompare(String(b.quando)));

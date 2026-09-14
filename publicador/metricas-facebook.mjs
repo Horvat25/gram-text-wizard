@@ -47,7 +47,8 @@ const TK = pag.access_token;
 
 // Reels da Página (os antigos também — servem de base de comparação).
 const reels = [];
-let r = await get(`/${FB_PAGE_ID}/video_reels`, { fields: 'id,description,created_time,permalink_url,length', limit: '50' }, TK);
+// curtidas e comentários vêm na própria lista (summary), sem chamada extra por Reel (14/09/2026)
+let r = await get(`/${FB_PAGE_ID}/video_reels`, { fields: 'id,description,created_time,permalink_url,length,likes.summary(true).limit(0),comments.summary(true).limit(0)', limit: '50' }, TK);
 for (let i = 0; i < 4; i++) {
   if (r.error) { erros.push(`video_reels: ${r.error.message}`); break; }
   reels.push(...(r.data || []));
@@ -87,6 +88,8 @@ for (const v of reels) {
     titulo: (v.description || '').split('\n')[0].slice(0, 110),
     link: v.permalink_url ? (v.permalink_url.startsWith('http') ? v.permalink_url : `https://www.facebook.com${v.permalink_url}`) : `https://www.facebook.com/reel/${v.id}`,
     segundos: v.length ?? null,
+    curtidas: v.likes?.summary?.total_count ?? null,
+    comentarios: v.comments?.summary?.total_count ?? null,
     views: n.fb_reels_total_plays ?? n.blue_reels_play_count ?? null,
     alcance: n.post_impressions_unique ?? null,
     tempo_medio_ms: n.post_video_avg_time_watched ?? null,
