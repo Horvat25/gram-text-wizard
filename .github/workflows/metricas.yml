@@ -41,6 +41,7 @@ jobs:
         continue-on-error: true
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          FB_TOKEN: ${{ secrets.FB_TOKEN }}   # so leitura (read_insights); vazio = usa IG_TOKEN
           FB_PAGE_ID: '962589380261249'   # Pagina Neural Update — identificador publico
         run: node publicador/metricas-facebook.mjs
 

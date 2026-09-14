@@ -18,8 +18,13 @@ import { fileURLToPath } from 'node:url';
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const SAIDA = path.join(AQUI, 'metricas-facebook.json');
 const API = 'https://graph.facebook.com/v21.0';
-const { IG_TOKEN, FB_PAGE_ID } = process.env;
-if (!IG_TOKEN || !FB_PAGE_ID) { console.error('faltam IG_TOKEN / FB_PAGE_ID'); process.exit(0); }
+// FB_TOKEN (14/09/2026): chave SÓ DE LEITURA (read_insights + pages_read_engagement), separada
+// da que publica — trocar a IG_TOKEN pra ganhar read_insights arriscava parar a publicação.
+// Pode ser token de Página (não vence) ou de usuário; sem ela, cai na IG_TOKEN (lê a lista de
+// Reels, mas não as views).
+const { IG_TOKEN, FB_TOKEN, FB_PAGE_ID } = process.env;
+const TOKEN_LEITURA = FB_TOKEN || IG_TOKEN;
+if (!TOKEN_LEITURA || !FB_PAGE_ID) { console.error('faltam FB_TOKEN/IG_TOKEN ou FB_PAGE_ID'); process.exit(0); }
 
 const get = async (caminho, params, token) => {
   const u = new URL(API + caminho);
@@ -29,7 +34,10 @@ const get = async (caminho, params, token) => {
 };
 const erros = [];
 
-const pag = await get(`/${FB_PAGE_ID}`, { fields: 'access_token,name,followers_count,fan_count' }, IG_TOKEN);
+const pag = await get(`/${FB_PAGE_ID}`, { fields: 'access_token,name,followers_count,fan_count' }, TOKEN_LEITURA);
+// Token de Página não devolve access_token de si mesmo: nesse caso ele já É o token da Página.
+if (!pag.access_token && FB_TOKEN && !pag.error) pag.access_token = FB_TOKEN;
+console.log(`chave usada: ${FB_TOKEN ? 'FB_TOKEN (só leitura)' : 'IG_TOKEN'}`);
 if (!pag.access_token) {
   erros.push(`token da Página: ${pag.error?.message || 'não veio'}`);
   fs.writeFileSync(SAIDA, JSON.stringify({ gerado_em: new Date().toISOString(), erros }, null, 2) + '\n');
