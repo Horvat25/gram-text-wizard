@@ -96,9 +96,42 @@ for (const v of reels) {
 }
 itens.sort((a, b) => new Date(b.quando) - new Date(a.quando));
 
+// ── Views da Página por dia (14/09/2026) ──────────────────────────────────────
+// Pro placar mostrar "quanto cada dia teve" no Facebook, como já faz no YouTube e no Insta.
+// A Meta aposentou métricas de Página em 2025; tenta os nomes em ordem e guarda o histórico.
+async function paginaDiaria() {
+  let anterior = [];
+  try { anterior = JSON.parse(fs.readFileSync(SAIDA, 'utf8')).pagina_diaria || []; } catch {}
+  const mapa = new Map(anterior.map(p => [p.d, p.views]));
+  const ts = n => String(Math.floor((Date.now() - n * 864e5) / 1000));
+  const falhas = [];
+  for (const metric of ['page_media_view', 'page_video_views', 'page_impressions']) {
+    const novos = []; let ok = true;
+    for (const [a, b] of [[90, 60], [60, 30], [30, 0]]) {
+      const r = await get(`/${FB_PAGE_ID}/insights`, { metric, period: 'day', since: ts(a), until: ts(b) }, TK);
+      const vals = r.data?.[0]?.values;
+      if (!vals) { ok = false; falhas.push(`${metric}: ${(r.error?.message || 'sem valores').slice(0, 100)}`); break; }
+      for (const v of vals) {
+        const val = (v.value && typeof v.value === 'object') ? Object.values(v.value).reduce((x, y) => x + (+y || 0), 0) : (v.value ?? 0);
+        novos.push([new Date(Date.parse(v.end_time) - 864e5).toISOString().slice(0, 10), val]);
+      }
+    }
+    if (ok) {
+      for (const [d, v] of novos) mapa.set(d, v);
+      return { metric, lista: [...mapa.entries()].sort(([x], [y]) => x.localeCompare(y)).map(([d, views]) => ({ d, views })) };
+    }
+  }
+  erros.push('pagina_diaria: ' + falhas.join(' | '));
+  return { metric: null, lista: [...mapa.entries()].sort(([x], [y]) => x.localeCompare(y)).map(([d, views]) => ({ d, views })) };
+}
+const pd = await paginaDiaria();
+console.log(`Página por dia: ${pd.lista.length} dias (${pd.metric || 'nenhuma métrica aceita'})`);
+
 const doc = {
   gerado_em: new Date().toISOString(),
   pagina: { id: FB_PAGE_ID, nome: pag.name, seguidores: pag.followers_count ?? null, curtidas: pag.fan_count ?? null },
+  pagina_diaria: pd.lista,
+  pagina_diaria_metrica: pd.metric,
   metricas_usadas: conjuntoOk,
   itens,
   erros,

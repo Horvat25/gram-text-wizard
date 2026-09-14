@@ -125,7 +125,8 @@ async function contaDiaria() {
   // 2) se a API só aceitar total do período, pede dia a dia o que falta (no máx. 35 por rodada)
   if (!modo) {
     let feitos = 0;
-    for (let n = 60; n >= 1 && feitos < 35; n--) {
+    // 120 dias (14/09): com 60, o filtro de 90 dias do placar ficava 39 mil abaixo do app.
+    for (let n = 120; n >= 1 && feitos < 35; n--) {
       const d = dia(n); if (mapa.has(d)) continue;
       const r = await get(`/${IG_USER_ID}/insights`, { metric: 'views', period: 'day', metric_type: 'total_value', since: ts(d), until: ts(dia(n - 1)) });
       feitos++;
