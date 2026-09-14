@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-14T01:42:30.728Z",
+  "gerado_em": "2026-09-14T02:51:04.719Z",
   "conta": {
     "username": "neuralupdate",
     "seguidores": 1157,
@@ -487,7 +487,7 @@
       "views": 4551
     }
   ],
-  "conta_diaria_modo": "total por dia",
+  "conta_diaria_modo": null,
   "conta_diaria_erro": "(#100) The following metrics (views) should be specified with parameter metric_type=total_value",
   "itens": [
     {
@@ -497,13 +497,13 @@
       "link": "https://www.instagram.com/reel/DdPfxbIj3PT/",
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
       "pede_quero": true,
-      "views": 425,
-      "reach": 336,
-      "likes": 13,
+      "views": 626,
+      "reach": 498,
+      "likes": 19,
       "comments": 1,
       "shares": 0,
       "saved": 2,
-      "total_interactions": 16,
+      "total_interactions": 22,
       "pedidos_dm": 0
     },
     {
@@ -513,8 +513,8 @@
       "link": "https://www.instagram.com/reel/DdPDwdhDfgS/",
       "titulo": "AULA da escola Universo do Zero. Europa é uma bola de gelo, mas o gelo é só a tampa: embaixo existe um oceano ",
       "pede_quero": false,
-      "views": 1856,
-      "reach": 1593,
+      "views": 1885,
+      "reach": 1612,
       "likes": 63,
       "comments": 1,
       "shares": 0,
@@ -529,7 +529,7 @@
       "link": "https://www.instagram.com/p/DdO3CAUDy83/",
       "titulo": "Como uma estrela morre depende de UMA coisa: a massa. 🌟",
       "pede_quero": false,
-      "views": 61,
+      "views": 63,
       "reach": 25,
       "likes": 1,
       "comments": 1,
@@ -545,8 +545,8 @@
       "link": "https://www.instagram.com/reel/DdOwBJBjUmR/",
       "titulo": "A sonda Lunar Reconnaissance Orbiter da NASA fotografou em 11 e 12 de agosto de 2026 uma cratera nova na Lua, ",
       "pede_quero": false,
-      "views": 1547,
-      "reach": 1316,
+      "views": 1556,
+      "reach": 1322,
       "likes": 47,
       "comments": 1,
       "shares": 0,
@@ -561,8 +561,8 @@
       "link": "https://www.instagram.com/reel/DdM66J3CPdA/",
       "titulo": "Estudo da NASA publicado em 19 de agosto de 2026 indica que alguns micróbios da Terra levados por exploradores",
       "pede_quero": false,
-      "views": 176,
-      "reach": 142,
+      "views": 178,
+      "reach": 143,
       "likes": 6,
       "comments": 1,
       "shares": 0,
@@ -577,8 +577,8 @@
       "link": "https://www.instagram.com/reel/DdMfeamkyQY/",
       "titulo": "AULA da escola Universo do Zero. O oxigênio é reativo demais para durar sozinho numa atmosfera: se ele está lá",
       "pede_quero": false,
-      "views": 1494,
-      "reach": 1232,
+      "views": 1496,
+      "reach": 1234,
       "likes": 53,
       "comments": 1,
       "shares": 3,
@@ -593,8 +593,8 @@
       "link": "https://www.instagram.com/reel/DdMGUmKE5IP/",
       "titulo": "A sonda Mars Express da Agência Espacial Europeia registrou mais de 30 redemoinhos de poeira ativos em Mamers ",
       "pede_quero": false,
-      "views": 1218,
-      "reach": 1011,
+      "views": 1219,
+      "reach": 1021,
       "likes": 25,
       "comments": 1,
       "shares": 0,
@@ -802,7 +802,7 @@
       "titulo": "Um estudo publicado em 18 de agosto de 2026 na Nature Astronomy indica que algumas das galáxias mais massivas ",
       "pede_quero": false,
       "views": 1076,
-      "reach": 873,
+      "reach": 875,
       "likes": 36,
       "comments": 2,
       "shares": 0,
@@ -1290,8 +1290,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZr7UQ4DaCs/",
       "titulo": "A verdade virou commodity. Em 2026, o consumo de notícias migrou para o campo de batalha da informação: as red",
-      "views": null,
-      "atualizado": null
+      "views": 8,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 4,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18142813087520816",
@@ -1299,8 +1304,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZsWyUCDE3T/",
       "titulo": "A Cursor, um nome que rapidamente se tornou sinônimo de produtividade para desenvolvedores com sua IA integrad",
-      "views": null,
-      "atualizado": null
+      "views": 23,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 8,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18017088515751662",
@@ -1308,8 +1318,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZsYY2bHA9q/",
       "titulo": "O sistema operacional da IA está deixando de ser promessa e virando fluxo de trabalho real. Quem entender essa",
-      "views": null,
-      "atualizado": null
+      "views": 41,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 34,
+      "shares": 0,
+      "likes": 2,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18144429763516416",
@@ -1317,8 +1332,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZsy7MMHO5a/",
       "titulo": "O futuro já chegou e o G7 está moldando as regras do jogo da IA.",
-      "views": null,
-      "atualizado": null
+      "views": 7,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 4,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18110204887854504",
@@ -1326,8 +1346,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZtOh4BjlrR/",
       "titulo": "O futuro não chega. Ele é construído — frame a frame.",
-      "views": null,
-      "atualizado": null
+      "views": 95,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 79,
+      "shares": 0,
+      "likes": 4,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18127534348713612",
@@ -1335,8 +1360,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZugHIyiV7C/",
       "titulo": "Você tem uma ideia incrível de aplicativo, mas a barreira do código o impede de tirá-la do papel? 🤯 Em 2026, ",
-      "views": null,
-      "atualizado": null
+      "views": 5,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 3,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18106545487790957",
@@ -1344,8 +1374,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZvygwLiG4t/",
       "titulo": "💡 SpaceX estreia na bolsa com números que desafiam a lógica não é só mais um movimento isolado no radar da te",
-      "views": null,
-      "atualizado": null
+      "views": 18,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 9,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18562985812064624",
@@ -1353,8 +1388,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZxd5KWhbJL/",
       "titulo": "Cair num buraco negro não te mata rápido... te apaga do tempo. ⏳🕳️",
-      "views": null,
-      "atualizado": null
+      "views": 196,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 167,
+      "shares": 0,
+      "likes": 7,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18052975688757449",
@@ -1362,8 +1402,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZxgXwoFuBK/",
       "titulo": "A porta do jardim fechado do iPhone no Brasil ABRIU! A chegada de lojas de aplicativos alternativas ao iOS mud",
-      "views": null,
-      "atualizado": null
+      "views": 16,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 8,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18104885867511267",
@@ -1371,8 +1416,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZx73KTlmrx/",
       "titulo": "Sua Alexa vai ficar mais inteligente? Descubra agora!",
-      "views": null,
-      "atualizado": null
+      "views": 9,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 5,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18115105489894899",
@@ -1380,8 +1430,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZyXTOLnFEq/",
       "titulo": "A Inteligência Artificial não só acelerou o mercado, como está moldando o acesso ao PRIMEIRO emprego, criando ",
-      "views": null,
-      "atualizado": null
+      "views": 13,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 8,
+      "shares": 0,
+      "likes": 1,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18067275671686900",
@@ -1389,8 +1444,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZzpszAFlDm/",
       "titulo": "A facilidade de \"escrever\" um TCC grátis em 2026 com IA é uma miragem perigosa. Não se trata de delegar o trab",
-      "views": null,
-      "atualizado": null
+      "views": 7,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 4,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18087688490408335",
@@ -1398,8 +1458,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ0FMoLjhF2/",
       "titulo": "Prepare-se: a fluência em inglês sem custos está ao seu alcance em 2026!",
-      "views": null,
-      "atualizado": null
+      "views": 7,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 6,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17953618506157450",
@@ -1407,8 +1472,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ0cZGyM8_3/",
       "titulo": "A interpretação dos muitos mundos diz que o universo se divide a cada decisão quântica — criando infinitas rea",
-      "views": null,
-      "atualizado": null
+      "views": 86,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 65,
+      "shares": 0,
+      "likes": 4,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18448575058139221",
@@ -1416,8 +1486,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ09Pr9CC2k/",
       "titulo": "A Inteligência Artificial está reescrevendo as regras do diagnóstico médico, abrindo um futuro promissor para ",
-      "views": null,
-      "atualizado": null
+      "views": 14,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 8,
+      "shares": 0,
+      "likes": 1,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17987990438824803",
@@ -1425,8 +1500,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ10FG0giuO/",
       "titulo": "Ao contrário dos filmes, você não explodiria — mas o desfecho é assustador. 🪐 Quer entender a ciência por trá",
-      "views": null,
-      "atualizado": null
+      "views": 683,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 480,
+      "shares": 0,
+      "likes": 29,
+      "saved": 5,
+      "comments": 0
     },
     {
       "id": "18120192337771908",
@@ -1434,8 +1514,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ2ijDBk6wD/",
       "titulo": "Se você caísse num buraco negro, seria muito pior do que morrer. O tempo ao seu redor desacelera até parar. A ",
-      "views": null,
-      "atualizado": null
+      "views": 2362,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 1560,
+      "shares": 4,
+      "likes": 95,
+      "saved": 4,
+      "comments": 9
     },
     {
       "id": "18105989117004565",
@@ -1443,8 +1528,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ3LvVBFYfK/",
       "titulo": "Existe um planeta feito quase inteiro de diamante: o 55 Cancri e, a 40 anos-luz da Terra e o dobro do tamanho ",
-      "views": null,
-      "atualizado": null
+      "views": 224,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 179,
+      "shares": 0,
+      "likes": 7,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18199059583319662",
@@ -1452,8 +1542,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ3ZhXnimAw/",
       "titulo": "💡 Xiaomi e Huawei trabalham em nova tecnologia de memória RAM não é só mais um movimento isolado no radar da ",
-      "views": null,
-      "atualizado": null
+      "views": 10,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 5,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17860505673643756",
@@ -1461,8 +1556,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ4yu8Ej8Ig/",
       "titulo": "Imagina uma civilização tão avançada que constrói uma casca gigante em volta de uma estrela inteira, só pra ca",
-      "views": null,
-      "atualizado": null
+      "views": 2911,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 2235,
+      "shares": 4,
+      "likes": 113,
+      "saved": 5,
+      "comments": 0
     },
     {
       "id": "17921426802367978",
@@ -1470,8 +1570,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ5AjHTFbj5/",
       "titulo": "💡 Alexa+ Chega ao Brasil: A Reinvenção da Assistente com IA Generativa",
-      "views": null,
-      "atualizado": null
+      "views": 4,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 2,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18107745173070150",
@@ -1479,8 +1584,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ5dqvIjUSH/",
       "titulo": "🔥 META INVESTIR� US$900 MI NA",
-      "views": null,
-      "atualizado": null
+      "views": 6,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 3,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17935353996085727",
@@ -1488,8 +1598,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ5whU_CUmY/",
       "titulo": "A interpretação dos muitos mundos diz que o universo se divide a cada decisão quântica — criando infinitas rea",
-      "views": null,
-      "atualizado": null
+      "views": 145,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 129,
+      "shares": 0,
+      "likes": 6,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18089041157383532",
@@ -1497,8 +1612,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ6G6m8jckF/",
       "titulo": "💡 Microsoft anuncia usina de gás para abastecer data centers de IA no Texas não é só mais um movimento isolad",
-      "views": null,
-      "atualizado": null
+      "views": 6,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 5,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17980544294863650",
@@ -1506,8 +1626,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ7XjDhk739/",
       "titulo": "A nossa galáxia tem mais de 100 bilhões de estrelas, muitas bilhões de anos mais velhas que o nosso Sol. Se a ",
-      "views": null,
-      "atualizado": null
+      "views": 183,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 143,
+      "shares": 0,
+      "likes": 6,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18113713075905011",
@@ -1515,8 +1640,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ7ed3NFyV4/",
       "titulo": "💡 Tendência tecnológica que está mudando o jogo",
-      "views": null,
-      "atualizado": null
+      "views": 2,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 1,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17978993106019338",
@@ -1524,8 +1654,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ759ThEVS2/",
       "titulo": "O tunelamento quântico permite que partículas atravessem barreiras impossíveis — como passar por dentro de uma",
-      "views": null,
-      "atualizado": null
+      "views": 152,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 132,
+      "shares": 0,
+      "likes": 5,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "17975624592023725",
@@ -1533,8 +1668,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ8VVWxjckH/",
       "titulo": "Enquanto um computador comum usa bits (0 ou 1), o computador quântico usa qubits que são 0 e 1 ao mesmo tempo ",
-      "views": null,
-      "atualizado": null
+      "views": 76,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 68,
+      "shares": 0,
+      "likes": 4,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "17918537217394860",
@@ -1542,8 +1682,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ8wzMcipNy/",
       "titulo": "💡 ChatGPT em junho de 2026: pequenas mudanças que deixam o app mais útil",
-      "views": null,
-      "atualizado": null
+      "views": 7,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 4,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18409630423145392",
@@ -1551,8 +1696,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ91dRhAF6c/",
       "titulo": "Se o universo é tão antigo e tão gigante, por que ele está em silêncio? A explicação mais assustadora tem nome",
-      "views": null,
-      "atualizado": null
+      "views": 156,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 126,
+      "shares": 0,
+      "likes": 6,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18044448917587164",
@@ -1560,8 +1710,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ9-BXAjkkW/",
       "titulo": "💡 IA para RH e Recrutamento Brasil 2026: Ferramentas e Riscos da LGPD não é só mais um movimento isolado no r",
-      "views": null,
-      "atualizado": null
+      "views": 13,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 7,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18135606721569728",
@@ -1569,8 +1724,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ-nOJxDgme/",
       "titulo": "💡 OpenAI lan�a Jalape�o, seu primeiro chip pr�prio para IA não é só mais um movimento isolado no radar da tec",
-      "views": null,
-      "atualizado": null
+      "views": 11,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 5,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18076305098663837",
@@ -1578,8 +1738,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DZ-6NlIEk9I/",
       "titulo": "E se um buraco negro não fosse o fim de tudo, mas uma porta? Alguns físicos acreditam que lá dentro pode exist",
-      "views": null,
-      "atualizado": null
+      "views": 1153,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 807,
+      "shares": 11,
+      "likes": 59,
+      "saved": 2,
+      "comments": 0
     },
     {
       "id": "18100017845270885",
@@ -1587,8 +1752,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DZ_Qa2-lz0d/",
       "titulo": "💡 Drone para Iniciantes Brasil 2026: Guia Completo de Compra e Regras da ANAC não é só uma manchete solta: é ",
-      "views": null,
-      "atualizado": null
+      "views": 7,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 5,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18023509700672327",
@@ -1596,8 +1766,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DaAaTvSjGlp/",
       "titulo": "O experimento da dupla fenda é o mais perturbador da física quântica: partículas se comportam como onda... até",
-      "views": null,
-      "atualizado": null
+      "views": 1586,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 1285,
+      "shares": 5,
+      "likes": 42,
+      "saved": 8,
+      "comments": 2
     },
     {
       "id": "18114415027896720",
@@ -1605,8 +1780,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DaAi0RAjvVR/",
       "titulo": "💡 Alibaba é acusado de tentar “copiar” IA da Anthropic não é só uma manchete solta: é um sinal de como infrae",
-      "views": null,
-      "atualizado": null
+      "views": 9,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 6,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18086974241530185",
@@ -1614,8 +1794,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DaBDhVwEle3/",
       "titulo": "Você imagina o fim do universo como um colapso silencioso? Existe uma teoria que diz o contrário: o Big Rip. A",
-      "views": null,
-      "atualizado": null
+      "views": 160,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 143,
+      "shares": 0,
+      "likes": 2,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18098440793224527",
@@ -1623,8 +1808,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DaBMD8iDYzo/",
       "titulo": "🔥 AGENTES DE IA NO TRABALHO:",
-      "views": null,
-      "atualizado": null
+      "views": 9,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 2,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18077808572280520",
@@ -1632,8 +1822,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DaBe_atDwQ1/",
       "titulo": "O emaranhamento quântico liga duas partículas: mexa em uma e a outra responde na mesma hora, mesmo a anos-luz ",
-      "views": null,
-      "atualizado": null
+      "views": 125,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 101,
+      "shares": 0,
+      "likes": 6,
+      "saved": 2,
+      "comments": 0
     },
     {
       "id": "17967395385092787",
@@ -1641,8 +1836,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DaB1Nt-FX5o/",
       "titulo": "💡 OpenAI Academy: por que cursos de IA viraram parte da estratégia das big techs não é só mais um movimento i",
-      "views": null,
-      "atualizado": null
+      "views": 8,
+      "atualizado": "2026-09-14T02:50:18.854Z",
+      "reach": 4,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18009919433871006",
@@ -3901,9 +4101,10 @@
       "views": 1614,
       "reach": 1305,
       "shares": 4,
+      "likes": 52,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18147310129556417",
@@ -3914,9 +4115,10 @@
       "views": 297,
       "reach": 263,
       "shares": 0,
+      "likes": 8,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18136547338716195",
@@ -3927,9 +4129,10 @@
       "views": 1702,
       "reach": 1333,
       "shares": 8,
+      "likes": 88,
       "saved": 4,
       "comments": 3,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18458512582136769",
@@ -3940,9 +4143,10 @@
       "views": 1047,
       "reach": 907,
       "shares": 2,
+      "likes": 29,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17957493104998955",
@@ -3953,9 +4157,10 @@
       "views": 1475,
       "reach": 1225,
       "shares": 0,
+      "likes": 40,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18125109325770563",
@@ -3966,9 +4171,10 @@
       "views": 1656,
       "reach": 1442,
       "shares": 2,
+      "likes": 50,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18193077268388306",
@@ -3979,9 +4185,10 @@
       "views": 3280,
       "reach": 2688,
       "shares": 8,
+      "likes": 86,
       "saved": 14,
       "comments": 2,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18127979713781410",
@@ -3992,9 +4199,10 @@
       "views": 1549,
       "reach": 1168,
       "shares": 1,
+      "likes": 51,
       "saved": 1,
       "comments": 2,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17907346998525752",
@@ -4005,9 +4213,10 @@
       "views": 945,
       "reach": 728,
       "shares": 0,
+      "likes": 34,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18107299778132824",
@@ -4018,9 +4227,10 @@
       "views": 143,
       "reach": 111,
       "shares": 0,
+      "likes": 3,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17899771764581685",
@@ -4031,9 +4241,10 @@
       "views": 1436,
       "reach": 1110,
       "shares": 1,
+      "likes": 50,
       "saved": 2,
       "comments": 6,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18625414231000198",
@@ -4044,9 +4255,10 @@
       "views": 1618,
       "reach": 1249,
       "shares": 1,
+      "likes": 45,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18115660444758659",
@@ -4057,9 +4269,10 @@
       "views": 1734,
       "reach": 1429,
       "shares": 5,
+      "likes": 64,
       "saved": 11,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17904238635516419",
@@ -4070,9 +4283,10 @@
       "views": 192,
       "reach": 148,
       "shares": 0,
+      "likes": 9,
       "saved": 0,
       "comments": 3,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18104730475916826",
@@ -4083,9 +4297,10 @@
       "views": 1806,
       "reach": 1432,
       "shares": 0,
+      "likes": 58,
       "saved": 1,
       "comments": 3,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18615959566030669",
@@ -4096,9 +4311,10 @@
       "views": 1402,
       "reach": 1161,
       "shares": 3,
+      "likes": 53,
       "saved": 9,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18616782982024171",
@@ -4109,9 +4325,10 @@
       "views": 939,
       "reach": 740,
       "shares": 1,
+      "likes": 48,
       "saved": 6,
       "comments": 3,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18208612765315366",
@@ -4122,9 +4339,10 @@
       "views": 99,
       "reach": 90,
       "shares": 0,
+      "likes": 3,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18097113092633065",
@@ -4135,9 +4353,10 @@
       "views": 668,
       "reach": 513,
       "shares": 1,
+      "likes": 39,
       "saved": 8,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18095510330086906",
@@ -4148,9 +4367,10 @@
       "views": 383,
       "reach": 313,
       "shares": 0,
+      "likes": 6,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17909910081463730",
@@ -4161,9 +4381,10 @@
       "views": 1492,
       "reach": 1288,
       "shares": 2,
+      "likes": 40,
       "saved": 9,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18151867516516858",
@@ -4174,9 +4395,10 @@
       "views": 1275,
       "reach": 1008,
       "shares": 2,
+      "likes": 37,
       "saved": 4,
       "comments": 2,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18183428527412217",
@@ -4187,9 +4409,10 @@
       "views": 284,
       "reach": 237,
       "shares": 0,
+      "likes": 8,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18430419901176616",
@@ -4200,9 +4423,10 @@
       "views": 2295,
       "reach": 1732,
       "shares": 1,
+      "likes": 93,
       "saved": 6,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18110048714111499",
@@ -4213,9 +4437,10 @@
       "views": 1493,
       "reach": 1198,
       "shares": 1,
+      "likes": 40,
       "saved": 5,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18067695485747501",
@@ -4226,9 +4451,10 @@
       "views": 387,
       "reach": 315,
       "shares": 0,
+      "likes": 13,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18129340285794247",
@@ -4239,9 +4465,10 @@
       "views": 2160,
       "reach": 1756,
       "shares": 11,
+      "likes": 70,
       "saved": 11,
       "comments": 9,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18021896576874733",
@@ -4252,9 +4479,10 @@
       "views": 379,
       "reach": 299,
       "shares": 0,
+      "likes": 13,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18074682785412231",
@@ -4265,9 +4493,10 @@
       "views": 506,
       "reach": 422,
       "shares": 0,
+      "likes": 27,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18164060557474610",
@@ -4278,9 +4507,10 @@
       "views": 1364,
       "reach": 1095,
       "shares": 1,
+      "likes": 38,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17876854008546787",
@@ -4289,11 +4519,12 @@
       "link": "https://www.instagram.com/reel/DdAC-SKCeXe/",
       "titulo": "Um estudo publicado em 18 de agosto de 2026 na Nature Astronomy indica que algumas das galáxias mais massivas ",
       "views": 1076,
-      "reach": 873,
+      "reach": 875,
       "shares": 0,
+      "likes": 36,
       "saved": 2,
       "comments": 2,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17940996048090511",
@@ -4304,9 +4535,10 @@
       "views": 1259,
       "reach": 1013,
       "shares": 1,
+      "likes": 29,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18391462645207565",
@@ -4317,9 +4549,10 @@
       "views": 101,
       "reach": 65,
       "shares": 0,
+      "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17944090677335005",
@@ -4330,9 +4563,10 @@
       "views": 108,
       "reach": 81,
       "shares": 0,
+      "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18101824682340096",
@@ -4343,9 +4577,10 @@
       "views": 136,
       "reach": 110,
       "shares": 0,
+      "likes": 3,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18065367872771656",
@@ -4356,9 +4591,10 @@
       "views": 1191,
       "reach": 980,
       "shares": 2,
+      "likes": 56,
       "saved": 6,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18127614421749775",
@@ -4369,9 +4605,10 @@
       "views": 70,
       "reach": 59,
       "shares": 0,
+      "likes": 4,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17945299929335298",
@@ -4382,9 +4619,10 @@
       "views": 463,
       "reach": 369,
       "shares": 0,
+      "likes": 17,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18390982177205779",
@@ -4395,9 +4633,10 @@
       "views": 305,
       "reach": 255,
       "shares": 1,
+      "likes": 7,
       "saved": 1,
       "comments": 2,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "17936344395363681",
@@ -4408,9 +4647,10 @@
       "views": 713,
       "reach": 561,
       "shares": 0,
+      "likes": 24,
       "saved": 4,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18090132413440084",
@@ -4421,9 +4661,10 @@
       "views": 42,
       "reach": 35,
       "shares": 0,
+      "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18625262311050337",
@@ -4434,9 +4675,10 @@
       "views": 504,
       "reach": 412,
       "shares": 0,
+      "likes": 16,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18087028598243613",
@@ -4447,9 +4689,10 @@
       "views": 1312,
       "reach": 1088,
       "shares": 0,
+      "likes": 46,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18017711891927512",
@@ -4457,12 +4700,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdMGUmKE5IP/",
       "titulo": "A sonda Mars Express da Agência Espacial Europeia registrou mais de 30 redemoinhos de poeira ativos em Mamers ",
-      "views": 1218,
-      "reach": 1011,
+      "views": 1219,
+      "reach": 1021,
       "shares": 0,
+      "likes": 25,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18208038664362436",
@@ -4470,12 +4714,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdMfeamkyQY/",
       "titulo": "AULA da escola Universo do Zero. O oxigênio é reativo demais para durar sozinho numa atmosfera: se ele está lá",
-      "views": 1494,
-      "reach": 1232,
+      "views": 1496,
+      "reach": 1234,
       "shares": 3,
+      "likes": 53,
       "saved": 6,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18093322520446000",
@@ -4483,12 +4728,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdM66J3CPdA/",
       "titulo": "Estudo da NASA publicado em 19 de agosto de 2026 indica que alguns micróbios da Terra levados por exploradores",
-      "views": 176,
-      "reach": 142,
+      "views": 178,
+      "reach": 143,
       "shares": 0,
+      "likes": 6,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18475294462117696",
@@ -4496,12 +4742,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdOwBJBjUmR/",
       "titulo": "A sonda Lunar Reconnaissance Orbiter da NASA fotografou em 11 e 12 de agosto de 2026 uma cratera nova na Lua, ",
-      "views": 1547,
-      "reach": 1316,
+      "views": 1556,
+      "reach": 1322,
       "shares": 0,
+      "likes": 47,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18024166709697424",
@@ -4509,12 +4756,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DdO3CAUDy83/",
       "titulo": "Como uma estrela morre depende de UMA coisa: a massa. 🌟",
-      "views": 61,
+      "views": 63,
       "reach": 25,
       "shares": 0,
+      "likes": 1,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18115924345767032",
@@ -4522,12 +4770,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdPDwdhDfgS/",
       "titulo": "AULA da escola Universo do Zero. Europa é uma bola de gelo, mas o gelo é só a tampa: embaixo existe um oceano ",
-      "views": 1856,
-      "reach": 1593,
+      "views": 1885,
+      "reach": 1612,
       "shares": 0,
+      "likes": 63,
       "saved": 4,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     },
     {
       "id": "18416339860155466",
@@ -4535,12 +4784,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdPfxbIj3PT/",
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
-      "views": 425,
-      "reach": 336,
+      "views": 626,
+      "reach": 498,
       "shares": 0,
+      "likes": 19,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-14T01:41:50.276Z"
+      "atualizado": "2026-09-14T02:50:18.854Z"
     }
   ]
 }

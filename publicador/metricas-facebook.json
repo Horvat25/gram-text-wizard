@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-14T01:42:40.233Z",
+  "gerado_em": "2026-09-14T02:51:21.842Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -365,11 +365,11 @@
     },
     {
       "d": "2026-09-13",
-      "views": 8
+      "views": 10
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
-  "metricas_usadas": "blue_reels_play_count",
+  "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
       "id": "1615905893529867",
@@ -377,10 +377,12 @@
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
       "link": "https://www.facebook.com/reel/1615905893529867/",
       "segundos": 39.541,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 3248,
+      "interacoes": 0
     },
     {
       "id": "1554252192197300",
@@ -388,10 +390,12 @@
       "titulo": "O Very Large Telescope encontrou evidências de um objeto do tamanho de uma lua girando em torno de uma anã mar",
       "link": "https://www.facebook.com/reel/1554252192197300/",
       "segundos": 40.458,
-      "views": 308,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 342,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 6249,
+      "interacoes": 0
     },
     {
       "id": "1961055401218444",
@@ -399,10 +403,12 @@
       "titulo": "Além de Netuno, tem objetos gelados com órbitas tortas — como se um planeta gigante e escuro estivesse puxando",
       "link": "https://www.facebook.com/reel/1961055401218444/",
       "segundos": 59.833,
-      "views": 1,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 1169,
+      "interacoes": 0
     },
     {
       "id": "1574400400715608",
@@ -410,10 +416,12 @@
       "titulo": "Isaac Newton calculou, em cartas secretas, a data do fim do mundo: 2060. Ele tratou as profecias da Bíblia com",
       "link": "https://www.facebook.com/reel/1574400400715608/",
       "segundos": 37.25,
-      "views": 1,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 3647,
+      "interacoes": 0
     },
     {
       "id": "1076043204746073",
@@ -421,10 +429,12 @@
       "titulo": "A 64 anos-luz daqui existe um planeta azul que, de longe, parece a Terra. Só que nele chove vidro derretido — ",
       "link": "https://www.facebook.com/reel/1076043204746073/",
       "segundos": 36.416,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 1100,
+      "interacoes": 0
     },
     {
       "id": "27829624353340864",
@@ -432,10 +442,12 @@
       "titulo": "A Estação Espacial está caindo agora mesmo — e nunca chega ao chão. Uma órbita é isso: cair pra sempre errando",
       "link": "https://www.facebook.com/reel/27829624353340864/",
       "segundos": 38.208,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 0,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 0,
+      "interacoes": 0
     },
     {
       "id": "27577463141862500",
@@ -443,10 +455,12 @@
       "titulo": "1 segundo depois do Big Bang, matéria e antimatéria se aniquilavam em pares. Deveria ter sobrado NADA. Sobrou ",
       "link": "https://www.facebook.com/reel/27577463141862500/",
       "segundos": 73.333,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 289,
+      "interacoes": 0
     },
     {
       "id": "1741643723917654",
@@ -454,10 +468,12 @@
       "titulo": "Em menos de um trilionésimo de segundo, o universo dobrou de tamanho 90 vezes seguidas. É o crescimento mais v",
       "link": "https://www.facebook.com/reel/1741643723917654/",
       "segundos": 58.291,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 0,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 0,
+      "interacoes": 0
     },
     {
       "id": "1658151961960166",
@@ -465,10 +481,12 @@
       "titulo": "No instante t = 0 não existia espaço nem tempo. O Big Bang não aconteceu num lugar — ele CRIOU o lugar. Todo o",
       "link": "https://www.facebook.com/reel/1658151961960166/",
       "segundos": 56.875,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 390,
+      "interacoes": 0
     },
     {
       "id": "1643531577490749",
@@ -476,10 +494,12 @@
       "titulo": "O Sol tem data pra morrer — e a ciência já sabe qual. Toda estrela é um cabo de guerra entre a gravidade que e",
       "link": "https://www.facebook.com/reel/1643531577490749/",
       "segundos": 43.416,
-      "views": 2,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 866,
+      "interacoes": 0
     },
     {
       "id": "1524357976133071",
@@ -487,10 +507,12 @@
       "titulo": "A água que você bebeu hoje é mais velha que o Sol. Metade das moléculas dos oceanos se formou numa nuvem inter",
       "link": "https://www.facebook.com/reel/1524357976133071/",
       "segundos": 35.083,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 0,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 0,
+      "interacoes": 0
     },
     {
       "id": "1447105920808559",
@@ -498,10 +520,12 @@
       "titulo": "Einstein provou: gravidade NÃO é uma força. Tudo que tem massa curva o espaço-tempo, e você só desliza pela cu",
       "link": "https://www.facebook.com/reel/1447105920808559/",
       "segundos": 41.458,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 596,
+      "interacoes": 0
     },
     {
       "id": "1219836763584561",
@@ -509,10 +533,12 @@
       "titulo": "Todo o ouro do universo nasceu de uma catástrofe: a colisão de duas estrelas de nêutrons. A aliança no seu ded",
       "link": "https://www.facebook.com/reel/1219836763584561/",
       "segundos": 55.166,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 905,
+      "interacoes": 0
     },
     {
       "id": "1044436054756114",
@@ -520,10 +546,12 @@
       "titulo": "Algo está puxando a Via Láctea inteira a 2 milhões de km/h — e fica escondido numa parte do céu que a gente nã",
       "link": "https://www.facebook.com/reel/1044436054756114/",
       "segundos": 32.625,
-      "views": 2,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 711,
+      "interacoes": 0
     },
     {
       "id": "1030475002710759",
@@ -531,10 +559,12 @@
       "titulo": "O universo tem um lado que ninguém te contou: chuva de vidro derretido, um sinal de rádio que sumiu pra sempre",
       "link": "https://www.facebook.com/reel/1030475002710759/",
       "segundos": 44.833,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 1188,
+      "interacoes": 0
     },
     {
       "id": "1019737270766186",
@@ -542,10 +572,12 @@
       "titulo": "E se os aliens já sabem que estamos aqui — e só decidiram nos observar de longe? A hipótese do zoológico diz q",
       "link": "https://www.facebook.com/reel/1019737270766186/",
       "segundos": 55.333,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 2500,
+      "interacoes": 0
     },
     {
       "id": "896514072893487",
@@ -553,10 +585,12 @@
       "titulo": "Existe uma lua de Saturno onde um humano decolaria batendo os braços. Titã tem gravidade 7x mais fraca e ar 4x",
       "link": "https://www.facebook.com/reel/896514072893487/",
       "segundos": 38.666,
+      "curtidas": 0,
+      "comentarios": 0,
       "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null
+      "tempo_medio_ms": 565,
+      "interacoes": 0
     }
   ],
   "erros": []
