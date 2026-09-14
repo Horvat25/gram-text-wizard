@@ -27,6 +27,7 @@ jobs:
         env:
           IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador publico, nao e segredo
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          FB_TOKEN: ${{ secrets.FB_TOKEN }}   # 14/09/2026: chave so de leitura das views do Facebook
         run: node publicador/conferir-token.mjs
 
       - name: Ficou algum post pra trás?

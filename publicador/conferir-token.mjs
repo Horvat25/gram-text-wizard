@@ -61,6 +61,18 @@ const prazos = [
   ['acesso aos dados', info?.data?.data_access_expires_at],
 ].filter(([, v]) => v);   // 0 e undefined saem: não têm prazo
 
+// 14/09/2026: a chave só de leitura do Facebook (FB_TOKEN) também vence em silêncio — o placar
+// perderia as views da Página sem ninguém saber. Mesmo alarme de 10 dias.
+if (process.env.FB_TOKEN) {
+  const f = new URL(`${API}/debug_token`);
+  f.searchParams.set('input_token', process.env.FB_TOKEN);
+  f.searchParams.set('access_token', process.env.FB_TOKEN);
+  const fi = await (await fetch(f)).json();
+  if (!fi?.data?.is_valid) console.error(`ATENÇÃO: FB_TOKEN inválido (${fi?.error?.message || 'is_valid=false'}) — o placar perde as views do Facebook.`);
+  else console.log(`FB_TOKEN ok · read_insights: ${(fi.data.scopes || []).includes('read_insights') ? 'sim' : 'NÃO'}`);
+  for (const [nome, v] of [['FB_TOKEN', fi?.data?.expires_at], ['FB_TOKEN acesso aos dados', fi?.data?.data_access_expires_at]]) if (v) prazos.push([nome, v]);
+}
+
 if (!prazos.length) { console.log('sem prazo declarado em nenhum dos dois campos'); process.exit(0); }
 
 let alarme = false;
