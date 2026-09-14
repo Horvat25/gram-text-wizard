@@ -62,6 +62,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # ⚠️ 13/09/2026: o relógio da nuvem (Worker) e a tarefa do PC disparam no MESMO minuto.
+      # O concurrency só ENFILEIRA a 2ª rodada — e ela vinha com o checkout do momento do
+      # disparo, a fila de ANTES da 1ª gravar "publicado". Resultado: o Reel das 18h e o Story
+      # das 21h saíram 2x. Agora toda rodada pega a fila mais nova antes de publicar.
+      - name: Pegar a fila mais nova
+        run: git fetch -q origin main && git reset -q --hard origin/main
+
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
