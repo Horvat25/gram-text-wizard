@@ -141,6 +141,46 @@ async function contaDiaria() {
 }
 const cd = SECO ? { lista: [], modo: null, erro: null } : await contaDiaria();
 
+// ── Acervo desde a virada pra astronomia (14/09/2026) ─────────────────────────
+// O Marcelo quer comparar as redes "desde que viramos astronomia" (17/06/2026), vídeo a vídeo.
+// A janela de 50 posts não chega lá: o acervo guarda TODOS os posts desde 17/06 e atualiza os
+// números aos poucos — no máx. 40 por rodada, pra caber no limite de ~200 chamadas/hora.
+const INICIO_ASTRONOMIA = '2026-06-17';
+async function acervo(recentes) {
+  let ant = [];
+  try { ant = JSON.parse(fs.readFileSync(SAIDA, 'utf8')).acervo || []; } catch {}
+  const mapa = new Map(ant.map(a => [a.id, a]));
+  const agora = new Date().toISOString();
+  for (const i of recentes) {
+    mapa.set(i.id, { id: i.id, quando: i.quando, tipo: i.tipo, link: i.link, titulo: i.titulo,
+      views: i.views ?? i.plays ?? null, reach: i.reach ?? null, shares: i.shares ?? null,
+      saved: i.saved ?? null, comments: i.comments ?? null, atualizado: agora });
+  }
+  let pag = midias, paginas = 0;   // continua a lista além das 50, até passar de 17/06
+  while (pag?.paging?.next && paginas < 12) {
+    const ult = pag.data?.at(-1);
+    if (ult && ult.timestamp < INICIO_ASTRONOMIA) break;
+    pag = await (await fetch(pag.paging.next)).json(); paginas++;
+    for (const m of pag.data || []) {
+      if (m.timestamp < INICIO_ASTRONOMIA || mapa.has(m.id)) continue;
+      mapa.set(m.id, { id: m.id, quando: m.timestamp, tipo: m.media_product_type || m.media_type, link: m.permalink,
+        titulo: (m.caption || '').split('\n')[0].slice(0, 110), views: null, atualizado: null });
+    }
+  }
+  const idsRecentes = new Set(recentes.map(r => r.id));
+  const vez = [...mapa.values()].filter(a => !idsRecentes.has(a.id))
+    .sort((a, b) => String(a.atualizado || '').localeCompare(String(b.atualizado || ''))).slice(0, 40);
+  for (const a of vez) {
+    const n = await insights(a.id);
+    if (!n._erro) Object.assign(a, { views: n.views ?? n.plays ?? a.views, reach: n.reach ?? a.reach, shares: n.shares ?? a.shares,
+      saved: n.saved ?? a.saved, comments: n.comments ?? a.comments, atualizado: agora });
+  }
+  const lista = [...mapa.values()].filter(a => String(a.quando) >= INICIO_ASTRONOMIA).sort((a, b) => String(a.quando).localeCompare(String(b.quando)));
+  console.log(`acervo desde ${INICIO_ASTRONOMIA}: ${lista.length} posts · ${lista.filter(a => a.views != null).length} com números · ${vez.length} atualizados agora`);
+  return lista;
+}
+const listaAcervo = SECO ? [] : await acervo(itens);
+
 const doc = {
   gerado_em: new Date().toISOString(),
   conta: { username: conta.username, seguidores: conta.followers_count, publicacoes: conta.media_count },
@@ -148,6 +188,7 @@ const doc = {
   conta_diaria_modo: cd.modo,
   ...(cd.erro ? { conta_diaria_erro: cd.erro } : {}),
   itens,
+  acervo: listaAcervo,
 };
 
 if (SECO) { console.log(JSON.stringify(doc, null, 2).slice(0, 1200)); process.exit(0); }
