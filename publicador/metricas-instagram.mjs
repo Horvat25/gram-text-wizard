@@ -102,9 +102,50 @@ for (const m of (midias.data || [])) {
 }
 
 itens.sort((a, b) => new Date(b.quando) - new Date(a.quando));
+
+// ── Views da CONTA por dia (14/09/2026) ──────────────────────────────────────
+// Os 50 posts mais novos não dizem "quantas views tivemos nos últimos 60 dias": post que sai
+// da janela congela. O Insights da conta dá o número real por dia. Guarda o histórico no
+// próprio arquivo e completa o que falta dos últimos 60 dias a cada rodada.
+async function contaDiaria() {
+  let anterior = [];
+  try { anterior = JSON.parse(fs.readFileSync(SAIDA, 'utf8')).conta_diaria || []; } catch {}
+  const mapa = new Map(anterior.map(p => [p.d, p.views]));
+  const dia = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+  const ts = d => String(Math.floor(Date.parse(d + 'T00:00:00Z') / 1000));
+  let modo = null, erro = null;
+  // 1) série diária em blocos de 30 dias (2 chamadas)
+  for (const [a, b] of [[61, 31], [31, 1]]) {
+    const r = await get(`/${IG_USER_ID}/insights`, { metric: 'views', period: 'day', since: ts(dia(a)), until: ts(dia(b)) });
+    const vals = r.data?.[0]?.values;
+    if (!vals) { erro = (r.error?.message || 'sem valores').slice(0, 160); modo = null; break; }
+    for (const v of vals) mapa.set(new Date(Date.parse(v.end_time) - 864e5).toISOString().slice(0, 10), v.value ?? 0);
+    modo = 'série diária';
+  }
+  // 2) se a API só aceitar total do período, pede dia a dia o que falta (no máx. 35 por rodada)
+  if (!modo) {
+    let feitos = 0;
+    for (let n = 60; n >= 1 && feitos < 35; n--) {
+      const d = dia(n); if (mapa.has(d)) continue;
+      const r = await get(`/${IG_USER_ID}/insights`, { metric: 'views', period: 'day', metric_type: 'total_value', since: ts(d), until: ts(dia(n - 1)) });
+      feitos++;
+      const v = r.data?.[0]?.total_value?.value;
+      if (v == null) { erro = (r.error?.message || 'sem total_value').slice(0, 160); break; }
+      mapa.set(d, v); modo = 'total por dia';
+    }
+  }
+  const lista = [...mapa.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-400).map(([d, views]) => ({ d, views }));
+  console.log(`conta por dia: ${lista.length} dias (${modo || 'falhou'})${erro ? ' · ' + erro : ''}`);
+  return { lista, modo, erro };
+}
+const cd = SECO ? { lista: [], modo: null, erro: null } : await contaDiaria();
+
 const doc = {
   gerado_em: new Date().toISOString(),
   conta: { username: conta.username, seguidores: conta.followers_count, publicacoes: conta.media_count },
+  conta_diaria: cd.lista,
+  conta_diaria_modo: cd.modo,
+  ...(cd.erro ? { conta_diaria_erro: cd.erro } : {}),
   itens,
 };
 
