@@ -56,27 +56,28 @@ for (let i = 0; i < 4; i++) {
   r = await (await fetch(r.paging.next)).json();
 }
 
-const CONJUNTOS = [
-  'fb_reels_total_plays,blue_reels_play_count,post_impressions_unique,post_video_avg_time_watched,post_video_social_actions',
-  'blue_reels_play_count,post_impressions_unique,post_video_avg_time_watched',
-  'blue_reels_play_count',
-];
-let conjuntoOk = null;
+// 14/09/2026: pedir as métricas JUNTAS derrubava o pedido inteiro quando UMA não existia, e o
+// robô caía só em blue_reels_play_count (sem alcance, sem tempo, sem interações). Agora testa
+// uma a uma no primeiro Reel e depois pede de uma vez só as que a API aceitou.
+const CANDIDATAS = ['fb_reels_total_plays', 'blue_reels_play_count', 'fb_reels_replay_count', 'post_impressions_unique',
+  'post_video_avg_time_watched', 'post_video_view_time', 'post_video_social_actions', 'post_video_likes_by_reaction_type'];
+let validas = null, conjuntoOk = null;
+const valorDe = v => (v && typeof v === 'object') ? Object.values(v).reduce((a, b) => a + (+b || 0), 0) : (v ?? null);
 async function insights(id) {
-  for (const metric of (conjuntoOk ? [conjuntoOk] : CONJUNTOS)) {
-    const x = await get(`/${id}/video_insights`, { metric }, TK);
-    if (x.data) {
-      conjuntoOk = metric;
-      const o = {};
-      for (const m of x.data) {
-        const v = m.values?.[0]?.value;
-        o[m.name] = (v && typeof v === 'object') ? Object.values(v).reduce((a, b) => a + (+b || 0), 0) : v ?? null;
-      }
-      return o;
+  if (!validas) {
+    validas = [];
+    for (const m of CANDIDATAS) {
+      const x = await get(`/${id}/video_insights`, { metric: m }, TK);
+      if (x.data && x.data.length) validas.push(m);
     }
-    if (!/metric|invalid|does not support|valid insights/i.test(x.error?.message || '')) return { _erro: (x.error?.message || '').slice(0, 160) };
+    conjuntoOk = validas.join(',') || null;
+    console.log(`métricas de Reel aceitas: ${conjuntoOk || 'nenhuma'}`);
   }
-  return { _erro: 'nenhum conjunto de métricas aceito' };
+  if (!validas.length) return { _erro: 'nenhuma métrica de Reel aceita' };
+  const x = await get(`/${id}/video_insights`, { metric: conjuntoOk }, TK);
+  if (!x.data) return { _erro: (x.error?.message || '').slice(0, 160) };
+  const o = {}; for (const m of x.data) o[m.name] = valorDe(m.values?.[0]?.value);
+  return o;
 }
 
 const itens = [];
