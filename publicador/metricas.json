@@ -1,11 +1,151 @@
 {
-  "gerado_em": "2026-09-14T01:12:44.387Z",
+  "gerado_em": "2026-09-14T01:35:30.451Z",
   "conta": {
     "username": "neuralupdate",
     "seguidores": 1157,
     "publicacoes": 879
   },
   "conta_diaria": [
+    {
+      "d": "2026-05-17",
+      "views": 51
+    },
+    {
+      "d": "2026-05-18",
+      "views": 142
+    },
+    {
+      "d": "2026-05-19",
+      "views": 73
+    },
+    {
+      "d": "2026-05-20",
+      "views": 119
+    },
+    {
+      "d": "2026-05-21",
+      "views": 58
+    },
+    {
+      "d": "2026-05-22",
+      "views": 37
+    },
+    {
+      "d": "2026-05-23",
+      "views": 93
+    },
+    {
+      "d": "2026-05-24",
+      "views": 19
+    },
+    {
+      "d": "2026-05-25",
+      "views": 26
+    },
+    {
+      "d": "2026-05-26",
+      "views": 17
+    },
+    {
+      "d": "2026-05-27",
+      "views": 28
+    },
+    {
+      "d": "2026-05-28",
+      "views": 18
+    },
+    {
+      "d": "2026-05-29",
+      "views": 20
+    },
+    {
+      "d": "2026-05-30",
+      "views": 26
+    },
+    {
+      "d": "2026-05-31",
+      "views": 36
+    },
+    {
+      "d": "2026-06-01",
+      "views": 20
+    },
+    {
+      "d": "2026-06-02",
+      "views": 168
+    },
+    {
+      "d": "2026-06-03",
+      "views": 31
+    },
+    {
+      "d": "2026-06-04",
+      "views": 46
+    },
+    {
+      "d": "2026-06-05",
+      "views": 19
+    },
+    {
+      "d": "2026-06-06",
+      "views": 22
+    },
+    {
+      "d": "2026-06-07",
+      "views": 27
+    },
+    {
+      "d": "2026-06-08",
+      "views": 64
+    },
+    {
+      "d": "2026-06-09",
+      "views": 18
+    },
+    {
+      "d": "2026-06-10",
+      "views": 9
+    },
+    {
+      "d": "2026-06-11",
+      "views": 5
+    },
+    {
+      "d": "2026-06-12",
+      "views": 174
+    },
+    {
+      "d": "2026-06-13",
+      "views": 133
+    },
+    {
+      "d": "2026-06-14",
+      "views": 2965
+    },
+    {
+      "d": "2026-06-15",
+      "views": 567
+    },
+    {
+      "d": "2026-06-16",
+      "views": 127
+    },
+    {
+      "d": "2026-06-17",
+      "views": 84
+    },
+    {
+      "d": "2026-06-18",
+      "views": 83
+    },
+    {
+      "d": "2026-06-19",
+      "views": 169
+    },
+    {
+      "d": "2026-06-20",
+      "views": 85
+    },
     {
       "d": "2026-07-16",
       "views": 3100
@@ -257,13 +397,13 @@
       "link": "https://www.instagram.com/reel/DdPfxbIj3PT/",
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
       "pede_quero": true,
-      "views": 367,
-      "reach": 272,
-      "likes": 12,
+      "views": 414,
+      "reach": 311,
+      "likes": 13,
       "comments": 1,
       "shares": 0,
       "saved": 2,
-      "total_interactions": 15,
+      "total_interactions": 16,
       "pedidos_dm": 0
     },
     {
@@ -273,7 +413,7 @@
       "link": "https://www.instagram.com/reel/DdPDwdhDfgS/",
       "titulo": "AULA da escola Universo do Zero. Europa é uma bola de gelo, mas o gelo é só a tampa: embaixo existe um oceano ",
       "pede_quero": false,
-      "views": 1846,
+      "views": 1855,
       "reach": 1593,
       "likes": 63,
       "comments": 1,
@@ -289,8 +429,8 @@
       "link": "https://www.instagram.com/p/DdO3CAUDy83/",
       "titulo": "Como uma estrela morre depende de UMA coisa: a massa. 🌟",
       "pede_quero": false,
-      "views": 60,
-      "reach": 24,
+      "views": 61,
+      "reach": 25,
       "likes": 1,
       "comments": 1,
       "shares": 0,
@@ -305,7 +445,7 @@
       "link": "https://www.instagram.com/reel/DdOwBJBjUmR/",
       "titulo": "A sonda Lunar Reconnaissance Orbiter da NASA fotografou em 11 e 12 de agosto de 2026 uma cratera nova na Lua, ",
       "pede_quero": false,
-      "views": 1542,
+      "views": 1545,
       "reach": 1314,
       "likes": 47,
       "comments": 1,
@@ -322,7 +462,7 @@
       "titulo": "Estudo da NASA publicado em 19 de agosto de 2026 indica que alguns micróbios da Terra levados por exploradores",
       "pede_quero": false,
       "views": 176,
-      "reach": 139,
+      "reach": 142,
       "likes": 6,
       "comments": 1,
       "shares": 0,
@@ -353,13 +493,13 @@
       "link": "https://www.instagram.com/reel/DdMGUmKE5IP/",
       "titulo": "A sonda Mars Express da Agência Espacial Europeia registrou mais de 30 redemoinhos de poeira ativos em Mamers ",
       "pede_quero": false,
-      "views": 1202,
-      "reach": 992,
-      "likes": 24,
+      "views": 1216,
+      "reach": 1011,
+      "likes": 25,
       "comments": 1,
       "shares": 0,
       "saved": 1,
-      "total_interactions": 26,
+      "total_interactions": 27,
       "pedidos_dm": 0
     },
     {
