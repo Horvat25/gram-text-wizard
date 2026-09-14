@@ -1,10 +1,154 @@
 {
-  "gerado_em": "2026-09-14T01:02:12.927Z",
+  "gerado_em": "2026-09-14T01:10:05.813Z",
   "conta": {
     "username": "neuralupdate",
     "seguidores": 1157,
     "publicacoes": 879
   },
+  "conta_diaria": [
+    {
+      "d": "2026-07-16",
+      "views": 3100
+    },
+    {
+      "d": "2026-07-17",
+      "views": 2308
+    },
+    {
+      "d": "2026-07-18",
+      "views": 2281
+    },
+    {
+      "d": "2026-07-19",
+      "views": 2359
+    },
+    {
+      "d": "2026-07-20",
+      "views": 1727
+    },
+    {
+      "d": "2026-07-21",
+      "views": 812
+    },
+    {
+      "d": "2026-07-22",
+      "views": 1118
+    },
+    {
+      "d": "2026-07-23",
+      "views": 843
+    },
+    {
+      "d": "2026-07-24",
+      "views": 1464
+    },
+    {
+      "d": "2026-07-25",
+      "views": 1873
+    },
+    {
+      "d": "2026-07-26",
+      "views": 2596
+    },
+    {
+      "d": "2026-07-27",
+      "views": 1358
+    },
+    {
+      "d": "2026-07-28",
+      "views": 851
+    },
+    {
+      "d": "2026-07-29",
+      "views": 741
+    },
+    {
+      "d": "2026-07-30",
+      "views": 1087
+    },
+    {
+      "d": "2026-07-31",
+      "views": 667
+    },
+    {
+      "d": "2026-08-01",
+      "views": 451
+    },
+    {
+      "d": "2026-08-02",
+      "views": 865
+    },
+    {
+      "d": "2026-08-03",
+      "views": 1333
+    },
+    {
+      "d": "2026-08-04",
+      "views": 988
+    },
+    {
+      "d": "2026-08-05",
+      "views": 1253
+    },
+    {
+      "d": "2026-08-06",
+      "views": 1108
+    },
+    {
+      "d": "2026-08-07",
+      "views": 1495
+    },
+    {
+      "d": "2026-08-08",
+      "views": 3163
+    },
+    {
+      "d": "2026-08-09",
+      "views": 3384
+    },
+    {
+      "d": "2026-08-10",
+      "views": 1477
+    },
+    {
+      "d": "2026-08-11",
+      "views": 1317
+    },
+    {
+      "d": "2026-08-12",
+      "views": 3849
+    },
+    {
+      "d": "2026-08-13",
+      "views": 5464
+    },
+    {
+      "d": "2026-08-14",
+      "views": 1593
+    },
+    {
+      "d": "2026-08-15",
+      "views": 1446
+    },
+    {
+      "d": "2026-08-16",
+      "views": 2061
+    },
+    {
+      "d": "2026-08-17",
+      "views": 1086
+    },
+    {
+      "d": "2026-08-18",
+      "views": 2078
+    },
+    {
+      "d": "2026-08-19",
+      "views": 2585
+    }
+  ],
+  "conta_diaria_modo": "total por dia",
+  "conta_diaria_erro": "(#100) The following metrics (views) should be specified with parameter metric_type=total_value",
   "itens": [
     {
       "id": "18416339860155466",
@@ -13,13 +157,13 @@
       "link": "https://www.instagram.com/reel/DdPfxbIj3PT/",
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
       "pede_quero": true,
-      "views": 333,
-      "reach": 250,
-      "likes": 10,
+      "views": 358,
+      "reach": 272,
+      "likes": 12,
       "comments": 1,
       "shares": 0,
       "saved": 2,
-      "total_interactions": 13,
+      "total_interactions": 15,
       "pedidos_dm": 0
     },
     {
@@ -29,7 +173,7 @@
       "link": "https://www.instagram.com/reel/DdPDwdhDfgS/",
       "titulo": "AULA da escola Universo do Zero. Europa é uma bola de gelo, mas o gelo é só a tampa: embaixo existe um oceano ",
       "pede_quero": false,
-      "views": 1844,
+      "views": 1846,
       "reach": 1588,
       "likes": 63,
       "comments": 1,
@@ -77,7 +221,7 @@
       "link": "https://www.instagram.com/reel/DdM66J3CPdA/",
       "titulo": "Estudo da NASA publicado em 19 de agosto de 2026 indica que alguns micróbios da Terra levados por exploradores",
       "pede_quero": false,
-      "views": 174,
+      "views": 176,
       "reach": 139,
       "likes": 6,
       "comments": 1,
@@ -109,7 +253,7 @@
       "link": "https://www.instagram.com/reel/DdMGUmKE5IP/",
       "titulo": "A sonda Mars Express da Agência Espacial Europeia registrou mais de 30 redemoinhos de poeira ativos em Mamers ",
       "pede_quero": false,
-      "views": 1197,
+      "views": 1200,
       "reach": 992,
       "likes": 24,
       "comments": 1,
