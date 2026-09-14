@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-14T02:51:21.842Z",
+  "gerado_em": "2026-09-14T15:57:06.039Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -366,11 +366,28 @@
     {
       "d": "2026-09-13",
       "views": 10
+    },
+    {
+      "d": "2026-09-14",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "916985007792034",
+      "quando": "2026-09-14T11:11:07+0000",
+      "titulo": "Às vezes o \"ar\" de um planeta é a própria estrela enganando a gente. 🔭",
+      "link": "https://www.facebook.com/reel/916985007792034/",
+      "segundos": 43.125,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1615905893529867",
       "quando": "2026-09-13T21:11:56+0000",
