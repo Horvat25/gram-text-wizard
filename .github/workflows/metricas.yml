@@ -35,11 +35,20 @@ jobs:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: node publicador/metricas-instagram.mjs
 
+      # 13/09/2026: os Reels saem tambem na Pagina do Facebook. Falha aqui NUNCA pode
+      # impedir as metricas do Instagram de serem salvas.
+      - name: Numeros do Facebook
+        continue-on-error: true
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          FB_PAGE_ID: '962589380261249'   # Pagina Neural Update — identificador publico
+        run: node publicador/metricas-facebook.mjs
+
       - name: Guardar o resultado
         if: always()
         run: |
           set -e
-          if [ -z "$(git status --porcelain publicador/metricas.json)" ]; then
+          if [ -z "$(git status --porcelain publicador/metricas.json publicador/metricas-facebook.json)" ]; then
             echo "nada mudou"; exit 0
           fi
           git config user.name  "publicador"
@@ -50,13 +59,16 @@ jobs:
           # arquivo e regerado inteiro a cada rodada, entao basta reaplicar por cima
           # do que estiver no GitHub — mas NUNCA sem reconciliar antes.
           cp publicador/metricas.json /tmp/metricas-minha.json
+          cp publicador/metricas-facebook.json /tmp/metricas-fb.json 2>/dev/null || true
           for tentativa in 1 2 3 4 5; do
             git fetch -q origin main
             git reset --hard -q origin/main
             cp /tmp/metricas-minha.json publicador/metricas.json
+            cp /tmp/metricas-fb.json publicador/metricas-facebook.json 2>/dev/null || true
             git add publicador/metricas.json
+            [ -f publicador/metricas-facebook.json ] && git add publicador/metricas-facebook.json
             if git diff --cached --quiet; then echo "ja estava igual"; exit 0; fi
-            git commit -q -m "metricas: numeros do Instagram em $(date -u +%Y-%m-%dT%H:%MZ)"
+            git commit -q -m "metricas: numeros do Instagram e do Facebook em $(date -u +%Y-%m-%dT%H:%MZ)"
             if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
             echo "push rejeitado; tentando de novo"
             sleep 5
