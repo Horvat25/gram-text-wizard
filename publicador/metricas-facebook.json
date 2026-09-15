@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-14T15:57:06.039Z",
+  "gerado_em": "2026-09-15T14:25:05.924Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -370,11 +370,54 @@
     {
       "d": "2026-09-14",
       "views": 0
+    },
+    {
+      "d": "2026-09-15",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2599692843881423",
+      "quando": "2026-09-15T11:11:10+0000",
+      "titulo": "Esse \"asteroide\" perto da Terra era, na verdade, um cometa. ☄️",
+      "link": "https://www.facebook.com/reel/2599692843881423/",
+      "segundos": 42.125,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1372205655078100",
+      "quando": "2026-09-14T21:11:01+0000",
+      "titulo": "Plutão não está seco: algo líquido subiu pelas rachaduras do gelo. ❄️",
+      "link": "https://www.facebook.com/reel/1372205655078100/",
+      "segundos": 41.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2007460569965928",
+      "quando": "2026-09-14T17:11:15+0000",
+      "titulo": "Tem vida em água fervendo, em ácido e sem luz nenhuma. 🦠",
+      "link": "https://www.facebook.com/reel/2007460569965928/",
+      "segundos": 37.416,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "916985007792034",
       "quando": "2026-09-14T11:11:07+0000",
