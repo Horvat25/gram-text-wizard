@@ -2083,7 +2083,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6b838dc9-139e-4259-add7-c79c1102dc64.png",
     "legenda": "",
     "slug": "story-blog-2026-09-15",
-    "status": "agendado"
+    "status": "falhou",
+    "erro": "publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"type\":\"OAuthException\",\"code\":24,\"error_subcode\":2207006,\"is_transient\":false,\"error_user_title\":\"Mídia não encontrada\",\"error_user_msg\":\"Não foi possível encontrar a mídia com 17.876.848.983.629.830.\",\"fbtrace_id\":\"A-ngxgJt5crwxcD8cl-NpUU\"}}"
   },
   {
     "quando": "2026-09-15T21:00:00.000Z",
@@ -2091,9 +2092,13 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/efea2ace-4b7b-4c0d-b53f-ecf3ec3f9915.mp4",
     "legenda": "A nossa galáxia não tem o tamanho que a gente achava. 🌌\n\nEcos de raios X de explosões distantes atravessaram a poeira dos braços externos da nossa galáxia.\nMedindo esses ecos com os telescópios XMM-Newton e Chandra, cientistas calcularam a distância diretamente.\nResultado: dois braços da Via Láctea estão até 10% mais longe do que se pensava.\n\n🌌 Quer levar uma experiência do universo para o seu quarto? Veja o projetor astronauta que selecionamos.\n💬 Comenta QUERO que eu te mando o link no direct. #publi\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: ESA / XMM-Newton e Chandra (01/07/2026) — esa.int\n\n#viálactea #astronomia #neuralupdate",
     "slug": "nw-galaxia-nao-tem-tamanho-que-parecia",
-    "status": "agendado",
+    "status": "publicado",
     "midia_anterior": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/92fab1e6-0d16-4f8a-9889-5fb4e2fc034d.mp4",
-    "obs_cta": "CTA do projetor com imagem (12/09)"
+    "obs_cta": "CTA do projetor com imagem (12/09)",
+    "id_instagram": "18115764745949740",
+    "publicado_em": "2026-09-15T21:11:09.021Z",
+    "id_comentario": "18103426804975424",
+    "id_facebook": "1066109372992226"
   },
   {
     "quando": "2026-09-15T23:00:00.000Z",
