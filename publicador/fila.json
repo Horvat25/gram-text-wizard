@@ -2184,7 +2184,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b2e9e6cd-6078-4420-8daf-d590178ae645.png",
     "legenda": "",
     "slug": "story-blog-2026-09-16",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18096921569178974",
+    "publicado_em": "2026-09-16T21:10:34.436Z"
   },
   {
     "quando": "2026-09-16T21:00:00.000Z",
@@ -2192,9 +2194,13 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2ec729e7-210f-4779-9a1d-2e84de4b41e4.mp4",
     "legenda": "Esse planeta foi descoberto porque a luz da estrela tremeu. 🪐\n\nA missão TESS, da NASA, achou pela primeira vez um sistema planetário por microlente gravitacional.\nA gravidade do sistema ampliou por um tempo a luz de uma estrela ao fundo, e o planeta deixou uma marca extra nesse brilho.\nÉ um super-Júpiter, com cerca de 1,6 vez a massa de Júpiter.\n\n🌌 Quer levar uma experiência do universo para o seu quarto? Veja o projetor astronauta que selecionamos.\n💬 Comenta QUERO que eu te mando o link no direct. #publi\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA / TESS (01/07/2026) — science.nasa.gov\n\n#exoplaneta #astronomia #neuralupdate",
     "slug": "nw-planeta-luz-tremeu",
-    "status": "agendado",
+    "status": "publicado",
     "midia_anterior": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/dcfcfc7e-1bea-4319-b48e-65350f443452.mp4",
-    "obs_cta": "CTA do projetor com imagem (12/09)"
+    "obs_cta": "CTA do projetor com imagem (12/09)",
+    "id_instagram": "18078628010344425",
+    "publicado_em": "2026-09-16T21:11:12.114Z",
+    "id_comentario": "18127099078700388",
+    "id_facebook": "2191929621698745"
   },
   {
     "quando": "2026-09-16T23:00:00.000Z",
