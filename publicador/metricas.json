@@ -1,9 +1,9 @@
 {
-  "gerado_em": "2026-09-15T14:24:39.780Z",
+  "gerado_em": "2026-09-16T14:15:21.352Z",
   "conta": {
     "username": "neuralupdate",
-    "seguidores": 1159,
-    "publicacoes": 885
+    "seguidores": 1158,
+    "publicacoes": 890
   },
   "conta_diaria": [
     {
@@ -489,11 +489,95 @@
     {
       "d": "2026-09-14",
       "views": 2496
+    },
+    {
+      "d": "2026-09-15",
+      "views": 1158
     }
   ],
   "conta_diaria_modo": "total por dia",
   "conta_diaria_erro": "(#100) The following metrics (views) should be specified with parameter metric_type=total_value",
   "itens": [
+    {
+      "id": "17956440138247155",
+      "quando": "2026-09-16T11:11:22+0000",
+      "tipo": "REELS",
+      "link": "https://www.instagram.com/reel/DdWJb-aCP99/",
+      "titulo": "Essa galáxia tem um anel que passa pelos polos. 💫",
+      "pede_quero": false,
+      "views": 131,
+      "reach": 96,
+      "likes": 4,
+      "comments": 1,
+      "shares": 0,
+      "saved": 0,
+      "total_interactions": 5,
+      "pedidos_dm": 0
+    },
+    {
+      "id": "18010546712985955",
+      "quando": "2026-09-16T01:10:28+0000",
+      "tipo": "FEED",
+      "link": "https://www.instagram.com/p/DdVEs9NlpJc/",
+      "titulo": "Estrelas tremem, e dá pra ouvir o que acontece lá dentro. ⭐",
+      "pede_quero": false,
+      "views": 34,
+      "reach": 24,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "saved": 0,
+      "total_interactions": 1,
+      "pedidos_dm": 0
+    },
+    {
+      "id": "18115764745949740",
+      "quando": "2026-09-15T21:11:02+0000",
+      "tipo": "REELS",
+      "link": "https://www.instagram.com/reel/DdUpRWnCXPf/",
+      "titulo": "A nossa galáxia não tem o tamanho que a gente achava. 🌌",
+      "pede_quero": true,
+      "views": 218,
+      "reach": 190,
+      "likes": 8,
+      "comments": 1,
+      "shares": 2,
+      "saved": 0,
+      "total_interactions": 11,
+      "pedidos_dm": 0
+    },
+    {
+      "id": "18128596702690738",
+      "quando": "2026-09-15T17:11:06+0000",
+      "tipo": "REELS",
+      "link": "https://www.instagram.com/reel/DdUN0UIkXcn/",
+      "titulo": "A estrela mais comum do universo é um problema para a vida. 🔴",
+      "pede_quero": false,
+      "views": 212,
+      "reach": 188,
+      "likes": 13,
+      "comments": 1,
+      "shares": 0,
+      "saved": 1,
+      "total_interactions": 16,
+      "pedidos_dm": 0
+    },
+    {
+      "id": "17987995683112780",
+      "quando": "2026-09-15T17:10:30+0000",
+      "tipo": "FEED",
+      "link": "https://www.instagram.com/p/DdUNyqZFGR7/",
+      "titulo": "A luz do Sol que bate na sua pele agora saiu dele há 8 minutos e 20 segundos. ☀️",
+      "pede_quero": false,
+      "views": 22,
+      "reach": 13,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "saved": 0,
+      "total_interactions": 1,
+      "pedidos_dm": 0
+    },
     {
       "id": "17875111935632451",
       "quando": "2026-09-15T11:10:55+0000",
@@ -501,13 +585,13 @@
       "link": "https://www.instagram.com/reel/DdTkmMTjtuG/",
       "titulo": "Esse \"asteroide\" perto da Terra era, na verdade, um cometa. ☄️",
       "pede_quero": false,
-      "views": 146,
-      "reach": 127,
-      "likes": 5,
+      "views": 312,
+      "reach": 272,
+      "likes": 14,
       "comments": 1,
       "shares": 0,
       "saved": 0,
-      "total_interactions": 6,
+      "total_interactions": 15,
       "pedidos_dm": 0
     },
     {
@@ -517,8 +601,8 @@
       "link": "https://www.instagram.com/p/DdSgAcAlQ5K/",
       "titulo": "A gravidade consegue dobrar a luz. E isso vira uma lupa do tamanho de uma galáxia. 🔭",
       "pede_quero": false,
-      "views": 33,
-      "reach": 18,
+      "views": 39,
+      "reach": 23,
       "likes": 0,
       "comments": 1,
       "shares": 1,
@@ -533,13 +617,13 @@
       "link": "https://www.instagram.com/reel/DdSEdH7Eo0m/",
       "titulo": "Plutão não está seco: algo líquido subiu pelas rachaduras do gelo. ❄️",
       "pede_quero": true,
-      "views": 337,
-      "reach": 293,
-      "likes": 10,
+      "views": 398,
+      "reach": 346,
+      "likes": 15,
       "comments": 1,
       "shares": 0,
       "saved": 0,
-      "total_interactions": 11,
+      "total_interactions": 16,
       "pedidos_dm": 0
     },
     {
@@ -549,8 +633,8 @@
       "link": "https://www.instagram.com/reel/DdRpBKElNqg/",
       "titulo": "Tem vida em água fervendo, em ácido e sem luz nenhuma. 🦠",
       "pede_quero": false,
-      "views": 39,
-      "reach": 27,
+      "views": 41,
+      "reach": 29,
       "likes": 2,
       "comments": 1,
       "shares": 0,
@@ -565,8 +649,8 @@
       "link": "https://www.instagram.com/p/DdRilMtjpAH/",
       "titulo": "Mito ou verdade? 5 frases sobre o espaço que quase todo mundo já ouviu. 🚀",
       "pede_quero": false,
-      "views": 47,
-      "reach": 24,
+      "views": 52,
+      "reach": 25,
       "likes": 1,
       "comments": 1,
       "shares": 0,
@@ -581,8 +665,8 @@
       "link": "https://www.instagram.com/reel/DdQ_yUNjn3n/",
       "titulo": "Às vezes o \"ar\" de um planeta é a própria estrela enganando a gente. 🔭",
       "pede_quero": false,
-      "views": 1324,
-      "reach": 1093,
+      "views": 1337,
+      "reach": 1102,
       "likes": 22,
       "comments": 1,
       "shares": 1,
@@ -597,8 +681,8 @@
       "link": "https://www.instagram.com/reel/DdPfxbIj3PT/",
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
       "pede_quero": true,
-      "views": 1283,
-      "reach": 1096,
+      "views": 1288,
+      "reach": 1100,
       "likes": 29,
       "comments": 1,
       "shares": 0,
@@ -613,13 +697,13 @@
       "link": "https://www.instagram.com/reel/DdPDwdhDfgS/",
       "titulo": "AULA da escola Universo do Zero. Europa é uma bola de gelo, mas o gelo é só a tampa: embaixo existe um oceano ",
       "pede_quero": false,
-      "views": 2042,
-      "reach": 1737,
-      "likes": 68,
+      "views": 2055,
+      "reach": 1742,
+      "likes": 69,
       "comments": 1,
       "shares": 2,
       "saved": 4,
-      "total_interactions": 76,
+      "total_interactions": 77,
       "pedidos_dm": 0
     },
     {
@@ -629,8 +713,8 @@
       "link": "https://www.instagram.com/p/DdO3CAUDy83/",
       "titulo": "Como uma estrela morre depende de UMA coisa: a massa. 🌟",
       "pede_quero": false,
-      "views": 86,
-      "reach": 36,
+      "views": 89,
+      "reach": 41,
       "likes": 2,
       "comments": 1,
       "shares": 1,
@@ -645,8 +729,8 @@
       "link": "https://www.instagram.com/reel/DdOwBJBjUmR/",
       "titulo": "A sonda Lunar Reconnaissance Orbiter da NASA fotografou em 11 e 12 de agosto de 2026 uma cratera nova na Lua, ",
       "pede_quero": false,
-      "views": 1640,
-      "reach": 1388,
+      "views": 1649,
+      "reach": 1390,
       "likes": 49,
       "comments": 1,
       "shares": 0,
@@ -661,8 +745,8 @@
       "link": "https://www.instagram.com/reel/DdM66J3CPdA/",
       "titulo": "Estudo da NASA publicado em 19 de agosto de 2026 indica que alguns micróbios da Terra levados por exploradores",
       "pede_quero": false,
-      "views": 180,
-      "reach": 145,
+      "views": 181,
+      "reach": 146,
       "likes": 6,
       "comments": 1,
       "shares": 0,
@@ -677,13 +761,13 @@
       "link": "https://www.instagram.com/reel/DdMfeamkyQY/",
       "titulo": "AULA da escola Universo do Zero. O oxigênio é reativo demais para durar sozinho numa atmosfera: se ele está lá",
       "pede_quero": false,
-      "views": 1512,
-      "reach": 1245,
-      "likes": 54,
+      "views": 1523,
+      "reach": 1251,
+      "likes": 55,
       "comments": 1,
       "shares": 3,
       "saved": 6,
-      "total_interactions": 67,
+      "total_interactions": 68,
       "pedidos_dm": 0
     },
     {
@@ -693,8 +777,8 @@
       "link": "https://www.instagram.com/reel/DdMGUmKE5IP/",
       "titulo": "A sonda Mars Express da Agência Espacial Europeia registrou mais de 30 redemoinhos de poeira ativos em Mamers ",
       "pede_quero": false,
-      "views": 1224,
-      "reach": 1023,
+      "views": 1226,
+      "reach": 1026,
       "likes": 25,
       "comments": 1,
       "shares": 0,
@@ -709,8 +793,8 @@
       "link": "https://www.instagram.com/reel/DdKWOOhgNkn/",
       "titulo": "A Agência Espacial Europeia anunciou em 24 de março de 2026 a solução para um mistério de mais de 50 anos: os ",
       "pede_quero": false,
-      "views": 1319,
-      "reach": 1091,
+      "views": 1321,
+      "reach": 1093,
       "likes": 46,
       "comments": 1,
       "shares": 0,
@@ -725,8 +809,8 @@
       "link": "https://www.instagram.com/reel/DdJ6te6j71T/",
       "titulo": "AULA da escola Universo do Zero. Ninguém vai visitar um exoplaneta: a busca por vida é feita lendo a luz da es",
       "pede_quero": false,
-      "views": 504,
-      "reach": 412,
+      "views": 507,
+      "reach": 413,
       "likes": 16,
       "comments": 1,
       "shares": 0,
@@ -741,8 +825,8 @@
       "link": "https://www.instagram.com/reel/DdJfSjBDcBS/",
       "titulo": "Uma equipe da NASA desenvolveu um modelo de aprendizado de máquina que consegue prever o surgimento de regiões",
       "pede_quero": false,
-      "views": 43,
-      "reach": 36,
+      "views": 45,
+      "reach": 38,
       "likes": 0,
       "comments": 1,
       "shares": 0,
@@ -757,7 +841,7 @@
       "link": "https://www.instagram.com/reel/DdHxR-RE96K/",
       "titulo": "Dados do Hubble e da missão Gaia deram evidência definitiva de que a jovem Via Láctea absorveu uma galáxia anã",
       "pede_quero": false,
-      "views": 714,
+      "views": 715,
       "reach": 563,
       "likes": 24,
       "comments": 1,
@@ -773,8 +857,8 @@
       "link": "https://www.instagram.com/reel/DdHV6cICQSj/",
       "titulo": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos micr",
       "pede_quero": false,
-      "views": 306,
-      "reach": 256,
+      "views": 307,
+      "reach": 257,
       "likes": 7,
       "comments": 2,
       "shares": 1,
@@ -789,8 +873,8 @@
       "link": "https://www.instagram.com/reel/DdGsqg8EzA9/",
       "titulo": "O cometa interestelar 3I/ATLAS, o terceiro já confirmado vindo de fora do Sistema Solar, foi analisado pelo te",
       "pede_quero": false,
-      "views": 464,
-      "reach": 371,
+      "views": 465,
+      "reach": 372,
       "likes": 17,
       "comments": 1,
       "shares": 0,
@@ -805,8 +889,8 @@
       "link": "https://www.instagram.com/reel/DdFMgHbD0CY/",
       "titulo": "Pesquisa destacada pela NASA propõe uma solução para o paradoxo do Sol jovem fraco: há 3 bilhões de anos, o So",
       "pede_quero": false,
-      "views": 70,
-      "reach": 59,
+      "views": 71,
+      "reach": 60,
       "likes": 4,
       "comments": 1,
       "shares": 0,
@@ -821,8 +905,8 @@
       "link": "https://www.instagram.com/reel/DdE14wGCV_U/",
       "titulo": "AULA da escola Universo do Zero. Ninguém pode repetir o universo para ver o que mudaria, então os cosmólogos c",
       "pede_quero": false,
-      "views": 1192,
-      "reach": 981,
+      "views": 1193,
+      "reach": 982,
       "likes": 56,
       "comments": 1,
       "shares": 2,
@@ -1163,8 +1247,7 @@
       "comments": 3,
       "shares": 0,
       "saved": 1,
-      "total_interactions": 62,
-      "pedidos_dm": 0
+      "total_interactions": 62
     },
     {
       "id": "17904238635516419",
@@ -1179,8 +1262,7 @@
       "comments": 3,
       "shares": 0,
       "saved": 0,
-      "total_interactions": 13,
-      "pedidos_dm": 0
+      "total_interactions": 13
     },
     {
       "id": "18115660444758659",
@@ -1195,8 +1277,7 @@
       "comments": 1,
       "shares": 5,
       "saved": 11,
-      "total_interactions": 85,
-      "pedidos_dm": 0
+      "total_interactions": 85
     },
     {
       "id": "18625414231000198",
@@ -1212,81 +1293,6 @@
       "shares": 1,
       "saved": 3,
       "total_interactions": 50
-    },
-    {
-      "id": "17899771764581685",
-      "quando": "2026-08-31T21:11:19+0000",
-      "tipo": "REELS",
-      "link": "https://www.instagram.com/reel/DcuBX1gAoby/",
-      "titulo": "Sagitário A* tem 4 milhões de massas solares e faz estrelas dispararem ao redor — mas menos de 1% do gás que c",
-      "pede_quero": false,
-      "views": 1437,
-      "reach": 1110,
-      "likes": 50,
-      "comments": 6,
-      "shares": 1,
-      "saved": 2,
-      "total_interactions": 60
-    },
-    {
-      "id": "18107299778132824",
-      "quando": "2026-08-31T17:11:37+0000",
-      "tipo": "REELS",
-      "link": "https://www.instagram.com/reel/Dctl85ZGIJY/",
-      "titulo": "AULA da escola Universo do Zero. Quando uma estrela grande colapsa e não vira buraco negro, a gravidade aperta",
-      "pede_quero": false,
-      "views": 143,
-      "reach": 111,
-      "likes": 3,
-      "comments": 1,
-      "shares": 0,
-      "saved": 2,
-      "total_interactions": 6
-    },
-    {
-      "id": "17907346998525752",
-      "quando": "2026-08-31T13:50:52+0000",
-      "tipo": "REELS",
-      "link": "https://www.instagram.com/reel/DctO9_TirIK/",
-      "titulo": "Pela primeira vez, astrônomos acompanharam o nascimento de um magnetar. Na supernova SN 2024afav, a curva de l",
-      "pede_quero": false,
-      "views": 945,
-      "reach": 728,
-      "likes": 34,
-      "comments": 1,
-      "shares": 0,
-      "saved": 3,
-      "total_interactions": 38
-    },
-    {
-      "id": "18127979713781410",
-      "quando": "2026-08-30T21:11:13+0000",
-      "tipo": "REELS",
-      "link": "https://www.instagram.com/reel/DcrckxXFY3t/",
-      "titulo": "A colisão entre a Via Láctea e Andrômeda deixou de ser certeza. Um estudo publicado na Nature Astronomy, usand",
-      "pede_quero": false,
-      "views": 1549,
-      "reach": 1168,
-      "likes": 51,
-      "comments": 2,
-      "shares": 1,
-      "saved": 1,
-      "total_interactions": 55
-    },
-    {
-      "id": "18193077268388306",
-      "quando": "2026-08-30T17:11:36+0000",
-      "tipo": "REELS",
-      "link": "https://www.instagram.com/reel/DcrBJ8pDW6S/",
-      "titulo": "AULA da escola Universo do Zero. Buraco negro não é uma coisa pesada, é uma coisa apertada. Para cada massa ex",
-      "pede_quero": false,
-      "views": 3281,
-      "reach": 2689,
-      "likes": 86,
-      "comments": 2,
-      "shares": 8,
-      "saved": 14,
-      "total_interactions": 113
     }
   ],
   "acervo": [
@@ -2976,8 +2982,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DavZvi-gTwO/",
       "titulo": "AULA da escola Universo do Zero: zona habitável — a faixa em volta de uma estrela onde a água fica líquida e a",
-      "views": null,
-      "atualizado": null
+      "views": 300,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 245,
+      "shares": 0,
+      "likes": 12,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18133960495610115",
@@ -2985,8 +2996,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DaviUZbDf0c/",
       "titulo": "💡 Processo da Apple pode atrasar lançamento do smartphone da OpenAI não é só mais um movimento isolado no rad",
-      "views": null,
-      "atualizado": null
+      "views": 7,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 6,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18119560816650527",
@@ -2994,8 +3010,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Dav1N6OAiVF/",
       "titulo": "1 segundo após o Big Bang, matéria e antimatéria se aniquilavam em pares — e deveria ter sobrado NADA. Sobrou ",
-      "views": null,
-      "atualizado": null
+      "views": 117,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 97,
+      "shares": 0,
+      "likes": 3,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18061699358739248",
@@ -3003,8 +3024,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DawQrhjjNd5/",
       "titulo": "A hipótese do zoológico: talvez o universo esteja cheio de civilizações avançadas que concordaram em nos obser",
-      "views": null,
-      "atualizado": null
+      "views": 235,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 186,
+      "shares": 0,
+      "likes": 6,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18097868741209616",
@@ -3012,8 +3038,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DawRhU7krOz/",
       "titulo": "O universo é uma máquina de nascer e morrer estrelas. Deslize e veja o ciclo. 🌌",
-      "views": null,
-      "atualizado": null
+      "views": 22,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 11,
+      "shares": 0,
+      "likes": 1,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18123764491783268",
@@ -3021,8 +3052,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DaxVV8KCv12/",
       "titulo": "O James Webb achou o buraco negro mais antigo já visto — grande demais para ter crescido tão cedo no universo ",
-      "views": null,
-      "atualizado": null
+      "views": 1786,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 1450,
+      "shares": 11,
+      "likes": 146,
+      "saved": 13,
+      "comments": 4
     },
     {
       "id": "18303531205304677",
@@ -3030,8 +3066,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DaxuOTVFvcQ/",
       "titulo": "🔭 Para comemorar 4 anos no espaço, o telescópio James Webb revelou uma nova imagem impressionante da galáxia ",
-      "views": null,
-      "atualizado": null
+      "views": 19,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 12,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17917547730199222",
@@ -3039,8 +3080,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DaxwzqfjO1h/",
       "titulo": "☀️ O Sol tem 99,86% de TODA a massa do Sistema Solar.",
-      "views": null,
-      "atualizado": null
+      "views": 17,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 7,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17974843803113558",
@@ -3048,8 +3094,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Dax-lvyoAPQ/",
       "titulo": "Um gato vivo e morto ao mesmo tempo é ciência real — e um dos 21 fenômenos do ebook \"O Lado Sombrio do Univers",
-      "views": null,
-      "atualizado": null
+      "views": 175,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 151,
+      "shares": 0,
+      "likes": 9,
+      "saved": 1,
+      "comments": 1
     },
     {
       "id": "18019321820906276",
@@ -3057,8 +3108,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DayaAlwjvq0/",
       "titulo": "Aos 3 minutos de idade o universo inteiro era uma usina de fusão nuclear — quente como o núcleo de uma estrela",
-      "views": null,
-      "atualizado": null
+      "views": 233,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 190,
+      "shares": 0,
+      "likes": 5,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18123556669743517",
@@ -3066,8 +3122,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Day1eauj8HK/",
       "titulo": "Todo ouro do universo nasceu quando estrelas de nêutrons colidiram numa explosão chamada kilonova. A joia que ",
-      "views": null,
-      "atualizado": null
+      "views": 248,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 200,
+      "shares": 0,
+      "likes": 15,
+      "saved": 2,
+      "comments": 0
     },
     {
       "id": "18117843044302352",
@@ -3075,8 +3136,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Daz6IyLjn35/",
       "titulo": "Pela terceira vez na história, um objeto interestelar — vindo de outra estrela — foi flagrado atravessando o n",
-      "views": null,
-      "atualizado": null
+      "views": 1687,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 1317,
+      "shares": 3,
+      "likes": 97,
+      "saved": 6,
+      "comments": 2
     },
     {
       "id": "17960779889963305",
@@ -3084,8 +3150,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/Da0VmhoF1q9/",
       "titulo": "\"Somos feitos de matéria de estrelas.\" — Carl Sagan ✨",
-      "views": null,
-      "atualizado": null
+      "views": 8,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 5,
+      "shares": 0,
+      "likes": 1,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18117974650871093",
@@ -3093,8 +3164,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da0jVq5Cu8M/",
       "titulo": "AULA da escola Universo do Zero: o método do trânsito planetário — como descobrimos milhares de planetas em ou",
-      "views": null,
-      "atualizado": null
+      "views": 186,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 152,
+      "shares": 0,
+      "likes": 7,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18078852836302699",
@@ -3102,8 +3178,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da0-ziNF7A_/",
       "titulo": "Aos 380 mil anos o universo ficou transparente e a primeira luz escapou — a radiação cósmica de fundo, a \"foto",
-      "views": null,
-      "atualizado": null
+      "views": 202,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 167,
+      "shares": 0,
+      "likes": 5,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18088436996530472",
@@ -3111,8 +3192,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da1aRBRk3QN/",
       "titulo": "Objetos gelados além de Netuno têm órbitas tortas, como se um planeta gigante e escuro os puxasse. O Planeta N",
-      "views": null,
-      "atualizado": null
+      "views": 186,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 166,
+      "shares": 0,
+      "likes": 9,
+      "saved": 2,
+      "comments": 0
     },
     {
       "id": "17951560818198962",
@@ -3120,8 +3206,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da2e77njP_m/",
       "titulo": "Astrônomos acharam o maior reservatório de água do universo: 140 trilhões de vezes os oceanos da Terra, flutua",
-      "views": null,
-      "atualizado": null
+      "views": 2180,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 1760,
+      "shares": 15,
+      "likes": 82,
+      "saved": 13,
+      "comments": 1
     },
     {
       "id": "17946891600233834",
@@ -3129,8 +3220,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/Da26cYynLzQ/",
       "titulo": "Os 4 objetos mais EXTREMOS do universo. Deslize se tiver coragem. 👉",
-      "views": null,
-      "atualizado": null
+      "views": 13,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 8,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18563528212066303",
@@ -3138,8 +3234,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da3IIDnjUsn/",
       "titulo": "Em 1977 um telescópio captou o sinal \"Wow!\" — 72 segundos, nunca mais repetido, sem explicação. É um dos 21 mi",
-      "views": null,
-      "atualizado": null
+      "views": 234,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 178,
+      "shares": 11,
+      "likes": 5,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18105457361272707",
@@ -3147,8 +3248,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da3jmVEj-5e/",
       "titulo": "Após 100 milhões de anos de escuridão total, a gravidade venceu: a primeira estrela do universo acendeu — um m",
-      "views": null,
-      "atualizado": null
+      "views": 149,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 127,
+      "shares": 1,
+      "likes": 6,
+      "saved": 1,
+      "comments": 2
     },
     {
       "id": "18437255521121953",
@@ -3156,8 +3262,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da3_EYdDcEB/",
       "titulo": "Terra, Sol, Via Láctea, e por fim Laniakea: um superaglomerado de 100 mil galáxias, todas escorregando para um",
-      "views": null,
-      "atualizado": null
+      "views": 1715,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 1247,
+      "shares": 17,
+      "likes": 102,
+      "saved": 10,
+      "comments": 0
     },
     {
       "id": "18016553657860941",
@@ -3165,8 +3276,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da5DukDlVKx/",
       "titulo": "O telescópio Euclid vai mapear bilhões de galáxias para revelar onde estão a matéria e a energia escura — os 9",
-      "views": null,
-      "atualizado": null
+      "views": 174,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 136,
+      "shares": 0,
+      "likes": 6,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18568046980064675",
@@ -3174,8 +3290,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/Da5fMlBFRDb/",
       "titulo": "🪐 Em Vênus, um DIA dura mais que um ANO.",
-      "views": null,
-      "atualizado": null
+      "views": 23,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 14,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18159310426472056",
@@ -3183,8 +3304,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da5s7itgCQy/",
       "titulo": "AULA da escola Universo do Zero: a matéria escura — 5x mais comum que toda a matéria visível, invisível, e sem",
-      "views": null,
-      "atualizado": null
+      "views": 708,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 615,
+      "shares": 6,
+      "likes": 49,
+      "saved": 6,
+      "comments": 2
     },
     {
       "id": "18027582104660316",
@@ -3192,8 +3318,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da6IY_GDUTw/",
       "titulo": "1 bilhão de anos após o Big Bang nasceram as primeiras galáxias — e o James Webb as encontrou maduras cedo dem",
-      "views": null,
-      "atualizado": null
+      "views": 226,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 193,
+      "shares": 0,
+      "likes": 10,
+      "saved": 2,
+      "comments": 0
     },
     {
       "id": "17914044636425574",
@@ -3201,8 +3332,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da6j29zgR1H/",
       "titulo": "Em 1990, uma sonda a 6 bilhões de km tirou a última foto da Terra: um ponto azul minúsculo. Carl Sagan lembrou",
-      "views": null,
-      "atualizado": null
+      "views": 261,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 214,
+      "shares": 1,
+      "likes": 6,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17976828846067500",
@@ -3210,8 +3346,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da7ojx4Fbb6/",
       "titulo": "A sonda que trouxe poeira do asteroide Bennu achou aminoácidos e bases do DNA — os tijolos da vida, espalhados",
-      "views": null,
-      "atualizado": null
+      "views": 1408,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 1198,
+      "shares": 16,
+      "likes": 41,
+      "saved": 7,
+      "comments": 0
     },
     {
       "id": "18331805467248134",
@@ -3219,8 +3360,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/Da8D_dqDuSh/",
       "titulo": "\"Em algum lugar, algo incrível está esperando para ser descoberto.\" — Carl Sagan 🌌",
-      "views": null,
-      "atualizado": null
+      "views": 13,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 10,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18202440556367704",
@@ -3228,8 +3374,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da8RvJJlcJw/",
       "titulo": "Um planeta real onde chove vidro derretido de lado, mais rápido que o som. É um dos 21 mundos impossíveis (e r",
-      "views": null,
-      "atualizado": null
+      "views": 167,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 139,
+      "shares": 1,
+      "likes": 7,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "18077215433335986",
@@ -3237,8 +3388,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da8tL98jq63/",
       "titulo": "Há 4,6 bilhões de anos (9 bilhões após o Big Bang) uma supernova disparou o nascimento do Sol — e da poeira de",
-      "views": null,
-      "atualizado": null
+      "views": 789,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 652,
+      "shares": 1,
+      "likes": 28,
+      "saved": 2,
+      "comments": 0
     },
     {
       "id": "18383813791200168",
@@ -3246,8 +3402,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da9Ip1YjaFw/",
       "titulo": "Astronautas não flutuam por falta de gravidade — eles estão caindo pra sempre. Isso é uma órbita: uma queda et",
-      "views": null,
-      "atualizado": null
+      "views": 156,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 140,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18176681143422690",
@@ -3255,8 +3416,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da-NUPDkdeu/",
       "titulo": "As rajadas rápidas de rádio liberam num piscar mais energia que o Sol em 1 bilhão de anos. Vêm de longe, apare",
-      "views": null,
-      "atualizado": null
+      "views": 366,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 316,
+      "shares": 0,
+      "likes": 9,
+      "saved": 1,
+      "comments": 0
     },
     {
       "id": "17981644263046260",
@@ -3264,8 +3430,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/Da-o0-vlWhm/",
       "titulo": "A escala do universo vai te deixar pequeno. Deslize até o fim. 👉",
-      "views": null,
-      "atualizado": null
+      "views": 36,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 14,
+      "shares": 0,
+      "likes": 1,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17959470717160362",
@@ -3273,8 +3444,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da-2hS_j2Ri/",
       "titulo": "AULA da escola Universo do Zero: a energia escura — 70% do universo, descoberta em 1998 acelerando a expansão,",
-      "views": null,
-      "atualizado": null
+      "views": 174,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 144,
+      "shares": 0,
+      "likes": 10,
+      "saved": 3,
+      "comments": 1
     },
     {
       "id": "18116790619896067",
@@ -3282,8 +3458,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da_R_G3Ciqu/",
       "titulo": "13,8 bilhões de anos de universo — e você existe exatamente agora, na era das estrelas. Se essa história fosse",
-      "views": null,
-      "atualizado": null
+      "views": 205,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 181,
+      "shares": 0,
+      "likes": 7,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18044068550802511",
@@ -3291,8 +3472,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/Da_td0yj44-/",
       "titulo": "O quasar é o objeto mais brilhante do universo — um buraco negro gigante devorando matéria com tanta violência",
-      "views": null,
-      "atualizado": null
+      "views": 1685,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 1326,
+      "shares": 3,
+      "likes": 71,
+      "saved": 4,
+      "comments": 0
     },
     {
       "id": "17867682279587266",
@@ -3300,8 +3486,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DbAyHeiDGme/",
       "titulo": "Astrônomos acharam a 40 anos-luz uma super-Terra riquíssima em carbono — sob pressão extrema, boa parte dela p",
-      "views": null,
-      "atualizado": null
+      "views": 174,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 145,
+      "shares": 0,
+      "likes": 3,
+      "saved": 1,
+      "comments": 1
     },
     {
       "id": "18099449659965385",
@@ -3309,8 +3500,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DbB2yCDiEor/",
       "titulo": "Daqui a 1 bilhão de anos o Sol estará 10% mais forte — o suficiente pra ferver os oceanos da Terra e transform",
-      "views": null,
-      "atualizado": null
+      "views": 301,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 242,
+      "shares": 0,
+      "likes": 10,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "18096989261200252",
@@ -3318,8 +3514,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DbEbkuTH9l_/",
       "titulo": "Em 4 bilhões de anos Andrômeda colide com a Via Láctea a 400 mil km/h — o céu inteiro muda, as galáxias se fun",
-      "views": null,
-      "atualizado": null
+      "views": 727,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 557,
+      "shares": 1,
+      "likes": 45,
+      "saved": 3,
+      "comments": 1
     },
     {
       "id": "18089706101555340",
@@ -3327,8 +3528,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DbE3HtNj1un/",
       "titulo": "Titã, a maior lua de Saturno, tem gravidade 7x mais fraca que a Terra e ar 4x mais denso — com asas nos braços",
-      "views": null,
-      "atualizado": null
+      "views": 159,
+      "atualizado": "2026-09-16T14:14:50.310Z",
+      "reach": 130,
+      "shares": 0,
+      "likes": 3,
+      "saved": 0,
+      "comments": 0
     },
     {
       "id": "17984830049851758",
@@ -4664,7 +4870,7 @@
       "likes": 45,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18115660444758659",
@@ -4678,7 +4884,7 @@
       "likes": 64,
       "saved": 11,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17904238635516419",
@@ -4692,7 +4898,7 @@
       "likes": 9,
       "saved": 0,
       "comments": 3,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18104730475916826",
@@ -4706,7 +4912,7 @@
       "likes": 58,
       "saved": 1,
       "comments": 3,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18615959566030669",
@@ -4720,7 +4926,7 @@
       "likes": 53,
       "saved": 9,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18616782982024171",
@@ -4734,7 +4940,7 @@
       "likes": 48,
       "saved": 6,
       "comments": 3,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18208612765315366",
@@ -4748,7 +4954,7 @@
       "likes": 3,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18097113092633065",
@@ -4762,7 +4968,7 @@
       "likes": 39,
       "saved": 8,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18095510330086906",
@@ -4776,7 +4982,7 @@
       "likes": 6,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17909910081463730",
@@ -4790,7 +4996,7 @@
       "likes": 40,
       "saved": 9,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18151867516516858",
@@ -4804,7 +5010,7 @@
       "likes": 37,
       "saved": 4,
       "comments": 2,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18183428527412217",
@@ -4818,7 +5024,7 @@
       "likes": 8,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18430419901176616",
@@ -4832,7 +5038,7 @@
       "likes": 93,
       "saved": 6,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18110048714111499",
@@ -4846,7 +5052,7 @@
       "likes": 40,
       "saved": 5,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18067695485747501",
@@ -4860,7 +5066,7 @@
       "likes": 13,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18129340285794247",
@@ -4874,7 +5080,7 @@
       "likes": 70,
       "saved": 11,
       "comments": 9,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18021896576874733",
@@ -4888,7 +5094,7 @@
       "likes": 13,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18074682785412231",
@@ -4902,7 +5108,7 @@
       "likes": 27,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18164060557474610",
@@ -4916,7 +5122,7 @@
       "likes": 38,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17876854008546787",
@@ -4930,7 +5136,7 @@
       "likes": 36,
       "saved": 2,
       "comments": 2,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17940996048090511",
@@ -4944,7 +5150,7 @@
       "likes": 29,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18391462645207565",
@@ -4958,7 +5164,7 @@
       "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17944090677335005",
@@ -4972,7 +5178,7 @@
       "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18101824682340096",
@@ -4986,7 +5192,7 @@
       "likes": 3,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18065367872771656",
@@ -4994,13 +5200,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdE14wGCV_U/",
       "titulo": "AULA da escola Universo do Zero. Ninguém pode repetir o universo para ver o que mudaria, então os cosmólogos c",
-      "views": 1192,
-      "reach": 981,
+      "views": 1193,
+      "reach": 982,
       "shares": 2,
       "likes": 56,
       "saved": 6,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18127614421749775",
@@ -5008,13 +5214,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdFMgHbD0CY/",
       "titulo": "Pesquisa destacada pela NASA propõe uma solução para o paradoxo do Sol jovem fraco: há 3 bilhões de anos, o So",
-      "views": 70,
-      "reach": 59,
+      "views": 71,
+      "reach": 60,
       "shares": 0,
       "likes": 4,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17945299929335298",
@@ -5022,13 +5228,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdGsqg8EzA9/",
       "titulo": "O cometa interestelar 3I/ATLAS, o terceiro já confirmado vindo de fora do Sistema Solar, foi analisado pelo te",
-      "views": 464,
-      "reach": 371,
+      "views": 465,
+      "reach": 372,
       "shares": 0,
       "likes": 17,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18390982177205779",
@@ -5036,13 +5242,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdHV6cICQSj/",
       "titulo": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos micr",
-      "views": 306,
-      "reach": 256,
+      "views": 307,
+      "reach": 257,
       "shares": 1,
       "likes": 7,
       "saved": 1,
       "comments": 2,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17936344395363681",
@@ -5050,13 +5256,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdHxR-RE96K/",
       "titulo": "Dados do Hubble e da missão Gaia deram evidência definitiva de que a jovem Via Láctea absorveu uma galáxia anã",
-      "views": 714,
+      "views": 715,
       "reach": 563,
       "shares": 0,
       "likes": 24,
       "saved": 4,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18090132413440084",
@@ -5064,13 +5270,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdJfSjBDcBS/",
       "titulo": "Uma equipe da NASA desenvolveu um modelo de aprendizado de máquina que consegue prever o surgimento de regiões",
-      "views": 43,
-      "reach": 36,
+      "views": 45,
+      "reach": 38,
       "shares": 0,
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18625262311050337",
@@ -5078,13 +5284,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdJ6te6j71T/",
       "titulo": "AULA da escola Universo do Zero. Ninguém vai visitar um exoplaneta: a busca por vida é feita lendo a luz da es",
-      "views": 504,
-      "reach": 412,
+      "views": 507,
+      "reach": 413,
       "shares": 0,
       "likes": 16,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18087028598243613",
@@ -5092,13 +5298,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdKWOOhgNkn/",
       "titulo": "A Agência Espacial Europeia anunciou em 24 de março de 2026 a solução para um mistério de mais de 50 anos: os ",
-      "views": 1319,
-      "reach": 1091,
+      "views": 1321,
+      "reach": 1093,
       "shares": 0,
       "likes": 46,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18017711891927512",
@@ -5106,13 +5312,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdMGUmKE5IP/",
       "titulo": "A sonda Mars Express da Agência Espacial Europeia registrou mais de 30 redemoinhos de poeira ativos em Mamers ",
-      "views": 1224,
-      "reach": 1023,
+      "views": 1226,
+      "reach": 1026,
       "shares": 0,
       "likes": 25,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18208038664362436",
@@ -5120,13 +5326,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdMfeamkyQY/",
       "titulo": "AULA da escola Universo do Zero. O oxigênio é reativo demais para durar sozinho numa atmosfera: se ele está lá",
-      "views": 1512,
-      "reach": 1245,
+      "views": 1523,
+      "reach": 1251,
       "shares": 3,
-      "likes": 54,
+      "likes": 55,
       "saved": 6,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18093322520446000",
@@ -5134,13 +5340,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdM66J3CPdA/",
       "titulo": "Estudo da NASA publicado em 19 de agosto de 2026 indica que alguns micróbios da Terra levados por exploradores",
-      "views": 180,
-      "reach": 145,
+      "views": 181,
+      "reach": 146,
       "shares": 0,
       "likes": 6,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18475294462117696",
@@ -5148,13 +5354,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdOwBJBjUmR/",
       "titulo": "A sonda Lunar Reconnaissance Orbiter da NASA fotografou em 11 e 12 de agosto de 2026 uma cratera nova na Lua, ",
-      "views": 1640,
-      "reach": 1388,
+      "views": 1649,
+      "reach": 1390,
       "shares": 0,
       "likes": 49,
       "saved": 3,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18024166709697424",
@@ -5162,13 +5368,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DdO3CAUDy83/",
       "titulo": "Como uma estrela morre depende de UMA coisa: a massa. 🌟",
-      "views": 86,
-      "reach": 36,
+      "views": 89,
+      "reach": 41,
       "shares": 1,
       "likes": 2,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18115924345767032",
@@ -5176,13 +5382,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdPDwdhDfgS/",
       "titulo": "AULA da escola Universo do Zero. Europa é uma bola de gelo, mas o gelo é só a tampa: embaixo existe um oceano ",
-      "views": 2042,
-      "reach": 1737,
+      "views": 2055,
+      "reach": 1742,
       "shares": 2,
-      "likes": 68,
+      "likes": 69,
       "saved": 4,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18416339860155466",
@@ -5190,13 +5396,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdPfxbIj3PT/",
       "titulo": "Essa \"juba\" no espaço não é fumaça: é uma estrela se desfazendo. 🦁",
-      "views": 1283,
-      "reach": 1096,
+      "views": 1288,
+      "reach": 1100,
       "shares": 0,
       "likes": 29,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18020583986716261",
@@ -5204,13 +5410,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdQ_yUNjn3n/",
       "titulo": "Às vezes o \"ar\" de um planeta é a própria estrela enganando a gente. 🔭",
-      "views": 1324,
-      "reach": 1093,
+      "views": 1337,
+      "reach": 1102,
       "shares": 1,
       "likes": 22,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18245604607309605",
@@ -5218,13 +5424,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DdRilMtjpAH/",
       "titulo": "Mito ou verdade? 5 frases sobre o espaço que quase todo mundo já ouviu. 🚀",
-      "views": 47,
-      "reach": 24,
+      "views": 52,
+      "reach": 25,
       "shares": 0,
       "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17905282197333890",
@@ -5232,13 +5438,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdRpBKElNqg/",
       "titulo": "Tem vida em água fervendo, em ácido e sem luz nenhuma. 🦠",
-      "views": 39,
-      "reach": 27,
+      "views": 41,
+      "reach": 29,
       "shares": 0,
       "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17912652618454913",
@@ -5246,13 +5452,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdSEdH7Eo0m/",
       "titulo": "Plutão não está seco: algo líquido subiu pelas rachaduras do gelo. ❄️",
-      "views": 337,
-      "reach": 293,
+      "views": 398,
+      "reach": 346,
       "shares": 0,
-      "likes": 10,
+      "likes": 15,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "18143128678604819",
@@ -5260,13 +5466,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DdSgAcAlQ5K/",
       "titulo": "A gravidade consegue dobrar a luz. E isso vira uma lupa do tamanho de uma galáxia. 🔭",
-      "views": 33,
-      "reach": 18,
+      "views": 39,
+      "reach": 23,
       "shares": 1,
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
     },
     {
       "id": "17875111935632451",
@@ -5274,13 +5480,83 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DdTkmMTjtuG/",
       "titulo": "Esse \"asteroide\" perto da Terra era, na verdade, um cometa. ☄️",
-      "views": 146,
-      "reach": 127,
+      "views": 312,
+      "reach": 272,
       "shares": 0,
-      "likes": 5,
+      "likes": 14,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-09-15T14:23:40.014Z"
+      "atualizado": "2026-09-16T14:14:50.310Z"
+    },
+    {
+      "id": "17987995683112780",
+      "quando": "2026-09-15T17:10:30+0000",
+      "tipo": "FEED",
+      "link": "https://www.instagram.com/p/DdUNyqZFGR7/",
+      "titulo": "A luz do Sol que bate na sua pele agora saiu dele há 8 minutos e 20 segundos. ☀️",
+      "views": 22,
+      "reach": 13,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 1,
+      "atualizado": "2026-09-16T14:14:50.310Z"
+    },
+    {
+      "id": "18128596702690738",
+      "quando": "2026-09-15T17:11:06+0000",
+      "tipo": "REELS",
+      "link": "https://www.instagram.com/reel/DdUN0UIkXcn/",
+      "titulo": "A estrela mais comum do universo é um problema para a vida. 🔴",
+      "views": 212,
+      "reach": 188,
+      "shares": 0,
+      "likes": 13,
+      "saved": 1,
+      "comments": 1,
+      "atualizado": "2026-09-16T14:14:50.310Z"
+    },
+    {
+      "id": "18115764745949740",
+      "quando": "2026-09-15T21:11:02+0000",
+      "tipo": "REELS",
+      "link": "https://www.instagram.com/reel/DdUpRWnCXPf/",
+      "titulo": "A nossa galáxia não tem o tamanho que a gente achava. 🌌",
+      "views": 218,
+      "reach": 190,
+      "shares": 2,
+      "likes": 8,
+      "saved": 0,
+      "comments": 1,
+      "atualizado": "2026-09-16T14:14:50.310Z"
+    },
+    {
+      "id": "18010546712985955",
+      "quando": "2026-09-16T01:10:28+0000",
+      "tipo": "FEED",
+      "link": "https://www.instagram.com/p/DdVEs9NlpJc/",
+      "titulo": "Estrelas tremem, e dá pra ouvir o que acontece lá dentro. ⭐",
+      "views": 34,
+      "reach": 24,
+      "shares": 0,
+      "likes": 0,
+      "saved": 0,
+      "comments": 1,
+      "atualizado": "2026-09-16T14:14:50.310Z"
+    },
+    {
+      "id": "17956440138247155",
+      "quando": "2026-09-16T11:11:22+0000",
+      "tipo": "REELS",
+      "link": "https://www.instagram.com/reel/DdWJb-aCP99/",
+      "titulo": "Essa galáxia tem um anel que passa pelos polos. 💫",
+      "views": 131,
+      "reach": 96,
+      "shares": 0,
+      "likes": 4,
+      "saved": 0,
+      "comments": 1,
+      "atualizado": "2026-09-16T14:14:50.310Z"
     }
   ]
 }
