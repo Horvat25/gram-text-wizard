@@ -2263,8 +2263,11 @@
     ],
     "legenda": "Quanto você pesaria em cada planeta? 🪐\n\nA conta usa a gravidade de cada mundo (dados da NASA) pra uma pessoa de 70 kg. A maior surpresa é Saturno: 95 vezes a massa da Terra, e mesmo assim você pesaria quase o mesmo que aqui.\n\n📤 Manda pra quem vive dizendo que tá de dieta.\n🔖 Salva pra fazer a conta com o seu peso.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Planetary Fact Sheet\n\n#planetas #sistemasolar #astronomia #curiosidades #neuralupdate",
     "slug": "car-peso-nos-planetas-2026-09-17",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "18103888376340070",
+    "publicado_em": "2026-09-17T17:11:21.577Z",
+    "id_comentario": "18062028245790399"
   },
   {
     "quando": "2026-09-17T17:00:00.000Z",
@@ -2272,7 +2275,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/af986e85-cce3-4f22-abcb-de6c6c83e669.mp4",
     "legenda": "A conta que estima civilizações na galáxia depende de chutes. 🧮\n\nAULA do curso Universo Avançado.\nA equação de Drake multiplica sete fatores para estimar quantas civilizações existiriam na galáxia.\nOs três primeiros já são medidos; os quatro últimos, ninguém mede. Ela serve para mostrar onde falta dado.\n\n💬 Chuta um número: quantas civilizações existem na nossa galáxia? Comenta seu chute 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: SETI Institute — seti.org\n\n#astrobiologia #astronomia #neuralupdate",
     "slug": "pl47-equacao-de-drake",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18118793527936665",
+    "publicado_em": "2026-09-17T17:11:59.908Z",
+    "id_comentario": "17986949904024855",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-17T19:00:00.000Z",
