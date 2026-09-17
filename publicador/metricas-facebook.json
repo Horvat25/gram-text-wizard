@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-16T14:15:38.277Z",
+  "gerado_em": "2026-09-17T14:21:46.830Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -378,11 +378,54 @@
     {
       "d": "2026-09-16",
       "views": 0
+    },
+    {
+      "d": "2026-09-17",
+      "views": 1
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1592204112604764",
+      "quando": "2026-09-17T11:11:18+0000",
+      "titulo": "O que segura o vento solar não é o ar da Terra. 🛡️",
+      "link": "https://www.facebook.com/reel/1592204112604764/",
+      "segundos": 42.666,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2191929621698745",
+      "quando": "2026-09-16T21:11:15+0000",
+      "titulo": "Esse planeta foi descoberto porque a luz da estrela tremeu. 🪐",
+      "link": "https://www.facebook.com/reel/2191929621698745/",
+      "segundos": 41.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 4519,
+      "interacoes": 0
+    },
+    {
+      "id": "1810064910001336",
+      "quando": "2026-09-16T17:11:47+0000",
+      "titulo": "Pode ser mais fácil achar uma fábrica alienígena do que uma bactéria. 🏭",
+      "link": "https://www.facebook.com/reel/1810064910001336/",
+      "segundos": 36.666,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1217780070570668",
       "quando": "2026-09-16T11:11:45+0000",
