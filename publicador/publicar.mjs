@@ -243,6 +243,31 @@ const FB_DESDE = '2026-09-13T20:00:00.000Z';
 const pendenteFb = i => Boolean(PAGINA_FB) && (i.tipo === 'reels' || i.tipo === 'video')
   && i.status === 'publicado' && !i.id_facebook && !i.erro_facebook && (i.publicado_em || '') >= FB_DESDE;
 
+// 17/09/2026: os 11 primeiros Reels publicaram com success:true e ficaram TODOS em 0
+// visualizacoes (nem 1 de 3s) mesmo com a Pagina "Recomendavel". A colecao oficial da Meta
+// (fbsamples/Facebook-Reels-Publishing-API-Postman-Collection) tem 5 passos - Create, Upload,
+// **Get upload session status**, Publish - e o nosso codigo pulava direto do upload pro
+// finish, sem nunca esperar o processing_phase terminar. Ver memoria `facebook-reels-automatico`.
+async function statusDoVideo(videoId, tk) {
+  const u = new URL(`${API}/${videoId}`);
+  u.searchParams.set('fields', 'status');
+  u.searchParams.set('access_token', tk);
+  return (await (await fetch(u)).json()).status || {};
+}
+
+async function esperaProcessar(videoId, tk) {
+  for (let t = 0; t < 30; t++) {           // ate ~5min (30 x 10s) - Reel de 40-50s costuma levar segundos
+    const st = await statusDoVideo(videoId, tk);
+    const fase = st.processing_phase?.status;
+    if (fase === 'complete' || fase === 'error' || st.video_status === 'ready') {
+      if (fase === 'error') throw new Error(`processamento falhou: ${JSON.stringify(st).slice(0, 200)}`);
+      return st;
+    }
+    await new Promise(r => setTimeout(r, 10000));
+  }
+  throw new Error('processamento nao terminou em 5min - nao publicando incompleto');
+}
+
 async function publicaNoFacebook(item) {
   const tk = await tokenDaPagina();
   const ini = await post(`${API}/${PAGINA_FB}/video_reels`, { upload_phase: 'start', access_token: tk });
@@ -251,6 +276,7 @@ async function publicaNoFacebook(item) {
     method: 'POST', headers: { Authorization: `OAuth ${tk}`, file_url: item.midia },
   })).json();
   if (!up.success) throw new Error(`upload: ${JSON.stringify(up).slice(0, 200)}`);
+  await esperaProcessar(ini.video_id, tk);   // NUNCA publicar antes disso - e a causa dos 0 views
   const fim = await post(`${API}/${PAGINA_FB}/video_reels`, {
     upload_phase: 'finish', video_id: ini.video_id, video_state: 'PUBLISHED',
     description: legendaFacebook(item.legenda), access_token: tk,
