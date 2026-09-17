@@ -2311,6 +2311,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-18T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2-2026-09-18/01.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2-2026-09-18/02.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2-2026-09-18/03.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2-2026-09-18/04.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2-2026-09-18/05.jpg",
+      "https://neural-update.com.br/carrossel/car-mito-ou-verdade-2-2026-09-18/06.jpg"
+    ],
+    "legenda": "Mito ou verdade? Mais 5 frases sobre o espaço. 🌠\n\nA da estrela cadente é a que mais engana: ela não é estrela nenhuma.\n\n💬 Comenta quantas você acertou.\n🔖 Salva pra usar na próxima discussão.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFontes: NASA · ESA\n\n#curiosidades #espaco #astronomia #ciencia #neuralupdate",
+    "slug": "car-mito-ou-verdade-2-2026-09-18",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-18T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/89ec2dca-0669-4f09-8baf-bc4ca85dc360.mp4",
@@ -2333,6 +2349,15 @@
     "legenda": "Saturno ganhou uma forma de DEZ lados no polo sul. 🪐\n\nImagens do Hubble mostraram uma onda de dez lados girando em volta do polo sul do planeta.\nOs primeiros sinais apareceram em 2023 e ela ficou mais forte em 2025.\nNo polo norte, Saturno já tinha o famoso hexágono, estável há mais de 40 anos.\n\n🔖 Salva pra mostrar pra alguém: o planeta dos anéis também desenha polígonos.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: Science Advances (02/09/2026) · NASA/ESA Hubble e Cassini\n\n#saturno #hubble #astronomia #neuralupdate",
     "slug": "nw-saturno-decagono",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-19T15:00:00.000Z",
+    "tipo": "post",
+    "midia": "https://neural-update.com.br/carrossel/post-voyager-um-dia-luz-2026-09-19/01.jpg",
+    "legenda": "O objeto mais distante que a humanidade já lançou ainda está chegando a 1 dia-luz da Terra. 🛰️\n\nA Voyager 1 foi lançada em 1977 e viaja a uns 61 mil km/h. A luz faz esse caminho em 24 horas; a sonda levou quase meio século.\n\n📤 Manda pra quem acha que dá pra visitar outra estrela.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA / JPL\n\n#voyager #nasa #espaco #curiosidades #neuralupdate",
+    "slug": "post-voyager-um-dia-luz-2026-09-19",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-19T17:00:00.000Z",
@@ -2359,6 +2384,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-20T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-sol-por-dentro-2026-09-20/01.jpg",
+      "https://neural-update.com.br/carrossel/car-sol-por-dentro-2026-09-20/02.jpg",
+      "https://neural-update.com.br/carrossel/car-sol-por-dentro-2026-09-20/03.jpg",
+      "https://neural-update.com.br/carrossel/car-sol-por-dentro-2026-09-20/04.jpg",
+      "https://neural-update.com.br/carrossel/car-sol-por-dentro-2026-09-20/05.jpg",
+      "https://neural-update.com.br/carrossel/car-sol-por-dentro-2026-09-20/06.jpg"
+    ],
+    "legenda": "O que tem dentro do Sol? ☀️\n\nSão camadas, do núcleo de 15 milhões de graus até a coroa, que é mais quente que a própria superfície. E a energia que te ilumina hoje pode ter começado a sair lá de dentro há milhares de anos.\n\n🔖 Salva pra revisar.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science (Sun)\n\n#sol #astronomia #ciencia #espaco #neuralupdate",
+    "slug": "car-sol-por-dentro-2026-09-20",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-20T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5ad2240c-817b-4f8e-8e26-740f4e14eaee.mp4",
@@ -2381,6 +2422,22 @@
     "legenda": "O Chandra achou 84 fontes de raios X que não se encaixam em nada conhecido. 🔭\n\nElas brilham nos raios X mais fracos e soltam ultravioleta forte, uma mistura sem classe definida.\nAs suspeitas: anãs brancas, estrelas de nêutrons ou buracos negros roubando gás de estrelas vizinhas.\nFicaram escondidas porque o gás entre as estrelas absorve justamente essa luz.\n\n💬 Chuta: o que você acha que são esses pontos? Comenta aqui embaixo 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA / observatório Chandra — chandra.harvard.edu\n\n#chandra #raiosx #astronomia #neuralupdate",
     "slug": "nw-chandra-pontos-sem-nome",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-21T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-ver-sem-telescopio-2026-09-21/01.jpg",
+      "https://neural-update.com.br/carrossel/car-ver-sem-telescopio-2026-09-21/02.jpg",
+      "https://neural-update.com.br/carrossel/car-ver-sem-telescopio-2026-09-21/03.jpg",
+      "https://neural-update.com.br/carrossel/car-ver-sem-telescopio-2026-09-21/04.jpg",
+      "https://neural-update.com.br/carrossel/car-ver-sem-telescopio-2026-09-21/05.jpg",
+      "https://neural-update.com.br/carrossel/car-ver-sem-telescopio-2026-09-21/06.jpg"
+    ],
+    "legenda": "5 coisas do espaço que dá pra ver sem telescópio. 🔭\n\nNão precisa de equipamento: só céu escuro, paciência e saber o que procurar. A Estação Espacial é a mais fácil de confundir com avião.\n\n💬 Qual dessas você já viu? Comenta o número.\n🔖 Salva pra próxima noite de céu limpo.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA\n\n#astronomia #ceunoturno #estrelas #espaco #neuralupdate",
+    "slug": "car-ver-sem-telescopio-2026-09-21",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-21T17:00:00.000Z",
@@ -2407,6 +2464,21 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-22T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-equinocio-primavera-2026-09-22/01.jpg",
+      "https://neural-update.com.br/carrossel/car-equinocio-primavera-2026-09-22/02.jpg",
+      "https://neural-update.com.br/carrossel/car-equinocio-primavera-2026-09-22/03.jpg",
+      "https://neural-update.com.br/carrossel/car-equinocio-primavera-2026-09-22/04.jpg",
+      "https://neural-update.com.br/carrossel/car-equinocio-primavera-2026-09-22/05.jpg"
+    ],
+    "legenda": "Hoje à noite começa a primavera no Brasil. 🌱\n\nÉ o equinócio: o Sol fica bem em cima do equador, e o dia e a noite ficam com quase a mesma duração no planeta inteiro.\n\n🔖 Salva pra explicar pra alguém.\n📤 Manda pra quem acha que a estação muda porque a Terra chega mais perto do Sol.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#equinocio #primavera #astronomia #ciencia #neuralupdate",
+    "slug": "car-equinocio-primavera-2026-09-22",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-22T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e5e40f73-ad2a-4114-8c90-b78b34c76c49.mp4",
@@ -2431,6 +2503,23 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-23T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/01.jpg",
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/02.jpg",
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/03.jpg",
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/04.jpg",
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/05.jpg",
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/06.jpg",
+      "https://neural-update.com.br/carrossel/car-de-carro-pelo-sistema-solar-2026-09-23/07.jpg"
+    ],
+    "legenda": "Quanto tempo de carro até cada lugar do espaço? 🚗\n\nA conta é a 100 km/h, sem parar nem pra abastecer. A Lua dá uma viagem longa. O resto passa de gerações.\n\n📤 Manda pra quem reclama de viagem de 6 horas.\n🔖 Salva a tabela.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#curiosidades #sistemasolar #astronomia #espaco #neuralupdate",
+    "slug": "car-de-carro-pelo-sistema-solar-2026-09-23",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-23T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c9be8f11-9917-4576-aa59-0bd4067e2d94.mp4",
@@ -2453,6 +2542,21 @@
     "legenda": "Você está dando uma volta na galáxia agora mesmo. 🎠\n\nO Sistema Solar gira em volta do centro da Via Láctea a uns 828 mil km/h.\nUma volta completa leva cerca de 230 milhões de anos.\nNa última vez que a gente passou por aqui, os primeiros dinossauros estavam surgindo.\n\n💬 Quantas voltas você acha que a Terra já deu na galáxia? Comenta seu chute 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Solar System) e EarthSky\n\n#galaxia #dinossauros #astronomia #neuralupdate",
     "slug": "cur-volta-do-sol-dinossauros",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-24T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-feito-de-estrelas-2026-09-24/01.jpg",
+      "https://neural-update.com.br/carrossel/car-feito-de-estrelas-2026-09-24/02.jpg",
+      "https://neural-update.com.br/carrossel/car-feito-de-estrelas-2026-09-24/03.jpg",
+      "https://neural-update.com.br/carrossel/car-feito-de-estrelas-2026-09-24/04.jpg",
+      "https://neural-update.com.br/carrossel/car-feito-de-estrelas-2026-09-24/05.jpg"
+    ],
+    "legenda": "Você é feito de pedaços de estrelas. Literalmente. ✨\n\nO hidrogênio do seu corpo veio do começo do universo. O carbono, o oxigênio e o ferro foram fabricados em estrelas que morreram antes do Sol nascer.\n\n📤 Manda pra alguém que precisa ouvir que é poeira de estrela.\n🔖 Salva pra lembrar.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#estrelas #supernova #astronomia #ciencia #neuralupdate",
+    "slug": "car-feito-de-estrelas-2026-09-24",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-24T17:00:00.000Z",
