@@ -2232,7 +2232,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4a7ba352-b9eb-430c-b0cd-94ee2ee14e54.mp4",
     "legenda": "O que segura o vento solar não é o ar da Terra. 🛡️\n\nA missão Smile, da ESA com a Academia Chinesa de Ciências, foi lançada para ver como a Terra reage ao vento solar.\nPela primeira vez, uma câmera de raios X vai fotografar o escudo magnético da Terra.\nOutra câmera vai acompanhar as auroras por até 45 horas seguidas.\n\n📤 Manda pra alguém que acha que o espaço é vazio.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: ESA / missão Smile (19/05/2026) — esa.int\n\n#terra #espaco #neuralupdate",
     "slug": "nw-escudo-nao-e-ar",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18115969141767684",
+    "publicado_em": "2026-09-17T11:11:07.936Z",
+    "id_comentario": "18141855502582933",
+    "id_facebook": "1592204112604764"
   },
   {
     "quando": "2026-09-17T11:00:00.000Z",
@@ -2240,7 +2244,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b36e0d8c-3f4c-4e74-8a0f-1c4d4a625bdc.png",
     "legenda": "",
     "slug": "story-noticia-2026-09-17",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18472011553115885",
+    "publicado_em": "2026-09-17T11:11:18.092Z"
   },
   {
     "quando": "2026-09-17T15:00:00.000Z",
@@ -2367,7 +2373,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bc73ed1c-4fac-4a4b-9b9f-a52fa332e56d.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-18",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   },
   {
     "quando": "2026-09-19T11:00:00.000Z",
@@ -2488,7 +2496,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ab771488-a2a5-4f97-9cbe-f3a303a261d9.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-20",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   },
   {
     "quando": "2026-09-21T11:00:00.000Z",
@@ -2615,7 +2625,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/22a86786-133c-47ec-bee8-acbc777bd1a2.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-22",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
   },
   {
     "quando": "2026-09-23T11:00:00.000Z",
@@ -2743,6 +2755,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/91f80205-4959-4328-98bd-b652d4b521f1.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-24",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   }
 ]
