@@ -2287,7 +2287,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/32b02027-d0a5-4c16-954a-3cf614b3e035.png",
     "legenda": "",
     "slug": "story-blog-2026-09-17",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18110660015025327",
+    "publicado_em": "2026-09-17T21:10:25.574Z"
   },
   {
     "quando": "2026-09-17T21:00:00.000Z",
@@ -2295,9 +2297,13 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/534777c8-3258-4682-83e1-34754de54b49.mp4",
     "legenda": "Essa foto não mostra só estrelas: ela revela planetas. 🌌\n\nA missão Euclid, da ESA, fez a maior foto em luz visível do centro da Via Láctea: mais de 60 milhões de estrelas.\nQuando duas estrelas se alinham, a da frente amplia a luz da de trás, e um planeta em volta dela muda esse brilho.\nEssa foto vira a referência para achar esses planetas no futuro.\n\n🌌 Quer levar uma experiência do universo para o seu quarto? Veja o projetor astronauta que selecionamos.\n💬 Comenta QUERO que eu te mando o link no direct. #publi\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: ESA / Euclid (24/06/2026) — esa.int\n\n#exoplanetas #astronomia #neuralupdate",
     "slug": "nw-foto-esconde-planetas-centro-galaxia",
-    "status": "agendado",
+    "status": "publicado",
     "midia_anterior": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d6f3de35-d957-4b9f-9c87-6ec864c7ecf7.mp4",
-    "obs_cta": "CTA do projetor com imagem (12/09)"
+    "obs_cta": "CTA do projetor com imagem (12/09)",
+    "id_instagram": "17969484963169643",
+    "publicado_em": "2026-09-17T21:11:55.624Z",
+    "id_comentario": "18127026736832370",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-17T23:00:00.000Z",
