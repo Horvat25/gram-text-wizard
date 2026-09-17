@@ -268,12 +268,18 @@ async function esperaProcessar(videoId, tk) {
   throw new Error('processamento nao terminou em 5min - nao publicando incompleto');
 }
 
+// 17/09/2026: nunca mandar pro Facebook o MESMO arquivo (bytes identicos) que acabou de sair
+// no Insta minutos antes - conteudo repostado identico entre redes e fator que reduz
+// distribuicao organica (doc oficial da Meta + guias de crescimento). O lote semanal gera uma
+// variante com zoom/crop sutil (_variante-facebook.js, 0cr) e a URL fica em midia_facebook;
+// sem ela (item antigo, ou slug fora do lote), cai no arquivo original mesmo.
 async function publicaNoFacebook(item) {
   const tk = await tokenDaPagina();
   const ini = await post(`${API}/${PAGINA_FB}/video_reels`, { upload_phase: 'start', access_token: tk });
   if (!ini.video_id) throw new Error(`start: ${JSON.stringify(ini).slice(0, 200)}`);
+  const midiaFb = item.midia_facebook || item.midia;
   const up = await (await fetch(`https://rupload.facebook.com/video-upload/v21.0/${ini.video_id}`, {
-    method: 'POST', headers: { Authorization: `OAuth ${tk}`, file_url: item.midia },
+    method: 'POST', headers: { Authorization: `OAuth ${tk}`, file_url: midiaFb },
   })).json();
   if (!up.success) throw new Error(`upload: ${JSON.stringify(up).slice(0, 200)}`);
   await esperaProcessar(ini.video_id, tk);   // NUNCA publicar antes disso - e a causa dos 0 views
