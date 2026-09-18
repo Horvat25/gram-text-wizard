@@ -2323,8 +2323,11 @@
     "midia": "https://neural-update.com.br/carrossel/post-blog-eclipse-todo-mes-2026-09-17/01.jpg",
     "legenda": "Se a Lua passa entre a Terra e o Sol todo mês, por que não tem eclipse todo mês? 🌘\n\nA órbita da Lua é inclinada uns 5 graus em relação à da Terra.\nNa maioria dos meses, Sol, Terra e Lua passam desalinhados.\nEclipse só acontece quando a Lua nova ou cheia cai perto do cruzamento das duas órbitas.\n\n📖 A explicação completa está no blog: link na bio.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Solar System Facts) — science.nasa.gov\n\n#eclipse #lua #neuralupdate",
     "slug": "post-blog-eclipse-todo-mes-2026-09-17",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "17942708145345263",
+    "publicado_em": "2026-09-18T01:10:30.932Z",
+    "id_comentario": "18119065480885769"
   },
   {
     "quando": "2026-09-18T11:00:00.000Z",
