@@ -2365,8 +2365,11 @@
     ],
     "legenda": "Mito ou verdade? Mais 5 frases sobre o espaço. 🌠\n\nA da estrela cadente é a que mais engana: ela não é estrela nenhuma.\n\n💬 Comenta quantas você acertou.\n🔖 Salva pra usar na próxima discussão.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFontes: NASA · ESA\n\n#curiosidades #espaco #astronomia #ciencia #neuralupdate",
     "slug": "car-mito-ou-verdade-2-2026-09-18",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "18475960927116872",
+    "publicado_em": "2026-09-18T17:11:14.105Z",
+    "id_comentario": "17926213026182542"
   },
   {
     "quando": "2026-09-18T17:00:00.000Z",
@@ -2374,8 +2377,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/89ec2dca-0669-4f09-8baf-bc4ca85dc360.mp4",
     "legenda": "Tem planeta sem estrela vagando no escuro. 🪐\n\nAULA do curso Universo Avançado.\nUm planeta gigante passa perto e arremessa o vizinho pra fora do sistema, como bola de sinuca.\nA galáxia pode ter trilhões deles, achados quando a gravidade deles amplia a luz de uma estrela ao fundo.\n\n💬 Você preferiria morar num planeta sem Sol ou num sem Lua? Responde nos comentários 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Roman — Rogue Planets) e Sumi et al. (2023)\n\n#exoplanetas #astronomia #neuralupdate",
     "slug": "pl48-planetas-sem-estrela",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fbbec0df-c094-44cf-8ef9-7a29b66590de.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fbbec0df-c094-44cf-8ef9-7a29b66590de.mp4",
+    "id_instagram": "18129302371690028",
+    "publicado_em": "2026-09-18T17:11:57.917Z",
+    "id_comentario": "18095618867436748",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-18T19:00:00.000Z",
