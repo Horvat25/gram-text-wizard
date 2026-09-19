@@ -2448,8 +2448,11 @@
     "midia": "https://neural-update.com.br/carrossel/post-voyager-um-dia-luz-2026-09-19/01.jpg",
     "legenda": "O objeto mais distante que a humanidade já lançou ainda está chegando a 1 dia-luz da Terra. 🛰️\n\nA Voyager 1 foi lançada em 1977 e viaja a uns 61 mil km/h. A luz faz esse caminho em 24 horas; a sonda levou quase meio século.\n\n📤 Manda pra quem acha que dá pra visitar outra estrela.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA / JPL\n\n#voyager #nasa #espaco #curiosidades #neuralupdate",
     "slug": "post-voyager-um-dia-luz-2026-09-19",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "17993607330019323",
+    "publicado_em": "2026-09-19T17:04:24.083Z",
+    "id_comentario": "18085300484304406"
   },
   {
     "quando": "2026-09-19T17:00:00.000Z",
@@ -2457,8 +2460,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f80feff0-c75f-44f1-ad07-619f27e763a3.mp4",
     "legenda": "Se o universo é tão grande, cadê todo mundo? 👽\n\nAULA do curso Universo Avançado.\nA galáxia tem bilhões de anos, tempo de sobra pra alguém se espalhar, e não vemos sinal nenhum.\nAs respostas caem em três grupos: vida inteligente é rara, ela some ou se esconde, ou a gente não sabe procurar.\n\n💬 Qual dos três você acha que é? Comenta 1, 2 ou 3 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: SETI Institute — seti.org\n\n#paradoxodefermi #vidaextraterrestre #astronomia #neuralupdate",
     "slug": "pl49-paradoxo-de-fermi",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/55c7b4c3-6d7e-45a3-8d91-d1447aeb6000.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/55c7b4c3-6d7e-45a3-8d91-d1447aeb6000.mp4",
+    "id_instagram": "17930481405405513",
+    "publicado_em": "2026-09-19T17:05:38.490Z",
+    "id_comentario": "18142830319605564",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-19T19:00:00.000Z",
