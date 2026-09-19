@@ -2410,12 +2410,14 @@
   {
     "quando": "2026-09-18T23:00:00.000Z",
     "tipo": "story",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bc73ed1c-4fac-4a4b-9b9f-a52fa332e56d.png",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/02-presente-universo.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-18",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "projetor-astronauta",
-    "variacao": "presente-universo"
+    "variacao": "presente-universo",
+    "id_instagram": "17906096667556540",
+    "publicado_em": "2026-09-19T00:10:33.066Z"
   },
   {
     "quando": "2026-09-19T11:00:00.000Z",
