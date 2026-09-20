@@ -2505,8 +2505,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/92ba82d6-aa91-460b-89c3-e86058213d72.mp4",
     "legenda": "Ninguém nunca viu uma foto da nossa galáxia. 🌌\n\nToda imagem da Via Láctea em espiral é ilustração, feita com dados de satélites como o Gaia.\nA gente está DENTRO do disco, que tem uns 100 mil anos-luz.\nE a Voyager 1, o objeto mais longe que já lançamos, não chegou nem a um dia-luz daqui.\n\n💬 Você sabia que aquela imagem era um desenho? Responde sim ou não nos comentários 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Milky Way) e ESA Gaia\n\n#vialactea #galaxia #astronomia #neuralupdate",
     "slug": "cur-foto-da-galaxia",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ca4277a8-540c-4c46-af50-bc3a48cb26d8.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ca4277a8-540c-4c46-af50-bc3a48cb26d8.mp4",
+    "id_instagram": "18333869101278496",
+    "publicado_em": "2026-09-20T11:11:20.766Z",
+    "id_comentario": "17916174642462158",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-20T11:00:00.000Z",
@@ -2514,7 +2518,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2a0011c2-24f8-4dce-873e-ff4e446430ed.png",
     "legenda": "",
     "slug": "story-noticia-2026-09-20",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18093064880666512",
+    "publicado_em": "2026-09-20T11:11:39.139Z"
   },
   {
     "quando": "2026-09-20T15:00:00.000Z",
