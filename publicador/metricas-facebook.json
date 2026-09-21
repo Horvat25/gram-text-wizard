@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-21T03:34:17.677Z",
+  "gerado_em": "2026-09-21T15:57:58.228Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -393,7 +393,11 @@
     },
     {
       "d": "2026-09-20",
-      "views": 6
+      "views": 9
+    },
+    {
+      "d": "2026-09-21",
+      "views": 1
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
