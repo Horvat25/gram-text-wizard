@@ -17,9 +17,23 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
-const SAIDA = path.join(AQUI, 'metricas.json');
+const SAIDA = process.env.METRICAS_SAIDA || path.join(AQUI, 'metricas.json');
 const API = 'https://graph.facebook.com/v21.0';
 const SECO = process.argv.includes('--seco');
+const AUTOTESTE = process.argv.includes('--autoteste');
+
+const valorMetrica = m => m?.values?.[0]?.value ?? m?.total_value?.value ?? null;
+const normalizaMetricas = resposta => Object.fromEntries((resposta?.data || []).map(m => [m.name, valorMetrica(m)]));
+
+if (AUTOTESTE) {
+  const fixture = normalizaMetricas({ data: [
+    { name: 'ig_reels_avg_watch_time', values: [{ value: 12500 }] },
+    { name: 'reels_skip_rate', total_value: { value: 0.37 } },
+  ] });
+  if (fixture.ig_reels_avg_watch_time !== 12500 || fixture.reels_skip_rate !== 0.37) throw new Error('autoteste do parser falhou');
+  console.log('autoteste metricas-instagram: OK');
+  process.exit(0);
+}
 
 const IG_USER_ID = process.env.IG_USER_ID;
 const IG_TOKEN = process.env.IG_TOKEN;
@@ -44,15 +58,30 @@ async function insights(idMidia) {
   for (const metric of conjuntos) {
     const r = await get(`/${idMidia}/insights`, { metric });
     if (r.data) {
-      const out = {};
-      for (const m of r.data) out[m.name] = m.values?.[0]?.value ?? null;
-      return out;
+      return normalizaMetricas(r);
     }
     // se o erro não for de métrica inválida, não adianta tentar os outros conjuntos
     const msg = r.error?.message || '';
     if (!/metric|invalid|does not support/i.test(msg)) return { _erro: msg.slice(0, 160) };
   }
   return { _erro: 'nenhum conjunto de métricas aceito' };
+}
+
+// Watch time e skip rate ficam separados do conjunto principal: uma métrica nova/inválida
+// nunca pode derrubar views, alcance e interações. O lote é pequeno para respeitar a quota.
+async function insightsRetencao(idMidia) {
+  const conjuntos = [
+    'ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate',
+    'ig_reels_avg_watch_time,ig_reels_video_view_total_time',
+    'ig_reels_avg_watch_time',
+  ];
+  for (const metric of conjuntos) {
+    const r = await get(`/${idMidia}/insights`, { metric });
+    if (r.data) return { ...normalizaMetricas(r), retencao_metricas: metric };
+    const msg = r.error?.message || '';
+    if (!/metric|invalid|does not support/i.test(msg)) return { _retencao_erro: msg.slice(0, 160) };
+  }
+  return { _retencao_erro: 'nenhum conjunto de retenção aceito' };
 }
 
 const conta = await get(`/${IG_USER_ID}`, { fields: 'username,followers_count,media_count' });
@@ -152,7 +181,7 @@ async function acervo(recentes) {
   const mapa = new Map(ant.map(a => [a.id, a]));
   const agora = new Date().toISOString();
   for (const i of recentes) {
-    mapa.set(i.id, { id: i.id, quando: i.quando, tipo: i.tipo, link: i.link, titulo: i.titulo,
+    mapa.set(i.id, { ...(mapa.get(i.id) || {}), id: i.id, quando: i.quando, tipo: i.tipo, link: i.link, titulo: i.titulo,
       views: i.views ?? i.plays ?? null, reach: i.reach ?? null, shares: i.shares ?? null, likes: i.likes ?? null,
       saved: i.saved ?? null, comments: i.comments ?? null, atualizado: agora });
   }
@@ -175,11 +204,37 @@ async function acervo(recentes) {
     if (!n._erro) Object.assign(a, { views: n.views ?? n.plays ?? a.views, reach: n.reach ?? a.reach, shares: n.shares ?? a.shares, likes: n.likes ?? a.likes ?? null,
       saved: n.saved ?? a.saved, comments: n.comments ?? a.comments, atualizado: agora });
   }
+  const reels = [...mapa.values()].filter(a => String(a.tipo || '').toUpperCase() === 'REELS');
+  const recentesRetencao = reels.sort((a, b) => String(b.quando).localeCompare(String(a.quando))).slice(0, 10);
+  const idsRecentesRetencao = new Set(recentesRetencao.map(a => a.id));
+  const rotacaoRetencao = reels.filter(a => !idsRecentesRetencao.has(a.id))
+    .sort((a, b) => String(a.retencao_atualizado || '').localeCompare(String(b.retencao_atualizado || '')) || String(b.quando).localeCompare(String(a.quando)))
+    .slice(0, 10);
+  const vezRetencao = [...recentesRetencao, ...rotacaoRetencao];
+  for (const a of vezRetencao) {
+    const n = await insightsRetencao(a.id);
+    a.retencao_atualizado = agora;
+    if (n._retencao_erro) a.retencao_erro = n._retencao_erro;
+    else {
+      delete a.retencao_erro;
+      Object.assign(a, n);
+    }
+  }
   const lista = [...mapa.values()].filter(a => String(a.quando) >= INICIO_ASTRONOMIA).sort((a, b) => String(a.quando).localeCompare(String(b.quando)));
   console.log(`acervo desde ${INICIO_ASTRONOMIA}: ${lista.length} posts · ${lista.filter(a => a.views != null).length} com números · ${vez.length} atualizados agora`);
+  console.log(`retenção Reels: ${vezRetencao.length} sondados · ${vezRetencao.filter(a => a.ig_reels_avg_watch_time != null).length} com watch time · ${vezRetencao.filter(a => a.reels_skip_rate != null).length} com skip rate`);
   return lista;
 }
 const listaAcervo = SECO ? [] : await acervo(itens);
+
+// Replica a retenção do acervo nos 50 itens recentes sem perder o histórico completo.
+const acervoPorId = new Map(listaAcervo.map(a => [a.id, a]));
+for (const i of itens) {
+  const a = acervoPorId.get(i.id); if (!a) continue;
+  for (const k of ['ig_reels_avg_watch_time', 'ig_reels_video_view_total_time', 'reels_skip_rate', 'retencao_metricas', 'retencao_atualizado', 'retencao_erro']) {
+    if (a[k] !== undefined) i[k] = a[k];
+  }
+}
 
 const doc = {
   gerado_em: new Date().toISOString(),
@@ -189,6 +244,12 @@ const doc = {
   ...(cd.erro ? { conta_diaria_erro: cd.erro } : {}),
   itens,
   acervo: listaAcervo,
+  retencao_coleta: {
+    reels_com_watch_time: listaAcervo.filter(a => a.ig_reels_avg_watch_time != null).length,
+    reels_com_tempo_total: listaAcervo.filter(a => a.ig_reels_video_view_total_time != null).length,
+    reels_com_skip_rate: listaAcervo.filter(a => a.reels_skip_rate != null).length,
+    reels_com_erro: listaAcervo.filter(a => a.retencao_erro).length,
+  },
 };
 
 if (SECO) { console.log(JSON.stringify(doc, null, 2).slice(0, 1200)); process.exit(0); }
