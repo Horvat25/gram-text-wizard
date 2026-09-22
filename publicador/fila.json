@@ -2737,7 +2737,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1f9b5146-4802-4946-b322-664443a47f11.png",
     "legenda": "",
     "slug": "story-feed-2026-09-22",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17909997936470956",
+    "publicado_em": "2026-09-22T21:10:32.428Z"
   },
   {
     "quando": "2026-09-22T21:00:00.000Z",
@@ -2745,8 +2747,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e249da50-15ea-459e-8db4-62688457f050.mp4",
     "legenda": "De carro até a estrela mais perto do Sol. 🚗✨\n\nSérie DE CARRO PELO ESPAÇO · parte 3.\nPróxima Centauri fica a 4,25 anos-luz, uns 40 trilhões de km.\nA 100 km/h, a viagem levaria quase 46 milhões de anos.\n\n💬 Pra onde a gente dirige na próxima? Comenta o destino 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA Science (Alpha Centauri)\n\n#proximacentauri #estrelas #curiosidades #neuralupdate",
     "slug": "serie-carro-p3-proxima",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/669921e3-15bf-4385-a3a6-47707e3813d2.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/669921e3-15bf-4385-a3a6-47707e3813d2.mp4",
+    "id_instagram": "18158956567519966",
+    "publicado_em": "2026-09-22T21:11:13.175Z",
+    "id_comentario": "18084926501299735",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-22T23:00:00.000Z",
