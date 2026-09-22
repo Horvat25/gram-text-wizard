@@ -2712,8 +2712,11 @@
     ],
     "legenda": "Hoje à noite começa a primavera no Brasil. 🌱\n\nÉ o equinócio: o Sol fica bem em cima do equador, e o dia e a noite ficam com quase a mesma duração no planeta inteiro.\n\n🔖 Salva pra explicar pra alguém.\n📤 Manda pra quem acha que a estação muda porque a Terra chega mais perto do Sol.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#equinocio #primavera #astronomia #ciencia #neuralupdate",
     "slug": "car-equinocio-primavera-2026-09-22",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "17964637857190467",
+    "publicado_em": "2026-09-22T17:10:44.741Z",
+    "id_comentario": "18215644459345009"
   },
   {
     "quando": "2026-09-22T17:00:00.000Z",
@@ -2721,8 +2724,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e5e40f73-ad2a-4114-8c90-b78b34c76c49.mp4",
     "legenda": "A hipernova não é só uma supernova maior. ⚡\n\nSérie A MORTE DAS ESTRELAS · episódio 3 de 6.\nEla vem de estrelas gigantes girando muito rápido, com dez vezes mais energia que uma supernova.\nDois jatos quase na velocidade da luz furam a estrela, e quando um aponta pra Terra vemos uma rajada de raios gama.\n\n💬 Você sabia que existia algo mais forte que uma supernova? Comenta aqui 👇\n\n👉 Segue @neuralupdate: episódio 4 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Gamma-ray Bursts)\n\n#hipernova #raiosgama #astronomia #neuralupdate",
     "slug": "nw-estrela-vira-hipernova",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/de2c5095-47c7-46d1-a006-3db815ede251.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/de2c5095-47c7-46d1-a006-3db815ede251.mp4",
+    "id_instagram": "18633845851005204",
+    "publicado_em": "2026-09-22T17:11:28.521Z",
+    "id_comentario": "17906266335326989",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-22T19:00:00.000Z",
