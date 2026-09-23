@@ -1,12 +1,12 @@
 {
- "gerado_em": "2026-09-23T17:30:26.411Z",
+ "gerado_em": "2026-09-23T18:17:47.825Z",
  "conta": {
   "username": "neuralupdate",
   "seguidores": 1201,
-  "publicacoes": 920
+  "publicacoes": 922
  },
- "total_listado": 920,
- "com_tempo_assistido": 385,
+ "total_listado": 922,
+ "com_tempo_assistido": 386,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
@@ -16,6 +16,7 @@
      "ate": "2026-09-22",
      "data": [
       {
+       "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
@@ -128,13 +129,12 @@
          "end_time": "2026-09-21T07:00:00+0000"
         },
         {
-         "value": 0,
+         "value": 9,
          "end_time": "2026-09-22T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
-       "description": "Número total de contas únicas que seguem este perfil",
-       "id": "17841478894893058/insights/follower_count/day"
+       "description": "Número total de contas únicas que seguem este perfil"
       }
      ]
     }
@@ -145,6 +145,7 @@
      "ate": "2026-07-16",
      "data": [
       {
+       "id": "17841478894893058/insights/follows_and_unfollows/day",
        "name": "follows_and_unfollows",
        "period": "day",
        "title": "Começaram a seguir e deixaram de seguir",
@@ -171,8 +172,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/follows_and_unfollows/day"
+       }
       }
      ]
     },
@@ -269,13 +269,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 89
+            "value": 98
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 9
+            "value": 11
            }
           ]
          }
@@ -337,13 +337,59 @@
      "ate": "2026-08-14",
      "data": [
       {
-       "id": "17841478894893058/insights/reach/day",
        "name": "reach",
        "period": "day",
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
         "value": 24692
+       },
+       "id": "17841478894893058/insights/reach/day"
+      },
+      {
+       "name": "views",
+       "period": "day",
+       "title": "Visualizações",
+       "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
+       "total_value": {
+        "value": 51332
+       },
+       "id": "17841478894893058/insights/views/day"
+      },
+      {
+       "name": "accounts_engaged",
+       "period": "day",
+       "title": "Contas com engajamento",
+       "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
+       "total_value": {
+        "value": 1623
+       },
+       "id": "17841478894893058/insights/accounts_engaged/day"
+      },
+      {
+       "name": "total_interactions",
+       "period": "day",
+       "title": "Interações com o conteúdo",
+       "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
+       "total_value": {
+        "value": 2673
+       },
+       "id": "17841478894893058/insights/total_interactions/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-08-14",
+     "ate": "2026-09-12",
+     "data": [
+      {
+       "id": "17841478894893058/insights/reach/day",
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 30633
        }
       },
       {
@@ -353,7 +399,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 51332
+        "value": 76223
        }
       },
       {
@@ -373,54 +419,8 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 2673
-       }
-      }
-     ]
-    },
-    {
-     "de": "2026-08-14",
-     "ate": "2026-09-12",
-     "data": [
-      {
-       "name": "reach",
-       "period": "day",
-       "title": "Contas alcançadas",
-       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
-       "total_value": {
-        "value": 30633
-       },
-       "id": "17841478894893058/insights/reach/day"
-      },
-      {
-       "name": "views",
-       "period": "day",
-       "title": "Visualizações",
-       "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
-       "total_value": {
-        "value": 76223
-       },
-       "id": "17841478894893058/insights/views/day"
-      },
-      {
-       "name": "accounts_engaged",
-       "period": "day",
-       "title": "Contas com engajamento",
-       "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
-       "total_value": {
-        "value": 1623
-       },
-       "id": "17841478894893058/insights/accounts_engaged/day"
-      },
-      {
-       "name": "total_interactions",
-       "period": "day",
-       "title": "Interações com o conteúdo",
-       "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
-       "total_value": {
         "value": 3421
-       },
-       "id": "17841478894893058/insights/total_interactions/day"
+       }
       }
      ]
     },
@@ -434,7 +434,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 11584
+        "value": 11601
        },
        "id": "17841478894893058/insights/reach/day"
       },
@@ -444,7 +444,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 24324
+        "value": 24377
        },
        "id": "17841478894893058/insights/views/day"
       },
@@ -464,7 +464,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 995
+        "value": 996
        },
        "id": "17841478894893058/insights/total_interactions/day"
       }
@@ -477,6 +477,7 @@
      "ate": "2026-07-16",
      "data": [
       {
+       "id": "17841478894893058/insights/reach/day",
        "name": "reach",
        "period": "day",
        "title": "Contas alcançadas",
@@ -504,8 +505,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/reach/day"
+       }
       }
      ]
     },
@@ -528,15 +528,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 24395
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 404
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 24395
            }
           ]
          }
@@ -593,7 +593,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 11584,
+        "value": 11601,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -604,13 +604,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 515
+            "value": 516
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 11134
+            "value": 11149
            }
           ]
          }
@@ -693,7 +693,6 @@
      "janela": "last_90_days",
      "data": [
       {
-       "id": "17841478894893058/insights/follower_demographics/lifetime",
        "name": "follower_demographics",
        "period": "lifetime",
        "title": "Dados demográficos dos seguidores",
@@ -726,7 +725,8 @@
           ]
          }
         ]
-       }
+       },
+       "id": "17841478894893058/insights/follower_demographics/lifetime"
       }
      ]
     },
@@ -734,6 +734,7 @@
      "janela": "last_90_days",
      "data": [
       {
+       "id": "17841478894893058/insights/follower_demographics/lifetime",
        "name": "follower_demographics",
        "period": "lifetime",
        "title": "Dados demográficos dos seguidores",
@@ -838,8 +839,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/follower_demographics/lifetime"
+       }
       }
      ]
     },
@@ -1142,6 +1142,7 @@
      "janela": "this_month",
      "data": [
       {
+       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime",
        "name": "engaged_audience_demographics",
        "period": "lifetime",
        "title": "Dados demográficos do público engajado",
@@ -1154,8 +1155,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime"
+       }
       }
      ]
     },
@@ -1163,6 +1163,7 @@
      "janela": "this_month",
      "data": [
       {
+       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime",
        "name": "engaged_audience_demographics",
        "period": "lifetime",
        "title": "Dados demográficos do público engajado",
@@ -1175,8 +1176,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime"
+       }
       }
      ]
     },
@@ -1249,7 +1249,6 @@
      "janela": "this_month",
      "data": [
       {
-       "id": "17841478894893058/insights/reached_audience_demographics/lifetime",
        "name": "reached_audience_demographics",
        "period": "lifetime",
        "title": "Dados demográficos do público alcançado",
@@ -1262,32 +1261,12 @@
           ]
          }
         ]
-       }
-      }
-     ]
-    },
-    "country": {
-     "janela": "this_month",
-     "data": [
-      {
-       "name": "reached_audience_demographics",
-       "period": "lifetime",
-       "title": "Dados demográficos do público alcançado",
-       "description": "As características demográficas do público alcançado, incluindo a distribuição por países, cidades e gênero.",
-       "total_value": {
-        "breakdowns": [
-         {
-          "dimension_keys": [
-           "country"
-          ]
-         }
-        ]
        },
        "id": "17841478894893058/insights/reached_audience_demographics/lifetime"
       }
      ]
     },
-    "city": {
+    "country": {
      "janela": "this_month",
      "data": [
       {
@@ -1300,11 +1279,32 @@
         "breakdowns": [
          {
           "dimension_keys": [
-           "city"
+           "country"
           ]
          }
         ]
        }
+      }
+     ]
+    },
+    "city": {
+     "janela": "this_month",
+     "data": [
+      {
+       "name": "reached_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público alcançado",
+       "description": "As características demográficas do público alcançado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "city"
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reached_audience_demographics/lifetime"
       }
      ]
     }
@@ -1320,6 +1320,22 @@
  },
  "comentarios": {
   "porMidia": {
+   "18000646841808459": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-23T17:11:36+0000",
+     "respostas": []
+    }
+   ],
+   "18118420348938431": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-23T17:10:55+0000",
+     "respostas": []
+    }
+   ],
    "18424748650144147": [
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -2663,6 +2679,47 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18000646841808459",
+   "quando": "2026-09-23T17:11:30+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Ddo0ORbFHyH/",
+   "titulo": "Esse caroço de 20 km pesa mais que o Sol. ⭐",
+   "legenda": "Esse caroço de 20 km pesa mais que o Sol. ⭐\n\nSérie A MORTE DAS ESTRELAS · episódio 4 de 6.\nDepois da supernova, a gravidade esmaga o núcleo até prótons e elétrons virarem nêutrons.\nUma colher de chá dessa matéria pesaria um bilhão de toneladas.\n\n📤 Manda pra quem acha que chumbo é pesado.\n\n👉 Segue @neuralupdate: episódio 5 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Neutron Stars)\n\n#estreladeneutrons #estrelas #astronomia #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 8,
+   "reach": 3,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "ig_reels_avg_watch_time": 11244,
+   "ig_reels_video_view_total_time": 44977,
+   "reels_skip_rate": 28.6,
+   "reposts": 0
+  },
+  {
+   "id": "18118420348938431",
+   "quando": "2026-09-23T17:10:51+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/Ddo0Lk4mnNA/",
+   "titulo": "Quanto tempo de carro até cada lugar do espaço? 🚗",
+   "legenda": "Quanto tempo de carro até cada lugar do espaço? 🚗\n\nA conta é a 100 km/h, sem parar nem pra abastecer. A Lua dá uma viagem longa. O resto passa de gerações.\n\n📤 Manda pra quem reclama de viagem de 6 horas.\n🔖 Salva a tabela.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#curiosidades #sistemasolar #astronomia #espaco #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 1,
+   "reach": 1,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
    "id": "18424748650144147",
    "quando": "2026-09-23T11:11:24+0000",
    "tipo": "REELS",
@@ -2672,16 +2729,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 181,
-   "reach": 144,
+   "views": 199,
+   "reach": 166,
    "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 6,
-   "ig_reels_avg_watch_time": 14076,
-   "ig_reels_video_view_total_time": 2083254,
-   "reels_skip_rate": 49.4,
+   "ig_reels_avg_watch_time": 13912,
+   "ig_reels_video_view_total_time": 2392927,
+   "reels_skip_rate": 50.3,
    "reposts": 0
   },
   {
@@ -2713,18 +2770,18 @@
    "link": "https://www.instagram.com/reel/DdmPaRkgMDL/",
    "titulo": "A hipernova não é só uma supernova maior. ⚡",
    "legenda": "A hipernova não é só uma supernova maior. ⚡\n\nSérie A MORTE DAS ESTRELAS · episódio 3 de 6.\nEla vem de estrelas gigantes girando muito rápido, com dez vezes mais energia que uma supernova.\nDois jatos quase na velocidade da luz furam a estrela, e quando um aponta pra Terra vemos uma rajada de raios gama.\n\n💬 Você sabia que existia algo mais forte que uma supernova? Comenta aqui 👇\n\n👉 Segue @neuralupdate: episódio 4 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Gamma-ray Bursts)\n\n#hipernova #raiosgama #astronomia #neuralupdate",
-   "curtidas_campo": 21,
+   "curtidas_campo": 22,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 437,
-   "reach": 346,
-   "likes": 21,
+   "views": 445,
+   "reach": 350,
+   "likes": 22,
    "comments": 1,
    "shares": 0,
    "saved": 5,
-   "total_interactions": 28,
-   "ig_reels_avg_watch_time": 20550,
-   "ig_reels_video_view_total_time": 7213196,
+   "total_interactions": 29,
+   "ig_reels_avg_watch_time": 20614,
+   "ig_reels_video_view_total_time": 7359383,
    "reels_skip_rate": 39.5,
    "reposts": 1
   },
@@ -3223,7 +3280,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 55,
+   "views": 56,
    "reach": 31,
    "likes": 0,
    "comments": 1,
