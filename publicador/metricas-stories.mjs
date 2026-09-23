@@ -59,6 +59,12 @@ for (const s of ativos) {
     ultimo_retrato: new Date().toISOString(), _metricas: usado, ...(dados ? metricas : { _erro: ultimoErro.slice(0, 160) }) };
   ok++;
 }
+// 24/09: seguidores do dia (a API só guarda 30 dias; aqui a série fica pra sempre)
+const conta = await get(`/${IG_USER_ID}`, { fields: 'followers_count,media_count' });
+if (!conta.error) (base.seguidores ||= {})[new Date().toISOString().slice(0, 13)] = { seguidores: conta.followers_count, publicacoes: conta.media_count };
+const fc = await get(`/${IG_USER_ID}/insights`, { metric: 'follower_count', period: 'day',
+  since: String(Math.floor((Date.now() - 29 * 864e5) / 1000)), until: String(Math.floor((Date.now() - 864e5) / 1000)) });
+for (const v of fc.data?.[0]?.values || []) (base.ganhos_por_dia ||= {})[String(v.end_time).slice(0, 10)] = v.value;
 base.gerado_em = new Date().toISOString();
 fs.writeFileSync(SAIDA, JSON.stringify(base, null, 1));
 console.log(`${ativos.length} Stories ativos · ${ok} retratados · ${Object.keys(base.stories).length} no histórico`);

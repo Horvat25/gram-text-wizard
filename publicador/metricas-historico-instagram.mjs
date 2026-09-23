@@ -112,15 +112,17 @@ const contaInsights = { series: {}, demografia: {}, erros: [] };
 const seg = d => Math.floor(new Date(d).getTime() / 1000);
 const INICIO_CONTA = '2026-06-17';
 const pedidosSerie = [
-  { nome: 'seguidores_por_dia', params: { metric: 'follower_count', period: 'day' } },
+  // follower_count: a Meta só entrega os últimos 30 dias (sem o dia atual) — o robô dos Stories acumula daqui pra frente
+  { nome: 'seguidores_por_dia', params: { metric: 'follower_count', period: 'day' }, ultimos30: true },
   { nome: 'follows_unfollows', params: { metric: 'follows_and_unfollows', period: 'day', metric_type: 'total_value', breakdown: 'follow_type' } },
   { nome: 'alcance_views_engajados', params: { metric: 'reach,views,accounts_engaged,total_interactions', period: 'day', metric_type: 'total_value' } },
   { nome: 'alcance_por_tipo_de_seguidor', params: { metric: 'reach', period: 'day', metric_type: 'total_value', breakdown: 'follow_type' } },
 ];
 for (const ped of pedidosSerie) {
   contaInsights.series[ped.nome] = [];
-  for (let ini = new Date(INICIO_CONTA); ini < new Date(); ini = new Date(ini.getTime() + 29 * 864e5)) {
-    const fim = new Date(Math.min(ini.getTime() + 29 * 864e5, Date.now()));
+  const inicioPed = ped.ultimos30 ? new Date(Date.now() - 29 * 864e5) : new Date(INICIO_CONTA);
+  for (let ini = inicioPed; ini < new Date(); ini = new Date(ini.getTime() + 29 * 864e5)) {
+    const fim = new Date(Math.min(ini.getTime() + 29 * 864e5, Date.now() - (ped.ultimos30 ? 864e5 : 0)));
     const r = await get(`/${IG_USER_ID}/insights`, { ...ped.params, since: String(seg(ini)), until: String(seg(fim)) });
     if (r.error) { contaInsights.erros.push({ pedido: ped.nome, janela: ini.toISOString().slice(0, 10), erro: (r.error.message || '').slice(0, 200) }); continue; }
     contaInsights.series[ped.nome].push({ de: ini.toISOString().slice(0, 10), ate: fim.toISOString().slice(0, 10), data: r.data });
@@ -129,9 +131,14 @@ for (const ped of pedidosSerie) {
 }
 for (const metric of ['follower_demographics', 'engaged_audience_demographics', 'reached_audience_demographics']) {
   for (const breakdown of ['age', 'gender', 'country', 'city']) {
-    const r = await get(`/${IG_USER_ID}/insights`, { metric, period: 'lifetime', metric_type: 'total_value', timeframe: 'last_90_days', breakdown });
+    // 24/09: a Meta aposentou last_90_days nas demografias de engajados/alcançados; tenta as janelas que restam
+    let r = null;
+    for (const timeframe of (metric === 'follower_demographics' ? ['last_90_days', 'this_month'] : ['this_month', 'this_week', 'last_30_days'])) {
+      r = await get(`/${IG_USER_ID}/insights`, { metric, period: 'lifetime', metric_type: 'total_value', timeframe, breakdown });
+      if (!r.error) { r.timeframe = timeframe; break; }
+    }
     if (r.error) { contaInsights.erros.push({ pedido: `${metric}/${breakdown}`, erro: (r.error.message || '').slice(0, 200) }); continue; }
-    (contaInsights.demografia[metric] ||= {})[breakdown] = r.data;
+    (contaInsights.demografia[metric] ||= {})[breakdown] = { janela: r.timeframe, data: r.data };
     await espera(300);
   }
 }
