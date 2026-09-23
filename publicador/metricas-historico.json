@@ -1,8 +1,8 @@
 {
- "gerado_em": "2026-09-23T12:17:37.581Z",
+ "gerado_em": "2026-09-23T17:30:26.411Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1199,
+  "seguidores": 1201,
   "publicacoes": 920
  },
  "total_listado": 920,
@@ -12,14 +12,81 @@
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-09-12",
-     "ate": "2026-09-23",
+     "de": "2026-08-25",
+     "ate": "2026-09-22",
      "data": [
       {
-       "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
+        {
+         "value": 12,
+         "end_time": "2026-08-26T07:00:00+0000"
+        },
+        {
+         "value": 11,
+         "end_time": "2026-08-27T07:00:00+0000"
+        },
+        {
+         "value": 13,
+         "end_time": "2026-08-28T07:00:00+0000"
+        },
+        {
+         "value": 28,
+         "end_time": "2026-08-29T07:00:00+0000"
+        },
+        {
+         "value": 53,
+         "end_time": "2026-08-30T07:00:00+0000"
+        },
+        {
+         "value": 9,
+         "end_time": "2026-08-31T07:00:00+0000"
+        },
+        {
+         "value": 27,
+         "end_time": "2026-09-01T07:00:00+0000"
+        },
+        {
+         "value": 26,
+         "end_time": "2026-09-02T07:00:00+0000"
+        },
+        {
+         "value": 24,
+         "end_time": "2026-09-03T07:00:00+0000"
+        },
+        {
+         "value": 13,
+         "end_time": "2026-09-04T07:00:00+0000"
+        },
+        {
+         "value": 20,
+         "end_time": "2026-09-05T07:00:00+0000"
+        },
+        {
+         "value": 23,
+         "end_time": "2026-09-06T07:00:00+0000"
+        },
+        {
+         "value": 11,
+         "end_time": "2026-09-07T07:00:00+0000"
+        },
+        {
+         "value": 5,
+         "end_time": "2026-09-08T07:00:00+0000"
+        },
+        {
+         "value": 11,
+         "end_time": "2026-09-09T07:00:00+0000"
+        },
+        {
+         "value": 7,
+         "end_time": "2026-09-10T07:00:00+0000"
+        },
+        {
+         "value": 2,
+         "end_time": "2026-09-11T07:00:00+0000"
+        },
         {
          "value": 26,
          "end_time": "2026-09-12T07:00:00+0000"
@@ -63,14 +130,11 @@
         {
          "value": 0,
          "end_time": "2026-09-22T07:00:00+0000"
-        },
-        {
-         "value": 0,
-         "end_time": "2026-09-23T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
-       "description": "Número total de contas únicas que seguem este perfil"
+       "description": "Número total de contas únicas que seguem este perfil",
+       "id": "17841478894893058/insights/follower_count/day"
       }
      ]
     }
@@ -117,7 +181,6 @@
      "ate": "2026-08-14",
      "data": [
       {
-       "id": "17841478894893058/insights/follows_and_unfollows/day",
        "name": "follows_and_unfollows",
        "period": "day",
        "title": "Começaram a seguir e deixaram de seguir",
@@ -144,7 +207,8 @@
           ]
          }
         ]
-       }
+       },
+       "id": "17841478894893058/insights/follows_and_unfollows/day"
       }
      ]
     },
@@ -153,6 +217,7 @@
      "ate": "2026-09-12",
      "data": [
       {
+       "id": "17841478894893058/insights/follows_and_unfollows/day",
        "name": "follows_and_unfollows",
        "period": "day",
        "title": "Começaram a seguir e deixaram de seguir",
@@ -179,8 +244,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/follows_and_unfollows/day"
+       }
       }
      ]
     },
@@ -189,6 +253,7 @@
      "ate": "2026-09-23",
      "data": [
       {
+       "id": "17841478894893058/insights/follows_and_unfollows/day",
        "name": "follows_and_unfollows",
        "period": "day",
        "title": "Começaram a seguir e deixaram de seguir",
@@ -215,8 +280,7 @@
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/follows_and_unfollows/day"
+       }
       }
      ]
     }
@@ -227,44 +291,44 @@
      "ate": "2026-07-16",
      "data": [
       {
+       "id": "17841478894893058/insights/reach/day",
        "name": "reach",
        "period": "day",
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
         "value": 20920
-       },
-       "id": "17841478894893058/insights/reach/day"
+       }
       },
       {
+       "id": "17841478894893058/insights/views/day",
        "name": "views",
        "period": "day",
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
         "value": 43398
-       },
-       "id": "17841478894893058/insights/views/day"
+       }
       },
       {
+       "id": "17841478894893058/insights/accounts_engaged/day",
        "name": "accounts_engaged",
        "period": "day",
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
         "value": 1266
-       },
-       "id": "17841478894893058/insights/accounts_engaged/day"
+       }
       },
       {
+       "id": "17841478894893058/insights/total_interactions/day",
        "name": "total_interactions",
        "period": "day",
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
         "value": 2658
-       },
-       "id": "17841478894893058/insights/total_interactions/day"
+       }
       }
      ]
     },
@@ -319,44 +383,44 @@
      "ate": "2026-09-12",
      "data": [
       {
-       "id": "17841478894893058/insights/reach/day",
        "name": "reach",
        "period": "day",
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
         "value": 30633
-       }
+       },
+       "id": "17841478894893058/insights/reach/day"
       },
       {
-       "id": "17841478894893058/insights/views/day",
        "name": "views",
        "period": "day",
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
         "value": 76223
-       }
+       },
+       "id": "17841478894893058/insights/views/day"
       },
       {
-       "id": "17841478894893058/insights/accounts_engaged/day",
        "name": "accounts_engaged",
        "period": "day",
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
         "value": 1623
-       }
+       },
+       "id": "17841478894893058/insights/accounts_engaged/day"
       },
       {
-       "id": "17841478894893058/insights/total_interactions/day",
        "name": "total_interactions",
        "period": "day",
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
         "value": 3421
-       }
+       },
+       "id": "17841478894893058/insights/total_interactions/day"
       }
      ]
     },
@@ -370,7 +434,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 11546
+        "value": 11584
        },
        "id": "17841478894893058/insights/reach/day"
       },
@@ -380,7 +444,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 24029
+        "value": 24324
        },
        "id": "17841478894893058/insights/views/day"
       },
@@ -400,7 +464,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 985
+        "value": 995
        },
        "id": "17841478894893058/insights/total_interactions/day"
       }
@@ -464,15 +528,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 404
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 24395
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 404
            }
           ]
          }
@@ -487,6 +551,7 @@
      "ate": "2026-09-12",
      "data": [
       {
+       "id": "17841478894893058/insights/reach/day",
        "name": "reach",
        "period": "day",
        "title": "Contas alcançadas",
@@ -501,21 +566,20 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 685
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 30185
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 685
            }
           ]
          }
         ]
-       },
-       "id": "17841478894893058/insights/reach/day"
+       }
       }
      ]
     },
@@ -529,7 +593,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 11546,
+        "value": 11584,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -538,15 +602,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 11098
+            "value": 515
            },
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 507
+            "value": 11134
            }
           ]
          }
@@ -560,555 +624,697 @@
   },
   "demografia": {
    "follower_demographics": {
-    "age": [
-     {
-      "name": "follower_demographics",
-      "period": "lifetime",
-      "title": "Dados demográficos dos seguidores",
-      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
-      "total_value": {
-       "breakdowns": [
-        {
-         "dimension_keys": [
-          "age"
-         ],
-         "results": [
-          {
-           "dimension_values": [
-            "13-17"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "18-24"
-           ],
-           "value": 38
-          },
-          {
-           "dimension_values": [
-            "25-34"
-           ],
-           "value": 281
-          },
-          {
-           "dimension_values": [
-            "35-44"
-           ],
-           "value": 337
-          },
-          {
-           "dimension_values": [
-            "45-54"
-           ],
-           "value": 258
-          },
-          {
-           "dimension_values": [
-            "55-64"
-           ],
-           "value": 162
-          },
-          {
-           "dimension_values": [
-            "65+"
-           ],
-           "value": 98
-          }
-         ]
-        }
-       ]
-      },
-      "id": "17841478894893058/insights/follower_demographics/lifetime"
-     }
-    ],
-    "gender": [
-     {
-      "name": "follower_demographics",
-      "period": "lifetime",
-      "title": "Dados demográficos dos seguidores",
-      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
-      "total_value": {
-       "breakdowns": [
-        {
-         "dimension_keys": [
-          "gender"
-         ],
-         "results": [
-          {
-           "dimension_values": [
-            "F"
-           ],
-           "value": 96
-          },
-          {
-           "dimension_values": [
-            "M"
-           ],
-           "value": 923
-          },
-          {
-           "dimension_values": [
-            "U"
-           ],
-           "value": 161
-          }
-         ]
-        }
-       ]
-      },
-      "id": "17841478894893058/insights/follower_demographics/lifetime"
-     }
-    ],
-    "country": [
-     {
-      "name": "follower_demographics",
-      "period": "lifetime",
-      "title": "Dados demográficos dos seguidores",
-      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
-      "total_value": {
-       "breakdowns": [
-        {
-         "dimension_keys": [
-          "country"
-         ],
-         "results": [
-          {
-           "dimension_values": [
-            "PT"
-           ],
-           "value": 13
-          },
-          {
-           "dimension_values": [
-            "JP"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "PY"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "MX"
-           ],
-           "value": 2
-          },
-          {
-           "dimension_values": [
-            "UA"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "FR"
-           ],
-           "value": 4
-          },
-          {
-           "dimension_values": [
-            "MZ"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "ES"
-           ],
-           "value": 2
-          },
-          {
-           "dimension_values": [
-            "BR"
-           ],
-           "value": 1144
-          },
-          {
-           "dimension_values": [
-            "AZ"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "PK"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "IE"
-           ],
-           "value": 2
-          },
-          {
-           "dimension_values": [
-            "TR"
-           ],
-           "value": 1
-          },
-          {
-           "dimension_values": [
-            "US"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "GF"
-           ],
-           "value": 1
-          }
-         ]
-        }
-       ]
-      },
-      "id": "17841478894893058/insights/follower_demographics/lifetime"
-     }
-    ],
-    "city": [
-     {
-      "name": "follower_demographics",
-      "period": "lifetime",
-      "title": "Dados demográficos dos seguidores",
-      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
-      "total_value": {
-       "breakdowns": [
-        {
-         "dimension_keys": [
-          "city"
-         ],
-         "results": [
-          {
-           "dimension_values": [
-            "São Caetano do Sul, São Paulo (state)"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Ribeirão Prêto, São Paulo (state)"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "São Paulo, São Paulo (state)"
-           ],
-           "value": 87
-          },
-          {
-           "dimension_values": [
-            "Boa Vista, Roraima"
-           ],
-           "value": 7
-          },
-          {
-           "dimension_values": [
-            "São Luís, Maranhão"
-           ],
-           "value": 13
-          },
-          {
-           "dimension_values": [
-            "Rio de Janeiro, Rio de Janeiro (state)"
-           ],
-           "value": 46
-          },
-          {
-           "dimension_values": [
-            "São José dos Campos, São Paulo (state)"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Contagem, Minas Gerais"
-           ],
-           "value": 7
-          },
-          {
-           "dimension_values": [
-            "Camaçari, Bahia"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Maceió, Alagoas"
-           ],
-           "value": 7
-          },
-          {
-           "dimension_values": [
-            "Uberlândia, Minas Gerais"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "Porto Alegre, Rio Grande do Sul"
-           ],
-           "value": 12
-          },
-          {
-           "dimension_values": [
-            "Campo Grande, Mato Grosso do Sul"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "Águas Lindas de Goiás, Goiás"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Gama, Federal District"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "João Pessoa, Paraíba"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Itajaí, Santa Catarina"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "Londrina, Paraná"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "Teresina, Piauí"
-           ],
-           "value": 9
-          },
-          {
-           "dimension_values": [
-            "Aparecida de Goiânia, Goiás"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Recife, Pernambuco"
-           ],
-           "value": 11
-          },
-          {
-           "dimension_values": [
-            "Brasília, Federal District"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "Guarulhos, São Paulo (state)"
-           ],
-           "value": 10
-          },
-          {
-           "dimension_values": [
-            "Sorocaba, São Paulo (state)"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Santarém, Pará"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Piracicaba, São Paulo (state)"
-           ],
-           "value": 7
-          },
-          {
-           "dimension_values": [
-            "Natal, Rio Grande do Norte"
-           ],
-           "value": 9
-          },
-          {
-           "dimension_values": [
-            "São Bernardo do Campo, São Paulo (state)"
-           ],
-           "value": 9
-          },
-          {
-           "dimension_values": [
-            "Pôrto Velho, Rondônia"
-           ],
-           "value": 8
-          },
-          {
-           "dimension_values": [
-            "Salvador, Bahia"
-           ],
-           "value": 21
-          },
-          {
-           "dimension_values": [
-            "Petrolina, Pernambuco"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Goiânia, Goiás"
-           ],
-           "value": 14
-          },
-          {
-           "dimension_values": [
-            "Fortaleza, Ceará"
-           ],
-           "value": 27
-          },
-          {
-           "dimension_values": [
-            "Manaus, Amazonas"
-           ],
-           "value": 13
-          },
-          {
-           "dimension_values": [
-            "Nova Iguaçu, Rio de Janeiro (state)"
-           ],
-           "value": 6
-          },
-          {
-           "dimension_values": [
-            "Maringá, Paraná"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Ananindeua, Pará"
-           ],
-           "value": 10
-          },
-          {
-           "dimension_values": [
-            "Florianópolis, Santa Catarina"
-           ],
-           "value": 8
-          },
-          {
-           "dimension_values": [
-            "Joinville, Santa Catarina"
-           ],
-           "value": 5
-          },
-          {
-           "dimension_values": [
-            "Belo Horizonte, Minas Gerais"
-           ],
-           "value": 25
-          },
-          {
-           "dimension_values": [
-            "Santo André, São Paulo (state)"
-           ],
-           "value": 9
-          },
-          {
-           "dimension_values": [
-            "Taguatinga, Federal District"
-           ],
-           "value": 13
-          },
-          {
-           "dimension_values": [
-            "Curitiba, Paraná"
-           ],
-           "value": 15
-          },
-          {
-           "dimension_values": [
-            "Belém, Pará"
-           ],
-           "value": 11
-          },
-          {
-           "dimension_values": [
-            "Campinas, São Paulo (state)"
-           ],
-           "value": 8
-          }
-         ]
-        }
-       ]
-      },
-      "id": "17841478894893058/insights/follower_demographics/lifetime"
-     }
-    ]
+    "age": {
+     "janela": "last_90_days",
+     "data": [
+      {
+       "id": "17841478894893058/insights/follower_demographics/lifetime",
+       "name": "follower_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos dos seguidores",
+       "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "age"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "13-17"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "18-24"
+            ],
+            "value": 38
+           },
+           {
+            "dimension_values": [
+             "25-34"
+            ],
+            "value": 284
+           },
+           {
+            "dimension_values": [
+             "35-44"
+            ],
+            "value": 342
+           },
+           {
+            "dimension_values": [
+             "45-54"
+            ],
+            "value": 259
+           },
+           {
+            "dimension_values": [
+             "55-64"
+            ],
+            "value": 162
+           },
+           {
+            "dimension_values": [
+             "65+"
+            ],
+            "value": 98
+           }
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "gender": {
+     "janela": "last_90_days",
+     "data": [
+      {
+       "id": "17841478894893058/insights/follower_demographics/lifetime",
+       "name": "follower_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos dos seguidores",
+       "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "gender"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "F"
+            ],
+            "value": 96
+           },
+           {
+            "dimension_values": [
+             "M"
+            ],
+            "value": 931
+           },
+           {
+            "dimension_values": [
+             "U"
+            ],
+            "value": 162
+           }
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "country": {
+     "janela": "last_90_days",
+     "data": [
+      {
+       "name": "follower_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos dos seguidores",
+       "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "country"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "PT"
+            ],
+            "value": 13
+           },
+           {
+            "dimension_values": [
+             "JP"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "PY"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "MX"
+            ],
+            "value": 2
+           },
+           {
+            "dimension_values": [
+             "UA"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "FR"
+            ],
+            "value": 4
+           },
+           {
+            "dimension_values": [
+             "MZ"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "ES"
+            ],
+            "value": 2
+           },
+           {
+            "dimension_values": [
+             "BR"
+            ],
+            "value": 1153
+           },
+           {
+            "dimension_values": [
+             "AZ"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "PK"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "IE"
+            ],
+            "value": 2
+           },
+           {
+            "dimension_values": [
+             "TR"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "US"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "GF"
+            ],
+            "value": 1
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/follower_demographics/lifetime"
+      }
+     ]
+    },
+    "city": {
+     "janela": "last_90_days",
+     "data": [
+      {
+       "name": "follower_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos dos seguidores",
+       "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "city"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "São Caetano do Sul, São Paulo (state)"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Ribeirão Prêto, São Paulo (state)"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "São Paulo, São Paulo (state)"
+            ],
+            "value": 91
+           },
+           {
+            "dimension_values": [
+             "Boa Vista, Roraima"
+            ],
+            "value": 7
+           },
+           {
+            "dimension_values": [
+             "São Luís, Maranhão"
+            ],
+            "value": 13
+           },
+           {
+            "dimension_values": [
+             "Rio de Janeiro, Rio de Janeiro (state)"
+            ],
+            "value": 46
+           },
+           {
+            "dimension_values": [
+             "São José dos Campos, São Paulo (state)"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Contagem, Minas Gerais"
+            ],
+            "value": 8
+           },
+           {
+            "dimension_values": [
+             "Camaçari, Bahia"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Maceió, Alagoas"
+            ],
+            "value": 7
+           },
+           {
+            "dimension_values": [
+             "Uberlândia, Minas Gerais"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Vila Velha, Espírito Santo"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Porto Alegre, Rio Grande do Sul"
+            ],
+            "value": 12
+           },
+           {
+            "dimension_values": [
+             "Campo Grande, Mato Grosso do Sul"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Águas Lindas de Goiás, Goiás"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "João Pessoa, Paraíba"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Itajaí, Santa Catarina"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Londrina, Paraná"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Teresina, Piauí"
+            ],
+            "value": 9
+           },
+           {
+            "dimension_values": [
+             "Aparecida de Goiânia, Goiás"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Recife, Pernambuco"
+            ],
+            "value": 11
+           },
+           {
+            "dimension_values": [
+             "Brasília, Federal District"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Guarulhos, São Paulo (state)"
+            ],
+            "value": 9
+           },
+           {
+            "dimension_values": [
+             "Sorocaba, São Paulo (state)"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Santarém, Pará"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Piracicaba, São Paulo (state)"
+            ],
+            "value": 7
+           },
+           {
+            "dimension_values": [
+             "São Bernardo do Campo, São Paulo (state)"
+            ],
+            "value": 9
+           },
+           {
+            "dimension_values": [
+             "Natal, Rio Grande do Norte"
+            ],
+            "value": 9
+           },
+           {
+            "dimension_values": [
+             "Pôrto Velho, Rondônia"
+            ],
+            "value": 8
+           },
+           {
+            "dimension_values": [
+             "Salvador, Bahia"
+            ],
+            "value": 21
+           },
+           {
+            "dimension_values": [
+             "Petrolina, Pernambuco"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Goiânia, Goiás"
+            ],
+            "value": 15
+           },
+           {
+            "dimension_values": [
+             "Fortaleza, Ceará"
+            ],
+            "value": 28
+           },
+           {
+            "dimension_values": [
+             "Manaus, Amazonas"
+            ],
+            "value": 13
+           },
+           {
+            "dimension_values": [
+             "Nova Iguaçu, Rio de Janeiro (state)"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Maringá, Paraná"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Ananindeua, Pará"
+            ],
+            "value": 10
+           },
+           {
+            "dimension_values": [
+             "Florianópolis, Santa Catarina"
+            ],
+            "value": 8
+           },
+           {
+            "dimension_values": [
+             "Cuiabá, Mato Grosso"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Belo Horizonte, Minas Gerais"
+            ],
+            "value": 25
+           },
+           {
+            "dimension_values": [
+             "Santo André, São Paulo (state)"
+            ],
+            "value": 9
+           },
+           {
+            "dimension_values": [
+             "Taguatinga, Federal District"
+            ],
+            "value": 13
+           },
+           {
+            "dimension_values": [
+             "Curitiba, Paraná"
+            ],
+            "value": 16
+           },
+           {
+            "dimension_values": [
+             "Belém, Pará"
+            ],
+            "value": 11
+           },
+           {
+            "dimension_values": [
+             "Campinas, São Paulo (state)"
+            ],
+            "value": 8
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/follower_demographics/lifetime"
+      }
+     ]
+    }
+   },
+   "engaged_audience_demographics": {
+    "age": {
+     "janela": "this_month",
+     "data": [
+      {
+       "name": "engaged_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público engajado",
+       "description": "As características demográficas do público engajado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "age"
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime"
+      }
+     ]
+    },
+    "gender": {
+     "janela": "this_month",
+     "data": [
+      {
+       "name": "engaged_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público engajado",
+       "description": "As características demográficas do público engajado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "gender"
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime"
+      }
+     ]
+    },
+    "country": {
+     "janela": "this_month",
+     "data": [
+      {
+       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime",
+       "name": "engaged_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público engajado",
+       "description": "As características demográficas do público engajado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "country"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "city": {
+     "janela": "this_month",
+     "data": [
+      {
+       "name": "engaged_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público engajado",
+       "description": "As características demográficas do público engajado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "city"
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/engaged_audience_demographics/lifetime"
+      }
+     ]
+    }
+   },
+   "reached_audience_demographics": {
+    "age": {
+     "janela": "this_month",
+     "data": [
+      {
+       "name": "reached_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público alcançado",
+       "description": "As características demográficas do público alcançado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "age"
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reached_audience_demographics/lifetime"
+      }
+     ]
+    },
+    "gender": {
+     "janela": "this_month",
+     "data": [
+      {
+       "id": "17841478894893058/insights/reached_audience_demographics/lifetime",
+       "name": "reached_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público alcançado",
+       "description": "As características demográficas do público alcançado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "gender"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "country": {
+     "janela": "this_month",
+     "data": [
+      {
+       "name": "reached_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público alcançado",
+       "description": "As características demográficas do público alcançado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "country"
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reached_audience_demographics/lifetime"
+      }
+     ]
+    },
+    "city": {
+     "janela": "this_month",
+     "data": [
+      {
+       "id": "17841478894893058/insights/reached_audience_demographics/lifetime",
+       "name": "reached_audience_demographics",
+       "period": "lifetime",
+       "title": "Dados demográficos do público alcançado",
+       "description": "As características demográficas do público alcançado, incluindo a distribuição por países, cidades e gênero.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "city"
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    }
    }
   },
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-06-17",
-    "erro": "(#100) (follower_count) metric only supports querying data for the last 30 days excluding the current day"
-   },
-   {
-    "pedido": "seguidores_por_dia",
-    "janela": "2026-07-16",
-    "erro": "(#100) (follower_count) metric only supports querying data for the last 30 days excluding the current day"
-   },
-   {
-    "pedido": "seguidores_por_dia",
-    "janela": "2026-08-14",
-    "erro": "(#100) (follower_count) metric only supports querying data for the last 30 days excluding the current day"
-   },
-   {
-    "pedido": "engaged_audience_demographics/age",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "engaged_audience_demographics/gender",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "engaged_audience_demographics/country",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "engaged_audience_demographics/city",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "reached_audience_demographics/age",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "reached_audience_demographics/gender",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "reached_audience_demographics/country",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
-   },
-   {
-    "pedido": "reached_audience_demographics/city",
-    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+    "janela": "2026-09-23",
+    "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
@@ -2463,19 +2669,19 @@
    "link": "https://www.instagram.com/reel/DdoLB6RCdMK/",
    "titulo": "O Webb achou estrelas FRACASSADAS com peso de planeta. ✨",
    "legenda": "O Webb achou estrelas FRACASSADAS com peso de planeta. ✨\n\nNa região IC 348, a mil anos-luz, ele encontrou anãs marrons com só duas vezes a massa de Júpiter.\nElas nascem como estrelas, mas não têm massa pra acender a fusão.\nUma delas tem um disco em volta, onde planetas ainda podem se formar.\n\n🔖 Salva pra lembrar: nem toda estrela consegue virar estrela.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: ESA/Webb (15/09/2026) · The Astrophysical Journal Letters\n\n#jameswebb #anamarrom #astronomia #neuralupdate",
-   "curtidas_campo": 0,
+   "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 29,
-   "reach": 7,
-   "likes": 0,
+   "views": 181,
+   "reach": 144,
+   "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 1,
-   "ig_reels_avg_watch_time": 8274,
-   "ig_reels_video_view_total_time": 124115,
-   "reels_skip_rate": 21.7,
+   "total_interactions": 6,
+   "ig_reels_avg_watch_time": 14076,
+   "ig_reels_video_view_total_time": 2083254,
+   "reels_skip_rate": 49.4,
    "reposts": 0
   },
   {
@@ -2488,16 +2694,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 173,
-   "reach": 139,
+   "views": 179,
+   "reach": 147,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 15071,
-   "ig_reels_video_view_total_time": 2185361,
-   "reels_skip_rate": 50,
+   "ig_reels_avg_watch_time": 14928,
+   "ig_reels_video_view_total_time": 2269162,
+   "reels_skip_rate": 48.7,
    "reposts": 1
   },
   {
@@ -2507,19 +2713,19 @@
    "link": "https://www.instagram.com/reel/DdmPaRkgMDL/",
    "titulo": "A hipernova não é só uma supernova maior. ⚡",
    "legenda": "A hipernova não é só uma supernova maior. ⚡\n\nSérie A MORTE DAS ESTRELAS · episódio 3 de 6.\nEla vem de estrelas gigantes girando muito rápido, com dez vezes mais energia que uma supernova.\nDois jatos quase na velocidade da luz furam a estrela, e quando um aponta pra Terra vemos uma rajada de raios gama.\n\n💬 Você sabia que existia algo mais forte que uma supernova? Comenta aqui 👇\n\n👉 Segue @neuralupdate: episódio 4 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Gamma-ray Bursts)\n\n#hipernova #raiosgama #astronomia #neuralupdate",
-   "curtidas_campo": 20,
+   "curtidas_campo": 21,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 394,
-   "reach": 313,
-   "likes": 20,
+   "views": 437,
+   "reach": 346,
+   "likes": 21,
    "comments": 1,
    "shares": 0,
-   "saved": 4,
-   "total_interactions": 26,
-   "ig_reels_avg_watch_time": 20040,
-   "ig_reels_video_view_total_time": 6352834,
-   "reels_skip_rate": 39.4,
+   "saved": 5,
+   "total_interactions": 28,
+   "ig_reels_avg_watch_time": 20550,
+   "ig_reels_video_view_total_time": 7213196,
+   "reels_skip_rate": 39.5,
    "reposts": 1
   },
   {
@@ -2532,8 +2738,8 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 43,
-   "reach": 23,
+   "views": 55,
+   "reach": 26,
    "likes": 1,
    "comments": 1,
    "shares": 0,
@@ -2551,15 +2757,15 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 372,
-   "reach": 287,
+   "views": 383,
+   "reach": 293,
    "likes": 13,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 17500,
-   "ig_reels_video_view_total_time": 5267655,
+   "ig_reels_avg_watch_time": 17397,
+   "ig_reels_video_view_total_time": 5358318,
    "reels_skip_rate": 56.9,
    "reposts": 1
   },
@@ -2573,16 +2779,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 229,
-   "reach": 195,
+   "views": 232,
+   "reach": 197,
    "likes": 13,
    "comments": 1,
    "shares": 1,
    "saved": 3,
    "total_interactions": 20,
-   "ig_reels_avg_watch_time": 11615,
-   "ig_reels_video_view_total_time": 2323136,
-   "reels_skip_rate": 58.9,
+   "ig_reels_avg_watch_time": 11702,
+   "ig_reels_video_view_total_time": 2363912,
+   "reels_skip_rate": 59.3,
    "reposts": 2
   },
   {
@@ -2595,16 +2801,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 196,
-   "reach": 154,
+   "views": 197,
+   "reach": 155,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 11546,
-   "ig_reels_video_view_total_time": 1847449,
-   "reels_skip_rate": 62,
+   "ig_reels_avg_watch_time": 11750,
+   "ig_reels_video_view_total_time": 1891842,
+   "reels_skip_rate": 61.6,
    "reposts": 1
   },
   {
@@ -2636,16 +2842,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 236,
-   "reach": 190,
+   "views": 237,
+   "reach": 191,
    "likes": 5,
    "comments": 2,
    "shares": 0,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 11320,
-   "ig_reels_video_view_total_time": 2196212,
-   "reels_skip_rate": 53.1,
+   "ig_reels_avg_watch_time": 11272,
+   "ig_reels_video_view_total_time": 2198188,
+   "reels_skip_rate": 53.4,
    "reposts": 1
   },
   {
@@ -2658,16 +2864,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 142,
-   "reach": 124,
+   "views": 143,
+   "reach": 125,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 4,
-   "ig_reels_avg_watch_time": 11855,
-   "ig_reels_video_view_total_time": 1576729,
-   "reels_skip_rate": 50.8,
+   "ig_reels_avg_watch_time": 11932,
+   "ig_reels_video_view_total_time": 1598999,
+   "reels_skip_rate": 50.4,
    "reposts": 0
   },
   {
@@ -2680,16 +2886,16 @@
    "curtidas_campo": 16,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 374,
-   "reach": 310,
+   "views": 375,
+   "reach": 312,
    "likes": 16,
    "comments": 1,
    "shares": 2,
    "saved": 2,
    "total_interactions": 23,
-   "ig_reels_avg_watch_time": 14930,
-   "ig_reels_video_view_total_time": 4927175,
-   "reels_skip_rate": 48.6,
+   "ig_reels_avg_watch_time": 14887,
+   "ig_reels_video_view_total_time": 4927687,
+   "reels_skip_rate": 48.8,
    "reposts": 2
   },
   {
@@ -2721,15 +2927,15 @@
    "curtidas_campo": 49,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1053,
+   "views": 1054,
    "reach": 847,
    "likes": 49,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 53,
-   "ig_reels_avg_watch_time": 18408,
-   "ig_reels_video_view_total_time": 15923188,
+   "ig_reels_avg_watch_time": 18388,
+   "ig_reels_video_view_total_time": 15924555,
    "reels_skip_rate": 36.4,
    "reposts": 2
   },
@@ -2743,16 +2949,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 42,
-   "reach": 37,
+   "views": 43,
+   "reach": 38,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 11406,
-   "ig_reels_video_view_total_time": 490473,
-   "reels_skip_rate": 70,
+   "ig_reels_avg_watch_time": 11962,
+   "ig_reels_video_view_total_time": 526333,
+   "reels_skip_rate": 68.3,
    "reposts": 0
   },
   {
@@ -2765,16 +2971,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 189,
-   "reach": 158,
+   "views": 190,
+   "reach": 159,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 2,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 12455,
-   "ig_reels_video_view_total_time": 2030170,
-   "reels_skip_rate": 58.6,
+   "ig_reels_avg_watch_time": 12461,
+   "ig_reels_video_view_total_time": 2043659,
+   "reels_skip_rate": 58.3,
    "reposts": 0
   },
   {
@@ -2787,7 +2993,7 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 30,
+   "views": 31,
    "reach": 20,
    "likes": 1,
    "comments": 1,
@@ -2806,16 +3012,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 199,
-   "reach": 165,
+   "views": 201,
+   "reach": 167,
    "likes": 12,
    "comments": 2,
    "shares": 2,
    "saved": 1,
    "total_interactions": 19,
-   "ig_reels_avg_watch_time": 15877,
-   "ig_reels_video_view_total_time": 2699157,
-   "reels_skip_rate": 26.9,
+   "ig_reels_avg_watch_time": 15962,
+   "ig_reels_video_view_total_time": 2745516,
+   "reels_skip_rate": 27.2,
    "reposts": 2
   },
   {
@@ -2828,16 +3034,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 140,
-   "reach": 117,
+   "views": 141,
+   "reach": 118,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 13669,
-   "ig_reels_video_view_total_time": 1667659,
-   "reels_skip_rate": 48.8,
+   "ig_reels_avg_watch_time": 13567,
+   "ig_reels_video_view_total_time": 1668769,
+   "reels_skip_rate": 49.2,
    "reposts": 0
   },
   {
@@ -2850,16 +3056,16 @@
    "curtidas_campo": 14,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 359,
+   "views": 360,
    "reach": 316,
    "likes": 14,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 12206,
-   "ig_reels_video_view_total_time": 3893816,
-   "reels_skip_rate": 48.9,
+   "ig_reels_avg_watch_time": 12275,
+   "ig_reels_video_view_total_time": 3928084,
+   "reels_skip_rate": 48.7,
    "reposts": 0
   },
   {
@@ -2891,16 +3097,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 53,
-   "reach": 40,
+   "views": 54,
+   "reach": 41,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 12986,
-   "ig_reels_video_view_total_time": 532427,
-   "reels_skip_rate": 55,
+   "ig_reels_avg_watch_time": 12744,
+   "ig_reels_video_view_total_time": 535270,
+   "reels_skip_rate": 56.1,
    "reposts": 0
   },
   {
@@ -2932,16 +3138,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 258,
-   "reach": 220,
+   "views": 259,
+   "reach": 221,
    "likes": 13,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 11874,
-   "ig_reels_video_view_total_time": 2707363,
-   "reels_skip_rate": 50.7,
+   "ig_reels_avg_watch_time": 11843,
+   "ig_reels_video_view_total_time": 2712162,
+   "reels_skip_rate": 50.4,
    "reposts": 0
   },
   {
@@ -2954,16 +3160,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 259,
-   "reach": 214,
+   "views": 260,
+   "reach": 215,
    "likes": 5,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 10395,
-   "ig_reels_video_view_total_time": 2245516,
-   "reels_skip_rate": 45.6,
+   "ig_reels_avg_watch_time": 10367,
+   "ig_reels_video_view_total_time": 2249764,
+   "reels_skip_rate": 45.4,
    "reposts": 0
   },
   {
@@ -2976,8 +3182,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 41,
-   "reach": 15,
+   "views": 42,
+   "reach": 16,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -2995,16 +3201,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 329,
-   "reach": 272,
+   "views": 330,
+   "reach": 273,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 12649,
-   "ig_reels_video_view_total_time": 3604984,
-   "reels_skip_rate": 37.1,
+   "ig_reels_avg_watch_time": 12618,
+   "ig_reels_video_view_total_time": 3608766,
+   "reels_skip_rate": 37,
    "reposts": 0
   },
   {
@@ -3036,15 +3242,15 @@
    "curtidas_campo": 40,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1138,
+   "views": 1139,
    "reach": 950,
    "likes": 40,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 41,
-   "ig_reels_avg_watch_time": 14614,
-   "ig_reels_video_view_total_time": 14731243,
+   "ig_reels_avg_watch_time": 14613,
+   "ig_reels_video_view_total_time": 14744898,
    "reels_skip_rate": 33.6,
    "reposts": 0
   },
@@ -3058,15 +3264,15 @@
    "curtidas_campo": 31,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1648,
-   "reach": 1393,
+   "views": 1649,
+   "reach": 1394,
    "likes": 31,
    "comments": 1,
    "shares": 2,
    "saved": 3,
    "total_interactions": 38,
-   "ig_reels_avg_watch_time": 14711,
-   "ig_reels_video_view_total_time": 20625368,
+   "ig_reels_avg_watch_time": 14707,
+   "ig_reels_video_view_total_time": 20634412,
    "reels_skip_rate": 21.7,
    "reposts": 1
   },
@@ -3099,15 +3305,15 @@
    "curtidas_campo": 54,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1385,
-   "reach": 1121,
+   "views": 1386,
+   "reach": 1122,
    "likes": 54,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 59,
-   "ig_reels_avg_watch_time": 18310,
-   "ig_reels_video_view_total_time": 21039124,
+   "ig_reels_avg_watch_time": 18295,
+   "ig_reels_video_view_total_time": 21039558,
    "reels_skip_rate": 31.8,
    "reposts": 1
   },
@@ -3140,16 +3346,16 @@
    "curtidas_campo": 10,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 286,
-   "reach": 247,
+   "views": 287,
+   "reach": 248,
    "likes": 10,
    "comments": 1,
    "shares": 2,
    "saved": 0,
    "total_interactions": 13,
-   "ig_reels_avg_watch_time": 12233,
-   "ig_reels_video_view_total_time": 3095102,
-   "reels_skip_rate": 39.2,
+   "ig_reels_avg_watch_time": 12187,
+   "ig_reels_video_view_total_time": 3095695,
+   "reels_skip_rate": 39.4,
    "reposts": 0
   },
   {
@@ -3162,16 +3368,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 241,
-   "reach": 214,
+   "views": 242,
+   "reach": 215,
    "likes": 13,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 11427,
-   "ig_reels_video_view_total_time": 2502719,
-   "reels_skip_rate": 39.1,
+   "ig_reels_avg_watch_time": 11377,
+   "ig_reels_video_view_total_time": 2502964,
+   "reels_skip_rate": 39.4,
    "reposts": 1
   },
   {
@@ -3203,16 +3409,16 @@
    "curtidas_campo": 14,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 332,
-   "reach": 292,
+   "views": 333,
+   "reach": 293,
    "likes": 14,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 15,
-   "ig_reels_avg_watch_time": 13373,
-   "ig_reels_video_view_total_time": 4038868,
-   "reels_skip_rate": 40.7,
+   "ig_reels_avg_watch_time": 13330,
+   "ig_reels_video_view_total_time": 4039112,
+   "reels_skip_rate": 40.9,
    "reposts": 0
   },
   {
@@ -3244,16 +3450,16 @@
    "curtidas_campo": 15,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 411,
-   "reach": 352,
+   "views": 412,
+   "reach": 353,
    "likes": 15,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 15533,
-   "ig_reels_video_view_total_time": 5700974,
-   "reels_skip_rate": 21.4,
+   "ig_reels_avg_watch_time": 15492,
+   "ig_reels_video_view_total_time": 5701200,
+   "reels_skip_rate": 21.6,
    "reposts": 0
   },
   {
@@ -3266,16 +3472,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 55,
-   "reach": 39,
+   "views": 56,
+   "reach": 40,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 17285,
-   "ig_reels_video_view_total_time": 726004,
-   "reels_skip_rate": 35,
+   "ig_reels_avg_watch_time": 16889,
+   "ig_reels_video_view_total_time": 726234,
+   "reels_skip_rate": 36.6,
    "reposts": 0
   },
   {
@@ -3307,15 +3513,15 @@
    "curtidas_campo": 22,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1345,
-   "reach": 1110,
+   "views": 1346,
+   "reach": 1112,
    "likes": 22,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 26,
-   "ig_reels_avg_watch_time": 16735,
-   "ig_reels_video_view_total_time": 19312911,
+   "ig_reels_avg_watch_time": 16721,
+   "ig_reels_video_view_total_time": 19313294,
    "reels_skip_rate": 24.5,
    "reposts": 0
   },
@@ -3634,16 +3840,16 @@
    "curtidas_campo": 56,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1199,
-   "reach": 986,
+   "views": 1201,
+   "reach": 987,
    "likes": 56,
    "comments": 1,
    "shares": 2,
    "saved": 6,
    "total_interactions": 68,
-   "ig_reels_avg_watch_time": 16269,
-   "ig_reels_video_view_total_time": 16253636,
-   "reels_skip_rate": 36.9,
+   "ig_reels_avg_watch_time": 16282,
+   "ig_reels_video_view_total_time": 16282158,
+   "reels_skip_rate": 36.8,
    "reposts": 3
   },
   {
@@ -16920,7 +17126,7 @@
    "comentarios_campo": 0,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
    "views": 4,
-   "reach": 2,
+   "reach": 3,
    "likes": 0,
    "comments": 0,
    "shares": 0,
