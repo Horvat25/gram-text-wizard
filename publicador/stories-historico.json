@@ -5,18 +5,19 @@
    "quando": "2026-09-23T11:11:46+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-09-23T11:47:10.856Z",
-   "_metricas": null,
-   "_erro": "(#10) Not enough viewers for the media to show insights"
+   "ultimo_retrato": "2026-09-23T16:55:50.711Z",
+   "_metricas": "reach,replies",
+   "reach": 18,
+   "replies": 0
   },
   "17871624804638713": {
    "id": "17871624804638713",
    "quando": "2026-09-23T00:10:33+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-09-23T11:47:17.544Z",
+   "ultimo_retrato": "2026-09-23T16:55:56.865Z",
    "_metricas": "reach,replies",
-   "reach": 16,
+   "reach": 24,
    "replies": 0
   },
   "17909997936470956": {
@@ -24,11 +25,11 @@
    "quando": "2026-09-22T21:10:30+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-09-23T11:47:23.127Z",
+   "ultimo_retrato": "2026-09-23T16:56:04.380Z",
    "_metricas": "reach,replies",
-   "reach": 28,
+   "reach": 36,
    "replies": 0
   }
  },
- "gerado_em": "2026-09-23T11:47:23.127Z"
+ "gerado_em": "2026-09-23T16:56:04.380Z"
 }
