@@ -38,18 +38,23 @@ async function get(caminho, params = {}) {
 
 // Reels têm métricas de tempo assistido; post/carrossel não. Tenta do mais completo pro mais simples.
 const CONJUNTOS_REELS = [
+  // 23/09: + reels_skip_rate (% que pulou nos 3 primeiros segundos) e reposts
+  'views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts',
+  'views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate',
   'views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time',
   'views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time',
   'views,reach,likes,comments,shares,saved,total_interactions',
   'plays,reach,likes,comments,shares,saved,total_interactions',
 ];
 const CONJUNTOS_OUTROS = [
+  'views,reach,likes,comments,shares,saved,total_interactions,reposts',
   'views,reach,likes,comments,shares,saved,total_interactions',
   'reach,likes,comments,saved',
 ];
 async function insights(m) {
   const lista = m.media_product_type === 'REELS' ? CONJUNTOS_REELS : CONJUNTOS_OUTROS;
   let ultimo = '';
+  // tenta do conjunto mais completo pro mais simples; se a API recusar uma métrica, cai pro próximo
   for (const metric of lista) {
     const r = await get(`/${m.id}/insights`, { metric });
     if (r.data) {
