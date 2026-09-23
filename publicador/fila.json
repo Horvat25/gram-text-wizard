@@ -2757,12 +2757,14 @@
   {
     "quando": "2026-09-22T23:00:00.000Z",
     "tipo": "story",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/22a86786-133c-47ec-bee8-acbc777bd1a2.png",
+    "midia": "https://neural-update.com.br/stories/projetor-astronauta/03-atmosfera-noturna.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-22",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "projetor-astronauta",
-    "variacao": "atmosfera-noturna"
+    "variacao": "atmosfera-noturna",
+    "id_instagram": "17871624804638713",
+    "publicado_em": "2026-09-23T00:10:35.540Z"
   },
   {
     "quando": "2026-09-23T11:00:00.000Z",
