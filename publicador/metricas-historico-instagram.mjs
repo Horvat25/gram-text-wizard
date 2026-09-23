@@ -104,10 +104,44 @@ for (const [i, m] of midias.entries()) {
   await espera(250);
 }
 
+
+// ---- CONTA (23/09): seguidores ganhos/perdidos por dia, alcance diário e demografia do público.
+// A Meta limita séries a janelas de ~30 dias, então anda em janelas desde 17/06/2026.
+// Cada pedido guarda o erro se a API recusar, pra diagnosticar sem acesso ao token.
+const contaInsights = { series: {}, demografia: {}, erros: [] };
+const seg = d => Math.floor(new Date(d).getTime() / 1000);
+const INICIO_CONTA = '2026-06-17';
+const pedidosSerie = [
+  { nome: 'seguidores_por_dia', params: { metric: 'follower_count', period: 'day' } },
+  { nome: 'follows_unfollows', params: { metric: 'follows_and_unfollows', period: 'day', metric_type: 'total_value', breakdown: 'follow_type' } },
+  { nome: 'alcance_views_engajados', params: { metric: 'reach,views,accounts_engaged,total_interactions', period: 'day', metric_type: 'total_value' } },
+  { nome: 'alcance_por_tipo_de_seguidor', params: { metric: 'reach', period: 'day', metric_type: 'total_value', breakdown: 'follow_type' } },
+];
+for (const ped of pedidosSerie) {
+  contaInsights.series[ped.nome] = [];
+  for (let ini = new Date(INICIO_CONTA); ini < new Date(); ini = new Date(ini.getTime() + 29 * 864e5)) {
+    const fim = new Date(Math.min(ini.getTime() + 29 * 864e5, Date.now()));
+    const r = await get(`/${IG_USER_ID}/insights`, { ...ped.params, since: String(seg(ini)), until: String(seg(fim)) });
+    if (r.error) { contaInsights.erros.push({ pedido: ped.nome, janela: ini.toISOString().slice(0, 10), erro: (r.error.message || '').slice(0, 200) }); continue; }
+    contaInsights.series[ped.nome].push({ de: ini.toISOString().slice(0, 10), ate: fim.toISOString().slice(0, 10), data: r.data });
+    await espera(300);
+  }
+}
+for (const metric of ['follower_demographics', 'engaged_audience_demographics', 'reached_audience_demographics']) {
+  for (const breakdown of ['age', 'gender', 'country', 'city']) {
+    const r = await get(`/${IG_USER_ID}/insights`, { metric, period: 'lifetime', metric_type: 'total_value', timeframe: 'last_90_days', breakdown });
+    if (r.error) { contaInsights.erros.push({ pedido: `${metric}/${breakdown}`, erro: (r.error.message || '').slice(0, 200) }); continue; }
+    (contaInsights.demografia[metric] ||= {})[breakdown] = r.data;
+    await espera(300);
+  }
+}
+console.log(`conta: ${Object.values(contaInsights.series).reduce((a, s) => a + s.length, 0)} janelas de série · ${Object.keys(contaInsights.demografia).length} demografias · ${contaInsights.erros.length} erros`);
+
 fs.writeFileSync(SAIDA, JSON.stringify({
   gerado_em: new Date().toISOString(),
   conta: { username: conta.username, seguidores: conta.followers_count, publicacoes: conta.media_count },
   total_listado: midias.length, com_tempo_assistido: comTempo, sem_insights: comErro,
+  conta_insights: contaInsights,
   nota: 'ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.',
   itens,
 }, null, 1));
