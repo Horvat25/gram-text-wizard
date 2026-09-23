@@ -50,9 +50,7 @@ for (const h of hashtags) {
     const tm = await (await fetch(t)).json();
     if (tm.error) { porHashtag.push({ hashtag: h, ok: false, erro: tm.error.message?.slice(0, 120) }); continue; }
     const ps = (tm.data || []).map(p => { const cap = p.caption || '', pede = PEDE.test(cap), m = cap.match(CTA);
-      return { pede, palavra: pede && m ? m[1].toUpperCase() : null, trecho: pede ? (cap.match(/[^
-]*(coment[ae]|direct|dm|me chama)[^
-]*/i) || [''])[0].slice(0, 160) : null,
+      return { pede, palavra: pede && m ? m[1].toUpperCase() : null, trecho: pede ? (cap.match(/[^\n]*(coment[ae]|direct|dm|me chama)[^\n]*/i) || [''])[0].slice(0, 160) : null,
         comentarios: p.comments_count ?? 0, curtidas: p.like_count ?? null, link: p.permalink }; });
     const com = ps.filter(p => p.pede), sem = ps.filter(p => !p.pede), razao = l => l.filter(x => x.curtidas).map(x => x.comentarios / x.curtidas);
     const palavras = {}; for (const p of com) if (p.palavra) palavras[p.palavra] = (palavras[p.palavra] || 0) + 1;
