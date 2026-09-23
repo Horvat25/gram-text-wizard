@@ -1,0 +1,34 @@
+{
+ "stories": {
+  "18191873209399950": {
+   "id": "18191873209399950",
+   "quando": "2026-09-23T11:11:46+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-09-23T11:47:10.856Z",
+   "_metricas": null,
+   "_erro": "(#10) Not enough viewers for the media to show insights"
+  },
+  "17871624804638713": {
+   "id": "17871624804638713",
+   "quando": "2026-09-23T00:10:33+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-09-23T11:47:17.544Z",
+   "_metricas": "reach,replies",
+   "reach": 16,
+   "replies": 0
+  },
+  "17909997936470956": {
+   "id": "17909997936470956",
+   "quando": "2026-09-22T21:10:30+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-09-23T11:47:23.127Z",
+   "_metricas": "reach,replies",
+   "reach": 28,
+   "replies": 0
+  }
+ },
+ "gerado_em": "2026-09-23T11:47:23.127Z"
+}
