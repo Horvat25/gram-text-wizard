@@ -1,0 +1,62 @@
+name: Historico completo do Instagram
+
+# POR QUE EXISTE (23/09/2026): o metricas.yml le so as 50 publicacoes mais recentes e nao pede
+# tempo assistido. Este workflow puxa as 864 publicacoes com o tempo medio assistido dos Reels,
+# pra alimentar o sistema de analise (analytics/jev). SO LEITURA: nao toca na fila nem publica.
+# Roda sob demanda e quando o proprio script/workflow mudar — nunca em horario fixo, pra nao
+# concorrer com o publicador.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'publicador/metricas-historico-instagram.mjs'
+      - '.github/workflows/metricas-historico.yml'
+
+concurrency:
+  group: metricas-historico-instagram
+  cancel-in-progress: false
+
+jobs:
+  historico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Puxar o historico inteiro
+        env:
+          IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador publico
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node publicador/metricas-historico-instagram.mjs
+
+      - name: Guardar o resultado
+        if: always()
+        run: |
+          set -e
+          [ -f publicador/metricas-historico.json ] || { echo "sem arquivo"; exit 0; }
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          # Mesmo cuidado do metricas.yml: reconciliar com o GitHub antes de empurrar.
+          # So adiciona o arquivo novo; nunca mexe em fila.json.
+          cp publicador/metricas-historico.json /tmp/historico.json
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cp /tmp/historico.json publicador/metricas-historico.json
+            git add publicador/metricas-historico.json
+            if git diff --cached --quiet; then echo "ja estava igual"; exit 0; fi
+            git commit -q -m "metricas: historico completo do Instagram em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado; tentando de novo"
+            sleep 5
+          done
+          echo "::error::nao consegui salvar o historico"
+          exit 1
