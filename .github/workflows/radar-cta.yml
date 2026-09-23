@@ -1,0 +1,57 @@
+name: Radar de CTA
+
+# POR QUE EXISTE (23/09/2026): o Marcelo quer aprender RÁPIDO como os bons vendem por "Comenta X que eu te mando
+# no direct". Lê posts PÚBLICOS de contas comerciais (Business Discovery) com o IG_TOKEN e mede qual palavra
+# pedem, com que frequência e se o pedido aumenta os comentários. SÓ LEITURA: não toca na fila nem publica.
+# Roda 1x por dia, 06h05 BRT (longe dos horários de publicação), sob demanda e quando o script/lista mudar.
+
+on:
+  schedule:
+    - cron: '5 9 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'publicador/radar-cta.mjs'
+      - 'publicador/radar-cta-contas.json'
+      - '.github/workflows/radar-cta.yml'
+
+concurrency:
+  group: radar-cta
+  cancel-in-progress: false
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Ler as contas
+        env:
+          IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador publico
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node publicador/radar-cta.mjs
+      - name: Guardar o resultado
+        if: always()
+        run: |
+          set -e
+          [ -f publicador/radar-cta.json ] || { echo "sem arquivo"; exit 0; }
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          cp publicador/radar-cta.json /tmp/radar-cta.json
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cp /tmp/radar-cta.json publicador/radar-cta.json
+            git add publicador/radar-cta.json
+            if git diff --cached --quiet; then echo "ja estava igual"; exit 0; fi
+            git commit -q -m "radar-cta: $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            sleep 5
+          done
+          echo "::error::nao consegui salvar"; exit 1
