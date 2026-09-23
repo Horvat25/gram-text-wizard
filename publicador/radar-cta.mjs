@@ -36,8 +36,35 @@ for (const c of contas) {
   } catch (e) { resultado.push({ usuario: c.usuario, grupo: c.grupo, ok: false, erro: e.message }); }
   await new Promise(r => setTimeout(r, 1500)); // gentil com o limite da API
 }
-const saida = { gerado_em: new Date().toISOString(), contas_lidas: resultado.filter(r => r.ok).length, contas_invalidas: resultado.filter(r => !r.ok).map(r => `${r.usuario}: ${r.erro}`), resultado };
+// ----- MODO HASHTAG: posts mais fortes de hashtags de venda/nicho (aprende o FORMATO do pedido, não a conta).
+// Precisa da permissão de busca de hashtag no app; se não tiver, registra o erro e segue.
+const hashtags = JSON.parse(fs.readFileSync('publicador/radar-cta-contas.json', 'utf8')).hashtags || [];
+const porHashtag = [];
+for (const h of hashtags) {
+  try {
+    const u = new URL(`${API}/ig_hashtag_search`); u.searchParams.set('user_id', IG_USER_ID); u.searchParams.set('q', h); u.searchParams.set('access_token', IG_TOKEN);
+    const id = (await (await fetch(u)).json());
+    if (id.error || !id.data?.[0]) { porHashtag.push({ hashtag: h, ok: false, erro: id.error?.message?.slice(0, 120) || 'sem id' }); continue; }
+    const t = new URL(`${API}/${id.data[0].id}/top_media`); t.searchParams.set('user_id', IG_USER_ID);
+    t.searchParams.set('fields', 'caption,comments_count,like_count,media_type,timestamp,permalink'); t.searchParams.set('limit', '50'); t.searchParams.set('access_token', IG_TOKEN);
+    const tm = await (await fetch(t)).json();
+    if (tm.error) { porHashtag.push({ hashtag: h, ok: false, erro: tm.error.message?.slice(0, 120) }); continue; }
+    const ps = (tm.data || []).map(p => { const cap = p.caption || '', pede = PEDE.test(cap), m = cap.match(CTA);
+      return { pede, palavra: pede && m ? m[1].toUpperCase() : null, trecho: pede ? (cap.match(/[^
+]*(coment[ae]|direct|dm|me chama)[^
+]*/i) || [''])[0].slice(0, 160) : null,
+        comentarios: p.comments_count ?? 0, curtidas: p.like_count ?? null, link: p.permalink }; });
+    const com = ps.filter(p => p.pede), sem = ps.filter(p => !p.pede), razao = l => l.filter(x => x.curtidas).map(x => x.comentarios / x.curtidas);
+    const palavras = {}; for (const p of com) if (p.palavra) palavras[p.palavra] = (palavras[p.palavra] || 0) + 1;
+    porHashtag.push({ hashtag: h, ok: true, posts: ps.length, pct_pedindo: +(com.length / Math.max(1, ps.length)).toFixed(2), palavras,
+      comentarios_por_curtida_com_pedido: media(razao(com)) == null ? null : +media(razao(com)).toFixed(3), comentarios_por_curtida_sem_pedido: media(razao(sem)) == null ? null : +media(razao(sem)).toFixed(3),
+      melhores_pedidos: com.sort((a, b) => b.comentarios - a.comentarios).slice(0, 8) });
+  } catch (e) { porHashtag.push({ hashtag: h, ok: false, erro: e.message }); }
+  await new Promise(r => setTimeout(r, 1500));
+}
+const saida = { gerado_em: new Date().toISOString(), contas_lidas: resultado.filter(r => r.ok).length, contas_invalidas: resultado.filter(r => !r.ok).map(r => `${r.usuario}: ${r.erro}`), resultado, hashtags: porHashtag };
 fs.writeFileSync('publicador/radar-cta.json', JSON.stringify(saida, null, 1));
 console.log(`contas lidas ${saida.contas_lidas}/${contas.length}`);
 for (const r of resultado.filter(r => r.ok)) console.log(`@${r.usuario} (${r.seguidores}) · ${Math.round(r.pct_posts_pedindo * 100)}% pedem · com ${r.comentarios_por_curtida_com_pedido} × sem ${r.comentarios_por_curtida_sem_pedido} · ${JSON.stringify(r.palavras)}`);
+for (const h of porHashtag) console.log(h.ok ? `#${h.hashtag}: ${h.posts} posts · ${Math.round(h.pct_pedindo * 100)}% pedem · com ${h.comentarios_por_curtida_com_pedido} × sem ${h.comentarios_por_curtida_sem_pedido} · ${JSON.stringify(h.palavras)}` : `#${h.hashtag}: ✗ ${h.erro}`);
 for (const x of saida.contas_invalidas) console.log(`  ✗ ${x}`);
