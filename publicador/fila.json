@@ -2803,8 +2803,11 @@
     ],
     "legenda": "Quanto tempo de carro até cada lugar do espaço? 🚗\n\nA conta é a 100 km/h, sem parar nem pra abastecer. A Lua dá uma viagem longa. O resto passa de gerações.\n\n📤 Manda pra quem reclama de viagem de 6 horas.\n🔖 Salva a tabela.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#curiosidades #sistemasolar #astronomia #espaco #neuralupdate",
     "slug": "car-de-carro-pelo-sistema-solar-2026-09-23",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "18118420348938431",
+    "publicado_em": "2026-09-23T17:10:55.358Z",
+    "id_comentario": "18447037528125765"
   },
   {
     "quando": "2026-09-23T17:00:00.000Z",
@@ -2812,8 +2815,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c9be8f11-9917-4576-aa59-0bd4067e2d94.mp4",
     "legenda": "Esse caroço de 20 km pesa mais que o Sol. ⭐\n\nSérie A MORTE DAS ESTRELAS · episódio 4 de 6.\nDepois da supernova, a gravidade esmaga o núcleo até prótons e elétrons virarem nêutrons.\nUma colher de chá dessa matéria pesaria um bilhão de toneladas.\n\n📤 Manda pra quem acha que chumbo é pesado.\n\n👉 Segue @neuralupdate: episódio 5 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Neutron Stars)\n\n#estreladeneutrons #estrelas #astronomia #neuralupdate",
     "slug": "nw-estrela-vira-estrela-de-neutrons",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/56efc8db-1f69-44ec-ac8a-b7a32d93cef0.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/56efc8db-1f69-44ec-ac8a-b7a32d93cef0.mp4",
+    "id_instagram": "18000646841808459",
+    "publicado_em": "2026-09-23T17:11:36.333Z",
+    "id_comentario": "17972723103153408",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-23T19:00:00.000Z",
