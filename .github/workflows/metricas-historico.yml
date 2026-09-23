@@ -3,10 +3,11 @@ name: Historico completo do Instagram
 # POR QUE EXISTE (23/09/2026): o metricas.yml le so as 50 publicacoes mais recentes e nao pede
 # tempo assistido. Este workflow puxa as 864 publicacoes com o tempo medio assistido dos Reels,
 # pra alimentar o sistema de analise (analytics/jev). SO LEITURA: nao toca na fila nem publica.
-# Roda sob demanda e quando o proprio script/workflow mudar — nunca em horario fixo, pra nao
-# concorrer com o publicador.
+# Roda todo dia 05h47 BRT (fora dos horarios de publicacao), sob demanda, e quando o script mudar.
 
 on:
+  schedule:
+    - cron: '47 8 * * *'   # 24/09: TODO DIA, 05h47 BRT — antes do robô de sensores (06h23) e longe dos horários de publicação
   workflow_dispatch:
   push:
     branches: [main]
