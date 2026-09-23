@@ -137,11 +137,24 @@ for (const metric of ['follower_demographics', 'engaged_audience_demographics', 
 }
 console.log(`conta: ${Object.values(contaInsights.series).reduce((a, s) => a + s.length, 0)} janelas de série · ${Object.keys(contaInsights.demografia).length} demografias · ${contaInsights.erros.length} erros`);
 
+// ---- COMENTÁRIOS (23/09): texto de todos os comentários desde 17/06/2026, com respostas.
+// Pede a permissão de comentários do token; se a Meta recusar, registra o erro e segue.
+const comentarios = { porMidia: {}, erros: [] };
+for (const m of midias.filter(x => (x.timestamp || '') >= '2026-06-17' && (x.comments_count || 0) > 0)) {
+  const r = await get(`/${m.id}/comments`, { fields: 'id,text,like_count,timestamp,replies.limit(20){text,timestamp,like_count}', limit: '50' });
+  if (r.error) { comentarios.erros.push({ midia: m.id, erro: (r.error.message || '').slice(0, 160) }); if (comentarios.erros.length >= 5 && !Object.keys(comentarios.porMidia).length) break; continue; }
+  comentarios.porMidia[m.id] = (r.data || []).map(c => ({ texto: c.text, curtidas: c.like_count ?? 0, quando: c.timestamp,
+    respostas: (c.replies?.data || []).map(x => ({ texto: x.text, quando: x.timestamp, curtidas: x.like_count ?? 0 })) }));
+  await espera(250);
+}
+console.log(`comentários: ${Object.values(comentarios.porMidia).reduce((a, l) => a + l.length, 0)} em ${Object.keys(comentarios.porMidia).length} mídias · ${comentarios.erros.length} erros`);
+
 fs.writeFileSync(SAIDA, JSON.stringify({
   gerado_em: new Date().toISOString(),
   conta: { username: conta.username, seguidores: conta.followers_count, publicacoes: conta.media_count },
   total_listado: midias.length, com_tempo_assistido: comTempo, sem_insights: comErro,
   conta_insights: contaInsights,
+  comentarios,
   nota: 'ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.',
   itens,
 }, null, 1));

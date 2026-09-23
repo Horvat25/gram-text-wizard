@@ -1,0 +1,61 @@
+name: Metricas dos Stories
+
+# POR QUE EXISTE (23/09/2026): a API so entrega metricas de Story nas 24h em que ele esta no ar.
+# Este robo retrata os Stories ativos a cada 6h e ACUMULA em publicador/stories-historico.json.
+# SO LEITURA: nao publica nem mexe na fila.
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # a cada 6h, fora do minuto cheio pra nao disputar com o publicador
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'publicador/metricas-stories.mjs'
+      - '.github/workflows/metricas-stories.yml'
+
+concurrency:
+  group: metricas-stories
+  cancel-in-progress: false
+
+jobs:
+  stories:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Retratar os Stories ativos
+        env:
+          IG_USER_ID: '17841478894893058'
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node publicador/metricas-stories.mjs
+      - name: Guardar (reconciliando com o GitHub)
+        if: always()
+        run: |
+          set -e
+          [ -f publicador/stories-historico.json ] || exit 0
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          cp publicador/stories-historico.json /tmp/minha.json
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            # junta o que ja estava no GitHub com o retrato novo (o mais recente de cada Story ganha)
+            node -e "
+              const fs=require('fs');
+              const a=fs.existsSync('publicador/stories-historico.json')?JSON.parse(fs.readFileSync('publicador/stories-historico.json','utf8')):{stories:{}};
+              const b=JSON.parse(fs.readFileSync('/tmp/minha.json','utf8'));
+              for(const [id,s] of Object.entries(b.stories)){ const x=a.stories[id]; if(!x||String(s.ultimo_retrato)>String(x.ultimo_retrato)) a.stories[id]=s; }
+              a.gerado_em=b.gerado_em; fs.writeFileSync('publicador/stories-historico.json',JSON.stringify(a,null,1));"
+            git add publicador/stories-historico.json
+            if git diff --cached --quiet; then echo "nada novo"; exit 0; fi
+            git commit -q -m "metricas: retrato dos Stories em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            sleep 5
+          done
+          echo "::error::nao consegui salvar"; exit 1
