@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-09-23T11:53:15.424Z",
+ "gerado_em": "2026-09-23T12:17:37.581Z",
  "conta": {
   "username": "neuralupdate",
   "seguidores": 1199,
@@ -8,6 +8,2452 @@
  "total_listado": 920,
  "com_tempo_assistido": 385,
  "sem_insights": 0,
+ "conta_insights": {
+  "series": {
+   "seguidores_por_dia": [
+    {
+     "de": "2026-09-12",
+     "ate": "2026-09-23",
+     "data": [
+      {
+       "id": "17841478894893058/insights/follower_count/day",
+       "name": "follower_count",
+       "period": "day",
+       "values": [
+        {
+         "value": 26,
+         "end_time": "2026-09-12T07:00:00+0000"
+        },
+        {
+         "value": 23,
+         "end_time": "2026-09-13T07:00:00+0000"
+        },
+        {
+         "value": 3,
+         "end_time": "2026-09-14T07:00:00+0000"
+        },
+        {
+         "value": 1,
+         "end_time": "2026-09-15T07:00:00+0000"
+        },
+        {
+         "value": 8,
+         "end_time": "2026-09-16T07:00:00+0000"
+        },
+        {
+         "value": 7,
+         "end_time": "2026-09-17T07:00:00+0000"
+        },
+        {
+         "value": 2,
+         "end_time": "2026-09-18T07:00:00+0000"
+        },
+        {
+         "value": 3,
+         "end_time": "2026-09-19T07:00:00+0000"
+        },
+        {
+         "value": 7,
+         "end_time": "2026-09-20T07:00:00+0000"
+        },
+        {
+         "value": 9,
+         "end_time": "2026-09-21T07:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-09-22T07:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-09-23T07:00:00+0000"
+        }
+       ],
+       "title": "Número de seguidores",
+       "description": "Número total de contas únicas que seguem este perfil"
+      }
+     ]
+    }
+   ],
+   "follows_unfollows": [
+    {
+     "de": "2026-06-17",
+     "ate": "2026-07-16",
+     "data": [
+      {
+       "name": "follows_and_unfollows",
+       "period": "day",
+       "title": "Começaram a seguir e deixaram de seguir",
+       "description": "O número de contas que começaram a seguir você menos o número de contas que deixaram de seguir ou saíram do Instagram no período selecionado.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 282
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 9
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/follows_and_unfollows/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-07-16",
+     "ate": "2026-08-14",
+     "data": [
+      {
+       "id": "17841478894893058/insights/follows_and_unfollows/day",
+       "name": "follows_and_unfollows",
+       "period": "day",
+       "title": "Começaram a seguir e deixaram de seguir",
+       "description": "O número de contas que começaram a seguir você menos o número de contas que deixaram de seguir ou saíram do Instagram no período selecionado.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 355
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20
+           }
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "de": "2026-08-14",
+     "ate": "2026-09-12",
+     "data": [
+      {
+       "name": "follows_and_unfollows",
+       "period": "day",
+       "title": "Começaram a seguir e deixaram de seguir",
+       "description": "O número de contas que começaram a seguir você menos o número de contas que deixaram de seguir ou saíram do Instagram no período selecionado.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 482
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 28
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/follows_and_unfollows/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-09-12",
+     "ate": "2026-09-23",
+     "data": [
+      {
+       "name": "follows_and_unfollows",
+       "period": "day",
+       "title": "Começaram a seguir e deixaram de seguir",
+       "description": "O número de contas que começaram a seguir você menos o número de contas que deixaram de seguir ou saíram do Instagram no período selecionado.",
+       "total_value": {
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 89
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 9
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/follows_and_unfollows/day"
+      }
+     ]
+    }
+   ],
+   "alcance_views_engajados": [
+    {
+     "de": "2026-06-17",
+     "ate": "2026-07-16",
+     "data": [
+      {
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 20920
+       },
+       "id": "17841478894893058/insights/reach/day"
+      },
+      {
+       "name": "views",
+       "period": "day",
+       "title": "Visualizações",
+       "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
+       "total_value": {
+        "value": 43398
+       },
+       "id": "17841478894893058/insights/views/day"
+      },
+      {
+       "name": "accounts_engaged",
+       "period": "day",
+       "title": "Contas com engajamento",
+       "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
+       "total_value": {
+        "value": 1266
+       },
+       "id": "17841478894893058/insights/accounts_engaged/day"
+      },
+      {
+       "name": "total_interactions",
+       "period": "day",
+       "title": "Interações com o conteúdo",
+       "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
+       "total_value": {
+        "value": 2658
+       },
+       "id": "17841478894893058/insights/total_interactions/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-07-16",
+     "ate": "2026-08-14",
+     "data": [
+      {
+       "id": "17841478894893058/insights/reach/day",
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 24692
+       }
+      },
+      {
+       "id": "17841478894893058/insights/views/day",
+       "name": "views",
+       "period": "day",
+       "title": "Visualizações",
+       "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
+       "total_value": {
+        "value": 51332
+       }
+      },
+      {
+       "id": "17841478894893058/insights/accounts_engaged/day",
+       "name": "accounts_engaged",
+       "period": "day",
+       "title": "Contas com engajamento",
+       "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
+       "total_value": {
+        "value": 1623
+       }
+      },
+      {
+       "id": "17841478894893058/insights/total_interactions/day",
+       "name": "total_interactions",
+       "period": "day",
+       "title": "Interações com o conteúdo",
+       "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
+       "total_value": {
+        "value": 2673
+       }
+      }
+     ]
+    },
+    {
+     "de": "2026-08-14",
+     "ate": "2026-09-12",
+     "data": [
+      {
+       "id": "17841478894893058/insights/reach/day",
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 30633
+       }
+      },
+      {
+       "id": "17841478894893058/insights/views/day",
+       "name": "views",
+       "period": "day",
+       "title": "Visualizações",
+       "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
+       "total_value": {
+        "value": 76223
+       }
+      },
+      {
+       "id": "17841478894893058/insights/accounts_engaged/day",
+       "name": "accounts_engaged",
+       "period": "day",
+       "title": "Contas com engajamento",
+       "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
+       "total_value": {
+        "value": 1623
+       }
+      },
+      {
+       "id": "17841478894893058/insights/total_interactions/day",
+       "name": "total_interactions",
+       "period": "day",
+       "title": "Interações com o conteúdo",
+       "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
+       "total_value": {
+        "value": 3421
+       }
+      }
+     ]
+    },
+    {
+     "de": "2026-09-12",
+     "ate": "2026-09-23",
+     "data": [
+      {
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 11546
+       },
+       "id": "17841478894893058/insights/reach/day"
+      },
+      {
+       "name": "views",
+       "period": "day",
+       "title": "Visualizações",
+       "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
+       "total_value": {
+        "value": 24029
+       },
+       "id": "17841478894893058/insights/views/day"
+      },
+      {
+       "name": "accounts_engaged",
+       "period": "day",
+       "title": "Contas com engajamento",
+       "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
+       "total_value": {
+        "value": 511
+       },
+       "id": "17841478894893058/insights/accounts_engaged/day"
+      },
+      {
+       "name": "total_interactions",
+       "period": "day",
+       "title": "Interações com o conteúdo",
+       "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
+       "total_value": {
+        "value": 985
+       },
+       "id": "17841478894893058/insights/total_interactions/day"
+      }
+     ]
+    }
+   ],
+   "alcance_por_tipo_de_seguidor": [
+    {
+     "de": "2026-06-17",
+     "ate": "2026-07-16",
+     "data": [
+      {
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 20920,
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 224
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20744
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reach/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-07-16",
+     "ate": "2026-08-14",
+     "data": [
+      {
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 24692,
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 404
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 24395
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reach/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-08-14",
+     "ate": "2026-09-12",
+     "data": [
+      {
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 30633,
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 685
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 30185
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reach/day"
+      }
+     ]
+    },
+    {
+     "de": "2026-09-12",
+     "ate": "2026-09-23",
+     "data": [
+      {
+       "name": "reach",
+       "period": "day",
+       "title": "Contas alcançadas",
+       "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
+       "total_value": {
+        "value": 11546,
+        "breakdowns": [
+         {
+          "dimension_keys": [
+           "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 11098
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 507
+           }
+          ]
+         }
+        ]
+       },
+       "id": "17841478894893058/insights/reach/day"
+      }
+     ]
+    }
+   ]
+  },
+  "demografia": {
+   "follower_demographics": {
+    "age": [
+     {
+      "name": "follower_demographics",
+      "period": "lifetime",
+      "title": "Dados demográficos dos seguidores",
+      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+      "total_value": {
+       "breakdowns": [
+        {
+         "dimension_keys": [
+          "age"
+         ],
+         "results": [
+          {
+           "dimension_values": [
+            "13-17"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "18-24"
+           ],
+           "value": 38
+          },
+          {
+           "dimension_values": [
+            "25-34"
+           ],
+           "value": 281
+          },
+          {
+           "dimension_values": [
+            "35-44"
+           ],
+           "value": 337
+          },
+          {
+           "dimension_values": [
+            "45-54"
+           ],
+           "value": 258
+          },
+          {
+           "dimension_values": [
+            "55-64"
+           ],
+           "value": 162
+          },
+          {
+           "dimension_values": [
+            "65+"
+           ],
+           "value": 98
+          }
+         ]
+        }
+       ]
+      },
+      "id": "17841478894893058/insights/follower_demographics/lifetime"
+     }
+    ],
+    "gender": [
+     {
+      "name": "follower_demographics",
+      "period": "lifetime",
+      "title": "Dados demográficos dos seguidores",
+      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+      "total_value": {
+       "breakdowns": [
+        {
+         "dimension_keys": [
+          "gender"
+         ],
+         "results": [
+          {
+           "dimension_values": [
+            "F"
+           ],
+           "value": 96
+          },
+          {
+           "dimension_values": [
+            "M"
+           ],
+           "value": 923
+          },
+          {
+           "dimension_values": [
+            "U"
+           ],
+           "value": 161
+          }
+         ]
+        }
+       ]
+      },
+      "id": "17841478894893058/insights/follower_demographics/lifetime"
+     }
+    ],
+    "country": [
+     {
+      "name": "follower_demographics",
+      "period": "lifetime",
+      "title": "Dados demográficos dos seguidores",
+      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+      "total_value": {
+       "breakdowns": [
+        {
+         "dimension_keys": [
+          "country"
+         ],
+         "results": [
+          {
+           "dimension_values": [
+            "PT"
+           ],
+           "value": 13
+          },
+          {
+           "dimension_values": [
+            "JP"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "PY"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "MX"
+           ],
+           "value": 2
+          },
+          {
+           "dimension_values": [
+            "UA"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "FR"
+           ],
+           "value": 4
+          },
+          {
+           "dimension_values": [
+            "MZ"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "ES"
+           ],
+           "value": 2
+          },
+          {
+           "dimension_values": [
+            "BR"
+           ],
+           "value": 1144
+          },
+          {
+           "dimension_values": [
+            "AZ"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "PK"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "IE"
+           ],
+           "value": 2
+          },
+          {
+           "dimension_values": [
+            "TR"
+           ],
+           "value": 1
+          },
+          {
+           "dimension_values": [
+            "US"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "GF"
+           ],
+           "value": 1
+          }
+         ]
+        }
+       ]
+      },
+      "id": "17841478894893058/insights/follower_demographics/lifetime"
+     }
+    ],
+    "city": [
+     {
+      "name": "follower_demographics",
+      "period": "lifetime",
+      "title": "Dados demográficos dos seguidores",
+      "description": "As características demográficas dos seguidores, incluindo a distribuição por países, cidades e gênero.",
+      "total_value": {
+       "breakdowns": [
+        {
+         "dimension_keys": [
+          "city"
+         ],
+         "results": [
+          {
+           "dimension_values": [
+            "São Caetano do Sul, São Paulo (state)"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Ribeirão Prêto, São Paulo (state)"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "São Paulo, São Paulo (state)"
+           ],
+           "value": 87
+          },
+          {
+           "dimension_values": [
+            "Boa Vista, Roraima"
+           ],
+           "value": 7
+          },
+          {
+           "dimension_values": [
+            "São Luís, Maranhão"
+           ],
+           "value": 13
+          },
+          {
+           "dimension_values": [
+            "Rio de Janeiro, Rio de Janeiro (state)"
+           ],
+           "value": 46
+          },
+          {
+           "dimension_values": [
+            "São José dos Campos, São Paulo (state)"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Contagem, Minas Gerais"
+           ],
+           "value": 7
+          },
+          {
+           "dimension_values": [
+            "Camaçari, Bahia"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Maceió, Alagoas"
+           ],
+           "value": 7
+          },
+          {
+           "dimension_values": [
+            "Uberlândia, Minas Gerais"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "Porto Alegre, Rio Grande do Sul"
+           ],
+           "value": 12
+          },
+          {
+           "dimension_values": [
+            "Campo Grande, Mato Grosso do Sul"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "Águas Lindas de Goiás, Goiás"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Gama, Federal District"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "João Pessoa, Paraíba"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Itajaí, Santa Catarina"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "Londrina, Paraná"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "Teresina, Piauí"
+           ],
+           "value": 9
+          },
+          {
+           "dimension_values": [
+            "Aparecida de Goiânia, Goiás"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Recife, Pernambuco"
+           ],
+           "value": 11
+          },
+          {
+           "dimension_values": [
+            "Brasília, Federal District"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "Guarulhos, São Paulo (state)"
+           ],
+           "value": 10
+          },
+          {
+           "dimension_values": [
+            "Sorocaba, São Paulo (state)"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Santarém, Pará"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Piracicaba, São Paulo (state)"
+           ],
+           "value": 7
+          },
+          {
+           "dimension_values": [
+            "Natal, Rio Grande do Norte"
+           ],
+           "value": 9
+          },
+          {
+           "dimension_values": [
+            "São Bernardo do Campo, São Paulo (state)"
+           ],
+           "value": 9
+          },
+          {
+           "dimension_values": [
+            "Pôrto Velho, Rondônia"
+           ],
+           "value": 8
+          },
+          {
+           "dimension_values": [
+            "Salvador, Bahia"
+           ],
+           "value": 21
+          },
+          {
+           "dimension_values": [
+            "Petrolina, Pernambuco"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Goiânia, Goiás"
+           ],
+           "value": 14
+          },
+          {
+           "dimension_values": [
+            "Fortaleza, Ceará"
+           ],
+           "value": 27
+          },
+          {
+           "dimension_values": [
+            "Manaus, Amazonas"
+           ],
+           "value": 13
+          },
+          {
+           "dimension_values": [
+            "Nova Iguaçu, Rio de Janeiro (state)"
+           ],
+           "value": 6
+          },
+          {
+           "dimension_values": [
+            "Maringá, Paraná"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Ananindeua, Pará"
+           ],
+           "value": 10
+          },
+          {
+           "dimension_values": [
+            "Florianópolis, Santa Catarina"
+           ],
+           "value": 8
+          },
+          {
+           "dimension_values": [
+            "Joinville, Santa Catarina"
+           ],
+           "value": 5
+          },
+          {
+           "dimension_values": [
+            "Belo Horizonte, Minas Gerais"
+           ],
+           "value": 25
+          },
+          {
+           "dimension_values": [
+            "Santo André, São Paulo (state)"
+           ],
+           "value": 9
+          },
+          {
+           "dimension_values": [
+            "Taguatinga, Federal District"
+           ],
+           "value": 13
+          },
+          {
+           "dimension_values": [
+            "Curitiba, Paraná"
+           ],
+           "value": 15
+          },
+          {
+           "dimension_values": [
+            "Belém, Pará"
+           ],
+           "value": 11
+          },
+          {
+           "dimension_values": [
+            "Campinas, São Paulo (state)"
+           ],
+           "value": 8
+          }
+         ]
+        }
+       ]
+      },
+      "id": "17841478894893058/insights/follower_demographics/lifetime"
+     }
+    ]
+   }
+  },
+  "erros": [
+   {
+    "pedido": "seguidores_por_dia",
+    "janela": "2026-06-17",
+    "erro": "(#100) (follower_count) metric only supports querying data for the last 30 days excluding the current day"
+   },
+   {
+    "pedido": "seguidores_por_dia",
+    "janela": "2026-07-16",
+    "erro": "(#100) (follower_count) metric only supports querying data for the last 30 days excluding the current day"
+   },
+   {
+    "pedido": "seguidores_por_dia",
+    "janela": "2026-08-14",
+    "erro": "(#100) (follower_count) metric only supports querying data for the last 30 days excluding the current day"
+   },
+   {
+    "pedido": "engaged_audience_demographics/age",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "engaged_audience_demographics/gender",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "engaged_audience_demographics/country",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "engaged_audience_demographics/city",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "reached_audience_demographics/age",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "reached_audience_demographics/gender",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "reached_audience_demographics/country",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   },
+   {
+    "pedido": "reached_audience_demographics/city",
+    "erro": "(#100) The timeframe parameter specified last_90_days is no longer supported for engaged_audience_demographics and reached_audience_demographics starting from version 20+. Instead, please refer to the"
+   }
+  ]
+ },
+ "comentarios": {
+  "porMidia": {
+   "18424748650144147": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-23T11:11:30+0000",
+     "respostas": []
+    }
+   ],
+   "18158956567519966": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-22T21:11:13+0000",
+     "respostas": []
+    }
+   ],
+   "18633845851005204": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-22T17:11:28+0000",
+     "respostas": []
+    }
+   ],
+   "17964637857190467": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-22T17:10:44+0000",
+     "respostas": []
+    }
+   ],
+   "18020962787876017": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-22T11:10:54+0000",
+     "respostas": []
+    }
+   ],
+   "17992485639011792": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-21T21:10:55+0000",
+     "respostas": []
+    }
+   ],
+   "18039288266827792": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-21T17:11:32+0000",
+     "respostas": []
+    }
+   ],
+   "18333729730275433": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-21T16:20:04+0000",
+     "respostas": []
+    }
+   ],
+   "18131747425670089": [
+    {
+     "texto": "Um dia quando eu chegar lá eu descubro, mas não direi o que é",
+     "curtidas": 1,
+     "quando": "2026-09-21T11:30:50+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-21T11:10:57+0000",
+     "respostas": []
+    }
+   ],
+   "17900869764665949": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-20T21:10:59+0000",
+     "respostas": []
+    }
+   ],
+   "18015869999928006": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-20T17:12:11+0000",
+     "respostas": []
+    }
+   ],
+   "18104576216214067": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-20T17:11:21+0000",
+     "respostas": []
+    }
+   ],
+   "18333869101278496": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-20T11:11:20+0000",
+     "respostas": []
+    }
+   ],
+   "18640566301036796": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-19T21:11:22+0000",
+     "respostas": []
+    }
+   ],
+   "17930481405405513": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-19T17:05:38+0000",
+     "respostas": []
+    }
+   ],
+   "17993607330019323": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-19T17:04:24+0000",
+     "respostas": []
+    }
+   ],
+   "18483349546108743": [
+    {
+     "texto": "Se a gente for morar lá descobre",
+     "curtidas": 1,
+     "quando": "2026-09-19T14:18:52+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-19T11:10:59+0000",
+     "respostas": []
+    }
+   ],
+   "18106651196608394": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-18T21:10:57+0000",
+     "respostas": []
+    }
+   ],
+   "18129302371690028": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-18T17:11:58+0000",
+     "respostas": []
+    }
+   ],
+   "18475960927116872": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-18T17:11:14+0000",
+     "respostas": []
+    }
+   ],
+   "17878006611546249": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-18T11:10:56+0000",
+     "respostas": []
+    }
+   ],
+   "17942708145345263": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-18T01:10:31+0000",
+     "respostas": []
+    }
+   ],
+   "17969484963169643": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-17T21:11:55+0000",
+     "respostas": []
+    }
+   ],
+   "18118793527936665": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-17T17:11:59+0000",
+     "respostas": []
+    }
+   ],
+   "18103888376340070": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-17T17:11:21+0000",
+     "respostas": []
+    }
+   ],
+   "18115969141767684": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-17T11:11:08+0000",
+     "respostas": []
+    }
+   ],
+   "18176808604436290": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-17T01:11:23+0000",
+     "respostas": []
+    }
+   ],
+   "18078628010344425": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-16T21:11:12+0000",
+     "respostas": []
+    }
+   ],
+   "17959525995211074": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-16T17:11:44+0000",
+     "respostas": []
+    }
+   ],
+   "18162636928438556": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-16T17:11:13+0000",
+     "respostas": []
+    }
+   ],
+   "17956440138247155": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-16T11:11:26+0000",
+     "respostas": []
+    }
+   ],
+   "18010546712985955": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-16T01:10:30+0000",
+     "respostas": []
+    }
+   ],
+   "18115764745949740": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-15T21:11:09+0000",
+     "respostas": []
+    }
+   ],
+   "18128596702690738": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-15T17:11:11+0000",
+     "respostas": []
+    }
+   ],
+   "17987995683112780": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-15T17:10:32+0000",
+     "respostas": []
+    }
+   ],
+   "17875111935632451": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-15T11:10:59+0000",
+     "respostas": []
+    }
+   ],
+   "18143128678604819": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-15T01:11:14+0000",
+     "respostas": []
+    }
+   ],
+   "17912652618454913": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-14T21:10:58+0000",
+     "respostas": []
+    }
+   ],
+   "17905282197333890": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-14T17:11:11+0000",
+     "respostas": []
+    }
+   ],
+   "18245604607309605": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-14T16:14:31+0000",
+     "respostas": []
+    }
+   ],
+   "18020583986716261": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-14T11:10:54+0000",
+     "respostas": []
+    }
+   ],
+   "18416339860155466": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-13T21:11:51+0000",
+     "respostas": []
+    }
+   ],
+   "18115924345767032": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-13T17:07:05+0000",
+     "respostas": []
+    }
+   ],
+   "18024166709697424": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-13T15:15:38+0000",
+     "respostas": []
+    }
+   ],
+   "18475294462117696": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-13T14:14:38+0000",
+     "respostas": []
+    }
+   ],
+   "18093322520446000": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-12T21:11:18+0000",
+     "respostas": []
+    }
+   ],
+   "18208038664362436": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-12T17:11:40+0000",
+     "respostas": []
+    }
+   ],
+   "18017711891927512": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-12T13:31:45+0000",
+     "respostas": []
+    }
+   ],
+   "18087028598243613": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-11T21:12:06+0000",
+     "respostas": []
+    }
+   ],
+   "18625262311050337": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-11T17:11:58+0000",
+     "respostas": []
+    }
+   ],
+   "18090132413440084": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-11T13:12:15+0000",
+     "respostas": []
+    }
+   ],
+   "17936344395363681": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-10T21:10:57+0000",
+     "respostas": []
+    }
+   ],
+   "18390982177205779": [
+    {
+     "texto": "Tá ruído no vácuo oxi como",
+     "curtidas": 0,
+     "quando": "2026-09-10T23:21:27+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-10T17:11:39+0000",
+     "respostas": []
+    }
+   ],
+   "17945299929335298": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-10T11:11:23+0000",
+     "respostas": []
+    }
+   ],
+   "18127614421749775": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-09T21:11:08+0000",
+     "respostas": []
+    }
+   ],
+   "18065367872771656": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 1,
+     "quando": "2026-09-09T17:53:31+0000",
+     "respostas": []
+    }
+   ],
+   "18101824682340096": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-09T11:12:02+0000",
+     "respostas": []
+    }
+   ],
+   "17944090677335005": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-08T21:11:23+0000",
+     "respostas": []
+    }
+   ],
+   "18391462645207565": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-08T17:11:49+0000",
+     "respostas": []
+    }
+   ],
+   "17940996048090511": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-08T14:22:48+0000",
+     "respostas": []
+    }
+   ],
+   "17876854008546787": [
+    {
+     "texto": "Kkkkkkkkkkkkkkkkk mano seis não tão pegando nem Marte direito imagina outra galáxia 😂😂",
+     "curtidas": 0,
+     "quando": "2026-09-08T08:40:33+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-07T21:11:32+0000",
+     "respostas": []
+    }
+   ],
+   "18164060557474610": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-07T17:11:31+0000",
+     "respostas": []
+    }
+   ],
+   "18074682785412231": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-07T11:11:10+0000",
+     "respostas": []
+    }
+   ],
+   "18021896576874733": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-06T21:11:07+0000",
+     "respostas": []
+    }
+   ],
+   "18129340285794247": [
+    {
+     "texto": "NN m mm m mm mm. NN NN no. no kkkk mm mmknnnm mm m no mlm no no kkkk m no mm ok nnomnok mm mmk mm bom l mm nknmmnmmmmk mm mm o mm mmk nnklk mm kknnk kkkk kkkk mm mm mm n kmnknnm nnk n kkkk mm mmknnnm mm kknnk kkkk kkkkk o mmknnnm mmknnnm nnklk kknnk o  nl nnomnok nnnn  no nnjnnnn nn.  NN NN nnbn .. .n .  bom lnm",
+     "curtidas": 0,
+     "quando": "2026-09-06T21:51:46+0000",
+     "respostas": []
+    },
+    {
+     "texto": "mm.",
+     "curtidas": 0,
+     "quando": "2026-09-06T21:51:44+0000",
+     "respostas": []
+    },
+    {
+     "curtidas": 0,
+     "quando": "2026-09-06T21:08:28+0000",
+     "respostas": []
+    },
+    {
+     "curtidas": 0,
+     "quando": "2026-09-06T20:42:10+0000",
+     "respostas": []
+    },
+    {
+     "texto": "A humanidade sem conhecer nada de cosmologia:",
+     "curtidas": 0,
+     "quando": "2026-09-06T19:25:23+0000",
+     "respostas": [
+      {
+       "texto": "Enviei uma mensagem para você!",
+       "quando": "2026-09-06T19:25:23+0000",
+       "curtidas": 0
+      }
+     ]
+    },
+    {
+     "texto": "mm.",
+     "curtidas": 0,
+     "quando": "2026-09-06T17:55:00+0000",
+     "respostas": []
+    },
+    {
+     "texto": "NN m mm m mm mm. NN NN no. no kkkk mm mmknnnm mm m no mlm no no kkkk m no mm ok nnomnok mm mmk mm bom l mm nknmmnmmmmk mm mm o mm mmk nnklk mm kknnk kkkk kkkk mm mm mm n kmnknnm nnk n kkkk mm mmknnnm mm kknnk kkkk kkkkk o mmknnnm mmknnnm nnklk kknnk o  nl nnomnok nnnn  no nnjnnnn nn.  NN NN nnbn .. .n .  bom lnm",
+     "curtidas": 0,
+     "quando": "2026-09-06T17:54:58+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-06T17:11:42+0000",
+     "respostas": []
+    }
+   ],
+   "18067695485747501": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-06T11:11:20+0000",
+     "respostas": []
+    }
+   ],
+   "18110048714111499": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-05T21:11:22+0000",
+     "respostas": []
+    }
+   ],
+   "18430419901176616": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-05T17:11:42+0000",
+     "respostas": []
+    }
+   ],
+   "18183428527412217": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-05T12:16:43+0000",
+     "respostas": []
+    }
+   ],
+   "18151867516516858": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-04T21:11:14+0000",
+     "respostas": []
+    }
+   ],
+   "17909910081463730": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-04T14:11:42+0000",
+     "respostas": []
+    }
+   ],
+   "18095510330086906": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-03T21:11:24+0000",
+     "respostas": []
+    }
+   ],
+   "18097113092633065": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-03T17:55:44+0000",
+     "respostas": []
+    }
+   ],
+   "18208612765315366": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-03T14:22:31+0000",
+     "respostas": []
+    }
+   ],
+   "18616782982024171": [
+    {
+     "texto": "Onde ficam os cometas e meteoritos que caem lá",
+     "curtidas": 0,
+     "quando": "2026-09-02T23:43:55+0000",
+     "respostas": [
+      {
+       "texto": "@_bibbo_  se desintegra",
+       "quando": "2026-09-02T23:56:27+0000",
+       "curtidas": 0
+      }
+     ]
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-02T22:33:07+0000",
+     "respostas": []
+    }
+   ],
+   "18615959566030669": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-02T17:11:48+0000",
+     "respostas": []
+    }
+   ],
+   "18104730475916826": [
+    {
+     "texto": "Nem pra lua o homem foi, kkkk imagina pra Marte kkkkkkkkkkkkk",
+     "curtidas": 0,
+     "quando": "2026-09-02T22:58:47+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Próxima fronteira de exploração mineral.",
+     "curtidas": 0,
+     "quando": "2026-09-02T15:50:18+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-02T11:11:26+0000",
+     "respostas": []
+    }
+   ],
+   "17904238635516419": [
+    {
+     "texto": "Será que a relatividade esqueceu das coordenadas do ponto zero??",
+     "curtidas": 1,
+     "quando": "2026-09-01T21:48:32+0000",
+     "respostas": [
+      {
+       "texto": "@zlaurindo Essa ideia seria do universo holografico, se realmente for real as coordenadas ela existe no micro mas no no macro é tudo emaranhado, se conseguissemos abrir um portal de cada lado do emaranhamento poderiamos conectar algo, ( o espaço e o tempo é relativo quando estamos falando da geometria quantica",
+       "quando": "2026-09-01T21:53:20+0000",
+       "curtidas": 0
+      }
+     ]
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-01T21:11:17+0000",
+     "respostas": []
+    }
+   ],
+   "18115660444758659": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-01T17:11:41+0000",
+     "respostas": []
+    }
+   ],
+   "18625414231000198": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-09-01T12:07:25+0000",
+     "respostas": []
+    }
+   ],
+   "17899771764581685": [
+    {
+     "texto": "Tudo que conhecemos cairá nele um dia",
+     "curtidas": 0,
+     "quando": "2026-08-31T22:59:20+0000",
+     "respostas": [
+      {
+       "texto": "@jcarlos_souza_1984 se conseguíssemos olhar um buraco negro de lado, como ele seria?entendeu?",
+       "quando": "2026-08-31T23:25:43+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@jcarlos_souza_1984 não é verdade. Isso não acontecerá.",
+       "quando": "2026-09-01T09:46:14+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@epassaia uai eu achava que ele é o grande atrator da via láctea. Tudo está indo ai seu encontro. Como se fosse um ralo",
+       "quando": "2026-09-01T09:54:21+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@jcarlos_souza_1984  eu também acho, mas a gente não percebe isso por causa da relatividade.",
+       "quando": "2026-09-01T18:35:39+0000",
+       "curtidas": 0
+      }
+     ]
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-31T21:11:25+0000",
+     "respostas": []
+    }
+   ],
+   "18107299778132824": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-31T17:11:43+0000",
+     "respostas": []
+    }
+   ],
+   "17907346998525752": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-31T13:50:57+0000",
+     "respostas": []
+    }
+   ],
+   "18127979713781410": [
+    {
+     "texto": "Conta de analfabetos.",
+     "curtidas": 0,
+     "quando": "2026-08-30T23:38:37+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-30T21:11:20+0000",
+     "respostas": []
+    }
+   ],
+   "18193077268388306": [
+    {
+     "texto": "Apertado = buraco negro! A anatomia do universo 🔥🔥🔥",
+     "curtidas": 0,
+     "quando": "2026-08-30T20:29:13+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-30T17:11:43+0000",
+     "respostas": []
+    }
+   ],
+   "18125109325770563": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-30T12:04:26+0000",
+     "respostas": []
+    }
+   ],
+   "17957493104998955": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-29T21:10:50+0000",
+     "respostas": []
+    }
+   ],
+   "18458512582136769": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-29T17:12:12+0000",
+     "respostas": []
+    }
+   ],
+   "18136547338716195": [
+    {
+     "texto": "👏👏👏",
+     "curtidas": 0,
+     "quando": "2026-08-30T10:31:01+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Dia histórico",
+     "curtidas": 1,
+     "quando": "2026-08-30T01:32:06+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-29T13:22:18+0000",
+     "respostas": []
+    }
+   ],
+   "18147310129556417": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-29T01:10:02+0000",
+     "respostas": []
+    }
+   ],
+   "17901849042572339": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-29T01:09:12+0000",
+     "respostas": []
+    }
+   ],
+   "18118217875924333": [
+    {
+     "texto": "🔥🔥🔥 energia e matéria é a mesma coisa ,só depende do referencial",
+     "curtidas": 0,
+     "quando": "2026-08-28T22:57:10+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-28T17:28:45+0000",
+     "respostas": []
+    }
+   ],
+   "18113952196966475": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-27T20:20:40+0000",
+     "respostas": []
+    }
+   ],
+   "17896373364666070": [
+    {
+     "texto": "Dizem que o sol é verde.... e o bloqueio da camada de ozonio remove a luz azul..... Mas aí como tem azul no arco-íris.... tantas perguntas.....",
+     "curtidas": 0,
+     "quando": "2026-08-27T13:59:05+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-26T23:22:08+0000",
+     "respostas": []
+    }
+   ],
+   "18092457254339730": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-26T19:15:26+0000",
+     "respostas": []
+    }
+   ],
+   "17972914515123416": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-26T11:40:02+0000",
+     "respostas": []
+    }
+   ],
+   "18127413361751800": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-25T21:05:12+0000",
+     "respostas": []
+    }
+   ],
+   "17957913447208924": [
+    {
+     "texto": "😂😂😂😂😂😂😂😂😂😂 nada não vem do nada",
+     "curtidas": 0,
+     "quando": "2026-08-26T22:09:36+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-25T17:40:24+0000",
+     "respostas": []
+    }
+   ],
+   "18123407795500116": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-25T11:12:37+0000",
+     "respostas": []
+    }
+   ],
+   "18115973930314208": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-24T21:10:55+0000",
+     "respostas": []
+    }
+   ],
+   "17947435452255660": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-24T17:39:59+0000",
+     "respostas": []
+    }
+   ],
+   "18105482501180787": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-24T11:39:27+0000",
+     "respostas": []
+    }
+   ],
+   "18139078102590467": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-23T21:30:42+0000",
+     "respostas": []
+    }
+   ],
+   "18114042161067999": [
+    {
+     "texto": "Mas, a antimatéria não sumiu.",
+     "curtidas": 0,
+     "quando": "2026-08-23T22:20:51+0000",
+     "respostas": []
+    },
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-23T17:03:13+0000",
+     "respostas": []
+    }
+   ],
+   "18113315243068916": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-23T11:01:01+0000",
+     "respostas": []
+    }
+   ],
+   "18388692487164519": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-22T21:31:36+0000",
+     "respostas": []
+    }
+   ],
+   "17964340791169583": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-22T17:01:18+0000",
+     "respostas": []
+    }
+   ],
+   "18627208813048671": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-22T11:00:43+0000",
+     "respostas": []
+    }
+   ],
+   "18104164712351267": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-21T21:02:11+0000",
+     "respostas": []
+    }
+   ],
+   "18138696607605497": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-21T17:38:26+0000",
+     "respostas": []
+    }
+   ],
+   "18614774767065131": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-08-21T11:04:55+0000",
+     "respostas": []
+    }
+   ],
+   "17885950443460204": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: dá pra testar o Kindle Unlimited de graça e ler o quanto quiser — link na bio. (link de afiliado)",
+     "curtidas": 0,
+     "quando": "2026-08-20T21:03:46+0000",
+     "respostas": []
+    }
+   ],
+   "17908824708459523": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: dá pra testar o Kindle Unlimited de graça e ler o quanto quiser — link na bio. (link de afiliado)",
+     "curtidas": 1,
+     "quando": "2026-08-20T17:06:22+0000",
+     "respostas": []
+    }
+   ],
+   "18612926656046891": [
+    {
+     "texto": "😂😂😂😂😂 viaja não soldado 😂",
+     "curtidas": 0,
+     "quando": "2026-08-20T23:28:45+0000",
+     "respostas": []
+    }
+   ],
+   "18122800732873441": [
+    {
+     "texto": "Mas, a velocidade não está aumentando ?",
+     "curtidas": 0,
+     "quando": "2026-08-19T23:12:01+0000",
+     "respostas": []
+    }
+   ],
+   "17990922171010519": [
+    {
+     "texto": "👏🏾👏🏾👏🏾👏🏾",
+     "curtidas": 0,
+     "quando": "2026-08-19T11:32:28+0000",
+     "respostas": []
+    }
+   ],
+   "17888937702672875": [
+    {
+     "texto": "Nenhuma interação, mas será que existe a possibilidade de algum neutrino chocar em algum particula em nosso corpo???",
+     "curtidas": 0,
+     "quando": "2026-08-17T13:43:11+0000",
+     "respostas": []
+    }
+   ],
+   "17964214080173175": [
+    {
+     "texto": "eu fico pensando: sera que o universo pegou as vibrações de energia de alguma borboleta e recriou em tamanho colossal😂",
+     "curtidas": 1,
+     "quando": "2026-08-13T22:12:24+0000",
+     "respostas": []
+    }
+   ],
+   "18554784130072364": [
+    {
+     "texto": "As árvores tocam um sinfonia e tmbm não ouvimos ... Tudo na natureza, tanto na Terra quando foram dela tem melodia ...",
+     "curtidas": 1,
+     "quando": "2026-08-14T01:33:50+0000",
+     "respostas": []
+    }
+   ],
+   "18352045810172206": [
+    {
+     "texto": "A primeira luz do universo começou a aparecer 270 anos após o Big Bang",
+     "curtidas": 0,
+     "quando": "2026-08-10T02:17:05+0000",
+     "respostas": []
+    }
+   ],
+   "18107783800850975": [
+    {
+     "texto": "Cosmos",
+     "curtidas": 0,
+     "quando": "2026-08-09T23:34:38+0000",
+     "respostas": []
+    }
+   ],
+   "17907201795289963": [
+    {
+     "texto": "Teoria das cordas transformar as partículas em nós",
+     "curtidas": 0,
+     "quando": "2026-08-10T01:02:13+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Os sófons?",
+     "curtidas": 0,
+     "quando": "2026-08-09T11:11:46+0000",
+     "respostas": []
+    }
+   ],
+   "18089441510647219": [
+    {
+     "texto": "COSMOS.",
+     "curtidas": 0,
+     "quando": "2026-08-09T07:25:39+0000",
+     "respostas": []
+    }
+   ],
+   "18054045965572537": [
+    {
+     "texto": "😂",
+     "curtidas": 1,
+     "quando": "2026-08-06T16:28:48+0000",
+     "respostas": []
+    }
+   ],
+   "18096989261200252": [],
+   "17867682279587266": [
+    {
+     "texto": "Cosmos",
+     "curtidas": 0,
+     "quando": "2026-07-23T19:41:24+0000",
+     "respostas": []
+    }
+   ],
+   "17959470717160362": [
+    {
+     "texto": "UAU !!!isto é fantastico",
+     "curtidas": 1,
+     "quando": "2026-07-19T17:25:49+0000",
+     "respostas": []
+    }
+   ],
+   "18159310426472056": [
+    {
+     "texto": "Cosmo",
+     "curtidas": 0,
+     "quando": "2026-07-18T10:00:55+0000",
+     "respostas": [
+      {
+       "texto": "@luizvieiraandrade te enviei dm!",
+       "quando": "2026-07-18T12:57:53+0000",
+       "curtidas": 0
+      }
+     ]
+    }
+   ],
+   "18105457361272707": [
+    {
+     "texto": "Cosmos",
+     "curtidas": 1,
+     "quando": "2026-07-19T17:37:40+0000",
+     "respostas": [
+      {
+       "texto": "@cissazandara te enviei dm.",
+       "quando": "2026-07-19T17:59:30+0000",
+       "curtidas": 0
+      }
+     ]
+    }
+   ],
+   "17951560818198962": [],
+   "18117843044302352": [
+    {
+     "texto": "Notícia velha , o terceiro objeto de fora do sistema solar foi 3i/atlas..!",
+     "curtidas": 2,
+     "quando": "2026-07-15T23:15:34+0000",
+     "respostas": [
+      {
+       "texto": "@andrew_akinn Temos video no canal do youtube sobre ele também, link na bio.",
+       "quando": "2026-07-16T13:05:35+0000",
+       "curtidas": 0
+      }
+     ]
+    }
+   ],
+   "17974843803113558": [
+    {
+     "texto": "Link na bio",
+     "curtidas": 0,
+     "quando": "2026-07-14T19:26:13+0000",
+     "respostas": []
+    }
+   ],
+   "18123764491783268": [
+    {
+     "texto": "Um brasileiro fez a maior descoberta do século: vivemos na ponta do tempo, no limite vivo onde passado, presente e futuro se tocam, e por pura improbabilidade, sempre voltamos. \nVídeo incrível explicando, e no minuto 4:50 tudo faz sentido. \nCanal: e o tempo se foi. \nTítulo: você vai existir de novo",
+     "curtidas": 0,
+     "quando": "2026-07-16T00:34:50+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Cosmo!",
+     "curtidas": 1,
+     "quando": "2026-07-15T10:17:07+0000",
+     "respostas": []
+    }
+   ],
+   "18079282760310168": [
+    {
+     "texto": "Mas se o lugar já existisse ? E se esse lugar fosse um campo Quantico que sofre cisalhamento e toda matéria surgisse desse momento, levando bilhões e bilhões de anos para vermos nesse momento o resultado da coagulação desse cisalhamento, nesse contexto não há necessidade de um big Bang por conseguinte não precisamos de uma expansão acelerada.",
+     "curtidas": 0,
+     "quando": "2026-08-11T04:17:33+0000",
+     "respostas": []
+    }
+   ],
+   "18126432442656546": [],
+   "18109832185952098": [
+    {
+     "texto": "Um brasileiro fez a maior descoberta do século: vivemos na ponta do tempo, no limite vivo onde passado, presente e futuro se tocam, e por pura improbabilidade, sempre voltamos. \nVídeo incrível explicando, e no minuto 4:50 tudo faz sentido. \nCanal: e o tempo se foi. \nTítulo: você vai existir de novo",
+     "curtidas": 0,
+     "quando": "2026-07-07T06:54:16+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Deformação do espaço tempo não é afundar a propria  métrica  espaço temporal, a deformação do espaço acontece pq Einstein  aplica a contração do comprimento e dilatação do tempo na propria  métrica  a contração e a dilatação na métrica  gera deformação na métrica, Eintein  se apossa das soluções  de Lorentz  só  para criar sua prolria  teoria nas costas de lorentz  kkkkkk",
+     "curtidas": 0,
+     "quando": "2026-07-06T21:23:29+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Só a água que não é puxada pra baixo né?",
+     "curtidas": 0,
+     "quando": "2026-07-06T20:01:56+0000",
+     "respostas": []
+    }
+   ],
+   "17945474742249525": [
+    {
+     "texto": "🌕 Luminária Lua aqui:  neural-update.com.br/links",
+     "curtidas": 0,
+     "quando": "2026-07-01T11:04:59+0000",
+     "respostas": []
+    }
+   ],
+   "18330958408249869": [],
+   "18087304064385930": [
+    {
+     "texto": "Um brasileiro fez a maior descoberta do século: vivemos na ponta do tempo, no limite vivo onde passado, presente e futuro se tocam, e por pura improbabilidade, sempre voltamos. \nVídeo incrível explicando, e no minuto 4:50 tudo faz sentido. \nCanal: e o tempo se foi. \nTítulo: você vai existir de novo",
+     "curtidas": 0,
+     "quando": "2026-06-26T21:32:49+0000",
+     "respostas": []
+    }
+   ],
+   "18095598737221770": [
+    {
+     "texto": "Não... Eu gosto de gente",
+     "curtidas": 0,
+     "quando": "2026-06-28T03:06:56+0000",
+     "respostas": []
+    }
+   ],
+   "18023509700672327": [
+    {
+     "texto": "Um brasileiro fez a maior descoberta do século: vivemos na ponta do tempo, no limite vivo onde passado, presente e futuro se tocam, e por pura improbabilidade, sempre voltamos. \nVídeo incrível explicando, e no minuto 4:50 tudo faz sentido. \nCanal: e o tempo se foi. \nTítulo: você vai existir de novo",
+     "curtidas": 1,
+     "quando": "2026-06-26T00:29:54+0000",
+     "respostas": []
+    }
+   ],
+   "18120192337771908": [
+    {
+     "texto": "Ou seja, você sofreria eternamente lá",
+     "curtidas": 1,
+     "quando": "2026-06-22T01:44:29+0000",
+     "respostas": []
+    },
+    {
+     "texto": "????",
+     "curtidas": 1,
+     "quando": "2026-06-21T22:21:00+0000",
+     "respostas": []
+    }
+   ]
+  },
+  "erros": []
+ },
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
@@ -20,16 +2466,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 10,
-   "reach": 3,
+   "views": 29,
+   "reach": 7,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 1952,
-   "ig_reels_video_view_total_time": 5857,
-   "reels_skip_rate": 42.9,
+   "ig_reels_avg_watch_time": 8274,
+   "ig_reels_video_view_total_time": 124115,
+   "reels_skip_rate": 21.7,
    "reposts": 0
   },
   {
@@ -42,16 +2488,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 169,
-   "reach": 138,
+   "views": 173,
+   "reach": 139,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 14492,
-   "ig_reels_video_view_total_time": 2086928,
-   "reels_skip_rate": 50.7,
+   "ig_reels_avg_watch_time": 15071,
+   "ig_reels_video_view_total_time": 2185361,
+   "reels_skip_rate": 50,
    "reposts": 1
   },
   {
@@ -61,19 +2507,19 @@
    "link": "https://www.instagram.com/reel/DdmPaRkgMDL/",
    "titulo": "A hipernova não é só uma supernova maior. ⚡",
    "legenda": "A hipernova não é só uma supernova maior. ⚡\n\nSérie A MORTE DAS ESTRELAS · episódio 3 de 6.\nEla vem de estrelas gigantes girando muito rápido, com dez vezes mais energia que uma supernova.\nDois jatos quase na velocidade da luz furam a estrela, e quando um aponta pra Terra vemos uma rajada de raios gama.\n\n💬 Você sabia que existia algo mais forte que uma supernova? Comenta aqui 👇\n\n👉 Segue @neuralupdate: episódio 4 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Gamma-ray Bursts)\n\n#hipernova #raiosgama #astronomia #neuralupdate",
-   "curtidas_campo": 19,
+   "curtidas_campo": 20,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 389,
-   "reach": 308,
-   "likes": 19,
+   "views": 394,
+   "reach": 313,
+   "likes": 20,
    "comments": 1,
    "shares": 0,
    "saved": 4,
-   "total_interactions": 25,
-   "ig_reels_avg_watch_time": 20121,
-   "ig_reels_video_view_total_time": 6277817,
-   "reels_skip_rate": 39.5,
+   "total_interactions": 26,
+   "ig_reels_avg_watch_time": 20040,
+   "ig_reels_video_view_total_time": 6352834,
+   "reels_skip_rate": 39.4,
    "reposts": 1
   },
   {
@@ -105,16 +2551,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 370,
-   "reach": 285,
+   "views": 372,
+   "reach": 287,
    "likes": 13,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 17512,
-   "ig_reels_video_view_total_time": 5218578,
-   "reels_skip_rate": 56.6,
+   "ig_reels_avg_watch_time": 17500,
+   "ig_reels_video_view_total_time": 5267655,
+   "reels_skip_rate": 56.9,
    "reposts": 1
   },
   {
