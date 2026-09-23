@@ -1,0 +1,145 @@
+{
+ "gerado_em": "2026-09-23T23:58:37.182Z",
+ "contas_lidas": 7,
+ "contas_invalidas": [
+  "canaldoschwarza: Invalid user id",
+  "achadinhospromo15: Invalid user id",
+  "achadosdashopee: Invalid user id",
+  "mundodosachadinhos: Invalid user id",
+  "achadinhosdaamazon: Invalid user id",
+  "tag_livros: Invalid user id"
+ ],
+ "resultado": [
+  {
+   "usuario": "spacetoday",
+   "grupo": "astronomia-grande",
+   "ok": true,
+   "seguidores": 2529577,
+   "posts_lidos": 50,
+   "pct_posts_pedindo": 0.02,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": 0.038,
+   "comentarios_por_curtida_sem_pedido": 0.021,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-09-18",
+     "tipo": "REELS",
+     "pede": true,
+     "palavra": null,
+     "trecho": "Hoje foi lançado o sexto pacote de vídeos e documentos sobre UAPs pelo governo americano!!! Vou postar os vídeos aqui e comentem!!!",
+     "comentarios": 22,
+     "curtidas": 575,
+     "link": "https://www.instagram.com/reel/DdbzpXFOgZx/"
+    }
+   ]
+  },
+  {
+   "usuario": "cienciatododia",
+   "grupo": "ciencia-grande",
+   "ok": true,
+   "seguidores": 16961,
+   "posts_lidos": 0,
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": null,
+   "melhores_pedidos": []
+  },
+  {
+   "usuario": "canaldoschwarza",
+   "grupo": "astronomia-media",
+   "ok": false,
+   "erro": "Invalid user id"
+  },
+  {
+   "usuario": "olhardigital",
+   "grupo": "ciencia-tech",
+   "ok": true,
+   "seguidores": 591065,
+   "posts_lidos": 50,
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.065,
+   "melhores_pedidos": []
+  },
+  {
+   "usuario": "achadinhospromo15",
+   "grupo": "achadinhos",
+   "ok": false,
+   "erro": "Invalid user id"
+  },
+  {
+   "usuario": "achadinhosdashopee",
+   "grupo": "achadinhos",
+   "ok": true,
+   "seguidores": 1,
+   "posts_lidos": 0,
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": null,
+   "melhores_pedidos": []
+  },
+  {
+   "usuario": "achadinhos.shopee",
+   "grupo": "achadinhos",
+   "ok": true,
+   "seguidores": 402,
+   "posts_lidos": 11,
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.011,
+   "melhores_pedidos": []
+  },
+  {
+   "usuario": "achadosdashopee",
+   "grupo": "achadinhos",
+   "ok": false,
+   "erro": "Invalid user id"
+  },
+  {
+   "usuario": "mundodosachadinhos",
+   "grupo": "achadinhos",
+   "ok": false,
+   "erro": "Invalid user id"
+  },
+  {
+   "usuario": "achadinhosdaamazon",
+   "grupo": "achadinhos-amazon",
+   "ok": false,
+   "erro": "Invalid user id"
+  },
+  {
+   "usuario": "dicasdelivros",
+   "grupo": "livros",
+   "ok": true,
+   "seguidores": 12,
+   "posts_lidos": 45,
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.113,
+   "melhores_pedidos": []
+  },
+  {
+   "usuario": "tag_livros",
+   "grupo": "livros",
+   "ok": false,
+   "erro": "Invalid user id"
+  },
+  {
+   "usuario": "intrinseca",
+   "grupo": "livros",
+   "ok": true,
+   "seguidores": 1052230,
+   "posts_lidos": 50,
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.021,
+   "melhores_pedidos": []
+  }
+ ]
+}
