@@ -2828,7 +2828,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0964eb41-6165-470a-90c7-a50afd058c84.png",
     "legenda": "",
     "slug": "story-feed-2026-09-23",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18115715957083245",
+    "publicado_em": "2026-09-23T21:10:24.114Z"
   },
   {
     "quando": "2026-09-23T21:00:00.000Z",
@@ -2836,8 +2838,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/81358c6b-da51-43b3-82f4-cef565452430.mp4",
     "legenda": "Apaga a luz e o seu teto vira uma galáxia. 🌌\n\nO projetor astronauta joga nebulosa e estrelas no teto e nas paredes.\nTem controle remoto, temporizador pra desligar sozinho e liga no USB.\nMais de 20 mil pessoas já levaram o seu.\n\n💬 Comenta QUERO que eu te mando o link no direct. #publi\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nLink de afiliado Shopee: posso receber comissão se você comprar, sem custo extra pra você.\n\n#projetorastronauta #decoracaodequarto #neuralupdate",
     "slug": "vsl-projetor-astronauta",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f7d1cc14-0581-45f9-a645-d254b41c8220.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f7d1cc14-0581-45f9-a645-d254b41c8220.mp4",
+    "id_instagram": "18068093078768796",
+    "publicado_em": "2026-09-23T21:10:59.856Z",
+    "id_comentario": "18123024874856620",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-23T23:00:00.000Z",
