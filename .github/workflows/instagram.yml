@@ -134,3 +134,10 @@ jobs:
           done
           echo "::error::nao consegui salvar o estado da fila em 5 tentativas"
           exit 1
+
+      # Roda depois de publicar E de salvar a fila. Se falhar, o post atual ja foi
+      # processado e o estado ja chegou ao Git; o alarme nao bloqueia publicacoes.
+      # As proximas rodadas continuam independentes e voltam a conferir a cada 20 min.
+      - name: Alarmar 2 falhas seguidas no Facebook
+        if: always()
+        run: node publicador/conferir-facebook.mjs

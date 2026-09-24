@@ -32,3 +32,6 @@ jobs:
 
       - name: Ficou algum post pra trás?
         run: node publicador/conferir-fila.mjs
+
+      - name: Facebook publicou os Reels?
+        run: node publicador/conferir-facebook.mjs
