@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-09-24T00:06:52.280Z",
+ "gerado_em": "2026-09-24T00:14:25.633Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2529580,
+   "seguidores": 2529590,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 16961,
+   "seguidores": 16962,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -133,7 +133,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1052237,
+   "seguidores": 1052246,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -151,7 +151,7 @@
   {
    "hashtag": "achadinhosdashopee",
    "ok": false,
-   "erro": "An unexpected error has occurred. Please retry your request later."
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "achadosshopee",
@@ -166,7 +166,7 @@
   {
    "hashtag": "astronomia",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "livros",
