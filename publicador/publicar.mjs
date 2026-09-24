@@ -258,14 +258,15 @@ async function statusDoVideo(videoId, tk) {
 async function esperaProcessar(videoId, tk) {
   for (let t = 0; t < 30; t++) {           // ate ~5min (30 x 10s) - Reel de 40-50s costuma levar segundos
     const st = await statusDoVideo(videoId, tk);
-    const fase = st.processing_phase?.status;
-    if (fase === 'complete' || fase === 'error' || st.video_status === 'ready') {
-      if (fase === 'error') throw new Error(`processamento falhou: ${JSON.stringify(st).slice(0, 200)}`);
-      return st;
-    }
+    // 24/09/2026: o processing_phase SÓ começa depois do finish — esperar por ele antes de publicar
+    // travava todo Reel em "não terminou em 5min" desde 17/09 (22 Reels sem Facebook). O certo
+    // (fluxo oficial da Meta) é esperar o UPLOAD completar, publicar, e deixar o processamento rodar.
+    const up = st.uploading_phase?.status;
+    if (up === 'error' || st.processing_phase?.status === 'error') throw new Error(`upload/processamento falhou: ${JSON.stringify(st).slice(0, 200)}`);
+    if (up === 'complete' || st.processing_phase?.status === 'complete' || st.video_status === 'ready') return st;
     await new Promise(r => setTimeout(r, 10000));
   }
-  throw new Error('processamento nao terminou em 5min - nao publicando incompleto');
+  throw new Error('upload nao completou em 5min - nao publicando incompleto');
 }
 
 // 17/09/2026: nunca mandar pro Facebook o MESMO arquivo (bytes identicos) que acabou de sair
