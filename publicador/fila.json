@@ -2890,8 +2890,11 @@
     ],
     "legenda": "Você é feito de pedaços de estrelas. Literalmente. ✨\n\nO hidrogênio do seu corpo veio do começo do universo. O carbono, o oxigênio e o ferro foram fabricados em estrelas que morreram antes do Sol nascer.\n\n📤 Manda pra alguém que precisa ouvir que é poeira de estrela.\n🔖 Salva pra lembrar.\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\nFonte: NASA Science\n\n#estrelas #supernova #astronomia #ciencia #neuralupdate",
     "slug": "car-feito-de-estrelas-2026-09-24",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "18054152273583425",
+    "publicado_em": "2026-09-24T17:10:44.606Z",
+    "id_comentario": "18164874091478670"
   },
   {
     "quando": "2026-09-24T17:00:00.000Z",
@@ -2899,8 +2902,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e5b28c8d-1638-4032-b672-f95713b817a6.mp4",
     "legenda": "Pulsar e magnetar não são a mesma coisa. 🌀\n\nSérie A MORTE DAS ESTRELAS · episódio 5 de 6.\nO pulsar gira centenas de vezes por segundo e varre o espaço com dois feixes, como um farol.\nO magnetar tem um campo magnético tão forte que racha a própria crosta.\n\n💬 Qual assusta mais: o farol ou o ímã? Comenta 🌀 ou 🧲 👇\n\n👉 Segue @neuralupdate: o último episódio é o buraco negro.\n\n📚 Fonte: NASA Science (Neutron Stars, Pulsars and Magnetars)\n\n#pulsar #magnetar #astronomia #neuralupdate",
     "slug": "nw-pulsar-e-magnetar",
-    "status": "agendado",
-    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/35e71819-54cb-42c5-a7f7-9664a8d88eff.mp4"
+    "status": "publicado",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/35e71819-54cb-42c5-a7f7-9664a8d88eff.mp4",
+    "id_instagram": "18390405793205376",
+    "publicado_em": "2026-09-24T17:11:37.461Z",
+    "id_comentario": "18038657501837594",
+    "erro_facebook": "processamento nao terminou em 5min - nao publicando incompleto"
   },
   {
     "quando": "2026-09-24T19:00:00.000Z",
