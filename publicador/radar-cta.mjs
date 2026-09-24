@@ -46,7 +46,7 @@ for (const h of hashtags) {
     const id = (await (await fetch(u)).json());
     if (id.error || !id.data?.[0]) { porHashtag.push({ hashtag: h, ok: false, erro: id.error?.message?.slice(0, 120) || 'sem id' }); continue; }
     const t = new URL(`${API}/${id.data[0].id}/top_media`); t.searchParams.set('user_id', IG_USER_ID);
-    t.searchParams.set('fields', 'caption,comments_count,like_count,media_type,timestamp,permalink'); t.searchParams.set('limit', '50'); t.searchParams.set('access_token', IG_TOKEN);
+    t.searchParams.set('fields', 'caption,comments_count,like_count,permalink'); t.searchParams.set('limit', '25'); t.searchParams.set('access_token', IG_TOKEN);
     const tm = await (await fetch(t)).json();
     if (tm.error) { porHashtag.push({ hashtag: h, ok: false, erro: tm.error.message?.slice(0, 120) }); continue; }
     const ps = (tm.data || []).map(p => { const cap = p.caption || '', pede = PEDE.test(cap), m = cap.match(CTA);
