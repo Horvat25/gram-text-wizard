@@ -2955,6 +2955,22 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-25T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-como-nasce-buraco-negro-2026-09-25/01.jpg",
+      "https://neural-update.com.br/carrossel/car-como-nasce-buraco-negro-2026-09-25/02.jpg",
+      "https://neural-update.com.br/carrossel/car-como-nasce-buraco-negro-2026-09-25/03.jpg",
+      "https://neural-update.com.br/carrossel/car-como-nasce-buraco-negro-2026-09-25/04.jpg",
+      "https://neural-update.com.br/carrossel/car-como-nasce-buraco-negro-2026-09-25/05.jpg",
+      "https://neural-update.com.br/carrossel/car-como-nasce-buraco-negro-2026-09-25/06.jpg"
+    ],
+    "legenda": "Como uma estrela vira um buraco negro? 🕳️\n\nNão basta ser uma estrela grande. Depois que o combustível acaba, o núcleo precisa continuar massivo o bastante para que nenhuma pressão consiga segurar o colapso. O resultado é uma região cercada pelo horizonte de eventos.\n\n🔖 Salva esta sequência.\n📤 Manda para quem acha que buraco negro é um buraco vazio.\n👉 Segue @neuralupdate: astronomia todos os dias.\n\n📚 Fonte primária: NASA Science — https://science.nasa.gov/universe/black-holes/\n\n#buraconegro #estrelas #astronomia #ciencia #universo #neuralupdate",
+    "slug": "car-como-nasce-buraco-negro-2026-09-25",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-25T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9915ac13-50f8-4c6f-afe0-bcd0c9d2dd76.mp4",
@@ -2982,6 +2998,21 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-26T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-roman-300-megapixels-2026-09-26/01.jpg",
+      "https://neural-update.com.br/carrossel/car-roman-300-megapixels-2026-09-26/02.jpg",
+      "https://neural-update.com.br/carrossel/car-roman-300-megapixels-2026-09-26/03.jpg",
+      "https://neural-update.com.br/carrossel/car-roman-300-megapixels-2026-09-26/04.jpg",
+      "https://neural-update.com.br/carrossel/car-roman-300-megapixels-2026-09-26/05.jpg"
+    ],
+    "legenda": "O telescópio Roman ligou uma câmera de 300 megapixels no espaço. 🔭\n\nSão 18 detectores capazes de registrar, numa única imagem, uma área do céu maior que a Lua cheia, mantendo nitidez comparável à do Hubble. O objetivo é observar grandes regiões rapidamente para estudar exoplanetas e a expansão do universo.\n\n🔖 Salva os números da missão.\n📤 Manda para quem acompanha telescópios espaciais.\n👉 Segue @neuralupdate para acompanhar as primeiras imagens.\n\n📚 Fonte primária: NASA — https://science.nasa.gov/blogs/roman/2026/09/15/nasa-activates-romans-primary-instrument-checks-out-coronagraph/\n\n#telescopioroman #nasa #astronomia #exoplanetas #universo #neuralupdate",
+    "slug": "car-roman-300-megapixels-2026-09-26",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
+  },
+  {
     "quando": "2026-09-26T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/21a979e8-63b7-4d7e-bf40-6b6f8841c373.mp4",
@@ -3007,6 +3038,22 @@
     "legenda": "A sonda Juice, da Agência Espacial Europeia, passa a cerca de 8.640 quilômetros da Terra para ganhar velocidade rumo a Júpiter. Antes da aproximação, ela atravessa a sombra terrestre operando com as baterias. A chegada ao sistema de Júpiter está prevista para julho de 2031.\n\n#juice #esa #jupiter #astronomia #espaco #neuralupdate",
     "slug": "nw-juice-raspa-terra-amanha",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-09-27T15:00:00.000Z",
+    "tipo": "carrossel",
+    "midia": [
+      "https://neural-update.com.br/carrossel/car-tipos-de-galaxia-2026-09-27/01.jpg",
+      "https://neural-update.com.br/carrossel/car-tipos-de-galaxia-2026-09-27/02.jpg",
+      "https://neural-update.com.br/carrossel/car-tipos-de-galaxia-2026-09-27/03.jpg",
+      "https://neural-update.com.br/carrossel/car-tipos-de-galaxia-2026-09-27/04.jpg",
+      "https://neural-update.com.br/carrossel/car-tipos-de-galaxia-2026-09-27/05.jpg",
+      "https://neural-update.com.br/carrossel/car-tipos-de-galaxia-2026-09-27/06.jpg"
+    ],
+    "legenda": "Espiral, elíptica, lenticular ou irregular: qual é a diferença? 🌌\n\nOs nomes descrevem a estrutura que enxergamos. Espirais têm disco e braços; elípticas parecem bolas ou elipses suaves; lenticulares têm disco e bojo, mas não braços; irregulares não exibem uma forma organizada. A Via Láctea é uma espiral com uma barra de estrelas no centro.\n\n🔖 Salva este guia para reconhecer os formatos.\n📤 Manda para quem sempre confunde galáxia com nebulosa.\n👉 Segue @neuralupdate para aprender astronomia sem enrolação.\n\n📚 Fonte primária: NASA Science — https://science.nasa.gov/universe/galaxies/types/\n\n#galaxias #vialactea #astronomia #ciencia #universo #neuralupdate",
+    "slug": "car-tipos-de-galaxia-2026-09-27",
+    "status": "agendado",
+    "origem": "carrossel/render.js"
   },
   {
     "quando": "2026-09-27T17:00:00.000Z",
