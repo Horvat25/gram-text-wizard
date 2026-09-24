@@ -2935,5 +2935,86 @@
     "status": "agendado",
     "campanha": "projetor-astronauta",
     "variacao": "presente-universo"
+  },
+  {
+    "quando": "2026-09-25T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c7831128-9377-4c9d-bcf6-543c55c0cdaf.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7a6b1036-c97b-43a1-ad62-ab48341ab66f.mp4",
+    "legenda": "Um círculo de 25 quilômetros ficou escondido na floresta do Canadá até aparecer num mapa de celular. Um astrônomo amador notou a forma; depois, geólogos encontraram sinais de uma cratera de impacto com cerca de 390 milhões de anos.\n\n#astronomia #ciencia #cratera #canada #espaco #neuralupdate",
+    "slug": "nw-cratera-escondida-quebec",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-25T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9915ac13-50f8-4c6f-afe0-bcd0c9d2dd76.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b11a296e-a361-46cd-b9f2-bb8ca3ce6d0e.mp4",
+    "legenda": "Um buraco negro não é um buraco vazio: é matéria concentrada a ponto de criar uma região da qual nem a luz escapa. Estrelas muito massivas podem terminar assim quando o núcleo que sobra passa do limite que consegue resistir ao colapso.\n\n#buraconegro #estrelas #astronomia #ciencia #universo #neuralupdate",
+    "slug": "nw-estrela-vira-buraco-negro",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-25T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b3f5775a-7e8b-45e7-b762-6c0a4dc08882.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/946143b5-10eb-42ca-acdb-b612e36cc57a.mp4",
+    "legenda": "Uma faixa de estrelas atravessando o céu inteiro ainda existe — mesmo quando a luz das cidades impede a gente de enxergar. Mais de um terço da humanidade já não consegue ver a Via Láctea de casa.\n\n#vialactea #ceu #astronomia #poluicaoluminosa #universo #neuralupdate",
+    "slug": "viral-ceu-que-a-cidade-apagou-ig",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-26T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4757eb43-29e2-4382-879f-8007fa2c6949.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ae70cfc1-2377-4ab2-a1cf-49deadc0606e.mp4",
+    "legenda": "O telescópio Roman ligou sua câmera principal: 18 detectores que somam 300 megapixels e cobrem uma área do céu maior que a Lua cheia com nitidez comparável à do Hubble. As primeiras imagens científicas são esperadas para o começo de 2027.\n\n#telescopioroman #nasa #astronomia #exoplanetas #espaco #neuralupdate",
+    "slug": "nw-roman-camera-300mp",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-26T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/21a979e8-63b7-4d7e-bf40-6b6f8841c373.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3841583b-858d-4666-8b45-b1b0e1bbcf22.mp4",
+    "legenda": "Uma nebulosa é uma nuvem gigante de gás e poeira. Em regiões mais densas, a gravidade junta o material; quando o centro fica quente o bastante, começa a fusão do hidrogênio e nasce uma estrela. Uma única nebulosa pode formar milhares delas — e o nosso Sol também nasceu assim.\n\n#nebulosa #estrelas #astronomia #ciencia #universo #neuralupdate",
+    "slug": "pl50-nebulosa-berco-das-estrelas",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-26T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/08761325-df9a-40d8-bc5b-27ab515ce839.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2c7d9908-56ee-4f6d-8d70-89ffa2bb801f.mp4",
+    "legenda": "Em 1859, uma tempestade solar fez fios de telégrafo soltarem faíscas. Em julho de 2012, outra ejeção de força comparável cruzou a órbita da Terra no ponto onde o planeta estava uma semana antes.\n\n#tempestadesolar #sol #astronomia #ciencia #espaco #neuralupdate",
+    "slug": "viral-tempestade-solar-carrington",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-27T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d807898e-d279-4465-8af8-c3ba102985a4.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/283c1650-96ed-413f-b1e1-ca6309aa2273.mp4",
+    "legenda": "A sonda Juice, da Agência Espacial Europeia, passa a cerca de 8.640 quilômetros da Terra para ganhar velocidade rumo a Júpiter. Antes da aproximação, ela atravessa a sombra terrestre operando com as baterias. A chegada ao sistema de Júpiter está prevista para julho de 2031.\n\n#juice #esa #jupiter #astronomia #espaco #neuralupdate",
+    "slug": "nw-juice-raspa-terra-amanha",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-27T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ca58f1e7-d32f-4960-8549-ca00709296a3.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0097f050-4726-4932-b35a-4460e5e20f8b.mp4",
+    "legenda": "As galáxias aparecem em quatro classes principais: espirais, elípticas, irregulares e lenticulares. A Via Láctea é uma espiral barrada, com uma barra de estrelas atravessando o centro.\n\n#galaxias #vialactea #astronomia #ciencia #universo #neuralupdate",
+    "slug": "pl51-tipos-de-galaxia",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-27T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0865b13d-fd39-4128-9be3-2b1414105947.mp4",
+    "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/63d5bc81-a896-492b-8fa0-4250e5397299.mp4",
+    "legenda": "Espelhos deixados na Lua pelas missões Apollo devolvem lasers disparados da Terra. Medindo o tempo de ida e volta da luz, cientistas descobriram que a Lua se afasta cerca de 3,8 centímetros por ano.\n\n#lua #eclipse #apollo #astronomia #ciencia #neuralupdate",
+    "slug": "viral-lua-fugindo",
+    "status": "agendado"
   }
 ]
