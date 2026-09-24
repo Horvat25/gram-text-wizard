@@ -2955,6 +2955,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-25T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b4bc6bdb-1bd4-40c8-b046-88c96aa5cbc2.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-25",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-25T15:00:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -2980,6 +2988,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-25T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cb121e7f-949c-4ea6-bf68-106c41518aae.png",
+    "legenda": "",
+    "slug": "story-feed-2026-09-25",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-25T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b3f5775a-7e8b-45e7-b762-6c0a4dc08882.mp4",
@@ -2989,12 +3005,28 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-25T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/73c477cd-1798-451d-8b73-a3ca381dce88.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-25",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-26T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4757eb43-29e2-4382-879f-8007fa2c6949.mp4",
     "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ae70cfc1-2377-4ab2-a1cf-49deadc0606e.mp4",
     "legenda": "O telescópio Roman ligou sua câmera principal: 18 detectores que somam 300 megapixels e cobrem uma área do céu maior que a Lua cheia com nitidez comparável à do Hubble. As primeiras imagens científicas são esperadas para o começo de 2027.\n\n#telescopioroman #nasa #astronomia #exoplanetas #espaco #neuralupdate",
     "slug": "nw-roman-camera-300mp",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-26T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/592f3273-6776-4a62-a483-4f23b17c668a.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-26",
     "status": "agendado"
   },
   {
@@ -3022,6 +3054,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-26T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/43612efb-b3ad-40da-8816-809540391d93.png",
+    "legenda": "",
+    "slug": "story-feed-2026-09-26",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-26T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/08761325-df9a-40d8-bc5b-27ab515ce839.mp4",
@@ -3031,12 +3071,28 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-26T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cbb7ae37-0681-459d-849e-43dcf64ffb68.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-26",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-27T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d807898e-d279-4465-8af8-c3ba102985a4.mp4",
     "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/283c1650-96ed-413f-b1e1-ca6309aa2273.mp4",
     "legenda": "A sonda Juice, da Agência Espacial Europeia, passa a cerca de 8.640 quilômetros da Terra para ganhar velocidade rumo a Júpiter. Antes da aproximação, ela atravessa a sombra terrestre operando com as baterias. A chegada ao sistema de Júpiter está prevista para julho de 2031.\n\n#juice #esa #jupiter #astronomia #espaco #neuralupdate",
     "slug": "nw-juice-raspa-terra-amanha",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-27T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7ec16dfd-2303-4e2e-8967-5ab148596cc3.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-09-27",
     "status": "agendado"
   },
   {
@@ -3065,12 +3121,28 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-27T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/52d8f3b2-0510-455c-9d36-10dbddf0c7a1.png",
+    "legenda": "",
+    "slug": "story-feed-2026-09-27",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-27T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0865b13d-fd39-4128-9be3-2b1414105947.mp4",
     "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/63d5bc81-a896-492b-8fa0-4250e5397299.mp4",
     "legenda": "Espelhos deixados na Lua pelas missões Apollo devolvem lasers disparados da Terra. Medindo o tempo de ida e volta da luz, cientistas descobriram que a Lua se afasta cerca de 3,8 centímetros por ano.\n\n#lua #eclipse #apollo #astronomia #ciencia #neuralupdate",
     "slug": "viral-lua-fugindo",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-27T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2c2cc669-7ae6-44aa-a8e9-41ac9da8927b.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-27",
     "status": "agendado"
   }
 ]
