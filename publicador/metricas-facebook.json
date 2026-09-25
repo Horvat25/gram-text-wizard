@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-24T14:16:58.052Z",
+  "gerado_em": "2026-09-25T14:40:14.329Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -409,12 +409,55 @@
     },
     {
       "d": "2026-09-24",
-      "views": 1
+      "views": 2
+    },
+    {
+      "d": "2026-09-25",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2073105243312134",
+      "quando": "2026-09-25T11:11:13+0000",
+      "titulo": "Um círculo de 25 quilômetros ficou escondido na floresta do Canadá até aparecer num mapa de celular. Um astrôn",
+      "link": "https://www.facebook.com/reel/2073105243312134/",
+      "segundos": 38,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1321801833226566",
+      "quando": "2026-09-25T00:10:57+0000",
+      "titulo": "O Departamento de Defesa dos EUA publicou um novo lote de arquivos sobre fenômenos anômalos não identificados.",
+      "link": "https://www.facebook.com/reel/1321801833226566/",
+      "segundos": 40.291,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2597475740676544",
+      "quando": "2026-09-24T21:11:12+0000",
+      "titulo": "Tem poeira do espaço no telhado da sua casa. 🏠",
+      "link": "https://www.facebook.com/reel/2597475740676544/",
+      "segundos": 43.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 6752,
+      "interacoes": 0
+    },
     {
       "id": "1592204112604764",
       "quando": "2026-09-17T11:11:18+0000",
