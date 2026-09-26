@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-09-25T14:33:05.526Z",
+ "gerado_em": "2026-09-26T13:44:16.930Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,11 +14,11 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2530944,
+   "seguidores": 2531291,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.005,
+   "comentarios_por_curtida_com_pedido": 0.014,
    "comentarios_por_curtida_sem_pedido": 0.014,
    "melhores_pedidos": [
     {
@@ -27,8 +27,8 @@
      "pede": true,
      "palavra": null,
      "trecho": "☄️ Como a destruição pode ter aberto caminho para a nossa existência? Entenda as evidências e os limites dessa hipótese no novo vídeo do Spa",
-     "comentarios": 2,
-     "curtidas": 435,
+     "comentarios": 8,
+     "curtidas": 590,
      "link": "https://www.instagram.com/p/DdsYzYZjGON/"
     }
    ]
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 16978,
+   "seguidores": 16997,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,24 +55,13 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590405,
+   "seguidores": 590391,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
+   "pct_posts_pedindo": 0,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.006,
-   "comentarios_por_curtida_sem_pedido": 0.085,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-09-24",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": null,
-     "trecho": "No Atol de Kaafu, a equipe analisou dez anos de imagens de satélite, correntes e outros dados para identificar como a erosão avançava. O est",
-     "comentarios": 1,
-     "curtidas": 166,
-     "link": "https://www.instagram.com/p/Ddq1cM5E9I2/"
-    }
-   ]
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.056,
+   "melhores_pedidos": []
   },
   {
    "usuario": "achadinhospromo15",
@@ -144,7 +133,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1052738,
+   "seguidores": 1052999,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
