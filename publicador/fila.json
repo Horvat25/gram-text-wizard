@@ -3082,8 +3082,11 @@
     ],
     "legenda": "O telescópio Roman ligou uma câmera de 300 megapixels no espaço. 🔭\n\nSão 18 detectores capazes de registrar, numa única imagem, uma área do céu maior que a Lua cheia, mantendo nitidez comparável à do Hubble. O objetivo é observar grandes regiões rapidamente para estudar exoplanetas e a expansão do universo.\n\n🔖 Salva os números da missão.\n📤 Manda para quem acompanha telescópios espaciais.\n👉 Segue @neuralupdate para acompanhar as primeiras imagens.\n\n📚 Fonte primária: NASA — https://science.nasa.gov/blogs/roman/2026/09/15/nasa-activates-romans-primary-instrument-checks-out-coronagraph/\n\n#telescopioroman #nasa #astronomia #exoplanetas #universo #neuralupdate",
     "slug": "car-roman-300-megapixels-2026-09-26",
-    "status": "agendado",
-    "origem": "carrossel/render.js"
+    "status": "publicado",
+    "origem": "carrossel/render.js",
+    "id_instagram": "17914988373460602",
+    "publicado_em": "2026-09-26T17:10:52.494Z",
+    "id_comentario": "18112347658902862"
   },
   {
     "quando": "2026-09-26T17:00:00.000Z",
@@ -3092,7 +3095,11 @@
     "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3841583b-858d-4666-8b45-b1b0e1bbcf22.mp4",
     "legenda": "As estrelas nascem dentro de nuvens — e demoram milhões de anos pra acender. 🌌\n\nUma nebulosa é uma nuvem de gás e poeira tão grande que a luz leva anos pra atravessar de uma ponta à outra. Nas partes mais densas, a gravidade vai juntando o gás em bolas cada vez mais apertadas. Quando o centro fica quente o bastante, o hidrogênio começa a se fundir: nasce uma estrela. Uma única nebulosa pode formar milhares de estrelas de uma vez — e o nosso Sol nasceu assim, há uns 4,6 bilhões de anos.\n\n🔖 Salva pra lembrar de onde o Sol veio.\n📤 Manda pra quem acha que as estrelas sempre estiveram lá.\n👉 Segue @neuralupdate: amanhã às 14h a aula é sobre os formatos das galáxias.\n\n📚 Fonte: NASA Science — https://science.nasa.gov/universe/stars/\n\n#nebulosa #estrelas #astronomia #ciencia #universo #neuralupdate",
     "slug": "pl50-nebulosa-berco-das-estrelas",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17898879408386846",
+    "publicado_em": "2026-09-26T17:11:31.433Z",
+    "id_comentario": "18112700339605183",
+    "id_facebook": "1495583502412867"
   },
   {
     "quando": "2026-09-26T19:00:00.000Z",
