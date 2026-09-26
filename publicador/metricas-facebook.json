@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-25T14:40:14.329Z",
+  "gerado_em": "2026-09-26T13:49:01.281Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -414,11 +414,54 @@
     {
       "d": "2026-09-25",
       "views": 0
+    },
+    {
+      "d": "2026-09-26",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2215929319270106",
+      "quando": "2026-09-26T11:11:15+0000",
+      "titulo": "O telescópio Roman ligou sua câmera principal: 18 detectores que somam 300 megapixels e cobrem uma área do céu",
+      "link": "https://www.facebook.com/reel/2215929319270106/",
+      "segundos": 38.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2338951183511786",
+      "quando": "2026-09-25T21:11:16+0000",
+      "titulo": "Uma faixa de estrelas atravessando o céu inteiro ainda existe — mesmo quando a luz das cidades impede a gente ",
+      "link": "https://www.facebook.com/reel/2338951183511786/",
+      "segundos": 36.916,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1074161441877192",
+      "quando": "2026-09-25T17:11:08+0000",
+      "titulo": "Um buraco negro não é um buraco vazio: é matéria concentrada a ponto de criar uma região da qual nem a luz esc",
+      "link": "https://www.facebook.com/reel/1074161441877192/",
+      "segundos": 41.583,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2073105243312134",
       "quando": "2026-09-25T11:11:13+0000",
