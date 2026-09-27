@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-09-26T13:44:16.930Z",
+ "gerado_em": "2026-09-27T14:40:06.370Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,11 +14,11 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2531291,
+   "seguidores": 2532179,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.014,
+   "comentarios_por_curtida_com_pedido": 0.017,
    "comentarios_por_curtida_sem_pedido": 0.014,
    "melhores_pedidos": [
     {
@@ -27,8 +27,8 @@
      "pede": true,
      "palavra": null,
      "trecho": "☄️ Como a destruição pode ter aberto caminho para a nossa existência? Entenda as evidências e os limites dessa hipótese no novo vídeo do Spa",
-     "comentarios": 8,
-     "curtidas": 590,
+     "comentarios": 11,
+     "curtidas": 647,
      "link": "https://www.instagram.com/p/DdsYzYZjGON/"
     }
    ]
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 16997,
+   "seguidores": 17010,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,12 +55,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590391,
+   "seguidores": 590451,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.056,
+   "comentarios_por_curtida_sem_pedido": 0.064,
    "melhores_pedidos": []
   },
   {
@@ -133,12 +133,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1052999,
+   "seguidores": 1053358,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.021,
+   "comentarios_por_curtida_sem_pedido": 0.02,
    "melhores_pedidos": []
   }
  ],
