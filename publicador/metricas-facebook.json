@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-26T13:49:01.281Z",
+  "gerado_em": "2026-09-27T14:45:16.964Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -418,11 +418,54 @@
     {
       "d": "2026-09-26",
       "views": 0
+    },
+    {
+      "d": "2026-09-27",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1230067802659467",
+      "quando": "2026-09-27T11:12:16+0000",
+      "titulo": "A sonda Juice, da Agência Espacial Europeia, passa a cerca de 8.640 quilômetros da Terra para ganhar velocidad",
+      "link": "https://www.facebook.com/reel/1230067802659467/",
+      "segundos": 41.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1774042616979571",
+      "quando": "2026-09-26T21:11:11+0000",
+      "titulo": "Em 1859, uma tempestade solar fez fios de telégrafo soltarem faíscas. Em julho de 2012, outra ejeção de força ",
+      "link": "https://www.facebook.com/reel/1774042616979571/",
+      "segundos": 38.458,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1495583502412867",
+      "quando": "2026-09-26T17:11:33+0000",
+      "titulo": "As estrelas nascem dentro de nuvens — e demoram milhões de anos pra acender. 🌌",
+      "link": "https://www.facebook.com/reel/1495583502412867/",
+      "segundos": 37.375,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2215929319270106",
       "quando": "2026-09-26T11:11:15+0000",
