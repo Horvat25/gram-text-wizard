@@ -3197,7 +3197,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/52d8f3b2-0510-455c-9d36-10dbddf0c7a1.png",
     "legenda": "",
     "slug": "story-feed-2026-09-27",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18338693104261317",
+    "publicado_em": "2026-09-27T21:10:33.101Z"
   },
   {
     "quando": "2026-09-27T21:00:00.000Z",
@@ -3206,7 +3208,11 @@
     "midia_facebook": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/63d5bc81-a896-492b-8fa0-4250e5397299.mp4",
     "legenda": "Espelhos deixados na Lua pelas missões Apollo devolvem lasers disparados da Terra. Medindo o tempo de ida e volta da luz, cientistas descobriram que a Lua se afasta cerca de 3,8 centímetros por ano.\n\n#lua #eclipse #apollo #astronomia #ciencia #neuralupdate",
     "slug": "viral-lua-fugindo",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18413778805091912",
+    "publicado_em": "2026-09-27T21:11:10.063Z",
+    "id_comentario": "17985342303075287",
+    "id_facebook": "1086663587615777"
   },
   {
     "quando": "2026-09-27T23:00:00.000Z",
