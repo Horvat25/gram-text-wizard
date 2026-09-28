@@ -165,13 +165,13 @@
    "quando": "2026-09-28T00:10:35+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-09-28T13:50:44.926Z",
+   "ultimo_retrato": "2026-09-28T23:14:44.190Z",
    "_metricas": "reach,replies",
-   "reach": 43,
+   "reach": 58,
    "replies": 0
   }
  },
- "gerado_em": "2026-09-28T13:50:56.492Z",
+ "gerado_em": "2026-09-28T23:14:44.450Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -252,6 +252,10 @@
   "2026-09-28T13": {
    "seguidores": 1214,
    "publicacoes": 941
+  },
+  "2026-09-28T23": {
+   "seguidores": 1218,
+   "publicacoes": 943
   }
  },
  "ganhos_por_dia": {
@@ -287,6 +291,6 @@
   "2026-09-24": 1,
   "2026-09-25": 2,
   "2026-09-26": 3,
-  "2026-09-27": 0
+  "2026-09-27": 10
  }
 }
