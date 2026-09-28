@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-27T14:45:16.964Z",
+  "gerado_em": "2026-09-28T17:43:35.504Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -422,11 +422,67 @@
     {
       "d": "2026-09-27",
       "views": 0
+    },
+    {
+      "d": "2026-09-28",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "973822025027120",
+      "quando": "2026-09-28T17:11:06+0000",
+      "titulo": "Tem planeta onde chove vidro de lado. E ele nem é o mais estranho. 🪐",
+      "link": "https://www.facebook.com/reel/973822025027120/",
+      "segundos": 40.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1110816548191555",
+      "quando": "2026-09-28T12:10:04+0000",
+      "titulo": "Um planeta de outra estrela mandou sinal de rádio — e não é ET. 📡",
+      "link": "https://www.facebook.com/reel/1110816548191555/",
+      "segundos": 38.625,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1086663587615777",
+      "quando": "2026-09-27T21:11:13+0000",
+      "titulo": "Espelhos deixados na Lua pelas missões Apollo devolvem lasers disparados da Terra. Medindo o tempo de ida e vo",
+      "link": "https://www.facebook.com/reel/1086663587615777/",
+      "segundos": 36.458,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2089651115007453",
+      "quando": "2026-09-27T17:11:46+0000",
+      "titulo": "Nem toda galáxia é aquela espiral bonita dos pôsteres. 🌌",
+      "link": "https://www.facebook.com/reel/2089651115007453/",
+      "segundos": 43.75,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1230067802659467",
       "quando": "2026-09-27T11:12:16+0000",
