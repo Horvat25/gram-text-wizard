@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-28T17:43:35.504Z",
+  "gerado_em": "2026-09-29T15:59:29.566Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -426,11 +426,41 @@
     {
       "d": "2026-09-28",
       "views": 0
+    },
+    {
+      "d": "2026-09-29",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2305657907057106",
+      "quando": "2026-09-29T11:12:03+0000",
+      "titulo": "Um satélite do tamanho de uma caixa de sapatos quer aposentar um dos tanques. 🛰️",
+      "link": "https://www.facebook.com/reel/2305657907057106/",
+      "segundos": 41.75,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1458933929385570",
+      "quando": "2026-09-28T21:11:27+0000",
+      "titulo": "Um planeta inteiro de hidrogênio — e ele não pega fogo. 🔥",
+      "link": "https://www.facebook.com/reel/1458933929385570/",
+      "segundos": 36.041,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "973822025027120",
       "quando": "2026-09-28T17:11:06+0000",
