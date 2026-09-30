@@ -51,5 +51,21 @@ if (dias <= 1) {
   console.error('FILA ACABANDO: produzir o próximo lote hoje, senão o canal fica mudo.');
 }
 
+// ⚠️ 30/09/2026 — O BURACO DOS STORIES. A conta acima olha a fila INTEIRA, então os Reels
+// (agendados até 01/10) escondiam que os Stories tinham acabado em 27/09: três dias sem
+// Story e o vigia verde. Story é gerado em lote à mão, não sai sozinho, então cada tipo
+// precisa da SUA própria cobertura.
+const TIPOS = { reels: 'Reels', story: 'Stories' };
+for (const [tipo, nome] of Object.entries(TIPOS)) {
+  const f = futuros.filter(i => i.tipo === tipo);
+  const d = f.length ? Math.ceil((new Date(f[f.length - 1].quando) - agora) / 86400000) : 0;
+  const ate = f.length ? f[f.length - 1].quando.slice(0, 10) : '(nenhum)';
+  console.log(`${nome}: ${f.length} pela frente, até ${ate} (${d} dia(s))`);
+  if (d <= 1) {
+    problema = true;
+    console.error(`${nome.toUpperCase()} ACABANDO: gerar e enfileirar o próximo lote de ${nome} hoje.`);
+  }
+}
+
 if (!problema) console.log('tudo em ordem');
 process.exit(problema ? 1 : 0);
