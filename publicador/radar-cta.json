@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-09-29T15:35:30.638Z",
+ "gerado_em": "2026-09-30T15:48:29.267Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,11 +14,11 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2533312,
+   "seguidores": 2533391,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.018,
+   "comentarios_por_curtida_com_pedido": 0.017,
    "comentarios_por_curtida_sem_pedido": 0.011,
    "melhores_pedidos": [
     {
@@ -28,7 +28,7 @@
      "palavra": null,
      "trecho": "☄️ Como a destruição pode ter aberto caminho para a nossa existência? Entenda as evidências e os limites dessa hipótese no novo vídeo do Spa",
      "comentarios": 12,
-     "curtidas": 682,
+     "curtidas": 701,
      "link": "https://www.instagram.com/p/DdsYzYZjGON/"
     }
    ]
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17020,
+   "seguidores": 17027,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,13 +55,26 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590669,
+   "seguidores": 590832,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.036,
-   "melhores_pedidos": []
+   "pct_posts_pedindo": 0.02,
+   "palavras": {
+    "AO": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.15,
+   "comentarios_por_curtida_sem_pedido": 0.04,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-09-29",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "AO",
+     "trecho": "Parte do setor financeiro avalia a medida contra as bets de forma positiva. Uma liderança do setor, porém, ressalva que não é possível atrib",
+     "comentarios": 100,
+     "curtidas": 665,
+     "link": "https://www.instagram.com/p/Dd4qskUCeYW/"
+    }
+   ]
   },
   {
    "usuario": "achadinhospromo15",
@@ -133,7 +146,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1053766,
+   "seguidores": 1053904,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
