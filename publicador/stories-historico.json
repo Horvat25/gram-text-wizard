@@ -169,9 +169,19 @@
    "_metricas": "reach,replies",
    "reach": 58,
    "replies": 0
+  },
+  "17888119902469307": {
+   "id": "17888119902469307",
+   "quando": "2026-09-30T20:52:31+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-09-30T22:13:37.171Z",
+   "_metricas": "reach,replies",
+   "reach": 11,
+   "replies": 0
   }
  },
- "gerado_em": "2026-09-30T12:31:43.114Z",
+ "gerado_em": "2026-09-30T22:13:38.302Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -276,6 +286,10 @@
   "2026-09-30T12": {
    "seguidores": 1224,
    "publicacoes": 947
+  },
+  "2026-09-30T22": {
+   "seguidores": 1223,
+   "publicacoes": 949
   }
  },
  "ganhos_por_dia": {
@@ -313,6 +327,6 @@
   "2026-09-26": 3,
   "2026-09-27": 10,
   "2026-09-28": 8,
-  "2026-09-29": 0
+  "2026-09-29": 3
  }
 }
