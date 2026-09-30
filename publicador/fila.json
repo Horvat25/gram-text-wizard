@@ -3316,7 +3316,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/680b5a3c-e6e4-48db-97bb-3a085aa05fbe.mp4",
     "legenda": "O Big Bang não foi uma explosão. Foi o espaço esticando. 💫\n\nHá 13,8 bilhões de anos, tudo o que existe estava num estado quente e denso e começou a se expandir. Não num ponto do espaço: o próprio espaço cresceu, em todo lugar ao mesmo tempo. Por isso o Big Bang não tem centro — ele aconteceu também onde você está. E a expansão continua: as galáxias distantes se afastam de nós.\n\n🔖 Salva pra explicar isso quando alguém falar em 'explosão'.\n📤 Manda pra quem sempre imaginou uma bomba no espaço.\n👉 Segue @neuralupdate: quinta às 14h a aula é sobre por que não tem eclipse todo mês.\n\n📚 Fonte: NASA Science — https://science.nasa.gov/universe/overview/\n\n#bigbang #universo #astronomia #ciencia #neuralupdate",
     "slug": "pl54-big-bang",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17909044878512971",
+    "publicado_em": "2026-09-30T17:11:06.484Z",
+    "id_comentario": "18629965207003415",
+    "id_facebook": "1062257469898234"
   },
   {
     "quando": "2026-09-30T19:00:00.000Z",
@@ -3340,7 +3344,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5aeafa09-2086-4f8d-b27e-6a36b5b1385b.png",
     "legenda": "",
     "slug": "story-kindle-2026-09-30",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   },
   {
     "quando": "2026-10-01T11:00:00.000Z",
@@ -3388,6 +3394,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e2ccf971-dad0-4d1b-bb46-1f7cf3fec255.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-01",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
   }
 ]
