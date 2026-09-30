@@ -3319,11 +3319,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-09-30T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9ed9ffa5-84cd-4fc6-97a3-b3fa2793228b.png",
+    "legenda": "",
+    "slug": "story-feed-2026-09-30",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-09-30T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/677bebbd-4bc6-4379-8dcc-f72ffdac9e88.mp4",
     "legenda": "Astronautas voltam do espaço um pouquinho mais jovens. ⏳\n\nA Estação Espacial passa a 28 mil km/h. E pela relatividade de Einstein, quanto mais rápido você se move, mais devagar o seu relógio anda. Depois de seis meses lá em cima, a diferença é de uns cinco milésimos de segundo. Viajar pro futuro já acontece — só que bem devagar.\n\n🔖 Salva pra usar essa curiosidade na próxima conversa.\n📤 Manda pra quem acha que viagem no tempo é só ficção.\n👉 Segue @neuralupdate pra mais física do espaço sem complicação.\n\n📚 Fonte: NASA — https://www.nasa.gov/humans-in-space/twins-study/\n\n#relatividade #einstein #astronautas #espaco #ciencia #neuralupdate",
     "slug": "viral-astronautas-mais-jovens",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-09-30T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5aeafa09-2086-4f8d-b27e-6a36b5b1385b.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-09-30",
     "status": "agendado"
   },
   {
@@ -3335,6 +3351,14 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-10-01T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5becb870-99ce-4836-8fde-bdafac6570af.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-01",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-10-01T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e2c7527c-eb17-4756-b587-79784b375104.mp4",
@@ -3343,11 +3367,27 @@
     "status": "agendado"
   },
   {
+    "quando": "2026-10-01T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/dffd412a-4d12-4722-bf84-bd9b0b517321.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-01",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-10-01T21:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c686a222-3e20-4374-97d5-fccdbf8d87e9.mp4",
     "legenda": "Estrela cadente não é estrela. É um grão de poeira. ☄️\n\nAquele risco de luz é um meteoro: uma partícula muitas vezes menor que um grão de areia batendo na atmosfera a dezenas de quilômetros por segundo. O ar na frente dela esquenta tanto que brilha. A maioria some a uns 100 km de altura. E na noite de 8 pra 9 de outubro tem a chuva Dracônidas — fraquinha, umas 5 por hora, mas com céu escuro dá pra pegar uma.\n\n🔖 Salva pra lembrar da noite de 8 de outubro.\n📤 Manda pra quem ainda faz pedido pra estrela cadente.\n👉 Segue @neuralupdate pra saber o que tem no céu toda semana.\n\n📚 Fonte: NASA Science — https://science.nasa.gov/solar-system/meteors-meteorites/\n\n#estrelacadente #meteoro #astronomia #ciencia #ceu #neuralupdate",
     "slug": "viral-estrela-cadente",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-01T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e2ccf971-dad0-4d1b-bb46-1f7cf3fec255.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-10-01",
     "status": "agendado"
   }
 ]
