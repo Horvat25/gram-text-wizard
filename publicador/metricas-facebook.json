@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-29T15:59:29.566Z",
+  "gerado_em": "2026-09-30T15:59:45.045Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -430,11 +430,54 @@
     {
       "d": "2026-09-29",
       "views": 0
+    },
+    {
+      "d": "2026-09-30",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2258985248279635",
+      "quando": "2026-09-30T11:11:53+0000",
+      "titulo": "O Hubble completou 200 mil voltas ao redor da Terra. 🔭",
+      "link": "https://www.facebook.com/reel/2258985248279635/",
+      "segundos": 40.291,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1519555233234014",
+      "quando": "2026-09-29T21:11:15+0000",
+      "titulo": "Tem uma lua maior que um planeta. E ela esconde um oceano. 🌊",
+      "link": "https://www.facebook.com/reel/1519555233234014/",
+      "segundos": 39.625,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "4363839593926456",
+      "quando": "2026-09-29T17:11:26+0000",
+      "titulo": "Plutão foi planeta por 76 anos. Aí reprovou num teste. 🪐",
+      "link": "https://www.facebook.com/reel/4363839593926456/",
+      "segundos": 45.75,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2305657907057106",
       "quando": "2026-09-29T11:12:03+0000",
