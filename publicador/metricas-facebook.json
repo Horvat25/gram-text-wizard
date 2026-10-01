@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-30T15:59:45.045Z",
+  "gerado_em": "2026-10-01T16:31:46.915Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -434,11 +434,54 @@
     {
       "d": "2026-09-30",
       "views": 0
+    },
+    {
+      "d": "2026-10-01",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2126503587948549",
+      "quando": "2026-10-01T11:11:26+0000",
+      "titulo": "A NASA escolheu um telescópio pra ver o que nem o James Webb enxerga. 🌌",
+      "link": "https://www.facebook.com/reel/2126503587948549/",
+      "segundos": 42.875,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1409624841235687",
+      "quando": "2026-09-30T21:11:14+0000",
+      "titulo": "Astronautas voltam do espaço um pouquinho mais jovens. ⏳",
+      "link": "https://www.facebook.com/reel/1409624841235687/",
+      "segundos": 34.416,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1062257469898234",
+      "quando": "2026-09-30T17:11:12+0000",
+      "titulo": "O Big Bang não foi uma explosão. Foi o espaço esticando. 💫",
+      "link": "https://www.facebook.com/reel/1062257469898234/",
+      "segundos": 41.791,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2258985248279635",
       "quando": "2026-09-30T11:11:53+0000",
