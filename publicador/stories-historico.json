@@ -175,13 +175,23 @@
    "quando": "2026-09-30T20:52:31+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-01T05:48:59.316Z",
+   "ultimo_retrato": "2026-10-01T13:09:44.500Z",
    "_metricas": "reach,replies",
-   "reach": 56,
+   "reach": 69,
+   "replies": 0
+  },
+  "18634569859051694": {
+   "id": "18634569859051694",
+   "quando": "2026-10-01T11:11:22+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-10-01T13:09:42.753Z",
+   "_metricas": "reach,replies",
+   "reach": 14,
    "replies": 0
   }
  },
- "gerado_em": "2026-10-01T05:49:00.215Z",
+ "gerado_em": "2026-10-01T13:09:45.181Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -294,6 +304,10 @@
   "2026-10-01T05": {
    "seguidores": 1223,
    "publicacoes": 949
+  },
+  "2026-10-01T13": {
+   "seguidores": 1223,
+   "publicacoes": 950
   }
  },
  "ganhos_por_dia": {
@@ -331,6 +345,7 @@
   "2026-09-26": 3,
   "2026-09-27": 10,
   "2026-09-28": 8,
-  "2026-09-29": 3
+  "2026-09-29": 3,
+  "2026-09-30": 0
  }
 }
