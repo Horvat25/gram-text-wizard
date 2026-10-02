@@ -3429,7 +3429,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bda7c9f3-ce3f-472c-a039-4541c22d3525.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-02",
-    "status": "agendado"
+    "status": "falhou",
+    "erro": "publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"type\":\"OAuthException\",\"code\":24,\"error_subcode\":2207006,\"is_transient\":false,\"error_user_title\":\"Mídia não encontrada\",\"error_user_msg\":\"Não foi possível encontrar a mídia com 17.878.743.504.629.830.\",\"fbtrace_id\":\"AiCdy9O0Zi1WnlwTEKo3B2T\"}}"
   },
   {
     "quando": "2026-10-02T11:00:00.000Z",
@@ -3437,7 +3438,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fcacebe0-3f1a-4112-ad13-63a6bac0bcec.mp4",
     "legenda": "Você nunca viu um planeta nascer. Agora alguém viu. 🪐\n\nA 430 anos-luz, um gigante gasoso com cerca de 5 vezes a massa de Júpiter ainda está se formando dentro de um disco de gás. O radiotelescópio ALMA, no Chile, mediu o gás girando em volta dele — o redemoinho que até hoje só existia em simulação de computador.\n\n🔖 Salva pra mostrar como nasce um planeta.\n📤 Manda pra quem acha que planeta sempre esteve ali.\n👉 Segue @neuralupdate: hoje às 14h a aula explica por que todos os planetas giram no mesmo plano.\n\n📚 Fonte: Instituto Max Planck de Astronomia (MPIA), 24/09/2026 — sistema WISPIT 2\n\n#planeta #astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "nw-planeta-nascendo-redemoinho",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18078094664392439",
+    "publicado_em": "2026-10-02T11:11:47.392Z",
+    "id_comentario": "18156545956509748",
+    "id_facebook": "2551497108651559"
   },
   {
     "quando": "2026-10-02T17:00:00.000Z",
