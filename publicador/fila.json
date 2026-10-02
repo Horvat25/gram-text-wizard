@@ -3477,5 +3477,53 @@
     "status": "agendado",
     "campanha": "projetor-astronauta",
     "variacao": "transformacao-quarto"
+  },
+  {
+    "quando": "2026-10-03T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9054ccaf-9bc4-4b6e-b7f4-737eef1904c1.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-03",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-03T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b9278d1c-5c0c-425f-933c-52eff0b4bfba.mp4",
+    "legenda": "Marte é vermelho de poeira. Mas o gelo do polo norte é quase limpo. 🧊\n\nPor anos, a conta dizia que até um quarto daquele gelo era poeira. Agora, juntando duas sondas e um robô que pousou lá, a conta mudou: menos de 3%. O polo funciona como um pavê: camadas de gelo limpo separadas por camadas mais sujas, cada uma guardando o clima de milhares de anos atrás.\n\n🔖 Salva pra lembrar que Marte guarda gelo quase puro.\n📤 Manda pra quem acha que Marte é só poeira.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que a Lua não cai na Terra.\n\n📚 Fonte: Khuller & Mohan, npj Space Exploration (30/09/2026). Imagens: ESA/DLR/FU Berlin (CC BY-SA 3.0 IGO)\n\n#marte #astronomia #espaco #ciencia #universo #neuralupdate",
+    "slug": "nw-gelo-marte-limpo",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-03T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/990497f2-497a-45d3-becf-3c965fd4d379.mp4",
+    "legenda": "A Lua está caindo na Terra. E nunca chega. 🌕\n\nJoga uma pedra pra frente: ela faz uma curva e cai. Joga mais forte, e cai mais longe. Agora imagina jogar tão rápido que o chão curvo vai sumindo embaixo dela. Ela continua caindo, mas nunca encosta. Isso é uma órbita, e a Lua faz igualzinho.\n\n🔖 Salva pra explicar órbita pra alguém.\n📤 Manda pra quem acha que a Lua só flutua.\n👉 Segue @neuralupdate: amanhã às 14h a aula é por que Saturno tem anéis.\n\n📚 Fonte: NASA Science — https://science.nasa.gov/moon/\n\n#lua #orbita #astronomia #ciencia #universo #neuralupdate",
+    "slug": "pl57-lua-nao-cai",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-03T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fd3b0129-cbe3-4817-856b-7880feba104c.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-03",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-03T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e7c48bd0-9f02-4c3f-b41b-b6f0d2facba0.mp4",
+    "legenda": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐\n\nAquele ponto amarelado que quase não pisca é Saturno, no dia do ano em que ele fica mais perto da Terra e mais brilhante. Com uma lunetinha simples, já dá pra ver os anéis. E a luz que bate no seu olho saiu de lá há uns 70 minutos. Só que os anéis estão sumindo: em menos de 300 milhões de anos, essa vista acaba.\n\n🔖 Salva pra lembrar de olhar pro céu amanhã.\n📤 Manda pra alguém que gosta de olhar o céu.\n👉 Segue @neuralupdate pra saber o que tem no céu toda semana.\n\n📚 Fonte: oposição de Saturno em 4/10/2026 às 12h UTC; NASA Science (anéis de Saturno)\n\n#saturno #astronomia #ceu #ciencia #espaco #neuralupdate",
+    "slug": "viral-saturno-amanha",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-03T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2f65cfd3-567f-4338-b8df-0ba38570df4a.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-10-03",
+    "status": "agendado"
   }
 ]
