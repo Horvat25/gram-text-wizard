@@ -1,8 +1,7 @@
 {
- "gerado_em": "2026-10-01T16:14:03.855Z",
- "contas_lidas": 6,
+ "gerado_em": "2026-10-02T15:37:23.320Z",
+ "contas_lidas": 7,
  "contas_invalidas": [
-  "spacetoday: Please reduce the amount of data you're asking for, then retry your request",
   "canaldoschwarza: Invalid user id",
   "achadinhospromo15: Invalid user id",
   "achadosdashopee: Invalid user id",
@@ -14,14 +13,31 @@
   {
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "seguidores": 2553801,
+   "posts_lidos": 50,
+   "pct_posts_pedindo": 0.02,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": 0.018,
+   "comentarios_por_curtida_sem_pedido": 0.012,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-09-25",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": null,
+     "trecho": "☄️ Como a destruição pode ter aberto caminho para a nossa existência? Entenda as evidências e os limites dessa hipótese no novo vídeo do Spa",
+     "comentarios": 13,
+     "curtidas": 742,
+     "link": "https://www.instagram.com/p/DdsYzYZjGON/"
+    }
+   ]
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17044,
+   "seguidores": 17094,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -39,26 +55,13 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590935,
+   "seguidores": 591049,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
-   "palavras": {
-    "AO": 1
-   },
-   "comentarios_por_curtida_com_pedido": 0.145,
-   "comentarios_por_curtida_sem_pedido": 0.05,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-09-29",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": "AO",
-     "trecho": "Parte do setor financeiro avalia a medida contra as bets de forma positiva. Uma liderança do setor, porém, ressalva que não é possível atrib",
-     "comentarios": 106,
-     "curtidas": 731,
-     "link": "https://www.instagram.com/p/Dd4qskUCeYW/"
-    }
-   ]
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.044,
+   "melhores_pedidos": []
   },
   {
    "usuario": "achadinhospromo15",
@@ -113,11 +116,11 @@
    "grupo": "livros",
    "ok": true,
    "seguidores": 14,
-   "posts_lidos": 46,
+   "posts_lidos": 47,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.111,
+   "comentarios_por_curtida_sem_pedido": 0.108,
    "melhores_pedidos": []
   },
   {
@@ -130,12 +133,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1054077,
+   "seguidores": 1054257,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.018,
+   "comentarios_por_curtida_sem_pedido": 0.019,
    "melhores_pedidos": []
   }
  ],
