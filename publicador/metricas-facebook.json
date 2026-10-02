@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-01T16:31:46.915Z",
+  "gerado_em": "2026-10-02T15:53:39.467Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -438,11 +438,54 @@
     {
       "d": "2026-10-01",
       "views": 0
+    },
+    {
+      "d": "2026-10-02",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2551497108651559",
+      "quando": "2026-10-02T11:11:49+0000",
+      "titulo": "Você nunca viu um planeta nascer. Agora alguém viu. 🪐",
+      "link": "https://www.facebook.com/reel/2551497108651559/",
+      "segundos": 36.583,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1098104582970542",
+      "quando": "2026-10-01T21:11:36+0000",
+      "titulo": "Estrela cadente não é estrela. É um grão de poeira. ☄️",
+      "link": "https://www.facebook.com/reel/1098104582970542/",
+      "segundos": 40.375,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "3492798060884607",
+      "quando": "2026-10-01T17:11:36+0000",
+      "titulo": "A Lua passa na frente do Sol todo mês. Então por que não tem eclipse todo mês? 🌑",
+      "link": "https://www.facebook.com/reel/3492798060884607/",
+      "segundos": 41.88,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2126503587948549",
       "quando": "2026-10-01T11:11:26+0000",
