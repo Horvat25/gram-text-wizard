@@ -3496,7 +3496,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9054ccaf-9bc4-4b6e-b7f4-737eef1904c1.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-03",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18131161663813125",
+    "publicado_em": "2026-10-03T11:11:07.833Z"
   },
   {
     "quando": "2026-10-03T11:00:00.000Z",
@@ -3504,7 +3506,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b9278d1c-5c0c-425f-933c-52eff0b4bfba.mp4",
     "legenda": "Marte é vermelho de poeira. Mas o gelo do polo norte é quase limpo. 🧊\n\nPor anos, a conta dizia que até um quarto daquele gelo era poeira. Agora, juntando duas sondas e um robô que pousou lá, a conta mudou: menos de 3%. O polo funciona como um pavê: camadas de gelo limpo separadas por camadas mais sujas, cada uma guardando o clima de milhares de anos atrás.\n\n🔖 Salva pra lembrar que Marte guarda gelo quase puro.\n📤 Manda pra quem acha que Marte é só poeira.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que a Lua não cai na Terra.\n\n📚 Fonte: Khuller & Mohan, npj Space Exploration (30/09/2026). Imagens: ESA/DLR/FU Berlin (CC BY-SA 3.0 IGO)\n\n#marte #astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "nw-gelo-marte-limpo",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18127475947842145",
+    "publicado_em": "2026-10-03T11:11:44.049Z",
+    "id_comentario": "18123448877477655",
+    "id_facebook": "2037518846932941"
   },
   {
     "quando": "2026-10-03T17:00:00.000Z",
@@ -3586,7 +3592,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f04b88e4-6ab0-4eda-9a10-217263ae42ad.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-04",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
   },
   {
     "quando": "2026-10-05T17:00:00.000Z",
@@ -3618,7 +3626,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5824bf5b-6bb1-4269-add0-7c61d4ebb939.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-05",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   },
   {
     "quando": "2026-10-06T17:00:00.000Z",
@@ -3650,7 +3660,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e32d7488-b3d7-4012-b42d-c003db47a0bf.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-06",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   },
   {
     "quando": "2026-10-07T17:00:00.000Z",
@@ -3682,7 +3694,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1d44aae0-63f1-4465-ab9d-d3ae35fd48a8.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-07",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
   },
   {
     "quando": "2026-10-08T17:00:00.000Z",
@@ -3714,6 +3728,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8290ef50-0efe-4616-9cd8-12505a6cf312.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-08",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   }
 ]
