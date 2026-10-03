@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-02T15:53:39.467Z",
+  "gerado_em": "2026-10-03T14:22:34.398Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -442,11 +442,54 @@
     {
       "d": "2026-10-02",
       "views": 0
+    },
+    {
+      "d": "2026-10-03",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2037518846932941",
+      "quando": "2026-10-03T11:11:46+0000",
+      "titulo": "Marte é vermelho de poeira. Mas o gelo do polo norte é quase limpo. 🧊",
+      "link": "https://www.facebook.com/reel/2037518846932941/",
+      "segundos": 36.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1439124894975824",
+      "quando": "2026-10-02T21:11:01+0000",
+      "titulo": "Neste segundo, você está a mais de 1.500 km/h. 🌍",
+      "link": "https://www.facebook.com/reel/1439124894975824/",
+      "segundos": 34.63,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1602610141644413",
+      "quando": "2026-10-02T17:11:04+0000",
+      "titulo": "Os oito planetas giram no mesmo plano. Não é coincidência. 🔭",
+      "link": "https://www.facebook.com/reel/1602610141644413/",
+      "segundos": 42.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2551497108651559",
       "quando": "2026-10-02T11:11:49+0000",
