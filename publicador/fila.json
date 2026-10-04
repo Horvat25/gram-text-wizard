@@ -3564,7 +3564,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/691abdb8-7e26-4182-979b-f1a5670a61c1.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-04",
-    "status": "agendado"
+    "status": "falhou",
+    "erro": "publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"type\":\"OAuthException\",\"code\":24,\"error_subcode\":2207006,\"is_transient\":false,\"error_user_title\":\"Mídia não encontrada\",\"error_user_msg\":\"Não foi possível encontrar a mídia com 17.878.980.054.629.830.\",\"fbtrace_id\":\"ARtjfmgMj38_Yeum2_yRIuW\"}}"
   },
   {
     "quando": "2026-10-04T11:00:00.000Z",
@@ -3572,7 +3573,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/05baf7e0-3fb4-4fc4-8f5b-6040068e67fd.mp4",
     "legenda": "A Lua que você vê de noite nasceu de uma batida. 💥\n\nO telescópio James Webb flagrou batidas assim em sistemas bem jovens: discos de poeira quente, restos de planetas se chocando. Quando a poeira tem sílica, o choque foi entre mundos do tamanho de Marte. Sem sílica, foi só uma raspada entre corpos do tamanho da Lua.\n\n🔖 Salva pra lembrar de onde veio a Lua.\n📤 Manda pra quem acha que a Lua sempre esteve ali.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que só Saturno tem anéis assim.\n\n📚 Fonte: NASA Science, 01/10/2026 — Webb Provides Crash Course on Planet-Shattering Collisions\n\n#webb #lua #astronomia #ciencia #universo #neuralupdate",
     "slug": "nw-planetas-colidindo-webb",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18457195024189178",
+    "publicado_em": "2026-10-04T11:11:11.466Z",
+    "id_comentario": "18016122299744776",
+    "id_facebook": "2109895606267179"
   },
   {
     "quando": "2026-10-04T17:00:00.000Z",
