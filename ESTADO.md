@@ -18,7 +18,7 @@
 ## Saúde
 
 - Vigia `conferir-fila.mjs` mede **Reels e Stories separados** desde 30/09 (`99bdc58`).
-- Token do Instagram: gerado 12/08, **vence ~11/10**. O `saude.yml` avisa 10 dias antes.
+- Token do Instagram (IG_TOKEN e FB_TOKEN): **vale até 31/12/2026** (medido 04/10 pelo `saude.yml`). Ele avisa 10 dias antes; não confiar em data escrita, ler o saude.
 - 9 falhas antigas na fila (19/08–19/09): histórico, não alarme.
 
 ## Pendências desta plataforma
