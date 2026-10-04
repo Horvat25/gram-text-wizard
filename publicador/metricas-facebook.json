@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-03T14:22:34.398Z",
+  "gerado_em": "2026-10-04T14:50:37.201Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -446,11 +446,54 @@
     {
       "d": "2026-10-03",
       "views": 0
+    },
+    {
+      "d": "2026-10-04",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2109895606267179",
+      "quando": "2026-10-04T11:11:13+0000",
+      "titulo": "A Lua que você vê de noite nasceu de uma batida. 💥",
+      "link": "https://www.facebook.com/reel/2109895606267179/",
+      "segundos": 39.88,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1076668438486401",
+      "quando": "2026-10-03T21:12:45+0000",
+      "titulo": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐",
+      "link": "https://www.facebook.com/reel/1076668438486401/",
+      "segundos": 39.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1574517007264292",
+      "quando": "2026-10-03T17:11:09+0000",
+      "titulo": "A Lua está caindo na Terra. E nunca chega. 🌕",
+      "link": "https://www.facebook.com/reel/1574517007264292/",
+      "segundos": 41.17,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2037518846932941",
       "quando": "2026-10-03T11:11:46+0000",
