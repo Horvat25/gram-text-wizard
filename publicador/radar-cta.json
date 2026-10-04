@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-03T14:15:35.295Z",
+ "gerado_em": "2026-10-04T14:45:20.964Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,12 +14,12 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2558045,
+   "seguidores": 2558575,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": 0.017,
-   "comentarios_por_curtida_sem_pedido": 0.011,
+   "comentarios_por_curtida_sem_pedido": 0.01,
    "melhores_pedidos": [
     {
      "quando": "2026-09-25",
@@ -28,7 +28,7 @@
      "palavra": null,
      "trecho": "☄️ Como a destruição pode ter aberto caminho para a nossa existência? Entenda as evidências e os limites dessa hipótese no novo vídeo do Spa",
      "comentarios": 13,
-     "curtidas": 757,
+     "curtidas": 760,
      "link": "https://www.instagram.com/p/DdsYzYZjGON/"
     }
    ]
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17109,
+   "seguidores": 17121,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,12 +55,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591111,
+   "seguidores": 591154,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.056,
+   "comentarios_por_curtida_sem_pedido": 0.055,
    "melhores_pedidos": []
   },
   {
@@ -133,12 +133,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1054495,
+   "seguidores": 1054599,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.02,
+   "comentarios_por_curtida_sem_pedido": 0.019,
    "melhores_pedidos": []
   }
  ],
@@ -171,7 +171,7 @@
   {
    "hashtag": "livros",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   }
  ]
 }
