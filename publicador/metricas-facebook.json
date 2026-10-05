@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-04T14:50:37.201Z",
+  "gerado_em": "2026-10-05T18:34:42.254Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -450,11 +450,67 @@
     {
       "d": "2026-10-04",
       "views": 0
+    },
+    {
+      "d": "2026-10-05",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2558617354635960",
+      "quando": "2026-10-05T17:11:00+0000",
+      "titulo": "Qual é o planeta mais quente? Não é o mais perto do Sol. É Vênus. 🔥",
+      "link": "https://www.facebook.com/reel/2558617354635960/",
+      "segundos": 43.38,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2135920353669195",
+      "quando": "2026-10-05T11:12:46+0000",
+      "titulo": "7 horas e 55 minutos, do chão da Flórida até a Estação Espacial. 🚀",
+      "link": "https://www.facebook.com/reel/2135920353669195/",
+      "segundos": 36.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1294549992778535",
+      "quando": "2026-10-04T21:11:21+0000",
+      "titulo": "Tudo que você está vendo agora já aconteceu. 👀",
+      "link": "https://www.facebook.com/reel/1294549992778535/",
+      "segundos": 38.25,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "28866487826308135",
+      "quando": "2026-10-04T17:11:09+0000",
+      "titulo": "Júpiter, Urano e Netuno também têm anéis. Por que só os de Saturno brilham assim? 🪐",
+      "link": "https://www.facebook.com/reel/28866487826308135/",
+      "segundos": 42.67,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2109895606267179",
       "quando": "2026-10-04T11:11:13+0000",
