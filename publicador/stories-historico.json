@@ -285,9 +285,9 @@
    "quando": "2026-10-05T00:10:28+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-05T14:33:28.180Z",
+   "ultimo_retrato": "2026-10-06T00:01:37.670Z",
    "_metricas": "reach,replies",
-   "reach": 7,
+   "reach": 11,
    "replies": 0
   },
   "17946252771071967": {
@@ -295,12 +295,22 @@
    "quando": "2026-10-05T11:12:44+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-05T14:33:26.334Z",
+   "ultimo_retrato": "2026-10-06T00:01:35.912Z",
+   "_metricas": "reach,replies",
+   "reach": 6,
+   "replies": 0
+  },
+  "18112531649125965": {
+   "id": "18112531649125965",
+   "quando": "2026-10-05T19:08:22+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-10-06T00:01:34.153Z",
    "_metricas": null,
    "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-10-05T14:33:30.612Z",
+ "gerado_em": "2026-10-06T00:01:38.159Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -469,6 +479,10 @@
   "2026-10-05T14": {
    "seguidores": 1240,
    "publicacoes": 962
+  },
+  "2026-10-06T00": {
+   "seguidores": 1240,
+   "publicacoes": 964
   }
  },
  "ganhos_por_dia": {
@@ -511,6 +525,6 @@
   "2026-10-01": 2,
   "2026-10-02": 7,
   "2026-10-03": 8,
-  "2026-10-04": 0
+  "2026-10-04": 3
  }
 }
