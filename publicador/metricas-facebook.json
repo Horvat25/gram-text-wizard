@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-05T18:34:42.254Z",
+  "gerado_em": "2026-10-06T16:02:08.050Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -454,11 +454,41 @@
     {
       "d": "2026-10-05",
       "views": 0
+    },
+    {
+      "d": "2026-10-06",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1091902520262536",
+      "quando": "2026-10-06T11:12:14+0000",
+      "titulo": "Quando duas estrelas mortas batem, o flash dura menos de 1 segundo. Esse durou quase 10 minutos. 💥",
+      "link": "https://www.facebook.com/reel/1091902520262536/",
+      "segundos": 39,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1845611563544876",
+      "quando": "2026-10-05T21:36:02+0000",
+      "titulo": "Nesta terça (6/10), antes do sol nascer, olha pro leste. 🌙",
+      "link": "https://www.facebook.com/reel/1845611563544876/",
+      "segundos": 33.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2558617354635960",
       "quando": "2026-10-05T17:11:00+0000",
