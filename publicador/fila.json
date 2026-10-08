@@ -3888,5 +3888,13 @@
     "status": "agendado",
     "campanha": "projetor-astronauta",
     "variacao": "transformacao-quarto"
+  },
+  {
+    "quando": "2026-10-09T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ee54916d-12d1-4a78-9dfa-2e7b932d9394.mp4",
+    "legenda": "Esse planeta tem superfície de lava. E mesmo assim tem atmosfera. 🌋\n\nO telescópio James Webb achou a evidência mais forte até hoje de ar num planeta rochoso fora do Sistema Solar: o TOI-561 b. Lá, um ano dura menos de 11 horas. Sem atmosfera, o lado de dia estaria perto de 2.700 °C; o Webb mediu uns 1.800 °C, porque essa camada de gases leva parte do calor pro lado escuro.\n\n🔖 Salva pra mostrar pra quem acha que planeta de lava é só pedra.\n📤 Manda pra quem ia apostar que ali não tinha ar.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que o cinturão de asteroides não virou planeta.\n\n📚 Fonte: NASA, 11/12/2025 — NASA’s Webb Detects Thick Atmosphere Around Broiling Lava World\n\n#webb #exoplanetas #nasa #astronomia #ciencia #neuralupdate",
+    "slug": "nw-webb-lava-planeta",
+    "status": "agendado"
   }
 ]
