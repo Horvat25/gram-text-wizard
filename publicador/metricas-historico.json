@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-10-08T16:08:28.301Z",
+ "gerado_em": "2026-10-09T15:50:59.530Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1244,
-  "publicacoes": 971
+  "seguidores": 1246,
+  "publicacoes": 974
  },
- "total_listado": 971,
- "com_tempo_assistido": 431,
+ "total_listado": 974,
+ "com_tempo_assistido": 434,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-09-09",
-     "ate": "2026-10-07",
+     "de": "2026-09-10",
+     "ate": "2026-10-08",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 7,
-         "end_time": "2026-09-10T07:00:00+0000"
-        },
         {
          "value": 2,
          "end_time": "2026-09-11T07:00:00+0000"
@@ -129,8 +125,12 @@
          "end_time": "2026-10-06T07:00:00+0000"
         },
         {
-         "value": 0,
+         "value": 3,
          "end_time": "2026-10-07T07:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-10-08T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -250,7 +250,7 @@
     },
     {
      "de": "2026-09-12",
-     "ate": "2026-10-08",
+     "ate": "2026-10-09",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -269,7 +269,7 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 155
+            "value": 158
            },
            {
             "dimension_values": [
@@ -426,7 +426,7 @@
     },
     {
      "de": "2026-09-12",
-     "ate": "2026-10-08",
+     "ate": "2026-10-09",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -435,7 +435,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 20545
+        "value": 20793
        }
       },
       {
@@ -445,7 +445,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 46837
+        "value": 47397
        }
       },
       {
@@ -455,7 +455,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 806
+        "value": 819
        }
       },
       {
@@ -465,7 +465,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 1650
+        "value": 1669
        }
       }
      ]
@@ -566,15 +566,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 685
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 30185
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 685
            }
           ]
          }
@@ -585,7 +585,7 @@
     },
     {
      "de": "2026-09-12",
-     "ate": "2026-10-08",
+     "ate": "2026-10-09",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -594,7 +594,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 20545,
+        "value": 20793,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -603,15 +603,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 643
+            "value": 20251
            },
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 20018
+            "value": 646
            }
           ]
          }
@@ -2433,13 +2433,37 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-10-08",
+    "janela": "2026-10-09",
     "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18283735351295656": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-09T11:11:46+0000",
+     "respostas": []
+    }
+   ],
+   "18141069268611394": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-08T21:11:55+0000",
+     "respostas": []
+    }
+   ],
+   "18051890087810630": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-08T17:11:03+0000",
+     "respostas": []
+    }
+   ],
    "18140007880614331": [
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4215,25 +4239,91 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18283735351295656",
+   "quando": "2026-10-09T11:11:41+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DeRXwtViZ0T/",
+   "titulo": "Esse planeta tem superfície de lava. E mesmo assim tem atmosfera. 🌋",
+   "legenda": "Esse planeta tem superfície de lava. E mesmo assim tem atmosfera. 🌋\n\nO telescópio James Webb achou a evidência mais forte até hoje de ar num planeta rochoso fora do Sistema Solar: o TOI-561 b. Lá, um ano dura menos de 11 horas. Sem atmosfera, o lado de dia estaria perto de 2.700 °C; o Webb mediu uns 1.800 °C, porque essa camada de gases leva parte do calor pro lado escuro.\n\n🔖 Salva pra mostrar pra quem acha que planeta de lava é só pedra.\n📤 Manda pra quem ia apostar que ali não tinha ar.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que o cinturão de asteroides não virou planeta.\n\n📚 Fonte: NASA, 11/12/2025 — NASA’s Webb Detects Thick Atmosphere Around Broiling Lava World\n\n#webb #exoplanetas #nasa #astronomia #ciencia #neuralupdate",
+   "curtidas_campo": 4,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 180,
+   "reach": 150,
+   "likes": 4,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 7972,
+   "ig_reels_video_view_total_time": 1211871,
+   "reels_skip_rate": 58.3,
+   "reposts": 0
+  },
+  {
+   "id": "18141069268611394",
+   "quando": "2026-10-08T21:11:48+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DeP3pIgjLGR/",
+   "titulo": "Nenhuma lei da física proíbe voltar no tempo. ⏳",
+   "legenda": "Nenhuma lei da física proíbe voltar no tempo. ⏳\n\nA relatividade de Einstein tem soluções em que o tempo dá a volta, como uma estrada que termina onde começou. O problema é o preço: precisaria de uma matéria com energia negativa, que ninguém nunca viu. Stephen Hawking apostava que o universo impede isso. Em 2009, ele fez uma festa pra viajantes do tempo e só mandou o convite depois. Ninguém apareceu.\n\n🔖 Salva pra lembrar da festa do Hawking.\n📤 Manda pra quem jura que vai inventar a máquina do tempo.\n👉 Segue @neuralupdate pra mais física de cabeça pra baixo.\n\n📚 Fonte: relatividade geral; festa de Stephen Hawking (28/06/2009)\n\n#viagemnotempo #hawking #astronomia #ciencia #universo #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 19,
+   "reach": 12,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 3,
+   "ig_reels_avg_watch_time": 18132,
+   "ig_reels_video_view_total_time": 253849,
+   "reels_skip_rate": 69.2,
+   "reposts": 0
+  },
+  {
+   "id": "18051890087810630",
+   "quando": "2026-10-08T17:10:58+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DePcFaijmdf/",
+   "titulo": "Mercúrio está encolhendo. Agora mesmo. 🪨",
+   "legenda": "Mercúrio está encolhendo. Agora mesmo. 🪨\n\nO núcleo de ferro dele está esfriando há bilhões de anos, e ferro que esfria encolhe. A casca não acompanha sem dobrar: igual uva virando passa, a superfície ficou cheia de rugas, algumas com mais de 1 km de altura. Desde que nasceu, Mercúrio já perdeu uns 7 km de raio.\n\n🔖 Salva pra lembrar do planeta-uva-passa.\n📤 Manda pra quem curte planetas estranhos.\n👉 Segue @neuralupdate: amanhã às 14h, por que o cinturão de asteroides não virou planeta.\n\n📚 Fonte: NASA — MESSENGER (2014, 2016)\n\n#mercurio #astronomia #ciencia #universo #neuralupdate",
+   "curtidas_campo": 5,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 194,
+   "reach": 164,
+   "likes": 5,
+   "comments": 1,
+   "shares": 0,
+   "saved": 1,
+   "total_interactions": 7,
+   "ig_reels_avg_watch_time": 9362,
+   "ig_reels_video_view_total_time": 1600912,
+   "reels_skip_rate": 57.3,
+   "reposts": 0
+  },
+  {
    "id": "18140007880614331",
    "quando": "2026-10-08T11:10:57+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/DeOy4X6iaef/",
    "titulo": "Pra ver um planeta perto de uma estrela, você precisa tapar a estrela. Igual pôr a mão na frente do sol. ✋☀️",
    "legenda": "Pra ver um planeta perto de uma estrela, você precisa tapar a estrela. Igual pôr a mão na frente do sol. ✋☀️\n\nO telescópio Roman, da NASA, acabou de usar pela primeira vez o coronógrafo, o instrumento que faz exatamente isso. E ele fica tão firme que, na comparação da NASA, acertaria uma moeda a 240 km. Por enquanto é teste, mas é o primeiro passo pra fotografar planetas como a Terra.\n\n🔖 Salva pra acompanhar a primeira foto.\n📤 Manda pra quem sonha em ver outra Terra.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que Mercúrio está encolhendo.\n\n📚 Fonte: NASA, 30/09/2026 — NASA checks Roman guidance system, takes first coronagraph observation\n\n#roman #nasa #exoplanetas #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 2,
+   "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 64,
-   "reach": 56,
-   "likes": 2,
+   "views": 176,
+   "reach": 154,
+   "likes": 5,
    "comments": 1,
    "shares": 1,
    "saved": 1,
-   "total_interactions": 6,
-   "ig_reels_avg_watch_time": 10331,
-   "ig_reels_video_view_total_time": 547581,
-   "reels_skip_rate": 54.4,
+   "total_interactions": 9,
+   "ig_reels_avg_watch_time": 8751,
+   "ig_reels_video_view_total_time": 1356429,
+   "reels_skip_rate": 62.6,
    "reposts": 1
   },
   {
@@ -4246,16 +4336,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 11,
-   "reach": 16,
+   "views": 18,
+   "reach": 17,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 3106,
-   "ig_reels_video_view_total_time": 52806,
-   "reels_skip_rate": 100,
+   "ig_reels_avg_watch_time": 31114,
+   "ig_reels_video_view_total_time": 591180,
+   "reels_skip_rate": 83.3,
    "reposts": 0
   },
   {
@@ -4268,16 +4358,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 39,
-   "reach": 28,
+   "views": 42,
+   "reach": 31,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 15465,
-   "ig_reels_video_view_total_time": 463959,
-   "reels_skip_rate": 52.2,
+   "ig_reels_avg_watch_time": 14494,
+   "ig_reels_video_view_total_time": 478306,
+   "reels_skip_rate": 53.8,
    "reposts": 0
   },
   {
@@ -4290,16 +4380,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 18,
-   "reach": 16,
+   "views": 21,
+   "reach": 18,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 5730,
-   "ig_reels_video_view_total_time": 103148,
-   "reels_skip_rate": 80,
+   "ig_reels_avg_watch_time": 5339,
+   "ig_reels_video_view_total_time": 106795,
+   "reels_skip_rate": 82.4,
    "reposts": 0
   },
   {
@@ -4312,16 +4402,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 19,
-   "reach": 15,
+   "views": 21,
+   "reach": 17,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 13432,
-   "ig_reels_video_view_total_time": 201483,
-   "reels_skip_rate": 66.7,
+   "ig_reels_avg_watch_time": 13430,
+   "ig_reels_video_view_total_time": 241754,
+   "reels_skip_rate": 64.7,
    "reposts": 0
   },
   {
@@ -4334,16 +4424,16 @@
    "curtidas_campo": 34,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 751,
-   "reach": 687,
+   "views": 752,
+   "reach": 688,
    "likes": 34,
    "comments": 1,
    "shares": 1,
    "saved": 4,
    "total_interactions": 42,
-   "ig_reels_avg_watch_time": 17915,
-   "ig_reels_video_view_total_time": 12397344,
-   "reels_skip_rate": 39.4,
+   "ig_reels_avg_watch_time": 17895,
+   "ig_reels_video_view_total_time": 12401670,
+   "reels_skip_rate": 39.3,
    "reposts": 2
   },
   {
@@ -4356,16 +4446,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 243,
-   "reach": 201,
+   "views": 244,
+   "reach": 202,
    "likes": 5,
    "comments": 1,
    "shares": 2,
    "saved": 2,
    "total_interactions": 11,
-   "ig_reels_avg_watch_time": 12671,
-   "ig_reels_video_view_total_time": 2635680,
-   "reels_skip_rate": 53,
+   "ig_reels_avg_watch_time": 12661,
+   "ig_reels_video_view_total_time": 2646185,
+   "reels_skip_rate": 53.3,
    "reposts": 1
   },
   {
@@ -4510,15 +4600,15 @@
    "curtidas_campo": 25,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1145,
+   "views": 1146,
    "reach": 867,
    "likes": 25,
    "comments": 2,
    "shares": 8,
    "saved": 4,
    "total_interactions": 42,
-   "ig_reels_avg_watch_time": 21320,
-   "ig_reels_video_view_total_time": 19487135,
+   "ig_reels_avg_watch_time": 21300,
+   "ig_reels_video_view_total_time": 19489922,
    "reels_skip_rate": 46.6,
    "reposts": 3
   },
@@ -4554,16 +4644,16 @@
    "curtidas_campo": 30,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1713,
-   "reach": 1299,
+   "views": 1720,
+   "reach": 1303,
    "likes": 30,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 34,
-   "ig_reels_avg_watch_time": 18855,
-   "ig_reels_video_view_total_time": 24511952,
-   "reels_skip_rate": 34.2,
+   "ig_reels_avg_watch_time": 18820,
+   "ig_reels_video_view_total_time": 24522713,
+   "reels_skip_rate": 34.3,
    "reposts": 0
   },
   {
@@ -4620,16 +4710,16 @@
    "curtidas_campo": 18,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 988,
-   "reach": 768,
+   "views": 991,
+   "reach": 769,
    "likes": 18,
    "comments": 1,
    "shares": 3,
    "saved": 4,
    "total_interactions": 26,
-   "ig_reels_avg_watch_time": 14034,
-   "ig_reels_video_view_total_time": 10904625,
-   "reels_skip_rate": 41.7,
+   "ig_reels_avg_watch_time": 14023,
+   "ig_reels_video_view_total_time": 10910052,
+   "reels_skip_rate": 41.8,
    "reposts": 0
   },
   {
@@ -4642,16 +4732,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 242,
-   "reach": 199,
+   "views": 245,
+   "reach": 201,
    "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 11086,
-   "ig_reels_video_view_total_time": 2305915,
-   "reels_skip_rate": 56,
+   "ig_reels_avg_watch_time": 11373,
+   "ig_reels_video_view_total_time": 2388483,
+   "reels_skip_rate": 55.5,
    "reposts": 0
   },
   {
@@ -4796,16 +4886,16 @@
    "curtidas_campo": 11,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 351,
-   "reach": 285,
+   "views": 352,
+   "reach": 286,
    "likes": 11,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 15,
-   "ig_reels_avg_watch_time": 16979,
-   "ig_reels_video_view_total_time": 4975007,
-   "reels_skip_rate": 48.8,
+   "ig_reels_avg_watch_time": 17020,
+   "ig_reels_video_view_total_time": 5004065,
+   "reels_skip_rate": 48.6,
    "reposts": 0
   },
   {
@@ -4884,16 +4974,16 @@
    "curtidas_campo": 20,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 664,
-   "reach": 533,
+   "views": 665,
+   "reach": 534,
    "likes": 20,
    "comments": 1,
    "shares": 1,
    "saved": 4,
    "total_interactions": 26,
-   "ig_reels_avg_watch_time": 12427,
-   "ig_reels_video_view_total_time": 6959192,
-   "reels_skip_rate": 47.1,
+   "ig_reels_avg_watch_time": 12406,
+   "ig_reels_video_view_total_time": 6960104,
+   "reels_skip_rate": 47.2,
    "reposts": 0
   },
   {
@@ -4906,15 +4996,15 @@
    "curtidas_campo": 66,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 4265,
-   "reach": 3377,
+   "views": 4281,
+   "reach": 3391,
    "likes": 66,
    "comments": 2,
    "shares": 2,
    "saved": 5,
    "total_interactions": 79,
-   "ig_reels_avg_watch_time": 18873,
-   "ig_reels_video_view_total_time": 66112727,
+   "ig_reels_avg_watch_time": 18858,
+   "ig_reels_video_view_total_time": 66344691,
    "reels_skip_rate": 29.2,
    "reposts": 4
   },
@@ -4969,15 +5059,15 @@
    "curtidas_campo": 24,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1351,
+   "views": 1352,
    "reach": 1157,
    "likes": 24,
    "comments": 1,
    "shares": 0,
    "saved": 4,
    "total_interactions": 30,
-   "ig_reels_avg_watch_time": 11811,
-   "ig_reels_video_view_total_time": 14090715,
+   "ig_reels_avg_watch_time": 11805,
+   "ig_reels_video_view_total_time": 14095506,
    "reels_skip_rate": 35.9,
    "reposts": 1
   },
@@ -5498,19 +5588,19 @@
    "link": "https://www.instagram.com/reel/DdjBWYeirSp/",
    "titulo": "O Chandra achou 84 fontes de raios X que não se encaixam em nada conhecido. 🔭",
    "legenda": "O Chandra achou 84 fontes de raios X que não se encaixam em nada conhecido. 🔭\n\nElas brilham nos raios X mais fracos e soltam ultravioleta forte, uma mistura sem classe definida.\nAs suspeitas: anãs brancas, estrelas de nêutrons ou buracos negros roubando gás de estrelas vizinhas.\nFicaram escondidas porque o gás entre as estrelas absorve justamente essa luz.\n\n💬 Chuta: o que você acha que são esses pontos? Comenta aqui embaixo 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA / observatório Chandra — chandra.harvard.edu\n\n#chandra #raiosx #astronomia #neuralupdate",
-   "curtidas_campo": 6,
+   "curtidas_campo": 7,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 249,
-   "reach": 200,
-   "likes": 6,
+   "views": 250,
+   "reach": 201,
+   "likes": 7,
    "comments": 2,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 10,
-   "ig_reels_avg_watch_time": 11171,
-   "ig_reels_video_view_total_time": 2256591,
-   "reels_skip_rate": 54,
+   "total_interactions": 11,
+   "ig_reels_avg_watch_time": 11116,
+   "ig_reels_video_view_total_time": 2256748,
+   "reels_skip_rate": 54.2,
    "reposts": 2
   },
   {
@@ -8083,16 +8173,16 @@
    "curtidas_campo": 15,
    "comentarios_campo": 0,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 503,
-   "reach": 424,
+   "views": 504,
+   "reach": 425,
    "likes": 15,
    "comments": 0,
    "shares": 0,
    "saved": 1,
    "total_interactions": 17,
-   "ig_reels_avg_watch_time": 12095,
-   "ig_reels_video_view_total_time": 5249516,
-   "reels_skip_rate": 44.3,
+   "ig_reels_avg_watch_time": 12069,
+   "ig_reels_video_view_total_time": 5250167,
+   "reels_skip_rate": 44.4,
    "reposts": 1
   },
   {
