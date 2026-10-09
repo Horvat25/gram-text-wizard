@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-08T16:37:51.795Z",
+  "gerado_em": "2026-10-09T16:19:44.688Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -466,11 +466,54 @@
     {
       "d": "2026-10-08",
       "views": 0
+    },
+    {
+      "d": "2026-10-09",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1185788243770752",
+      "quando": "2026-10-09T11:11:49+0000",
+      "titulo": "Esse planeta tem superfície de lava. E mesmo assim tem atmosfera. 🌋",
+      "link": "https://www.facebook.com/reel/1185788243770752/",
+      "segundos": 38,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2264111804371107",
+      "quando": "2026-10-08T21:11:57+0000",
+      "titulo": "Nenhuma lei da física proíbe voltar no tempo. ⏳",
+      "link": "https://www.facebook.com/reel/2264111804371107/",
+      "segundos": 39,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1024481587270131",
+      "quando": "2026-10-08T17:11:06+0000",
+      "titulo": "Mercúrio está encolhendo. Agora mesmo. 🪨",
+      "link": "https://www.facebook.com/reel/1024481587270131/",
+      "segundos": 42.96,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1109756634842666",
       "quando": "2026-10-08T11:11:14+0000",
