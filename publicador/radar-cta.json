@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-08T16:16:57.296Z",
+ "gerado_em": "2026-10-09T16:01:05.841Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2560303,
+   "seguidores": 2560503,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17146,
+   "seguidores": 17163,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591438,
+   "seguidores": 591504,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.031,
+   "comentarios_por_curtida_sem_pedido": 0.033,
    "melhores_pedidos": []
   },
   {
@@ -122,35 +122,46 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1054581,
+   "seguidores": 1054891,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
+   "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.019,
-   "melhores_pedidos": []
+   "comentarios_por_curtida_com_pedido": 0.489,
+   "comentarios_por_curtida_sem_pedido": 0.018,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-10-09",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": null,
+     "trecho": "— Marcar duas pessoas nos comentários (cada usuário só pode comentar uma única vez)⁣",
+     "comentarios": 2190,
+     "curtidas": 4481,
+     "link": "https://www.instagram.com/p/DeRx9vaAeBN/"
+    }
+   ]
   }
  ],
  "hashtags": [
   {
    "hashtag": "achadinhos",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "achadinhosdashopee",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "achadosshopee",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "projetorgalaxia",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "astronomia",
