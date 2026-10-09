@@ -400,12 +400,12 @@
    "quando": "2026-10-09T00:10:37+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-09T13:13:28.554Z",
+   "ultimo_retrato": "2026-10-09T22:36:22.545Z",
    "_metricas": null,
    "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-10-09T13:13:31.628Z",
+ "gerado_em": "2026-10-09T22:36:23.071Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -618,6 +618,10 @@
   "2026-10-09T13": {
    "seguidores": 1245,
    "publicacoes": 974
+  },
+  "2026-10-09T22": {
+   "seguidores": 1247,
+   "publicacoes": 976
   }
  },
  "ganhos_por_dia": {
