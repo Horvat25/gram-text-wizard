@@ -3939,7 +3939,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e661cc26-8597-4e57-9af5-bb83abfa75c1.mp4",
     "legenda": "Quatro pessoas acabaram de voltar de 237 dias no espaço. 🚀\n\nA cápsula Dragon da missão Crew-12 caiu no oceano Pacífico, perto de Los Angeles, na quinta (08/10). Foram quase 4 mil voltas na Terra, estudos com células-tronco e até uma pesquisa sobre como a bactéria da pneumonia pode machucar o coração. A astronauta Jessica Meir fez 4 caminhadas espaciais só nessa viagem.\n\n🔖 Salva pra lembrar de acompanhar a coletiva da tripulação, na quinta (15/10).\n📤 Manda pra quem sonha em ir pra estação espacial.\n👉 Segue @neuralupdate pra acompanhar as notícias do espaço.\n\n📚 Fonte: NASA, 08/10/2026 — NASA's SpaceX Crew-12 Splashes Down\n\n#crew12 #nasa #estacaoespacial #astronomia #ciencia #neuralupdate",
     "slug": "nw-crew12-volta-237-dias",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18166773037486220",
+    "publicado_em": "2026-10-10T11:11:47.802Z",
+    "id_comentario": "18075412367751656",
+    "id_facebook": "1092927986961291"
   },
   {
     "quando": "2026-10-10T11:00:00.000Z",
@@ -3947,7 +3951,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6077b96b-a9b8-44ab-91f1-26360ccbcb85.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-10",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18398203246205170",
+    "publicado_em": "2026-10-10T11:12:01.579Z"
   },
   {
     "quando": "2026-10-10T17:00:00.000Z",
@@ -3979,7 +3985,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/23fd08ab-8f26-4b20-9c81-1b8afae5a06d.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-10",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
   },
   {
     "quando": "2026-10-11T11:00:00.000Z",
@@ -4027,7 +4035,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/27285dc8-e784-491a-b1b9-2b6042629613.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-11",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   },
   {
     "quando": "2026-10-12T11:00:00.000Z",
@@ -4075,7 +4085,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10157a30-79bb-48a5-b187-f927156cc492.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-12",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   },
   {
     "quando": "2026-10-13T11:00:00.000Z",
@@ -4123,7 +4135,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5d443c2e-3a87-4ac9-9aeb-36d52ff32bc7.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-13",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "atmosfera-noturna"
   },
   {
     "quando": "2026-10-14T11:00:00.000Z",
@@ -4171,7 +4185,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ecf25988-c0b1-4338-bb60-e1da6c7b13ce.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-14",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "transformacao-quarto"
   },
   {
     "quando": "2026-10-15T11:00:00.000Z",
@@ -4219,6 +4235,8 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c122edc7-d7f4-4fcf-a6ed-ee3a8419f96d.png",
     "legenda": "",
     "slug": "story-kindle-2026-10-15",
-    "status": "agendado"
+    "status": "agendado",
+    "campanha": "projetor-astronauta",
+    "variacao": "presente-universo"
   }
 ]
