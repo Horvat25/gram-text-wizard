@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-09T16:19:44.688Z",
+  "gerado_em": "2026-10-10T15:27:09.681Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -470,11 +470,54 @@
     {
       "d": "2026-10-09",
       "views": 0
+    },
+    {
+      "d": "2026-10-10",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1092927986961291",
+      "quando": "2026-10-10T11:12:01+0000",
+      "titulo": "Quatro pessoas acabaram de voltar de 237 dias no espaço. 🚀",
+      "link": "https://www.facebook.com/reel/1092927986961291/",
+      "segundos": 40.166,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1085504747736713",
+      "quando": "2026-10-09T21:11:09+0000",
+      "titulo": "Amanhã à noite a Lua some do céu. 🌑",
+      "link": "https://www.facebook.com/reel/1085504747736713/",
+      "segundos": 36.92,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1651399969934423",
+      "quando": "2026-10-09T17:11:49+0000",
+      "titulo": "Entre Marte e Júpiter tinha espaço pra um planeta. Por que ele nunca nasceu? 🪨",
+      "link": "https://www.facebook.com/reel/1651399969934423/",
+      "segundos": 40.625,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1185788243770752",
       "quando": "2026-10-09T11:11:49+0000",
