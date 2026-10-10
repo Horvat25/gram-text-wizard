@@ -3932,5 +3932,53 @@
     "publicado_em": "2026-10-09T21:11:06.774Z",
     "id_comentario": "18129787915763585",
     "id_facebook": "1085504747736713"
+  },
+  {
+    "quando": "2026-10-10T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e661cc26-8597-4e57-9af5-bb83abfa75c1.mp4",
+    "legenda": "Quatro pessoas acabaram de voltar de 237 dias no espaço. 🚀\n\nA cápsula Dragon da missão Crew-12 caiu no oceano Pacífico, perto de Los Angeles, na quinta (08/10). Foram quase 4 mil voltas na Terra, estudos com células-tronco e até uma pesquisa sobre como a bactéria da pneumonia pode machucar o coração. A astronauta Jessica Meir fez 4 caminhadas espaciais só nessa viagem.\n\n🔖 Salva pra lembrar de acompanhar a coletiva da tripulação, na quinta (15/10).\n📤 Manda pra quem sonha em ir pra estação espacial.\n👉 Segue @neuralupdate pra acompanhar as notícias do espaço.\n\n📚 Fonte: NASA, 08/10/2026 — NASA's SpaceX Crew-12 Splashes Down\n\n#crew12 #nasa #estacaoespacial #astronomia #ciencia #neuralupdate",
+    "slug": "nw-crew12-volta-237-dias",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-10T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6077b96b-a9b8-44ab-91f1-26360ccbcb85.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-10",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-10T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d7508145-4cab-4f27-8630-4932bbef13ef.mp4",
+    "legenda": "A Mancha Vermelha de Júpiter é uma tempestade, e cabem duas Terras lado a lado dentro dela. 🪐\n\nEla é vista há mais de 300 anos, e a sonda Juno mediu: a tempestade afunda uns 350 km abaixo do topo das nuvens, num planeta sem chão, feito de nuvens de amônia e água.\n\n🔖 Salva pra lembrar do tamanho dessa tempestade.\n📤 Manda pra quem acha que furacão é grande.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Jupiter Facts\n\n#jupiter #manchavermelha #sistemasolar #astronomia #ciencia #neuralupdate",
+    "slug": "pl64-jupiter-mancha-vermelha",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-10T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/65a16434-f8fc-49f0-b647-f311d8b5327d.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-10",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-10T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ee683b60-3e13-40e6-888c-9569fec26887.mp4",
+    "legenda": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é inverno. 🌍\n\nSe fosse a distância, o mundo todo teria verão junto. A diferença é só de uns 5 milhões de km (147 milhões em janeiro, 152 em julho). Quem manda nas estações é a inclinação da Terra, de uns 23 graus.\n\n🔖 Salva pra explicar isso na próxima vez que alguém falar de estação.\n📤 Manda pra quem achava que era a distância.\n👉 Segue @neuralupdate e conta nos comentários: você achava que era a distância?\n\n📚 Fonte: NASA Science — Earth Facts; distâncias calculadas por efemérides.\n\n#estacoes #terra #astronomia #ciencia #universo #neuralupdate",
+    "slug": "viral-estacoes-nao-e-distancia",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-10T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/23fd08ab-8f26-4b20-9c81-1b8afae5a06d.png",
+    "legenda": "",
+    "slug": "story-kindle-2026-10-10",
+    "status": "agendado"
   }
 ]
