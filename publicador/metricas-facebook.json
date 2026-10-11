@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-10T15:27:09.681Z",
+  "gerado_em": "2026-10-11T15:48:02.771Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -474,11 +474,54 @@
     {
       "d": "2026-10-10",
       "views": 0
+    },
+    {
+      "d": "2026-10-11",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1081646171244923",
+      "quando": "2026-10-11T11:12:04+0000",
+      "titulo": "Tem um tipo de astro que não é estrela e também não é planeta. 🟤",
+      "link": "https://www.facebook.com/reel/1081646171244923/",
+      "segundos": 41.25,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1684930486296793",
+      "quando": "2026-10-10T21:10:56+0000",
+      "titulo": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na ",
+      "link": "https://www.facebook.com/reel/1684930486296793/",
+      "segundos": 34.42,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "3114474072240811",
+      "quando": "2026-10-10T17:11:04+0000",
+      "titulo": "A Mancha Vermelha de Júpiter é uma tempestade, e cabem duas Terras lado a lado dentro dela. 🪐",
+      "link": "https://www.facebook.com/reel/3114474072240811/",
+      "segundos": 36.125,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1092927986961291",
       "quando": "2026-10-10T11:12:01+0000",
