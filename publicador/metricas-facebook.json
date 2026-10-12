@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-11T15:48:02.771Z",
+  "gerado_em": "2026-10-12T19:08:33.549Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -478,11 +478,67 @@
     {
       "d": "2026-10-11",
       "views": 0
+    },
+    {
+      "d": "2026-10-12",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1677352427333272",
+      "quando": "2026-10-12T17:11:44+0000",
+      "titulo": "O que protege a Terra do vento do Sol não é o ar: é o campo magnético. 🧲",
+      "link": "https://www.facebook.com/reel/1677352427333272/",
+      "segundos": 34.416,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1121227310354512",
+      "quando": "2026-10-12T11:11:16+0000",
+      "titulo": "Um clarão de rádio de um milésimo de segundo viajou por bilhões de anos pra chegar aqui. 📡",
+      "link": "https://www.facebook.com/reel/1121227310354512/",
+      "segundos": 36.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "39915216951398859",
+      "quando": "2026-10-11T21:10:58+0000",
+      "titulo": "Amanhã, logo depois do pôr do sol, olha pro oeste. 🌙",
+      "link": "https://www.facebook.com/reel/39915216951398859/",
+      "segundos": 31.17,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1650054790122041",
+      "quando": "2026-10-11T17:11:28+0000",
+      "titulo": "Marte já teve ar mais grosso, água e clima mais quente. 🔴",
+      "link": "https://www.facebook.com/reel/1650054790122041/",
+      "segundos": 34.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1081646171244923",
       "quando": "2026-10-11T11:12:04+0000",
