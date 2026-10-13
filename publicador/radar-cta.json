@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-12T18:49:44.624Z",
+ "gerado_em": "2026-10-13T16:51:17.267Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2561168,
+   "seguidores": 2560908,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.011,
+   "comentarios_por_curtida_sem_pedido": 0.01,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17180,
+   "seguidores": 17186,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591690,
+   "seguidores": 591679,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.051,
+   "comentarios_por_curtida_sem_pedido": 0.046,
    "melhores_pedidos": []
   },
   {
@@ -104,12 +104,12 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 17,
-   "posts_lidos": 47,
+   "seguidores": 18,
+   "posts_lidos": 48,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.108,
+   "comentarios_por_curtida_sem_pedido": 0.106,
    "melhores_pedidos": []
   },
   {
@@ -122,11 +122,11 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057143,
+   "seguidores": 1057359,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.454,
+   "comentarios_por_curtida_com_pedido": 0.46,
    "comentarios_por_curtida_sem_pedido": 0.019,
    "melhores_pedidos": [
     {
@@ -135,8 +135,8 @@
      "pede": true,
      "palavra": null,
      "trecho": "— Marcar duas pessoas nos comentários (cada usuário só pode comentar uma única vez)⁣",
-     "comentarios": 8981,
-     "curtidas": 19784,
+     "comentarios": 9312,
+     "curtidas": 20242,
      "link": "https://www.instagram.com/p/DeRx9vaAeBN/"
     }
    ]
@@ -171,7 +171,7 @@
   {
    "hashtag": "livros",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "An unknown error occurred"
   }
  ]
 }
