@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-12T19:08:33.549Z",
+  "gerado_em": "2026-10-13T17:00:27.876Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -482,11 +482,41 @@
     {
       "d": "2026-10-12",
       "views": 0
+    },
+    {
+      "d": "2026-10-13",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "28944313978496703",
+      "quando": "2026-10-13T11:12:10+0000",
+      "titulo": "Uma estrela morta pode ter um planeta que nasceu depois dela morrer. 🪐",
+      "link": "https://www.facebook.com/reel/28944313978496703/",
+      "segundos": 37.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1854720955892289",
+      "quando": "2026-10-12T21:11:00+0000",
+      "titulo": "As estrelas piscam, mas os planetas quase não. ✨",
+      "link": "https://www.facebook.com/reel/1854720955892289/",
+      "segundos": 35.25,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1677352427333272",
       "quando": "2026-10-12T17:11:44+0000",
