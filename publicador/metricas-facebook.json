@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-13T17:00:27.876Z",
+  "gerado_em": "2026-10-14T14:35:12.367Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -486,11 +486,54 @@
     {
       "d": "2026-10-13",
       "views": 0
+    },
+    {
+      "d": "2026-10-14",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2189008382493676",
+      "quando": "2026-10-14T11:12:06+0000",
+      "titulo": "Isso é o nascer do sol em Marte, visto por um robô. 🌅",
+      "link": "https://www.facebook.com/reel/2189008382493676/",
+      "segundos": 40.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1456555659685904",
+      "quando": "2026-10-13T21:11:17+0000",
+      "titulo": "O \"lado escuro\" da Lua não é escuro. 🌑",
+      "link": "https://www.facebook.com/reel/1456555659685904/",
+      "segundos": 34.38,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2976426866030337",
+      "quando": "2026-10-13T17:11:07+0000",
+      "titulo": "A cauda de um cometa não aponta pra onde ele está indo: aponta sempre pra longe do Sol. ☄️",
+      "link": "https://www.facebook.com/reel/2976426866030337/",
+      "segundos": 35.67,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "28944313978496703",
       "quando": "2026-10-13T11:12:10+0000",
