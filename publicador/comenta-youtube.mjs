@@ -53,19 +53,31 @@ const JANELA_HORAS = 30;
 // do Instagram.
 const TEXTO_CURTO = [
   '📚 O primeiro mês do Kindle Unlimited é grátis.',
-  'O link está na bio do canal: toca em Neural Update aqui em cima e vai em "Links".',
+  'O link está na bio do canal: toca em Neural Update aqui em cima → Links → Kindle.',
   '',
   'Depois vira assinatura paga — se não quiser continuar, cancela antes de o mês acabar e não paga nada.',
+  '(Link de afiliado: o canal pode receber comissão se você assinar, sem custo extra.)',
 ].join('\n');
 
 const TEXTO_LONGO = [
   '📚 O primeiro mês do Kindle Unlimited é grátis:',
-  'https://neural-update.com.br/links?o=yt',
+  'https://neural-update.com.br/kindle/?o=yt',
   '',
   'Depois vira assinatura paga — se não quiser continuar, cancela antes de o mês acabar e não paga nada.',
-  '',
-  '(link de afiliado — como participante do Programa de Associados da Amazon, sou remunerado pelas compras qualificadas, sem custo a mais pra você)',
+  // no LONGO o link aparece de verdade: manter a frase do Programa de Associados (mais forte que a dos Shorts)
+  '(Link de afiliado — como associado da Amazon, o Neural Update recebe por compras qualificadas, sem custo a mais pra você.)',
 ].join('\n');
+
+// Texto POR VÍDEO (campo `comentario` do lote). O `sobe-lote.js` do estúdio grava videoId → texto em
+// data/comentarios-yt.json; esse arquivo é copiado pra cá como publicador/comentarios-yt.json.
+// Vídeo sem entrada no mapa → o genérico acima. (Mudança de 14/10/2026, ordem da Direção.)
+import { readFileSync, existsSync } from 'node:fs';
+// JSON quebrado não pode derrubar o robô: cai no texto genérico e avisa no log.
+let MAPA = {};
+try {
+  if (existsSync('publicador/comentarios-yt.json')) MAPA = JSON.parse(readFileSync('publicador/comentarios-yt.json', 'utf8'));
+} catch (e) { console.error('comentarios-yt.json ilegível, usando o texto genérico: ' + e.message); }
+const textoDe = v => MAPA[v.id]?.texto || (ehShort(v) ? TEXTO_CURTO : TEXTO_LONGO);
 
 // Short vai até 3 min em 2026. Acima disso é vídeo comum, onde o link funciona.
 const ehShort = v => {
@@ -130,12 +142,14 @@ async function main() {
       f.snippet?.topLevelComment?.snippet?.authorChannelId?.value === meuId);
     if (jaComentei) { console.log(`· ${titulo} — já comentado`); continue; }
 
-    if (SECO) { console.log(`[seco] comentaria em ${titulo}`); continue; }
+    if (SECO) { console.log(`[seco] comentaria em ${titulo}:
+${textoDe(v)}
+`); continue; }
 
     const r = await fetch(`${API}/commentThreads?part=snippet`, {
       method: 'POST',
       headers: { authorization: `Bearer ${tk}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ snippet: { videoId: v.id, topLevelComment: { snippet: { textOriginal: ehShort(v) ? TEXTO_CURTO : TEXTO_LONGO } } } }),
+      body: JSON.stringify({ snippet: { videoId: v.id, topLevelComment: { snippet: { textOriginal: textoDe(v) } } } }),
     });
     const j = await r.json();
     if (j.id) console.log(`✓ ${titulo} — comentado`);
