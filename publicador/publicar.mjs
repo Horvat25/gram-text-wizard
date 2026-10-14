@@ -96,10 +96,12 @@ function substituiKindlePorProjetor(fila) {
 //
 // ⚠️ Falhar aqui NUNCA pode marcar o post como falho: o vídeo já está no ar. O erro
 // fica registrado no item pra aparecer no log e no saude.yml.
+// 14/10/2026: o item da fila pode trazer `comentario` (texto próprio do primeiro comentário, ex.: teste
+// "Comenta LIVRO"); sem o campo vale o texto padrão abaixo.
 const COMENTARIO = '📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.';
 
-async function comenta(idMidia) {
-  const r = await post(`${API}/${idMidia}/comments`, { message: COMENTARIO, access_token: IG_TOKEN });
+async function comenta(idMidia, texto) {
+  const r = await post(`${API}/${idMidia}/comments`, { message: texto || COMENTARIO, access_token: IG_TOKEN });
   if (!r.id) throw new Error(JSON.stringify(r).slice(0, 300));
   return r.id;
 }
@@ -401,7 +403,7 @@ for (const item of vencidos) {
     // Story não aceita comentário — só reels/feed.
     if (item.tipo !== 'story') {
       try {
-        item.id_comentario = await comenta(id);
+        item.id_comentario = await comenta(id, item.comentario);
         console.log(`  COMENTADO: ${item.id_comentario}`);
       } catch (e) {
         item.erro_comentario = String(e.message || e).slice(0, 300);
