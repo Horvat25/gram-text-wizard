@@ -98,7 +98,7 @@ if (midias.error) { console.error('mídias: ' + JSON.stringify(midias.error).sli
 // QUERO/CÉU com o link do projetor. Pra melhorar a mensagem com DADO, e não com opinião,
 // cada reel dos últimos 14 dias ganha a contagem de comentários com a palavra-chave
 // (= quantos directs de venda saíram). Cliques e vendas vêm do painel da Shopee.
-const PALAVRA = /(^|[^\p{L}])(quero|c[ée]u|cosmos)([^\p{L}]|$)/iu;
+const PALAVRA = /(^|[^\p{L}])(quero|c[ée]u|cosmos|livros?)([^\p{L}]|$)/iu;
 const JANELA_DM = 14 * 24 * 3600 * 1000;
 async function pedidosDm(idMidia) {
   let n = 0, pagina = await get(`/${idMidia}/comments`, { fields: 'text', limit: '100' });
