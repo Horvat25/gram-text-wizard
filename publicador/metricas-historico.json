@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-10-13T16:43:36.316Z",
+ "gerado_em": "2026-10-14T14:24:08.653Z",
  "conta": {
   "username": "neuralupdate",
   "seguidores": 1261,
-  "publicacoes": 986
+  "publicacoes": 989
  },
- "total_listado": 986,
- "com_tempo_assistido": 446,
+ "total_listado": 989,
+ "com_tempo_assistido": 449,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-09-14",
-     "ate": "2026-10-12",
+     "de": "2026-09-15",
+     "ate": "2026-10-13",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 1,
-         "end_time": "2026-09-15T07:00:00+0000"
-        },
         {
          "value": 8,
          "end_time": "2026-09-16T07:00:00+0000"
@@ -129,8 +125,12 @@
          "end_time": "2026-10-11T07:00:00+0000"
         },
         {
-         "value": 0,
+         "value": 7,
          "end_time": "2026-10-12T07:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-10-13T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -286,7 +286,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-13",
+     "ate": "2026-10-14",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -305,13 +305,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 3
+            "value": 10
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 0
+            "value": 1
            }
           ]
          }
@@ -508,7 +508,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-13",
+     "ate": "2026-10-14",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -517,7 +517,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 2584
+        "value": 2741
        }
       },
       {
@@ -527,7 +527,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 3967
+        "value": 4436
        }
       },
       {
@@ -537,7 +537,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 105
+        "value": 119
        }
       },
       {
@@ -547,7 +547,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 183
+        "value": 213
        }
       }
      ]
@@ -611,15 +611,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 404
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 24395
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 404
            }
           ]
          }
@@ -704,7 +704,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-13",
+     "ate": "2026-10-14",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -713,7 +713,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 2584,
+        "value": 2741,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -724,13 +724,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 160
+            "value": 183
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 2431
+            "value": 2566
            }
           ]
          }
@@ -2552,13 +2552,37 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-10-13",
-    "erro": "(#100) since param is not valid. Metrics data is available for the last 2 years"
+    "janela": "2026-10-14",
+    "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "17925318357204279": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-14T11:11:45+0000",
+     "respostas": []
+    }
+   ],
+   "18107316385964436": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-13T21:11:13+0000",
+     "respostas": []
+    }
+   ],
+   "18205351675370189": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-13T17:11:05+0000",
+     "respostas": []
+    }
+   ],
    "18101615504636738": [
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4448,25 +4472,91 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "17925318357204279",
+   "quando": "2026-10-14T11:11:40+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DeePu8Ajro3/",
+   "titulo": "Isso é o nascer do sol em Marte, visto por um robô. 🌅",
+   "legenda": "Isso é o nascer do sol em Marte, visto por um robô. 🌅\n\nO Curiosity tirou o panorama às 8h30 no horário de Marte: seis fotos coladas, sem o ajuste de cor de sempre, o que deixou o chão azulado. No fundo, paredões esculpidos pelo vento, que se estendem por uns 16 km na montanha que o robô escala desde 2014.\n\n🔖 Salva pra ver de novo quando precisar de um respiro.\n📤 Manda pra quem ia querer acordar num lugar assim.\n👉 Segue @neuralupdate e responde: você ia querer?\n\n📚 Fonte: NASA, 06/10/2026 — Curiosity Rover Catches Stunning Martian Dawn\n\n#curiosity #marte #nasa #astronomia #ciencia #neuralupdate",
+   "curtidas_campo": 1,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 61,
+   "reach": 36,
+   "likes": 1,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 2,
+   "ig_reels_avg_watch_time": 15525,
+   "ig_reels_video_view_total_time": 621024,
+   "reels_skip_rate": 36.5,
+   "reposts": 0
+  },
+  {
+   "id": "18107316385964436",
+   "quando": "2026-10-13T21:11:07+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DecviqQmMn8/",
+   "titulo": "O \"lado escuro\" da Lua não é escuro. 🌑",
+   "legenda": "O \"lado escuro\" da Lua não é escuro. 🌑\n\nA Lua gira no mesmo ritmo em que dá a volta na Terra, então a gente sempre vê a mesma cara. O outro lado só foi visto em 1959, por uma nave soviética. Ele recebe luz do Sol igualzinho: na Lua nova de sábado, foi o lado de lá que ficou de dia.\n\n🔖 Salva pra explicar isso pra alguém.\n📤 Manda pra quem ainda fala \"lado escuro\".\n👉 Segue @neuralupdate e conta: você já tinha pensado nisso?\n\n📚 Fonte: NASA Science — Moon Facts\n\n#lua #ladooculto #astronomia #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 24,
+   "reach": 15,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "ig_reels_avg_watch_time": 10759,
+   "ig_reels_video_view_total_time": 182914,
+   "reels_skip_rate": 70.6,
+   "reposts": 0
+  },
+  {
+   "id": "18205351675370189",
+   "quando": "2026-10-13T17:10:59+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DecUDmxguXy/",
+   "titulo": "A cauda de um cometa não aponta pra onde ele está indo: aponta sempre pra longe do Sol. ☄️",
+   "legenda": "A cauda de um cometa não aponta pra onde ele está indo: aponta sempre pra longe do Sol. ☄️\n\nUm cometa é um bloco de gelo e poeira do tamanho de uma cidade pequena. Perto do Sol ele esquenta, solta gás e poeira, e forma uma cabeça maior que a maioria dos planetas e uma cauda de milhões de quilômetros.\n\n🔖 Salva pra lembrar da próxima vez que ver um cometa.\n📤 Manda pra quem acha que o cometa vai de frente pro rastro.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Comets\n\n#cometas #astronomia #sistemasolar #ciencia #universo #neuralupdate",
+   "curtidas_campo": 12,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 190,
+   "reach": 164,
+   "likes": 12,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 13,
+   "ig_reels_avg_watch_time": 10328,
+   "ig_reels_video_view_total_time": 1735108,
+   "reels_skip_rate": 57.1,
+   "reposts": 0
+  },
+  {
    "id": "18101615504636738",
    "quando": "2026-10-13T11:11:44+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/Debq8F4CMWF/",
    "titulo": "Uma estrela morta pode ter um planeta que nasceu depois dela morrer. 🪐",
    "legenda": "Uma estrela morta pode ter um planeta que nasceu depois dela morrer. 🪐\n\nAstrônomos reanalisaram dados do Hubble de 1999 e acharam um metal raro, o nióbio, na anã branca HS 0209+0832. Ele só se forma nas condições extremas de estrelas moribundas, e sugere um planeta de segunda geração, feito do material que a estrela jogou fora.\n\n🔖 Salva pra lembrar que o fim de uma estrela pode ser um começo.\n📤 Manda pra quem gosta de planetas estranhos.\n👉 Segue @neuralupdate e responde: dá pra imaginar um planeta nascendo depois do fim?\n\n📚 Fonte: NASA, 05/10/2026 — Suspected Second-generation Planet Solves NASA Hubble Cold Case\n\n#hubble #anabranca #exoplaneta #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 1,
+   "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 32,
-   "reach": 22,
-   "likes": 1,
+   "views": 59,
+   "reach": 46,
+   "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 0,
-   "total_interactions": 3,
-   "ig_reels_avg_watch_time": 15321,
-   "ig_reels_video_view_total_time": 321744,
-   "reels_skip_rate": 57.1,
+   "total_interactions": 8,
+   "ig_reels_avg_watch_time": 12048,
+   "ig_reels_video_view_total_time": 578313,
+   "reels_skip_rate": 46.8,
    "reposts": 0
   },
   {
@@ -4476,18 +4566,18 @@
    "link": "https://www.instagram.com/reel/DeaKuEpjW8g/",
    "titulo": "As estrelas piscam, mas os planetas quase não. ✨",
    "legenda": "As estrelas piscam, mas os planetas quase não. ✨\n\nA luz de uma estrela chega como um pontinho, e o ar da Terra bagunça esse ponto. Perto do horizonte elas piscam ainda mais, porque tem mais ar no caminho. Um planeta é um disquinho, então o brilho oscila bem menos. Se você vir uma luz firme perto do pôr do sol, provavelmente é um planeta.\n\n🔖 Salva pra testar hoje à noite.\n📤 Manda pra quem confunde planeta com estrela.\n👉 Segue @neuralupdate e conta: quantas luzes você já confundiu com estrela?\n\n📚 Fonte: NASA StarChild — Why do stars twinkle?\n\n#estrelas #planetas #astronomia #ceu #ciencia #neuralupdate",
-   "curtidas_campo": 21,
+   "curtidas_campo": 25,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 439,
-   "reach": 341,
-   "likes": 21,
+   "views": 470,
+   "reach": 365,
+   "likes": 25,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 22,
-   "ig_reels_avg_watch_time": 14464,
-   "ig_reels_video_view_total_time": 5004769,
+   "total_interactions": 26,
+   "ig_reels_avg_watch_time": 14262,
+   "ig_reels_video_view_total_time": 5334104,
    "reels_skip_rate": 53.8,
    "reposts": 0
   },
@@ -4498,19 +4588,19 @@
    "link": "https://www.instagram.com/reel/DeZvVWMEiu6/",
    "titulo": "O que protege a Terra do vento do Sol não é o ar: é o campo magnético. 🧲",
    "legenda": "O que protege a Terra do vento do Sol não é o ar: é o campo magnético. 🧲\n\nEle nasce do núcleo de ferro e níquel derretido, girando, e o vento solar empurra esse escudo até deixá-lo com forma de gota. De tempos em tempos ele inverte os polos, em média a cada 300 mil anos.\n\n🔖 Salva pra lembrar do escudo invisível do planeta.\n📤 Manda pra quem acha que só o ar protege a gente.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Earth Facts\n\n#terra #campomagnetico #astronomia #ciencia #sistemasolar #neuralupdate",
-   "curtidas_campo": 9,
+   "curtidas_campo": 11,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 526,
-   "reach": 417,
-   "likes": 9,
+   "views": 591,
+   "reach": 474,
+   "likes": 11,
    "comments": 1,
    "shares": 0,
    "saved": 2,
-   "total_interactions": 13,
-   "ig_reels_avg_watch_time": 10784,
-   "ig_reels_video_view_total_time": 4702203,
-   "reels_skip_rate": 44,
+   "total_interactions": 15,
+   "ig_reels_avg_watch_time": 10752,
+   "ig_reels_video_view_total_time": 5322348,
+   "reels_skip_rate": 44.5,
    "reposts": 1
   },
   {
@@ -4523,16 +4613,16 @@
    "curtidas_campo": 19,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 469,
-   "reach": 391,
+   "views": 480,
+   "reach": 403,
    "likes": 19,
    "comments": 1,
    "shares": 2,
    "saved": 1,
    "total_interactions": 24,
-   "ig_reels_avg_watch_time": 10199,
-   "ig_reels_video_view_total_time": 4202204,
-   "reels_skip_rate": 55.7,
+   "ig_reels_avg_watch_time": 10237,
+   "ig_reels_video_view_total_time": 4340749,
+   "reels_skip_rate": 55.3,
    "reposts": 1
   },
   {
@@ -4545,16 +4635,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 463,
-   "reach": 379,
+   "views": 464,
+   "reach": 380,
    "likes": 13,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 9784,
-   "ig_reels_video_view_total_time": 3884513,
-   "reels_skip_rate": 54.4,
+   "ig_reels_avg_watch_time": 9763,
+   "ig_reels_video_view_total_time": 3885766,
+   "reels_skip_rate": 54.5,
    "reposts": 0
   },
   {
@@ -4567,16 +4657,16 @@
    "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 430,
-   "reach": 385,
+   "views": 432,
+   "reach": 386,
    "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 3,
    "total_interactions": 11,
-   "ig_reels_avg_watch_time": 9152,
-   "ig_reels_video_view_total_time": 3569573,
-   "reels_skip_rate": 51,
+   "ig_reels_avg_watch_time": 9162,
+   "ig_reels_video_view_total_time": 3582345,
+   "reels_skip_rate": 50.9,
    "reposts": 0
   },
   {
@@ -4590,14 +4680,14 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1020,
-   "reach": 864,
+   "reach": 866,
    "likes": 29,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 34,
-   "ig_reels_avg_watch_time": 12598,
-   "ig_reels_video_view_total_time": 11086809,
+   "ig_reels_avg_watch_time": 12602,
+   "ig_reels_video_view_total_time": 11103069,
    "reels_skip_rate": 50.5,
    "reposts": 1
   },
@@ -4655,15 +4745,15 @@
    "curtidas_campo": 34,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 887,
-   "reach": 758,
+   "views": 890,
+   "reach": 760,
    "likes": 34,
    "comments": 1,
    "shares": 21,
    "saved": 3,
    "total_interactions": 60,
-   "ig_reels_avg_watch_time": 15308,
-   "ig_reels_video_view_total_time": 11603603,
+   "ig_reels_avg_watch_time": 15285,
+   "ig_reels_video_view_total_time": 11617297,
    "reels_skip_rate": 37.9,
    "reposts": 1
   },
@@ -4831,16 +4921,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 48,
-   "reach": 35,
+   "views": 49,
+   "reach": 36,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 14520,
-   "ig_reels_video_view_total_time": 551789,
-   "reels_skip_rate": 54.8,
+   "ig_reels_avg_watch_time": 14169,
+   "ig_reels_video_view_total_time": 552601,
+   "reels_skip_rate": 56.3,
    "reposts": 0
   },
   {
@@ -4897,16 +4987,16 @@
    "curtidas_campo": 34,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 755,
-   "reach": 690,
+   "views": 760,
+   "reach": 691,
    "likes": 34,
    "comments": 1,
    "shares": 1,
    "saved": 4,
    "total_interactions": 42,
-   "ig_reels_avg_watch_time": 17879,
-   "ig_reels_video_view_total_time": 12444040,
-   "reels_skip_rate": 39.5,
+   "ig_reels_avg_watch_time": 17935,
+   "ig_reels_video_view_total_time": 12501185,
+   "reels_skip_rate": 39.4,
    "reposts": 2
   },
   {
@@ -5114,18 +5204,18 @@
    "link": "https://www.instagram.com/reel/DeB6_XAEVbP/",
    "titulo": "Marte é vermelho de poeira. Mas o gelo do polo norte é quase limpo. 🧊",
    "legenda": "Marte é vermelho de poeira. Mas o gelo do polo norte é quase limpo. 🧊\n\nPor anos, a conta dizia que até um quarto daquele gelo era poeira. Agora, juntando duas sondas e um robô que pousou lá, a conta mudou: menos de 3%. O polo funciona como um pavê: camadas de gelo limpo separadas por camadas mais sujas, cada uma guardando o clima de milhares de anos atrás.\n\n🔖 Salva pra lembrar que Marte guarda gelo quase puro.\n📤 Manda pra quem acha que Marte é só poeira.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que a Lua não cai na Terra.\n\n📚 Fonte: Khuller & Mohan, npj Space Exploration (30/09/2026). Imagens: ESA/DLR/FU Berlin (CC BY-SA 3.0 IGO)\n\n#marte #astronomia #espaco #ciencia #universo #neuralupdate",
-   "curtidas_campo": 30,
+   "curtidas_campo": 31,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1724,
-   "reach": 1307,
-   "likes": 30,
+   "views": 1727,
+   "reach": 1309,
+   "likes": 31,
    "comments": 1,
    "shares": 1,
-   "saved": 2,
-   "total_interactions": 34,
-   "ig_reels_avg_watch_time": 18834,
-   "ig_reels_video_view_total_time": 24597585,
+   "saved": 3,
+   "total_interactions": 36,
+   "ig_reels_avg_watch_time": 18827,
+   "ig_reels_video_view_total_time": 24644954,
    "reels_skip_rate": 34.2,
    "reposts": 0
   },
@@ -5183,16 +5273,16 @@
    "curtidas_campo": 18,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 993,
-   "reach": 771,
+   "views": 994,
+   "reach": 772,
    "likes": 18,
    "comments": 1,
    "shares": 3,
    "saved": 4,
    "total_interactions": 26,
-   "ig_reels_avg_watch_time": 14010,
-   "ig_reels_video_view_total_time": 10927999,
-   "reels_skip_rate": 41.8,
+   "ig_reels_avg_watch_time": 13994,
+   "ig_reels_video_view_total_time": 10929673,
+   "reels_skip_rate": 41.9,
    "reposts": 0
   },
   {
@@ -5205,16 +5295,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 246,
-   "reach": 203,
+   "views": 248,
+   "reach": 204,
    "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 11358,
-   "ig_reels_video_view_total_time": 2396579,
-   "reels_skip_rate": 55.2,
+   "ig_reels_avg_watch_time": 11495,
+   "ig_reels_video_view_total_time": 2437012,
+   "reels_skip_rate": 55,
    "reposts": 0
   },
   {
@@ -5271,16 +5361,16 @@
    "curtidas_campo": 11,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 782,
-   "reach": 585,
+   "views": 783,
+   "reach": 587,
    "likes": 11,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 17058,
-   "ig_reels_video_view_total_time": 10747051,
-   "reels_skip_rate": 38.6,
+   "ig_reels_avg_watch_time": 17035,
+   "ig_reels_video_view_total_time": 10749484,
+   "reels_skip_rate": 38.7,
    "reposts": 1
   },
   {
@@ -7368,15 +7458,15 @@
    "titulo": "A missão IXPE da NASA observou por mais de 140 horas uma estrela de nêutrons altamente magnetizada e encontrou um padrão de polarização comp",
    "legenda": "A missão IXPE da NASA observou por mais de 140 horas uma estrela de nêutrons altamente magnetizada e encontrou um padrão de polarização compatível com uma previsão de 90 anos da eletrodinâmica quântica. Em campos magnéticos extremos, o vácuo pode se comportar como um meio que altera a luz. O resultado, publicado em 5 de agosto de 2026, é apresentado pela NASA como a primeira medição desse tipo e ainda será testado por novas observações.\n\n#astronomia #fisicaquantica #neuralupdate",
    "curtidas_campo": 37,
-   "comentarios_campo": 2,
+   "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1277,
    "reach": 1011,
    "likes": 37,
-   "comments": 2,
+   "comments": 1,
    "shares": 2,
    "saved": 4,
-   "total_interactions": 46,
+   "total_interactions": 45,
    "ig_reels_avg_watch_time": 16016,
    "ig_reels_video_view_total_time": 16865830,
    "reels_skip_rate": 30.3,
@@ -7612,15 +7702,15 @@
    "curtidas_campo": 51,
    "comentarios_campo": 6,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1464,
+   "views": 1465,
    "reach": 1119,
    "likes": 51,
    "comments": 6,
    "shares": 1,
    "saved": 2,
    "total_interactions": 61,
-   "ig_reels_avg_watch_time": 18327,
-   "ig_reels_video_view_total_time": 21424728,
+   "ig_reels_avg_watch_time": 18315,
+   "ig_reels_video_view_total_time": 21429054,
    "reels_skip_rate": 42.6,
    "reposts": 1
   },
