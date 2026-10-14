@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-13T16:51:17.267Z",
+ "gerado_em": "2026-10-14T14:28:11.440Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2560908,
+   "seguidores": 2560775,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17186,
+   "seguidores": 17195,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591679,
+   "seguidores": 591681,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.046,
+   "comentarios_por_curtida_sem_pedido": 0.04,
    "melhores_pedidos": []
   },
   {
@@ -62,8 +62,8 @@
    "usuario": "achadinhosdashopee",
    "grupo": "achadinhos",
    "ok": true,
-   "seguidores": 2,
-   "posts_lidos": 0,
+   "seguidores": 0,
+   "posts_lidos": 2,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
@@ -104,7 +104,7 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 18,
+   "seguidores": 19,
    "posts_lidos": 48,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -122,24 +122,13 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057359,
+   "seguidores": 1057253,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
+   "pct_posts_pedindo": 0,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.46,
-   "comentarios_por_curtida_sem_pedido": 0.019,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-10-09",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": null,
-     "trecho": "— Marcar duas pessoas nos comentários (cada usuário só pode comentar uma única vez)⁣",
-     "comentarios": 9312,
-     "curtidas": 20242,
-     "link": "https://www.instagram.com/p/DeRx9vaAeBN/"
-    }
-   ]
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.027,
+   "melhores_pedidos": []
   }
  ],
  "hashtags": [
@@ -161,17 +150,17 @@
   {
    "hashtag": "projetorgalaxia",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "An unknown error occurred"
   },
   {
    "hashtag": "astronomia",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "An unknown error occurred"
   },
   {
    "hashtag": "livros",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   }
  ]
 }
