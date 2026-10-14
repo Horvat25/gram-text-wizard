@@ -4472,5 +4472,54 @@
     "legenda": "",
     "slug": "story-livro-2026-10-18",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-10-19T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/36101a6e-3bc1-4420-a3d8-aa5f213f0e42.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-19",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-19T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/593b4369-e162-4551-94b1-9af322d6cf22.mp4",
+    "legenda": "O Webb achou um aglomerado de galáxias que cresceu rápido demais. 🌌\n\nA luz dele viajou 10,4 bilhões de anos até chegar aqui, então a gente vê o aglomerado de quando o universo era bem mais novo. Mesmo assim ele já tem cara de adulto, com a massa toda apertada no centro. Quase tudo ali é matéria escura, que ninguém vê, mas que entorta a luz das galáxias de trás.\n\n🔖 Salva pra lembrar do aglomerado que cresceu rápido demais.\n📤 Manda pra quem gosta de galáxias e de matéria escura.\n👉 Segue @neuralupdate e responde: como ele cresceu tão rápido?\n\n📚 Fonte: ScienceDaily / Caltech IPAC — XLSSC 122, 12/10/2026\n\n#webb #galaxias #materiaescura #astronomia #ciencia #neuralupdate",
+    "slug": "nw-webb-aglomerado-adulto-cedo",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-19T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/921bb33a-8b9a-4ddf-8439-8fcff00f2964.mp4",
+    "legenda": "Onde termina o Sistema Solar? 🛰️\n\nO Sol sopra um vento de partículas o tempo todo, e esse vento forma uma bolha enorme. A borda dessa bolha se chama heliopausa. A Voyager 1 passou por ela em 2012 e a Voyager 2, em 2018. Lá fora começa o espaço entre as estrelas, mas a gravidade do Sol ainda segura cometas muito mais longe.\n\n🔖 Salva pra lembrar onde o Sistema Solar acaba.\n📤 Manda pra quem acha que o Sistema Solar acaba em Netuno.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Heliosphere / Voyager\n\n#heliosfera #voyager #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl73-onde-acaba-o-sistema-solar",
+    "status": "agendado",
+    "comentario": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem."
+  },
+  {
+    "quando": "2026-10-19T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1cbe4dfa-722d-4010-bf8e-40bfb9796ff6.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-19",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-19T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fd86f2a9-abb5-4f8f-bc0a-a7545ee78468.mp4",
+    "legenda": "Em Vênus, o Sol nasce do lado errado. ☀️\n\nVênus gira ao contrário da maioria dos planetas, então lá o Sol nasce no oeste. E gira tão devagar que uma volta nele mesmo leva 243 dias terrestres, enquanto a volta em torno do Sol leva 225. Ou seja: em Vênus, girar uma vez demora mais que um ano.\n\n🔖 Salva pra lembrar que em Vênus o dia dura mais que o ano.\n📤 Manda pra quem acha que o Sol sempre nasce no leste.\n👉 Segue @neuralupdate e responde: como você ia contar o tempo morando lá?\n\n📚 Fonte: NASA Science — Venus facts\n\n#venus #sol #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "viral-venus-sol-nasce-do-lado-errado",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-19T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a3a1a0b6-3200-409d-9f4e-cd210eb9e4ad.png",
+    "legenda": "",
+    "slug": "story-livro-2026-10-19",
+    "status": "agendado"
   }
 ]
