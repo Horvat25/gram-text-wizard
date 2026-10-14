@@ -4374,5 +4374,103 @@
     "status": "agendado",
     "campanha": "projetor-astronauta",
     "variacao": "transformacao-quarto"
+  },
+  {
+    "quando": "2026-10-17T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/43ebace1-43b4-4dec-92a0-860cf3435660.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-17",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-17T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a89cc4c7-751f-4cf4-904e-57bd1558e171.mp4",
+    "legenda": "Astronautas viram clarões na Lua, e as fotos acabaram de sair. 🌕\n\nA NASA liberou mais de 11 mil fotos e vídeos da Artemis II, a missão que levou quatro pessoas até a Lua em abril. Numa das imagens, a tripulação marcou pequenos clarões na Lua escura: são impactos, pedras do espaço batendo no chão lunar.\n\n🔖 Salva pra lembrar que fazia mais de 50 anos que gente de verdade não fotografava a Lua de perto.\n📤 Manda pra quem gosta de missões à Lua.\n👉 Segue @neuralupdate e responde: o que você queria ver nessas fotos?\n\n📚 Fonte: NASA, 07/10/2026 — Artemis II lunar science data release\n\n#artemis2 #lua #nasa #astronomia #ciencia #neuralupdate",
+    "slug": "nw-artemis2-claroes-na-lua",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-17T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/25d8df36-88b1-4174-86d1-0bdf347ad14e.mp4",
+    "legenda": "De onde saiu a Lua? A ideia mais aceita é uma batida. 💥\n\nHá uns 4,5 bilhões de anos, um planeta do tamanho de Marte, chamado Teia, acertou a Terra. O choque jogou rocha derretida pro espaço, e esses pedaços se juntaram em volta da Terra. Por isso as rochas que os astronautas trouxeram da Lua são tão parecidas com as daqui.\n\n🔖 Salva pra lembrar de onde a Lua saiu.\n📤 Manda pra quem acha que a Lua sempre esteve aí.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Earth's Moon: formation\n\n#lua #formacaodalua #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl71-lua-nasceu-de-uma-batida",
+    "status": "agendado",
+    "comentario": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem."
+  },
+  {
+    "quando": "2026-10-17T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f889e004-f190-4ce7-be81-e19476aff4c3.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-17",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-17T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f3b205f8-23ae-4381-a408-a97e430cab25.mp4",
+    "legenda": "Amanhã, domingo 18/10, a Lua fica metade acesa. 🌓\n\nNa lua cheia, o Sol bate de frente e o relevo some. Na meia-lua a luz chega de lado e cada cratera faz sombra: olha na linha que separa o claro do escuro, que é onde aparecem as crateras e as montanhas. Dá pra ver até com binóculo, no fim da tarde, alta no céu.\n\n🔖 Salva pra lembrar de olhar amanhã.\n📤 Manda pra quem tem um binóculo em casa.\n👉 Segue @neuralupdate e responde: você tem um binóculo em casa?\n\n📚 Fonte: efemérides (astronomy-engine), quarto crescente em 18/10/2026; NASA Science — Moon Phases\n\n#lua #quartocrescente #astronomia #ceu #ciencia #neuralupdate",
+    "slug": "viral-amanha-lua-metade-crateras",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-17T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4b9fb742-0263-451a-81c6-668f157c5d78.png",
+    "legenda": "",
+    "slug": "story-livro-2026-10-17",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-18T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b847af1e-595f-4546-8028-f76ce540a7b9.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-18",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-18T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/68dac203-4d99-4cee-8e1d-d23209cab3fd.mp4",
+    "legenda": "Isso parece um botão de flor, mas é um berçário de estrelas. 🌸\n\nO telescópio James Webb fotografou a nebulosa NGC 7129. No infravermelho, ele enxerga através da poeira que esconde as estrelas recém-nascidas, ainda se formando, enroladas em gás. O nosso Sol nasceu numa nuvem parecida, há uns 4,5 bilhões de anos.\n\n🔖 Salva pra lembrar de onde o Sol veio.\n📤 Manda pra quem gosta das fotos do Webb.\n👉 Segue @neuralupdate e responde: você acha que alguma dessas estrelas vai ter planetas?\n\n📚 Fonte: Space.com / NASA Webb — NGC 7129, 07/10/2026\n\n#webb #nebulosa #estrelas #astronomia #ciencia #neuralupdate",
+    "slug": "nw-webb-nebulosa-botao-de-flor",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-18T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8fbdb263-1b12-4b6f-bb84-7e483b902fc8.mp4",
+    "legenda": "O lugar com mais vulcão não é a Terra. 🌋\n\nÉ Io, uma lua de Júpiter, com uns 400 vulcões ativos. Júpiter puxa e aperta essa lua o tempo todo, como a gente amassando uma bolinha de borracha, e ela esquenta por dentro. Tem vulcão soltando jato a centenas de quilômetros de altura.\n\n🔖 Salva pra lembrar da lua que cospe lava.\n📤 Manda pra quem acha que o lugar com mais vulcão é a Terra.\n👉 Segue @neuralupdate e conta nos comentários se você ia querer ver um desses de perto.\n\n📚 Fonte: NASA Science — Io facts\n\n#io #jupiter #vulcoes #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl72-io-lua-dos-vulcoes",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-18T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/074ad7f0-7e7f-49f9-b926-c20aaa72180b.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-18",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-18T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ee39fe68-371f-4668-bff6-1f1189a9cbab.mp4",
+    "legenda": "Hoje dá pra ver Saturno sem telescópio. 🪐\n\nDepois das 20h, olha pro leste, um pouco pra cima: ele é um ponto amarelado, de brilho firme. Com um telescópio pequeno, já aparecem os anéis. A luz que você vê saiu de lá há mais de uma hora.\n\n🔖 Salva pra lembrar de olhar hoje.\n📤 Manda pra quem nunca viu Saturno.\n🌌 Quer um céu de estrelas no seu quarto também? Comenta QUERO que eu te mando o projetor no direct (link de afiliado Shopee).\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: efemérides para São Paulo, 18/10/2026 (astronomy-engine)\n\n#saturno #ceu #astronomia #observacao #ciencia #neuralupdate",
+    "slug": "viral-saturno-hoje-sem-telescopio",
+    "status": "agendado",
+    "comentario": "Comenta QUERO que eu te mando no direct o projetor que enche o teto de estrelas 🌌 (link de afiliado Shopee)"
+  },
+  {
+    "quando": "2026-10-18T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3f9dafc2-b37a-4884-b4c4-95632a5904d7.png",
+    "legenda": "",
+    "slug": "story-livro-2026-10-18",
+    "status": "agendado"
   }
 ]
