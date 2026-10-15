@@ -1,8 +1,9 @@
 // comenta-youtube.mjs — põe o primeiro comentário nos Shorts que acabaram de ficar públicos.
 //
-// POR QUE EXISTE (20/08/2026): o Kindle saiu de dentro do vídeo — a medição de 19/08
-// mostrou o cartaz de CTA derrubando a retenção de 100%+ pra 48%, e quase ninguém
-// chegava a vê-lo. A oferta passou a viver no COMENTÁRIO FIXADO.
+// POR QUE EXISTE: o CTA comercial saiu de dentro do vídeo depois de medir queda forte
+// de retenção. A oferta passou a viver no comentário fixado.
+// DIREÇÃO 15/10/2026: o fallback de NOVOS vídeos passa a priorizar Rotina que Paga
+// com a palavra ROTINA. Comentários específicos já congelados por vídeo continuam vencendo.
 //
 // POR QUE RODA AQUI, no repositório do Instagram: este é o único motor da operação
 // que roda sozinho, no GitHub Actions, com o PC do Marcelo desligado. O estúdio do
@@ -32,25 +33,9 @@ if (!YT_CLIENT_ID || !YT_CLIENT_SECRET || !YT_REFRESH_TOKEN) {
 // saiu ontem não precisa mais do comentário — se não pegou, não pega.
 const JANELA_HORAS = 30;
 
-// ⚠️ Dizer só "de graça" promete mais do que é. Correção do Marcelo em 20/08 (ele viu
-// isso no Instagram primeiro): tem que ficar claro que o GRÁTIS é o primeiro mês, que
-// depois vira assinatura paga, e que dá pra cancelar antes. Protege a conta também —
-// prometer "grátis" sem qualificar é o que vira reclamação.
-//
-//
-// ⚠️ DUAS SUPERFÍCIES, DOIS TEXTOS (21/08/2026, correção do Marcelo).
-//
-// No player de SHORTS o link do comentário NÃO é clicável — no celular ele aparece
-// como texto morto. (Eu tinha "verificado" na página de computador, onde ele vira
-// <a href> de verdade, e concluí errado. Conferir na superfície onde a pessoa está.)
-// Então no Short o comentário manda pra BIO DO CANAL, igual ao "link na bio" do
-// Instagram — e o link do canal já existe e já aponta pra /links?o=yt.
-//
-// No vídeo LONGO o link é clicável de verdade, então lá vai a URL inteira.
-//
-// ⚠️ O aviso de afiliado só aparece onde o LINK aparece (contrato dos Associados,
-// cláusula 5). No texto do Short não há link, então ele não vai — igual à legenda
-// do Instagram.
+// Shorts: URLs em comentários não são uma boa rota primária. O fallback novo usa
+// comentário ROTINA -> resposta -> qualificação. Não depende de link.
+// Vídeos com texto específico no mapa abaixo continuam usando o texto congelado deles.
 const TEXTO_CURTO = [
   '🤖 Estou acompanhando plataformas que remuneram tarefas de coleta de dados para treinar IA e robôs no projeto Rotina que Paga.',
   '',
