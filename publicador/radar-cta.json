@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-14T14:28:11.440Z",
+ "gerado_em": "2026-10-15T14:05:41.245Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2560775,
+   "seguidores": 2560456,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.01,
+   "comentarios_por_curtida_sem_pedido": 0.013,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17195,
+   "seguidores": 17209,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591681,
+   "seguidores": 591602,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.04,
+   "comentarios_por_curtida_sem_pedido": 0.051,
    "melhores_pedidos": []
   },
   {
@@ -63,12 +63,25 @@
    "grupo": "achadinhos",
    "ok": true,
    "seguidores": 0,
-   "posts_lidos": 2,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
+   "posts_lidos": 4,
+   "pct_posts_pedindo": 0.25,
+   "palavras": {
+    "QUERO": 1
+   },
    "comentarios_por_curtida_com_pedido": null,
    "comentarios_por_curtida_sem_pedido": null,
-   "melhores_pedidos": []
+   "melhores_pedidos": [
+    {
+     "quando": "2026-10-14",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "QUERO",
+     "trecho": "comente “quero” para receber o link",
+     "comentarios": 0,
+     "curtidas": 0,
+     "link": "https://www.instagram.com/p/Deerx-QFuTa/"
+    }
+   ]
   },
   {
    "usuario": "achadinhos.shopee",
@@ -105,11 +118,11 @@
    "grupo": "livros",
    "ok": true,
    "seguidores": 19,
-   "posts_lidos": 48,
+   "posts_lidos": 49,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.106,
+   "comentarios_por_curtida_sem_pedido": 0.104,
    "melhores_pedidos": []
   },
   {
@@ -122,12 +135,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057253,
+   "seguidores": 1057259,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.027,
+   "comentarios_por_curtida_sem_pedido": 0.026,
    "melhores_pedidos": []
   }
  ],
@@ -150,12 +163,12 @@
   {
    "hashtag": "projetorgalaxia",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "astronomia",
    "ok": false,
-   "erro": "An unknown error occurred"
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "livros",
