@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-14T14:35:12.367Z",
+  "gerado_em": "2026-10-15T14:15:06.978Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -490,11 +490,54 @@
     {
       "d": "2026-10-14",
       "views": 0
+    },
+    {
+      "d": "2026-10-15",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1631378428517864",
+      "quando": "2026-10-15T11:11:47+0000",
+      "titulo": "Na semana que vem, o Japão vai lançar uma sonda pra buscar um pedaço de uma lua de Marte. 🚀",
+      "link": "https://www.facebook.com/reel/1631378428517864/",
+      "segundos": 33.25,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1280263314239190",
+      "quando": "2026-10-14T21:11:35+0000",
+      "titulo": "Neste segundo, o Sol ficou 4 milhões de toneladas mais leve. ☀️",
+      "link": "https://www.facebook.com/reel/1280263314239190/",
+      "segundos": 29.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1836339580833264",
+      "quando": "2026-10-14T17:11:14+0000",
+      "titulo": "A atmosfera do Sol é mais quente que a superfície dele. ☀️",
+      "link": "https://www.facebook.com/reel/1836339580833264/",
+      "segundos": 37.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "2189008382493676",
       "quando": "2026-10-14T11:12:06+0000",
