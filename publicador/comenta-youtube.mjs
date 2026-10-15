@@ -52,21 +52,14 @@ const JANELA_HORAS = 30;
 // cláusula 5). No texto do Short não há link, então ele não vai — igual à legenda
 // do Instagram.
 const TEXTO_CURTO = [
-  '📚 O primeiro mês do Kindle Unlimited é grátis.',
-  'O link está na bio do canal: toca em Neural Update aqui em cima → Links → Kindle.',
+  '🤖 Estou acompanhando plataformas que remuneram tarefas de coleta de dados para treinar IA e robôs no projeto Rotina que Paga.',
   '',
-  'Depois vira assinatura paga — se não quiser continuar, cancela antes de o mês acabar e não paga nada.',
-  '(Link de afiliado: o canal pode receber comissão se você assinar, sem custo extra.)',
+  'Quer que eu te mostre por onde começar? Comenta ROTINA.',
+  '',
+  'Sem promessa de vaga ou renda: a disponibilidade e a aprovação dependem de cada plataforma.',
 ].join('\n');
 
-const TEXTO_LONGO = [
-  '📚 O primeiro mês do Kindle Unlimited é grátis:',
-  'https://neural-update.com.br/kindle/?o=yt',
-  '',
-  'Depois vira assinatura paga — se não quiser continuar, cancela antes de o mês acabar e não paga nada.',
-  // no LONGO o link aparece de verdade: manter a frase do Programa de Associados (mais forte que a dos Shorts)
-  '(Link de afiliado — como associado da Amazon, o Neural Update recebe por compras qualificadas, sem custo a mais pra você.)',
-].join('\n');
+const TEXTO_LONGO = TEXTO_CURTO;
 
 // Texto POR VÍDEO (campo `comentario` do lote). O `sobe-lote.js` do estúdio grava videoId → texto em
 // data/comentarios-yt.json; esse arquivo é copiado pra cá como publicador/comentarios-yt.json.
