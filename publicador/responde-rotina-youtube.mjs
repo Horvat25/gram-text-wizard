@@ -1,3 +1,5 @@
+import { pathToFileURL } from 'node:url';
+
 // responde-rotina-youtube.mjs
 // Neural Update -> RQP: responde a comentários que começam com ROTINA.
 // API oficial do YouTube, sem navegador. Idempotente por thread.
@@ -177,7 +179,7 @@ export async function run({ dryRun = false } = {}) {
   return { scannedVideos: recent.length, intents, replied };
 }
 
-const isMain = process.argv[1] && new URL(import.meta.url).pathname.endsWith(process.argv[1].replace(/\\/g, '/'));
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
   run({ dryRun: process.argv.includes('--seco') })
     .then((r) => console.log(JSON.stringify(r)))
