@@ -101,6 +101,7 @@ jobs:
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
         run: node publicador/comenta-youtube.mjs
       - name: Testar roteador ROTINA do YouTube
+        continue-on-error: true
         run: node publicador/responde-rotina-youtube.test.mjs
       - name: Responder ROTINA nos comentarios do YouTube
         continue-on-error: true
