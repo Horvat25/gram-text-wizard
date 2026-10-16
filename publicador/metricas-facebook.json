@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-15T14:15:06.978Z",
+  "gerado_em": "2026-10-16T14:02:21.567Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -494,11 +494,54 @@
     {
       "d": "2026-10-15",
       "views": 0
+    },
+    {
+      "d": "2026-10-16",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1377730327894970",
+      "quando": "2026-10-16T11:12:06+0000",
+      "titulo": "Um robô acabou de bater o recorde de quem mais andou fora da Terra. 🚗",
+      "link": "https://www.facebook.com/reel/1377730327894970/",
+      "segundos": 38.71,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1603831607441011",
+      "quando": "2026-10-15T21:11:00+0000",
+      "titulo": "Semana que vem vai cair poeira do cometa Halley do céu. ☄️",
+      "link": "https://www.facebook.com/reel/1603831607441011/",
+      "segundos": 32.291,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "3062741550738419",
+      "quando": "2026-10-15T17:11:50+0000",
+      "titulo": "Fora da Terra, o único lugar com chuva, rios e lagos é Titã. 🪐",
+      "link": "https://www.facebook.com/reel/3062741550738419/",
+      "segundos": 32.46,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1631378428517864",
       "quando": "2026-10-15T11:11:47+0000",
