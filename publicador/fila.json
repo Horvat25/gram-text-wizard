@@ -4349,16 +4349,22 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ddd054c0-8220-480b-8474-8c5e9aa62690.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-16",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17997663078035334",
+    "publicado_em": "2026-10-16T11:11:07.716Z"
   },
   {
     "quando": "2026-10-16T11:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/919e91b3-2fce-445f-8f12-6eb2d0009b27.mp4",
     "slug": "nw-perseverance-recorde-45km",
-    "status": "agendado",
+    "status": "publicado",
     "legenda": "Um robô acabou de bater o recorde de quem mais andou fora da Terra. 🚗\n\nO Perseverance, da NASA, já rodou 45 km em Marte e passou o Opportunity, que segurava o recorde desde 2018. O plano original era rodar no máximo uns 20 km.\n\n🔖 Salva pra lembrar do robô que passou a maratona em Marte.\n📤 Manda pra quem gosta de robôs e de Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Perseverance blog, 12/10/2026\n\n#perseverance #marte #nasa #astronomia #ciencia #neuralupdate",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18168114460415864",
+    "publicado_em": "2026-10-16T11:12:04.305Z",
+    "id_comentario": "17981598981067138",
+    "id_facebook": "1377730327894970"
   },
   {
     "quando": "2026-10-16T17:00:00.000Z",
