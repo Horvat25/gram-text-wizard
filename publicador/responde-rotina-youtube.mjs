@@ -18,8 +18,21 @@ export function normalizeKeywordText(value) {
     .toUpperCase();
 }
 
+// 16/10/2026 (decisão da Direção): responde QUALQUER comentário com a palavra ROTINA solta, em qualquer
+// posição, sem distinguir acento/caixa. Exceção: mais de 12 palavras pode ser alguém falando da própria
+// rotina, e não pedindo; esses ficam marcados pro Marcelo (isRotinaLongo) e o robô NÃO responde.
+const MAX_PALAVRAS_PEDIDO = 12;
+const PALAVRA_ROTINA = /\bROTINA\b/;
+const contaPalavras = (n) => n.split(' ').filter(Boolean).length;
+
 export function isRotinaIntent(value) {
-  return /^ROTINA(?:\s|$)/.test(normalizeKeywordText(value));
+  const n = normalizeKeywordText(value);
+  return PALAVRA_ROTINA.test(n) && contaPalavras(n) <= MAX_PALAVRAS_PEDIDO;
+}
+
+export function isRotinaLongo(value) {
+  const n = normalizeKeywordText(value);
+  return PALAVRA_ROTINA.test(n) && contaPalavras(n) > MAX_PALAVRAS_PEDIDO;
 }
 
 export function replyFor(commentId) {
@@ -150,6 +163,10 @@ export async function run({ dryRun = false } = {}) {
       const s = top?.snippet;
       if (!top?.id || !s) continue;
       if (s.authorChannelId?.value === ownChannelId) continue;
+      if (isRotinaLongo(s.textDisplay || s.textOriginal)) {
+        console.log('· ' + video.id + ' / ' + (s.authorDisplayName || '?') + ' — ROTINA em comentário longo (>12 palavras): marcado pro Marcelo, sem resposta automática');
+        continue;
+      }
       if (!isRotinaIntent(s.textDisplay || s.textOriginal)) continue;
 
       intents++;
