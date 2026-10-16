@@ -1,0 +1,65 @@
+name: Contagem ROTINA
+
+# POR QUE EXISTE (16/10/2026, ordem da Direção): a semana do Rotina que Paga mede o máximo de
+# comentários ROTINA e exige que nenhum fique sem resposta. O IG_TOKEN é secret do GitHub e não desce
+# pra máquina do Marcelo, então a contagem roda aqui e ACRESCENTA linhas em
+# `publicador/rotina-contagem.jsonl` (só acrescenta, nunca reescreve). SÓ LEITURA no Instagram.
+#
+# Horários (BRT 12h, 18h e 22h = 15:00Z, 21:00Z e 01:00Z). O cron do GitHub atrasa; a linha grava
+# a hora real. Vale de 16 a 22/10/2026: depois disso, desligar este workflow.
+
+on:
+  schedule:
+    - cron: '0 15 * * *'
+    - cron: '0 21 * * *'
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: rotina-contagem
+  cancel-in-progress: false
+
+jobs:
+  conta:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Autoteste
+        run: node publicador/conta-rotina.mjs --autoteste
+
+      - name: Contar os ROTINA
+        env:
+          IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador público
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          ROTINA_SAIDA: /tmp/rotina-novas.jsonl
+        run: |
+          : > /tmp/rotina-novas.jsonl
+          node publicador/conta-rotina.mjs
+
+      - name: Guardar (só acrescenta)
+        run: |
+          set -e
+          [ -s /tmp/rotina-novas.jsonl ] || { echo "nada a guardar"; exit 0; }
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          # Mesmo cuidado do metricas.yml: este job empurra pro MESMO branch do publicador.
+          # Reconcilia com o origin antes e só acrescenta ao fim do arquivo.
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cat /tmp/rotina-novas.jsonl >> publicador/rotina-contagem.jsonl
+            git add publicador/rotina-contagem.jsonl
+            git commit -q -m "rotina: contagem de comentarios ROTINA em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado; tentando de novo"
+            sleep 5
+          done
+          echo "::error::nao consegui salvar a contagem"
+          exit 1
