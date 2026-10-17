@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-16T14:02:21.567Z",
+  "gerado_em": "2026-10-17T13:02:36.868Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -498,11 +498,54 @@
     {
       "d": "2026-10-16",
       "views": 0
+    },
+    {
+      "d": "2026-10-17",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1117370357538896",
+      "quando": "2026-10-17T11:11:50+0000",
+      "titulo": "Astronautas viram clarões na Lua, e as fotos acabaram de sair. 🌕",
+      "link": "https://www.facebook.com/reel/1117370357538896/",
+      "segundos": 41.512,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1089563457404745",
+      "quando": "2026-10-16T21:11:26+0000",
+      "titulo": "Tem uma cidade brasileira morando dentro de uma cratera de asteroide. ☄️",
+      "link": "https://www.facebook.com/reel/1089563457404745/",
+      "segundos": 40.77,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1878249330215350",
+      "quando": "2026-10-16T17:10:52+0000",
+      "titulo": "É a sombra da Terra que faz as fases da Lua? Não. 🌓",
+      "link": "https://www.facebook.com/reel/1878249330215350/",
+      "segundos": 34.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1377730327894970",
       "quando": "2026-10-16T11:12:06+0000",
