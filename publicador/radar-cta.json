@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-16T13:52:30.011Z",
+ "gerado_em": "2026-10-17T12:49:50.653Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2560923,
+   "seguidores": 2561418,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.018,
+   "comentarios_por_curtida_sem_pedido": 0.016,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17231,
+   "seguidores": 17250,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591589,
+   "seguidores": 591639,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.057,
+   "comentarios_por_curtida_sem_pedido": 0.062,
    "melhores_pedidos": []
   },
   {
@@ -63,8 +63,8 @@
    "grupo": "achadinhos",
    "ok": true,
    "seguidores": 0,
-   "posts_lidos": 6,
-   "pct_posts_pedindo": 0.17,
+   "posts_lidos": 7,
+   "pct_posts_pedindo": 0.14,
    "palavras": {
     "QUERO": 1
    },
@@ -117,7 +117,7 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 21,
+   "seguidores": 22,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -135,7 +135,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057356,
+   "seguidores": 1057352,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
