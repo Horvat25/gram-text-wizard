@@ -4407,9 +4407,11 @@
     "midia": "https://neural-update.com.br/stories/projetor-astronauta/01-transformacao-quarto.png",
     "legenda": "",
     "slug": "story-projetor-2026-10-16",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "projetor-astronauta",
-    "variacao": "transformacao-quarto"
+    "variacao": "transformacao-quarto",
+    "id_instagram": "18150271705504014",
+    "publicado_em": "2026-10-17T00:10:26.581Z"
   },
   {
     "quando": "2026-10-17T11:00:00.000Z",
