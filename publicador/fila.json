@@ -4419,7 +4419,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/43ebace1-43b4-4dec-92a0-860cf3435660.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-17",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18072673871595262",
+    "publicado_em": "2026-10-17T11:11:08.702Z"
   },
   {
     "quando": "2026-10-17T11:00:00.000Z",
@@ -4427,8 +4429,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bf040020-4f2c-48f9-a429-0743cedf05ec.mp4",
     "legenda": "Astronautas viram clarões na Lua, e as fotos acabaram de sair. 🌕\n\nA NASA liberou mais de 11 mil fotos e vídeos da Artemis II, a missão que levou quatro pessoas até a Lua em abril. Numa das imagens, a tripulação marcou pequenos clarões na Lua escura: são impactos, pedras do espaço batendo no chão lunar.\n\n🔖 Salva pra lembrar que fazia mais de 50 anos que gente de verdade não fotografava a Lua de perto.\n📤 Manda pra quem gosta de missões à Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 07/10/2026 — Artemis II lunar science data release\n\n#artemis2 #lua #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-artemis2-claroes-na-lua",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18129297727837196",
+    "publicado_em": "2026-10-17T11:11:46.431Z",
+    "id_comentario": "18054046910592575",
+    "id_facebook": "1117370357538896"
   },
   {
     "quando": "2026-10-17T17:00:00.000Z",
