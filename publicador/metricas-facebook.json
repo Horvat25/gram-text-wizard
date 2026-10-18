@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-17T13:02:36.868Z",
+  "gerado_em": "2026-10-18T13:22:54.436Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -502,11 +502,54 @@
     {
       "d": "2026-10-17",
       "views": 0
+    },
+    {
+      "d": "2026-10-18",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1490144522941244",
+      "quando": "2026-10-18T11:12:24+0000",
+      "titulo": "Isso parece um botão de flor, mas é um berçário de estrelas. 🌸",
+      "link": "https://www.facebook.com/reel/1490144522941244/",
+      "segundos": 41.012,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "4365892540326671",
+      "quando": "2026-10-17T21:11:26+0000",
+      "titulo": "Amanhã, domingo 18/10, a Lua fica metade acesa. 🌓",
+      "link": "https://www.facebook.com/reel/4365892540326671/",
+      "segundos": 43.872,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2616626595475385",
+      "quando": "2026-10-17T17:10:58+0000",
+      "titulo": "De onde saiu a Lua? A ideia mais aceita é uma batida. 💥",
+      "link": "https://www.facebook.com/reel/2616626595475385/",
+      "segundos": 35.833,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1117370357538896",
       "quando": "2026-10-17T11:11:50+0000",
