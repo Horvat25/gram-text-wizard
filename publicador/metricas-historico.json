@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-10-17T12:49:26.626Z",
+ "gerado_em": "2026-10-18T13:09:10.083Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1262,
-  "publicacoes": 998
+  "seguidores": 1263,
+  "publicacoes": 1001
  },
- "total_listado": 998,
- "com_tempo_assistido": 458,
+ "total_listado": 1001,
+ "com_tempo_assistido": 461,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-09-18",
-     "ate": "2026-10-16",
+     "de": "2026-09-19",
+     "ate": "2026-10-17",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 3,
-         "end_time": "2026-09-19T07:00:00+0000"
-        },
         {
          "value": 7,
          "end_time": "2026-09-20T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 0,
          "end_time": "2026-10-16T07:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-10-17T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -286,7 +286,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-17",
+     "ate": "2026-10-18",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -311,7 +311,7 @@
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 4
+            "value": 5
            }
           ]
          }
@@ -508,7 +508,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-17",
+     "ate": "2026-10-18",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -517,7 +517,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 5294
+        "value": 5606
        }
       },
       {
@@ -527,7 +527,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 7969
+        "value": 8766
        }
       },
       {
@@ -537,7 +537,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 165
+        "value": 173
        }
       },
       {
@@ -547,7 +547,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 300
+        "value": 330
        }
       }
      ]
@@ -648,15 +648,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 30185
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 685
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 30185
            }
           ]
          }
@@ -704,7 +704,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-17",
+     "ate": "2026-10-18",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -713,7 +713,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 5294,
+        "value": 5606,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -722,15 +722,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 5026
+            "value": 239
            },
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 232
+            "value": 5389
            }
           ]
          }
@@ -2552,13 +2552,43 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-10-17",
-    "erro": "(#100) since param is not valid. Metrics data is available for the last 2 years"
+    "janela": "2026-10-18",
+    "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18125748844797573": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-10-18T11:12:19+0000",
+     "respostas": []
+    }
+   ],
+   "18469188031188012": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-10-17T21:11:22+0000",
+     "respostas": []
+    }
+   ],
+   "18124622581912073": [
+    {
+     "texto": "Suspeito que alguém colocou ali",
+     "curtidas": 0,
+     "quando": "2026-10-17T23:19:25+0000",
+     "respostas": []
+    },
+    {
+     "texto": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem.",
+     "curtidas": 0,
+     "quando": "2026-10-17T17:10:54+0000",
+     "respostas": []
+    }
+   ],
    "18129297727837196": [
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
@@ -2568,6 +2598,18 @@
     }
    ],
    "17906076600577509": [
+    {
+     "texto": "Rotina",
+     "curtidas": 1,
+     "quando": "2026-10-17T21:52:22+0000",
+     "respostas": [
+      {
+       "texto": "Te mandei no direct 📩",
+       "quando": "2026-10-17T21:52:22+0000",
+       "curtidas": 0
+      }
+     ]
+    },
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
      "curtidas": 0,
@@ -4574,26 +4616,92 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18125748844797573",
+   "quando": "2026-10-18T11:12:14+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Deoi-pHD-Iv/",
+   "titulo": "Isso parece um botão de flor, mas é um berçário de estrelas. 🌸",
+   "legenda": "Isso parece um botão de flor, mas é um berçário de estrelas. 🌸\n\nO telescópio James Webb fotografou a nebulosa NGC 7129. No infravermelho, ele enxerga através da poeira que esconde as estrelas recém-nascidas, ainda se formando, enroladas em gás. O nosso Sol nasceu numa nuvem parecida, há uns 4,5 bilhões de anos.\n\n🔖 Salva pra lembrar de onde o Sol veio.\n📤 Manda pra quem gosta das fotos do Webb.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Space.com / NASA Webb — NGC 7129, 07/10/2026\n\n#webb #nebulosa #estrelas #astronomia #ciencia #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 56,
+   "reach": 46,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 3,
+   "ig_reels_avg_watch_time": 7515,
+   "ig_reels_video_view_total_time": 368272,
+   "reels_skip_rate": 55.6,
+   "reposts": 0
+  },
+  {
+   "id": "18469188031188012",
+   "quando": "2026-10-17T21:11:17+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DenCu6KAHCA/",
+   "titulo": "Amanhã, domingo 18/10, a Lua fica metade acesa. 🌓",
+   "legenda": "Amanhã, domingo 18/10, a Lua fica metade acesa. 🌓\n\nNa lua cheia, o Sol bate de frente e o relevo some. Na meia-lua a luz chega de lado e cada cratera faz sombra: olha na linha que separa o claro do escuro, que é onde aparecem as crateras e as montanhas. Dá pra ver até com binóculo, no fim da tarde, alta no céu.\n\n🔖 Salva pra lembrar de olhar amanhã.\n📤 Manda pra quem tem um binóculo em casa.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: efemérides (astronomy-engine), quarto crescente em 18/10/2026; NASA Science — Moon Phases\n\n#lua #quartocrescente #astronomia #ceu #ciencia #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 119,
+   "reach": 110,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 4,
+   "ig_reels_avg_watch_time": 5759,
+   "ig_reels_video_view_total_time": 662383,
+   "reels_skip_rate": 72.8,
+   "reposts": 1
+  },
+  {
+   "id": "18124622581912073",
+   "quando": "2026-10-17T17:10:49+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DemnOfBj3aY/",
+   "titulo": "De onde saiu a Lua? A ideia mais aceita é uma batida. 💥",
+   "legenda": "De onde saiu a Lua? A ideia mais aceita é uma batida. 💥\n\nHá uns 4,5 bilhões de anos, um planeta do tamanho de Marte, chamado Teia, acertou a Terra. O choque jogou rocha derretida pro espaço, e esses pedaços se juntaram em volta da Terra. Por isso as rochas que os astronautas trouxeram da Lua são tão parecidas com as daqui.\n\n🔖 Salva pra lembrar de onde a Lua saiu.\n📤 Manda pra quem acha que a Lua sempre esteve aí.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Earth's Moon: formation\n\n#lua #formacaodalua #astronomia #sistemasolar #ciencia #neuralupdate",
+   "curtidas_campo": 6,
+   "comentarios_campo": 2,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 189,
+   "reach": 154,
+   "likes": 6,
+   "comments": 2,
+   "shares": 0,
+   "saved": 1,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 11223,
+   "ig_reels_video_view_total_time": 1773332,
+   "reels_skip_rate": 60.8,
+   "reposts": 1
+  },
+  {
    "id": "18129297727837196",
    "quando": "2026-10-17T11:11:40+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/Del-HxyDFEQ/",
    "titulo": "Astronautas viram clarões na Lua, e as fotos acabaram de sair. 🌕",
    "legenda": "Astronautas viram clarões na Lua, e as fotos acabaram de sair. 🌕\n\nA NASA liberou mais de 11 mil fotos e vídeos da Artemis II, a missão que levou quatro pessoas até a Lua em abril. Numa das imagens, a tripulação marcou pequenos clarões na Lua escura: são impactos, pedras do espaço batendo no chão lunar.\n\n🔖 Salva pra lembrar que fazia mais de 50 anos que gente de verdade não fotografava a Lua de perto.\n📤 Manda pra quem gosta de missões à Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 07/10/2026 — Artemis II lunar science data release\n\n#artemis2 #lua #nasa #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 0,
+   "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 25,
-   "reach": 10,
-   "likes": 0,
+   "views": 279,
+   "reach": 232,
+   "likes": 4,
    "comments": 1,
    "shares": 1,
    "saved": 0,
-   "total_interactions": 2,
-   "ig_reels_avg_watch_time": 6147,
-   "ig_reels_video_view_total_time": 73769,
-   "reels_skip_rate": 39.1,
-   "reposts": 0
+   "total_interactions": 7,
+   "ig_reels_avg_watch_time": 10877,
+   "ig_reels_video_view_total_time": 2697694,
+   "reels_skip_rate": 53.4,
+   "reposts": 1
   },
   {
    "id": "17906076600577509",
@@ -4602,19 +4710,19 @@
    "link": "https://www.instagram.com/reel/Dekd8xdiiLm/",
    "titulo": "Tem uma cidade brasileira morando dentro de uma cratera de asteroide. ☄️",
    "legenda": "Tem uma cidade brasileira morando dentro de uma cratera de asteroide. ☄️\n\nÉ Araguainha, no Mato Grosso, na divisa com Goiás. A cratera tem uns 40 km de largura, a maior da América do Sul, e o asteroide caiu há uns 250 milhões de anos, antes dos dinossauros. Hoje a marca está gasta, mas quem olha do alto ainda vê o anel.\n\n🔖 Salva pra lembrar que isso existe no Brasil.\n📤 Manda pra quem é de Mato Grosso ou de Goiás.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Earth Impact Database; Serviço Geológico do Brasil (Domo de Araguainha, MT/GO)\n\n#araguainha #cratera #asteroide #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 12,
-   "comentarios_campo": 1,
+   "curtidas_campo": 13,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1193,
-   "reach": 1071,
-   "likes": 12,
-   "comments": 1,
+   "views": 1253,
+   "reach": 1134,
+   "likes": 13,
+   "comments": 3,
    "shares": 1,
-   "saved": 1,
-   "total_interactions": 16,
-   "ig_reels_avg_watch_time": 11741,
-   "ig_reels_video_view_total_time": 12751140,
-   "reels_skip_rate": 32.4,
+   "saved": 2,
+   "total_interactions": 20,
+   "ig_reels_avg_watch_time": 11664,
+   "ig_reels_video_view_total_time": 13437783,
+   "reels_skip_rate": 32.8,
    "reposts": 1
   },
   {
@@ -4624,19 +4732,19 @@
    "link": "https://www.instagram.com/reel/DekCbZBCfdw/",
    "titulo": "É a sombra da Terra que faz as fases da Lua? Não. 🌓",
    "legenda": "É a sombra da Terra que faz as fases da Lua? Não. 🌓\n\nA Lua tem sempre uma metade acesa pelo Sol. O que muda é quanto dessa metade a gente consegue ver daqui. É como uma bola e uma lanterna: ao andar em volta, a parte clara parece crescer e diminuir. A sombra da Terra só cai na Lua no eclipse.\n\n🔖 Salva pra explicar quando alguém falar da sombra.\n📤 Manda pra quem acha que é a sombra da Terra.\n👉 Segue @neuralupdate e conta nos comentários se você vai olhar a Lua no domingo.\n\n📚 Fonte: NASA Science — Moon Phases\n\n#fasesdalua #lua #astronomia #sistemasolar #ciencia #neuralupdate",
-   "curtidas_campo": 5,
+   "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 170,
-   "reach": 144,
-   "likes": 5,
+   "views": 193,
+   "reach": 161,
+   "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 7,
-   "ig_reels_avg_watch_time": 9014,
-   "ig_reels_video_view_total_time": 1343201,
-   "reels_skip_rate": 64.9,
+   "total_interactions": 8,
+   "ig_reels_avg_watch_time": 8587,
+   "ig_reels_video_view_total_time": 1442719,
+   "reels_skip_rate": 65.7,
    "reposts": 0
   },
   {
@@ -4646,19 +4754,19 @@
    "link": "https://www.instagram.com/reel/DejZUnYiHqb/",
    "titulo": "Um robô acabou de bater o recorde de quem mais andou fora da Terra. 🚗",
    "legenda": "Um robô acabou de bater o recorde de quem mais andou fora da Terra. 🚗\n\nO Perseverance, da NASA, já rodou 45 km em Marte e passou o Opportunity, que segurava o recorde desde 2018. O plano original era rodar no máximo uns 20 km.\n\n🔖 Salva pra lembrar do robô que passou a maratona em Marte.\n📤 Manda pra quem gosta de robôs e de Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Perseverance blog, 12/10/2026\n\n#perseverance #marte #nasa #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 23,
+   "curtidas_campo": 24,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1233,
-   "reach": 1076,
-   "likes": 23,
+   "views": 1261,
+   "reach": 1098,
+   "likes": 24,
    "comments": 3,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 27,
-   "ig_reels_avg_watch_time": 12989,
-   "ig_reels_video_view_total_time": 14573684,
-   "reels_skip_rate": 35.1,
+   "total_interactions": 28,
+   "ig_reels_avg_watch_time": 12879,
+   "ig_reels_video_view_total_time": 14772759,
+   "reels_skip_rate": 35.7,
    "reposts": 1
   },
   {
@@ -4671,16 +4779,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 15,
-   "reach": 9,
+   "views": 17,
+   "reach": 10,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 8542,
-   "ig_reels_video_view_total_time": 102508,
-   "reels_skip_rate": 45.5,
+   "ig_reels_avg_watch_time": 7678,
+   "ig_reels_video_view_total_time": 107497,
+   "reels_skip_rate": 46.2,
    "reposts": 0
   },
   {
@@ -4693,16 +4801,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 147,
-   "reach": 122,
+   "views": 150,
+   "reach": 124,
    "likes": 2,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 4,
-   "ig_reels_avg_watch_time": 8855,
-   "ig_reels_video_view_total_time": 1062703,
-   "reels_skip_rate": 66.7,
+   "ig_reels_avg_watch_time": 9040,
+   "ig_reels_video_view_total_time": 1112005,
+   "reels_skip_rate": 65.9,
    "reposts": 0
   },
   {
@@ -4715,16 +4823,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 126,
-   "reach": 109,
+   "views": 130,
+   "reach": 111,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 7592,
-   "ig_reels_video_view_total_time": 880721,
-   "reels_skip_rate": 62.6,
+   "ig_reels_avg_watch_time": 7918,
+   "ig_reels_video_view_total_time": 942328,
+   "reels_skip_rate": 62.2,
    "reposts": 0
   },
   {
@@ -4737,16 +4845,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 214,
+   "views": 216,
    "reach": 164,
    "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 6,
-   "ig_reels_avg_watch_time": 9477,
-   "ig_reels_video_view_total_time": 1658495,
-   "reels_skip_rate": 52.3,
+   "ig_reels_avg_watch_time": 9584,
+   "ig_reels_video_view_total_time": 1696507,
+   "reels_skip_rate": 51.7,
    "reposts": 0
   },
   {
@@ -4759,16 +4867,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 33,
+   "views": 35,
    "reach": 23,
    "likes": 2,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 9196,
-   "ig_reels_video_view_total_time": 248300,
-   "reels_skip_rate": 57.7,
+   "ig_reels_avg_watch_time": 10356,
+   "ig_reels_video_view_total_time": 289993,
+   "reels_skip_rate": 55.6,
    "reposts": 0
   },
   {
@@ -4781,15 +4889,15 @@
    "curtidas_campo": 5,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 299,
+   "views": 301,
    "reach": 233,
    "likes": 5,
    "comments": 2,
    "shares": 0,
    "saved": 0,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 14983,
-   "ig_reels_video_view_total_time": 3656013,
+   "ig_reels_avg_watch_time": 15009,
+   "ig_reels_video_view_total_time": 3692318,
    "reels_skip_rate": 48.4,
    "reposts": 0
   },
@@ -4803,16 +4911,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 26,
+   "views": 27,
    "reach": 17,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 10048,
-   "ig_reels_video_view_total_time": 190928,
-   "reels_skip_rate": 68.4,
+   "ig_reels_avg_watch_time": 9570,
+   "ig_reels_video_view_total_time": 191406,
+   "reels_skip_rate": 70,
    "reposts": 0
   },
   {
@@ -4847,16 +4955,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 66,
-   "reach": 48,
+   "views": 67,
+   "reach": 49,
    "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 12712,
-   "ig_reels_video_view_total_time": 661062,
-   "reels_skip_rate": 43.1,
+   "ig_reels_avg_watch_time": 12503,
+   "ig_reels_video_view_total_time": 662702,
+   "reels_skip_rate": 44.2,
    "reposts": 0
   },
   {
@@ -4870,15 +4978,15 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 480,
-   "reach": 368,
+   "reach": 369,
    "likes": 25,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 26,
-   "ig_reels_avg_watch_time": 14250,
-   "ig_reels_video_view_total_time": 5400817,
-   "reels_skip_rate": 53.7,
+   "ig_reels_avg_watch_time": 14213,
+   "ig_reels_video_view_total_time": 5401313,
+   "reels_skip_rate": 54,
    "reposts": 0
   },
   {
@@ -4935,16 +5043,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 466,
-   "reach": 382,
+   "views": 467,
+   "reach": 383,
    "likes": 13,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 9733,
-   "ig_reels_video_view_total_time": 3893565,
-   "reels_skip_rate": 54.5,
+   "ig_reels_avg_watch_time": 9712,
+   "ig_reels_video_view_total_time": 3894669,
+   "reels_skip_rate": 54.6,
    "reposts": 0
   },
   {
@@ -5042,19 +5150,19 @@
    "link": "https://www.instagram.com/reel/DeT8j3QjV3T/",
    "titulo": "Quatro pessoas acabaram de voltar de 237 dias no espaço. 🚀",
    "legenda": "Quatro pessoas acabaram de voltar de 237 dias no espaço. 🚀\n\nA cápsula Dragon da missão Crew-12 caiu no oceano Pacífico, perto de Los Angeles, na quinta (08/10). Foram quase 4 mil voltas na Terra, estudos com células-tronco e até uma pesquisa sobre como a bactéria da pneumonia pode machucar o coração. A astronauta Jessica Meir fez 4 caminhadas espaciais só nessa viagem.\n\n🔖 Salva pra lembrar de acompanhar a coletiva da tripulação, na quinta (15/10).\n📤 Manda pra quem sonha em ir pra estação espacial.\n👉 Segue @neuralupdate pra acompanhar as notícias do espaço.\n\n📚 Fonte: NASA, 08/10/2026 — NASA's SpaceX Crew-12 Splashes Down\n\n#crew12 #nasa #estacaoespacial #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 34,
+   "curtidas_campo": 35,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 890,
-   "reach": 760,
-   "likes": 34,
+   "views": 891,
+   "reach": 761,
+   "likes": 35,
    "comments": 1,
    "shares": 21,
    "saved": 3,
-   "total_interactions": 60,
-   "ig_reels_avg_watch_time": 15285,
-   "ig_reels_video_view_total_time": 11617297,
-   "reels_skip_rate": 37.9,
+   "total_interactions": 61,
+   "ig_reels_avg_watch_time": 15275,
+   "ig_reels_video_view_total_time": 11624741,
+   "reels_skip_rate": 37.8,
    "reposts": 1
   },
   {
@@ -5155,16 +5263,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 215,
-   "reach": 184,
+   "views": 216,
+   "reach": 185,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 10,
-   "ig_reels_avg_watch_time": 9238,
-   "ig_reels_video_view_total_time": 1773763,
-   "reels_skip_rate": 55.5,
+   "ig_reels_avg_watch_time": 9210,
+   "ig_reels_video_view_total_time": 1777649,
+   "reels_skip_rate": 55.2,
    "reposts": 0
   },
   {
@@ -5221,16 +5329,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 49,
+   "views": 50,
    "reach": 36,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 14169,
-   "ig_reels_video_view_total_time": 552601,
-   "reels_skip_rate": 56.3,
+   "ig_reels_avg_watch_time": 13891,
+   "ig_reels_video_view_total_time": 555674,
+   "reels_skip_rate": 54.5,
    "reposts": 0
   },
   {
@@ -5265,16 +5373,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 25,
-   "reach": 18,
+   "views": 26,
+   "reach": 19,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 13124,
-   "ig_reels_video_view_total_time": 275615,
-   "reels_skip_rate": 65,
+   "ig_reels_avg_watch_time": 12579,
+   "ig_reels_video_view_total_time": 276753,
+   "reels_skip_rate": 66.7,
    "reposts": 0
   },
   {
@@ -5284,19 +5392,19 @@
    "link": "https://www.instagram.com/reel/DeKSkORk_Dz/",
    "titulo": "Imagina um planeta rolando como uma bola no chão. Esse é Urano. 🌀",
    "legenda": "Imagina um planeta rolando como uma bola no chão. Esse é Urano. 🌀\n\nO eixo dele está tombado 98°: ele gira deitado. Por isso cada polo passa uns 42 anos de dia e outros 42 de noite. A explicação mais aceita é uma pancada gigante; outra hipótese é uma lua antiga que foi puxando ele aos poucos. Ninguém provou ainda.\n\n🔖 Salva pra lembrar do planeta deitado.\n📤 Manda pra quem curte mistério do espaço.\n👉 Segue @neuralupdate: amanhã às 14h, como Netuno foi descoberto com uma conta.\n\n📚 Fonte: NASA Science — https://science.nasa.gov/uranus/\n\n#urano #astronomia #ciencia #universo #neuralupdate",
-   "curtidas_campo": 34,
+   "curtidas_campo": 35,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 761,
-   "reach": 693,
-   "likes": 34,
+   "views": 762,
+   "reach": 694,
+   "likes": 35,
    "comments": 1,
    "shares": 1,
    "saved": 4,
-   "total_interactions": 42,
-   "ig_reels_avg_watch_time": 17910,
-   "ig_reels_video_view_total_time": 12501731,
-   "reels_skip_rate": 39.5,
+   "total_interactions": 43,
+   "ig_reels_avg_watch_time": 17890,
+   "ig_reels_video_view_total_time": 12505380,
+   "reels_skip_rate": 39.4,
    "reposts": 2
   },
   {
@@ -7449,16 +7557,16 @@
    "link": "https://www.instagram.com/reel/DdE14wGCV_U/",
    "titulo": "AULA da escola Universo do Zero. Ninguém pode repetir o universo para ver o que mudaria, então os cosmólogos constroem um dentro do computad",
    "legenda": "AULA da escola Universo do Zero. Ninguém pode repetir o universo para ver o que mudaria, então os cosmólogos constroem um dentro do computador: partem de pequenas diferenças de densidade no começo, deixam a gravidade agir e comparam o resultado com o céu real.\n\n🌌 Quer levar uma experiência do universo para o seu quarto? Veja o projetor astronauta que selecionamos.\n🔗 Link na bio.\n\nPublicidade: este é um link de afiliado; podemos receber comissão sem custo extra para você.\n\n#cosmologia #astronomia #neuralupdate",
-   "curtidas_campo": 56,
+   "curtidas_campo": 55,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1203,
    "reach": 989,
-   "likes": 56,
+   "likes": 55,
    "comments": 1,
    "shares": 2,
    "saved": 6,
-   "total_interactions": 68,
+   "total_interactions": 67,
    "ig_reels_avg_watch_time": 16251,
    "ig_reels_video_view_total_time": 16283910,
    "reels_skip_rate": 37,
@@ -7606,16 +7714,16 @@
    "curtidas_campo": 27,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 510,
-   "reach": 424,
+   "views": 512,
+   "reach": 425,
    "likes": 27,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 28,
-   "ig_reels_avg_watch_time": 13479,
-   "ig_reels_video_view_total_time": 5863517,
-   "reels_skip_rate": 43.2,
+   "ig_reels_avg_watch_time": 13455,
+   "ig_reels_video_view_total_time": 5866756,
+   "reels_skip_rate": 43.1,
    "reposts": 0
   },
   {
@@ -8508,15 +8616,15 @@
    "curtidas_campo": 77,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1241,
-   "reach": 967,
+   "views": 1242,
+   "reach": 969,
    "likes": 77,
    "comments": 2,
    "shares": 7,
    "saved": 8,
    "total_interactions": 99,
-   "ig_reels_avg_watch_time": 16398,
-   "ig_reels_video_view_total_time": 16677565,
+   "ig_reels_avg_watch_time": 16407,
+   "ig_reels_video_view_total_time": 16702628,
    "reels_skip_rate": 37.6,
    "reposts": 5
   },
@@ -9432,16 +9540,16 @@
    "curtidas_campo": 93,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1542,
-   "reach": 1161,
+   "views": 1543,
+   "reach": 1162,
    "likes": 93,
    "comments": 1,
    "shares": 1,
    "saved": 9,
    "total_interactions": 108,
-   "ig_reels_avg_watch_time": 15649,
-   "ig_reels_video_view_total_time": 18889234,
-   "reels_skip_rate": 42.3,
+   "ig_reels_avg_watch_time": 15637,
+   "ig_reels_video_view_total_time": 18890393,
+   "reels_skip_rate": 42.4,
    "reposts": 4
   },
   {
@@ -24640,7 +24748,7 @@
    "comments": 0,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 2,
+   "total_interactions": 0,
    "reposts": 0
   },
   {
