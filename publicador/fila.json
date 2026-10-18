@@ -4511,9 +4511,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-18",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-1"
+    "variacao": "pro-1",
+    "id_instagram": "18111756011166634",
+    "publicado_em": "2026-10-18T17:09:38.760Z"
   },
   {
     "quando": "2026-10-18T17:00:00.000Z",
@@ -4521,7 +4523,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8fbdb263-1b12-4b6f-bb84-7e483b902fc8.mp4",
     "legenda": "O lugar com mais vulcão não é a Terra. 🌋\n\nÉ Io, uma lua de Júpiter, com uns 400 vulcões ativos. Júpiter puxa e aperta essa lua o tempo todo, como a gente amassando uma bolinha de borracha, e ela esquenta por dentro. Tem vulcão soltando jato a centenas de quilômetros de altura.\n\n🔖 Salva pra lembrar da lua que cospe lava.\n📤 Manda pra quem acha que o lugar com mais vulcão é a Terra.\n👉 Segue @neuralupdate e conta nos comentários se você ia querer ver um desses de perto.\n\n📚 Fonte: NASA Science — Io facts\n\n#io #jupiter #vulcoes #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl72-io-lua-dos-vulcoes",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18089807216261361",
+    "publicado_em": "2026-10-18T17:10:16.236Z",
+    "id_comentario": "18129540550835122",
+    "id_facebook": "1435623928702888"
   },
   {
     "quando": "2026-10-18T19:00:00.000Z",
