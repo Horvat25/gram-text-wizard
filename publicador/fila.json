@@ -4506,6 +4506,16 @@
     "id_facebook": "1490144522941244"
   },
   {
+    "quando": "2026-10-18T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1a376948-156a-4620-8e6c-e8f441ebb370.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-18",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "arte-1"
+  },
+  {
     "quando": "2026-10-18T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8fbdb263-1b12-4b6f-bb84-7e483b902fc8.mp4",
@@ -4554,6 +4564,16 @@
     "slug": "nw-webb-aglomerado-adulto-cedo",
     "status": "agendado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-19T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3ad0e08f-20fc-435c-9c15-f3eba555ec5c.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-19",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "arte-3"
   },
   {
     "quando": "2026-10-19T17:00:00.000Z",
@@ -4637,9 +4657,20 @@
     "midia": "https://neural-update.com.br/stories/projetor-astronauta/02-presente-universo.png",
     "legenda": "",
     "slug": "story-projetor-2026-10-20",
-    "status": "agendado",
+    "status": "cancelado",
     "campanha": "projetor-astronauta",
-    "variacao": "presente-universo"
+    "variacao": "presente-universo",
+    "motivo_cancelamento": "trocado pelo story-rqp-2026-10-20 (ordem 18/10 do Marcelo)"
+  },
+  {
+    "quando": "2026-10-20T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fa01593e-5772-4f94-95a1-60891c36e92c.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-20",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "arte-4"
   },
   {
     "quando": "2026-10-21T11:00:00.000Z",
@@ -4657,6 +4688,16 @@
     "slug": "nw-reator-nuclear-na-lua",
     "status": "agendado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-21T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/fb0ee05c-4508-4d94-8f05-416a2304f185.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-21",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "arte-5"
   },
   {
     "quando": "2026-10-21T17:00:00.000Z",
@@ -4708,6 +4749,16 @@
     "slug": "nw-juno-disco-magnetico-ondula",
     "status": "agendado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-22T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/1a376948-156a-4620-8e6c-e8f441ebb370.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-22",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "arte-1"
   },
   {
     "quando": "2026-10-22T17:00:00.000Z",
