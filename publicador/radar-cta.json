@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-18T13:07:15.671Z",
+ "gerado_em": "2026-10-19T16:22:10.407Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,30 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2561491,
+   "seguidores": 2561551,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
+   "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.017,
-   "melhores_pedidos": []
+   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_sem_pedido": 0.013,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-10-18",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": null,
+     "trecho": "🎬 No vídeo, mostro as datas e o que falta para voltarmos à Lua. Assista e comente: qual nave chega primeiro? 👇",
+     "comentarios": 0,
+     "curtidas": 188,
+     "link": "https://www.instagram.com/p/Deo8hgnoBZm/"
+    }
+   ]
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17272,
+   "seguidores": 17295,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +55,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590828,
+   "seguidores": 590683,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.068,
+   "comentarios_por_curtida_sem_pedido": 0.071,
    "melhores_pedidos": []
   },
   {
@@ -122,7 +133,7 @@
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.102,
+   "comentarios_por_curtida_sem_pedido": 0.088,
    "melhores_pedidos": []
   },
   {
@@ -135,7 +146,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057341,
+   "seguidores": 1057227,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
