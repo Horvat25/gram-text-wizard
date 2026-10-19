@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-18T13:22:54.436Z",
+  "gerado_em": "2026-10-19T16:32:35.468Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -506,11 +506,54 @@
     {
       "d": "2026-10-18",
       "views": 0
+    },
+    {
+      "d": "2026-10-19",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "986001143829290",
+      "quando": "2026-10-19T11:11:16+0000",
+      "titulo": "O Webb achou um aglomerado de galáxias que cresceu rápido demais. 🌌",
+      "link": "https://www.facebook.com/reel/986001143829290/",
+      "segundos": 42.442,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1579016053512205",
+      "quando": "2026-10-18T21:11:49+0000",
+      "titulo": "Hoje dá pra ver Saturno sem telescópio. 🪐",
+      "link": "https://www.facebook.com/reel/1579016053512205/",
+      "segundos": 34.533,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1435623928702888",
+      "quando": "2026-10-18T17:10:19+0000",
+      "titulo": "O lugar com mais vulcão não é a Terra. 🌋",
+      "link": "https://www.facebook.com/reel/1435623928702888/",
+      "segundos": 33.92,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1490144522941244",
       "quando": "2026-10-18T11:12:24+0000",
