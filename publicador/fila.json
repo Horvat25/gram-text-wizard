@@ -4649,7 +4649,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d86a534e-1209-4dab-8e89-96bd3d9e36f8.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-20",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18060175898796174",
+    "publicado_em": "2026-10-20T11:10:30.464Z"
   },
   {
     "quando": "2026-10-20T11:00:00.000Z",
@@ -4657,8 +4659,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3463c9fe-2554-45e9-ad7a-520723005a6a.mp4",
     "legenda": "Esse buraco na Lua pode ser a porta de uma caverna gigante. 🌕\n\nEle fica numa região chamada Colinas de Márius e tem dezenas de metros de fundura. A NASA escolheu um projeto pra descobrir se embaixo dele tem um túnel de lava, com radar e sensores de tremor, sem precisar descer lá dentro. Se a caverna existir, ela protege astronautas da radiação e do frio da noite lunar.\n\n🔖 Salva pra lembrar da possível caverna na Lua.\n📤 Manda pra quem moraria dentro da Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Planetary Science Institute / NASA PRISM — GIMLI, Marius Hills Pit (Space.com)\n\n#lua #caverna #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-caverna-na-lua-gimli",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18227698231327853",
+    "publicado_em": "2026-10-20T11:11:09.042Z",
+    "id_comentario": "18080734748372080",
+    "id_facebook": "4482635972010150"
   },
   {
     "quando": "2026-10-20T17:00:00.000Z",
