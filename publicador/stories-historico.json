@@ -685,7 +685,7 @@
    "quando": "2026-10-19T11:10:27+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-19T22:19:48.685Z",
+   "ultimo_retrato": "2026-10-20T04:46:44.161Z",
    "_metricas": "reach,replies",
    "reach": 5,
    "replies": 0
@@ -695,7 +695,7 @@
    "quando": "2026-10-19T21:10:35+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-19T22:19:44.482Z",
+   "ultimo_retrato": "2026-10-20T04:46:41.050Z",
    "_metricas": null,
    "_erro": "(#10) Not enough viewers for the media to show insights"
   },
@@ -704,12 +704,21 @@
    "quando": "2026-10-19T16:51:29+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-10-19T22:19:46.244Z",
+   "ultimo_retrato": "2026-10-20T04:46:42.525Z",
+   "_metricas": null,
+   "_erro": "(#10) Not enough viewers for the media to show insights"
+  },
+  "17987888058116011": {
+   "id": "17987888058116011",
+   "quando": "2026-10-20T00:10:34+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-10-20T04:46:39.555Z",
    "_metricas": null,
    "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-10-19T22:19:51.603Z",
+ "gerado_em": "2026-10-20T04:46:44.866Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -1061,6 +1070,10 @@
   },
   "2026-10-19T22": {
    "seguidores": 1261,
+   "publicacoes": 1006
+  },
+  "2026-10-20T04": {
+   "seguidores": 1262,
    "publicacoes": 1006
   }
  },
