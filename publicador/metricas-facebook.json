@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-19T16:32:35.468Z",
+  "gerado_em": "2026-10-20T14:23:01.200Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -510,11 +510,54 @@
     {
       "d": "2026-10-19",
       "views": 0
+    },
+    {
+      "d": "2026-10-20",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "4482635972010150",
+      "quando": "2026-10-20T11:11:15+0000",
+      "titulo": "Esse buraco na Lua pode ser a porta de uma caverna gigante. 🌕",
+      "link": "https://www.facebook.com/reel/4482635972010150/",
+      "segundos": 39.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1418294327077145",
+      "quando": "2026-10-19T21:11:34+0000",
+      "titulo": "Em Vênus, o Sol nasce do lado errado. ☀️",
+      "link": "https://www.facebook.com/reel/1418294327077145/",
+      "segundos": 36.642,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1104677332285872",
+      "quando": "2026-10-19T17:11:29+0000",
+      "titulo": "Onde termina o Sistema Solar? 🛰️",
+      "link": "https://www.facebook.com/reel/1104677332285872/",
+      "segundos": 39.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "986001143829290",
       "quando": "2026-10-19T11:11:16+0000",
