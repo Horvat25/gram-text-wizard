@@ -4713,50 +4713,17 @@
     "motivo_cancelamento": "trocado pelo story-rqp-2026-10-20 (ordem 18/10 do Marcelo)"
   },
   {
-    "quando": "2026-10-20T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10f5f6ff-1d29-48b6-9eaa-c01a6f962b86.png",
-    "legenda": "",
-    "slug": "story-rqp-2026-10-20",
-    "status": "agendado",
-    "campanha": "rqp-rotina",
-    "variacao": "pro-3"
-  },
-  {
-    "quando": "2026-10-21T11:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3077d22c-bd97-4451-831e-a6ea3b56c2f6.png",
-    "legenda": "",
-    "slug": "story-noticia-2026-10-21",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-10-21T11:00:00.000Z",
-    "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c288c7ec-9a06-4e0d-b044-aa4b4f9d1164.mp4",
-    "legenda": "Na Lua, a noite dura duas semanas, e painel solar não dá conta. 🌕\n\nPor isso a NASA e o Departamento de Energia dos EUA assinaram um acordo de energia nuclear no espaço. Um dos planos é um reator na superfície da Lua, pra manter a futura base ligada, com meta de ter um reator pronto pra lançar até 2030. Seria a primeira usina de energia fora da Terra.\n\n🔖 Salva pra lembrar da primeira usina de energia fora da Terra.\n📤 Manda pra quem confiaria num reator na Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 08/10/2026 — NASA, Energy Department advance new era of nuclear-powered exploration\n\n#lua #energianuclear #nasa #astronomia #ciencia #neuralupdate",
-    "slug": "nw-reator-nuclear-na-lua",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
-  },
-  {
-    "quando": "2026-10-21T15:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c6b0e7b1-118f-4e85-aa2d-614fd670e70a.png",
-    "legenda": "",
-    "slug": "story-rqp-2026-10-21",
-    "status": "agendado",
-    "campanha": "rqp-rotina",
-    "variacao": "pro-4"
-  },
-  {
     "quando": "2026-10-21T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5cd3a5b5-731c-4ec6-b63b-429e3d60dd9c.mp4",
     "legenda": "Em abril de 2029, um asteroide vai passar raspando na Terra. ☄️\n\nO nome dele é Apófis, e ele tem uns 340 metros. No dia 13 de abril, ele passa a menos de 32 mil km daqui, mais perto que muitos satélites. E não, ele não vai bater: a NASA já descartou o risco por pelo menos 100 anos. Ele vai brilhar tanto que milhões de pessoas vão ver sem telescópio.\n\n🔖 Salva pra lembrar do dia 13 de abril de 2029.\n📤 Manda pra quem vai querer acompanhar.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Apophis\n\n#apophis #asteroide #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl75-apophis-2029",
-    "status": "agendado",
-    "comentario": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem."
+    "status": "publicado",
+    "comentario": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem.",
+    "id_instagram": "18120443713975952",
+    "publicado_em": "2026-10-21T21:54:53.378Z",
+    "id_comentario": "18118192376519513",
+    "id_facebook": "1989141251759370"
   },
   {
     "quando": "2026-10-21T19:00:00.000Z",
@@ -4764,7 +4731,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/011311d0-5f18-402f-86d4-210d73d7228e.png",
     "legenda": "",
     "slug": "story-feed-2026-10-21",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18103567268202215",
+    "publicado_em": "2026-10-21T21:55:09.391Z"
   },
   {
     "quando": "2026-10-21T21:00:00.000Z",
@@ -4772,8 +4741,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8c923149-642a-445b-8c09-18c272abed3d.mp4",
     "legenda": "Esta madrugada vão cair pedaços do cometa Halley. ☄️\n\nÉ o pico das Orionidas, a chuva de meteoros feita da poeira que o Halley deixou no caminho. Os riscos parecem sair de perto das Três Marias, aquelas três estrelas em fila. A melhor hora é entre 3h e 5h da manhã, depois que a Lua se põe, e em céu bem escuro dá pra ver uns 20 por hora.\n\n🔖 Salva pra lembrar de olhar.\n📤 Manda pra quem vai acordar pra ver.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Orionids; efemérides para São Paulo (pôr da Lua 02h57, 22/10/2026)\n\n#orionidas #halley #meteoros #astronomia #ceu #neuralupdate",
     "slug": "viral-esta-madrugada-orionideas",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18132657553752051",
+    "publicado_em": "2026-10-21T21:55:49.188Z",
+    "id_comentario": "18132359200806954",
+    "id_facebook": "1369946418320673"
   },
   {
     "quando": "2026-10-21T23:00:00.000Z",
@@ -4782,6 +4755,19 @@
     "legenda": "",
     "slug": "story-livro-2026-10-21",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-10-22T00:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10f5f6ff-1d29-48b6-9eaa-c01a6f962b86.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-20",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-3",
+    "quando_anterior": "2026-10-20T23:00:00.000Z",
+    "reagendado_em": "2026-10-21T21:53:38.945Z",
+    "motivo_reagendamento": "cron nao disparou no horario original"
   },
   {
     "quando": "2026-10-22T11:00:00.000Z",
@@ -4842,5 +4828,41 @@
     "legenda": "",
     "slug": "story-livro-2026-10-22",
     "status": "agendado"
+  },
+  {
+    "quando": "2026-10-23T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3077d22c-bd97-4451-831e-a6ea3b56c2f6.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-21",
+    "status": "agendado",
+    "quando_anterior": "2026-10-21T11:00:00.000Z",
+    "reagendado_em": "2026-10-21T21:53:38.945Z",
+    "motivo_reagendamento": "cron nao disparou no horario original"
+  },
+  {
+    "quando": "2026-10-23T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c288c7ec-9a06-4e0d-b044-aa4b4f9d1164.mp4",
+    "legenda": "Na Lua, a noite dura duas semanas, e painel solar não dá conta. 🌕\n\nPor isso a NASA e o Departamento de Energia dos EUA assinaram um acordo de energia nuclear no espaço. Um dos planos é um reator na superfície da Lua, pra manter a futura base ligada, com meta de ter um reator pronto pra lançar até 2030. Seria a primeira usina de energia fora da Terra.\n\n🔖 Salva pra lembrar da primeira usina de energia fora da Terra.\n📤 Manda pra quem confiaria num reator na Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 08/10/2026 — NASA, Energy Department advance new era of nuclear-powered exploration\n\n#lua #energianuclear #nasa #astronomia #ciencia #neuralupdate",
+    "slug": "nw-reator-nuclear-na-lua",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "quando_anterior": "2026-10-21T11:00:00.000Z",
+    "reagendado_em": "2026-10-21T21:53:38.945Z",
+    "motivo_reagendamento": "cron nao disparou no horario original"
+  },
+  {
+    "quando": "2026-10-23T21:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c6b0e7b1-118f-4e85-aa2d-614fd670e70a.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-21",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-4",
+    "quando_anterior": "2026-10-21T15:00:00.000Z",
+    "reagendado_em": "2026-10-21T21:53:38.945Z",
+    "motivo_reagendamento": "cron nao disparou no horario original"
   }
 ]
