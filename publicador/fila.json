@@ -4847,22 +4847,28 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3077d22c-bd97-4451-831e-a6ea3b56c2f6.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-21",
-    "status": "agendado",
+    "status": "cancelado",
     "quando_anterior": "2026-10-21T11:00:00.000Z",
     "reagendado_em": "2026-10-21T21:53:38.945Z",
-    "motivo_reagendamento": "cron nao disparou no horario original"
+    "motivo_reagendamento": "cron nao disparou no horario original",
+    "motivo_cancelamento": "noticia velha reagendada pelo robo para 23/10; cancelado na ordem de 22/10 (sexta 23/10)"
+  },
+  {
+    "quando": "2026-10-23T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/408b3890-364f-4199-b1bd-f3e211912b48.mp4",
+    "legenda": "Isso que parece fogo é um berçário de estrelas, e o James Webb acabou de mostrar o que tinha lá dentro. 🔥\n\nA nuvem fica a 3.300 anos-luz daqui. A poeira escondia estrelas recém-nascidas, e o infravermelho do Webb atravessou. Esses fios vermelhos são jatos de gás que as estrelas bebês disparam contra a nuvem, e a mais pesada tem de 5 a 8 vezes a massa do Sol.\n\n🔖 Salva pra lembrar de como as estrelas nascem.\n📤 Manda pra quem gosta das fotos do Webb.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA/ESA — Webb captures commotion from nebula's stellar jets (NGC 7129), out/2026\n\n#jameswebb #astronomia #espaco #neuralupdate",
+    "slug": "nw-webb-estrelas-bebes-jatos",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
   },
   {
     "quando": "2026-10-23T17:00:00.000Z",
     "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c288c7ec-9a06-4e0d-b044-aa4b4f9d1164.mp4",
-    "legenda": "Na Lua, a noite dura duas semanas, e painel solar não dá conta. 🌕\n\nPor isso a NASA e o Departamento de Energia dos EUA assinaram um acordo de energia nuclear no espaço. Um dos planos é um reator na superfície da Lua, pra manter a futura base ligada, com meta de ter um reator pronto pra lançar até 2030. Seria a primeira usina de energia fora da Terra.\n\n🔖 Salva pra lembrar da primeira usina de energia fora da Terra.\n📤 Manda pra quem confiaria num reator na Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 08/10/2026 — NASA, Energy Department advance new era of nuclear-powered exploration\n\n#lua #energianuclear #nasa #astronomia #ciencia #neuralupdate",
-    "slug": "nw-reator-nuclear-na-lua",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
-    "quando_anterior": "2026-10-21T11:00:00.000Z",
-    "reagendado_em": "2026-10-21T21:53:38.945Z",
-    "motivo_reagendamento": "cron nao disparou no horario original"
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d66f7991-cb54-4dd3-9f32-dda1354de36b.mp4",
+    "legenda": "E se uma lua minúscula de Saturno tivesse um oceano inteiro escondido? 💧\n\nEncélado tem uns 500 km de largura, mais ou menos de São Paulo ao Rio. Por baixo do gelo existe um oceano de água salgada, cobrindo a lua inteira. No polo sul, rachaduras soltam jatos de água pro espaço, como gêiseres, e a sonda Cassini atravessou esses jatos e achou sal e moléculas orgânicas.\n\n🔖 Salva pra lembrar da lua com oceano escondido.\n📤 Manda pra quem gosta de Saturno.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Enceladus / Cassini\n\n#encelado #saturno #astronomia #ciencia #neuralupdate",
+    "slug": "pl77-encelado-oceano-jatos",
+    "status": "agendado"
   },
   {
     "quando": "2026-10-23T21:00:00.000Z",
@@ -4874,6 +4880,27 @@
     "campanha": "rqp-rotina",
     "variacao": "pro-4",
     "quando_anterior": "2026-10-21T15:00:00.000Z",
+    "reagendado_em": "2026-10-21T21:53:38.945Z",
+    "motivo_reagendamento": "cron nao disparou no horario original"
+  },
+  {
+    "quando": "2026-10-23T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/dee86278-0dce-4dfc-ad35-1394ae83c3d7.mp4",
+    "legenda": "Existe uma estrela que gira 716 vezes por segundo. 🌀\n\nEstrelas assim são do tamanho de uma cidade e têm mais massa que o Sol. Nessa velocidade, o chão no equador dela corre a quase um quarto da velocidade da luz, e os cientistas acham que, um pouco mais rápido, ela se despedaçaria. É o resto de uma estrela que explodiu, a uns 18 mil anos-luz daqui.\n\n🔖 Salva pra lembrar da estrela que gira 716 vezes por segundo.\n📤 Manda pra quem gosta de física.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Hessels et al., Science (2006) — pulsar PSR J1748-2446ad, 716 Hz (Terzan 5); NASA Science — Neutron Stars\n\n#pulsar #estrelasdeneutrons #astronomia #ciencia #neuralupdate",
+    "slug": "viral-estrela-gira-716-vezes",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-24T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c288c7ec-9a06-4e0d-b044-aa4b4f9d1164.mp4",
+    "legenda": "Na Lua, a noite dura duas semanas, e painel solar não dá conta. 🌕\n\nPor isso a NASA e o Departamento de Energia dos EUA assinaram um acordo de energia nuclear no espaço. Um dos planos é um reator na superfície da Lua, pra manter a futura base ligada, com meta de ter um reator pronto pra lançar até 2030. Seria a primeira usina de energia fora da Terra.\n\n🔖 Salva pra lembrar da primeira usina de energia fora da Terra.\n📤 Manda pra quem confiaria num reator na Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 08/10/2026 — NASA, Energy Department advance new era of nuclear-powered exploration\n\n#lua #energianuclear #nasa #astronomia #ciencia #neuralupdate",
+    "slug": "nw-reator-nuclear-na-lua",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "quando_anterior": "2026-10-21T11:00:00.000Z",
     "reagendado_em": "2026-10-21T21:53:38.945Z",
     "motivo_reagendamento": "cron nao disparou no horario original"
   }
