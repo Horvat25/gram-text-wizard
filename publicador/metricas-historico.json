@@ -1,33 +1,25 @@
 {
- "gerado_em": "2026-10-20T14:07:12.880Z",
+ "gerado_em": "2026-10-22T14:24:09.657Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1265,
-  "publicacoes": 1007
+  "seguidores": 1263,
+  "publicacoes": 1012
  },
- "total_listado": 1007,
- "com_tempo_assistido": 467,
+ "total_listado": 1012,
+ "com_tempo_assistido": 472,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-09-21",
-     "ate": "2026-10-19",
+     "de": "2026-09-23",
+     "ate": "2026-10-21",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 9,
-         "end_time": "2026-09-22T07:00:00+0000"
-        },
-        {
-         "value": 4,
-         "end_time": "2026-09-23T07:00:00+0000"
-        },
         {
          "value": 1,
          "end_time": "2026-09-24T07:00:00+0000"
@@ -129,8 +121,16 @@
          "end_time": "2026-10-18T07:00:00+0000"
         },
         {
-         "value": 0,
+         "value": 2,
          "end_time": "2026-10-19T07:00:00+0000"
+        },
+        {
+         "value": 3,
+         "end_time": "2026-10-20T07:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-10-21T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -286,7 +286,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-20",
+     "ate": "2026-10-22",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -305,13 +305,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 17
+            "value": 22
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 8
+            "value": 9
            }
           ]
          }
@@ -508,7 +508,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-20",
+     "ate": "2026-10-22",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -517,7 +517,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 6012
+        "value": 6534
        }
       },
       {
@@ -527,7 +527,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 9976
+        "value": 11180
        }
       },
       {
@@ -537,7 +537,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 200
+        "value": 223
        }
       },
       {
@@ -547,7 +547,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 393
+        "value": 450
        }
       }
      ]
@@ -574,15 +574,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 224
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 20744
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 224
            }
           ]
          }
@@ -611,15 +611,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 404
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 24395
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 404
            }
           ]
          }
@@ -648,15 +648,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 30185
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 685
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 30185
            }
           ]
          }
@@ -685,15 +685,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 20920
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 654
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20920
            }
           ]
          }
@@ -704,7 +704,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-10-20",
+     "ate": "2026-10-22",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -713,7 +713,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 6012,
+        "value": 6534,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -724,13 +724,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 263
+            "value": 280
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 5755
+            "value": 6282
            }
           ]
          }
@@ -769,37 +769,37 @@
             "dimension_values": [
              "18-24"
             ],
-            "value": 38
+            "value": 37
            },
            {
             "dimension_values": [
              "25-34"
             ],
-            "value": 284
+            "value": 299
            },
            {
             "dimension_values": [
              "35-44"
             ],
-            "value": 346
+            "value": 373
            },
            {
             "dimension_values": [
              "45-54"
             ],
-            "value": 261
+            "value": 281
            },
            {
             "dimension_values": [
              "55-64"
             ],
-            "value": 163
+            "value": 170
            },
            {
             "dimension_values": [
              "65+"
             ],
-            "value": 98
+            "value": 99
            }
           ]
          }
@@ -828,19 +828,19 @@
             "dimension_values": [
              "F"
             ],
-            "value": 96
+            "value": 110
            },
            {
             "dimension_values": [
              "M"
             ],
-            "value": 936
+            "value": 992
            },
            {
             "dimension_values": [
              "U"
             ],
-            "value": 164
+            "value": 163
            }
           ]
          }
@@ -869,7 +869,7 @@
             "dimension_values": [
              "PT"
             ],
-            "value": 13
+            "value": 14
            },
            {
             "dimension_values": [
@@ -909,6 +909,12 @@
            },
            {
             "dimension_values": [
+             "AO"
+            ],
+            "value": 2
+           },
+           {
+            "dimension_values": [
              "ES"
             ],
             "value": 2
@@ -917,7 +923,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 1160
+            "value": 1227
            },
            {
             "dimension_values": [
@@ -936,12 +942,6 @@
              "IE"
             ],
             "value": 2
-           },
-           {
-            "dimension_values": [
-             "TR"
-            ],
-            "value": 1
            },
            {
             "dimension_values": [
@@ -988,13 +988,13 @@
             "dimension_values": [
              "Ribeirão Prêto, São Paulo (state)"
             ],
-            "value": 6
+            "value": 7
            },
            {
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 92
+            "value": 88
            },
            {
             "dimension_values": [
@@ -1012,35 +1012,41 @@
             "dimension_values": [
              "Rio de Janeiro, Rio de Janeiro (state)"
             ],
-            "value": 46
+            "value": 48
            },
            {
             "dimension_values": [
              "São José dos Campos, São Paulo (state)"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
              "Contagem, Minas Gerais"
             ],
-            "value": 8
+            "value": 7
            },
            {
             "dimension_values": [
-             "Camaçari, Bahia"
+             "Osasco, São Paulo (state)"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
              "Maceió, Alagoas"
             ],
-            "value": 7
+            "value": 9
            },
            {
             "dimension_values": [
              "Uberlândia, Minas Gerais"
+            ],
+            "value": 6
+           },
+           {
+            "dimension_values": [
+             "Vila Velha, Espírito Santo"
             ],
             "value": 6
            },
@@ -1058,13 +1064,13 @@
            },
            {
             "dimension_values": [
-             "Águas Lindas de Goiás, Goiás"
+             "Gama, Federal District"
             ],
             "value": 5
            },
            {
             "dimension_values": [
-             "João Pessoa, Paraíba"
+             "Itajaí, Santa Catarina"
             ],
             "value": 5
            },
@@ -1072,13 +1078,7 @@
             "dimension_values": [
              "Londrina, Paraná"
             ],
-            "value": 6
-           },
-           {
-            "dimension_values": [
-             "Itajaí, Santa Catarina"
-            ],
-            "value": 6
+            "value": 8
            },
            {
             "dimension_values": [
@@ -1090,7 +1090,7 @@
             "dimension_values": [
              "Aparecida de Goiânia, Goiás"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1102,19 +1102,19 @@
             "dimension_values": [
              "Brasília, Federal District"
             ],
-            "value": 5
+            "value": 7
            },
            {
             "dimension_values": [
              "Guarulhos, São Paulo (state)"
             ],
-            "value": 9
+            "value": 10
            },
            {
             "dimension_values": [
              "Sorocaba, São Paulo (state)"
             ],
-            "value": 6
+            "value": 7
            },
            {
             "dimension_values": [
@@ -1124,15 +1124,15 @@
            },
            {
             "dimension_values": [
-             "Natal, Rio Grande do Norte"
+             "São Bernardo do Campo, São Paulo (state)"
             ],
-            "value": 9
+            "value": 8
            },
            {
             "dimension_values": [
-             "São Bernardo do Campo, São Paulo (state)"
+             "Natal, Rio Grande do Norte"
             ],
-            "value": 9
+            "value": 11
            },
            {
             "dimension_values": [
@@ -1150,37 +1150,31 @@
             "dimension_values": [
              "Petrolina, Pernambuco"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
              "Goiânia, Goiás"
             ],
-            "value": 15
+            "value": 14
            },
            {
             "dimension_values": [
              "Fortaleza, Ceará"
             ],
-            "value": 28
+            "value": 34
            },
            {
             "dimension_values": [
              "Manaus, Amazonas"
             ],
-            "value": 13
-           },
-           {
-            "dimension_values": [
-             "Ipatinga, Minas Gerais"
-            ],
-            "value": 5
+            "value": 16
            },
            {
             "dimension_values": [
              "Nova Iguaçu, Rio de Janeiro (state)"
             ],
-            "value": 6
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1198,13 +1192,13 @@
             "dimension_values": [
              "Florianópolis, Santa Catarina"
             ],
-            "value": 8
+            "value": 9
            },
            {
             "dimension_values": [
              "Joinville, Santa Catarina"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1216,37 +1210,43 @@
             "dimension_values": [
              "Belo Horizonte, Minas Gerais"
             ],
-            "value": 25
+            "value": 27
            },
            {
             "dimension_values": [
              "Santo André, São Paulo (state)"
             ],
-            "value": 9
+            "value": 10
            },
            {
             "dimension_values": [
              "Taguatinga, Federal District"
             ],
-            "value": 13
+            "value": 12
            },
            {
             "dimension_values": [
              "Curitiba, Paraná"
             ],
-            "value": 16
+            "value": 15
+           },
+           {
+            "dimension_values": [
+             "Hortolândia, São Paulo (state)"
+            ],
+            "value": 6
            },
            {
             "dimension_values": [
              "Belém, Pará"
             ],
-            "value": 10
+            "value": 13
            },
            {
             "dimension_values": [
              "Campinas, São Paulo (state)"
             ],
-            "value": 8
+            "value": 7
            }
           ]
          }
@@ -1283,37 +1283,37 @@
             "dimension_values": [
              "18-24"
             ],
-            "value": 62
+            "value": 57
            },
            {
             "dimension_values": [
              "25-34"
             ],
-            "value": 285
+            "value": 243
            },
            {
             "dimension_values": [
              "35-44"
             ],
-            "value": 252
+            "value": 215
            },
            {
             "dimension_values": [
              "45-54"
             ],
-            "value": 155
+            "value": 119
            },
            {
             "dimension_values": [
              "55-64"
             ],
-            "value": 69
+            "value": 58
            },
            {
             "dimension_values": [
              "65+"
             ],
-            "value": 29
+            "value": 28
            }
           ]
          }
@@ -1342,19 +1342,19 @@
             "dimension_values": [
              "F"
             ],
-            "value": 61
+            "value": 67
            },
            {
             "dimension_values": [
              "M"
             ],
-            "value": 697
+            "value": 571
            },
            {
             "dimension_values": [
              "U"
             ],
-            "value": 94
+            "value": 82
            }
           ]
          }
@@ -1379,12 +1379,6 @@
            "country"
           ],
           "results": [
-           {
-            "dimension_values": [
-             "DE"
-            ],
-            "value": 0
-           },
            {
             "dimension_values": [
              "NO"
@@ -1437,7 +1431,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 826
+            "value": 693
            },
            {
             "dimension_values": [
@@ -1459,13 +1453,13 @@
            },
            {
             "dimension_values": [
-             "CA"
+             "US"
             ],
             "value": 0
            },
            {
             "dimension_values": [
-             "US"
+             "CA"
             ],
             "value": 1
            },
@@ -1521,7 +1515,7 @@
             "dimension_values": [
              "AO"
             ],
-            "value": 2
+            "value": 3
            },
            {
             "dimension_values": [
@@ -1578,27 +1572,27 @@
           "results": [
            {
             "dimension_values": [
-             "São Paulo, São Paulo (state)"
+             "Ribeirão Prêto, São Paulo (state)"
             ],
-            "value": 74
+            "value": 4
            },
            {
             "dimension_values": [
-             "Boa Vista, Roraima"
+             "São Paulo, São Paulo (state)"
             ],
-            "value": 3
+            "value": 50
            },
            {
             "dimension_values": [
              "São Luís, Maranhão"
             ],
-            "value": 8
+            "value": 9
            },
            {
             "dimension_values": [
              "Rio de Janeiro, Rio de Janeiro (state)"
             ],
-            "value": 30
+            "value": 31
            },
            {
             "dimension_values": [
@@ -1610,12 +1604,6 @@
             "dimension_values": [
              "Osasco, São Paulo (state)"
             ],
-            "value": 6
-           },
-           {
-            "dimension_values": [
-             "Maceió, Alagoas"
-            ],
             "value": 4
            },
            {
@@ -1623,6 +1611,12 @@
              "Uberlândia, Minas Gerais"
             ],
             "value": 5
+           },
+           {
+            "dimension_values": [
+             "Rio Branco, Acre (state)"
+            ],
+            "value": 3
            },
            {
             "dimension_values": [
@@ -1634,13 +1628,13 @@
             "dimension_values": [
              "Porto Alegre, Rio Grande do Sul"
             ],
-            "value": 8
+            "value": 4
            },
            {
             "dimension_values": [
              "Campo Grande, Mato Grosso do Sul"
             ],
-            "value": 8
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1652,7 +1646,13 @@
             "dimension_values": [
              "Gama, Federal District"
             ],
-            "value": 4
+            "value": 3
+           },
+           {
+            "dimension_values": [
+             "Franca, São Paulo (state)"
+            ],
+            "value": 3
            },
            {
             "dimension_values": [
@@ -1664,19 +1664,19 @@
             "dimension_values": [
              "João Pessoa, Paraíba"
             ],
-            "value": 9
+            "value": 6
            },
            {
             "dimension_values": [
              "Teresina, Piauí"
             ],
-            "value": 6
+            "value": 3
            },
            {
             "dimension_values": [
-             "Marabá, Pará"
+             "Limeira, São Paulo (state)"
             ],
-            "value": 3
+            "value": 4
            },
            {
             "dimension_values": [
@@ -1686,25 +1686,13 @@
            },
            {
             "dimension_values": [
-             "Brasília, Federal District"
-            ],
-            "value": 3
-           },
-           {
-            "dimension_values": [
              "Guará, Federal District"
             ],
-            "value": 5
+            "value": 4
            },
            {
             "dimension_values": [
-             "Guarulhos, São Paulo (state)"
-            ],
-            "value": 6
-           },
-           {
-            "dimension_values": [
-             "Passos, Minas Gerais"
+             "Sorocaba, São Paulo (state)"
             ],
             "value": 3
            },
@@ -1716,69 +1704,81 @@
            },
            {
             "dimension_values": [
+             "Natal, Rio Grande do Norte"
+            ],
+            "value": 3
+           },
+           {
+            "dimension_values": [
+             "Passos, Minas Gerais"
+            ],
+            "value": 3
+           },
+           {
+            "dimension_values": [
+             "Niterói, Rio de Janeiro (state)"
+            ],
+            "value": 3
+           },
+           {
+            "dimension_values": [
              "Piracicaba, São Paulo (state)"
             ],
-            "value": 6
+            "value": 4
            },
            {
             "dimension_values": [
              "São Bernardo do Campo, São Paulo (state)"
             ],
-            "value": 8
-           },
-           {
-            "dimension_values": [
-             "Natal, Rio Grande do Norte"
-            ],
-            "value": 10
+            "value": 6
            },
            {
             "dimension_values": [
              "Betim, Minas Gerais"
             ],
-            "value": 4
+            "value": 5
            },
            {
             "dimension_values": [
              "Salvador, Bahia"
             ],
-            "value": 12
+            "value": 13
            },
            {
             "dimension_values": [
-             "Sinop, Mato Grosso"
+             "São José, Santa Catarina"
             ],
-            "value": 4
+            "value": 3
            },
            {
             "dimension_values": [
              "Goiânia, Goiás"
             ],
-            "value": 11
+            "value": 7
            },
            {
             "dimension_values": [
              "Fortaleza, Ceará"
             ],
-            "value": 23
+            "value": 19
            },
            {
             "dimension_values": [
              "Manaus, Amazonas"
             ],
-            "value": 16
+            "value": 11
            },
            {
             "dimension_values": [
              "Arapongas, Paraná"
             ],
-            "value": 4
+            "value": 3
            },
            {
             "dimension_values": [
              "Aracaju, Sergipe"
             ],
-            "value": 5
+            "value": 4
            },
            {
             "dimension_values": [
@@ -1788,63 +1788,57 @@
            },
            {
             "dimension_values": [
-             "Caxias do Sul, Rio Grande do Sul"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Ananindeua, Pará"
             ],
-            "value": 5
+            "value": 4
            },
            {
             "dimension_values": [
              "Florianópolis, Santa Catarina"
             ],
-            "value": 5
+            "value": 4
+           },
+           {
+            "dimension_values": [
+             "Joinville, Santa Catarina"
+            ],
+            "value": 4
            },
            {
             "dimension_values": [
              "Cuiabá, Mato Grosso"
             ],
-            "value": 4
+            "value": 5
            },
            {
             "dimension_values": [
              "Belo Horizonte, Minas Gerais"
             ],
-            "value": 16
-           },
-           {
-            "dimension_values": [
-             "Santo André, São Paulo (state)"
-            ],
-            "value": 3
+            "value": 14
            },
            {
             "dimension_values": [
              "Taguatinga, Federal District"
             ],
-            "value": 7
+            "value": 6
            },
            {
             "dimension_values": [
              "Curitiba, Paraná"
             ],
-            "value": 11
+            "value": 10
            },
            {
             "dimension_values": [
              "Hortolândia, São Paulo (state)"
             ],
-            "value": 4
+            "value": 5
            },
            {
             "dimension_values": [
              "Belém, Pará"
             ],
-            "value": 5
+            "value": 7
            }
           ]
          }
@@ -1887,31 +1881,31 @@
             "dimension_values": [
              "25-34"
             ],
-            "value": 7118
+            "value": 6565
            },
            {
             "dimension_values": [
              "35-44"
             ],
-            "value": 7144
+            "value": 6176
            },
            {
             "dimension_values": [
              "45-54"
             ],
-            "value": 4192
+            "value": 3499
            },
            {
             "dimension_values": [
              "55-64"
             ],
-            "value": 1703
+            "value": 1502
            },
            {
             "dimension_values": [
              "65+"
             ],
-            "value": 785
+            "value": 730
            }
           ]
          }
@@ -1940,19 +1934,19 @@
             "dimension_values": [
              "F"
             ],
-            "value": 1376
+            "value": 1410
            },
            {
             "dimension_values": [
              "M"
             ],
-            "value": 18121
+            "value": 15889
            },
            {
             "dimension_values": [
              "U"
             ],
-            "value": 3252
+            "value": 2980
            }
           ]
          }
@@ -1981,7 +1975,7 @@
             "dimension_values": [
              "DE"
             ],
-            "value": 24
+            "value": 23
            },
            {
             "dimension_values": [
@@ -1993,19 +1987,19 @@
             "dimension_values": [
              "BE"
             ],
-            "value": 16
+            "value": 14
            },
            {
             "dimension_values": [
              "PT"
             ],
-            "value": 506
+            "value": 479
            },
            {
             "dimension_values": [
              "JP"
             ],
-            "value": 36
+            "value": 31
            },
            {
             "dimension_values": [
@@ -2017,19 +2011,25 @@
             "dimension_values": [
              "LU"
             ],
-            "value": 5
+            "value": 3
            },
            {
             "dimension_values": [
              "PY"
             ],
-            "value": 29
+            "value": 21
            },
            {
             "dimension_values": [
              "HR"
             ],
             "value": 3
+           },
+           {
+            "dimension_values": [
+             "NZ"
+            ],
+            "value": 2
            },
            {
             "dimension_values": [
@@ -2041,19 +2041,19 @@
             "dimension_values": [
              "BO"
             ],
-            "value": 4
+            "value": 3
            },
            {
             "dimension_values": [
              "BR"
             ],
-            "value": 21488
+            "value": 19134
            },
            {
             "dimension_values": [
              "SE"
             ],
-            "value": 4
+            "value": 3
            },
            {
             "dimension_values": [
@@ -2065,13 +2065,13 @@
             "dimension_values": [
              "GB"
             ],
-            "value": 49
+            "value": 38
            },
            {
             "dimension_values": [
              "IE"
             ],
-            "value": 23
+            "value": 18
            },
            {
             "dimension_values": [
@@ -2083,11 +2083,17 @@
             "dimension_values": [
              "US"
             ],
-            "value": 116
+            "value": 119
            },
            {
             "dimension_values": [
              "GF"
+            ],
+            "value": 2
+           },
+           {
+            "dimension_values": [
+             "IL"
             ],
             "value": 2
            },
@@ -2101,7 +2107,7 @@
             "dimension_values": [
              "UY"
             ],
-            "value": 10
+            "value": 6
            },
            {
             "dimension_values": [
@@ -2111,15 +2117,15 @@
            },
            {
             "dimension_values": [
-             "IN"
+             "CH"
             ],
-            "value": 16
+            "value": 15
            },
            {
             "dimension_values": [
-             "CH"
+             "IN"
             ],
-            "value": 16
+            "value": 22
            },
            {
             "dimension_values": [
@@ -2129,15 +2135,21 @@
            },
            {
             "dimension_values": [
+             "MT"
+            ],
+            "value": 2
+           },
+           {
+            "dimension_values": [
              "IR"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
              "CL"
             ],
-            "value": 8
+            "value": 7
            },
            {
             "dimension_values": [
@@ -2149,13 +2161,19 @@
             "dimension_values": [
              "IT"
             ],
-            "value": 35
+            "value": 34
+           },
+           {
+            "dimension_values": [
+             "CO"
+            ],
+            "value": 2
            },
            {
             "dimension_values": [
              "MZ"
             ],
-            "value": 12
+            "value": 15
            },
            {
             "dimension_values": [
@@ -2167,37 +2185,25 @@
             "dimension_values": [
              "ES"
             ],
-            "value": 48
-           },
-           {
-            "dimension_values": [
-             "KZ"
-            ],
-            "value": 1
+            "value": 46
            },
            {
             "dimension_values": [
              "VE"
             ],
-            "value": 4
+            "value": 3
            },
            {
             "dimension_values": [
              "AR"
             ],
-            "value": 26
-           },
-           {
-            "dimension_values": [
-             "AT"
-            ],
-            "value": 2
+            "value": 24
            },
            {
             "dimension_values": [
              "CV"
             ],
-            "value": 3
+            "value": 5
            },
            {
             "dimension_values": [
@@ -2219,21 +2225,9 @@
            },
            {
             "dimension_values": [
-             "PK"
-            ],
-            "value": 2
-           },
-           {
-            "dimension_values": [
              "PL"
             ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
-             "RO"
-            ],
-            "value": 2
+            "value": 4
            },
            {
             "dimension_values": [
@@ -2245,7 +2239,7 @@
             "dimension_values": [
              "NL"
             ],
-            "value": 17
+            "value": 11
            }
           ]
          }
@@ -2274,49 +2268,49 @@
             "dimension_values": [
              "Ribeirão Prêto, São Paulo (state)"
             ],
-            "value": 79
+            "value": 67
            },
            {
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 1656
+            "value": 1477
            },
            {
             "dimension_values": [
              "Blumenau, Santa Catarina"
             ],
-            "value": 67
+            "value": 57
            },
            {
             "dimension_values": [
              "Anápolis, Goiás"
             ],
-            "value": 70
+            "value": 59
            },
            {
             "dimension_values": [
              "Boa Vista, Roraima"
             ],
-            "value": 74
+            "value": 61
            },
            {
             "dimension_values": [
              "São Luís, Maranhão"
             ],
-            "value": 159
+            "value": 133
            },
            {
             "dimension_values": [
              "Rio de Janeiro, Rio de Janeiro (state)"
             ],
-            "value": 674
+            "value": 625
            },
            {
             "dimension_values": [
              "São José dos Campos, São Paulo (state)"
             ],
-            "value": 103
+            "value": 87
            },
            {
             "dimension_values": [
@@ -2328,73 +2322,73 @@
             "dimension_values": [
              "Osasco, São Paulo (state)"
             ],
-            "value": 94
+            "value": 77
            },
            {
             "dimension_values": [
              "Maceió, Alagoas"
             ],
-            "value": 128
+            "value": 111
            },
            {
             "dimension_values": [
              "Uberlândia, Minas Gerais"
             ],
-            "value": 116
+            "value": 107
            },
            {
             "dimension_values": [
              "Vila Velha, Espírito Santo"
             ],
-            "value": 75
+            "value": 64
            },
            {
             "dimension_values": [
              "Porto Alegre, Rio Grande do Sul"
             ],
-            "value": 240
+            "value": 197
            },
            {
             "dimension_values": [
              "Campo Grande, Mato Grosso do Sul"
             ],
-            "value": 132
+            "value": 112
            },
            {
             "dimension_values": [
              "Londrina, Paraná"
             ],
-            "value": 97
+            "value": 83
            },
            {
             "dimension_values": [
              "João Pessoa, Paraíba"
             ],
-            "value": 165
+            "value": 147
            },
            {
             "dimension_values": [
              "Teresina, Piauí"
             ],
-            "value": 130
+            "value": 120
            },
            {
             "dimension_values": [
              "Recife, Pernambuco"
             ],
-            "value": 215
+            "value": 182
            },
            {
             "dimension_values": [
              "Brasília, Federal District"
             ],
-            "value": 85
+            "value": 70
            },
            {
             "dimension_values": [
              "Guarulhos, São Paulo (state)"
             ],
-            "value": 177
+            "value": 151
            },
            {
             "dimension_values": [
@@ -2404,141 +2398,141 @@
            },
            {
             "dimension_values": [
+             "Niterói, Rio de Janeiro (state)"
+            ],
+            "value": 58
+           },
+           {
+            "dimension_values": [
              "São Bernardo do Campo, São Paulo (state)"
             ],
-            "value": 115
+            "value": 109
            },
            {
             "dimension_values": [
              "Natal, Rio Grande do Norte"
             ],
-            "value": 148
+            "value": 128
            },
            {
             "dimension_values": [
              "Pôrto Velho, Rondônia"
             ],
-            "value": 71
+            "value": 62
            },
            {
             "dimension_values": [
              "Salvador, Bahia"
             ],
-            "value": 247
+            "value": 220
            },
            {
             "dimension_values": [
              "Goiânia, Goiás"
             ],
-            "value": 316
+            "value": 253
            },
            {
             "dimension_values": [
              "Fortaleza, Ceará"
             ],
-            "value": 405
+            "value": 357
            },
            {
             "dimension_values": [
              "Manaus, Amazonas"
             ],
-            "value": 248
+            "value": 236
            },
            {
             "dimension_values": [
              "Aracaju, Sergipe"
             ],
-            "value": 86
+            "value": 72
            },
            {
             "dimension_values": [
              "Caxias do Sul, Rio Grande do Sul"
             ],
-            "value": 73
+            "value": 66
            },
            {
             "dimension_values": [
              "Maringá, Paraná"
             ],
-            "value": 85
+            "value": 66
            },
            {
             "dimension_values": [
              "Florianópolis, Santa Catarina"
             ],
-            "value": 137
+            "value": 114
            },
            {
             "dimension_values": [
              "Joinville, Santa Catarina"
             ],
-            "value": 90
+            "value": 76
            },
            {
             "dimension_values": [
              "Cuiabá, Mato Grosso"
             ],
-            "value": 104
+            "value": 87
            },
            {
             "dimension_values": [
              "Juiz de Fora, Minas Gerais"
             ],
-            "value": 66
+            "value": 63
            },
            {
             "dimension_values": [
              "Serra, Espírito Santo"
             ],
-            "value": 83
+            "value": 73
            },
            {
             "dimension_values": [
              "Belo Horizonte, Minas Gerais"
             ],
-            "value": 377
-           },
-           {
-            "dimension_values": [
-             "Vitória, Espírito Santo"
-            ],
-            "value": 66
+            "value": 347
            },
            {
             "dimension_values": [
              "São José do Rio Prêto, São Paulo (state)"
             ],
-            "value": 68
+            "value": 65
            },
            {
             "dimension_values": [
              "Santo André, São Paulo (state)"
             ],
-            "value": 103
+            "value": 87
            },
            {
             "dimension_values": [
              "Taguatinga, Federal District"
             ],
-            "value": 156
+            "value": 140
            },
            {
             "dimension_values": [
              "Curitiba, Paraná"
             ],
-            "value": 347
+            "value": 317
            },
            {
             "dimension_values": [
              "Belém, Pará"
             ],
-            "value": 146
+            "value": 132
            },
            {
             "dimension_values": [
              "Campinas, São Paulo (state)"
             ],
-            "value": 152
+            "value": 144
            }
           ]
          }
@@ -2552,13 +2546,53 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-10-20",
+    "janela": "2026-10-22",
     "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18012843740766702": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-10-22T11:11:43+0000",
+     "respostas": []
+    }
+   ],
+   "18132657553752051": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-10-21T21:55:49+0000",
+     "respostas": []
+    }
+   ],
+   "18120443713975952": [
+    {
+     "texto": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem.",
+     "curtidas": 0,
+     "quando": "2026-10-21T21:54:53+0000",
+     "respostas": []
+    }
+   ],
+   "18240325126316544": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-10-20T21:11:05+0000",
+     "respostas": []
+    }
+   ],
+   "18117883582955792": [
+    {
+     "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
+     "curtidas": 0,
+     "quando": "2026-10-20T17:11:00+0000",
+     "respostas": []
+    }
+   ],
    "18227698231327853": [
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
@@ -4444,6 +4478,12 @@
    ],
    "17888937702672875": [
     {
+     "texto": "A explicação sobre a passagem dos neutrinos pela Terra é correta em parte, mas há uma confusão fundamental na classificação e na origem que é apresentada aqui.\n \nNa minha compreensão:\nO neutrino é a manifestação de uma frequência específica de um campo muito mais amplo. Não é uma partícula que surge do Sol de forma isolada ou apenas de um lado, como simplificam. Na realidade, faz parte de um fluxo constante que permeia todo o universo e está diretamente ligado à força pósitromagnética.\n \nA afirmação de que ele vem apenas do \"lado negativo\" ou de uma forma unidirecional não corresponde à natureza real dessas energias.\n \nQuanto à chamada \"matéria escura\": ela não é composta por neutrinos vindos do Sol. Conforme a Teoria do Campo Unificado, ela é formada pelos elementos 119 a 134 — a zona de transição que ainda não foi totalmente detectada, mas que corresponde exatamente aos 25% que completam os 30% da matéria total do universo.\n \nEm breve, a obra completa com todos os fundamentos, explicações e previsões estará disponível para a comunidade científica. Ela será publicada no Zenodo e no arXiv, assim que o registro oficial na Biblioteca Nacional for finalizado — que já se encontra na fase final de conclusão.",
+     "curtidas": 1,
+     "quando": "2026-08-18T12:04:52+0000",
+     "respostas": []
+    },
+    {
      "texto": "Nenhuma interação, mas será que existe a possibilidade de algum neutrino chocar em algum particula em nosso corpo???",
      "curtidas": 0,
      "quando": "2026-08-17T13:43:11+0000",
@@ -4676,25 +4716,135 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18012843740766702",
+   "quando": "2026-10-22T11:11:38+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Dey2DvijOxG/",
+   "titulo": "Júpiter tem um disco invisível em volta dele, e ele ondula. 🪐",
+   "legenda": "Júpiter tem um disco invisível em volta dele, e ele ondula. 🪐\n\nÉ o magnetodisco: uma camada de partículas presa pelo campo magnético do planeta. Com dados da sonda Juno, cientistas viram que esse disco não é plano: ele é ondulado e gira junto com Júpiter. A bolha magnética de Júpiter é tão grande que, se desse pra enxergar, pareceria maior que a Lua cheia no céu.\n\n🔖 Salva pra lembrar do disco invisível de Júpiter.\n📤 Manda pra quem gosta de Júpiter.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science / Shandong University — Juno magnetodisk, out/2026\n\n#jupiter #juno #astronomia #sistemasolar #ciencia #neuralupdate",
+   "curtidas_campo": 3,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 131,
+   "reach": 110,
+   "likes": 3,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 4,
+   "ig_reels_avg_watch_time": 9841,
+   "ig_reels_video_view_total_time": 1161286,
+   "reels_skip_rate": 61,
+   "reposts": 0
+  },
+  {
+   "id": "18132657553752051",
+   "quando": "2026-10-21T21:55:41+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DexbAMMjjsk/",
+   "titulo": "Esta madrugada vão cair pedaços do cometa Halley. ☄️",
+   "legenda": "Esta madrugada vão cair pedaços do cometa Halley. ☄️\n\nÉ o pico das Orionidas, a chuva de meteoros feita da poeira que o Halley deixou no caminho. Os riscos parecem sair de perto das Três Marias, aquelas três estrelas em fila. A melhor hora é entre 3h e 5h da manhã, depois que a Lua se põe, e em céu bem escuro dá pra ver uns 20 por hora.\n\n🔖 Salva pra lembrar de olhar.\n📤 Manda pra quem vai acordar pra ver.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Orionids; efemérides para São Paulo (pôr da Lua 02h57, 22/10/2026)\n\n#orionidas #halley #meteoros #astronomia #ceu #neuralupdate",
+   "curtidas_campo": 9,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 145,
+   "reach": 129,
+   "likes": 9,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 9391,
+   "ig_reels_video_view_total_time": 1230266,
+   "reels_skip_rate": 46.6,
+   "reposts": 0
+  },
+  {
+   "id": "18120443713975952",
+   "quando": "2026-10-21T21:54:44+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Dexa5g7Dz3k/",
+   "titulo": "Em abril de 2029, um asteroide vai passar raspando na Terra. ☄️",
+   "legenda": "Em abril de 2029, um asteroide vai passar raspando na Terra. ☄️\n\nO nome dele é Apófis, e ele tem uns 340 metros. No dia 13 de abril, ele passa a menos de 32 mil km daqui, mais perto que muitos satélites. E não, ele não vai bater: a NASA já descartou o risco por pelo menos 100 anos. Ele vai brilhar tanto que milhões de pessoas vão ver sem telescópio.\n\n🔖 Salva pra lembrar do dia 13 de abril de 2029.\n📤 Manda pra quem vai querer acompanhar.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Apophis\n\n#apophis #asteroide #astronomia #sistemasolar #ciencia #neuralupdate",
+   "curtidas_campo": 8,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 181,
+   "reach": 138,
+   "likes": 8,
+   "comments": 1,
+   "shares": 0,
+   "saved": 1,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 14852,
+   "ig_reels_video_view_total_time": 2198187,
+   "reels_skip_rate": 55.1,
+   "reposts": 0
+  },
+  {
+   "id": "18240325126316544",
+   "quando": "2026-10-20T21:10:58+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DeuxFbHky40/",
+   "titulo": "Antes do sol nascer, tem um planeta vermelho do lado de um gigante. 🔴",
+   "legenda": "Antes do sol nascer, tem um planeta vermelho do lado de um gigante. 🔴\n\nHoje, olha pro nordeste, lá pelas 5h da manhã. O ponto mais brilhante é Júpiter; o avermelhado, mais fraco, é Marte. Eles estão a uns 10 graus um do outro, mais ou menos um punho com o braço esticado, e toda manhã chegam um pouco mais perto.\n\n🔖 Salva pra lembrar de olhar de manhã.\n📤 Manda pra quem acorda antes do sol.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: efemérides para São Paulo, 20/10/2026 (astronomy-engine)\n\n#marte #jupiter #astronomia #ceu #ciencia #neuralupdate",
+   "curtidas_campo": 3,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 218,
+   "reach": 186,
+   "likes": 3,
+   "comments": 1,
+   "shares": 1,
+   "saved": 1,
+   "total_interactions": 6,
+   "ig_reels_avg_watch_time": 10078,
+   "ig_reels_video_view_total_time": 1995562,
+   "reels_skip_rate": 56.1,
+   "reposts": 0
+  },
+  {
+   "id": "18117883582955792",
+   "quando": "2026-10-20T17:10:55+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DeuVng_lKR2/",
+   "titulo": "De onde vêm os cometas que demoram milhares de anos pra voltar? ☄️",
+   "legenda": "De onde vêm os cometas que demoram milhares de anos pra voltar? ☄️\n\nDe uma nuvem de gelo em volta do Sol, chamada Nuvem de Oort. Ela fica muito além de Plutão, tão longe que a luz do Sol leva mais de um ano pra chegar na borda. Ninguém nunca viu essa nuvem: a gente sabe que ela existe pelos cometas que vêm de lá. De vez em quando, o puxão de uma estrela que passa manda uma bola de gelo na direção do Sol.\n\n🔖 Salva pra lembrar de onde vêm os cometas de longo período.\n📤 Manda pra quem gosta de cometas.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Oort Cloud\n\n#nuvemdeoort #cometas #astronomia #sistemasolar #ciencia #neuralupdate",
+   "curtidas_campo": 14,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 211,
+   "reach": 164,
+   "likes": 14,
+   "comments": 1,
+   "shares": 1,
+   "saved": 1,
+   "total_interactions": 17,
+   "ig_reels_avg_watch_time": 8435,
+   "ig_reels_video_view_total_time": 1535190,
+   "reels_skip_rate": 64.6,
+   "reposts": 0
+  },
+  {
    "id": "18227698231327853",
    "quando": "2026-10-20T11:11:02+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/DetsbpTjQya/",
    "titulo": "Esse buraco na Lua pode ser a porta de uma caverna gigante. 🌕",
    "legenda": "Esse buraco na Lua pode ser a porta de uma caverna gigante. 🌕\n\nEle fica numa região chamada Colinas de Márius e tem dezenas de metros de fundura. A NASA escolheu um projeto pra descobrir se embaixo dele tem um túnel de lava, com radar e sensores de tremor, sem precisar descer lá dentro. Se a caverna existir, ela protege astronautas da radiação e do frio da noite lunar.\n\n🔖 Salva pra lembrar da possível caverna na Lua.\n📤 Manda pra quem moraria dentro da Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Planetary Science Institute / NASA PRISM — GIMLI, Marius Hills Pit (Space.com)\n\n#lua #caverna #nasa #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 3,
+   "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 75,
-   "reach": 48,
-   "likes": 3,
+   "views": 260,
+   "reach": 216,
+   "likes": 6,
    "comments": 1,
    "shares": 0,
-   "saved": 0,
-   "total_interactions": 4,
-   "ig_reels_avg_watch_time": 10527,
-   "ig_reels_video_view_total_time": 526358,
-   "reels_skip_rate": 41.2,
+   "saved": 2,
+   "total_interactions": 9,
+   "ig_reels_avg_watch_time": 10340,
+   "ig_reels_video_view_total_time": 2440421,
+   "reels_skip_rate": 56,
    "reposts": 0
   },
   {
@@ -4707,16 +4857,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 31,
-   "reach": 19,
+   "views": 35,
+   "reach": 25,
    "likes": 2,
    "comments": 3,
    "shares": 0,
    "saved": 0,
    "total_interactions": 6,
-   "ig_reels_avg_watch_time": 15045,
-   "ig_reels_video_view_total_time": 315953,
-   "reels_skip_rate": 54.5,
+   "ig_reels_avg_watch_time": 12187,
+   "ig_reels_video_view_total_time": 329075,
+   "reels_skip_rate": 61.5,
    "reposts": 1
   },
   {
@@ -4729,16 +4879,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 333,
-   "reach": 272,
+   "views": 345,
+   "reach": 280,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 10,
-   "ig_reels_avg_watch_time": 14349,
-   "ig_reels_video_view_total_time": 4189967,
-   "reels_skip_rate": 47.3,
+   "ig_reels_avg_watch_time": 14222,
+   "ig_reels_video_view_total_time": 4295193,
+   "reels_skip_rate": 47.2,
    "reposts": 0
   },
   {
@@ -4751,16 +4901,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 191,
-   "reach": 159,
+   "views": 196,
+   "reach": 163,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 9700,
-   "ig_reels_video_view_total_time": 1639465,
-   "reels_skip_rate": 64.5,
+   "ig_reels_avg_watch_time": 9546,
+   "ig_reels_video_view_total_time": 1661010,
+   "reels_skip_rate": 64.4,
    "reposts": 1
   },
   {
@@ -4773,16 +4923,16 @@
    "curtidas_campo": 11,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 179,
+   "views": 180,
    "reach": 154,
    "likes": 11,
    "comments": 1,
    "shares": 1,
    "saved": 1,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 7697,
-   "ig_reels_video_view_total_time": 1216136,
-   "reels_skip_rate": 63.3,
+   "ig_reels_avg_watch_time": 7686,
+   "ig_reels_video_view_total_time": 1222148,
+   "reels_skip_rate": 62.9,
    "reposts": 0
   },
   {
@@ -4817,16 +4967,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 203,
+   "views": 205,
    "reach": 174,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 7701,
-   "ig_reels_video_view_total_time": 1393920,
-   "reels_skip_rate": 65.7,
+   "ig_reels_avg_watch_time": 7696,
+   "ig_reels_video_view_total_time": 1400741,
+   "reels_skip_rate": 65.9,
    "reposts": 0
   },
   {
@@ -4840,7 +4990,7 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 132,
-   "reach": 121,
+   "reach": 122,
    "likes": 2,
    "comments": 1,
    "shares": 0,
@@ -4861,16 +5011,16 @@
    "curtidas_campo": 9,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 254,
-   "reach": 211,
+   "views": 255,
+   "reach": 212,
    "likes": 9,
    "comments": 2,
    "shares": 0,
    "saved": 1,
    "total_interactions": 13,
-   "ig_reels_avg_watch_time": 10856,
-   "ig_reels_video_view_total_time": 2377519,
-   "reels_skip_rate": 59.4,
+   "ig_reels_avg_watch_time": 10813,
+   "ig_reels_video_view_total_time": 2378947,
+   "reels_skip_rate": 59.6,
    "reposts": 1
   },
   {
@@ -4883,16 +5033,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 306,
+   "views": 307,
    "reach": 254,
    "likes": 4,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 10597,
-   "ig_reels_video_view_total_time": 2893074,
-   "reels_skip_rate": 54.4,
+   "ig_reels_avg_watch_time": 10566,
+   "ig_reels_video_view_total_time": 2895306,
+   "reels_skip_rate": 54.6,
    "reposts": 1
   },
   {
@@ -4905,16 +5055,16 @@
    "curtidas_campo": 13,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1262,
-   "reach": 1144,
+   "views": 1265,
+   "reach": 1146,
    "likes": 13,
    "comments": 3,
    "shares": 1,
    "saved": 2,
    "total_interactions": 20,
-   "ig_reels_avg_watch_time": 11670,
-   "ig_reels_video_view_total_time": 13561646,
-   "reels_skip_rate": 32.8,
+   "ig_reels_avg_watch_time": 11667,
+   "ig_reels_video_view_total_time": 13592620,
+   "reels_skip_rate": 32.9,
    "reposts": 1
   },
   {
@@ -4927,16 +5077,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 195,
-   "reach": 163,
+   "views": 196,
+   "reach": 164,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 8614,
-   "ig_reels_video_view_total_time": 1464403,
-   "reels_skip_rate": 65.5,
+   "ig_reels_avg_watch_time": 8569,
+   "ig_reels_video_view_total_time": 1465341,
+   "reels_skip_rate": 65.7,
    "reposts": 0
   },
   {
@@ -4949,16 +5099,16 @@
    "curtidas_campo": 24,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1264,
-   "reach": 1098,
+   "views": 1265,
+   "reach": 1100,
    "likes": 24,
    "comments": 3,
    "shares": 0,
    "saved": 0,
    "total_interactions": 28,
-   "ig_reels_avg_watch_time": 12861,
-   "ig_reels_video_view_total_time": 14790690,
-   "reels_skip_rate": 35.7,
+   "ig_reels_avg_watch_time": 12857,
+   "ig_reels_video_view_total_time": 14798665,
+   "reels_skip_rate": 35.6,
    "reposts": 1
   },
   {
@@ -4971,16 +5121,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 20,
-   "reach": 12,
+   "views": 21,
+   "reach": 13,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 7402,
-   "ig_reels_video_view_total_time": 118441,
-   "reels_skip_rate": 46.7,
+   "ig_reels_avg_watch_time": 7109,
+   "ig_reels_video_view_total_time": 120862,
+   "reels_skip_rate": 50,
    "reposts": 0
   },
   {
@@ -5015,16 +5165,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 131,
-   "reach": 112,
+   "views": 133,
+   "reach": 114,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 7969,
-   "ig_reels_video_view_total_time": 964270,
-   "reels_skip_rate": 62.5,
+   "ig_reels_avg_watch_time": 7880,
+   "ig_reels_video_view_total_time": 969330,
+   "reels_skip_rate": 63.1,
    "reposts": 0
   },
   {
@@ -5059,16 +5209,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 38,
-   "reach": 26,
+   "views": 39,
+   "reach": 27,
    "likes": 2,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 9621,
-   "ig_reels_video_view_total_time": 298280,
-   "reels_skip_rate": 56.7,
+   "ig_reels_avg_watch_time": 9411,
+   "ig_reels_video_view_total_time": 301181,
+   "reels_skip_rate": 58.1,
    "reposts": 0
   },
   {
@@ -5147,16 +5297,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 67,
-   "reach": 49,
+   "views": 69,
+   "reach": 51,
    "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 12503,
-   "ig_reels_video_view_total_time": 662702,
-   "reels_skip_rate": 44.2,
+   "ig_reels_avg_watch_time": 12741,
+   "ig_reels_video_view_total_time": 700787,
+   "reels_skip_rate": 44.4,
    "reposts": 0
   },
   {
@@ -5169,16 +5319,16 @@
    "curtidas_campo": 26,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 483,
+   "views": 484,
    "reach": 372,
    "likes": 26,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 28,
-   "ig_reels_avg_watch_time": 14178,
-   "ig_reels_video_view_total_time": 5416157,
-   "reels_skip_rate": 53.9,
+   "ig_reels_avg_watch_time": 14149,
+   "ig_reels_video_view_total_time": 5419419,
+   "reels_skip_rate": 54.1,
    "reposts": 0
   },
   {
@@ -5191,16 +5341,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 592,
-   "reach": 474,
+   "views": 594,
+   "reach": 475,
    "likes": 12,
    "comments": 1,
    "shares": 0,
    "saved": 3,
    "total_interactions": 17,
-   "ig_reels_avg_watch_time": 10736,
-   "ig_reels_video_view_total_time": 5325526,
-   "reels_skip_rate": 44.4,
+   "ig_reels_avg_watch_time": 10773,
+   "ig_reels_video_view_total_time": 5365363,
+   "reels_skip_rate": 44.3,
    "reposts": 1
   },
   {
@@ -5235,7 +5385,7 @@
    "curtidas_campo": 13,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 467,
+   "views": 468,
    "reach": 383,
    "likes": 13,
    "comments": 1,
@@ -5243,8 +5393,8 @@
    "saved": 0,
    "total_interactions": 14,
    "ig_reels_avg_watch_time": 9712,
-   "ig_reels_video_view_total_time": 3894669,
-   "reels_skip_rate": 54.6,
+   "ig_reels_video_view_total_time": 3904434,
+   "reels_skip_rate": 54.5,
    "reposts": 0
   },
   {
@@ -5257,16 +5407,16 @@
    "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 433,
-   "reach": 388,
+   "views": 434,
+   "reach": 389,
    "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 3,
    "total_interactions": 11,
-   "ig_reels_avg_watch_time": 9157,
-   "ig_reels_video_view_total_time": 3589928,
-   "reels_skip_rate": 50.8,
+   "ig_reels_avg_watch_time": 9139,
+   "ig_reels_video_view_total_time": 3591665,
+   "reels_skip_rate": 50.9,
    "reposts": 0
   },
   {
@@ -5301,16 +5451,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 249,
-   "reach": 204,
+   "views": 251,
+   "reach": 205,
    "likes": 5,
    "comments": 2,
    "shares": 0,
    "saved": 2,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 9112,
-   "ig_reels_video_view_total_time": 1931759,
-   "reels_skip_rate": 59.5,
+   "ig_reels_avg_watch_time": 9193,
+   "ig_reels_video_view_total_time": 1967467,
+   "reels_skip_rate": 59.4,
    "reposts": 0
   },
   {
@@ -5323,16 +5473,16 @@
    "curtidas_campo": 11,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 407,
-   "reach": 354,
+   "views": 408,
+   "reach": 355,
    "likes": 11,
    "comments": 1,
    "shares": 3,
    "saved": 1,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 9523,
-   "ig_reels_video_view_total_time": 3399723,
-   "reels_skip_rate": 60,
+   "ig_reels_avg_watch_time": 9499,
+   "ig_reels_video_view_total_time": 3400804,
+   "reels_skip_rate": 60.1,
    "reposts": 0
   },
   {
@@ -5367,16 +5517,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 40,
+   "views": 41,
    "reach": 30,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 11704,
-   "ig_reels_video_view_total_time": 386241,
-   "reels_skip_rate": 54.5,
+   "ig_reels_avg_watch_time": 11402,
+   "ig_reels_video_view_total_time": 387676,
+   "reels_skip_rate": 55.9,
    "reposts": 0
   },
   {
@@ -5474,19 +5624,19 @@
    "link": "https://www.instagram.com/reel/DeOy4X6iaef/",
    "titulo": "Pra ver um planeta perto de uma estrela, você precisa tapar a estrela. Igual pôr a mão na frente do sol. ✋☀️",
    "legenda": "Pra ver um planeta perto de uma estrela, você precisa tapar a estrela. Igual pôr a mão na frente do sol. ✋☀️\n\nO telescópio Roman, da NASA, acabou de usar pela primeira vez o coronógrafo, o instrumento que faz exatamente isso. E ele fica tão firme que, na comparação da NASA, acertaria uma moeda a 240 km. Por enquanto é teste, mas é o primeiro passo pra fotografar planetas como a Terra.\n\n🔖 Salva pra acompanhar a primeira foto.\n📤 Manda pra quem sonha em ver outra Terra.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que Mercúrio está encolhendo.\n\n📚 Fonte: NASA, 30/09/2026 — NASA checks Roman guidance system, takes first coronagraph observation\n\n#roman #nasa #exoplanetas #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 5,
+   "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 187,
-   "reach": 163,
-   "likes": 5,
+   "views": 188,
+   "reach": 164,
+   "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 1,
-   "total_interactions": 9,
-   "ig_reels_avg_watch_time": 8288,
-   "ig_reels_video_view_total_time": 1375842,
-   "reels_skip_rate": 64.2,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 8267,
+   "ig_reels_video_view_total_time": 1380714,
+   "reels_skip_rate": 63.9,
    "reposts": 1
   },
   {
@@ -5565,16 +5715,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 26,
-   "reach": 19,
+   "views": 31,
+   "reach": 20,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 12579,
-   "ig_reels_video_view_total_time": 276753,
-   "reels_skip_rate": 66.7,
+   "ig_reels_avg_watch_time": 120685,
+   "ig_reels_video_view_total_time": 2775767,
+   "reels_skip_rate": 63.6,
    "reposts": 0
   },
   {
@@ -5587,7 +5737,7 @@
    "curtidas_campo": 35,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 762,
+   "views": 825,
    "reach": 694,
    "likes": 35,
    "comments": 1,
@@ -5596,7 +5746,7 @@
    "total_interactions": 43,
    "ig_reels_avg_watch_time": 17890,
    "ig_reels_video_view_total_time": 12505380,
-   "reels_skip_rate": 39.4,
+   "reels_skip_rate": 36.4,
    "reposts": 2
   },
   {
@@ -5895,16 +6045,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 251,
-   "reach": 205,
+   "views": 253,
+   "reach": 207,
    "likes": 6,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 11822,
-   "ig_reels_video_view_total_time": 2518178,
-   "reels_skip_rate": 54.7,
+   "ig_reels_avg_watch_time": 11843,
+   "ig_reels_video_view_total_time": 2546343,
+   "reels_skip_rate": 54.2,
    "reposts": 0
   },
   {
@@ -6159,16 +6309,16 @@
    "curtidas_campo": 66,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 4304,
-   "reach": 3408,
+   "views": 4305,
+   "reach": 3409,
    "likes": 66,
    "comments": 2,
    "shares": 2,
    "saved": 5,
    "total_interactions": 79,
-   "ig_reels_avg_watch_time": 18823,
-   "ig_reels_video_view_total_time": 66635873,
-   "reels_skip_rate": 29.3,
+   "ig_reels_avg_watch_time": 18820,
+   "ig_reels_video_view_total_time": 66642737,
+   "reels_skip_rate": 29.2,
    "reposts": 4
   },
   {
@@ -6222,15 +6372,15 @@
    "curtidas_campo": 24,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1352,
+   "views": 1353,
    "reach": 1157,
    "likes": 24,
    "comments": 1,
    "shares": 0,
    "saved": 4,
    "total_interactions": 30,
-   "ig_reels_avg_watch_time": 11805,
-   "ig_reels_video_view_total_time": 14095506,
+   "ig_reels_avg_watch_time": 11799,
+   "ig_reels_video_view_total_time": 14100578,
    "reels_skip_rate": 35.9,
    "reposts": 1
   },
@@ -7425,15 +7575,15 @@
    "curtidas_campo": 22,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1350,
+   "views": 1352,
    "reach": 1115,
    "likes": 22,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 26,
-   "ig_reels_avg_watch_time": 16751,
-   "ig_reels_video_view_total_time": 19397846,
+   "ig_reels_avg_watch_time": 16737,
+   "ig_reels_video_view_total_time": 19399335,
    "reels_skip_rate": 24.6,
    "reposts": 0
   },
@@ -7492,7 +7642,7 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
    "views": 97,
-   "reach": 57,
+   "reach": 58,
    "likes": 2,
    "comments": 1,
    "shares": 1,
@@ -9160,15 +9310,15 @@
    "curtidas_campo": 67,
    "comentarios_campo": 0,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1399,
-   "reach": 1121,
+   "views": 1400,
+   "reach": 1122,
    "likes": 67,
    "comments": 0,
    "shares": 1,
    "saved": 2,
    "total_interactions": 71,
-   "ig_reels_avg_watch_time": 33489,
-   "ig_reels_video_view_total_time": 38345861,
+   "ig_reels_avg_watch_time": 33462,
+   "ig_reels_video_view_total_time": 38347719,
    "reels_skip_rate": 32.5,
    "reposts": 1
   },
@@ -10133,8 +10283,8 @@
    "likes": 30,
    "comments": 0,
    "shares": 4,
-   "saved": 5,
-   "total_interactions": 41,
+   "saved": 4,
+   "total_interactions": 40,
    "ig_reels_avg_watch_time": 20467,
    "ig_reels_video_view_total_time": 14245352,
    "reels_skip_rate": 36.4,
