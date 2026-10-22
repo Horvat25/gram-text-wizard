@@ -98,7 +98,9 @@ function substituiKindlePorProjetor(fila) {
 // fica registrado no item pra aparecer no log e no saude.yml.
 // 14/10/2026: o item da fila pode trazer `comentario` (texto próprio do primeiro comentário, ex.: teste
 // "Comenta LIVRO"); sem o campo vale o texto padrão abaixo.
-const COMENTARIO = '📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.';
+// 22/10/2026 (pivot RQP, decisão do Marcelo via Direção): o texto padrão deixou de vender Kindle e passou a
+// apresentar o Rotina que Paga como parceria. Item da fila com `comentario` próprio continua mandando nele.
+const COMENTARIO = '🤝 Parceria Rotina que Paga: quer saber se dá pra trabalhar com IA pelo seu celular? Comenta ROTINA que a gente te mostra por onde começar 👇 (não é promessa de renda)';
 
 async function comenta(idMidia, texto) {
   const r = await post(`${API}/${idMidia}/comments`, { message: texto || COMENTARIO, access_token: IG_TOKEN });
