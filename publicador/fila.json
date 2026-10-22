@@ -4779,7 +4779,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/02cd14ab-03be-4046-987f-91dd1cbdcc17.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-22",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18134405434705224",
+    "publicado_em": "2026-10-22T11:10:44.300Z"
   },
   {
     "quando": "2026-10-22T11:00:00.000Z",
@@ -4787,8 +4789,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9a06e9b1-f036-4744-bcde-0b5c9e7ee7ba.mp4",
     "legenda": "Júpiter tem um disco invisível em volta dele, e ele ondula. 🪐\n\nÉ o magnetodisco: uma camada de partículas presa pelo campo magnético do planeta. Com dados da sonda Juno, cientistas viram que esse disco não é plano: ele é ondulado e gira junto com Júpiter. A bolha magnética de Júpiter é tão grande que, se desse pra enxergar, pareceria maior que a Lua cheia no céu.\n\n🔖 Salva pra lembrar do disco invisível de Júpiter.\n📤 Manda pra quem gosta de Júpiter.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science / Shandong University — Juno magnetodisk, out/2026\n\n#jupiter #juno #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "nw-juno-disco-magnetico-ondula",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18012843740766702",
+    "publicado_em": "2026-10-22T11:11:43.861Z",
+    "id_comentario": "18147128863604374",
+    "id_facebook": "3397695340413124"
   },
   {
     "quando": "2026-10-22T15:00:00.000Z",
