@@ -4802,9 +4802,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-22",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-1"
+    "variacao": "pro-1",
+    "id_instagram": "18103078403383566",
+    "publicado_em": "2026-10-22T17:10:29.322Z"
   },
   {
     "quando": "2026-10-22T17:00:00.000Z",
@@ -4812,7 +4814,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/58b9ff50-226a-41db-8a80-964d6bb05721.mp4",
     "legenda": "O que é aquele coração enorme em Plutão? 🤍\n\nO lado esquerdo dele é uma planície de gelo de nitrogênio. Esse gelo é mole: ele escorre devagar, como uma geleira, e se renova por baixo, em blocos do tamanho de cidades. A sonda New Horizons mostrou isso em 2015.\n\n🔖 Salva pra lembrar do coração de Plutão.\n📤 Manda pra quem curte Plutão.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — New Horizons: Sputnik Planitia\n\n#plutao #newhorizons #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl76-plutao-coracao-de-gelo",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18395077012204519",
+    "publicado_em": "2026-10-22T17:11:20.584Z",
+    "id_comentario": "18116972333088878",
+    "id_facebook": "2251289529054361"
   },
   {
     "quando": "2026-10-22T19:00:00.000Z",
