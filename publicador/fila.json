@@ -4849,9 +4849,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10f5f6ff-1d29-48b6-9eaa-c01a6f962b86.png",
     "legenda": "",
     "slug": "story-livro-2026-10-22",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-3"
+    "variacao": "pro-3",
+    "id_instagram": "17964918756206816",
+    "publicado_em": "2026-10-22T23:03:39.239Z"
   },
   {
     "quando": "2026-10-23T11:00:00.000Z",
