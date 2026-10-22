@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-20T14:14:16.184Z",
+ "gerado_em": "2026-10-22T14:28:33.506Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,12 +14,12 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2561351,
+   "seguidores": 2561672,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": 0,
-   "comentarios_por_curtida_sem_pedido": 0.012,
+   "comentarios_por_curtida_sem_pedido": 0.011,
    "melhores_pedidos": [
     {
      "quando": "2026-10-18",
@@ -28,7 +28,7 @@
      "palavra": null,
      "trecho": "🎬 No vídeo, mostro as datas e o que falta para voltarmos à Lua. Assista e comente: qual nave chega primeiro? 👇",
      "comentarios": 0,
-     "curtidas": 202,
+     "curtidas": 214,
      "link": "https://www.instagram.com/p/Deo8hgnoBZm/"
     }
    ]
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17316,
+   "seguidores": 17349,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,13 +55,26 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590692,
+   "seguidores": 590765,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.061,
-   "melhores_pedidos": []
+   "pct_posts_pedindo": 0.02,
+   "palavras": {
+    "RAM": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.474,
+   "comentarios_por_curtida_sem_pedido": 0.077,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-10-21",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "RAM",
+     "trecho": "Além de organizar as propostas, ouvimos três especialistas, que comentaram os temas:",
+     "comentarios": 92,
+     "curtidas": 194,
+     "link": "https://www.instagram.com/p/DewmuILjqkB/"
+    }
+   ]
   },
   {
    "usuario": "achadinhospromo15",
@@ -98,7 +111,7 @@
    "usuario": "achadinhos.shopee",
    "grupo": "achadinhos",
    "ok": true,
-   "seguidores": 404,
+   "seguidores": 403,
    "posts_lidos": 11,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -128,12 +141,12 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 23,
+   "seguidores": 24,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.088,
+   "comentarios_por_curtida_sem_pedido": 0.078,
    "melhores_pedidos": []
   },
   {
@@ -146,7 +159,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057178,
+   "seguidores": 1057094,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
