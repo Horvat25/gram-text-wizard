@@ -4908,7 +4908,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/64d65d46-6081-4810-9c6d-3535ab285013.png",
     "legenda": "",
     "slug": "story-feed-2026-10-23",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18113792273613647",
+    "publicado_em": "2026-10-23T21:10:34.954Z"
   },
   {
     "quando": "2026-10-23T21:00:00.000Z",
@@ -4916,12 +4918,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c6b0e7b1-118f-4e85-aa2d-614fd670e70a.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-21",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
     "variacao": "pro-4",
     "quando_anterior": "2026-10-21T15:00:00.000Z",
     "reagendado_em": "2026-10-21T21:53:38.945Z",
-    "motivo_reagendamento": "cron nao disparou no horario original"
+    "motivo_reagendamento": "cron nao disparou no horario original",
+    "id_instagram": "18346589110280563",
+    "publicado_em": "2026-10-23T21:10:45.334Z"
   },
   {
     "quando": "2026-10-23T21:00:00.000Z",
@@ -4929,8 +4933,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/dee86278-0dce-4dfc-ad35-1394ae83c3d7.mp4",
     "legenda": "Existe uma estrela que gira 716 vezes por segundo. 🌀\n\nEstrelas assim são do tamanho de uma cidade e têm mais massa que o Sol. Nessa velocidade, o chão no equador dela corre a quase um quarto da velocidade da luz, e os cientistas acham que, um pouco mais rápido, ela se despedaçaria. É o resto de uma estrela que explodiu, a uns 18 mil anos-luz daqui.\n\n🔖 Salva pra lembrar da estrela que gira 716 vezes por segundo.\n📤 Manda pra quem gosta de física.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Hessels et al., Science (2006) — pulsar PSR J1748-2446ad, 716 Hz (Terzan 5); NASA Science — Neutron Stars\n\n#pulsar #estrelasdeneutrons #astronomia #ciencia #neuralupdate",
     "slug": "viral-estrela-gira-716-vezes",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18285523795294115",
+    "publicado_em": "2026-10-23T21:11:27.913Z",
+    "id_comentario": "18137379625643144",
+    "id_facebook": "2033447123981579"
   },
   {
     "quando": "2026-10-24T11:00:00.000Z",
