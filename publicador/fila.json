@@ -4928,10 +4928,323 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c288c7ec-9a06-4e0d-b044-aa4b4f9d1164.mp4",
     "legenda": "Na Lua, a noite dura duas semanas, e painel solar não dá conta. 🌕\n\nPor isso a NASA e o Departamento de Energia dos EUA assinaram um acordo de energia nuclear no espaço. Um dos planos é um reator na superfície da Lua, pra manter a futura base ligada, com meta de ter um reator pronto pra lançar até 2030. Seria a primeira usina de energia fora da Terra.\n\n🔖 Salva pra lembrar da primeira usina de energia fora da Terra.\n📤 Manda pra quem confiaria num reator na Lua.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 08/10/2026 — NASA, Energy Department advance new era of nuclear-powered exploration\n\n#lua #energianuclear #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-reator-nuclear-na-lua",
-    "status": "agendado",
+    "status": "cancelado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
     "quando_anterior": "2026-10-21T11:00:00.000Z",
     "reagendado_em": "2026-10-21T21:53:38.945Z",
-    "motivo_reagendamento": "cron nao disparou no horario original"
+    "motivo_reagendamento": "cron nao disparou no horario original",
+    "motivo_cancelamento": "substituído pelo lote 24–29"
+  },
+  {
+    "quando": "2026-10-24T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cec03244-8f16-4063-8c77-3ba5d635bbbd.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-24",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-24T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6071afb5-5d87-49a4-a88c-80cbceb5f4be.mp4",
+    "legenda": "Uma sonda japonesa vai pousar numa lua de Marte e trazer um pedaço dela pra Terra. 🪨\n\nA missão se chama MMX, e o alvo é Fobos, uma lua com formato de batata. Ninguém sabe se Fobos é um asteroide capturado ou um pedaço arrancado de Marte. A NASA vai junto, com um instrumento que lê a química dessa lua, e a amostra deve chegar aqui em 2031.\n\n🔖 Salva pra acompanhar a amostra de Fobos chegar em 2031.\n📤 Manda pra quem gosta de missões a Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 15/10/2026 — NASA to Help Unlock Mysteries of Mars' Moons in Upcoming Mission (MMX, JAXA)\n\n#mmx #fobos #marte #astronomia #ciencia #neuralupdate",
+    "slug": "nw-japao-vai-trazer-pedaco-de-fobos",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-24T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-24",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-1"
+  },
+  {
+    "quando": "2026-10-24T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b16013cc-bcb3-47b5-9548-5e6cc67aadde.mp4",
+    "legenda": "E se uma lua girasse na direção contrária do próprio planeta? 🧊\n\nÉ o que faz Tritão, a maior lua de Netuno. Isso é sinal de que ela não nasceu ali: foi capturada, vinda dos confins do Sistema Solar. A sonda Voyager 2 viu gêiseres soltando nitrogênio a quilômetros de altura, num lugar com mais de 200 graus abaixo de zero.\n\n🔖 Salva pra lembrar da lua que gira ao contrário.\n📤 Manda pra quem gosta de Netuno.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Triton\n\n#tritao #netuno #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl78-tritao-lua-ao-contrario",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-24T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/3abb7cf0-5816-42e5-926f-5857f461b1c6.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-24",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-24T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e22902fd-d44c-4f61-b9f5-d8f1b9f55b64.mp4",
+    "legenda": "Uma pedra que caiu do espaço pesa mais de 5 toneladas e está aqui no Brasil. ☄️\n\nÉ o Bendegó, achado no sertão da Bahia em 1784. Ele é quase todo de ferro e níquel, metal que veio de dentro de um asteroide. Levaram mais de cem anos pra arrastar ele até o Rio de Janeiro, e quando o Museu Nacional pegou fogo, em 2018, ele saiu inteiro.\n\n🔖 Salva pra lembrar do maior meteorito do Brasil.\n📤 Manda pra quem é da Bahia.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Museu Nacional/UFRJ — Meteorito Bendegó (5.360 kg, achado em 1784 em Monte Santo, BA)\n\n#bendego #meteorito #museunacional #astronomia #ciencia #neuralupdate",
+    "slug": "viral-bendego-meteorito-5-toneladas",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-25T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/8cb4ec66-f053-4813-98d2-3bea77a7dd57.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-25",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-25T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/53f38237-092b-4964-99ed-b24c06d68fc7.mp4",
+    "legenda": "Quatro pessoas acabaram de completar um ano trancadas numa casa que finge ser Marte. 🏠\n\nA casa foi impressa em 3D e fica dentro de um centro da NASA, no Texas, com 158 metros quadrados pra quatro pessoas. Elas plantam comida, racionam recursos e falam com a Terra com atraso, como seria em Marte, pra testar se o corpo e a cabeça aguentam uma missão de verdade.\n\n🔖 Salva pra lembrar do ano numa Marte de mentira.\n📤 Manda pra quem aguentaria.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, 19/10/2026 — NASA's Simulated Mars Crew Marks One Year Inside Habitat (CHAPEA 2)\n\n#chapea #marte #nasa #astronomia #ciencia #neuralupdate",
+    "slug": "nw-um-ano-numa-marte-de-mentira",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-25T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e1a2e00-c6d8-48b7-af7a-c51e540fa9aa.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-25",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-2"
+  },
+  {
+    "quando": "2026-10-25T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5f6a9aa9-ffc5-42f2-8687-83893fc355c0.mp4",
+    "legenda": "O que seriam luzes brilhando numa cratera escura no meio dos asteroides? ✨\n\nElas ficam em Ceres, o maior objeto do cinturão de asteroides, com uns 900 km. A sonda Dawn chegou perto e descobriu: são depósitos de sal, que veio de água salgada que subiu de baixo da superfície. Ou seja, Ceres pode guardar água salgada lá dentro até hoje.\n\n🔖 Salva pra lembrar do sal brilhante de Ceres.\n📤 Manda pra quem gosta de planetas anões.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Ceres / missão Dawn\n\n#ceres #dawn #planetaanao #astronomia #ciencia #neuralupdate",
+    "slug": "pl79-ceres-sal-que-brilha",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-25T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b026e4fa-4504-41c7-98e6-018849160020.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-25",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-25T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e62dcdc9-5569-4aae-8e8b-e95b606ce172.mp4",
+    "legenda": "Hoje à noite a Lua fica cheia, e ela tem nome: Lua do Caçador. 🌕\n\nO nome vem do hemisfério norte, da época em que caçadores aproveitavam a luz dela no outono. Aqui no Brasil, é só olhar pro leste depois que o Sol se pôr. O ponto mais cheio é de madrugada, à 1h12, horário de Brasília. Ela nasce enorme no horizonte, mas isso é ilusão do seu cérebro, não da Lua.\n\n🔖 Salva pra lembrar de olhar a Lua hoje.\n📤 Manda pra quem gosta de olhar o céu.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Lua cheia em 26/10/2026, 01h12 (horário de Brasília) — calendários astronômicos (Star Walk)\n\n#luacheia #luadocacador #astronomia #ceu #ciencia #neuralupdate",
+    "slug": "viral-hoje-lua-cheia-do-cacador",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-26T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a3ea859b-0c74-45e7-98cd-638a9abde597.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-26",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-26T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4855e1d4-0a00-4394-8004-8a5170a4552f.mp4",
+    "legenda": "Esse arco de luz é uma galáxia inteira entortada por outra que está na frente. 🔭\n\nA da frente fica a 4,5 bilhões de anos-luz; a de trás, a 8 bilhões. A massa da galáxia da frente curva o espaço, e a luz de trás faz a volta: é a tal lente gravitacional, que Einstein previu. O Hubble está caçando essas lentes pra preparar o próximo telescópio da NASA, o Roman.\n\n🔖 Salva pra lembrar que o espaço entorta a luz.\n📤 Manda pra quem gosta de Einstein.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — NASA's Hubble Charts Path for Roman with Gravitational Lenses, out/2026\n\n#hubble #lentegravitacional #einstein #astronomia #ciencia #neuralupdate",
+    "slug": "nw-hubble-galaxia-entorta-luz",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-26T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10f5f6ff-1d29-48b6-9eaa-c01a6f962b86.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-26",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-3"
+  },
+  {
+    "quando": "2026-10-26T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/60fecb8d-7834-4748-a6e8-578414b8e8eb.mp4",
+    "legenda": "E se um dia na sua cidade durasse mais que dois anos? ☀️\n\nEm Mercúrio é assim: de um nascer do Sol ao outro passam 176 dias da Terra, e o ano de lá tem só 88 dias. De dia o chão passa de 400 graus; de noite cai pra quase 200 graus negativos. Mesmo assim, a sonda MESSENGER achou gelo escondido em crateras que nunca veem o Sol.\n\n🔖 Salva pra lembrar do dia que dura dois anos.\n📤 Manda pra quem gosta de Mercúrio.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Mercury / MESSENGER\n\n#mercurio #messenger #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl80-mercurio-dia-de-dois-anos",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-26T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/13714119-c304-4c8a-ade5-2b3646d56c28.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-26",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-26T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5796180d-62c0-4b7b-927c-b705d06834df.mp4",
+    "legenda": "As estrelas da bandeira do Brasil não foram desenhadas ao acaso: é o céu de verdade. 🇧🇷\n\nÉ o céu do Rio de Janeiro na manhã de 15 de novembro de 1889. Cada estrela representa um estado, e o Distrito Federal também tem a sua. Dá pra achar o Cruzeiro do Sul e o Escorpião ali no meio, e a estrela sozinha acima da faixa é Espiga, que representa o Pará.\n\n🔖 Salva pra achar a estrela do seu estado.\n📤 Manda pra quem ama o Brasil.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Lei nº 5.700/1971 (Símbolos Nacionais) — céu do Rio de Janeiro em 15/11/1889\n\n#bandeiradobrasil #cruzeirodosul #astronomia #brasil #ciencia #neuralupdate",
+    "slug": "viral-bandeira-tem-o-ceu-de-verdade",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-27T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/f89d0d28-79db-46bc-b4c1-45edbc69dd1a.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-27",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-27T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c84adf48-6685-4237-b363-0d16aeaaeb4c.mp4",
+    "legenda": "Esse desenho de ondas de rádio parece uma clave de sol, e quem fez foi um buraco negro. 🎼\n\nUm buraco negro gigante soltou partículas quase na velocidade da luz, e a nuvem foi apagando com o tempo, até que dois aglomerados de galáxias bateram de frente. A trombada, há algumas centenas de milhões de anos, reacendeu a nuvem. O telescópio de raio-X Chandra viu o gás em volta a milhões de graus.\n\n🔖 Salva pra lembrar da clave de sol feita por um buraco negro.\n📤 Manda pra quem gosta de buracos negros.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — NASA's Chandra Breaks Down 'Treble Clef' Galaxy Cluster Collision, out/2026 (Botteon et al., A&A)\n\n#buraconegro #chandra #astronomia #espaco #ciencia #neuralupdate",
+    "slug": "nw-buraco-negro-clave-de-sol",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-27T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c6b0e7b1-118f-4e85-aa2d-614fd670e70a.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-27",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-4"
+  },
+  {
+    "quando": "2026-10-27T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bb245c26-9175-4c09-8290-c85dd7057979.mp4",
+    "legenda": "Onde fica a montanha mais alta que não está num planeta? ⛰️\n\nNum asteroide chamado Vesta, com uns 500 km. No polo sul dele tem uma cratera enorme, e no meio dela um pico de uns 20 km: mais que o dobro do Everest. Alguns meteoritos que caíram na Terra vieram justamente dessa pancada.\n\n🔖 Salva pra lembrar da montanha de Vesta.\n📤 Manda pra quem gosta de montanhismo.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Vesta / missão Dawn\n\n#vesta #asteroide #dawn #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl81-vesta-montanha-gigante",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-27T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/bcc295b3-746a-4fef-a125-0c01d66c84d0.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-27",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-27T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/09714145-bb8e-4e2a-b30e-8b8b2cf0e306.mp4",
+    "legenda": "Do Brasil você vê o coração da nossa galáxia melhor do que quem mora nos Estados Unidos. 🌌\n\nO centro da Via Láctea fica na direção da constelação de Sagitário. Pra quem está no sul do mundo, ele passa quase em cima da cabeça; lá no norte, ele mal sai do horizonte. Em outubro, dá pra ver no começo da noite, pro lado oeste, longe da luz da cidade.\n\n🔖 Salva pra procurar o centro da galáxia no céu.\n📤 Manda pra quem mora longe da luz da cidade.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: centro galáctico em Sagitário (declinação −29°) — NASA/JPL-Caltech (Spitzer)\n\n#viaLactea #sagitario #astronomia #brasil #ciencia #neuralupdate",
+    "slug": "viral-do-brasil-voce-ve-o-centro-da-galaxia",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-28T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/0f4b969a-e6b2-4d8d-884b-9ba41d7d0251.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-28",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-28T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e8a7a94a-69b8-4e1c-9386-bf07fb6120cb.mp4",
+    "legenda": "Três fantasmas novos apareceram no céu, perto da constelação de Cassiopeia. 👻\n\nNa verdade são nuvens de gás que ninguém tinha visto. Pra achar, um grupo de astrofotógrafos somou 100 horas de fotos com um filtro especial. O azul vem de oxigênio brilhando, e uma delas pode ser o que sobrou de uma estrela.\n\n🔖 Salva pra lembrar dos fantasmas de Cassiopeia.\n📤 Manda pra quem gosta de astrofotografia.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA APOD, 21/10/2026 — New Ghosts Revealed in Cassiopeia (Leroux-Géré, Rouillée, Martin, de Decker — Starfront Observatories)\n\n#cassiopeia #astrofotografia #nebulosa #astronomia #ciencia #neuralupdate",
+    "slug": "nw-tres-fantasmas-novos-no-ceu",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-28T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-28",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-1"
+  },
+  {
+    "quando": "2026-10-28T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ca37c38f-9ecb-45ef-8267-e2b737186ff5.mp4",
+    "legenda": "Como é a coisa mais distante que uma sonda já visitou? ⛄\n\nEla se chama Arrokoth e parece um boneco de neve achatado. Fica depois de Plutão, a uns 6,5 bilhões de km da Terra. São duas bolas de gelo que se encostaram devagar, bem no começo do Sistema Solar, e a sonda New Horizons passou por ela no primeiro dia de 2019.\n\n🔖 Salva pra lembrar do boneco de neve mais distante.\n📤 Manda pra quem gosta de sondas espaciais.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Arrokoth / New Horizons\n\n#arrokoth #newhorizons #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl82-arrokoth-boneco-de-neve",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-28T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7c8369ad-81b4-4003-8e72-a8f5185470e7.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-28",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-28T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a059e98d-944b-4949-a53d-ef033fc8692e.mp4",
+    "legenda": "Um dia o Sol vai crescer tanto que vai engolir Mercúrio e Vênus. 🔥\n\nDaqui a uns 5 bilhões de anos, o combustível do centro dele vai acabar. Aí ele incha e vira uma gigante vermelha, centenas de vezes maior que hoje. Se a Terra escapa ou não, os cientistas ainda discutem, mas muito antes disso o calor já vai ter secado os oceanos.\n\n🔖 Salva pra lembrar do futuro do Sol.\n📤 Manda pra quem gosta de física.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Our Sun / ciclo de vida estelar (gigante vermelha em ~5 bilhões de anos)\n\n#sol #gigantevermelha #astronomia #espaco #ciencia #neuralupdate",
+    "slug": "viral-o-sol-vai-engolir-mercurio-e-venus",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-29T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/33f491ef-db00-47c9-9f12-20e700230b69.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-10-29",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-29T11:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/42b96fa3-97d7-4b4d-b138-55418fb5f75b.mp4",
+    "legenda": "Essa é uma galáxia vista de lado, como um disco olhado pela borda. 🌌\n\nEla se chama NGC 1827 e fica a 37 milhões de anos-luz, na constelação da Pomba. As faixas marrons são poeira, e os pontos azuis são estrelas nascendo. Ela faz parte de uma pesquisa com 260 galáxias pequenas em volta de galáxias como a nossa, e o Hubble já fotografou 111 delas.\n\n🔖 Salva pra lembrar da galáxia vista de lado.\n📤 Manda pra quem gosta das fotos do Hubble.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — NASA's Hubble Spies Spiral's Edge (NGC 1827), out/2026\n\n#hubble #galaxia #ngc1827 #astronomia #ciencia #neuralupdate",
+    "slug": "nw-hubble-galaxia-de-lado",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+  },
+  {
+    "quando": "2026-10-29T15:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e1a2e00-c6d8-48b7-af7a-c51e540fa9aa.png",
+    "legenda": "",
+    "slug": "story-rqp-2026-10-29",
+    "status": "agendado",
+    "campanha": "rqp-rotina",
+    "variacao": "pro-2"
+  },
+  {
+    "quando": "2026-10-29T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/152c0f5b-253a-455e-8208-02dcf0148394.mp4",
+    "legenda": "Onde tem mais água, na Terra ou numa lua de Júpiter? 🌊\n\nEuropa, uma lua menor que a nossa, deve ter o dobro da água de todos os oceanos da Terra, só que escondida embaixo de uma casca de gelo de quilômetros. As rachaduras na superfície mostram que esse gelo se mexe, e a sonda Europa Clipper está a caminho e chega lá em 2030.\n\n🔖 Salva pra lembrar da lua com mais água que a Terra.\n📤 Manda pra quem gosta de Júpiter.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Europa / Europa Clipper\n\n#europa #jupiter #europaclipper #astronomia #sistemasolar #ciencia #neuralupdate",
+    "slug": "pl83-europa-mais-agua-que-a-terra",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-29T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7323bee7-3ed0-45b8-b687-0e89eeea7179.png",
+    "legenda": "",
+    "slug": "story-feed-2026-10-29",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-10-29T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/051dfafd-a551-42e5-b6d5-ef08ee24d95b.mp4",
+    "legenda": "Saturno é tão leve pro tamanho dele que flutuaria na água. 🛁\n\nEle tem 95 vezes a massa da Terra, mas é feito quase só de hidrogênio e hélio, então cada pedaço dele pesa menos que a mesma quantidade de água. Claro, ia precisar de uma banheira maior que o próprio planeta, e ainda ia deixar um anel nela: os anéis dele são gelo e poeira.\n\n🔖 Salva pra lembrar do planeta que flutuaria.\n📤 Manda pra quem gosta de Saturno.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Saturn Facts (densidade 0,687 g/cm³; 95 massas terrestres)\n\n#saturno #astronomia #espaco #ciencia #neuralupdate",
+    "slug": "viral-saturno-flutuaria-na-agua",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
   }
 ]
