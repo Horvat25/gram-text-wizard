@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-22T14:35:37.728Z",
+  "gerado_em": "2026-10-23T14:18:54.481Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -522,11 +522,54 @@
     {
       "d": "2026-10-22",
       "views": 0
+    },
+    {
+      "d": "2026-10-23",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "3291585327694806",
+      "quando": "2026-10-23T11:11:27+0000",
+      "titulo": "Isso que parece fogo é um berçário de estrelas, e o James Webb acabou de mostrar o que tinha lá dentro. 🔥",
+      "link": "https://www.facebook.com/reel/3291585327694806/",
+      "segundos": 40.98,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "3501060090063430",
+      "quando": "2026-10-22T21:11:05+0000",
+      "titulo": "Um dia, eclipse total do Sol vai deixar de existir. 🌑",
+      "link": "https://www.facebook.com/reel/3501060090063430/",
+      "segundos": 40.64,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2251289529054361",
+      "quando": "2026-10-22T17:11:31+0000",
+      "titulo": "O que é aquele coração enorme em Plutão? 🤍",
+      "link": "https://www.facebook.com/reel/2251289529054361/",
+      "segundos": 33.125,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "3397695340413124",
       "quando": "2026-10-22T11:11:49+0000",
