@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-23T14:11:24.527Z",
+ "gerado_em": "2026-10-24T13:14:17.149Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2561949,
+   "seguidores": 2562251,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
@@ -28,7 +28,7 @@
      "palavra": null,
      "trecho": "🎬 No vídeo, mostro as datas e o que falta para voltarmos à Lua. Assista e comente: qual nave chega primeiro? 👇",
      "comentarios": 0,
-     "curtidas": 216,
+     "curtidas": 219,
      "link": "https://www.instagram.com/p/Deo8hgnoBZm/"
     }
    ]
@@ -37,7 +37,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17364,
+   "seguidores": 17389,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,26 +55,13 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590799,
+   "seguidores": 590876,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
-   "palavras": {
-    "RAM": 1
-   },
-   "comentarios_por_curtida_com_pedido": 0.486,
-   "comentarios_por_curtida_sem_pedido": 0.06,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-10-21",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": "RAM",
-     "trecho": "Além de organizar as propostas, ouvimos três especialistas, que comentaram os temas:",
-     "comentarios": 107,
-     "curtidas": 220,
-     "link": "https://www.instagram.com/p/DewmuILjqkB/"
-    }
-   ]
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.063,
+   "melhores_pedidos": []
   },
   {
    "usuario": "achadinhospromo15",
@@ -146,7 +133,7 @@
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.065,
+   "comentarios_por_curtida_sem_pedido": 0.058,
    "melhores_pedidos": []
   },
   {
@@ -159,12 +146,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057201,
+   "seguidores": 1057143,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.024,
+   "comentarios_por_curtida_sem_pedido": 0.025,
    "melhores_pedidos": []
   }
  ],
