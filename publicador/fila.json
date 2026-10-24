@@ -4982,9 +4982,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-24",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-1"
+    "variacao": "pro-1",
+    "id_instagram": "17906623596665693",
+    "publicado_em": "2026-10-24T17:10:28.795Z"
   },
   {
     "quando": "2026-10-24T17:00:00.000Z",
@@ -4992,7 +4994,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b16013cc-bcb3-47b5-9548-5e6cc67aadde.mp4",
     "legenda": "E se uma lua girasse na direção contrária do próprio planeta? 🧊\n\nÉ o que faz Tritão, a maior lua de Netuno. Isso é sinal de que ela não nasceu ali: foi capturada, vinda dos confins do Sistema Solar. A sonda Voyager 2 viu gêiseres soltando nitrogênio a quilômetros de altura, num lugar com mais de 200 graus abaixo de zero.\n\n🔖 Salva pra lembrar da lua que gira ao contrário.\n📤 Manda pra quem gosta de Netuno.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Triton\n\n#tritao #netuno #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl78-tritao-lua-ao-contrario",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17984521848092079",
+    "publicado_em": "2026-10-24T17:11:06.551Z",
+    "id_comentario": "18133240684665295",
+    "id_facebook": "1434022715517481"
   },
   {
     "quando": "2026-10-24T19:00:00.000Z",
