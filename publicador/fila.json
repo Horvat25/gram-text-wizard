@@ -4959,7 +4959,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/cec03244-8f16-4063-8c77-3ba5d635bbbd.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-24",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18142178656717838",
+    "publicado_em": "2026-10-24T11:10:42.546Z"
   },
   {
     "quando": "2026-10-24T11:00:00.000Z",
@@ -4967,8 +4969,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/6071afb5-5d87-49a4-a88c-80cbceb5f4be.mp4",
     "legenda": "Uma sonda japonesa vai pousar numa lua de Marte e trazer um pedaço dela pra Terra. 🪨\n\nA missão se chama MMX, e o alvo é Fobos, uma lua com formato de batata. Ninguém sabe se Fobos é um asteroide capturado ou um pedaço arrancado de Marte. A NASA vai junto, com um instrumento que lê a química dessa lua, e a amostra deve chegar aqui em 2031.\n\n🔖 Salva pra acompanhar a amostra de Fobos chegar em 2031.\n📤 Manda pra quem gosta de missões a Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 15/10/2026 — NASA to Help Unlock Mysteries of Mars' Moons in Upcoming Mission (MMX, JAXA)\n\n#mmx #fobos #marte #astronomia #ciencia #neuralupdate",
     "slug": "nw-japao-vai-trazer-pedaco-de-fobos",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18467831275185485",
+    "publicado_em": "2026-10-24T11:11:19.801Z",
+    "id_comentario": "18104971316013375",
+    "id_facebook": "39656203103995567"
   },
   {
     "quando": "2026-10-24T15:00:00.000Z",
