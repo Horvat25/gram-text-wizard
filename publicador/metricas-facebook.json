@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-23T14:18:54.481Z",
+  "gerado_em": "2026-10-24T13:25:03.899Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -526,11 +526,54 @@
     {
       "d": "2026-10-23",
       "views": 0
+    },
+    {
+      "d": "2026-10-24",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "39656203103995567",
+      "quando": "2026-10-24T11:11:24+0000",
+      "titulo": "Uma sonda japonesa vai pousar numa lua de Marte e trazer um pedaço dela pra Terra. 🪨",
+      "link": "https://www.facebook.com/reel/39656203103995567/",
+      "segundos": 39.7,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2033447123981579",
+      "quando": "2026-10-23T21:11:35+0000",
+      "titulo": "Existe uma estrela que gira 716 vezes por segundo. 🌀",
+      "link": "https://www.facebook.com/reel/2033447123981579/",
+      "segundos": 42.266,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1424729176306463",
+      "quando": "2026-10-23T17:11:14+0000",
+      "titulo": "E se uma lua minúscula de Saturno tivesse um oceano inteiro escondido? 💧",
+      "link": "https://www.facebook.com/reel/1424729176306463/",
+      "segundos": 41.291,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "3291585327694806",
       "quando": "2026-10-23T11:11:27+0000",
