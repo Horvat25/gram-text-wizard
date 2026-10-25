@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-24T13:25:03.899Z",
+  "gerado_em": "2026-10-25T13:46:30.077Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -530,11 +530,54 @@
     {
       "d": "2026-10-24",
       "views": 0
+    },
+    {
+      "d": "2026-10-25",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1667950434702235",
+      "quando": "2026-10-25T11:08:07+0000",
+      "titulo": "Quatro pessoas acabaram de completar um ano trancadas numa casa que finge ser Marte. 🏠",
+      "link": "https://www.facebook.com/reel/1667950434702235/",
+      "segundos": 40.566,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1119994530401667",
+      "quando": "2026-10-24T21:11:09+0000",
+      "titulo": "Uma pedra que caiu do espaço pesa mais de 5 toneladas e está aqui no Brasil. ☄️",
+      "link": "https://www.facebook.com/reel/1119994530401667/",
+      "segundos": 42.58,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1434022715517481",
+      "quando": "2026-10-24T17:11:11+0000",
+      "titulo": "E se uma lua girasse na direção contrária do próprio planeta? 🧊",
+      "link": "https://www.facebook.com/reel/1434022715517481/",
+      "segundos": 35.208,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "39656203103995567",
       "quando": "2026-10-24T11:11:24+0000",
