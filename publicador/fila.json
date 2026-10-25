@@ -5052,9 +5052,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e1a2e00-c6d8-48b7-af7a-c51e540fa9aa.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-25",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-2"
+    "variacao": "pro-2",
+    "id_instagram": "18124532911910744",
+    "publicado_em": "2026-10-25T17:10:31.318Z"
   },
   {
     "quando": "2026-10-25T17:00:00.000Z",
@@ -5062,7 +5064,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5f6a9aa9-ffc5-42f2-8687-83893fc355c0.mp4",
     "legenda": "O que seriam luzes brilhando numa cratera escura no meio dos asteroides? ✨\n\nElas ficam em Ceres, o maior objeto do cinturão de asteroides, com uns 900 km. A sonda Dawn chegou perto e descobriu: são depósitos de sal, que veio de água salgada que subiu de baixo da superfície. Ou seja, Ceres pode guardar água salgada lá dentro até hoje.\n\n🔖 Salva pra lembrar do sal brilhante de Ceres.\n📤 Manda pra quem gosta de planetas anões.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Ceres / missão Dawn\n\n#ceres #dawn #planetaanao #astronomia #ciencia #neuralupdate",
     "slug": "pl79-ceres-sal-que-brilha",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18078524396560260",
+    "publicado_em": "2026-10-25T17:11:13.805Z",
+    "id_comentario": "18650078932052985",
+    "id_facebook": "1154948800371216"
   },
   {
     "quando": "2026-10-25T19:00:00.000Z",
