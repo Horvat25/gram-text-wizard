@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-25T13:46:30.077Z",
+  "gerado_em": "2026-10-26T16:12:57.495Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -534,11 +534,54 @@
     {
       "d": "2026-10-25",
       "views": 0
+    },
+    {
+      "d": "2026-10-26",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1144872154543933",
+      "quando": "2026-10-26T11:11:25+0000",
+      "titulo": "Esse arco de luz é uma galáxia inteira entortada por outra que está na frente. 🔭",
+      "link": "https://www.facebook.com/reel/1144872154543933/",
+      "segundos": 43.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2604303640327624",
+      "quando": "2026-10-25T21:11:21+0000",
+      "titulo": "Hoje à noite a Lua fica cheia, e ela tem nome: Lua do Caçador. 🌕",
+      "link": "https://www.facebook.com/reel/2604303640327624/",
+      "segundos": 45.466,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1154948800371216",
+      "quando": "2026-10-25T17:11:17+0000",
+      "titulo": "O que seriam luzes brilhando numa cratera escura no meio dos asteroides? ✨",
+      "link": "https://www.facebook.com/reel/1154948800371216/",
+      "segundos": 38.125,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1667950434702235",
       "quando": "2026-10-25T11:08:07+0000",
