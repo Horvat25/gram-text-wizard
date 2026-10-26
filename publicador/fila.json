@@ -5099,7 +5099,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/a3ea859b-0c74-45e7-98cd-638a9abde597.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-26",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18117783983048293",
+    "publicado_em": "2026-10-26T11:10:43.654Z"
   },
   {
     "quando": "2026-10-26T11:00:00.000Z",
@@ -5107,8 +5109,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4855e1d4-0a00-4394-8004-8a5170a4552f.mp4",
     "legenda": "Esse arco de luz é uma galáxia inteira entortada por outra que está na frente. 🔭\n\nA da frente fica a 4,5 bilhões de anos-luz; a de trás, a 8 bilhões. A massa da galáxia da frente curva o espaço, e a luz de trás faz a volta: é a tal lente gravitacional, que Einstein previu. O Hubble está caçando essas lentes pra preparar o próximo telescópio da NASA, o Roman.\n\n🔖 Salva pra lembrar que o espaço entorta a luz.\n📤 Manda pra quem gosta de Einstein.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — NASA's Hubble Charts Path for Roman with Gravitational Lenses, out/2026\n\n#hubble #lentegravitacional #einstein #astronomia #ciencia #neuralupdate",
     "slug": "nw-hubble-galaxia-entorta-luz",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18496273255097783",
+    "publicado_em": "2026-10-26T11:11:22.977Z",
+    "id_comentario": "18094665614179295",
+    "id_facebook": "1144872154543933"
   },
   {
     "quando": "2026-10-26T15:00:00.000Z",
