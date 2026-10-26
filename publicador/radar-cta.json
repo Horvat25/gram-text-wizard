@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-25T13:40:35.065Z",
+ "gerado_em": "2026-10-26T16:00:11.506Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,30 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2562457,
+   "seguidores": 2559752,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
+   "pct_posts_pedindo": 0,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_com_pedido": null,
    "comentarios_por_curtida_sem_pedido": 0.01,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-10-18",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": null,
-     "trecho": "🎬 No vídeo, mostro as datas e o que falta para voltarmos à Lua. Assista e comente: qual nave chega primeiro? 👇",
-     "comentarios": 0,
-     "curtidas": 221,
-     "link": "https://www.instagram.com/p/Deo8hgnoBZm/"
-    }
-   ]
+   "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17403,
+   "seguidores": 17405,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -55,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590833,
+   "seguidores": 590229,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.059,
+   "comentarios_por_curtida_sem_pedido": 0.072,
    "melhores_pedidos": []
   },
   {
@@ -146,12 +135,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057158,
+   "seguidores": 1057045,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.025,
+   "comentarios_por_curtida_sem_pedido": 0.024,
    "melhores_pedidos": []
   }
  ],
