@@ -5192,9 +5192,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c6b0e7b1-118f-4e85-aa2d-614fd670e70a.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-27",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-4"
+    "variacao": "pro-4",
+    "id_instagram": "18340152265277290",
+    "publicado_em": "2026-10-27T15:47:02.263Z"
   },
   {
     "quando": "2026-10-27T17:00:00.000Z",
