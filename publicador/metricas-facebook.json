@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-26T16:12:57.495Z",
+  "gerado_em": "2026-10-27T15:26:45.739Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -538,11 +538,41 @@
     {
       "d": "2026-10-26",
       "views": 0
+    },
+    {
+      "d": "2026-10-27",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1146919438286110",
+      "quando": "2026-10-27T11:11:17+0000",
+      "titulo": "Esse desenho de ondas de rádio parece uma clave de sol, e quem fez foi um buraco negro. 🎼",
+      "link": "https://www.facebook.com/reel/1146919438286110/",
+      "segundos": 43.272,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1703402484551312",
+      "quando": "2026-10-26T21:11:18+0000",
+      "titulo": "As estrelas da bandeira do Brasil não foram desenhadas ao acaso: é o céu de verdade. 🇧🇷",
+      "link": "https://www.facebook.com/reel/1703402484551312/",
+      "segundos": 39.602,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1144872154543933",
       "quando": "2026-10-26T11:11:25+0000",
