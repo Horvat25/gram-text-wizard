@@ -5262,9 +5262,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
     "legenda": "",
     "slug": "story-rqp-2026-10-28",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-1"
+    "variacao": "pro-1",
+    "id_instagram": "17914044453503154",
+    "publicado_em": "2026-10-28T16:29:46.525Z"
   },
   {
     "quando": "2026-10-28T17:00:00.000Z",
