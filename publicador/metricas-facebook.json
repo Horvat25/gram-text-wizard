@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-27T15:26:45.739Z",
+  "gerado_em": "2026-10-28T16:10:37.440Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -542,11 +542,54 @@
     {
       "d": "2026-10-27",
       "views": 0
+    },
+    {
+      "d": "2026-10-28",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1653839669867057",
+      "quando": "2026-10-28T11:11:33+0000",
+      "titulo": "Três fantasmas novos apareceram no céu, perto da constelação de Cassiopeia. 👻",
+      "link": "https://www.facebook.com/reel/1653839669867057/",
+      "segundos": 41.833,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1141318052177536",
+      "quando": "2026-10-27T21:11:07+0000",
+      "titulo": "Do Brasil você vê o coração da nossa galáxia melhor do que quem mora nos Estados Unidos. 🌌",
+      "link": "https://www.facebook.com/reel/1141318052177536/",
+      "segundos": 40.933,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2400187267453857",
+      "quando": "2026-10-27T17:11:08+0000",
+      "titulo": "Onde fica a montanha mais alta que não está num planeta? ⛰️",
+      "link": "https://www.facebook.com/reel/2400187267453857/",
+      "segundos": 33.458,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1146919438286110",
       "quando": "2026-10-27T11:11:17+0000",
