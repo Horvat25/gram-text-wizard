@@ -5309,7 +5309,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/33f491ef-db00-47c9-9f12-20e700230b69.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-29",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18100097084534315",
+    "publicado_em": "2026-10-29T11:10:33.435Z"
   },
   {
     "quando": "2026-10-29T11:00:00.000Z",
@@ -5317,8 +5319,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/42b96fa3-97d7-4b4d-b138-55418fb5f75b.mp4",
     "legenda": "Essa é uma galáxia vista de lado, como um disco olhado pela borda. 🌌\n\nEla se chama NGC 1827 e fica a 37 milhões de anos-luz, na constelação da Pomba. As faixas marrons são poeira, e os pontos azuis são estrelas nascendo. Ela faz parte de uma pesquisa com 260 galáxias pequenas em volta de galáxias como a nossa, e o Hubble já fotografou 111 delas.\n\n🔖 Salva pra lembrar da galáxia vista de lado.\n📤 Manda pra quem gosta das fotos do Hubble.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — NASA's Hubble Spies Spiral's Edge (NGC 1827), out/2026\n\n#hubble #galaxia #ngc1827 #astronomia #ciencia #neuralupdate",
     "slug": "nw-hubble-galaxia-de-lado",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "17932479912166671",
+    "publicado_em": "2026-10-29T11:11:23.381Z",
+    "id_comentario": "18174132280460696",
+    "id_facebook": "1917494485899691"
   },
   {
     "quando": "2026-10-29T15:00:00.000Z",
