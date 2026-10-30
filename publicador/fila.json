@@ -5379,7 +5379,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2b348641-cfd2-4939-8f15-e77e8f78a98e.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-30",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18111590234231599",
+    "publicado_em": "2026-10-30T11:10:33.763Z"
   },
   {
     "quando": "2026-10-30T11:00:00.000Z",
@@ -5387,8 +5389,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/96c7206a-aede-44f8-8f2e-958db005930e.mp4",
     "legenda": "Um telescópio que passou 22 anos caçando as maiores explosões do universo acabou de se despedir. 🛰️\n\nÉ o Swift, da NASA, lançado em 2004. Ele flagrou mais de 2 mil explosões de raios gama, as mais violentas que existem, e estudou mais de 1.400 estrelas explodindo. Agora a órbita dele ficou baixa demais, e nas próximas semanas ele vai cair e queimar na atmosfera.\n\n🔖 Salva pra lembrar de 22 anos caçando explosões.\n📤 Manda pra quem gosta de telescópios.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 23/10/2026 — NASA's Swift Mission Ends, Leaves Behind Scientific Bonanza\n\n#swift #nasa #raiosgama #astronomia #ciencia #neuralupdate",
     "slug": "nw-telescopio-das-2000-explosoes-se-despede",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18083665652650920",
+    "publicado_em": "2026-10-30T11:11:28.414Z",
+    "id_comentario": "18076151600742877",
+    "id_facebook": "1714920763540085"
   },
   {
     "quando": "2026-10-30T15:00:00.000Z",
