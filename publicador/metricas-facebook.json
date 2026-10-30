@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-29T16:15:37.227Z",
+  "gerado_em": "2026-10-30T16:01:58.894Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -550,11 +550,54 @@
     {
       "d": "2026-10-29",
       "views": 0
+    },
+    {
+      "d": "2026-10-30",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1714920763540085",
+      "quando": "2026-10-30T11:11:35+0000",
+      "titulo": "Um telescópio que passou 22 anos caçando as maiores explosões do universo acabou de se despedir. 🛰️",
+      "link": "https://www.facebook.com/reel/1714920763540085/",
+      "segundos": 44.8,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1527583439129888",
+      "quando": "2026-10-29T21:11:17+0000",
+      "titulo": "Saturno é tão leve pro tamanho dele que flutuaria na água. 🛁",
+      "link": "https://www.facebook.com/reel/1527583439129888/",
+      "segundos": 38.433,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1143095808232475",
+      "quando": "2026-10-29T17:11:22+0000",
+      "titulo": "Onde tem mais água, na Terra ou numa lua de Júpiter? 🌊",
+      "link": "https://www.facebook.com/reel/1143095808232475/",
+      "segundos": 33.833,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1917494485899691",
       "quando": "2026-10-29T11:11:25+0000",
