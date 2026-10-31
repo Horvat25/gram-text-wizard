@@ -5449,7 +5449,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/04d3ee96-15f6-4edb-b238-9500301db7fb.png",
     "legenda": "",
     "slug": "story-noticia-2026-10-31",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17983360955907955",
+    "publicado_em": "2026-10-31T11:10:38.778Z"
   },
   {
     "quando": "2026-10-31T11:00:00.000Z",
@@ -5457,8 +5459,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/e43d29e3-aecf-42f1-a8dd-8b270afa0180.mp4",
     "legenda": "A NASA vai mandar um drone pra uma lua de Saturno, e ele já fez o primeiro voo, num computador. 🚁\n\nÉ a Dragonfly, rumo a Titã, uma lua com ar mais grosso que o nosso. No teste, o cérebro do drone pilotou sozinho, com câmeras e lasers simulados. Ele deve chegar em Titã em 2034, depois de 6 anos de viagem, e vai passar 3 anos voando por lá.\n\n🔖 Salva pra acompanhar a chegada a Titã em 2034.\n📤 Manda pra quem gosta de drones.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 23/10/2026 — NASA's Dragonfly Completes First Simulated Flight\n\n#dragonfly #tita #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-drone-da-nasa-vai-voar-em-tita",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18096988517670713",
+    "publicado_em": "2026-10-31T11:11:21.332Z",
+    "id_comentario": "18152622073548600",
+    "id_facebook": "1432210255109904"
   },
   {
     "quando": "2026-10-31T15:00:00.000Z",
