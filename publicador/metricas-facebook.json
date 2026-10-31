@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-30T16:01:58.894Z",
+  "gerado_em": "2026-10-31T15:25:48.927Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -554,11 +554,54 @@
     {
       "d": "2026-10-30",
       "views": 0
+    },
+    {
+      "d": "2026-10-31",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1432210255109904",
+      "quando": "2026-10-31T11:11:25+0000",
+      "titulo": "A NASA vai mandar um drone pra uma lua de Saturno, e ele já fez o primeiro voo, num computador. 🚁",
+      "link": "https://www.facebook.com/reel/1432210255109904/",
+      "segundos": 44.342,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1018094651310904",
+      "quando": "2026-10-30T21:02:37+0000",
+      "titulo": "No Maranhão, o chão gira a 1.600 km por hora, e isso ajuda foguete a subir. 🚀",
+      "link": "https://www.facebook.com/reel/1018094651310904/",
+      "segundos": 40.88,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1602123654999385",
+      "quando": "2026-10-30T17:11:15+0000",
+      "titulo": "E se a Terra girasse deitada, rolando em volta do Sol? 🪐",
+      "link": "https://www.facebook.com/reel/1602123654999385/",
+      "segundos": 35.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1714920763540085",
       "quando": "2026-10-30T11:11:35+0000",
