@@ -5519,7 +5519,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/35f73f75-19ef-4f03-8939-49a72c6cbc6f.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-01",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18390290176225727",
+    "publicado_em": "2026-11-01T11:11:02.787Z"
   },
   {
     "quando": "2026-11-01T11:00:00.000Z",
@@ -5527,8 +5529,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/d90b39e7-a773-46cc-840e-b3dd7d802fef.mp4",
     "legenda": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷\n\nO robô Perseverance mediu isso pela primeira vez, lá mesmo, em Marte: ele levou pedacinhos de tecido de traje espacial e ficou vendo a poeira grudar neles por mais de 1.600 dias. Algumas partículas têm uns 100 nanômetros, centenas de vezes mais finas que um fio de cabelo, e a poeira tem substâncias que podem atrapalhar a tireoide.\n\n🔖 Salva pra lembrar do perigo da poeira de Marte.\n📤 Manda pra quem sonha em morar em Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, PNAS, 27/10/2026 — NASA's Perseverance Offers Clues to Protect Crews From Mars Dust\n\n#marte #perseverance #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-poeira-de-marte-pode-entrar-no-sangue",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18138632665650933",
+    "publicado_em": "2026-11-01T11:11:40.633Z",
+    "id_comentario": "18144122746718636",
+    "id_facebook": "1442629108066073"
   },
   {
     "quando": "2026-11-01T15:00:00.000Z",
