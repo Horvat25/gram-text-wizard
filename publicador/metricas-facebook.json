@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-31T15:25:48.927Z",
+  "gerado_em": "2026-11-01T16:07:20.591Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -558,11 +558,54 @@
     {
       "d": "2026-10-31",
       "views": 0
+    },
+    {
+      "d": "2026-11-01",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1442629108066073",
+      "quando": "2026-11-01T11:11:43+0000",
+      "titulo": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷",
+      "link": "https://www.facebook.com/reel/1442629108066073/",
+      "segundos": 41.48,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2202672580652588",
+      "quando": "2026-10-31T21:11:02+0000",
+      "titulo": "No Halloween de 2015, um asteroide com cara de caveira passou perto da Terra. 💀",
+      "link": "https://www.facebook.com/reel/2202672580652588/",
+      "segundos": 41.84,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1738483740589802",
+      "quando": "2026-10-31T17:11:19+0000",
+      "titulo": "Essa lua de Júpiter está quase igual há 4 bilhões de anos. 🌑",
+      "link": "https://www.facebook.com/reel/1738483740589802/",
+      "segundos": 34.75,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1432210255109904",
       "quando": "2026-10-31T11:11:25+0000",
