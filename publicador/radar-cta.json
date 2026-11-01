@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-31T15:14:50.756Z",
+ "gerado_em": "2026-11-01T15:56:26.054Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,32 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2560910,
+   "seguidores": 2561427,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
+   "pct_posts_pedindo": 0.02,
+   "palavras": {
+    "NDO": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.084,
    "comentarios_por_curtida_sem_pedido": 0.008,
-   "melhores_pedidos": []
+   "melhores_pedidos": [
+    {
+     "quando": "2026-11-01",
+     "tipo": "REELS",
+     "pede": true,
+     "palavra": "NDO",
+     "trecho": "Que inveja morar num país em que a notícia principal hoje é no plano concreto de mandar duas pessoas para pisar na Lua, todas as redes , jor",
+     "comentarios": 13,
+     "curtidas": 154,
+     "link": "https://www.instagram.com/reel/DfM8BgjoV_E/"
+    }
+   ]
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17447,
+   "seguidores": 17455,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +57,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 589441,
+   "seguidores": 589400,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.135,
+   "comentarios_por_curtida_sem_pedido": 0.136,
    "melhores_pedidos": []
   },
   {
@@ -117,12 +130,12 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 25,
+   "seguidores": 26,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.052,
+   "comentarios_por_curtida_sem_pedido": 0.045,
    "melhores_pedidos": []
   },
   {
@@ -135,12 +148,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1056601,
+   "seguidores": 1056681,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.023,
+   "comentarios_por_curtida_sem_pedido": 0.013,
    "melhores_pedidos": []
   }
  ],
