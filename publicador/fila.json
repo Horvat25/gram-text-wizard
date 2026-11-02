@@ -5611,9 +5611,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e1a2e00-c6d8-48b7-af7a-c51e540fa9aa.png",
     "legenda": "",
     "slug": "story-rqp-2026-11-02",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-2"
+    "variacao": "pro-2",
+    "id_instagram": "18120908419955800",
+    "publicado_em": "2026-11-02T17:10:38.294Z"
   },
   {
     "quando": "2026-11-02T17:00:00.000Z",
@@ -5621,7 +5623,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/41332214-ee99-4d8a-ab1f-d96f895de1d1.mp4",
     "legenda": "Por que um planeta anão teria formato de ovo? 🥚\n\nHaumea, lá depois de Netuno, gira tão rápido que esticou: um dia lá dura menos de 4 horas. Ele tem uns 2 mil km no lado mais comprido, e ainda tem um anel e duas luas. O anel foi descoberto em 2017, quando ele passou na frente de uma estrela.\n\n🔖 Salva pra lembrar do planeta anão em forma de ovo.\n📤 Manda pra quem gosta de planetas anões.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Haumea; Ortiz et al., Nature (2017)\n\n#haumea #planetaanao #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl87-haumea-planeta-anao-em-forma-de-ovo",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18015185006758963",
+    "publicado_em": "2026-11-02T17:11:15.166Z",
+    "id_comentario": "18203319454379110",
+    "id_facebook": "981976888294072"
   },
   {
     "quando": "2026-11-02T19:00:00.000Z",
