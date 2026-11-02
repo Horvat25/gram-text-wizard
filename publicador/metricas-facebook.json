@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-01T16:07:20.591Z",
+  "gerado_em": "2026-11-02T19:34:52.906Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -562,11 +562,67 @@
     {
       "d": "2026-11-01",
       "views": 0
+    },
+    {
+      "d": "2026-11-02",
+      "views": 0
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "981976888294072",
+      "quando": "2026-11-02T17:11:18+0000",
+      "titulo": "Por que um planeta anão teria formato de ovo? 🥚",
+      "link": "https://www.facebook.com/reel/981976888294072/",
+      "segundos": 35.416,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2906806109696819",
+      "quando": "2026-11-02T11:11:42+0000",
+      "titulo": "A NASA terminou o guarda-sol do telescópio que vai procurar asteroides perigosos pra Terra. ☀️",
+      "link": "https://www.facebook.com/reel/2906806109696819/",
+      "segundos": 45.933,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1645688226950270",
+      "quando": "2026-11-01T21:11:56+0000",
+      "titulo": "Só quem mora no hemisfério sul consegue ver essas duas galáxias a olho nu. 🌌",
+      "link": "https://www.facebook.com/reel/1645688226950270/",
+      "segundos": 33.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2239255590268522",
+      "quando": "2026-11-01T17:11:18+0000",
+      "titulo": "Qual é o maior penhasco de todo o Sistema Solar? 🧗",
+      "link": "https://www.facebook.com/reel/2239255590268522/",
+      "segundos": 37.25,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "1442629108066073",
       "quando": "2026-11-01T11:11:43+0000",
