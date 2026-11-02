@@ -5588,7 +5588,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ac2f43ce-b749-4a9a-86fc-59c0884ec764.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-02",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17934253068300685",
+    "publicado_em": "2026-11-02T11:10:50.663Z"
   },
   {
     "quando": "2026-11-02T11:00:00.000Z",
@@ -5596,8 +5598,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ba9eda37-1222-4110-a49d-b8c472dfd847.mp4",
     "legenda": "A NASA terminou o guarda-sol do telescópio que vai procurar asteroides perigosos pra Terra. ☀️\n\nEle se chama NEO Surveyor e vai olhar até na direção do Sol, onde hoje é difícil enxergar. O guarda-sol tem 6 metros de altura e 864 células solares. O telescópio enxerga em infravermelho, pelo calor, e assim calcula o tamanho de cada pedra.\n\n🔖 Salva pra lembrar do caçador de asteroides da NASA.\n📤 Manda pra quem se preocupa com asteroides.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 26/10/2026 — Sunshade for NASA's NEO Surveyor Mission Ready for Its Day in Sun\n\n#neosurveyor #asteroides #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-telescopio-cacador-de-asteroides",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "17989090929115261",
+    "publicado_em": "2026-11-02T11:11:38.054Z",
+    "id_comentario": "18081611762392402",
+    "id_facebook": "2906806109696819"
   },
   {
     "quando": "2026-11-02T15:00:00.000Z",
