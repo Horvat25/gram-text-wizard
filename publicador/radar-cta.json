@@ -1,45 +1,28 @@
 {
- "gerado_em": "2026-11-01T15:56:26.054Z",
- "contas_lidas": 7,
+ "gerado_em": "2026-11-02T19:20:55.983Z",
+ "contas_lidas": 5,
  "contas_invalidas": [
+  "spacetoday: Please reduce the amount of data you're asking for, then retry your request",
   "canaldoschwarza: Invalid user id",
   "achadinhospromo15: Invalid user id",
   "achadosdashopee: Invalid user id",
   "mundodosachadinhos: Invalid user id",
   "achadinhosdaamazon: Invalid user id",
-  "tag_livros: Invalid user id"
+  "tag_livros: Invalid user id",
+  "intrinseca: Please reduce the amount of data you're asking for, then retry your request"
  ],
  "resultado": [
   {
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
-   "ok": true,
-   "seguidores": 2561427,
-   "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
-   "palavras": {
-    "NDO": 1
-   },
-   "comentarios_por_curtida_com_pedido": 0.084,
-   "comentarios_por_curtida_sem_pedido": 0.008,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-11-01",
-     "tipo": "REELS",
-     "pede": true,
-     "palavra": "NDO",
-     "trecho": "Que inveja morar num país em que a notícia principal hoje é no plano concreto de mandar duas pessoas para pisar na Lua, todas as redes , jor",
-     "comentarios": 13,
-     "curtidas": 154,
-     "link": "https://www.instagram.com/reel/DfM8BgjoV_E/"
-    }
-   ]
+   "ok": false,
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17455,
+   "seguidores": 17475,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -57,12 +40,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 589400,
+   "seguidores": 589403,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.136,
+   "comentarios_por_curtida_sem_pedido": 0.127,
    "melhores_pedidos": []
   },
   {
@@ -130,13 +113,24 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 26,
+   "seguidores": 27,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
+   "pct_posts_pedindo": 0.02,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.045,
-   "melhores_pedidos": []
+   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_sem_pedido": 0.046,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-11-01",
+     "tipo": "REELS",
+     "pede": true,
+     "palavra": null,
+     "trecho": "",
+     "comentarios": 0,
+     "curtidas": 2,
+     "link": "https://www.instagram.com/reel/DfMvDGYBZ5i/"
+    }
+   ]
   },
   {
    "usuario": "tag_livros",
@@ -147,14 +141,8 @@
   {
    "usuario": "intrinseca",
    "grupo": "livros",
-   "ok": true,
-   "seguidores": 1056681,
-   "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.013,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   }
  ],
  "hashtags": [
