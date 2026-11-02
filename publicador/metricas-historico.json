@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-01T15:44:35.393Z",
+ "gerado_em": "2026-11-02T19:11:48.906Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1274,
-  "publicacoes": 1042
+  "seguidores": 1286,
+  "publicacoes": 1046
  },
- "total_listado": 1042,
- "com_tempo_assistido": 502,
+ "total_listado": 1046,
+ "com_tempo_assistido": 506,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-03",
-     "ate": "2026-10-31",
+     "de": "2026-10-04",
+     "ate": "2026-11-01",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 3,
-         "end_time": "2026-10-04T07:00:00+0000"
-        },
         {
          "value": 0,
          "end_time": "2026-10-05T07:00:00+0000"
@@ -129,8 +125,12 @@
          "end_time": "2026-10-30T07:00:00+0000"
         },
         {
-         "value": 0,
+         "value": 1,
          "end_time": "2026-10-31T07:00:00+0000"
+        },
+        {
+         "value": 8,
+         "end_time": "2026-11-01T07:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -286,7 +286,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-11-01",
+     "ate": "2026-11-02",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -305,13 +305,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 40
+            "value": 49
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 19
+            "value": 21
            }
           ]
          }
@@ -508,7 +508,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-11-01",
+     "ate": "2026-11-02",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -517,7 +517,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 13611
+        "value": 16130
        }
       },
       {
@@ -527,7 +527,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 23784
+        "value": 28043
        }
       },
       {
@@ -537,7 +537,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 431
+        "value": 552
        }
       },
       {
@@ -547,7 +547,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 760
+        "value": 939
        }
       }
      ]
@@ -611,15 +611,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 24395
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 404
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 24395
            }
           ]
          }
@@ -704,7 +704,7 @@
     },
     {
      "de": "2026-10-11",
-     "ate": "2026-11-01",
+     "ate": "2026-11-02",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -713,7 +713,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 13611,
+        "value": 16130,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -722,15 +722,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 357
+            "value": 15785
            },
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 13266
+            "value": 386
            }
           ]
          }
@@ -769,7 +769,7 @@
             "dimension_values": [
              "18-24"
             ],
-            "value": 40
+            "value": 39
            },
            {
             "dimension_values": [
@@ -793,7 +793,7 @@
             "dimension_values": [
              "55-64"
             ],
-            "value": 169
+            "value": 170
            },
            {
             "dimension_values": [
@@ -1006,19 +1006,13 @@
             "dimension_values": [
              "São Luís, Maranhão"
             ],
-            "value": 13
+            "value": 14
            },
            {
             "dimension_values": [
              "Rio de Janeiro, Rio de Janeiro (state)"
             ],
             "value": 51
-           },
-           {
-            "dimension_values": [
-             "São José dos Campos, São Paulo (state)"
-            ],
-            "value": 5
            },
            {
             "dimension_values": [
@@ -1064,7 +1058,19 @@
            },
            {
             "dimension_values": [
-             "Águas Lindas de Goiás, Goiás"
+             "Cabo Frio, Rio de Janeiro (state)"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Uberaba, Minas Gerais"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Itajaí, Santa Catarina"
             ],
             "value": 5
            },
@@ -1205,12 +1211,6 @@
              "Belo Horizonte, Minas Gerais"
             ],
             "value": 26
-           },
-           {
-            "dimension_values": [
-             "São José do Rio Prêto, São Paulo (state)"
-            ],
-            "value": 5
            },
            {
             "dimension_values": [
@@ -2528,14 +2528,64 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-01",
+    "janela": "2026-11-02",
     "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18015185006758963": [
+    {
+     "texto": "🤝 Parceria Rotina que Paga: quer saber se dá pra trabalhar com IA pelo seu celular? Comenta ROTINA que a gente te mostra por onde começar 👇 (não é promessa de renda)",
+     "curtidas": 0,
+     "quando": "2026-11-02T17:11:15+0000",
+     "respostas": []
+    }
+   ],
+   "17989090929115261": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-11-02T11:11:38+0000",
+     "respostas": []
+    }
+   ],
+   "18020788517945711": [
+    {
+     "texto": "🤝 Parceria Rotina que Paga: quer saber se dá pra trabalhar com IA pelo seu celular? Comenta ROTINA que a gente te mostra por onde começar 👇 (não é promessa de renda)",
+     "curtidas": 0,
+     "quando": "2026-11-01T21:11:53+0000",
+     "respostas": []
+    }
+   ],
+   "17994181461116323": [
+    {
+     "texto": "🤝 Parceria Rotina que Paga: quer saber se dá pra trabalhar com IA pelo seu celular? Comenta ROTINA que a gente te mostra por onde começar 👇 (não é promessa de renda)",
+     "curtidas": 0,
+     "quando": "2026-11-01T17:11:15+0000",
+     "respostas": []
+    }
+   ],
    "18138632665650933": [
+    {
+     "texto": "❤️",
+     "curtidas": 0,
+     "quando": "2026-11-02T12:44:19+0000",
+     "respostas": [
+      {
+       "texto": "@osvaldino35 ❤️deus",
+       "quando": "2026-11-02T12:44:30+0000",
+       "curtidas": 0
+      }
+     ]
+    },
+    {
+     "texto": "A gente tá convivendo com o governo do PT e tá aguentando essa poeira não é nada",
+     "curtidas": 0,
+     "quando": "2026-11-01T16:53:56+0000",
+     "respostas": []
+    },
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
      "curtidas": 0,
@@ -4962,25 +5012,113 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18015185006758963",
+   "quando": "2026-11-02T17:11:08+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfPz-sDhf4o/",
+   "titulo": "Por que um planeta anão teria formato de ovo? 🥚",
+   "legenda": "Por que um planeta anão teria formato de ovo? 🥚\n\nHaumea, lá depois de Netuno, gira tão rápido que esticou: um dia lá dura menos de 4 horas. Ele tem uns 2 mil km no lado mais comprido, e ainda tem um anel e duas luas. O anel foi descoberto em 2017, quando ele passou na frente de uma estrela.\n\n🔖 Salva pra lembrar do planeta anão em forma de ovo.\n📤 Manda pra quem gosta de planetas anões.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Haumea; Ortiz et al., Nature (2017)\n\n#haumea #planetaanao #astronomia #sistemasolar #ciencia #neuralupdate",
+   "curtidas_campo": 3,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 155,
+   "reach": 130,
+   "likes": 3,
+   "comments": 1,
+   "shares": 0,
+   "saved": 1,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 9532,
+   "ig_reels_video_view_total_time": 1258250,
+   "reels_skip_rate": 58.6,
+   "reposts": 0
+  },
+  {
+   "id": "17989090929115261",
+   "quando": "2026-11-02T11:11:33+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfPKzlVPSQq/",
+   "titulo": "A NASA terminou o guarda-sol do telescópio que vai procurar asteroides perigosos pra Terra. ☀️",
+   "legenda": "A NASA terminou o guarda-sol do telescópio que vai procurar asteroides perigosos pra Terra. ☀️\n\nEle se chama NEO Surveyor e vai olhar até na direção do Sol, onde hoje é difícil enxergar. O guarda-sol tem 6 metros de altura e 864 células solares. O telescópio enxerga em infravermelho, pelo calor, e assim calcula o tamanho de cada pedra.\n\n🔖 Salva pra lembrar do caçador de asteroides da NASA.\n📤 Manda pra quem se preocupa com asteroides.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 26/10/2026 — Sunshade for NASA's NEO Surveyor Mission Ready for Its Day in Sun\n\n#neosurveyor #asteroides #nasa #astronomia #ciencia #neuralupdate",
+   "curtidas_campo": 4,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 188,
+   "reach": 172,
+   "likes": 4,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 6513,
+   "ig_reels_video_view_total_time": 1152869,
+   "reels_skip_rate": 59.3,
+   "reposts": 0
+  },
+  {
+   "id": "18020788517945711",
+   "quando": "2026-11-01T21:11:46+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfNquWbxXfA/",
+   "titulo": "Só quem mora no hemisfério sul consegue ver essas duas galáxias a olho nu. 🌌",
+   "legenda": "Só quem mora no hemisfério sul consegue ver essas duas galáxias a olho nu. 🌌\n\nSão as Nuvens de Magalhães, duas galáxias pequenas que giram em volta da nossa. A maior fica a uns 160 mil anos-luz daqui. Em novembro, depois que escurece, elas aparecem pro lado sul, longe das luzes da cidade. Parecem dois pedaços soltos da Via Láctea, mas são outras galáxias.\n\n🔖 Salva pra procurar as Nuvens de Magalhães.\n📤 Manda pra quem mora longe da luz da cidade.\n👉 Segue @neuralupdate e responde: você já reparou nelas?\n\n📚 Fonte: NASA Science — Magellanic Clouds; ESO\n\n#nuvensdemagalhaes #hemisferiosul #astronomia #ceu #ciencia #neuralupdate",
+   "curtidas_campo": 71,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 1482,
+   "reach": 1110,
+   "likes": 71,
+   "comments": 1,
+   "shares": 9,
+   "saved": 5,
+   "total_interactions": 87,
+   "ig_reels_avg_watch_time": 12867,
+   "ig_reels_video_view_total_time": 14926632,
+   "reels_skip_rate": 48.8,
+   "reposts": 1
+  },
+  {
+   "id": "17994181461116323",
+   "quando": "2026-11-01T17:11:11+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfNPJbmyv_F/",
+   "titulo": "Qual é o maior penhasco de todo o Sistema Solar? 🧗",
+   "legenda": "Qual é o maior penhasco de todo o Sistema Solar? 🧗\n\nEle fica em Miranda, uma lua pequena de Urano. Chama Verona Rupes e pode ter uns 20 km de altura. A gravidade lá é tão fraca que uma pedra levaria uns 12 minutos pra chegar lá embaixo. A sonda Voyager 2 fotografou ele em 1986, e ninguém voltou lá desde então.\n\n🔖 Salva pra lembrar do maior penhasco do Sistema Solar.\n📤 Manda pra quem gosta de escalar.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Miranda / Verona Rupes\n\n#miranda #urano #voyager2 #astronomia #sistemasolar #ciencia #neuralupdate",
+   "curtidas_campo": 31,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 1580,
+   "reach": 1364,
+   "likes": 31,
+   "comments": 1,
+   "shares": 0,
+   "saved": 2,
+   "total_interactions": 34,
+   "ig_reels_avg_watch_time": 15917,
+   "ig_reels_video_view_total_time": 22332365,
+   "reels_skip_rate": 31.4,
+   "reposts": 0
+  },
+  {
    "id": "18138632665650933",
    "quando": "2026-11-01T11:11:34+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/DfMmCAVh4ul/",
    "titulo": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷",
    "legenda": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷\n\nO robô Perseverance mediu isso pela primeira vez, lá mesmo, em Marte: ele levou pedacinhos de tecido de traje espacial e ficou vendo a poeira grudar neles por mais de 1.600 dias. Algumas partículas têm uns 100 nanômetros, centenas de vezes mais finas que um fio de cabelo, e a poeira tem substâncias que podem atrapalhar a tireoide.\n\n🔖 Salva pra lembrar do perigo da poeira de Marte.\n📤 Manda pra quem sonha em morar em Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, PNAS, 27/10/2026 — NASA's Perseverance Offers Clues to Protect Crews From Mars Dust\n\n#marte #perseverance #nasa #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 10,
-   "comentarios_campo": 1,
+   "curtidas_campo": 38,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 510,
-   "reach": 431,
-   "likes": 10,
-   "comments": 1,
-   "shares": 1,
-   "saved": 1,
-   "total_interactions": 13,
-   "ig_reels_avg_watch_time": 17378,
-   "ig_reels_video_view_total_time": 7768384,
-   "reels_skip_rate": 39,
+   "views": 1290,
+   "reach": 1081,
+   "likes": 38,
+   "comments": 4,
+   "shares": 2,
+   "saved": 2,
+   "total_interactions": 46,
+   "ig_reels_avg_watch_time": 17214,
+   "ig_reels_video_view_total_time": 20106335,
+   "reels_skip_rate": 38.6,
    "reposts": 0
   },
   {
@@ -4990,19 +5128,19 @@
    "link": "https://www.instagram.com/reel/DfLF0XvgqgU/",
    "titulo": "No Halloween de 2015, um asteroide com cara de caveira passou perto da Terra. 💀",
    "legenda": "No Halloween de 2015, um asteroide com cara de caveira passou perto da Terra. 💀\n\nEle tem uns 600 metros e passou a pouco mais que a distância da Lua. Quando os radares fotografaram, apareceu um crânio olhando pra gente. Os cientistas acham que ele é um cometa morto, que perdeu todo o gelo, e ele continua girando pelo Sistema Solar, voltando de tempos em tempos.\n\n🔖 Salva pra lembrar do asteroide caveira.\n📤 Manda pra quem curte Halloween.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA/JPL — asteroide 2015 TB145, passagem em 31/10/2015 (~1,3 distância lunar)\n\n#halloween #asteroide #astronomia #espaco #ciencia #neuralupdate",
-   "curtidas_campo": 4,
+   "curtidas_campo": 5,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 212,
-   "reach": 175,
-   "likes": 4,
+   "views": 247,
+   "reach": 205,
+   "likes": 5,
    "comments": 2,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 7,
-   "ig_reels_avg_watch_time": 8550,
-   "ig_reels_video_view_total_time": 1658761,
-   "reels_skip_rate": 58.8,
+   "total_interactions": 8,
+   "ig_reels_avg_watch_time": 8530,
+   "ig_reels_video_view_total_time": 1919255,
+   "reels_skip_rate": 58.2,
    "reposts": 1
   },
   {
@@ -5012,19 +5150,19 @@
    "link": "https://www.instagram.com/reel/DfKqWnRBnB-/",
    "titulo": "Essa lua de Júpiter está quase igual há 4 bilhões de anos. 🌑",
    "legenda": "Essa lua de Júpiter está quase igual há 4 bilhões de anos. 🌑\n\nÉ Calisto, uma lua quase do tamanho de Mercúrio, com uma das superfícies mais cheias de crateras de todo o Sistema Solar. Como quase nada mexe por dentro, nenhuma cicatriz se apaga. A maior marca, chamada Valhala, tem anéis espalhados por quase 4 mil km.\n\n🔖 Salva pra lembrar da lua que não mudou.\n📤 Manda pra quem gosta de Júpiter.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Callisto\n\n#calisto #jupiter #astronomia #sistemasolar #ciencia #neuralupdate",
-   "curtidas_campo": 3,
+   "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 157,
-   "reach": 125,
-   "likes": 3,
+   "views": 163,
+   "reach": 131,
+   "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 5,
-   "ig_reels_avg_watch_time": 12162,
-   "ig_reels_video_view_total_time": 1666290,
-   "reels_skip_rate": 47.4,
+   "total_interactions": 6,
+   "ig_reels_avg_watch_time": 12506,
+   "ig_reels_video_view_total_time": 1788442,
+   "reels_skip_rate": 46.2,
    "reposts": 1
   },
   {
@@ -5037,16 +5175,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 146,
-   "reach": 122,
+   "views": 152,
+   "reach": 129,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 5731,
-   "ig_reels_video_view_total_time": 768055,
-   "reels_skip_rate": 61.7,
+   "ig_reels_avg_watch_time": 5608,
+   "ig_reels_video_view_total_time": 785120,
+   "reels_skip_rate": 61.9,
    "reposts": 0
   },
   {
@@ -5056,19 +5194,19 @@
    "link": "https://www.instagram.com/reel/DfIgD79BV62/",
    "titulo": "No Maranhão, o chão gira a 1.600 km por hora, e isso ajuda foguete a subir. 🚀",
    "legenda": "No Maranhão, o chão gira a 1.600 km por hora, e isso ajuda foguete a subir. 🚀\n\nÉ o Centro de Lançamento de Alcântara, quase em cima da linha do Equador. Perto do Equador, a Terra gira mais rápido, e o foguete já sai com esse empurrão, o que economiza combustível na hora de chegar à órbita. Por isso empresas e agências do mundo todo olham pra Alcântara.\n\n🔖 Salva pra lembrar que o Brasil tem isso.\n📤 Manda pra quem é do Maranhão.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Agência Espacial Brasileira — Centro de Lançamento de Alcântara (MA), latitude 2°18′ S\n\n#alcantara #foguete #aeb #astronomia #brasil #neuralupdate",
-   "curtidas_campo": 13,
+   "curtidas_campo": 14,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 754,
-   "reach": 656,
-   "likes": 13,
+   "views": 763,
+   "reach": 661,
+   "likes": 14,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 14,
-   "ig_reels_avg_watch_time": 13668,
-   "ig_reels_video_view_total_time": 9717998,
-   "reels_skip_rate": 40,
+   "total_interactions": 15,
+   "ig_reels_avg_watch_time": 13677,
+   "ig_reels_video_view_total_time": 9834448,
+   "reels_skip_rate": 39.9,
    "reposts": 0
   },
   {
@@ -5081,16 +5219,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 166,
-   "reach": 141,
+   "views": 168,
+   "reach": 142,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 8577,
-   "ig_reels_video_view_total_time": 1269433,
-   "reels_skip_rate": 61.9,
+   "ig_reels_avg_watch_time": 8471,
+   "ig_reels_video_view_total_time": 1270672,
+   "reels_skip_rate": 62.4,
    "reposts": 0
   },
   {
@@ -5103,16 +5241,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 160,
-   "reach": 135,
+   "views": 161,
+   "reach": 136,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 11796,
-   "ig_reels_video_view_total_time": 1686866,
-   "reels_skip_rate": 59.9,
+   "ig_reels_avg_watch_time": 11718,
+   "ig_reels_video_view_total_time": 1687495,
+   "reels_skip_rate": 60.1,
    "reposts": 0
   },
   {
@@ -5125,15 +5263,15 @@
    "curtidas_campo": 11,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1285,
-   "reach": 1154,
+   "views": 1288,
+   "reach": 1156,
    "likes": 11,
    "comments": 3,
    "shares": 1,
    "saved": 2,
    "total_interactions": 18,
-   "ig_reels_avg_watch_time": 13343,
-   "ig_reels_video_view_total_time": 15919060,
+   "ig_reels_avg_watch_time": 13348,
+   "ig_reels_video_view_total_time": 15964575,
    "reels_skip_rate": 32.4,
    "reposts": 1
   },
@@ -5213,16 +5351,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 368,
-   "reach": 325,
+   "views": 369,
+   "reach": 326,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 4,
-   "ig_reels_avg_watch_time": 12079,
-   "ig_reels_video_view_total_time": 4046465,
-   "reels_skip_rate": 36.4,
+   "ig_reels_avg_watch_time": 12047,
+   "ig_reels_video_view_total_time": 4047845,
+   "reels_skip_rate": 36.6,
    "reposts": 0
   },
   {
@@ -5389,16 +5527,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 143,
-   "reach": 125,
+   "views": 144,
+   "reach": 126,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 4729,
-   "ig_reels_video_view_total_time": 629050,
-   "reels_skip_rate": 72.7,
+   "ig_reels_avg_watch_time": 4706,
+   "ig_reels_video_view_total_time": 630613,
+   "reels_skip_rate": 72.9,
    "reposts": 0
   },
   {
@@ -5433,16 +5571,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 162,
-   "reach": 138,
+   "views": 163,
+   "reach": 139,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 7065,
-   "ig_reels_video_view_total_time": 1102140,
-   "reels_skip_rate": 55.5,
+   "ig_reels_avg_watch_time": 7029,
+   "ig_reels_video_view_total_time": 1103657,
+   "reels_skip_rate": 55.8,
    "reposts": 0
   },
   {
@@ -5455,15 +5593,15 @@
    "curtidas_campo": 26,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1720,
-   "reach": 1487,
+   "views": 1722,
+   "reach": 1489,
    "likes": 26,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 30,
-   "ig_reels_avg_watch_time": 16508,
-   "ig_reels_video_view_total_time": 26083370,
+   "ig_reels_avg_watch_time": 16518,
+   "ig_reels_video_view_total_time": 26132144,
    "reels_skip_rate": 35.6,
    "reposts": 2
   },
@@ -5477,16 +5615,16 @@
    "curtidas_campo": 9,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 469,
+   "views": 470,
    "reach": 385,
    "likes": 9,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 10,
-   "ig_reels_avg_watch_time": 13895,
-   "ig_reels_video_view_total_time": 5641426,
-   "reels_skip_rate": 51.7,
+   "ig_reels_avg_watch_time": 13863,
+   "ig_reels_video_view_total_time": 5642299,
+   "reels_skip_rate": 51.9,
    "reposts": 0
   },
   {
@@ -5521,15 +5659,15 @@
    "curtidas_campo": 42,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1406,
-   "reach": 1232,
+   "views": 1409,
+   "reach": 1234,
    "likes": 42,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 46,
-   "ig_reels_avg_watch_time": 20532,
-   "ig_reels_video_view_total_time": 25707131,
+   "ig_reels_avg_watch_time": 20521,
+   "ig_reels_video_view_total_time": 25713729,
    "reels_skip_rate": 38.8,
    "reposts": 0
   },
@@ -5628,19 +5766,19 @@
    "link": "https://www.instagram.com/reel/Dey2DvijOxG/",
    "titulo": "Júpiter tem um disco invisível em volta dele, e ele ondula. 🪐",
    "legenda": "Júpiter tem um disco invisível em volta dele, e ele ondula. 🪐\n\nÉ o magnetodisco: uma camada de partículas presa pelo campo magnético do planeta. Com dados da sonda Juno, cientistas viram que esse disco não é plano: ele é ondulado e gira junto com Júpiter. A bolha magnética de Júpiter é tão grande que, se desse pra enxergar, pareceria maior que a Lua cheia no céu.\n\n🔖 Salva pra lembrar do disco invisível de Júpiter.\n📤 Manda pra quem gosta de Júpiter.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science / Shandong University — Juno magnetodisk, out/2026\n\n#jupiter #juno #astronomia #sistemasolar #ciencia #neuralupdate",
-   "curtidas_campo": 7,
+   "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 231,
-   "reach": 191,
-   "likes": 7,
+   "views": 232,
+   "reach": 192,
+   "likes": 8,
    "comments": 1,
    "shares": 1,
    "saved": 1,
-   "total_interactions": 10,
-   "ig_reels_avg_watch_time": 11034,
-   "ig_reels_video_view_total_time": 2284176,
-   "reels_skip_rate": 55.3,
+   "total_interactions": 11,
+   "ig_reels_avg_watch_time": 11000,
+   "ig_reels_video_view_total_time": 2288052,
+   "reels_skip_rate": 55.1,
    "reposts": 0
   },
   {
@@ -5672,19 +5810,19 @@
    "link": "https://www.instagram.com/reel/Dexa5g7Dz3k/",
    "titulo": "Em abril de 2029, um asteroide vai passar raspando na Terra. ☄️",
    "legenda": "Em abril de 2029, um asteroide vai passar raspando na Terra. ☄️\n\nO nome dele é Apófis, e ele tem uns 340 metros. No dia 13 de abril, ele passa a menos de 32 mil km daqui, mais perto que muitos satélites. E não, ele não vai bater: a NASA já descartou o risco por pelo menos 100 anos. Ele vai brilhar tanto que milhões de pessoas vão ver sem telescópio.\n\n🔖 Salva pra lembrar do dia 13 de abril de 2029.\n📤 Manda pra quem vai querer acompanhar.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Apophis\n\n#apophis #asteroide #astronomia #sistemasolar #ciencia #neuralupdate",
-   "curtidas_campo": 14,
+   "curtidas_campo": 15,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 341,
-   "reach": 256,
-   "likes": 14,
+   "views": 342,
+   "reach": 258,
+   "likes": 15,
    "comments": 1,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 17,
-   "ig_reels_avg_watch_time": 17057,
-   "ig_reels_video_view_total_time": 4741891,
-   "reels_skip_rate": 49.3,
+   "total_interactions": 18,
+   "ig_reels_avg_watch_time": 17005,
+   "ig_reels_video_view_total_time": 4744578,
+   "reels_skip_rate": 49.5,
    "reposts": 1
   },
   {
@@ -10785,16 +10923,16 @@
    "link": "https://www.instagram.com/reel/Db0SEXqAs7r/",
    "titulo": "São quasares: buracos negros gigantes devorando matéria com tanta violência que brilham mais que galáxias inteiras. Astrônomos localizaram 3",
    "legenda": "São quasares: buracos negros gigantes devorando matéria com tanta violência que brilham mais que galáxias inteiras. Astrônomos localizaram 31 de uma vez, e dois deles são os mais antigos já vistos — a luz saiu quando o universo tinha apenas 670 milhões de anos. O que ninguém explica é o tamanho: buracos negros levam bilhões de anos para engordar assim.\n\n🔭 Segue o @neuralupdate pra não perder — ciência de verdade, sem enrolação.\n\n#quasar #buraconegro #astronomia #ciência #neuralupdate",
-   "curtidas_campo": 94,
+   "curtidas_campo": 93,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1543,
    "reach": 1162,
-   "likes": 94,
+   "likes": 93,
    "comments": 1,
    "shares": 1,
    "saved": 9,
-   "total_interactions": 109,
+   "total_interactions": 108,
    "ig_reels_avg_watch_time": 15637,
    "ig_reels_video_view_total_time": 18890393,
    "reels_skip_rate": 42.4,
