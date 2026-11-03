@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-02T19:34:52.906Z",
+  "gerado_em": "2026-11-03T17:09:23.642Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -565,12 +565,42 @@
     },
     {
       "d": "2026-11-02",
-      "views": 0
+      "views": 1
+    },
+    {
+      "d": "2026-11-03",
+      "views": 173
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "4626354520918040",
+      "quando": "2026-11-03T11:11:29+0000",
+      "titulo": "A NASA mudou o plano pra voltar a pisar na Lua, e agora tem dois módulos disputando quem leva os astronautas. ",
+      "link": "https://www.facebook.com/reel/4626354520918040/",
+      "segundos": 48.2,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 211,
+      "alcance": null,
+      "tempo_medio_ms": 2585,
+      "interacoes": 0
+    },
+    {
+      "id": "1511969167437094",
+      "quando": "2026-11-02T21:10:57+0000",
+      "titulo": "Toda estrela que você vê hoje à noite é uma foto de muito tempo atrás. ✨",
+      "link": "https://www.facebook.com/reel/1511969167437094/",
+      "segundos": 35.17,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
     {
       "id": "981976888294072",
       "quando": "2026-11-02T17:11:18+0000",
@@ -618,9 +648,9 @@
       "segundos": 37.25,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 8152,
       "interacoes": 0
     },
     {
