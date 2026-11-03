@@ -5657,7 +5657,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/5f0a0d29-dac0-4612-9019-7bf7b72ec691.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-03",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17903826588376772",
+    "publicado_em": "2026-11-03T11:10:48.981Z"
   },
   {
     "quando": "2026-11-03T11:00:00.000Z",
@@ -5665,8 +5667,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/7ff8af2b-845d-4894-b53d-16c96c605d79.mp4",
     "legenda": "A NASA mudou o plano pra voltar a pisar na Lua, e agora tem dois módulos disputando quem leva os astronautas. 🌕\n\nUm é a Starship, da SpaceX; o outro é o Blue Moon, da Blue Origin. A primeira descida com gente está marcada pra 2028, perto do polo sul da Lua, e vai quem estiver pronto primeiro. Dois astronautas descem, e cada missão deve ter duas caminhadas de umas 2 horas.\n\n🔖 Salva pra acompanhar a volta à Lua em 2028.\n📤 Manda pra quem aposta num dos dois.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, out/2026 — NASA, Partners Accelerate Lander Development for 2028 Moon Missions\n\n#lua #artemis #nasa #astronomia #espaco #neuralupdate",
     "slug": "nw-dois-foguetes-disputam-a-volta-a-lua",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18126941836925675",
+    "publicado_em": "2026-11-03T11:11:25.599Z",
+    "id_comentario": "18083383133409052",
+    "id_facebook": "4626354520918040"
   },
   {
     "quando": "2026-11-03T15:00:00.000Z",
