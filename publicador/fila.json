@@ -5680,9 +5680,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10f5f6ff-1d29-48b6-9eaa-c01a6f962b86.png",
     "legenda": "",
     "slug": "story-rqp-2026-11-03",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-3"
+    "variacao": "pro-3",
+    "id_instagram": "18221671003350903",
+    "publicado_em": "2026-11-03T17:10:34.455Z"
   },
   {
     "quando": "2026-11-03T17:00:00.000Z",
@@ -5690,7 +5692,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/2d996cab-cd53-41ea-a9f4-423b21632090.mp4",
     "legenda": "E se um ano durasse 11 mil anos? 🐢\n\nÉ o ano de Sedna, um mundo gelado bem depois de Plutão. Na parte mais perto, ele fica umas 76 vezes mais longe do Sol que a Terra, e na mais longe, umas 900 vezes. Da última vez que ele passou aqui perto, a humanidade estava começando a plantar.\n\n🔖 Salva pra lembrar do ano de 11 mil anos.\n📤 Manda pra quem gosta de mundos distantes.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Sedna\n\n#sedna #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl88-sedna-ano-de-11-mil-anos",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18059787881802291",
+    "publicado_em": "2026-11-03T17:11:11.643Z",
+    "id_comentario": "18123000614514481",
+    "id_facebook": "2413410135862425"
   },
   {
     "quando": "2026-11-03T19:00:00.000Z",
