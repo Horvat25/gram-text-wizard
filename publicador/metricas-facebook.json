@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-03T17:09:23.642Z",
+  "gerado_em": "2026-11-04T17:22:03.902Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -569,12 +569,68 @@
     },
     {
       "d": "2026-11-03",
-      "views": 173
+      "views": 791
+    },
+    {
+      "d": "2026-11-04",
+      "views": 102
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1441547564852723",
+      "quando": "2026-11-04T17:11:23+0000",
+      "titulo": "Uma lua pode ter aurora, igual ao céu do polo? 🧲",
+      "link": "https://www.facebook.com/reel/1441547564852723/",
+      "segundos": 37.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1690769459423734",
+      "quando": "2026-11-04T11:11:23+0000",
+      "titulo": "Uma sonda da NASA passou raspando por Marte pra ganhar velocidade, rumo a um asteroide de metal. 🪙",
+      "link": "https://www.facebook.com/reel/1690769459423734/",
+      "segundos": 39.7,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2539549616528348",
+      "quando": "2026-11-03T21:11:27+0000",
+      "titulo": "Em 2020, choveu pedra do espaço numa cidade do sertão de Pernambuco. ☄️",
+      "link": "https://www.facebook.com/reel/2539549616528348/",
+      "segundos": 41.7,
+      "curtidas": 5,
+      "comentarios": 0,
+      "views": 451,
+      "alcance": null,
+      "tempo_medio_ms": 9840,
+      "interacoes": 0
+    },
+    {
+      "id": "2413410135862425",
+      "quando": "2026-11-03T17:11:13+0000",
+      "titulo": "E se um ano durasse 11 mil anos? 🐢",
+      "link": "https://www.facebook.com/reel/2413410135862425/",
+      "segundos": 35.75,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 231,
+      "alcance": null,
+      "tempo_medio_ms": 3862,
+      "interacoes": 0
+    },
     {
       "id": "4626354520918040",
       "quando": "2026-11-03T11:11:29+0000",
@@ -583,9 +639,9 @@
       "segundos": 48.2,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 211,
+      "views": 226,
       "alcance": null,
-      "tempo_medio_ms": 2585,
+      "tempo_medio_ms": 2347,
       "interacoes": 0
     },
     {
@@ -739,9 +795,9 @@
       "segundos": 44.8,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 22828,
       "interacoes": 0
     },
     {
@@ -1402,9 +1458,9 @@
       "segundos": 34.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 34199,
       "interacoes": 0
     },
     {
@@ -1545,9 +1601,9 @@
       "segundos": 39,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 2649,
       "interacoes": 0
     },
     {
