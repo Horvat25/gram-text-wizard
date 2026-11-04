@@ -5750,9 +5750,10 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/c6b0e7b1-118f-4e85-aa2d-614fd670e70a.png",
     "legenda": "",
     "slug": "story-rqp-2026-11-04",
-    "status": "agendado",
+    "status": "falhou",
     "campanha": "rqp-rotina",
-    "variacao": "pro-4"
+    "variacao": "pro-4",
+    "erro": "publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"type\":\"OAuthException\",\"code\":24,\"error_subcode\":2207006,\"is_transient\":false,\"error_user_title\":\"Mídia não encontrada\",\"error_user_msg\":\"Não foi possível encontrar a mídia com 17.882.837.484.629.830.\",\"fbtrace_id\":\"AhvDFfVP_MBPQZ3kCQa2eB0\"}}"
   },
   {
     "quando": "2026-11-04T17:00:00.000Z",
@@ -5760,7 +5761,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/4d65855c-0ac1-46f6-93b5-d250160b12a6.mp4",
     "legenda": "Uma lua pode ter aurora, igual ao céu do polo? 🧲\n\nGanimedes pode: é a maior lua do Sistema Solar, maior até que Mercúrio, e a única lua com campo magnético próprio, como um ímã gigante. Por isso ela tem auroras brilhando nos polos. Olhando como essas auroras balançam, o Hubble achou sinais de um oceano escondido.\n\n🔖 Salva pra lembrar da lua com aurora.\n📤 Manda pra quem gosta de Júpiter.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Ganymede; Hubble (Saur et al., 2015)\n\n#ganimedes #jupiter #aurora #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl89-ganimedes-tem-aurora",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17992715565061940",
+    "publicado_em": "2026-11-04T17:11:21.467Z",
+    "id_comentario": "18111742565613907",
+    "id_facebook": "1441547564852723"
   },
   {
     "quando": "2026-11-04T19:00:00.000Z",
