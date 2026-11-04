@@ -5727,7 +5727,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/ea3c5344-3e02-42ec-92e9-da3f164ca6c2.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-04",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18341984275259827",
+    "publicado_em": "2026-11-04T11:10:39.464Z"
   },
   {
     "quando": "2026-11-04T11:00:00.000Z",
@@ -5735,8 +5737,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/54ec16a9-a473-45b2-98fc-25e377917f90.mp4",
     "legenda": "Uma sonda da NASA passou raspando por Marte pra ganhar velocidade, rumo a um asteroide de metal. 🪙\n\nÉ a Psyche, e o alvo tem o mesmo nome: um asteroide de uns 280 km que pode ser o núcleo de um planeta que nunca terminou de se formar. Agora os motores elétricos dela vão ficar ligados quase o tempo todo, e ela deve chegar lá em 2029.\n\n🔖 Salva pra acompanhar a Psyche chegar em 2029.\n📤 Manda pra quem gosta de asteroides.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science, 22/10/2026 — Pedal to the Metal: NASA's Psyche Heads Toward Asteroid Belt\n\n#psyche #asteroide #nasa #astronomia #ciencia #neuralupdate",
     "slug": "nw-sonda-a-caminho-de-asteroide-de-metal",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18092094179245743",
+    "publicado_em": "2026-11-04T11:11:20.332Z",
+    "id_comentario": "18154762261516793",
+    "id_facebook": "1690769459423734"
   },
   {
     "quando": "2026-11-04T15:00:00.000Z",
