@@ -1,0 +1,65 @@
+{
+ "gerado_em": "2026-11-05T23:31:36.060Z",
+ "desde": "2026-10-16T00:00:00Z",
+ "reels_lidos": 62,
+ "reels_com_erro": 0,
+ "conversas_lidas": 22,
+ "erro_conversas": null,
+ "totais": {
+  "comentarios_rotina": 3,
+  "dm_diretas_rotina": 0,
+  "comentarios_sem_dm": 0,
+  "comentarios_sem_nenhuma_resposta": 0,
+  "comentarios_dm_parada_na_nossa": 0,
+  "diretas_sem_resposta": 0
+ },
+ "comentarios": [
+  {
+   "origem": "comentario",
+   "video": "nw-perseverance-recorde-45km",
+   "classe": "exata",
+   "comentou_em": "2026-10-16T11:09-03:00",
+   "resposta_publica": true,
+   "resposta_publica_em": "2026-10-16T11:09-03:00",
+   "dm_aberta": true,
+   "abriu_por_automacao": true,
+   "horas_ate_dm": 0,
+   "msgs": 7,
+   "ultima_de": "nos",
+   "ultima_em": "2026-10-20T13:19-03:00",
+   "pessoa_respondeu_a_dm": true
+  },
+  {
+   "origem": "comentario",
+   "video": "viral-araguainha-cidade-na-cratera",
+   "classe": "exata",
+   "comentou_em": "2026-10-17T18:52-03:00",
+   "resposta_publica": true,
+   "resposta_publica_em": "2026-10-17T18:52-03:00",
+   "dm_aberta": true,
+   "abriu_por_automacao": true,
+   "horas_ate_dm": 0,
+   "msgs": 2,
+   "ultima_de": "pessoa",
+   "ultima_em": "2026-10-22T20:07-03:00",
+   "pessoa_respondeu_a_dm": true
+  },
+  {
+   "origem": "comentario",
+   "video": "nw-tres-fantasmas-novos-no-ceu",
+   "classe": "exata",
+   "comentou_em": "2026-10-28T09:17-03:00",
+   "resposta_publica": true,
+   "resposta_publica_em": "2026-10-28T09:17-03:00",
+   "dm_aberta": true,
+   "abriu_por_automacao": true,
+   "horas_ate_dm": 0,
+   "msgs": 9,
+   "ultima_de": "nos",
+   "ultima_em": "2026-10-28T11:32-03:00",
+   "pessoa_respondeu_a_dm": true
+  }
+ ],
+ "dm_diretas": [],
+ "erros": []
+}
