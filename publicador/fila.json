@@ -5796,7 +5796,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/04ea13b0-fc1a-425f-8e61-5908bbd57402.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-05",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17912233602589935",
+    "publicado_em": "2026-11-05T11:10:57.910Z"
   },
   {
     "quando": "2026-11-05T11:00:00.000Z",
@@ -5804,8 +5806,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b3eef57a-77c9-4e7a-96c3-a36e198dadce.mp4",
     "legenda": "Dá pra ver outra galáxia inteira daqui do Brasil, e agora é a época certa. 🌌\n\nÉ Andrômeda, a galáxia vizinha, a uns 2,5 milhões de anos-luz. Um astrofotógrafo na Austrália acabou de fotografar ela nascendo atrás dos morros. No hemisfério sul ela fica baixa, pro lado norte, e sobe mais perto da meia-noite; a olho nu, aparece como uma manchinha apagada, num céu bem escuro.\n\n🔖 Salva pra procurar Andrômeda no céu.\n📤 Manda pra quem mora longe da luz da cidade.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA APOD, 23/10/2026 — Andromeda in Southern Spring (foto de Mullion, Austrália)\n\n#andromeda #galaxia #astronomia #ceu #ciencia #neuralupdate",
     "slug": "nw-andromeda-da-pra-ver-do-brasil",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "18089974286315223",
+    "publicado_em": "2026-11-05T11:11:56.874Z",
+    "id_comentario": "18349133248250910",
+    "id_facebook": "1708328701085623"
   },
   {
     "quando": "2026-11-05T15:00:00.000Z",
