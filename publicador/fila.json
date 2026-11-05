@@ -5819,9 +5819,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/b66f4f7b-093f-493e-a87e-d4fc2dadaf90.png",
     "legenda": "",
     "slug": "story-rqp-2026-11-05",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-1"
+    "variacao": "pro-1",
+    "id_instagram": "17919840792531977",
+    "publicado_em": "2026-11-05T17:10:24.283Z"
   },
   {
     "quando": "2026-11-05T17:00:00.000Z",
@@ -5829,7 +5831,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/57d10a46-5ace-4832-a126-145103b6515d.mp4",
     "legenda": "Além da Terra, onde mais existem rios, lagos e chuva? 🌊\n\nEm Titã, a maior lua de Saturno. Só que lá não chove água: chove metano, um gás que aqui na Terra é combustível. Faz uns 180 graus negativos, então o metano vira líquido e forma lagos. Um deles, o Kraken, é maior que o mar Cáspio.\n\n🔖 Salva pra lembrar dos lagos de metano de Titã.\n📤 Manda pra quem gosta de Saturno.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Titan\n\n#tita #saturno #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl90-tita-rios-e-lagos-de-metano",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18113538836177503",
+    "publicado_em": "2026-11-05T17:11:19.960Z",
+    "id_comentario": "17965256274227203",
+    "id_facebook": "1110193098660227"
   },
   {
     "quando": "2026-11-05T19:00:00.000Z",
