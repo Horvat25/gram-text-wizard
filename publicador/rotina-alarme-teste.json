@@ -1,0 +1,22 @@
+{
+ "gerado_em": "2026-11-05T23:34:28.744Z",
+ "janela_h": 720,
+ "contagem": {
+  "lidas": 22,
+  "esperando": 1,
+  "recusou": 0,
+  "expirada": 0,
+  "ok": 2,
+  "recente": 0,
+  "silenciadas": 0
+ },
+ "esperando": [
+  {
+   "ref": "a1c8e9af",
+   "video": "viral-araguainha-cidade-na-cratera",
+   "horas": 336,
+   "toca": true
+  }
+ ],
+ "dispararia": true
+}
