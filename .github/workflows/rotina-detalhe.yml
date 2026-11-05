@@ -1,0 +1,58 @@
+name: Detalhe ROTINA
+
+# POR QUE EXISTE (05/11/2026, Direção): descobrir onde o ROTINA vaza (comentário sem DM, conversa parada,
+# ROTINA mandado direto na DM sem resposta). SÓ LEITURA. O repositório é PÚBLICO: o relatório não leva @ nem
+# texto de mensagem (ver cabeçalho de publicador/detalha-rotina.mjs). Roda ao empurrar o arquivo gatilho ou
+# manualmente (Actions → Run workflow).
+
+on:
+  push:
+    paths:
+      - 'publicador/rotina-detalhe.gatilho'
+  workflow_dispatch:
+
+concurrency:
+  group: rotina-detalhe
+  cancel-in-progress: false
+
+jobs:
+  detalhe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Autoteste
+        run: node publicador/detalha-rotina.mjs --autoteste
+
+      - name: Detalhar os ROTINA
+        env:
+          IG_USER_ID: '17841478894893058'   # @neuralupdate — identificador público
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          DETALHE_SAIDA: /tmp/rotina-detalhe.json
+        run: node publicador/detalha-rotina.mjs
+
+      - name: Guardar o relatório
+        run: |
+          set -e
+          [ -s /tmp/rotina-detalhe.json ] || { echo "sem relatório"; exit 0; }
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cp /tmp/rotina-detalhe.json publicador/rotina-detalhe.json
+            git add publicador/rotina-detalhe.json
+            if git diff --cached --quiet; then echo "ja estava igual"; exit 0; fi
+            git commit -q -m "rotina: detalhe dos ROTINA (sem nomes) em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado; tentando de novo"
+            sleep 5
+          done
+          echo "::error::nao consegui salvar o relatorio"
+          exit 1
