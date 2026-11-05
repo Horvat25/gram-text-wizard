@@ -5,6 +5,9 @@
 // contagem (12h, 18h e 22h BRT) roda aqui, no Actions, e acrescenta linhas em
 // `publicador/rotina-contagem.jsonl`. SÓ LEITURA: não comenta, não manda DM, não mexe na fila.
 //
+// 05/11/2026: a janela de mensagens subiu de 5 para 25. Com 5, conversa longa perdia a abertura "Você comentou ROTINA"
+// e a contagem dizia dm_enviadas: 0 mesmo com DM enviada (foi o caso do vídeo dos fantasmas, 9 mensagens).
+//
 // "respondidos" = quem comentou ROTINA e já recebeu uma DM nossa (conversa que abre com
 // "Você comentou ROTINA") OU uma resposta pública da própria conta.
 // "dm_enviadas" = conversas nossas que abrem com "Você comentou ROTINA" entre quem comentou.
@@ -92,7 +95,7 @@ async function usuariosComDm() {
   const usuarios = new Set();
   let pagina = await get(`/${IG_USER_ID}/conversations`, {
     platform: 'instagram', limit: '50',
-    fields: 'participants,messages.limit(5){message,from,created_time}',
+    fields: 'participants,messages.limit(25){message,from,created_time}',
   });
   for (let i = 0; i < 20; i++) {
     if (pagina.error) return { usuarios, erro: (pagina.error.message || 'erro').slice(0, 160) };
