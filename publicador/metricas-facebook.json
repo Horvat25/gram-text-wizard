@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-04T17:22:03.902Z",
+  "gerado_em": "2026-11-05T17:29:46.373Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 0,
-    "curtidas": 0
+    "seguidores": 3,
+    "curtidas": 3
   },
   "pagina_diaria": [
     {
@@ -573,23 +573,66 @@
     },
     {
       "d": "2026-11-04",
-      "views": 102
+      "views": 1011
+    },
+    {
+      "d": "2026-11-05",
+      "views": 251
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
-      "id": "1441547564852723",
-      "quando": "2026-11-04T17:11:23+0000",
-      "titulo": "Uma lua pode ter aurora, igual ao céu do polo? 🧲",
-      "link": "https://www.facebook.com/reel/1441547564852723/",
-      "segundos": 37.5,
+      "id": "1110193098660227",
+      "quando": "2026-11-05T17:11:22+0000",
+      "titulo": "Além da Terra, onde mais existem rios, lagos e chuva? 🌊",
+      "link": "https://www.facebook.com/reel/1110193098660227/",
+      "segundos": 36.833,
       "curtidas": 0,
       "comentarios": 0,
       "views": 0,
       "alcance": null,
       "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1708328701085623",
+      "quando": "2026-11-05T11:11:59+0000",
+      "titulo": "Dá pra ver outra galáxia inteira daqui do Brasil, e agora é a época certa. 🌌",
+      "link": "https://www.facebook.com/reel/1708328701085623/",
+      "segundos": 49.006,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 246,
+      "alcance": null,
+      "tempo_medio_ms": 7815,
+      "interacoes": 0
+    },
+    {
+      "id": "2737252156790008",
+      "quando": "2026-11-04T21:11:22+0000",
+      "titulo": "Esta semana o céu solta bolas de fogo, e dá pra ver do Brasil. 🔥",
+      "link": "https://www.facebook.com/reel/2737252156790008/",
+      "segundos": 42.233,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 220,
+      "alcance": null,
+      "tempo_medio_ms": 6533,
+      "interacoes": 0
+    },
+    {
+      "id": "1441547564852723",
+      "quando": "2026-11-04T17:11:23+0000",
+      "titulo": "Uma lua pode ter aurora, igual ao céu do polo? 🧲",
+      "link": "https://www.facebook.com/reel/1441547564852723/",
+      "segundos": 37.5,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 270,
+      "alcance": null,
+      "tempo_medio_ms": 4216,
       "interacoes": 0
     },
     {
@@ -613,9 +656,9 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 451,
+      "views": 827,
       "alcance": null,
-      "tempo_medio_ms": 9840,
+      "tempo_medio_ms": 7766,
       "interacoes": 0
     },
     {
@@ -626,9 +669,9 @@
       "segundos": 35.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 231,
+      "views": 232,
       "alcance": null,
-      "tempo_medio_ms": 3862,
+      "tempo_medio_ms": 3848,
       "interacoes": 0
     },
     {
@@ -1250,9 +1293,9 @@
       "segundos": 43.872,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 639,
       "interacoes": 0
     },
     {
@@ -1276,9 +1319,9 @@
       "segundos": 41.512,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 121,
       "interacoes": 0
     },
     {
@@ -2238,9 +2281,9 @@
       "segundos": 37.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 1434,
       "interacoes": 0
     },
     {
@@ -2251,9 +2294,9 @@
       "segundos": 42.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 69067,
       "interacoes": 0
     },
     {
@@ -2264,9 +2307,9 @@
       "segundos": 41.5,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 6917,
       "interacoes": 0
     },
     {
@@ -2277,9 +2320,9 @@
       "segundos": 37.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 38604,
       "interacoes": 0
     },
     {
@@ -2290,9 +2333,9 @@
       "segundos": 43.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 2494,
       "interacoes": 0
     },
     {
@@ -2303,9 +2346,9 @@
       "segundos": 39.541,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 3248,
+      "tempo_medio_ms": 4627,
       "interacoes": 0
     },
     {
@@ -2316,9 +2359,9 @@
       "segundos": 40.458,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 342,
+      "views": 343,
       "alcance": null,
-      "tempo_medio_ms": 6249,
+      "tempo_medio_ms": 6232,
       "interacoes": 0
     },
     {
@@ -2329,9 +2372,9 @@
       "segundos": 59.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 1169,
+      "tempo_medio_ms": 1337,
       "interacoes": 0
     },
     {
@@ -2342,9 +2385,9 @@
       "segundos": 37.25,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 3647,
+      "tempo_medio_ms": 2387,
       "interacoes": 0
     },
     {
@@ -2355,9 +2398,9 @@
       "segundos": 36.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 1100,
+      "tempo_medio_ms": 3574,
       "interacoes": 0
     },
     {
@@ -2368,9 +2411,9 @@
       "segundos": 38.208,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 1655,
       "interacoes": 0
     },
     {
@@ -2381,9 +2424,9 @@
       "segundos": 73.333,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 289,
+      "tempo_medio_ms": 774,
       "interacoes": 0
     },
     {
@@ -2394,9 +2437,9 @@
       "segundos": 58.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 981,
       "interacoes": 0
     },
     {
@@ -2407,9 +2450,9 @@
       "segundos": 56.875,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 390,
+      "tempo_medio_ms": 619,
       "interacoes": 0
     },
     {
@@ -2420,9 +2463,9 @@
       "segundos": 43.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 866,
+      "tempo_medio_ms": 2955,
       "interacoes": 0
     },
     {
@@ -2433,9 +2476,9 @@
       "segundos": 35.083,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 4394,
       "interacoes": 0
     },
     {
@@ -2444,11 +2487,11 @@
       "titulo": "Einstein provou: gravidade NÃO é uma força. Tudo que tem massa curva o espaço-tempo, e você só desliza pela cu",
       "link": "https://www.facebook.com/reel/1447105920808559/",
       "segundos": 41.458,
-      "curtidas": 0,
+      "curtidas": 1,
       "comentarios": 0,
-      "views": 1,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 596,
+      "tempo_medio_ms": 2404,
       "interacoes": 0
     },
     {
@@ -2459,9 +2502,9 @@
       "segundos": 55.166,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 905,
+      "tempo_medio_ms": 28944,
       "interacoes": 0
     },
     {
@@ -2472,9 +2515,9 @@
       "segundos": 32.625,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 4,
+      "views": 6,
       "alcance": null,
-      "tempo_medio_ms": 711,
+      "tempo_medio_ms": 2732,
       "interacoes": 0
     },
     {
@@ -2485,9 +2528,9 @@
       "segundos": 44.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 1188,
+      "tempo_medio_ms": 1190,
       "interacoes": 0
     },
     {
@@ -2498,9 +2541,9 @@
       "segundos": 55.333,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 2500,
+      "tempo_medio_ms": 4752,
       "interacoes": 0
     },
     {
@@ -2511,9 +2554,9 @@
       "segundos": 38.666,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 565,
+      "tempo_medio_ms": 2209,
       "interacoes": 0
     }
   ],
