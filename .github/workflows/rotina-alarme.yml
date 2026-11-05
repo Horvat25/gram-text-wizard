@@ -1,0 +1,66 @@
+name: Alarme ROTINA
+
+# POR QUE EXISTE (05/11/2026, Direção): avisar quando uma conversa de ROTINA fica esperando resposta nossa
+# há mais de 1 hora. SÓ LEITURA. Fica vermelho (o GitHub manda e-mail) quando há conversa esperando; o log e o
+# e-mail só têm contagem, referência opaca e vídeo, nunca nome nem texto (repositório PÚBLICO).
+# Como não vira "alarme que toca sempre": ver o cabeçalho de publicador/alarme-rotina.mjs.
+# Silenciar uma conversa: pôr a referência dela em publicador/rotina-alarme-ignorar.json (lista de strings).
+# Prova de que dispara: empurrar o arquivo gatilho (roda em modo teste, janela de 30 dias, e não falha).
+
+on:
+  schedule:
+    - cron: '7 * * * *'
+  push:
+    paths:
+      - 'publicador/rotina-alarme.gatilho'
+  workflow_dispatch:
+
+concurrency:
+  group: rotina-alarme
+  cancel-in-progress: false
+
+jobs:
+  alarme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Autoteste
+        run: node publicador/alarme-rotina.mjs --autoteste
+
+      - name: Rodada de teste (só no gatilho)
+        if: github.event_name == 'push'
+        env:
+          IG_USER_ID: '17841478894893058'
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          ALARME_JANELA_H: '720'
+          ALARME_SAIDA: /tmp/rotina-alarme-teste.json
+        run: |
+          node publicador/alarme-rotina.mjs --teste
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cp /tmp/rotina-alarme-teste.json publicador/rotina-alarme-teste.json
+            git add publicador/rotina-alarme-teste.json
+            if git diff --cached --quiet; then echo "ja estava igual"; exit 0; fi
+            git commit -q -m "rotina: rodada de teste do alarme (sem nomes) em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado; tentando de novo"
+            sleep 5
+          done
+          exit 1
+
+      - name: Vigiar (de hora em hora e manual)
+        if: github.event_name != 'push'
+        env:
+          IG_USER_ID: '17841478894893058'
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node publicador/alarme-rotina.mjs
