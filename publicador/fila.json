@@ -5888,9 +5888,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e1a2e00-c6d8-48b7-af7a-c51e540fa9aa.png",
     "legenda": "",
     "slug": "story-rqp-2026-11-06",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-2"
+    "variacao": "pro-2",
+    "id_instagram": "17911388766579359",
+    "publicado_em": "2026-11-06T17:10:34.731Z"
   },
   {
     "quando": "2026-11-06T17:00:00.000Z",
@@ -5898,7 +5900,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/1036f06b-d6c7-4898-871d-b698e45b4d3d.mp4",
     "legenda": "Saturno tem uma lua que parece a Estrela da Morte, a nave do Star Wars. 🌊\n\nÉ Mimas, uma bola de gelo de uns 400 km. Aquele olho gigante é uma cratera de 130 km, e a pancada que fez esse buraco quase partiu a lua no meio. Em 2024 veio a surpresa: embaixo do gelo tem um oceano escondido.\n\n🔖 Salva pra lembrar da lua Estrela da Morte.\n📤 Manda pra quem curte Star Wars.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: Lainey et al., Nature (07/02/2024) — A recently formed ocean inside Saturn's moon Mimas; NASA Science — Mimas\n\n#mimas #saturno #estreladamorte #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl91-mimas-estrela-da-morte-com-oceano",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18000547359041470",
+    "publicado_em": "2026-11-06T17:11:09.524Z",
+    "id_comentario": "18043052144842740",
+    "id_facebook": "1625544305422085"
   },
   {
     "quando": "2026-11-06T19:00:00.000Z",
