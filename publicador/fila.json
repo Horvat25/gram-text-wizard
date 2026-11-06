@@ -5869,6 +5869,14 @@
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
   },
   {
+    "quando": "2026-11-06T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/f9dac636-1a75-4747-9f7c-9a7aba06c400.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-06",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-06T15:00:00.000Z",
     "tipo": "story",
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/9e1a2e00-c6d8-48b7-af7a-c51e540fa9aa.png",
@@ -5884,6 +5892,14 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/1036f06b-d6c7-4898-871d-b698e45b4d3d.mp4",
     "legenda": "Saturno tem uma lua que parece a Estrela da Morte, a nave do Star Wars. 🌊\n\nÉ Mimas, uma bola de gelo de uns 400 km. Aquele olho gigante é uma cratera de 130 km, e a pancada que fez esse buraco quase partiu a lua no meio. Em 2024 veio a surpresa: embaixo do gelo tem um oceano escondido.\n\n🔖 Salva pra lembrar da lua Estrela da Morte.\n📤 Manda pra quem curte Star Wars.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: Lainey et al., Nature (07/02/2024) — A recently formed ocean inside Saturn's moon Mimas; NASA Science — Mimas\n\n#mimas #saturno #estreladamorte #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl91-mimas-estrela-da-morte-com-oceano",
+    "status": "agendado"
+  },
+  {
+    "quando": "2026-11-06T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/21ef3216-dd1a-4c2e-8d1f-bef1a6f1b71b.png",
+    "legenda": "",
+    "slug": "story-feed-2026-11-06",
     "status": "agendado"
   },
   {
