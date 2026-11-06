@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-05T17:29:46.373Z",
+  "gerado_em": "2026-11-06T16:50:30.155Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 3,
-    "curtidas": 3
+    "seguidores": 4,
+    "curtidas": 4
   },
   "pagina_diaria": [
     {
@@ -577,12 +577,42 @@
     },
     {
       "d": "2026-11-05",
-      "views": 251
+      "views": 723
+    },
+    {
+      "d": "2026-11-06",
+      "views": 411
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "4703007579984993",
+      "quando": "2026-11-06T11:11:40+0000",
+      "titulo": "O telescópio que passou 22 anos caçando explosões no céu caiu ontem. 🔥",
+      "link": "https://www.facebook.com/reel/4703007579984993/",
+      "segundos": 45.78,
+      "curtidas": 3,
+      "comentarios": 0,
+      "views": 407,
+      "alcance": null,
+      "tempo_medio_ms": 6593,
+      "interacoes": 0
+    },
+    {
+      "id": "2381667752575173",
+      "quando": "2026-11-05T21:11:02+0000",
+      "titulo": "Os astronautas da Estação Espacial veem o Sol nascer 16 vezes por dia. 🌅",
+      "link": "https://www.facebook.com/reel/2381667752575173/",
+      "segundos": 31.75,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 247,
+      "alcance": null,
+      "tempo_medio_ms": 4782,
+      "interacoes": 0
+    },
     {
       "id": "1110193098660227",
       "quando": "2026-11-05T17:11:22+0000",
@@ -591,9 +621,9 @@
       "segundos": 36.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 205,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 2370,
       "interacoes": 0
     },
     {
@@ -604,9 +634,9 @@
       "segundos": 49.006,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 246,
+      "views": 262,
       "alcance": null,
-      "tempo_medio_ms": 7815,
+      "tempo_medio_ms": 7558,
       "interacoes": 0
     },
     {
@@ -617,9 +647,9 @@
       "segundos": 42.233,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 220,
+      "views": 224,
       "alcance": null,
-      "tempo_medio_ms": 6533,
+      "tempo_medio_ms": 6641,
       "interacoes": 0
     },
     {
@@ -656,9 +686,9 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 827,
+      "views": 830,
       "alcance": null,
-      "tempo_medio_ms": 7766,
+      "tempo_medio_ms": 7754,
       "interacoes": 0
     },
     {
