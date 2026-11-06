@@ -5912,7 +5912,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/21ef3216-dd1a-4c2e-8d1f-bef1a6f1b71b.png",
     "legenda": "",
     "slug": "story-feed-2026-11-06",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18011563313776276",
+    "publicado_em": "2026-11-06T21:10:23.798Z"
   },
   {
     "quando": "2026-11-06T21:00:00.000Z",
@@ -5920,7 +5922,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/394ec254-9fa0-4402-84f8-f613945dc93b.mp4",
     "legenda": "Amanhã de madrugada a Lua vai encostar em Vênus. 🌙\n\nA Lua vai estar fininha, só um risquinho de luz, e do lado dela, Vênus, o ponto mais brilhante do céu depois da Lua. Olhe pro leste, onde o Sol nasce, lá pelas 4h30 da manhã. Elas vão estar baixinhas: procure um lugar sem prédio nem morro na frente. Parecem juntas, mas Vênus está mais de 100 vezes mais longe que a Lua.\n\n🔖 Salva pra acordar cedo amanhã.\n📤 Manda pra quem vai acordar cedo pra ver.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: posições calculadas para São Paulo (astronomy-engine, VSOP87); Sol nasce 05h17 de 07/11/2026\n\n#lua #venus #conjuncao #astronomia #ceu #ciencia #neuralupdate",
     "slug": "viral-amanha-lua-encosta-em-venus",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "17907287691354408",
+    "publicado_em": "2026-11-06T21:11:55.453Z",
+    "id_comentario": "18133413001761920",
+    "id_facebook": "1629880485818542"
   }
 ]
