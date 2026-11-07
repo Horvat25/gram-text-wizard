@@ -5958,9 +5958,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEjkk254YNnOyG10ORpjMSWLPO/10f5f6ff-1d29-48b6-9eaa-c01a6f962b86.png",
     "legenda": "",
     "slug": "story-rqp-2026-11-07",
-    "status": "agendado",
+    "status": "publicado",
     "campanha": "rqp-rotina",
-    "variacao": "pro-3"
+    "variacao": "pro-3",
+    "id_instagram": "17927795286199656",
+    "publicado_em": "2026-11-07T20:18:24.201Z"
   },
   {
     "quando": "2026-11-07T17:00:00.000Z",
@@ -5968,7 +5970,11 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/1660faeb-a589-4b06-b2a9-a312cab3d084.mp4",
     "legenda": "Uma lua de Saturno é pintada de dois jeitos: metade branca como neve, metade escura como carvão. 🌗\n\nÉ Japeto. Quando foi descoberta, em 1671, ela só aparecia de um lado de Saturno, por causa do lado escuro, que quase não reflete luz. E em volta da cintura tem uma cordilheira de até 20 km de altura, mais que o dobro do Everest.\n\n🔖 Salva pra lembrar da lua de duas cores.\n📤 Manda pra quem gosta de Saturno.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Iapetus (sonda Cassini)\n\n#japeto #saturno #astronomia #sistemasolar #ciencia #neuralupdate",
     "slug": "pl92-japeto-a-lua-de-duas-cores",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18000881058021412",
+    "publicado_em": "2026-11-07T20:19:31.143Z",
+    "id_comentario": "18103285574063785",
+    "id_facebook": "1504495218398034"
   },
   {
     "quando": "2026-11-07T19:00:00.000Z",
@@ -5976,7 +5982,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/1dda4fd9-b668-4cf8-8f98-31a179f3877c.png",
     "legenda": "",
     "slug": "story-feed-2026-11-07",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18014165634004550",
+    "publicado_em": "2026-11-07T20:19:40.975Z"
   },
   {
     "quando": "2026-11-07T21:00:00.000Z",
