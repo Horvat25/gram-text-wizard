@@ -5935,7 +5935,9 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/aee17961-3400-4954-924d-bb048f1e4bf6.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-07",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18093106001226635",
+    "publicado_em": "2026-11-07T11:10:47.472Z"
   },
   {
     "quando": "2026-11-07T11:00:00.000Z",
@@ -5943,8 +5945,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/6b663fab-2bdc-4a6b-862c-7177e8e6b325.mp4",
     "legenda": "Daqui a 11 dias, uma nave da Terra vai ficar a um dia-luz de distância. 🛰️\n\nÉ a Voyager 1, lançada em 1977. Um dia-luz é o caminho que a luz faz em um dia: quase 26 bilhões de quilômetros. Uma mensagem daqui vai levar um dia inteiro pra chegar lá, e ela já está quase sem energia.\n\n🔖 Salva pra lembrar no dia 18/11.\n📤 Manda pra quem acha que 1977 foi ontem.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA/JPL — Voyager 1 a um dia-luz da Terra em 18/11/2026\n\n#voyager #nasa #astronomia #espaco #ciencia #neuralupdate",
     "slug": "nw-voyager-1-vai-ficar-a-um-dia-luz",
-    "status": "agendado",
-    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda)."
+    "status": "publicado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "id_instagram": "17920568004461451",
+    "publicado_em": "2026-11-07T11:11:33.193Z",
+    "id_comentario": "18102745490387559",
+    "id_facebook": "1177987294915063"
   },
   {
     "quando": "2026-11-07T15:00:00.000Z",
