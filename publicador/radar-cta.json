@@ -1,203 +1,131 @@
 {
- "gerado_em": "2026-11-06T16:41:02.742Z",
- "contas_lidas": 7,
+ "gerado_em": "2026-11-07T15:31:18.793Z",
+ "contas_lidas": 0,
  "contas_invalidas": [
-  "canaldoschwarza: Invalid user id",
-  "achadinhospromo15: Invalid user id",
-  "achadosdashopee: Invalid user id",
-  "mundodosachadinhos: Invalid user id",
-  "achadinhosdaamazon: Invalid user id",
-  "tag_livros: Invalid user id"
+  "spacetoday: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "cienciatododia: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "canaldoschwarza: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "olhardigital: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "achadinhospromo15: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "achadinhosdashopee: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "achadinhos.shopee: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "achadosdashopee: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "mundodosachadinhos: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "achadinhosdaamazon: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "dicasdelivros: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "tag_livros: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,",
+  "intrinseca: Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
  ],
  "resultado": [
   {
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
-   "ok": true,
-   "seguidores": 2557240,
-   "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
-   "palavras": {
-    "NDO": 1
-   },
-   "comentarios_por_curtida_com_pedido": 0.057,
-   "comentarios_por_curtida_sem_pedido": 0.02,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-11-01",
-     "tipo": "REELS",
-     "pede": true,
-     "palavra": "NDO",
-     "trecho": "Que inveja morar num país em que a notícia principal hoje é no plano concreto de mandar duas pessoas para pisar na Lua, todas as redes , jor",
-     "comentarios": 32,
-     "curtidas": 560,
-     "link": "https://www.instagram.com/reel/DfM8BgjoV_E/"
-    }
-   ]
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
-   "ok": true,
-   "seguidores": 17520,
-   "posts_lidos": 0,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": null,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "canaldoschwarza",
    "grupo": "astronomia-media",
    "ok": false,
-   "erro": "Invalid user id"
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
-   "ok": true,
-   "seguidores": 589830,
-   "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.05,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "achadinhospromo15",
    "grupo": "achadinhos",
    "ok": false,
-   "erro": "Invalid user id"
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "achadinhosdashopee",
    "grupo": "achadinhos",
-   "ok": true,
-   "seguidores": 0,
-   "posts_lidos": 7,
-   "pct_posts_pedindo": 0.14,
-   "palavras": {
-    "QUERO": 1
-   },
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": null,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-10-14",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": "QUERO",
-     "trecho": "comente “quero” para receber o link",
-     "comentarios": 0,
-     "curtidas": 0,
-     "link": "https://www.instagram.com/p/Deerx-QFuTa/"
-    }
-   ]
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "achadinhos.shopee",
    "grupo": "achadinhos",
-   "ok": true,
-   "seguidores": 402,
-   "posts_lidos": 11,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.011,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "achadosdashopee",
    "grupo": "achadinhos",
    "ok": false,
-   "erro": "Invalid user id"
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "mundodosachadinhos",
    "grupo": "achadinhos",
    "ok": false,
-   "erro": "Invalid user id"
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "achadinhosdaamazon",
    "grupo": "achadinhos-amazon",
    "ok": false,
-   "erro": "Invalid user id"
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "dicasdelivros",
    "grupo": "livros",
-   "ok": true,
-   "seguidores": 27,
-   "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0,
-   "comentarios_por_curtida_sem_pedido": 0.046,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-11-01",
-     "tipo": "REELS",
-     "pede": true,
-     "palavra": null,
-     "trecho": "",
-     "comentarios": 0,
-     "curtidas": 2,
-     "link": "https://www.instagram.com/reel/DfMvDGYBZ5i/"
-    }
-   ]
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "tag_livros",
    "grupo": "livros",
    "ok": false,
-   "erro": "Invalid user id"
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   },
   {
    "usuario": "intrinseca",
    "grupo": "livros",
-   "ok": true,
-   "seguidores": 1057158,
-   "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.019,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Unsupported get request. Object with ID '17841478894893058' does not exist, cannot be loaded due to missing permissions,"
   }
  ],
  "hashtags": [
   {
    "hashtag": "achadinhos",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "(#200) Requires instagram_basic permission to manage the object"
   },
   {
    "hashtag": "achadinhosdashopee",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "(#200) Requires instagram_basic permission to manage the object"
   },
   {
    "hashtag": "achadosshopee",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "(#200) Requires instagram_basic permission to manage the object"
   },
   {
    "hashtag": "projetorgalaxia",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "(#200) Requires instagram_basic permission to manage the object"
   },
   {
    "hashtag": "astronomia",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "(#200) Requires instagram_basic permission to manage the object"
   },
   {
    "hashtag": "livros",
    "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "erro": "(#200) Requires instagram_basic permission to manage the object"
   }
  ]
 }
