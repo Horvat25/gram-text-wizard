@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-06T16:50:30.155Z",
+  "gerado_em": "2026-11-08T16:03:05.921Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 4,
-    "curtidas": 4
+    "seguidores": 5,
+    "curtidas": 5
   },
   "pagina_diaria": [
     {
@@ -581,12 +581,85 @@
     },
     {
       "d": "2026-11-06",
-      "views": 411
+      "views": 928
+    },
+    {
+      "d": "2026-11-07",
+      "views": 518
+    },
+    {
+      "d": "2026-11-08",
+      "views": 7
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2336826687063705",
+      "quando": "2026-11-07T21:11:09+0000",
+      "titulo": "Toda madrugada, Marte e Júpiter estão chegando mais perto um do outro no céu. 🔴🟠",
+      "link": "https://www.facebook.com/reel/2336826687063705/",
+      "segundos": 42.3,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 281,
+      "alcance": null,
+      "tempo_medio_ms": 6903,
+      "interacoes": 0
+    },
+    {
+      "id": "1504495218398034",
+      "quando": "2026-11-07T20:19:41+0000",
+      "titulo": "Uma lua de Saturno é pintada de dois jeitos: metade branca como neve, metade escura como carvão. 🌗",
+      "link": "https://www.facebook.com/reel/1504495218398034/",
+      "segundos": 44.583,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 227,
+      "alcance": null,
+      "tempo_medio_ms": 4824,
+      "interacoes": 0
+    },
+    {
+      "id": "1177987294915063",
+      "quando": "2026-11-07T11:11:35+0000",
+      "titulo": "Daqui a 11 dias, uma nave da Terra vai ficar a um dia-luz de distância. 🛰️",
+      "link": "https://www.facebook.com/reel/1177987294915063/",
+      "segundos": 45.49,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1629880485818542",
+      "quando": "2026-11-06T21:11:58+0000",
+      "titulo": "Amanhã de madrugada a Lua vai encostar em Vênus. 🌙",
+      "link": "https://www.facebook.com/reel/1629880485818542/",
+      "segundos": 45.1,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 272,
+      "alcance": null,
+      "tempo_medio_ms": 8841,
+      "interacoes": 0
+    },
+    {
+      "id": "1625544305422085",
+      "quando": "2026-11-06T17:11:12+0000",
+      "titulo": "Saturno tem uma lua que parece a Estrela da Morte, a nave do Star Wars. 🌊",
+      "link": "https://www.facebook.com/reel/1625544305422085/",
+      "segundos": 39.708,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 235,
+      "alcance": null,
+      "tempo_medio_ms": 12124,
+      "interacoes": 0
+    },
     {
       "id": "4703007579984993",
       "quando": "2026-11-06T11:11:40+0000",
@@ -595,9 +668,9 @@
       "segundos": 45.78,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 407,
+      "views": 420,
       "alcance": null,
-      "tempo_medio_ms": 6593,
+      "tempo_medio_ms": 6597,
       "interacoes": 0
     },
     {
@@ -606,11 +679,11 @@
       "titulo": "Os astronautas da Estação Espacial veem o Sol nascer 16 vezes por dia. 🌅",
       "link": "https://www.facebook.com/reel/2381667752575173/",
       "segundos": 31.75,
-      "curtidas": 2,
+      "curtidas": 3,
       "comentarios": 0,
-      "views": 247,
+      "views": 251,
       "alcance": null,
-      "tempo_medio_ms": 4782,
+      "tempo_medio_ms": 5081,
       "interacoes": 0
     },
     {
@@ -632,11 +705,11 @@
       "titulo": "Dá pra ver outra galáxia inteira daqui do Brasil, e agora é a época certa. 🌌",
       "link": "https://www.facebook.com/reel/1708328701085623/",
       "segundos": 49.006,
-      "curtidas": 1,
+      "curtidas": 2,
       "comentarios": 0,
-      "views": 262,
+      "views": 265,
       "alcance": null,
-      "tempo_medio_ms": 7558,
+      "tempo_medio_ms": 7599,
       "interacoes": 0
     },
     {
@@ -647,9 +720,9 @@
       "segundos": 42.233,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 224,
+      "views": 225,
       "alcance": null,
-      "tempo_medio_ms": 6641,
+      "tempo_medio_ms": 6619,
       "interacoes": 0
     },
     {
@@ -660,9 +733,9 @@
       "segundos": 37.5,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 270,
+      "views": 271,
       "alcance": null,
-      "tempo_medio_ms": 4216,
+      "tempo_medio_ms": 4202,
       "interacoes": 0
     },
     {
@@ -686,9 +759,9 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 830,
+      "views": 833,
       "alcance": null,
-      "tempo_medio_ms": 7754,
+      "tempo_medio_ms": 7730,
       "interacoes": 0
     },
     {
@@ -1245,9 +1318,9 @@
       "segundos": 36.642,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 38,
       "interacoes": 0
     },
     {
@@ -1635,9 +1708,9 @@
       "segundos": 36.92,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 422,
       "interacoes": 0
     },
     {
@@ -2129,9 +2202,9 @@
       "segundos": 41.333,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 590,
       "interacoes": 0
     },
     {
