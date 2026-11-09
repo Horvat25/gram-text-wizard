@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-08T16:03:05.921Z",
+  "gerado_em": "2026-11-09T19:56:09.871Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -589,7 +589,11 @@
     },
     {
       "d": "2026-11-08",
-      "views": 7
+      "views": 39
+    },
+    {
+      "d": "2026-11-09",
+      "views": 5
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -603,9 +607,9 @@
       "segundos": 42.3,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 281,
+      "views": 306,
       "alcance": null,
-      "tempo_medio_ms": 6903,
+      "tempo_medio_ms": 7160,
       "interacoes": 0
     },
     {
@@ -655,9 +659,9 @@
       "segundos": 39.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 235,
+      "views": 236,
       "alcance": null,
-      "tempo_medio_ms": 12124,
+      "tempo_medio_ms": 12072,
       "interacoes": 0
     },
     {
@@ -759,9 +763,9 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 833,
+      "views": 841,
       "alcance": null,
-      "tempo_medio_ms": 7730,
+      "tempo_medio_ms": 8004,
       "interacoes": 0
     },
     {
@@ -1318,9 +1322,9 @@
       "segundos": 36.642,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 38,
+      "tempo_medio_ms": 658,
       "interacoes": 0
     },
     {
@@ -1825,9 +1829,9 @@
       "segundos": 39.041,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 664,
       "interacoes": 0
     },
     {
