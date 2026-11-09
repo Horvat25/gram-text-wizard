@@ -6048,6 +6048,14 @@
     "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
   },
   {
+    "quando": "2026-11-10T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-noticia-2026-11-10.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-10",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-10T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/pl95-caronte-e-plutao-se-encarando.mp4",
@@ -6057,6 +6065,14 @@
     "status": "agendado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
     "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+  },
+  {
+    "quando": "2026-11-10T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-feed-2026-11-10.png",
+    "legenda": "",
+    "slug": "story-feed-2026-11-10",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-10T21:00:00.000Z",
@@ -6081,6 +6097,14 @@
     "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
   },
   {
+    "quando": "2026-11-11T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-noticia-2026-11-11.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-11",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-11T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/pl96-eris-o-mundo-que-derrubou-plutao.mp4",
@@ -6090,6 +6114,14 @@
     "status": "agendado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
     "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+  },
+  {
+    "quando": "2026-11-11T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-feed-2026-11-11.png",
+    "legenda": "",
+    "slug": "story-feed-2026-11-11",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-11T21:00:00.000Z",
@@ -6114,6 +6146,14 @@
     "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
   },
   {
+    "quando": "2026-11-12T11:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-noticia-2026-11-12.png",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-12",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-12T17:00:00.000Z",
     "tipo": "reels",
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/pl97-makemake-o-mundo-com-nome-de-deus.mp4",
@@ -6123,6 +6163,14 @@
     "status": "agendado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
     "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+  },
+  {
+    "quando": "2026-11-12T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-feed-2026-11-12.png",
+    "legenda": "",
+    "slug": "story-feed-2026-11-12",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-12T21:00:00.000Z",
