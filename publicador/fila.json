@@ -5998,5 +5998,16 @@
     "publicado_em": "2026-11-07T21:11:07.411Z",
     "id_comentario": "17915782827288101",
     "id_facebook": "2336826687063705"
+  },
+  {
+    "quando": "2026-11-09T20:27:40.978Z",
+    "tipo": "reels",
+    "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/2026-11-09-betelgeuse.mp4",
+    "midia_facebook": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/2026-11-09-betelgeuse-fb.mp4",
+    "legenda": "Tem uma estrela escondida atravessando a atmosfera de Betelgeuse. Betelgeuse é a estrela avermelhada de Órion, pertinho das Três Marias. A companheira é pequena e quente, e passa por dentro do gás da gigante, como um barco cortando a água. E deixa um rastro que deforma a atmosfera da gigante. O nome dela é Siuarra, que quer dizer o bracelete.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: MIT Haystack / The Astronomical Journal (2026), via ScienceDaily, 03/11/2026\nImagens: ESO/ALMA; Rogelio Bernal Andreo (Wikimedia, CC BY-SA); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
+    "slug": "nw-estrela-escondida-dentro-de-betelgeuse",
+    "status": "agendado",
+    "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+    "recuperacao": "Founder solicitou recuperação em 09/11; master aprovado do slot 08h; fila remota terminou em 07/11."
   }
 ]
