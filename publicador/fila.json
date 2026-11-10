@@ -6090,7 +6090,9 @@
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-feed-2026-11-10.png",
     "legenda": "",
     "slug": "story-feed-2026-11-10",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18026194928866347",
+    "publicado_em": "2026-11-10T21:10:30.184Z"
   },
   {
     "quando": "2026-11-10T21:00:00.000Z",
@@ -6099,9 +6101,13 @@
     "midia_facebook": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/viral-o-sete-estrelo-voltou-fb.mp4",
     "legenda": "Esse montinho de estrelas que aparece no céu de novembro tem nome: Sete-Estrelo. São as Plêiades, um grupo de estrelas jovens que nasceram juntas. Elas nascem logo depois que escurece, pro nordeste, e às dez da noite já estão bem visíveis. Sem telescópio, a maioria das pessoas conta seis ou sete estrelas. Mas na verdade são mais de mil, a uns quatrocentos e quarenta anos-luz daqui.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Posições calculadas para São Paulo (astronomy-engine): as Plêiades nascem às 19h17 e às 22h estão a 29° pro nordeste em 10/11/2026.\nImagens: NASA/ESA/AURA/Caltech (Wikimedia); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
     "slug": "viral-o-sete-estrelo-voltou",
-    "status": "agendado",
+    "status": "publicado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
-    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante.",
+    "id_instagram": "18138086470658510",
+    "publicado_em": "2026-11-10T21:11:27.299Z",
+    "id_comentario": "18109085975241236",
+    "id_facebook": "1056296934099260"
   },
   {
     "quando": "2026-11-11T11:00:00.000Z",
