@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-09T19:56:09.871Z",
+  "gerado_em": "2026-11-10T17:08:01.075Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 5,
-    "curtidas": 5
+    "seguidores": 16,
+    "curtidas": 16
   },
   "pagina_diaria": [
     {
@@ -593,12 +593,68 @@
     },
     {
       "d": "2026-11-09",
-      "views": 5
+      "views": 838
+    },
+    {
+      "d": "2026-11-10",
+      "views": 2323
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1604208615073265",
+      "quando": "2026-11-10T11:11:59+0000",
+      "titulo": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do as",
+      "link": "https://www.facebook.com/reel/1604208615073265/",
+      "segundos": 43.6,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 236,
+      "alcance": null,
+      "tempo_medio_ms": 7696,
+      "interacoes": 0
+    },
+    {
+      "id": "1894529281682355",
+      "quando": "2026-11-09T21:10:57+0000",
+      "titulo": "Hoje à noite, o ponto amarelado bem lá no alto que não pisca é Saturno. Estrela pisca. Planeta brilha firme, s",
+      "link": "https://www.facebook.com/reel/1894529281682355/",
+      "segundos": 33.635,
+      "curtidas": 6,
+      "comentarios": 1,
+      "views": 1098,
+      "alcance": null,
+      "tempo_medio_ms": 6230,
+      "interacoes": 2
+    },
+    {
+      "id": "1513211240897962",
+      "quando": "2026-11-09T20:46:02+0000",
+      "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Existe uma lua que parece uma esponja de lavar louça. É Hi",
+      "link": "https://www.facebook.com/reel/1513211240897962/",
+      "segundos": 38.5,
+      "curtidas": 25,
+      "comentarios": 0,
+      "views": 1878,
+      "alcance": null,
+      "tempo_medio_ms": 6454,
+      "interacoes": 0
+    },
+    {
+      "id": "1147287977980909",
+      "quando": "2026-11-09T20:29:17+0000",
+      "titulo": "Tem uma estrela escondida atravessando a atmosfera de Betelgeuse. Betelgeuse é a estrela avermelhada de Órion,",
+      "link": "https://www.facebook.com/reel/1147287977980909/",
+      "segundos": 47.071,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 338,
+      "alcance": null,
+      "tempo_medio_ms": 4608,
+      "interacoes": 0
+    },
     {
       "id": "2336826687063705",
       "quando": "2026-11-07T21:11:09+0000",
@@ -607,9 +663,9 @@
       "segundos": 42.3,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 306,
+      "views": 307,
       "alcance": null,
-      "tempo_medio_ms": 7160,
+      "tempo_medio_ms": 7146,
       "interacoes": 0
     },
     {
@@ -620,9 +676,9 @@
       "segundos": 44.583,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 227,
+      "views": 230,
       "alcance": null,
-      "tempo_medio_ms": 4824,
+      "tempo_medio_ms": 4855,
       "interacoes": 0
     },
     {
@@ -763,9 +819,9 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 841,
+      "views": 842,
       "alcance": null,
-      "tempo_medio_ms": 8004,
+      "tempo_medio_ms": 7994,
       "interacoes": 0
     },
     {
