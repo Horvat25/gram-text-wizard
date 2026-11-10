@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-09T19:26:02.634Z",
+ "gerado_em": "2026-11-10T16:54:03.187Z",
  "conta": {
   "username": "neuralupdate",
   "seguidores": 1288,
-  "publicacoes": 1062
+  "publicacoes": 1066
  },
- "total_listado": 1062,
- "com_tempo_assistido": 522,
+ "total_listado": 1066,
+ "com_tempo_assistido": 526,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-11",
-     "ate": "2026-11-08",
+     "de": "2026-10-12",
+     "ate": "2026-11-09",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 7,
-         "end_time": "2026-10-12T07:00:00+0000"
-        },
         {
          "value": 1,
          "end_time": "2026-10-13T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 0,
          "end_time": "2026-11-08T08:00:00+0000"
+        },
+        {
+         "value": 1,
+         "end_time": "2026-11-09T08:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -311,7 +311,7 @@
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 29
+            "value": 30
            }
           ]
          }
@@ -322,7 +322,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-09",
+     "ate": "2026-11-10",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -335,6 +335,20 @@
          {
           "dimension_keys": [
            "follow_type"
+          ],
+          "results": [
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 1
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 0
+           }
           ]
          }
         ]
@@ -503,7 +517,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 48957
+        "value": 48958
        }
       },
       {
@@ -576,7 +590,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-09",
+     "ate": "2026-11-10",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -585,7 +599,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 11
+        "value": 285
        }
       },
       {
@@ -595,7 +609,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 26
+        "value": 504
        }
       },
       {
@@ -605,7 +619,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 0
+        "value": 14
        }
       },
       {
@@ -615,7 +629,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 0
+        "value": 17
        }
       }
      ]
@@ -642,15 +656,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 20744
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 224
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20744
            }
           ]
          }
@@ -679,15 +693,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 24395
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 404
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 24395
            }
           ]
          }
@@ -809,7 +823,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-09",
+     "ate": "2026-11-10",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -818,7 +832,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 11,
+        "value": 285,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -827,15 +841,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 7
+            "value": 248
            },
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 4
+            "value": 42
            }
           ]
          }
@@ -892,7 +906,7 @@
             "dimension_values": [
              "45-54"
             ],
-            "value": 287
+            "value": 286
            },
            {
             "dimension_values": [
@@ -933,7 +947,7 @@
             "dimension_values": [
              "F"
             ],
-            "value": 112
+            "value": 111
            },
            {
             "dimension_values": [
@@ -1028,7 +1042,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 1247
+            "value": 1246
            },
            {
             "dimension_values": [
@@ -1091,6 +1105,12 @@
           "results": [
            {
             "dimension_values": [
+             "São Caetano do Sul, São Paulo (state)"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
              "Ribeirão Prêto, São Paulo (state)"
             ],
             "value": 8
@@ -1099,7 +1119,7 @@
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 93
+            "value": 94
            },
            {
             "dimension_values": [
@@ -1139,12 +1159,6 @@
            },
            {
             "dimension_values": [
-             "Núcleo Bandeirante, Federal District"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Maceió, Alagoas"
             ],
             "value": 10
@@ -1165,7 +1179,7 @@
             "dimension_values": [
              "Porto Alegre, Rio Grande do Sul"
             ],
-            "value": 11
+            "value": 12
            },
            {
             "dimension_values": [
@@ -1189,7 +1203,7 @@
             "dimension_values": [
              "Londrina, Paraná"
             ],
-            "value": 8
+            "value": 9
            },
            {
             "dimension_values": [
@@ -1277,6 +1291,12 @@
            },
            {
             "dimension_values": [
+             "Ipatinga, Minas Gerais"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
              "Nova Iguaçu, Rio de Janeiro (state)"
             ],
             "value": 6
@@ -1285,7 +1305,7 @@
             "dimension_values": [
              "Maringá, Paraná"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1307,33 +1327,27 @@
            },
            {
             "dimension_values": [
-             "Cuiabá, Mato Grosso"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Várzea Grande, Mato Grosso"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
              "Belo Horizonte, Minas Gerais"
             ],
-            "value": 25
+            "value": 26
            },
            {
             "dimension_values": [
              "Santo André, São Paulo (state)"
             ],
-            "value": 10
+            "value": 9
            },
            {
             "dimension_values": [
              "Taguatinga, Federal District"
             ],
-            "value": 11
+            "value": 10
            },
            {
             "dimension_values": [
@@ -2639,13 +2653,45 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-09",
+    "janela": "2026-11-10",
     "erro": "(#100) since param is not valid. Metrics data is available for the last 2 years"
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18114915365191336": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-11-10T11:11:39+0000",
+     "respostas": []
+    }
+   ],
+   "18639183856042230": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-11-09T21:10:56+0000",
+     "respostas": []
+    }
+   ],
+   "18113893628458541": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-11-09T20:46:00+0000",
+     "respostas": []
+    }
+   ],
+   "18487258489114558": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 1,
+     "quando": "2026-11-09T20:29:15+0000",
+     "respostas": []
+    }
+   ],
    "18079769900752744": [
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
@@ -5190,6 +5236,12 @@
      "curtidas": 0,
      "quando": "2026-07-06T21:23:29+0000",
      "respostas": []
+    },
+    {
+     "texto": "Só a água que não é puxada pra baixo né?",
+     "curtidas": 0,
+     "quando": "2026-07-06T20:01:56+0000",
+     "respostas": []
     }
    ],
    "17945474742249525": [
@@ -5245,6 +5297,94 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18114915365191336",
+   "quando": "2026-11-10T11:11:32+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfjxLQVTZ_d/",
+   "titulo": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do asteroide Riúgu, trazida por uma",
+   "legenda": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do asteroide Riúgu, trazida por uma sonda japonesa em dois mil e vinte. São só cinco gramas e meio de poeira. E dentro deles estão as cinco bases que formam o DNA e o RNA de todo ser vivo. Isso reforça a ideia de que os ingredientes da vida chegaram na Terra a bordo de asteroides.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Nature Astronomy (2026), via The Conversation / ScienceDaily, 02/11/2026; amostras da missão Hayabusa2 (JAXA)\nImagens: cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 13,
+   "reach": 9,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "ig_reels_avg_watch_time": 15071,
+   "ig_reels_video_view_total_time": 135643,
+   "reels_skip_rate": 50,
+   "reposts": 0
+  },
+  {
+   "id": "18639183856042230",
+   "quando": "2026-11-09T21:10:50+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfiQ-TLSQ8v/",
+   "titulo": "Hoje à noite, o ponto amarelado bem lá no alto que não pisca é Saturno. Estrela pisca. Planeta brilha firme, sem tremer. Lá pelas nove da no",
+   "legenda": "Hoje à noite, o ponto amarelado bem lá no alto que não pisca é Saturno. Estrela pisca. Planeta brilha firme, sem tremer. Lá pelas nove da noite, ele fica quase em cima da cabeça, pro lado norte. E sem Lua no céu, é a melhor semana do mês pra achar ele. A luz que você vai ver saiu de lá há mais de uma hora.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Posições calculadas para São Paulo (astronomy-engine): às 21h de 09/11/2026 Saturno fica a 65° de altura, pro norte; se põe às 03h25.\nImagens: NASA/JPL-Caltech/Space Science Institute (Cassini); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
+   "curtidas_campo": 5,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 177,
+   "reach": 142,
+   "likes": 5,
+   "comments": 1,
+   "shares": 0,
+   "saved": 1,
+   "total_interactions": 7,
+   "ig_reels_avg_watch_time": 9726,
+   "ig_reels_video_view_total_time": 1478376,
+   "reels_skip_rate": 57,
+   "reposts": 0
+  },
+  {
+   "id": "18113893628458541",
+   "quando": "2026-11-09T20:45:55+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfiOH9zTCKV/",
+   "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Existe uma lua que parece uma esponja de lavar louça. É Hipérion, de Saturno, cheia de b",
+   "legenda": "Escola de Astronomia Neural Update · Sistema Solar. Existe uma lua que parece uma esponja de lavar louça. É Hipérion, de Saturno, cheia de buracos fundos. Ela é tão leve e porosa que quase metade dela é espaço vazio. Quando algo bate nela, a pancada afunda em vez de espalhar, e deixa esses buracos. E ela nem gira direito: rola de um jeito bagunçado, que ninguém consegue prever.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Hyperion\nImagens: NASA/JPL-Caltech/Space Science Institute (Cassini); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #ciencia #aula #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 133,
+   "reach": 106,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 3,
+   "ig_reels_avg_watch_time": 6585,
+   "ig_reels_video_view_total_time": 750798,
+   "reels_skip_rate": 61.7,
+   "reposts": 0
+  },
+  {
+   "id": "18487258489114558",
+   "quando": "2026-11-09T20:29:10+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DfiMNIjp8e6/",
+   "titulo": "Tem uma estrela escondida atravessando a atmosfera de Betelgeuse. Betelgeuse é a estrela avermelhada de Órion, pertinho das Três Marias. A c",
+   "legenda": "Tem uma estrela escondida atravessando a atmosfera de Betelgeuse. Betelgeuse é a estrela avermelhada de Órion, pertinho das Três Marias. A companheira é pequena e quente, e passa por dentro do gás da gigante, como um barco cortando a água. E deixa um rastro que deforma a atmosfera da gigante. O nome dela é Siuarra, que quer dizer o bracelete.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: MIT Haystack / The Astronomical Journal (2026), via ScienceDaily, 03/11/2026\nImagens: ESO/ALMA; Rogelio Bernal Andreo (Wikimedia, CC BY-SA); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
+   "curtidas_campo": 4,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 146,
+   "reach": 118,
+   "likes": 4,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 9742,
+   "ig_reels_video_view_total_time": 1188603,
+   "reels_skip_rate": 64.8,
+   "reposts": 0
+  },
+  {
    "id": "18079769900752744",
    "quando": "2026-11-07T21:11:02+0000",
    "tipo": "REELS",
@@ -5261,8 +5401,8 @@
    "shares": 0,
    "saved": 0,
    "total_interactions": 10,
-   "ig_reels_avg_watch_time": 9950,
-   "ig_reels_video_view_total_time": 3074700,
+   "ig_reels_avg_watch_time": 9907,
+   "ig_reels_video_view_total_time": 3081323,
    "reels_skip_rate": 51.8,
    "reposts": 2
   },
@@ -5342,16 +5482,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 213,
-   "reach": 178,
+   "views": 214,
+   "reach": 179,
    "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 12326,
-   "ig_reels_video_view_total_time": 2292665,
-   "reels_skip_rate": 44.9,
+   "ig_reels_avg_watch_time": 12456,
+   "ig_reels_video_view_total_time": 2329341,
+   "reels_skip_rate": 44.6,
    "reposts": 0
   },
   {
@@ -5364,16 +5504,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 437,
-   "reach": 353,
+   "views": 438,
+   "reach": 354,
    "likes": 12,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 14025,
-   "ig_reels_video_view_total_time": 5441854,
-   "reels_skip_rate": 42.4,
+   "ig_reels_avg_watch_time": 14104,
+   "ig_reels_video_view_total_time": 5486457,
+   "reels_skip_rate": 42.3,
    "reposts": 0
   },
   {
@@ -5386,16 +5526,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 196,
-   "reach": 152,
+   "views": 197,
+   "reach": 153,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 11594,
-   "ig_reels_video_view_total_time": 1831928,
-   "reels_skip_rate": 52.9,
+   "ig_reels_avg_watch_time": 11533,
+   "ig_reels_video_view_total_time": 1833756,
+   "reels_skip_rate": 53.2,
    "reposts": 0
   },
   {
@@ -5430,15 +5570,15 @@
    "curtidas_campo": 12,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 376,
-   "reach": 324,
+   "views": 378,
+   "reach": 326,
    "likes": 12,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 12580,
-   "ig_reels_video_view_total_time": 4302480,
+   "ig_reels_avg_watch_time": 12536,
+   "ig_reels_video_view_total_time": 4312409,
    "reels_skip_rate": 48.5,
    "reposts": 1
   },
@@ -5452,16 +5592,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 94,
-   "reach": 80,
+   "views": 95,
+   "reach": 81,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 6659,
-   "ig_reels_video_view_total_time": 559433,
-   "reels_skip_rate": 59.5,
+   "ig_reels_avg_watch_time": 7009,
+   "ig_reels_video_view_total_time": 595848,
+   "reels_skip_rate": 58.8,
    "reposts": 0
   },
   {
@@ -5540,16 +5680,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 23,
-   "reach": 18,
+   "views": 24,
+   "reach": 19,
    "likes": 2,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 5788,
-   "ig_reels_video_view_total_time": 133146,
-   "reels_skip_rate": 47.6,
+   "ig_reels_avg_watch_time": 5622,
+   "ig_reels_video_view_total_time": 134936,
+   "reels_skip_rate": 50,
    "reposts": 0
   },
   {
@@ -5650,15 +5790,15 @@
    "curtidas_campo": 75,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1531,
-   "reach": 1146,
+   "views": 1532,
+   "reach": 1147,
    "likes": 75,
    "comments": 1,
    "shares": 9,
    "saved": 5,
    "total_interactions": 91,
-   "ig_reels_avg_watch_time": 12955,
-   "ig_reels_video_view_total_time": 15520955,
+   "ig_reels_avg_watch_time": 12945,
+   "ig_reels_video_view_total_time": 15521827,
    "reels_skip_rate": 48.8,
    "reposts": 1
   },
@@ -5694,15 +5834,15 @@
    "curtidas_campo": 40,
    "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1307,
+   "views": 1308,
    "reach": 1096,
    "likes": 40,
    "comments": 4,
    "shares": 2,
    "saved": 2,
    "total_interactions": 48,
-   "ig_reels_avg_watch_time": 17168,
-   "ig_reels_video_view_total_time": 20379601,
+   "ig_reels_avg_watch_time": 17155,
+   "ig_reels_video_view_total_time": 20380768,
    "reels_skip_rate": 38.8,
    "reposts": 0
   },
@@ -5717,7 +5857,7 @@
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 252,
-   "reach": 211,
+   "reach": 212,
    "likes": 5,
    "comments": 2,
    "shares": 0,
@@ -5804,16 +5944,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 169,
-   "reach": 143,
+   "views": 170,
+   "reach": 144,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 8522,
-   "ig_reels_video_view_total_time": 1286924,
-   "reels_skip_rate": 62,
+   "ig_reels_avg_watch_time": 8474,
+   "ig_reels_video_view_total_time": 1288111,
+   "reels_skip_rate": 62.3,
    "reposts": 0
   },
   {
@@ -5893,7 +6033,7 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 201,
-   "reach": 182,
+   "reach": 183,
    "likes": 4,
    "comments": 1,
    "shares": 0,
@@ -6882,16 +7022,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 29,
-   "reach": 17,
+   "views": 30,
+   "reach": 18,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 8796,
-   "ig_reels_video_view_total_time": 193516,
-   "reels_skip_rate": 72.7,
+   "ig_reels_avg_watch_time": 8473,
+   "ig_reels_video_view_total_time": 194891,
+   "reels_skip_rate": 73.9,
    "reposts": 0
   },
   {
@@ -6904,16 +7044,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 208,
-   "reach": 180,
+   "views": 209,
+   "reach": 181,
    "likes": 12,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 13,
-   "ig_reels_avg_watch_time": 9999,
-   "ig_reels_video_view_total_time": 1859839,
-   "reels_skip_rate": 58.1,
+   "ig_reels_avg_watch_time": 10105,
+   "ig_reels_video_view_total_time": 1889772,
+   "reels_skip_rate": 57.8,
    "reposts": 0
   },
   {
@@ -7055,19 +7195,19 @@
    "link": "https://www.instagram.com/reel/DeWhXbEDHR7/",
    "titulo": "Tem um tipo de astro que não é estrela e também não é planeta. 🟤",
    "legenda": "Tem um tipo de astro que não é estrela e também não é planeta. 🟤\n\nSão as anãs marrons: nascem como estrelas, mas não têm massa pra acender. O telescópio SPHEREx, da NASA, olhou 37 delas e achou atmosferas com água, metano e gás carbônico, de mais de 2.000 °C a 20 °C negativos. Milhares de outras ainda vão ser analisadas.\n\n🔖 Salva pra lembrar que existe um meio-termo entre estrela e planeta.\n📤 Manda pra quem acha que só existem estrelas e planetas.\n👉 Segue @neuralupdate e responde: estrela ou planeta pra você?\n\n📚 Fonte: NASA, 08/10/2026 — SPHEREx Sees Menagerie of Brown Dwarfs\n\n#anamarrom #spherex #nasa #astronomia #ciencia #neuralupdate",
-   "curtidas_campo": 30,
+   "curtidas_campo": 31,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1026,
-   "reach": 869,
-   "likes": 30,
+   "views": 1027,
+   "reach": 870,
+   "likes": 31,
    "comments": 1,
    "shares": 1,
    "saved": 3,
-   "total_interactions": 36,
-   "ig_reels_avg_watch_time": 12568,
-   "ig_reels_video_view_total_time": 11123154,
-   "reels_skip_rate": 50.3,
+   "total_interactions": 37,
+   "ig_reels_avg_watch_time": 12599,
+   "ig_reels_video_view_total_time": 11163560,
+   "reels_skip_rate": 50.2,
    "reposts": 1
   },
   {
@@ -7938,15 +8078,15 @@
    "curtidas_campo": 66,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 4311,
-   "reach": 3414,
+   "views": 4312,
+   "reach": 3415,
    "likes": 66,
    "comments": 2,
    "shares": 2,
    "saved": 5,
    "total_interactions": 79,
-   "ig_reels_avg_watch_time": 18821,
-   "ig_reels_video_view_total_time": 66742179,
+   "ig_reels_avg_watch_time": 18818,
+   "ig_reels_video_view_total_time": 66747791,
    "reels_skip_rate": 29.3,
    "reposts": 4
   },
@@ -8407,16 +8547,16 @@
    "curtidas_campo": 23,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 499,
+   "views": 500,
    "reach": 390,
    "likes": 23,
    "comments": 1,
    "shares": 0,
    "saved": 5,
    "total_interactions": 31,
-   "ig_reels_avg_watch_time": 20014,
-   "ig_reels_video_view_total_time": 8045890,
-   "reels_skip_rate": 40.4,
+   "ig_reels_avg_watch_time": 19969,
+   "ig_reels_video_view_total_time": 8047516,
+   "reels_skip_rate": 40.5,
    "reposts": 2
   },
   {
