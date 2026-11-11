@@ -6155,7 +6155,9 @@
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-feed-2026-11-11.png",
     "legenda": "",
     "slug": "story-feed-2026-11-11",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17979953745137069",
+    "publicado_em": "2026-11-11T21:10:28.694Z"
   },
   {
     "quando": "2026-11-11T21:00:00.000Z",
@@ -6164,9 +6166,13 @@
     "midia_facebook": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/viral-hoje-a-lua-volta-fininha-fb.mp4",
     "legenda": "Hoje, logo depois do pôr do sol, a Lua volta pro céu, fininha. Ela vai estar só sete por cento acesa, baixinha, pro lado oeste. Olhe entre as seis e meia e as oito, antes que ela se ponha. E repare: o resto do disco aparece de leve, num cinza apagado. É a luz da Terra batendo na Lua e voltando. Os cientistas chamam de luz cinérea.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Cálculo para São Paulo (astronomy-engine): em 11/11/2026 o Sol se põe às 18h26; a Lua (7% iluminada) fica a 20° pro oeste e se põe às 20h47.\nFotos: Wikimedia Commons (CC BY-SA); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
     "slug": "viral-hoje-a-lua-volta-fininha",
-    "status": "agendado",
+    "status": "publicado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
-    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante.",
+    "id_instagram": "18018457067975261",
+    "publicado_em": "2026-11-11T21:11:32.911Z",
+    "id_comentario": "18038913812902895",
+    "id_facebook": "2042179853150041"
   },
   {
     "quando": "2026-11-12T11:00:00.000Z",
