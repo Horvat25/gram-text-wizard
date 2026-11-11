@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-10T16:54:40.846Z",
+ "gerado_em": "2026-11-11T17:00:03.054Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2564496,
+   "seguidores": 2565687,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17575,
+   "seguidores": 17585,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590255,
+   "seguidores": 590375,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.038,
+   "comentarios_por_curtida_sem_pedido": 0.046,
    "melhores_pedidos": []
   },
   {
@@ -146,12 +146,12 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057005,
+   "seguidores": 1057062,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.02,
+   "comentarios_por_curtida_sem_pedido": 0.021,
    "melhores_pedidos": []
   }
  ],
