@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-10T17:08:01.075Z",
+  "gerado_em": "2026-11-11T17:17:02.079Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 16,
-    "curtidas": 16
+    "seguidores": 46,
+    "curtidas": 46
   },
   "pagina_diaria": [
     {
@@ -589,7 +589,7 @@
     },
     {
       "d": "2026-11-08",
-      "views": 39
+      "views": 40
     },
     {
       "d": "2026-11-09",
@@ -597,24 +597,80 @@
     },
     {
       "d": "2026-11-10",
-      "views": 2323
+      "views": 19054
+    },
+    {
+      "d": "2026-11-11",
+      "views": 409
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "2185042108781347",
+      "quando": "2026-11-11T17:10:55+0000",
+      "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Um mundo gelado tirou Plutão da lista dos planetas. É Éris",
+      "link": "https://www.facebook.com/reel/2185042108781347/",
+      "segundos": 40.791,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "29260134300285811",
+      "quando": "2026-11-11T11:11:10+0000",
+      "titulo": "A sonda que vai investigar a cena de um crime espacial já está chegando. Em dois mil e vinte e dois, a NASA jo",
+      "link": "https://www.facebook.com/reel/29260134300285811/",
+      "segundos": 43.681,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 222,
+      "alcance": null,
+      "tempo_medio_ms": 7438,
+      "interacoes": 0
+    },
+    {
+      "id": "1056296934099260",
+      "quando": "2026-11-10T21:11:29+0000",
+      "titulo": "Esse montinho de estrelas que aparece no céu de novembro tem nome: Sete-Estrelo. São as Plêiades, um grupo de ",
+      "link": "https://www.facebook.com/reel/1056296934099260/",
+      "segundos": 43.868,
+      "curtidas": 11,
+      "comentarios": 0,
+      "views": 1296,
+      "alcance": null,
+      "tempo_medio_ms": 5876,
+      "interacoes": 0
+    },
+    {
+      "id": "1151516210667823",
+      "quando": "2026-11-10T17:11:33+0000",
+      "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Plutão e a lua dele vivem se encarando, sem nunca virar a ",
+      "link": "https://www.facebook.com/reel/1151516210667823/",
+      "segundos": 36.666,
+      "curtidas": 80,
+      "comentarios": 0,
+      "views": 8986,
+      "alcance": null,
+      "tempo_medio_ms": 6542,
+      "interacoes": 1
+    },
+    {
       "id": "1604208615073265",
       "quando": "2026-11-10T11:11:59+0000",
       "titulo": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do as",
       "link": "https://www.facebook.com/reel/1604208615073265/",
       "segundos": 43.6,
-      "curtidas": 2,
+      "curtidas": 30,
       "comentarios": 0,
-      "views": 236,
+      "views": 2149,
       "alcance": null,
-      "tempo_medio_ms": 7696,
-      "interacoes": 0
+      "tempo_medio_ms": 9462,
+      "interacoes": 3
     },
     {
       "id": "1894529281682355",
@@ -624,9 +680,9 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1098,
+      "views": 1147,
       "alcance": null,
-      "tempo_medio_ms": 6230,
+      "tempo_medio_ms": 6218,
       "interacoes": 2
     },
     {
@@ -635,12 +691,12 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Existe uma lua que parece uma esponja de lavar louça. É Hi",
       "link": "https://www.facebook.com/reel/1513211240897962/",
       "segundos": 38.5,
-      "curtidas": 25,
-      "comentarios": 0,
-      "views": 1878,
+      "curtidas": 53,
+      "comentarios": 1,
+      "views": 5563,
       "alcance": null,
-      "tempo_medio_ms": 6454,
-      "interacoes": 0
+      "tempo_medio_ms": 5947,
+      "interacoes": 1
     },
     {
       "id": "1147287977980909",
@@ -648,12 +704,12 @@
       "titulo": "Tem uma estrela escondida atravessando a atmosfera de Betelgeuse. Betelgeuse é a estrela avermelhada de Órion,",
       "link": "https://www.facebook.com/reel/1147287977980909/",
       "segundos": 47.071,
-      "curtidas": 2,
-      "comentarios": 0,
-      "views": 338,
+      "curtidas": 11,
+      "comentarios": 1,
+      "views": 918,
       "alcance": null,
-      "tempo_medio_ms": 4608,
-      "interacoes": 0
+      "tempo_medio_ms": 5638,
+      "interacoes": 1
     },
     {
       "id": "2336826687063705",
@@ -663,9 +719,9 @@
       "segundos": 42.3,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 307,
+      "views": 310,
       "alcance": null,
-      "tempo_medio_ms": 7146,
+      "tempo_medio_ms": 7222,
       "interacoes": 0
     },
     {
@@ -676,9 +732,9 @@
       "segundos": 44.583,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 230,
+      "views": 232,
       "alcance": null,
-      "tempo_medio_ms": 4855,
+      "tempo_medio_ms": 4898,
       "interacoes": 0
     },
     {
@@ -689,9 +745,9 @@
       "segundos": 45.49,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 19914,
       "interacoes": 0
     },
     {
@@ -702,9 +758,9 @@
       "segundos": 45.1,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 272,
+      "views": 274,
       "alcance": null,
-      "tempo_medio_ms": 8841,
+      "tempo_medio_ms": 8783,
       "interacoes": 0
     },
     {
@@ -715,9 +771,9 @@
       "segundos": 39.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 236,
+      "views": 237,
       "alcance": null,
-      "tempo_medio_ms": 12072,
+      "tempo_medio_ms": 12147,
       "interacoes": 0
     },
     {
@@ -728,9 +784,9 @@
       "segundos": 45.78,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 420,
+      "views": 421,
       "alcance": null,
-      "tempo_medio_ms": 6597,
+      "tempo_medio_ms": 6583,
       "interacoes": 0
     },
     {
@@ -741,9 +797,9 @@
       "segundos": 31.75,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 251,
+      "views": 252,
       "alcance": null,
-      "tempo_medio_ms": 5081,
+      "tempo_medio_ms": 5063,
       "interacoes": 0
     },
     {
@@ -754,9 +810,9 @@
       "segundos": 36.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 205,
+      "views": 206,
       "alcance": null,
-      "tempo_medio_ms": 2370,
+      "tempo_medio_ms": 2363,
       "interacoes": 0
     },
     {
@@ -767,9 +823,9 @@
       "segundos": 49.006,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 265,
+      "views": 266,
       "alcance": null,
-      "tempo_medio_ms": 7599,
+      "tempo_medio_ms": 7582,
       "interacoes": 0
     },
     {
@@ -1170,9 +1226,9 @@
       "segundos": 38.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 1132,
       "interacoes": 0
     },
     {
