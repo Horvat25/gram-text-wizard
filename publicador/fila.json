@@ -6116,9 +6116,13 @@
     "midia_facebook": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/nw-hera-chegando-na-cena-da-batida-fb.mp4",
     "legenda": "A sonda que vai investigar a cena de um crime espacial já está chegando. Em dois mil e vinte e dois, a NASA jogou uma nave contra o asteroide Dimórfos, de propósito. A batida mudou a órbita dele: a volta ficou trinta e três minutos mais curta. Agora a sonda europeia Hera já enxerga os dois asteroides separados. As primeiras fotos de perto saem no dia vinte e cinco de novembro.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: ESA — Hera (via ScienceDaily, 03/11/2026); NASA — DART (26/09/2022)\nImagens: NASA/Johns Hopkins APL; cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
     "slug": "nw-hera-chegando-na-cena-da-batida",
-    "status": "agendado",
+    "status": "publicado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
-    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante.",
+    "id_instagram": "18134970283791905",
+    "publicado_em": "2026-11-11T11:10:50.358Z",
+    "id_comentario": "17954950287291451",
+    "id_facebook": "29260134300285811"
   },
   {
     "quando": "2026-11-11T11:00:00.000Z",
@@ -6126,7 +6130,9 @@
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-noticia-2026-11-11.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-11",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17955716940337580",
+    "publicado_em": "2026-11-11T11:11:10.277Z"
   },
   {
     "quando": "2026-11-11T17:00:00.000Z",
