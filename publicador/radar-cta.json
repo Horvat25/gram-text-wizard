@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-11T17:00:03.054Z",
+ "gerado_em": "2026-11-12T17:29:29.431Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2565687,
+   "seguidores": 2566025,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17585,
+   "seguidores": 17593,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590375,
+   "seguidores": 590455,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.046,
+   "comentarios_por_curtida_sem_pedido": 0.055,
    "melhores_pedidos": []
   },
   {
@@ -117,7 +117,7 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 28,
+   "seguidores": 29,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
@@ -146,13 +146,26 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057062,
+   "seguidores": 1057083,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
+   "pct_posts_pedindo": 0.02,
+   "palavras": {
+    "REM": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.031,
    "comentarios_por_curtida_sem_pedido": 0.021,
-   "melhores_pedidos": []
+   "melhores_pedidos": [
+    {
+     "quando": "2026-11-12",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "REM",
+     "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
+     "comentarios": 85,
+     "curtidas": 2724,
+     "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
+    }
+   ]
   }
  ],
  "hashtags": [
