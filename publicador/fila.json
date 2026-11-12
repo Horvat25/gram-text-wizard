@@ -6220,7 +6220,9 @@
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-feed-2026-11-12.png",
     "legenda": "",
     "slug": "story-feed-2026-11-12",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18099902012548777",
+    "publicado_em": "2026-11-12T21:10:22.631Z"
   },
   {
     "quando": "2026-11-12T21:00:00.000Z",
@@ -6229,8 +6231,12 @@
     "midia_facebook": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/viral-dia-17-chuva-de-meteoros-leonidas-fb.mp4",
     "legenda": "Na madrugada de terça pra quarta, dia dezessete, tem chuva de meteoros. São as Leônidas: pedaços de um cometa que a Terra atravessa todo ano. Nos melhores momentos, são uns quinze meteoros por hora. O melhor horário é depois das duas da manhã, olhando pro leste, quando a Lua já se pôs. Deite num lugar escuro e deixe os olhos acostumarem por uns vinte minutos.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 IMO 2026: pico das Leônidas na madrugada de 17 pra 18/11/2026 (~15 meteoros/hora). Lua se põe às 00h54 em São Paulo (astronomy-engine).\nCenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
     "slug": "viral-dia-17-chuva-de-meteoros-leonidas",
-    "status": "agendado",
+    "status": "publicado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
-    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante.",
+    "id_instagram": "18109388633619254",
+    "publicado_em": "2026-11-12T21:11:13.503Z",
+    "id_comentario": "18085024298547241",
+    "id_facebook": "1130067386542232"
   }
 ]
