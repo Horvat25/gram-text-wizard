@@ -6181,9 +6181,13 @@
     "midia_facebook": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/nw-buracos-negros-podem-se-partir-fb.mp4",
     "legenda": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca se divide. Mas um estudo novo achou uma brecha: se ele girar quase no limite, a divisão fica possível. Os cientistas chamaram o formato de calça, porque um vira dois, como duas pernas. Ninguém viu isso acontecer ainda. A pista seria um brilho de raios gama vindo de pedaços minúsculos.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: University of Southern Denmark / Physical Review D (2026), via ScienceDaily, 02/11/2026\nImagens: EHT Collaboration (M87*); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
     "slug": "nw-buracos-negros-podem-se-partir",
-    "status": "agendado",
+    "status": "publicado",
     "comentario": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
-    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante."
+    "recuperacao": "Lote aprovado 08–12/11 recuperado pelo Founder em 09/11; somente os slots de hoje em diante.",
+    "id_instagram": "17904500058607330",
+    "publicado_em": "2026-11-12T11:11:27.177Z",
+    "id_comentario": "18093386777290064",
+    "id_facebook": "1671092501068991"
   },
   {
     "quando": "2026-11-12T11:00:00.000Z",
@@ -6191,7 +6195,9 @@
     "midia": "https://ygsfgttlrgvjizeubjws.supabase.co/storage/v1/object/public/rqp-videos/neural-update-recovery/story-noticia-2026-11-12.png",
     "legenda": "",
     "slug": "story-noticia-2026-11-12",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17956020207294099",
+    "publicado_em": "2026-11-12T11:11:45.902Z"
   },
   {
     "quando": "2026-11-12T17:00:00.000Z",
