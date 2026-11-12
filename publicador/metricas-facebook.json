@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-11T17:17:02.079Z",
+  "gerado_em": "2026-11-12T17:40:20.716Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 46,
-    "curtidas": 46
+    "seguidores": 76,
+    "curtidas": 76
   },
   "pagina_diaria": [
     {
@@ -597,28 +597,528 @@
     },
     {
       "d": "2026-11-10",
-      "views": 19054
+      "views": 19065
     },
     {
       "d": "2026-11-11",
-      "views": 409
+      "views": 9919
+    },
+    {
+      "d": "2026-11-12",
+      "views": 5659
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
+  "ganhos_diarios": [
+    {
+      "d": "2026-08-15",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-16",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-17",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-18",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-19",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-20",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-21",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-22",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-23",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-24",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-25",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-26",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-27",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-28",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-29",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-30",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-08-31",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-01",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-02",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-03",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-04",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-05",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-06",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-07",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-08",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-09",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-10",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-11",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-12",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-13",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-14",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-15",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-16",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-17",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-18",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-19",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-20",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-21",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-22",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-23",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-24",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-25",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-26",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-27",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-28",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-29",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-09-30",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-01",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-02",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-03",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-04",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-05",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-06",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-07",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-08",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-09",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-10",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-11",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-12",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-13",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-14",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-15",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-16",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-17",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-18",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-19",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-20",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-21",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-22",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-23",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-24",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-25",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-26",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-27",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-28",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-29",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-30",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-10-31",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-01",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-02",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-03",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-04",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-05",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-06",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-07",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-08",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-09",
+      "valor": 0,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-10",
+      "valor": 22,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-11",
+      "valor": 14.01,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-12",
+      "valor": 8,
+      "moeda": "USD"
+    }
+  ],
+  "ganhos_metrica": "content_monetization_earnings",
+  "ganhos_resposta_crua": {
+    "currency": "USD",
+    "microAmount": 0
+  },
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1843147703497460",
+      "quando": "2026-11-12T17:10:56+0000",
+      "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Ma",
+      "link": "https://www.facebook.com/reel/1843147703497460/",
+      "segundos": 36.75,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 8,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1671092501068991",
+      "quando": "2026-11-12T11:11:46+0000",
+      "titulo": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca",
+      "link": "https://www.facebook.com/reel/1671092501068991/",
+      "segundos": 48.3,
+      "curtidas": 12,
+      "comentarios": 0,
+      "views": 650,
+      "alcance": null,
+      "tempo_medio_ms": 6785,
+      "interacoes": 0
+    },
+    {
+      "id": "2042179853150041",
+      "quando": "2026-11-11T21:11:35+0000",
+      "titulo": "Hoje, logo depois do pôr do sol, a Lua volta pro céu, fininha. Ela vai estar só sete por cento acesa, baixinha",
+      "link": "https://www.facebook.com/reel/2042179853150041/",
+      "segundos": 44.866,
+      "curtidas": 49,
+      "comentarios": 0,
+      "views": 5669,
+      "alcance": null,
+      "tempo_medio_ms": 7924,
+      "interacoes": 0
+    },
     {
       "id": "2185042108781347",
       "quando": "2026-11-11T17:10:55+0000",
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Um mundo gelado tirou Plutão da lista dos planetas. É Éris",
       "link": "https://www.facebook.com/reel/2185042108781347/",
       "segundos": 40.791,
-      "curtidas": 0,
+      "curtidas": 97,
       "comentarios": 0,
-      "views": 0,
+      "views": 6762,
       "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
+      "tempo_medio_ms": 7071,
+      "interacoes": 1
     },
     {
       "id": "29260134300285811",
@@ -626,12 +1126,12 @@
       "titulo": "A sonda que vai investigar a cena de um crime espacial já está chegando. Em dois mil e vinte e dois, a NASA jo",
       "link": "https://www.facebook.com/reel/29260134300285811/",
       "segundos": 43.681,
-      "curtidas": 1,
-      "comentarios": 0,
-      "views": 222,
+      "curtidas": 29,
+      "comentarios": 1,
+      "views": 2420,
       "alcance": null,
-      "tempo_medio_ms": 7438,
-      "interacoes": 0
+      "tempo_medio_ms": 9138,
+      "interacoes": 1
     },
     {
       "id": "1056296934099260",
@@ -641,9 +1141,9 @@
       "segundos": 43.868,
       "curtidas": 11,
       "comentarios": 0,
-      "views": 1296,
+      "views": 1379,
       "alcance": null,
-      "tempo_medio_ms": 5876,
+      "tempo_medio_ms": 6198,
       "interacoes": 0
     },
     {
@@ -652,11 +1152,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Plutão e a lua dele vivem se encarando, sem nunca virar a ",
       "link": "https://www.facebook.com/reel/1151516210667823/",
       "segundos": 36.666,
-      "curtidas": 80,
+      "curtidas": 84,
       "comentarios": 0,
-      "views": 8986,
+      "views": 9044,
       "alcance": null,
-      "tempo_medio_ms": 6542,
+      "tempo_medio_ms": 6575,
       "interacoes": 1
     },
     {
@@ -667,9 +1167,9 @@
       "segundos": 43.6,
       "curtidas": 30,
       "comentarios": 0,
-      "views": 2149,
+      "views": 2158,
       "alcance": null,
-      "tempo_medio_ms": 9462,
+      "tempo_medio_ms": 9489,
       "interacoes": 3
     },
     {
@@ -680,9 +1180,9 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1147,
+      "views": 1154,
       "alcance": null,
-      "tempo_medio_ms": 6218,
+      "tempo_medio_ms": 6203,
       "interacoes": 2
     },
     {
@@ -693,9 +1193,9 @@
       "segundos": 38.5,
       "curtidas": 53,
       "comentarios": 1,
-      "views": 5563,
+      "views": 5578,
       "alcance": null,
-      "tempo_medio_ms": 5947,
+      "tempo_medio_ms": 5965,
       "interacoes": 1
     },
     {
@@ -706,9 +1206,9 @@
       "segundos": 47.071,
       "curtidas": 11,
       "comentarios": 1,
-      "views": 918,
+      "views": 926,
       "alcance": null,
-      "tempo_medio_ms": 5638,
+      "tempo_medio_ms": 5711,
       "interacoes": 1
     },
     {
@@ -719,9 +1219,9 @@
       "segundos": 42.3,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 310,
+      "views": 314,
       "alcance": null,
-      "tempo_medio_ms": 7222,
+      "tempo_medio_ms": 7296,
       "interacoes": 0
     },
     {
@@ -732,9 +1232,9 @@
       "segundos": 44.583,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 232,
+      "views": 236,
       "alcance": null,
-      "tempo_medio_ms": 4898,
+      "tempo_medio_ms": 5087,
       "interacoes": 0
     },
     {
@@ -745,9 +1245,9 @@
       "segundos": 45.49,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 5,
       "alcance": null,
-      "tempo_medio_ms": 19914,
+      "tempo_medio_ms": 22474,
       "interacoes": 0
     },
     {
@@ -758,9 +1258,9 @@
       "segundos": 45.1,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 274,
+      "views": 278,
       "alcance": null,
-      "tempo_medio_ms": 8783,
+      "tempo_medio_ms": 8714,
       "interacoes": 0
     },
     {
@@ -771,9 +1271,9 @@
       "segundos": 39.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 237,
+      "views": 241,
       "alcance": null,
-      "tempo_medio_ms": 12147,
+      "tempo_medio_ms": 12116,
       "interacoes": 0
     },
     {
@@ -784,9 +1284,9 @@
       "segundos": 45.78,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 421,
+      "views": 424,
       "alcance": null,
-      "tempo_medio_ms": 6583,
+      "tempo_medio_ms": 6645,
       "interacoes": 0
     },
     {
@@ -797,9 +1297,9 @@
       "segundos": 31.75,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 252,
+      "views": 256,
       "alcance": null,
-      "tempo_medio_ms": 5063,
+      "tempo_medio_ms": 5085,
       "interacoes": 0
     },
     {
@@ -810,9 +1310,9 @@
       "segundos": 36.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 206,
+      "views": 209,
       "alcance": null,
-      "tempo_medio_ms": 2363,
+      "tempo_medio_ms": 2587,
       "interacoes": 0
     },
     {
@@ -823,9 +1323,9 @@
       "segundos": 49.006,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 266,
+      "views": 269,
       "alcance": null,
-      "tempo_medio_ms": 7582,
+      "tempo_medio_ms": 7602,
       "interacoes": 0
     },
     {
@@ -836,9 +1336,9 @@
       "segundos": 42.233,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 225,
+      "views": 228,
       "alcance": null,
-      "tempo_medio_ms": 6619,
+      "tempo_medio_ms": 6780,
       "interacoes": 0
     },
     {
@@ -849,9 +1349,9 @@
       "segundos": 37.5,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 271,
+      "views": 274,
       "alcance": null,
-      "tempo_medio_ms": 4202,
+      "tempo_medio_ms": 4343,
       "interacoes": 0
     },
     {
@@ -862,9 +1362,9 @@
       "segundos": 39.7,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 6,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 107080,
       "interacoes": 0
     },
     {
@@ -875,9 +1375,9 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 842,
+      "views": 847,
       "alcance": null,
-      "tempo_medio_ms": 7994,
+      "tempo_medio_ms": 8126,
       "interacoes": 0
     },
     {
@@ -888,9 +1388,9 @@
       "segundos": 35.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 232,
+      "views": 236,
       "alcance": null,
-      "tempo_medio_ms": 3848,
+      "tempo_medio_ms": 4301,
       "interacoes": 0
     },
     {
@@ -901,9 +1401,9 @@
       "segundos": 48.2,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 226,
+      "views": 230,
       "alcance": null,
-      "tempo_medio_ms": 2347,
+      "tempo_medio_ms": 2522,
       "interacoes": 0
     },
     {
@@ -914,9 +1414,9 @@
       "segundos": 35.17,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 2965,
       "interacoes": 0
     },
     {
@@ -927,9 +1427,9 @@
       "segundos": 35.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 30296,
       "interacoes": 0
     },
     {
@@ -940,9 +1440,9 @@
       "segundos": 45.933,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 13270,
       "interacoes": 0
     },
     {
@@ -953,9 +1453,9 @@
       "segundos": 33.5,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 13127,
       "interacoes": 0
     },
     {
@@ -966,9 +1466,9 @@
       "segundos": 37.25,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 8152,
+      "tempo_medio_ms": 21801,
       "interacoes": 0
     },
     {
@@ -977,11 +1477,11 @@
       "titulo": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷",
       "link": "https://www.facebook.com/reel/1442629108066073/",
       "segundos": 41.48,
-      "curtidas": 0,
+      "curtidas": 1,
       "comentarios": 0,
-      "views": 0,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 33670,
       "interacoes": 0
     },
     {
@@ -992,9 +1492,9 @@
       "segundos": 41.84,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 19323,
       "interacoes": 0
     },
     {
@@ -1005,9 +1505,9 @@
       "segundos": 34.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 7,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 63030,
       "interacoes": 0
     },
     {
@@ -1018,9 +1518,9 @@
       "segundos": 44.342,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 4819,
       "interacoes": 0
     },
     {
@@ -1031,9 +1531,9 @@
       "segundos": 40.88,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 3290,
       "interacoes": 0
     },
     {
@@ -1044,9 +1544,9 @@
       "segundos": 35.083,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 31288,
       "interacoes": 0
     },
     {
@@ -1057,9 +1557,9 @@
       "segundos": 44.8,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 22828,
+      "tempo_medio_ms": 18803,
       "interacoes": 0
     },
     {
@@ -1070,9 +1570,9 @@
       "segundos": 38.433,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 16171,
       "interacoes": 0
     },
     {
@@ -1083,9 +1583,9 @@
       "segundos": 33.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 31149,
       "interacoes": 0
     },
     {
@@ -1096,9 +1596,9 @@
       "segundos": 42.51,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 37610,
       "interacoes": 0
     },
     {
@@ -1109,9 +1609,9 @@
       "segundos": 41.266,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 4304,
       "interacoes": 0
     },
     {
@@ -1122,9 +1622,9 @@
       "segundos": 35.96,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 35957,
       "interacoes": 0
     },
     {
@@ -1135,9 +1635,9 @@
       "segundos": 41.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 33889,
       "interacoes": 0
     },
     {
@@ -1148,9 +1648,9 @@
       "segundos": 40.933,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 13304,
       "interacoes": 0
     },
     {
@@ -1161,9 +1661,9 @@
       "segundos": 33.458,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 30911,
       "interacoes": 0
     },
     {
@@ -1174,9 +1674,9 @@
       "segundos": 43.272,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 36414,
       "interacoes": 0
     },
     {
@@ -1187,9 +1687,9 @@
       "segundos": 39.602,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 4794,
       "interacoes": 0
     },
     {
@@ -1200,9 +1700,9 @@
       "segundos": 43.333,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 37542,
       "interacoes": 0
     },
     {
@@ -1213,9 +1713,9 @@
       "segundos": 45.466,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 3622,
       "interacoes": 0
     },
     {
@@ -1226,9 +1726,9 @@
       "segundos": 38.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 1132,
+      "tempo_medio_ms": 18165,
       "interacoes": 0
     },
     {
@@ -1239,9 +1739,9 @@
       "segundos": 40.566,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 7900,
       "interacoes": 0
     },
     {
@@ -1252,9 +1752,9 @@
       "segundos": 42.58,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 4105,
       "interacoes": 0
     },
     {
@@ -1265,9 +1765,9 @@
       "segundos": 35.208,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 33386,
       "interacoes": 0
     },
     {
@@ -1278,9 +1778,9 @@
       "segundos": 39.7,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 20009,
       "interacoes": 0
     },
     {
@@ -1291,9 +1791,9 @@
       "segundos": 42.266,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 36490,
       "interacoes": 0
     },
     {
@@ -1304,9 +1804,9 @@
       "segundos": 41.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 41291,
       "interacoes": 0
     },
     {
@@ -1317,9 +1817,9 @@
       "segundos": 40.98,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 53766,
       "interacoes": 0
     },
     {
@@ -1330,9 +1830,9 @@
       "segundos": 40.64,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 3938,
       "interacoes": 0
     },
     {
@@ -1343,9 +1843,9 @@
       "segundos": 33.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 6716,
       "interacoes": 0
     },
     {
@@ -1356,9 +1856,9 @@
       "segundos": 42.876,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 13312,
       "interacoes": 0
     },
     {
@@ -1369,9 +1869,9 @@
       "segundos": 43.1,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 11066,
       "interacoes": 0
     },
     {
@@ -1382,9 +1882,9 @@
       "segundos": 38.38,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 26129,
       "interacoes": 0
     },
     {
@@ -1395,9 +1895,9 @@
       "segundos": 39.9,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 24757,
       "interacoes": 0
     },
     {
@@ -1408,9 +1908,9 @@
       "segundos": 38.67,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 57410,
       "interacoes": 0
     },
     {
@@ -1421,9 +1921,9 @@
       "segundos": 39.5,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 4760,
       "interacoes": 0
     },
     {
@@ -1434,9 +1934,9 @@
       "segundos": 36.642,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 658,
+      "tempo_medio_ms": 3382,
       "interacoes": 0
     },
     {
