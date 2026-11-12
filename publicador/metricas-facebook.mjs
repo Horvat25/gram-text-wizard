@@ -131,11 +131,62 @@ async function paginaDiaria() {
 const pd = await paginaDiaria();
 console.log(`Página por dia: ${pd.lista.length} dias (${pd.metric || 'nenhuma métrica aceita'})`);
 
+// ── Ganhos da monetização por dia (12/11/2026) ────────────────────────────────
+// A Página foi aprovada na monetização de conteúdo. A Meta devolve o ganho estimado como
+// objeto ({ microAmount, currency } ou { amount, currency }) ou número; guardo valor + moeda
+// e a resposta crua do 1º dia com ganho, pra conferir com o painel profissional. Pede read_insights.
+const dinheiro = v => {
+  if (v == null) return { valor: 0, moeda: null };
+  if (typeof v === 'number') return { valor: v, moeda: null };
+  if (typeof v === 'object') {
+    const moeda = v.currency || v.moeda || null;
+    if (v.microAmount != null) return { valor: +v.microAmount / 1e6, moeda };
+    if (v.micro_amount != null) return { valor: +v.micro_amount / 1e6, moeda };
+    if (v.amount != null) return { valor: +v.amount, moeda };
+    if (v.value != null) return { valor: +v.value, moeda };
+    const nums = Object.values(v).filter(x => typeof x === 'number');
+    return { valor: nums.reduce((a, b) => a + b, 0), moeda };
+  }
+  return { valor: +v || 0, moeda: null };
+};
+async function ganhosDiarios() {
+  let anterior = [];
+  try { anterior = JSON.parse(fs.readFileSync(SAIDA, 'utf8')).ganhos_diarios || []; } catch {}
+  const mapa = new Map(anterior.map(p => [p.d, p]));
+  const ts = n => String(Math.floor((Date.now() - n * 864e5) / 1000));
+  const falhas = [];
+  for (const metric of ['content_monetization_earnings', 'monetization_approximate_earnings']) {
+    const novos = []; let ok = true, cru = null;
+    for (const [a, b] of [[90, 60], [60, 30], [30, 0]]) {
+      const r = await get(`/${FB_PAGE_ID}/insights`, { metric, period: 'day', since: ts(a), until: ts(b) }, TK);
+      const vals = r.data?.[0]?.values;
+      if (!vals) { ok = false; falhas.push(`${metric}: ${(r.error?.message || 'sem valores').slice(0, 120)}`); break; }
+      for (const v of vals) {
+        if (cru == null && v.value != null && v.value !== 0) cru = v.value;
+        const { valor, moeda } = dinheiro(v.value);
+        novos.push({ d: new Date(Date.parse(v.end_time) - 864e5).toISOString().slice(0, 10), valor: Math.round(valor * 100) / 100, moeda });
+      }
+    }
+    if (ok) {
+      for (const p of novos) mapa.set(p.d, p);
+      return { metric, cru, lista: [...mapa.values()].sort((x, y) => x.d.localeCompare(y.d)) };
+    }
+  }
+  erros.push('ganhos: ' + falhas.join(' | '));
+  return { metric: null, cru: null, lista: [...mapa.values()].sort((x, y) => x.d.localeCompare(y.d)) };
+}
+const gd = await ganhosDiarios();
+const ganhoTotal = gd.lista.reduce((a, p) => a + (p.valor || 0), 0);
+console.log(`ganhos: ${gd.metric || 'nenhuma métrica aceita'} · ${gd.lista.length} dias · total ${ganhoTotal.toFixed(2)} ${gd.lista.find(p => p.moeda)?.moeda || ''}`);
+
 const doc = {
   gerado_em: new Date().toISOString(),
   pagina: { id: FB_PAGE_ID, nome: pag.name, seguidores: pag.followers_count ?? null, curtidas: pag.fan_count ?? null },
   pagina_diaria: pd.lista,
   pagina_diaria_metrica: pd.metric,
+  ganhos_diarios: gd.lista,
+  ganhos_metrica: gd.metric,
+  ganhos_resposta_crua: gd.cru,
   metricas_usadas: conjuntoOk,
   itens,
   erros,
