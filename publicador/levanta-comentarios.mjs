@@ -61,7 +61,7 @@ if (process.argv.includes('--autoteste')) {
 
 const IG_USER_ID = process.env.IG_USER_ID;
 const IG_TOKEN = process.env.IG_TOKEN;
-const FB_TOKEN = process.env.FB_TOKEN || process.env.IG_TOKEN;
+let FB_TOKEN = process.env.FB_TOKEN || process.env.IG_TOKEN;
 if (!IG_USER_ID || !IG_TOKEN) { console.error('faltam IG_USER_ID / IG_TOKEN'); process.exit(1); }
 
 const get = async (caminho, params = {}, token = IG_TOKEN) => {
@@ -105,6 +105,11 @@ async function main() {
   }
 
   // ── Página do Facebook (posts e vídeos/Reels)
+  // O secret FB_TOKEN está inválido (13/11); o publicar.mjs tira o token da Página do IG_TOKEN (de usuário). Igual aqui.
+  try {
+    const t = await get(`/${FB_PAGE_ID}`, { fields: 'access_token' }, IG_TOKEN);
+    if (t.access_token) FB_TOKEN = t.access_token; else erros.push('token da Pagina: ' + (t.error?.message || 'nao veio').slice(0, 100));
+  } catch (e) { erros.push('token da Pagina: ' + (e.message || e)); }
   let fb_itens = 0;
   for (const rota of ['posts', 'videos']) {
     const campos = rota === 'posts' ? 'id,created_time,message,permalink_url' : 'id,created_time,description,permalink_url';
