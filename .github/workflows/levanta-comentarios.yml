@@ -1,0 +1,59 @@
+name: Levantar comentarios
+
+# POR QUE EXISTE (13/11/2026, pedido do Marcelo via Direção): relacionamento com o público. SÓ LEITURA.
+# O repositório é PÚBLICO: o resultado com @ e texto de comentário sai CIFRADO (chave pública no script;
+# a privada fica fora do repositório). Log e commit só têm contagens. Roda ao empurrar o arquivo gatilho
+# ou manualmente. Depois de usado, o arquivo cifrado deve ser apagado do repositório.
+
+on:
+  push:
+    paths:
+      - 'publicador/levanta-comentarios.gatilho'
+  workflow_dispatch:
+
+concurrency:
+  group: levanta-comentarios
+  cancel-in-progress: false
+
+jobs:
+  levanta:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Autoteste da cifra
+        run: node publicador/levanta-comentarios.mjs --autoteste
+
+      - name: Levantar
+        env:
+          IG_USER_ID: '17841478894893058'
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          FB_TOKEN: ${{ secrets.FB_TOKEN }}
+          FB_PAGE_ID: '962589380261249'
+          LEVANTA_SAIDA: /tmp/levantamento-comentarios.enc.json
+        run: node publicador/levanta-comentarios.mjs
+
+      - name: Guardar (cifrado)
+        run: |
+          set -e
+          [ -s /tmp/levantamento-comentarios.enc.json ] || { echo "sem resultado"; exit 0; }
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cp /tmp/levantamento-comentarios.enc.json publicador/levantamento-comentarios.enc.json
+            git add publicador/levantamento-comentarios.enc.json
+            if git diff --cached --quiet; then echo "ja estava igual"; exit 0; fi
+            git commit -q -m "comentarios: levantamento cifrado (so contagens em claro) em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado; tentando de novo"
+            sleep 5
+          done
+          exit 1
