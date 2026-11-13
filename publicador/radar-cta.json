@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-12T17:29:29.431Z",
+ "gerado_em": "2026-11-13T17:03:40.362Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2566025,
+   "seguidores": 2566201,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.021,
+   "comentarios_por_curtida_sem_pedido": 0.022,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17593,
+   "seguidores": 17606,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,13 +44,46 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590455,
+   "seguidores": 590802,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.055,
-   "melhores_pedidos": []
+   "pct_posts_pedindo": 0.06,
+   "palavras": {
+    "MOS": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.048,
+   "comentarios_por_curtida_sem_pedido": 0.036,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-11-12",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": null,
+     "trecho": "A funcionária não foi identificada pela Reuters, que afirmou não ter conseguido contato com ela. A Nvidia também não quis comentar o caso. H",
+     "comentarios": 21,
+     "curtidas": 216,
+     "link": "https://www.instagram.com/p/Dfp-56kjETx/"
+    },
+    {
+     "quando": "2026-11-12",
+     "tipo": "REELS",
+     "pede": true,
+     "palavra": null,
+     "trecho": "🚨 Jensen Huang renunciou aos cargos de presidente e CEO da Nvidia e deixou o conselho de administração da companhia.",
+     "comentarios": 3,
+     "curtidas": 193,
+     "link": "https://www.instagram.com/reel/DfpszUDMrOP/"
+    },
+    {
+     "quando": "2026-11-12",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "MOS",
+     "trecho": "Sem um plano formal de sucessão, a Nvidia nomeou sua diretora financeira de longa data como líder interina. A mudança aconteceu após uma seq",
+     "comentarios": 3,
+     "curtidas": 94,
+     "link": "https://www.instagram.com/p/Dfpm37JIFFX/"
+    }
+   ]
   },
   {
    "usuario": "achadinhospromo15",
@@ -146,14 +179,14 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057083,
+   "seguidores": 1057141,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
     "REM": 1
    },
-   "comentarios_por_curtida_com_pedido": 0.031,
-   "comentarios_por_curtida_sem_pedido": 0.021,
+   "comentarios_por_curtida_com_pedido": 0.026,
+   "comentarios_por_curtida_sem_pedido": 0.022,
    "melhores_pedidos": [
     {
      "quando": "2026-11-12",
@@ -161,8 +194,8 @@
      "pede": true,
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
-     "comentarios": 85,
-     "curtidas": 2724,
+     "comentarios": 106,
+     "curtidas": 4101,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -186,8 +219,22 @@
   },
   {
    "hashtag": "projetorgalaxia",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.1,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_sem_pedido": 0.012,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": null,
+     "trecho": "👉 Curtiu? Então chama no direct para garantir o seu com condição especial!",
+     "comentarios": 0,
+     "curtidas": 1,
+     "link": "https://www.instagram.com/p/DKpEXXeRLld/"
+    }
+   ]
   },
   {
    "hashtag": "astronomia",
