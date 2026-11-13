@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-12T17:24:17.330Z",
+ "gerado_em": "2026-11-13T17:03:25.430Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1287,
-  "publicacoes": 1072
+  "seguidores": 1292,
+  "publicacoes": 1074
  },
- "total_listado": 1072,
- "com_tempo_assistido": 532,
+ "total_listado": 1074,
+ "com_tempo_assistido": 534,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-14",
-     "ate": "2026-11-11",
+     "de": "2026-10-15",
+     "ate": "2026-11-12",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 1,
-         "end_time": "2026-10-15T07:00:00+0000"
-        },
         {
          "value": 0,
          "end_time": "2026-10-16T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 1,
          "end_time": "2026-11-11T08:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-11-12T08:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -322,7 +322,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-12",
+     "ate": "2026-11-13",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -590,7 +590,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-12",
+     "ate": "2026-11-13",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -599,7 +599,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 915
+        "value": 2298
        }
       },
       {
@@ -609,7 +609,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 1594
+        "value": 3565
        }
       },
       {
@@ -619,7 +619,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 36
+        "value": 78
        }
       },
       {
@@ -629,7 +629,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 70
+        "value": 207
        }
       }
      ]
@@ -730,15 +730,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 685
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 30185
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 685
            }
           ]
          }
@@ -767,15 +767,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 654
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 20920
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 654
            }
           ]
          }
@@ -804,15 +804,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 18410
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 404
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 18410
            }
           ]
          }
@@ -823,7 +823,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-12",
+     "ate": "2026-11-13",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -832,7 +832,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 915,
+        "value": 2298,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -841,15 +841,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 84
+            "value": 2187
            },
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 822
+            "value": 108
            }
           ]
          }
@@ -894,19 +894,19 @@
             "dimension_values": [
              "25-34"
             ],
-            "value": 305
+            "value": 302
            },
            {
             "dimension_values": [
              "35-44"
             ],
-            "value": 377
+            "value": 379
            },
            {
             "dimension_values": [
              "45-54"
             ],
-            "value": 286
+            "value": 287
            },
            {
             "dimension_values": [
@@ -1119,7 +1119,7 @@
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 96
+            "value": 94
            },
            {
             "dimension_values": [
@@ -1131,13 +1131,13 @@
             "dimension_values": [
              "São Luís, Maranhão"
             ],
-            "value": 14
+            "value": 12
            },
            {
             "dimension_values": [
              "Rio de Janeiro, Rio de Janeiro (state)"
             ],
-            "value": 48
+            "value": 49
            },
            {
             "dimension_values": [
@@ -1161,13 +1161,13 @@
             "dimension_values": [
              "Maceió, Alagoas"
             ],
-            "value": 10
+            "value": 11
            },
            {
             "dimension_values": [
              "Uberlândia, Minas Gerais"
             ],
-            "value": 7
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1179,7 +1179,7 @@
             "dimension_values": [
              "Porto Alegre, Rio Grande do Sul"
             ],
-            "value": 11
+            "value": 12
            },
            {
             "dimension_values": [
@@ -1190,12 +1190,6 @@
            {
             "dimension_values": [
              "Águas Lindas de Goiás, Goiás"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
-             "João Pessoa, Paraíba"
             ],
             "value": 5
            },
@@ -1227,7 +1221,7 @@
             "dimension_values": [
              "Guarulhos, São Paulo (state)"
             ],
-            "value": 9
+            "value": 10
            },
            {
             "dimension_values": [
@@ -1263,7 +1257,7 @@
             "dimension_values": [
              "Salvador, Bahia"
             ],
-            "value": 23
+            "value": 24
            },
            {
             "dimension_values": [
@@ -1275,13 +1269,13 @@
             "dimension_values": [
              "Goiânia, Goiás"
             ],
-            "value": 12
+            "value": 13
            },
            {
             "dimension_values": [
              "Fortaleza, Ceará"
             ],
-            "value": 32
+            "value": 33
            },
            {
             "dimension_values": [
@@ -1323,7 +1317,13 @@
             "dimension_values": [
              "Joinville, Santa Catarina"
             ],
-            "value": 6
+            "value": 5
+           },
+           {
+            "dimension_values": [
+             "Caucaia, Ceará"
+            ],
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1353,7 +1353,7 @@
             "dimension_values": [
              "Curitiba, Paraná"
             ],
-            "value": 15
+            "value": 16
            },
            {
             "dimension_values": [
@@ -2653,13 +2653,29 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-12",
-    "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
+    "janela": "2026-11-13",
+    "erro": "(#100) since param is not valid. Metrics data is available for the last 2 years"
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18109388633619254": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-11-12T21:11:13+0000",
+     "respostas": []
+    }
+   ],
+   "18224148157351762": [
+    {
+     "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
+     "curtidas": 0,
+     "quando": "2026-11-12T17:10:53+0000",
+     "respostas": []
+    }
+   ],
    "17904500058607330": [
     {
      "texto": "Bem que eu desconfiava",
@@ -5363,25 +5379,69 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18109388633619254",
+   "quando": "2026-11-12T21:11:05+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Dfp_X9aCUGr/",
+   "titulo": "Na madrugada de terça pra quarta, dia dezessete, tem chuva de meteoros. São as Leônidas: pedaços de um cometa que a Terra atravessa todo ano",
+   "legenda": "Na madrugada de terça pra quarta, dia dezessete, tem chuva de meteoros. São as Leônidas: pedaços de um cometa que a Terra atravessa todo ano. Nos melhores momentos, são uns quinze meteoros por hora. O melhor horário é depois das duas da manhã, olhando pro leste, quando a Lua já se pôs. Deite num lugar escuro e deixe os olhos acostumarem por uns vinte minutos.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 IMO 2026: pico das Leônidas na madrugada de 17 pra 18/11/2026 (~15 meteoros/hora). Lua se põe às 00h54 em São Paulo (astronomy-engine).\nCenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
+   "curtidas_campo": 36,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 1771,
+   "reach": 1394,
+   "likes": 36,
+   "comments": 1,
+   "shares": 43,
+   "saved": 4,
+   "total_interactions": 86,
+   "ig_reels_avg_watch_time": 11065,
+   "ig_reels_video_view_total_time": 16897519,
+   "reels_skip_rate": 33.3,
+   "reposts": 2
+  },
+  {
+   "id": "18224148157351762",
+   "quando": "2026-11-12T17:10:49+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Dfpj5N0B0Sk/",
+   "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Makêmake, descoberto em dois mil",
+   "legenda": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Makêmake, descoberto em dois mil e cinco, perto da Páscoa. Ele tem uns mil e quatrocentos quilômetros e é coberto de gelo avermelhado. Lá faz uns duzentos e quarenta graus negativos. Leva trezentos e cinco anos pra dar uma volta no Sol, e tem uma lua escura, achada em dois mil e dezesseis.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Makemake\nImagens: ESO/L. Calçada (concepção artística); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #ciencia #aula #neuralupdate",
+   "curtidas_campo": 6,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 183,
+   "reach": 146,
+   "likes": 6,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 7,
+   "ig_reels_avg_watch_time": 13964,
+   "ig_reels_video_view_total_time": 2220277,
+   "reels_skip_rate": 49.7,
+   "reposts": 0
+  },
+  {
    "id": "17904500058607330",
    "quando": "2026-11-12T11:11:22+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/Dfo6tgKqvSY/",
    "titulo": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca se divide. Mas um estudo novo",
    "legenda": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca se divide. Mas um estudo novo achou uma brecha: se ele girar quase no limite, a divisão fica possível. Os cientistas chamaram o formato de calça, porque um vira dois, como duas pernas. Ninguém viu isso acontecer ainda. A pista seria um brilho de raios gama vindo de pedaços minúsculos.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: University of Southern Denmark / Physical Review D (2026), via ScienceDaily, 02/11/2026\nImagens: EHT Collaboration (M87*); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
-   "curtidas_campo": 1,
+   "curtidas_campo": 2,
    "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 17,
-   "reach": 7,
-   "likes": 1,
+   "views": 25,
+   "reach": 14,
+   "likes": 2,
    "comments": 2,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 4,
-   "ig_reels_avg_watch_time": 18290,
-   "ig_reels_video_view_total_time": 164611,
-   "reels_skip_rate": 66.7,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 13398,
+   "ig_reels_video_view_total_time": 214378,
+   "reels_skip_rate": 75,
    "reposts": 1
   },
   {
@@ -5394,16 +5454,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 17,
-   "reach": 11,
+   "views": 19,
+   "reach": 12,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 8645,
-   "ig_reels_video_view_total_time": 112391,
-   "reels_skip_rate": 50,
+   "ig_reels_avg_watch_time": 7724,
+   "ig_reels_video_view_total_time": 115868,
+   "reels_skip_rate": 57.1,
    "reposts": 0
   },
   {
@@ -5416,16 +5476,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 151,
-   "reach": 122,
+   "views": 155,
+   "reach": 125,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 10548,
-   "ig_reels_video_view_total_time": 1350262,
-   "reels_skip_rate": 58.3,
+   "ig_reels_avg_watch_time": 10412,
+   "ig_reels_video_view_total_time": 1374501,
+   "reels_skip_rate": 58.8,
    "reposts": 0
   },
   {
@@ -5438,16 +5498,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 583,
-   "reach": 463,
+   "views": 592,
+   "reach": 472,
    "likes": 12,
    "comments": 3,
    "shares": 5,
    "saved": 2,
    "total_interactions": 23,
-   "ig_reels_avg_watch_time": 13532,
-   "ig_reels_video_view_total_time": 7023401,
-   "reels_skip_rate": 46.2,
+   "ig_reels_avg_watch_time": 13369,
+   "ig_reels_video_view_total_time": 7045838,
+   "reels_skip_rate": 46.3,
    "reposts": 1
   },
   {
@@ -5460,16 +5520,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 139,
-   "reach": 125,
+   "views": 140,
+   "reach": 126,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 4,
-   "ig_reels_avg_watch_time": 6507,
-   "ig_reels_video_view_total_time": 839425,
-   "reels_skip_rate": 66.7,
+   "ig_reels_avg_watch_time": 6463,
+   "ig_reels_video_view_total_time": 840288,
+   "reels_skip_rate": 66.9,
    "reposts": 0
   },
   {
@@ -5482,16 +5542,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 132,
-   "reach": 115,
+   "views": 133,
+   "reach": 116,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 8897,
-   "ig_reels_video_view_total_time": 1049848,
-   "reels_skip_rate": 61.9,
+   "ig_reels_avg_watch_time": 8836,
+   "ig_reels_video_view_total_time": 1051552,
+   "reels_skip_rate": 62.2,
    "reposts": 0
   },
   {
@@ -5504,16 +5564,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 18,
-   "reach": 14,
+   "views": 20,
+   "reach": 16,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 12778,
-   "ig_reels_video_view_total_time": 191680,
-   "reels_skip_rate": 40,
+   "ig_reels_avg_watch_time": 11376,
+   "ig_reels_video_view_total_time": 193394,
+   "reels_skip_rate": 47.1,
    "reposts": 0
   },
   {
@@ -5592,15 +5652,15 @@
    "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 343,
-   "reach": 302,
+   "views": 345,
+   "reach": 303,
    "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 10,
-   "ig_reels_avg_watch_time": 9890,
-   "ig_reels_video_view_total_time": 3085801,
+   "ig_reels_avg_watch_time": 9886,
+   "ig_reels_video_view_total_time": 3104472,
    "reels_skip_rate": 51.6,
    "reposts": 2
   },
@@ -5614,16 +5674,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 283,
-   "reach": 263,
+   "views": 285,
+   "reach": 264,
    "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 11090,
-   "ig_reels_video_view_total_time": 2972232,
-   "reels_skip_rate": 43.3,
+   "ig_reels_avg_watch_time": 11038,
+   "ig_reels_video_view_total_time": 2980529,
+   "reels_skip_rate": 43,
    "reposts": 0
   },
   {
@@ -5658,16 +5718,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 158,
-   "reach": 133,
+   "views": 159,
+   "reach": 134,
    "likes": 8,
    "comments": 1,
    "shares": 1,
    "saved": 1,
    "total_interactions": 12,
-   "ig_reels_avg_watch_time": 8828,
-   "ig_reels_video_view_total_time": 1271362,
-   "reels_skip_rate": 51.7,
+   "ig_reels_avg_watch_time": 8793,
+   "ig_reels_video_view_total_time": 1275107,
+   "reels_skip_rate": 51.4,
    "reposts": 1
   },
   {
@@ -5702,16 +5762,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 438,
+   "views": 441,
    "reach": 354,
    "likes": 12,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 14104,
-   "ig_reels_video_view_total_time": 5486457,
-   "reels_skip_rate": 42.3,
+   "ig_reels_avg_watch_time": 14050,
+   "ig_reels_video_view_total_time": 5493828,
+   "reels_skip_rate": 42.6,
    "reposts": 0
   },
   {
@@ -5724,16 +5784,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 197,
-   "reach": 153,
+   "views": 198,
+   "reach": 154,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 11533,
-   "ig_reels_video_view_total_time": 1833756,
-   "reels_skip_rate": 53.2,
+   "ig_reels_avg_watch_time": 11496,
+   "ig_reels_video_view_total_time": 1839372,
+   "reels_skip_rate": 52.8,
    "reposts": 0
   },
   {
@@ -5768,16 +5828,16 @@
    "curtidas_campo": 12,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 378,
-   "reach": 326,
+   "views": 382,
+   "reach": 327,
    "likes": 12,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 14,
-   "ig_reels_avg_watch_time": 12536,
-   "ig_reels_video_view_total_time": 4312409,
-   "reels_skip_rate": 48.5,
+   "ig_reels_avg_watch_time": 12546,
+   "ig_reels_video_view_total_time": 4328413,
+   "reels_skip_rate": 48.7,
    "reposts": 1
   },
   {
@@ -5790,16 +5850,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 95,
+   "views": 96,
    "reach": 81,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 7009,
-   "ig_reels_video_view_total_time": 595848,
-   "reels_skip_rate": 58.8,
+   "ig_reels_avg_watch_time": 6970,
+   "ig_reels_video_view_total_time": 599462,
+   "reels_skip_rate": 58.1,
    "reposts": 0
   },
   {
@@ -5834,16 +5894,16 @@
    "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 335,
-   "reach": 294,
+   "views": 336,
+   "reach": 295,
    "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 21848,
-   "ig_reels_video_view_total_time": 6707636,
-   "reels_skip_rate": 43,
+   "ig_reels_avg_watch_time": 21782,
+   "ig_reels_video_view_total_time": 6709075,
+   "reels_skip_rate": 43.2,
    "reposts": 0
   },
   {
@@ -5966,16 +6026,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 230,
-   "reach": 207,
+   "views": 231,
+   "reach": 208,
    "likes": 5,
    "comments": 1,
    "shares": 2,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 6459,
-   "ig_reels_video_view_total_time": 1388856,
-   "reels_skip_rate": 58.4,
+   "ig_reels_avg_watch_time": 6432,
+   "ig_reels_video_view_total_time": 1389508,
+   "reels_skip_rate": 58.6,
    "reposts": 0
   },
   {
@@ -6032,15 +6092,15 @@
    "curtidas_campo": 40,
    "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1309,
+   "views": 1310,
    "reach": 1096,
    "likes": 40,
    "comments": 4,
    "shares": 2,
    "saved": 2,
    "total_interactions": 48,
-   "ig_reels_avg_watch_time": 17141,
-   "ig_reels_video_view_total_time": 20380817,
+   "ig_reels_avg_watch_time": 17147,
+   "ig_reels_video_view_total_time": 20405246,
    "reels_skip_rate": 38.9,
    "reposts": 0
   },
@@ -6516,16 +6576,16 @@
    "curtidas_campo": 26,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1723,
+   "views": 1724,
    "reach": 1489,
    "likes": 26,
    "comments": 1,
    "shares": 1,
    "saved": 0,
    "total_interactions": 30,
-   "ig_reels_avg_watch_time": 16530,
-   "ig_reels_video_view_total_time": 26167214,
-   "reels_skip_rate": 35.5,
+   "ig_reels_avg_watch_time": 16520,
+   "ig_reels_video_view_total_time": 26169098,
+   "reels_skip_rate": 35.6,
    "reposts": 2
   },
   {
@@ -7176,16 +7236,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 41,
-   "reach": 27,
+   "views": 42,
+   "reach": 28,
    "likes": 2,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 9048,
-   "ig_reels_video_view_total_time": 307659,
-   "reels_skip_rate": 57.6,
+   "ig_reels_avg_watch_time": 8889,
+   "ig_reels_video_view_total_time": 311143,
+   "reels_skip_rate": 55.9,
    "reposts": 0
   },
   {
@@ -9609,7 +9669,7 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
    "views": 97,
-   "reach": 59,
+   "reach": 60,
    "likes": 2,
    "comments": 1,
    "shares": 1,
