@@ -140,7 +140,9 @@ const dinheiro = v => {
   if (typeof v === 'number') return { valor: v, moeda: null };
   if (typeof v === 'object') {
     const moeda = v.currency || v.moeda || null;
-    if (v.microAmount != null) return { valor: +v.microAmount / 1e6, moeda };
+    // 13/11: conferido com o painel (US$ 0,57 em nov): o microAmount da Meta vem em 1e-8 da
+    // moeda, não 1e-6 — dividir por 1e6 mostrava US$ 55,01 (100x a mais).
+    if (v.microAmount != null) return { valor: +v.microAmount / 1e8, moeda };
     if (v.micro_amount != null) return { valor: +v.micro_amount / 1e6, moeda };
     if (v.amount != null) return { valor: +v.amount, moeda };
     if (v.value != null) return { valor: +v.value, moeda };
@@ -162,9 +164,9 @@ async function ganhosDiarios() {
       const vals = r.data?.[0]?.values;
       if (!vals) { ok = false; falhas.push(`${metric}: ${(r.error?.message || 'sem valores').slice(0, 120)}`); break; }
       for (const v of vals) {
-        if (cru == null && v.value != null && v.value !== 0) cru = v.value;
+        if (cru == null && v.value != null && dinheiro(v.value).valor !== 0) cru = v.value;
         const { valor, moeda } = dinheiro(v.value);
-        novos.push({ d: new Date(Date.parse(v.end_time) - 864e5).toISOString().slice(0, 10), valor: Math.round(valor * 100) / 100, moeda });
+        novos.push({ d: new Date(Date.parse(v.end_time) - 864e5).toISOString().slice(0, 10), valor: Math.round(valor * 10000) / 10000, moeda });
       }
     }
     if (ok) {
