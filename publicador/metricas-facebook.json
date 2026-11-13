@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-13T13:49:54.791Z",
+  "gerado_em": "2026-11-13T14:00:12.455Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -1051,17 +1051,17 @@
     },
     {
       "d": "2026-11-10",
-      "valor": 22,
+      "valor": 0.22,
       "moeda": "USD"
     },
     {
       "d": "2026-11-11",
-      "valor": 14.01,
+      "valor": 0.1401,
       "moeda": "USD"
     },
     {
       "d": "2026-11-12",
-      "valor": 19,
+      "valor": 0.19,
       "moeda": "USD"
     },
     {
@@ -1073,9 +1073,9 @@
   "ganhos_metrica": "content_monetization_earnings",
   "ganhos_resposta_crua": {
     "currency": "USD",
-    "microAmount": 0
+    "microAmount": 22000000
   },
-  "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
+  "metricas_usadas": "blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
       "id": "1130067386542232",
@@ -1085,9 +1085,9 @@
       "segundos": 33.51,
       "curtidas": 32,
       "comentarios": 0,
-      "views": 1756,
+      "views": 1509,
       "alcance": null,
-      "tempo_medio_ms": 9508,
+      "tempo_medio_ms": 9512,
       "interacoes": 0
     },
     {
@@ -1098,7 +1098,7 @@
       "segundos": 36.75,
       "curtidas": 69,
       "comentarios": 0,
-      "views": 5237,
+      "views": 4742,
       "alcance": null,
       "tempo_medio_ms": 6495,
       "interacoes": 1
@@ -1111,7 +1111,7 @@
       "segundos": 48.3,
       "curtidas": 33,
       "comentarios": 1,
-      "views": 2771,
+      "views": 2568,
       "alcance": null,
       "tempo_medio_ms": 6684,
       "interacoes": 1
@@ -1124,7 +1124,7 @@
       "segundos": 44.866,
       "curtidas": 50,
       "comentarios": 0,
-      "views": 6138,
+      "views": 5619,
       "alcance": null,
       "tempo_medio_ms": 7638,
       "interacoes": 0
@@ -1137,7 +1137,7 @@
       "segundos": 40.791,
       "curtidas": 97,
       "comentarios": 0,
-      "views": 6776,
+      "views": 6110,
       "alcance": null,
       "tempo_medio_ms": 7083,
       "interacoes": 1
@@ -1150,7 +1150,7 @@
       "segundos": 43.681,
       "curtidas": 29,
       "comentarios": 1,
-      "views": 2430,
+      "views": 2201,
       "alcance": null,
       "tempo_medio_ms": 9150,
       "interacoes": 1
@@ -1163,7 +1163,7 @@
       "segundos": 43.868,
       "curtidas": 11,
       "comentarios": 0,
-      "views": 1380,
+      "views": 1256,
       "alcance": null,
       "tempo_medio_ms": 6203,
       "interacoes": 0
@@ -1176,9 +1176,9 @@
       "segundos": 36.666,
       "curtidas": 85,
       "comentarios": 0,
-      "views": 9061,
+      "views": 8180,
       "alcance": null,
-      "tempo_medio_ms": 6580,
+      "tempo_medio_ms": 6584,
       "interacoes": 1
     },
     {
@@ -1189,7 +1189,7 @@
       "segundos": 43.6,
       "curtidas": 30,
       "comentarios": 0,
-      "views": 2159,
+      "views": 1957,
       "alcance": null,
       "tempo_medio_ms": 9503,
       "interacoes": 3
@@ -1202,7 +1202,7 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1155,
+      "views": 1031,
       "alcance": null,
       "tempo_medio_ms": 6203,
       "interacoes": 2
@@ -1215,7 +1215,7 @@
       "segundos": 38.5,
       "curtidas": 53,
       "comentarios": 1,
-      "views": 5582,
+      "views": 5121,
       "alcance": null,
       "tempo_medio_ms": 5963,
       "interacoes": 1
@@ -1228,7 +1228,7 @@
       "segundos": 47.071,
       "curtidas": 11,
       "comentarios": 1,
-      "views": 927,
+      "views": 864,
       "alcance": null,
       "tempo_medio_ms": 5706,
       "interacoes": 1
@@ -1241,7 +1241,7 @@
       "segundos": 42.3,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 315,
+      "views": 290,
       "alcance": null,
       "tempo_medio_ms": 7287,
       "interacoes": 0
@@ -1254,7 +1254,7 @@
       "segundos": 44.583,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 237,
+      "views": 218,
       "alcance": null,
       "tempo_medio_ms": 5070,
       "interacoes": 0
@@ -1267,7 +1267,7 @@
       "segundos": 45.49,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 6,
+      "views": null,
       "alcance": null,
       "tempo_medio_ms": 24754,
       "interacoes": 0
@@ -1280,7 +1280,7 @@
       "segundos": 45.1,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 279,
+      "views": 244,
       "alcance": null,
       "tempo_medio_ms": 8691,
       "interacoes": 0
@@ -1293,7 +1293,7 @@
       "segundos": 39.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 242,
+      "views": 226,
       "alcance": null,
       "tempo_medio_ms": 12076,
       "interacoes": 0
@@ -1306,7 +1306,7 @@
       "segundos": 45.78,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 425,
+      "views": 389,
       "alcance": null,
       "tempo_medio_ms": 6630,
       "interacoes": 0
@@ -1319,7 +1319,7 @@
       "segundos": 31.75,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 256,
+      "views": 226,
       "alcance": null,
       "tempo_medio_ms": 5085,
       "interacoes": 0
@@ -1332,7 +1332,7 @@
       "segundos": 36.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 209,
+      "views": 200,
       "alcance": null,
       "tempo_medio_ms": 2587,
       "interacoes": 0
@@ -1345,7 +1345,7 @@
       "segundos": 49.006,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 269,
+      "views": 254,
       "alcance": null,
       "tempo_medio_ms": 7602,
       "interacoes": 0
@@ -1358,7 +1358,7 @@
       "segundos": 42.233,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 228,
+      "views": 214,
       "alcance": null,
       "tempo_medio_ms": 6780,
       "interacoes": 0
@@ -1371,7 +1371,7 @@
       "segundos": 37.5,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 274,
+      "views": 259,
       "alcance": null,
       "tempo_medio_ms": 4343,
       "interacoes": 0
@@ -1384,7 +1384,7 @@
       "segundos": 39.7,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 6,
+      "views": 2,
       "alcance": null,
       "tempo_medio_ms": 107080,
       "interacoes": 0
@@ -1397,7 +1397,7 @@
       "segundos": 41.7,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 847,
+      "views": 784,
       "alcance": null,
       "tempo_medio_ms": 8126,
       "interacoes": 0
@@ -1410,7 +1410,7 @@
       "segundos": 35.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 236,
+      "views": 218,
       "alcance": null,
       "tempo_medio_ms": 4301,
       "interacoes": 0
@@ -1423,7 +1423,7 @@
       "segundos": 48.2,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 230,
+      "views": 224,
       "alcance": null,
       "tempo_medio_ms": 2522,
       "interacoes": 0
@@ -1501,7 +1501,7 @@
       "segundos": 41.48,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 4,
+      "views": 3,
       "alcance": null,
       "tempo_medio_ms": 33670,
       "interacoes": 0
@@ -1527,7 +1527,7 @@
       "segundos": 34.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 7,
+      "views": 3,
       "alcance": null,
       "tempo_medio_ms": 63030,
       "interacoes": 0
@@ -1839,7 +1839,7 @@
       "segundos": 40.98,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 1,
       "alcance": null,
       "tempo_medio_ms": 53766,
       "interacoes": 0
@@ -1930,7 +1930,7 @@
       "segundos": 38.67,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 1,
       "alcance": null,
       "tempo_medio_ms": 57410,
       "interacoes": 0
@@ -3035,7 +3035,7 @@
       "segundos": 42.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 1,
       "alcance": null,
       "tempo_medio_ms": 69067,
       "interacoes": 0
@@ -3061,7 +3061,7 @@
       "segundos": 37.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 1,
       "alcance": null,
       "tempo_medio_ms": 38604,
       "interacoes": 0
@@ -3100,7 +3100,7 @@
       "segundos": 40.458,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 343,
+      "views": 309,
       "alcance": null,
       "tempo_medio_ms": 6232,
       "interacoes": 0
@@ -3113,7 +3113,7 @@
       "segundos": 59.833,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 2,
       "alcance": null,
       "tempo_medio_ms": 1337,
       "interacoes": 0
@@ -3126,7 +3126,7 @@
       "segundos": 37.25,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 4,
+      "views": 2,
       "alcance": null,
       "tempo_medio_ms": 2387,
       "interacoes": 0
@@ -3204,7 +3204,7 @@
       "segundos": 43.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 4,
+      "views": 3,
       "alcance": null,
       "tempo_medio_ms": 2955,
       "interacoes": 0
@@ -3230,7 +3230,7 @@
       "segundos": 41.458,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 3,
+      "views": 2,
       "alcance": null,
       "tempo_medio_ms": 2404,
       "interacoes": 0
@@ -3243,7 +3243,7 @@
       "segundos": 55.166,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 2,
       "alcance": null,
       "tempo_medio_ms": 28944,
       "interacoes": 0
@@ -3256,7 +3256,7 @@
       "segundos": 32.625,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 6,
+      "views": 3,
       "alcance": null,
       "tempo_medio_ms": 2732,
       "interacoes": 0
@@ -3282,7 +3282,7 @@
       "segundos": 55.333,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 2,
       "alcance": null,
       "tempo_medio_ms": 4752,
       "interacoes": 0
