@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-12T17:40:20.716Z",
+  "gerado_em": "2026-11-13T13:31:05.271Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 76,
-    "curtidas": 76
+    "seguidores": 96,
+    "curtidas": 96
   },
   "pagina_diaria": [
     {
@@ -601,11 +601,15 @@
     },
     {
       "d": "2026-11-11",
-      "views": 9919
+      "views": 9922
     },
     {
       "d": "2026-11-12",
-      "views": 5659
+      "views": 15382
+    },
+    {
+      "d": "2026-11-13",
+      "views": 241
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1057,7 +1061,12 @@
     },
     {
       "d": "2026-11-12",
-      "valor": 8,
+      "valor": 19,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-13",
+      "valor": 0,
       "moeda": "USD"
     }
   ],
@@ -1069,17 +1078,30 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "1130067386542232",
+      "quando": "2026-11-12T21:11:16+0000",
+      "titulo": "Na madrugada de terça pra quarta, dia dezessete, tem chuva de meteoros. São as Leônidas: pedaços de um cometa ",
+      "link": "https://www.facebook.com/reel/1130067386542232/",
+      "segundos": 33.51,
+      "curtidas": 31,
+      "comentarios": 0,
+      "views": 1720,
+      "alcance": null,
+      "tempo_medio_ms": 9518,
+      "interacoes": 0
+    },
+    {
       "id": "1843147703497460",
       "quando": "2026-11-12T17:10:56+0000",
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Ma",
       "link": "https://www.facebook.com/reel/1843147703497460/",
       "segundos": 36.75,
-      "curtidas": 1,
+      "curtidas": 69,
       "comentarios": 0,
-      "views": 8,
+      "views": 5234,
       "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
+      "tempo_medio_ms": 6500,
+      "interacoes": 1
     },
     {
       "id": "1671092501068991",
@@ -1087,12 +1109,12 @@
       "titulo": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca",
       "link": "https://www.facebook.com/reel/1671092501068991/",
       "segundos": 48.3,
-      "curtidas": 12,
-      "comentarios": 0,
-      "views": 650,
+      "curtidas": 33,
+      "comentarios": 1,
+      "views": 2771,
       "alcance": null,
-      "tempo_medio_ms": 6785,
-      "interacoes": 0
+      "tempo_medio_ms": 6686,
+      "interacoes": 1
     },
     {
       "id": "2042179853150041",
@@ -1100,11 +1122,11 @@
       "titulo": "Hoje, logo depois do pôr do sol, a Lua volta pro céu, fininha. Ela vai estar só sete por cento acesa, baixinha",
       "link": "https://www.facebook.com/reel/2042179853150041/",
       "segundos": 44.866,
-      "curtidas": 49,
+      "curtidas": 50,
       "comentarios": 0,
-      "views": 5669,
+      "views": 6138,
       "alcance": null,
-      "tempo_medio_ms": 7924,
+      "tempo_medio_ms": 7638,
       "interacoes": 0
     },
     {
@@ -1115,9 +1137,9 @@
       "segundos": 40.791,
       "curtidas": 97,
       "comentarios": 0,
-      "views": 6762,
+      "views": 6776,
       "alcance": null,
-      "tempo_medio_ms": 7071,
+      "tempo_medio_ms": 7083,
       "interacoes": 1
     },
     {
@@ -1128,9 +1150,9 @@
       "segundos": 43.681,
       "curtidas": 29,
       "comentarios": 1,
-      "views": 2420,
+      "views": 2430,
       "alcance": null,
-      "tempo_medio_ms": 9138,
+      "tempo_medio_ms": 9150,
       "interacoes": 1
     },
     {
@@ -1141,9 +1163,9 @@
       "segundos": 43.868,
       "curtidas": 11,
       "comentarios": 0,
-      "views": 1379,
+      "views": 1380,
       "alcance": null,
-      "tempo_medio_ms": 6198,
+      "tempo_medio_ms": 6203,
       "interacoes": 0
     },
     {
@@ -1154,9 +1176,9 @@
       "segundos": 36.666,
       "curtidas": 84,
       "comentarios": 0,
-      "views": 9044,
+      "views": 9060,
       "alcance": null,
-      "tempo_medio_ms": 6575,
+      "tempo_medio_ms": 6580,
       "interacoes": 1
     },
     {
@@ -1167,9 +1189,9 @@
       "segundos": 43.6,
       "curtidas": 30,
       "comentarios": 0,
-      "views": 2158,
+      "views": 2159,
       "alcance": null,
-      "tempo_medio_ms": 9489,
+      "tempo_medio_ms": 9503,
       "interacoes": 3
     },
     {
@@ -1180,7 +1202,7 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1154,
+      "views": 1155,
       "alcance": null,
       "tempo_medio_ms": 6203,
       "interacoes": 2
@@ -1193,9 +1215,9 @@
       "segundos": 38.5,
       "curtidas": 53,
       "comentarios": 1,
-      "views": 5578,
+      "views": 5582,
       "alcance": null,
-      "tempo_medio_ms": 5965,
+      "tempo_medio_ms": 5963,
       "interacoes": 1
     },
     {
@@ -1206,9 +1228,9 @@
       "segundos": 47.071,
       "curtidas": 11,
       "comentarios": 1,
-      "views": 926,
+      "views": 927,
       "alcance": null,
-      "tempo_medio_ms": 5711,
+      "tempo_medio_ms": 5706,
       "interacoes": 1
     },
     {
@@ -1219,9 +1241,9 @@
       "segundos": 42.3,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 314,
+      "views": 315,
       "alcance": null,
-      "tempo_medio_ms": 7296,
+      "tempo_medio_ms": 7287,
       "interacoes": 0
     },
     {
@@ -1232,9 +1254,9 @@
       "segundos": 44.583,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 236,
+      "views": 237,
       "alcance": null,
-      "tempo_medio_ms": 5087,
+      "tempo_medio_ms": 5070,
       "interacoes": 0
     },
     {
@@ -1245,9 +1267,9 @@
       "segundos": 45.49,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 5,
+      "views": 6,
       "alcance": null,
-      "tempo_medio_ms": 22474,
+      "tempo_medio_ms": 24754,
       "interacoes": 0
     },
     {
@@ -1258,9 +1280,9 @@
       "segundos": 45.1,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 278,
+      "views": 279,
       "alcance": null,
-      "tempo_medio_ms": 8714,
+      "tempo_medio_ms": 8691,
       "interacoes": 0
     },
     {
@@ -1271,9 +1293,9 @@
       "segundos": 39.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 241,
+      "views": 242,
       "alcance": null,
-      "tempo_medio_ms": 12116,
+      "tempo_medio_ms": 12076,
       "interacoes": 0
     },
     {
@@ -1284,9 +1306,9 @@
       "segundos": 45.78,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 424,
+      "views": 425,
       "alcance": null,
-      "tempo_medio_ms": 6645,
+      "tempo_medio_ms": 6630,
       "interacoes": 0
     },
     {
