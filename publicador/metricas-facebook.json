@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-13T17:17:44.581Z",
+  "gerado_em": "2026-11-14T15:52:55.961Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 96,
-    "curtidas": 96
+    "seguidores": 102,
+    "curtidas": 102
   },
   "pagina_diaria": [
     {
@@ -605,11 +605,15 @@
     },
     {
       "d": "2026-11-12",
-      "views": 15384
+      "views": 15388
     },
     {
       "d": "2026-11-13",
-      "views": 489
+      "views": 1741
+    },
+    {
+      "d": "2026-11-14",
+      "views": 431
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1066,6 +1070,11 @@
     },
     {
       "d": "2026-11-13",
+      "valor": 0.0102,
+      "moeda": null
+    },
+    {
+      "d": "2026-11-14",
       "valor": 0,
       "moeda": null
     }
@@ -1075,16 +1084,55 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "1398012885746247",
+      "quando": "2026-11-14T11:11:06+0000",
+      "titulo": "Marte pode não estar tão morto quanto a gente pensava.",
+      "link": "https://www.facebook.com/reel/1398012885746247/",
+      "segundos": 41.333,
+      "curtidas": 4,
+      "comentarios": 0,
+      "views": 336,
+      "alcance": null,
+      "tempo_medio_ms": 9570,
+      "interacoes": 0
+    },
+    {
+      "id": "970815465710684",
+      "quando": "2026-11-14T00:10:57+0000",
+      "titulo": "Tem uma estrela que explode a cada 113 dias e continua viva.",
+      "link": "https://www.facebook.com/reel/970815465710684/",
+      "segundos": 39.125,
+      "curtidas": 4,
+      "comentarios": 0,
+      "views": 345,
+      "alcance": null,
+      "tempo_medio_ms": 9362,
+      "interacoes": 0
+    },
+    {
+      "id": "1006779125115405",
+      "quando": "2026-11-13T21:10:54+0000",
+      "titulo": "Amanhã cedo, a estrela mais brilhante do céu não é estrela.",
+      "link": "https://www.facebook.com/reel/1006779125115405/",
+      "segundos": 34.125,
+      "curtidas": 12,
+      "comentarios": 0,
+      "views": 468,
+      "alcance": null,
+      "tempo_medio_ms": 8875,
+      "interacoes": 3
+    },
+    {
       "id": "1124336103824297",
       "quando": "2026-11-13T17:11:15+0000",
       "titulo": "Parece montagem, mas é foto de verdade, da sonda Cassini: uma lua com formato de pastel.",
       "link": "https://www.facebook.com/reel/1124336103824297/",
       "segundos": 39.625,
-      "curtidas": 0,
+      "curtidas": 6,
       "comentarios": 0,
-      "views": 0,
+      "views": 341,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 7361,
       "interacoes": 0
     },
     {
@@ -1093,11 +1141,11 @@
       "titulo": "Na madrugada de terça pra quarta, dia dezessete, tem chuva de meteoros. São as Leônidas: pedaços de um cometa ",
       "link": "https://www.facebook.com/reel/1130067386542232/",
       "segundos": 33.51,
-      "curtidas": 33,
+      "curtidas": 35,
       "comentarios": 0,
-      "views": 1920,
+      "views": 2062,
       "alcance": null,
-      "tempo_medio_ms": 9350,
+      "tempo_medio_ms": 9050,
       "interacoes": 0
     },
     {
@@ -1108,9 +1156,9 @@
       "segundos": 36.75,
       "curtidas": 69,
       "comentarios": 0,
-      "views": 5246,
+      "views": 5261,
       "alcance": null,
-      "tempo_medio_ms": 6494,
+      "tempo_medio_ms": 6489,
       "interacoes": 1
     },
     {
@@ -1121,9 +1169,9 @@
       "segundos": 48.3,
       "curtidas": 33,
       "comentarios": 1,
-      "views": 2774,
+      "views": 2776,
       "alcance": null,
-      "tempo_medio_ms": 6682,
+      "tempo_medio_ms": 6678,
       "interacoes": 1
     },
     {
@@ -1134,9 +1182,9 @@
       "segundos": 44.866,
       "curtidas": 50,
       "comentarios": 0,
-      "views": 6141,
+      "views": 6151,
       "alcance": null,
-      "tempo_medio_ms": 7636,
+      "tempo_medio_ms": 7638,
       "interacoes": 0
     },
     {
@@ -1147,9 +1195,9 @@
       "segundos": 40.791,
       "curtidas": 97,
       "comentarios": 0,
-      "views": 6777,
+      "views": 6781,
       "alcance": null,
-      "tempo_medio_ms": 7088,
+      "tempo_medio_ms": 7091,
       "interacoes": 1
     },
     {
@@ -1160,9 +1208,9 @@
       "segundos": 43.681,
       "curtidas": 29,
       "comentarios": 1,
-      "views": 2431,
+      "views": 2433,
       "alcance": null,
-      "tempo_medio_ms": 9146,
+      "tempo_medio_ms": 9139,
       "interacoes": 1
     },
     {
@@ -1184,11 +1232,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Plutão e a lua dele vivem se encarando, sem nunca virar a ",
       "link": "https://www.facebook.com/reel/1151516210667823/",
       "segundos": 36.666,
-      "curtidas": 85,
+      "curtidas": 87,
       "comentarios": 0,
-      "views": 9066,
+      "views": 9072,
       "alcance": null,
-      "tempo_medio_ms": 6582,
+      "tempo_medio_ms": 6585,
       "interacoes": 1
     },
     {
@@ -1197,11 +1245,11 @@
       "titulo": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do as",
       "link": "https://www.facebook.com/reel/1604208615073265/",
       "segundos": 43.6,
-      "curtidas": 30,
+      "curtidas": 29,
       "comentarios": 0,
-      "views": 2159,
+      "views": 2162,
       "alcance": null,
-      "tempo_medio_ms": 9503,
+      "tempo_medio_ms": 9493,
       "interacoes": 3
     },
     {
@@ -1212,9 +1260,9 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1155,
+      "views": 1156,
       "alcance": null,
-      "tempo_medio_ms": 6203,
+      "tempo_medio_ms": 6198,
       "interacoes": 2
     },
     {
@@ -1225,9 +1273,9 @@
       "segundos": 38.5,
       "curtidas": 53,
       "comentarios": 1,
-      "views": 5583,
+      "views": 5588,
       "alcance": null,
-      "tempo_medio_ms": 5962,
+      "tempo_medio_ms": 5965,
       "interacoes": 1
     },
     {
@@ -1264,9 +1312,9 @@
       "segundos": 44.583,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 237,
+      "views": 238,
       "alcance": null,
-      "tempo_medio_ms": 5070,
+      "tempo_medio_ms": 5048,
       "interacoes": 0
     },
     {
@@ -1303,9 +1351,9 @@
       "segundos": 39.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 242,
+      "views": 243,
       "alcance": null,
-      "tempo_medio_ms": 12076,
+      "tempo_medio_ms": 12029,
       "interacoes": 0
     },
     {
