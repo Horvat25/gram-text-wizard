@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-13T17:03:40.362Z",
+ "gerado_em": "2026-11-14T15:41:19.075Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2566201,
+   "seguidores": 2566461,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17606,
+   "seguidores": 17618,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,14 +44,14 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 590802,
+   "seguidores": 591150,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.06,
    "palavras": {
     "MOS": 1
    },
-   "comentarios_por_curtida_com_pedido": 0.048,
-   "comentarios_por_curtida_sem_pedido": 0.036,
+   "comentarios_por_curtida_com_pedido": 0.053,
+   "comentarios_por_curtida_sem_pedido": 0.037,
    "melhores_pedidos": [
     {
      "quando": "2026-11-12",
@@ -59,9 +59,19 @@
      "pede": true,
      "palavra": null,
      "trecho": "A funcionária não foi identificada pela Reuters, que afirmou não ter conseguido contato com ela. A Nvidia também não quis comentar o caso. H",
-     "comentarios": 21,
-     "curtidas": 216,
+     "comentarios": 24,
+     "curtidas": 231,
      "link": "https://www.instagram.com/p/Dfp-56kjETx/"
+    },
+    {
+     "quando": "2026-11-12",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "MOS",
+     "trecho": "Sem um plano formal de sucessão, a Nvidia nomeou sua diretora financeira de longa data como líder interina. A mudança aconteceu após uma seq",
+     "comentarios": 4,
+     "curtidas": 98,
+     "link": "https://www.instagram.com/p/Dfpm37JIFFX/"
     },
     {
      "quando": "2026-11-12",
@@ -70,18 +80,8 @@
      "palavra": null,
      "trecho": "🚨 Jensen Huang renunciou aos cargos de presidente e CEO da Nvidia e deixou o conselho de administração da companhia.",
      "comentarios": 3,
-     "curtidas": 193,
+     "curtidas": 201,
      "link": "https://www.instagram.com/reel/DfpszUDMrOP/"
-    },
-    {
-     "quando": "2026-11-12",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": "MOS",
-     "trecho": "Sem um plano formal de sucessão, a Nvidia nomeou sua diretora financeira de longa data como líder interina. A mudança aconteceu após uma seq",
-     "comentarios": 3,
-     "curtidas": 94,
-     "link": "https://www.instagram.com/p/Dfpm37JIFFX/"
     }
    ]
   },
@@ -179,7 +179,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057141,
+   "seguidores": 1057243,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
@@ -194,8 +194,8 @@
      "pede": true,
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
-     "comentarios": 106,
-     "curtidas": 4101,
+     "comentarios": 109,
+     "curtidas": 4272,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
