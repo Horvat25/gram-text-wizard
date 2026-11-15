@@ -1,7 +1,23 @@
 {
   "sol-bonus-20261114-01-sol-branco": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:08:00.000Z",
-    "video_id": "2263092590921374"
+    "video_id": "2263092590921374",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 3370937
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
