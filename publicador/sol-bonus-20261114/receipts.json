@@ -115,7 +115,7 @@
     "confirmed_at": "2026-11-15T02:23:06.798Z"
   },
   "sol-bonus-20261114-05-silencio": {
-    "state": "UPLOADED_WAITING_SLOT",
+    "state": "FINISHING",
     "slot": "2026-11-15T02:28:00.000Z",
     "video_id": "1555884936303016",
     "readback": {
