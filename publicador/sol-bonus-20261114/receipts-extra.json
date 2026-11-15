@@ -86,7 +86,8 @@
     "confirmed_at": "2026-11-15T02:19:07.658Z"
   },
   "sol-bonus-20261114-09-viajando": {
-    "state": "STARTING",
-    "slot": "2026-11-15T02:21:00.000Z"
+    "state": "UPLOADING",
+    "slot": "2026-11-15T02:21:00.000Z",
+    "video_id": "1398954878705920"
   }
 }
