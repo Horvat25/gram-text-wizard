@@ -1,23 +1,30 @@
 {
   "sol-bonus-20261114-01-sol-branco": {
-    "state": "ACCEPTED",
+    "state": "POSTED",
     "slot": "2026-11-15T02:08:00.000Z",
     "video_id": "2263092590921374",
     "readback": {
-      "video_status": "upload_complete",
-      "uploading_phase": {
-        "status": "complete",
-        "bytes_transferred": 3370937
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3370937
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
       },
-      "processing_phase": {
-        "status": "not_started"
-      },
-      "publishing_phase": {
-        "status": "not_started"
-      },
-      "copyright_check_status": {
-        "status": "in_progress"
-      }
-    }
+      "published": true,
+      "permalink_url": "/reel/2263092590921374/",
+      "id": "2263092590921374"
+    },
+    "confirmed_at": "2026-11-15T02:08:55.397Z"
   }
 }
