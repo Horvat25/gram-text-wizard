@@ -1,0 +1,28 @@
+name: SOL Facebook bonus 2026-11-14
+on:
+  push:
+    branches: [main]
+    paths: [publicador/sol-bonus-20261114/manifest.json]
+  workflow_dispatch:
+concurrency:
+  group: sol-facebook-bonus-20261114
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Publish only SOL videos 1 to 5
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          git config user.name 'SOL publisher'
+          git config user.email 'publisher@users.noreply.github.com'
+          git pull --rebase origin main
+          node publicador/sol-bonus-20261114.mjs
