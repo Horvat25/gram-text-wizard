@@ -115,8 +115,24 @@
     "confirmed_at": "2026-11-15T02:23:06.798Z"
   },
   "sol-bonus-20261114-05-silencio": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:28:00.000Z",
-    "video_id": "1555884936303016"
+    "video_id": "1555884936303016",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 820645
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
