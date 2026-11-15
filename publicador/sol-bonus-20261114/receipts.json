@@ -28,8 +28,24 @@
     "confirmed_at": "2026-11-15T02:08:55.397Z"
   },
   "sol-bonus-20261114-02-passado": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:13:00.000Z",
-    "video_id": "1677485810561474"
+    "video_id": "1677485810561474",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 3402866
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
