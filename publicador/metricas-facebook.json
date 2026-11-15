@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-14T15:55:46.124Z",
+  "gerado_em": "2026-11-15T16:29:26.283Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 102,
-    "curtidas": 102
+    "seguidores": 110,
+    "curtidas": 110
   },
   "pagina_diaria": [
     {
@@ -613,7 +613,11 @@
     },
     {
       "d": "2026-11-14",
-      "views": 431
+      "views": 2048
+    },
+    {
+      "d": "2026-11-15",
+      "views": 251
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1075,6 +1079,11 @@
     },
     {
       "d": "2026-11-14",
+      "valor": 0.01,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-15",
       "valor": 0,
       "moeda": "USD"
     }
@@ -1087,16 +1096,211 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "29763092446662167",
+      "quando": "2026-11-15T11:12:05+0000",
+      "titulo": "A água do mar pode ter nascido do fogo, e não de cometa.",
+      "link": "https://www.facebook.com/reel/29763092446662167/",
+      "segundos": 39.958,
+      "curtidas": 5,
+      "comentarios": 0,
+      "views": 197,
+      "alcance": null,
+      "tempo_medio_ms": 6868,
+      "interacoes": 0
+    },
+    {
+      "id": "1487690023267598",
+      "quando": "2026-11-15T03:10:35+0000",
+      "titulo": "Astronautas viram clarões na Lua, e as fotos acabaram de sair.",
+      "link": "https://www.facebook.com/reel/1487690023267598/",
+      "segundos": 41.512,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 2,
+      "alcance": null,
+      "tempo_medio_ms": 2274,
+      "interacoes": 0
+    },
+    {
+      "id": "1014724724237948",
+      "quando": "2026-11-15T03:10:16+0000",
+      "titulo": "Um robô acabou de bater o recorde de quem mais andou fora da Terra.",
+      "link": "https://www.facebook.com/reel/1014724724237948/",
+      "segundos": 38.71,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 3168,
+      "interacoes": 0
+    },
+    {
+      "id": "1555884936303016",
+      "quando": "2026-11-15T02:23:09+0000",
+      "titulo": "No vácuo, a luz se propaga; o som precisa de um meio material. Visual ilustrativo. Siga o Neural Update!",
+      "link": "https://www.facebook.com/reel/1555884936303016/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 4,
+      "alcance": null,
+      "tempo_medio_ms": 2228,
+      "interacoes": 0
+    },
+    {
+      "id": "1815472976424272",
+      "quando": "2026-11-15T02:21:08+0000",
+      "titulo": "Depois do Sol, Próxima Centauri é a estrela mais próxima da Terra, a aproximadamente 4,24 anos-luz. Siga o Neu",
+      "link": "https://www.facebook.com/reel/1815472976424272/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 7,
+      "alcance": null,
+      "tempo_medio_ms": 6269,
+      "interacoes": 0
+    },
+    {
+      "id": "1398954878705920",
+      "quando": "2026-11-15T02:19:09+0000",
+      "titulo": "A Terra viaja ao redor do Sol a cerca de 107 mil km/h. Velocidade sempre depende do referencial. Siga o Neural",
+      "link": "https://www.facebook.com/reel/1398954878705920/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 3,
+      "alcance": null,
+      "tempo_medio_ms": 6146,
+      "interacoes": 0
+    },
+    {
+      "id": "988362684341467",
+      "quando": "2026-11-15T02:18:11+0000",
+      "titulo": "Saturno tem densidade média menor que a água. A piscina gigante é apenas uma comparação imaginária. 🪐 Siga o ",
+      "link": "https://www.facebook.com/reel/988362684341467/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 6,
+      "alcance": null,
+      "tempo_medio_ms": 4742,
+      "interacoes": 0
+    },
+    {
+      "id": "1826705551711362",
+      "quando": "2026-11-15T02:17:07+0000",
+      "titulo": "Estimativas da quantidade de estrelas no universo observável ficam na ordem de 10²² a 10²⁴. Não é uma contagem",
+      "link": "https://www.facebook.com/reel/1826705551711362/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 6,
+      "alcance": null,
+      "tempo_medio_ms": 6747,
+      "interacoes": 0
+    },
+    {
+      "id": "1124372800298657",
+      "quando": "2026-11-15T02:16:06+0000",
+      "titulo": "Experimento imaginário: um buraco negro com a mesma massa do Sol manteria praticamente a órbita terrestre. O S",
+      "link": "https://www.facebook.com/reel/1124372800298657/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 3578,
+      "interacoes": 0
+    },
+    {
+      "id": "993230107177219",
+      "quando": "2026-11-15T02:15:51+0000",
+      "titulo": "A Lua se afasta em média cerca de 3,8 centímetros por ano. No passado, mais próxima, ela aparecia maior no céu",
+      "link": "https://www.facebook.com/reel/993230107177219/",
+      "segundos": 12,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 285,
+      "alcance": null,
+      "tempo_medio_ms": 5714,
+      "interacoes": 0
+    },
+    {
+      "id": "2350773815759052",
+      "quando": "2026-11-15T02:13:08+0000",
+      "titulo": "Uma rotação de Vênus leva cerca de 243 dias terrestres; seu ano, 225. Rotação não é o intervalo entre dois nas",
+      "link": "https://www.facebook.com/reel/2350773815759052/",
+      "segundos": 12,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 717,
+      "interacoes": 0
+    },
+    {
+      "id": "1677485810561474",
+      "quando": "2026-11-15T02:08:57+0000",
+      "titulo": "A luz solar leva aproximadamente 8 minutos e 20 segundos para chegar à Terra. Siga o Neural Update!",
+      "link": "https://www.facebook.com/reel/1677485810561474/",
+      "segundos": 12,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 293,
+      "alcance": null,
+      "tempo_medio_ms": 3758,
+      "interacoes": 0
+    },
+    {
+      "id": "2263092590921374",
+      "quando": "2026-11-15T02:08:43+0000",
+      "titulo": "A luz do Sol é praticamente branca. A atmosfera pode mudar sua aparência. ☀️ Siga o Neural Update!",
+      "link": "https://www.facebook.com/reel/2263092590921374/",
+      "segundos": 12,
+      "curtidas": 4,
+      "comentarios": 0,
+      "views": 311,
+      "alcance": null,
+      "tempo_medio_ms": 4455,
+      "interacoes": 0
+    },
+    {
+      "id": "1126809393301798",
+      "quando": "2026-11-14T21:11:13+0000",
+      "titulo": "Na escola ensinaram que, quando é dia no Brasil, a Lua tá lá na China.",
+      "link": "https://www.facebook.com/reel/1126809393301798/",
+      "segundos": 35.88,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 288,
+      "alcance": null,
+      "tempo_medio_ms": 7168,
+      "interacoes": 0
+    },
+    {
+      "id": "1166500492490784",
+      "quando": "2026-11-14T17:11:08+0000",
+      "titulo": "Imagina dois carros na mesma pista, quase encostando.",
+      "link": "https://www.facebook.com/reel/1166500492490784/",
+      "segundos": 40.625,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 318,
+      "alcance": null,
+      "tempo_medio_ms": 5903,
+      "interacoes": 0
+    },
+    {
       "id": "1398012885746247",
       "quando": "2026-11-14T11:11:06+0000",
       "titulo": "Marte pode não estar tão morto quanto a gente pensava.",
       "link": "https://www.facebook.com/reel/1398012885746247/",
       "segundos": 41.333,
-      "curtidas": 4,
+      "curtidas": 6,
       "comentarios": 0,
-      "views": 336,
+      "views": 382,
       "alcance": null,
-      "tempo_medio_ms": 9570,
+      "tempo_medio_ms": 9803,
       "interacoes": 0
     },
     {
@@ -1105,11 +1309,11 @@
       "titulo": "Tem uma estrela que explode a cada 113 dias e continua viva.",
       "link": "https://www.facebook.com/reel/970815465710684/",
       "segundos": 39.125,
-      "curtidas": 4,
+      "curtidas": 5,
       "comentarios": 0,
-      "views": 345,
+      "views": 362,
       "alcance": null,
-      "tempo_medio_ms": 9362,
+      "tempo_medio_ms": 9454,
       "interacoes": 0
     },
     {
@@ -1120,9 +1324,9 @@
       "segundos": 34.125,
       "curtidas": 12,
       "comentarios": 0,
-      "views": 468,
+      "views": 525,
       "alcance": null,
-      "tempo_medio_ms": 8875,
+      "tempo_medio_ms": 8910,
       "interacoes": 3
     },
     {
@@ -1133,9 +1337,9 @@
       "segundos": 39.625,
       "curtidas": 6,
       "comentarios": 0,
-      "views": 341,
+      "views": 346,
       "alcance": null,
-      "tempo_medio_ms": 7361,
+      "tempo_medio_ms": 7599,
       "interacoes": 0
     },
     {
@@ -1146,9 +1350,9 @@
       "segundos": 33.51,
       "curtidas": 35,
       "comentarios": 0,
-      "views": 2062,
+      "views": 2065,
       "alcance": null,
-      "tempo_medio_ms": 9050,
+      "tempo_medio_ms": 9038,
       "interacoes": 0
     },
     {
@@ -1157,11 +1361,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Ma",
       "link": "https://www.facebook.com/reel/1843147703497460/",
       "segundos": 36.75,
-      "curtidas": 69,
+      "curtidas": 70,
       "comentarios": 0,
-      "views": 5261,
+      "views": 5264,
       "alcance": null,
-      "tempo_medio_ms": 6489,
+      "tempo_medio_ms": 6494,
       "interacoes": 1
     },
     {
@@ -1172,9 +1376,9 @@
       "segundos": 48.3,
       "curtidas": 33,
       "comentarios": 1,
-      "views": 2776,
+      "views": 2779,
       "alcance": null,
-      "tempo_medio_ms": 6678,
+      "tempo_medio_ms": 6709,
       "interacoes": 1
     },
     {
@@ -1185,7 +1389,7 @@
       "segundos": 44.866,
       "curtidas": 50,
       "comentarios": 0,
-      "views": 6151,
+      "views": 6155,
       "alcance": null,
       "tempo_medio_ms": 7638,
       "interacoes": 0
@@ -1196,11 +1400,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Um mundo gelado tirou Plutão da lista dos planetas. É Éris",
       "link": "https://www.facebook.com/reel/2185042108781347/",
       "segundos": 40.791,
-      "curtidas": 97,
+      "curtidas": 98,
       "comentarios": 0,
-      "views": 6781,
+      "views": 6785,
       "alcance": null,
-      "tempo_medio_ms": 7091,
+      "tempo_medio_ms": 7094,
       "interacoes": 1
     },
     {
@@ -1211,9 +1415,9 @@
       "segundos": 43.681,
       "curtidas": 29,
       "comentarios": 1,
-      "views": 2433,
+      "views": 2435,
       "alcance": null,
-      "tempo_medio_ms": 9139,
+      "tempo_medio_ms": 9148,
       "interacoes": 1
     },
     {
@@ -1222,11 +1426,11 @@
       "titulo": "Esse montinho de estrelas que aparece no céu de novembro tem nome: Sete-Estrelo. São as Plêiades, um grupo de ",
       "link": "https://www.facebook.com/reel/1056296934099260/",
       "segundos": 43.868,
-      "curtidas": 11,
+      "curtidas": 12,
       "comentarios": 0,
-      "views": 1380,
+      "views": 1387,
       "alcance": null,
-      "tempo_medio_ms": 6203,
+      "tempo_medio_ms": 6299,
       "interacoes": 0
     },
     {
@@ -1237,9 +1441,9 @@
       "segundos": 36.666,
       "curtidas": 87,
       "comentarios": 0,
-      "views": 9072,
+      "views": 9077,
       "alcance": null,
-      "tempo_medio_ms": 6585,
+      "tempo_medio_ms": 6587,
       "interacoes": 1
     },
     {
@@ -1250,9 +1454,9 @@
       "segundos": 43.6,
       "curtidas": 29,
       "comentarios": 0,
-      "views": 2162,
+      "views": 2163,
       "alcance": null,
-      "tempo_medio_ms": 9493,
+      "tempo_medio_ms": 9489,
       "interacoes": 3
     },
     {
@@ -1263,9 +1467,9 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1156,
+      "views": 1160,
       "alcance": null,
-      "tempo_medio_ms": 6198,
+      "tempo_medio_ms": 6188,
       "interacoes": 2
     },
     {
@@ -1276,7 +1480,7 @@
       "segundos": 38.5,
       "curtidas": 53,
       "comentarios": 1,
-      "views": 5588,
+      "views": 5589,
       "alcance": null,
       "tempo_medio_ms": 5965,
       "interacoes": 1
@@ -1367,9 +1571,9 @@
       "segundos": 45.78,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 425,
+      "views": 429,
       "alcance": null,
-      "tempo_medio_ms": 6630,
+      "tempo_medio_ms": 6597,
       "interacoes": 0
     },
     {
@@ -1564,7 +1768,7 @@
       "comentarios": 0,
       "views": 5,
       "alcance": null,
-      "tempo_medio_ms": 33670,
+      "tempo_medio_ms": 25735,
       "interacoes": 0
     },
     {
@@ -1770,9 +1974,9 @@
       "segundos": 39.602,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 7,
       "alcance": null,
-      "tempo_medio_ms": 4794,
+      "tempo_medio_ms": 3712,
       "interacoes": 0
     },
     {
@@ -2173,9 +2377,9 @@
       "segundos": 32.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 6,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 3945,
       "interacoes": 0
     },
     {
@@ -2290,9 +2494,9 @@
       "segundos": 35.25,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 1810,
       "interacoes": 0
     },
     {
@@ -2888,9 +3092,9 @@
       "segundos": 43.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 3939,
       "interacoes": 0
     },
     {
@@ -3083,9 +3287,9 @@
       "segundos": 37.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 1434,
+      "tempo_medio_ms": 798,
       "interacoes": 0
     },
     {
