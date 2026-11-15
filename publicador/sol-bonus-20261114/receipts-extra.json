@@ -115,8 +115,24 @@
     "confirmed_at": "2026-11-15T02:21:05.941Z"
   },
   "sol-bonus-20261114-10-proxima": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:26:00.000Z",
-    "video_id": "1815472976424272"
+    "video_id": "1815472976424272",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 3368719
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
