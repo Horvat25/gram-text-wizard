@@ -1,7 +1,23 @@
 {
   "sol-bonus-20261114-06-lua": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:15:00.000Z",
-    "video_id": "993230107177219"
+    "video_id": "993230107177219",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 10684014
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
