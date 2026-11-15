@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "sol-bonus-20261114-06-lua",
+    "file": "06-lua.mp4",
+    "caption": "A Lua se afasta em média cerca de 3,8 centímetros por ano. No passado, mais próxima, ela aparecia maior no céu. Siga o Neural Update!",
+    "duration": 12,
+    "owner": "SOL",
+    "topic": 6,
+    "slot": "2026-11-15T02:15:00Z"
+  },
+  {
+    "slug": "sol-bonus-20261114-07-buraco-negro",
+    "file": "07-buraco-negro.mp4",
+    "caption": "Experimento imaginário: um buraco negro com a mesma massa do Sol manteria praticamente a órbita terrestre. O Sol real não tem massa suficiente para virar um buraco negro. Siga o Neural Update!",
+    "duration": 12,
+    "owner": "SOL",
+    "topic": 7,
+    "slot": "2026-11-15T02:17:00Z"
+  },
+  {
+    "slug": "sol-bonus-20261114-08-estrelas",
+    "file": "08-estrelas.mp4",
+    "caption": "Estimativas da quantidade de estrelas no universo observável ficam na ordem de 10²² a 10²⁴. Não é uma contagem exata. Siga o Neural Update!",
+    "duration": 12,
+    "owner": "SOL",
+    "topic": 8,
+    "slot": "2026-11-15T02:19:00Z"
+  },
+  {
+    "slug": "sol-bonus-20261114-09-viajando",
+    "file": "09-viajando.mp4",
+    "caption": "A Terra viaja ao redor do Sol a cerca de 107 mil km/h. Velocidade sempre depende do referencial. Siga o Neural Update!",
+    "duration": 12,
+    "owner": "SOL",
+    "topic": 9,
+    "slot": "2026-11-15T02:21:00Z"
+  },
+  {
+    "slug": "sol-bonus-20261114-10-proxima",
+    "file": "10-proxima.mp4",
+    "caption": "Depois do Sol, Próxima Centauri é a estrela mais próxima da Terra, a aproximadamente 4,24 anos-luz. Siga o Neural Update!",
+    "duration": 12,
+    "owner": "SOL",
+    "topic": 10,
+    "slot": "2026-11-15T02:26:00Z"
+  }
+]
