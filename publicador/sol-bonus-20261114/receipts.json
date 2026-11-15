@@ -86,24 +86,32 @@
     "confirmed_at": "2026-11-15T02:18:08.105Z"
   },
   "sol-bonus-20261114-04-saturno": {
-    "state": "ACCEPTED",
+    "state": "POSTED",
     "slot": "2026-11-15T02:23:00.000Z",
     "video_id": "988362684341467",
     "readback": {
-      "video_status": "upload_complete",
-      "uploading_phase": {
-        "status": "complete",
-        "bytes_transferred": 4229890
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 4229890
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
       },
-      "processing_phase": {
-        "status": "not_started"
-      },
-      "publishing_phase": {
-        "status": "not_started"
-      },
-      "copyright_check_status": {
-        "status": "in_progress"
-      }
-    }
+      "published": true,
+      "permalink_url": "/reel/988362684341467/",
+      "id": "988362684341467"
+    },
+    "confirmed_at": "2026-11-15T02:23:06.798Z"
   }
 }
