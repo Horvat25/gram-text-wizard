@@ -57,7 +57,8 @@
     "confirmed_at": "2026-11-15T02:17:05.152Z"
   },
   "sol-bonus-20261114-08-estrelas": {
-    "state": "STARTING",
-    "slot": "2026-11-15T02:19:00.000Z"
+    "state": "UPLOADING",
+    "slot": "2026-11-15T02:19:00.000Z",
+    "video_id": "1826705551711362"
   }
 }
