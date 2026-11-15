@@ -1,24 +1,31 @@
 {
   "old-20261016-perseverance": {
-    "state": "ACCEPTED",
+    "state": "POSTED",
     "source": "youtube-short+instagram 2026-10-16",
     "title": "Robô da NASA bate recorde: 45 km em Marte",
     "video_id": "1014724724237948",
     "readback": {
-      "video_status": "upload_complete",
-      "uploading_phase": {
-        "status": "complete",
-        "bytes_transferred": 13341856
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 13341856
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
       },
-      "processing_phase": {
-        "status": "not_started"
-      },
-      "publishing_phase": {
-        "status": "not_started"
-      },
-      "copyright_check_status": {
-        "status": "in_progress"
-      }
-    }
+      "published": true,
+      "permalink_url": "/reel/1014724724237948/",
+      "id": "1014724724237948"
+    },
+    "confirmed_at": "2026-11-15T03:10:33.095Z"
   }
 }
