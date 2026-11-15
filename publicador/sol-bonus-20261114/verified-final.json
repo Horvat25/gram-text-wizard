@@ -1,0 +1,269 @@
+{
+  "checked_at": "2026-11-15T02:28:40.522Z",
+  "page": {
+    "id": "962589380261249",
+    "name": "Neural Update"
+  },
+  "videos": [
+    {
+      "slug": "sol-bonus-20261114-01-sol-branco",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3370937
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:08:43+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/2263092590921374/",
+      "length": 12,
+      "id": "2263092590921374"
+    },
+    {
+      "slug": "sol-bonus-20261114-02-passado",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3402866
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:08:57+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/1677485810561474/",
+      "length": 12,
+      "id": "1677485810561474"
+    },
+    {
+      "slug": "sol-bonus-20261114-03-venus",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 779603
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:13:08+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/2350773815759052/",
+      "length": 12,
+      "id": "2350773815759052"
+    },
+    {
+      "slug": "sol-bonus-20261114-04-saturno",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 4229890
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:18:11+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/988362684341467/",
+      "length": 12,
+      "id": "988362684341467"
+    },
+    {
+      "slug": "sol-bonus-20261114-05-silencio",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 820645
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:23:09+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/1555884936303016/",
+      "length": 12,
+      "id": "1555884936303016"
+    },
+    {
+      "slug": "sol-bonus-20261114-06-lua",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 10684014
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:15:51+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/993230107177219/",
+      "length": 12,
+      "id": "993230107177219"
+    },
+    {
+      "slug": "sol-bonus-20261114-07-buraco-negro",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 1072078
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:16:06+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/1124372800298657/",
+      "length": 12,
+      "id": "1124372800298657"
+    },
+    {
+      "slug": "sol-bonus-20261114-08-estrelas",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 1031519
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:17:07+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/1826705551711362/",
+      "length": 12,
+      "id": "1826705551711362"
+    },
+    {
+      "slug": "sol-bonus-20261114-09-viajando",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 1111589
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:19:09+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/1398954878705920/",
+      "length": 12,
+      "id": "1398954878705920"
+    },
+    {
+      "slug": "sol-bonus-20261114-10-proxima",
+      "status": {
+        "video_status": "ready",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3368719
+        },
+        "processing_phase": {
+          "status": "complete"
+        },
+        "publishing_phase": {
+          "status": "complete",
+          "publish_status": "published",
+          "publish_time": "2026-11-15T02:21:08+0000"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
+      },
+      "published": true,
+      "permalink_url": "/reel/1815472976424272/",
+      "length": 12,
+      "id": "1815472976424272"
+    }
+  ]
+}
