@@ -28,8 +28,24 @@
     "confirmed_at": "2026-11-15T02:16:04.471Z"
   },
   "sol-bonus-20261114-07-buraco-negro": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:17:00.000Z",
-    "video_id": "1124372800298657"
+    "video_id": "1124372800298657",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 1072078
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
