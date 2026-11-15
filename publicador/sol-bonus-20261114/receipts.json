@@ -57,8 +57,24 @@
     "confirmed_at": "2026-11-15T02:13:06.692Z"
   },
   "sol-bonus-20261114-03-venus": {
-    "state": "UPLOADING",
+    "state": "UPLOADED_WAITING_SLOT",
     "slot": "2026-11-15T02:18:00.000Z",
-    "video_id": "2350773815759052"
+    "video_id": "2350773815759052",
+    "readback": {
+      "video_status": "upload_complete",
+      "uploading_phase": {
+        "status": "complete",
+        "bytes_transferred": 779603
+      },
+      "processing_phase": {
+        "status": "not_started"
+      },
+      "publishing_phase": {
+        "status": "not_started"
+      },
+      "copyright_check_status": {
+        "status": "in_progress"
+      }
+    }
   }
 }
