@@ -57,24 +57,32 @@
     "confirmed_at": "2026-11-15T02:17:05.152Z"
   },
   "sol-bonus-20261114-08-estrelas": {
-    "state": "ACCEPTED",
+    "state": "POSTED",
     "slot": "2026-11-15T02:19:00.000Z",
     "video_id": "1826705551711362",
     "readback": {
-      "video_status": "upload_complete",
-      "uploading_phase": {
-        "status": "complete",
-        "bytes_transferred": 1031519
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 1031519
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "complete",
+          "matches_found": false
+        }
       },
-      "processing_phase": {
-        "status": "not_started"
-      },
-      "publishing_phase": {
-        "status": "not_started"
-      },
-      "copyright_check_status": {
-        "status": "in_progress"
-      }
-    }
+      "published": true,
+      "permalink_url": "/reel/1826705551711362/",
+      "id": "1826705551711362"
+    },
+    "confirmed_at": "2026-11-15T02:19:07.658Z"
   }
 }
