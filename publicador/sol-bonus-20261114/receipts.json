@@ -86,7 +86,8 @@
     "confirmed_at": "2026-11-15T02:18:08.105Z"
   },
   "sol-bonus-20261114-04-saturno": {
-    "state": "STARTING",
-    "slot": "2026-11-15T02:23:00.000Z"
+    "state": "UPLOADING",
+    "slot": "2026-11-15T02:23:00.000Z",
+    "video_id": "988362684341467"
   }
 }
