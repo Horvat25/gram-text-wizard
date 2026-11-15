@@ -28,7 +28,8 @@
     "confirmed_at": "2026-11-15T02:08:55.397Z"
   },
   "sol-bonus-20261114-02-passado": {
-    "state": "STARTING",
-    "slot": "2026-11-15T02:13:00.000Z"
+    "state": "UPLOADING",
+    "slot": "2026-11-15T02:13:00.000Z",
+    "video_id": "1677485810561474"
   }
 }
