@@ -1,0 +1,29 @@
+name: Facebook old October reels
+on:
+  push:
+    branches: [main]
+    paths:
+      - publicador/fb-old-oct/manifest.json
+  workflow_dispatch:
+concurrency:
+  group: fb-old-oct-20261115
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Post two October reels now
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          git config user.name 'SOL publisher'
+          git config user.email 'publisher@users.noreply.github.com'
+          git pull --rebase origin main
+          node publicador/fb-old-oct.mjs
