@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-15T16:13:09.870Z",
+ "gerado_em": "2026-11-16T19:27:05.545Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2567319,
+   "seguidores": 2567689,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.021,
+   "comentarios_por_curtida_sem_pedido": 0.019,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17627,
+   "seguidores": 17619,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,22 +44,24 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591326,
+   "seguidores": 591442,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0.102,
+   "palavras": {
+    "COMO": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.067,
    "comentarios_por_curtida_sem_pedido": 0.032,
    "melhores_pedidos": [
     {
-     "quando": "2026-11-12",
-     "tipo": "FEED",
+     "quando": "2026-11-16",
+     "tipo": "REELS",
      "pede": true,
-     "palavra": null,
-     "trecho": "A funcionária não foi identificada pela Reuters, que afirmou não ter conseguido contato com ela. A Nvidia também não quis comentar o caso. H",
-     "comentarios": 24,
-     "curtidas": 235,
-     "link": "https://www.instagram.com/p/Dfp-56kjETx/"
+     "palavra": "COMO",
+     "trecho": "📲 Murilo Rabusky, especialista em tecnologia financeira e CMO da fintech Lina Open X, comenta como o Pix transformou a nossa maneira de faz",
+     "comentarios": 1,
+     "curtidas": 15,
+     "link": "https://www.instagram.com/reel/Dfzbmy-BMrZ/"
     }
    ]
   },
@@ -157,7 +159,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057291,
+   "seguidores": 1057257,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
@@ -172,8 +174,8 @@
      "pede": true,
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
-     "comentarios": 111,
-     "curtidas": 4377,
+     "comentarios": 112,
+     "curtidas": 4506,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
