@@ -1324,7 +1324,7 @@
    "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-11-16T06:23:30.273Z",
+ "gerado_em": "2026-11-16T21:58:44.697Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -1977,6 +1977,10 @@
   "2026-11-16T06": {
    "seguidores": 1299,
    "publicacoes": 1083
+  },
+  "2026-11-16T21": {
+   "seguidores": 1301,
+   "publicacoes": 1086
   }
  },
  "ganhos_por_dia": {
@@ -2060,6 +2064,7 @@
   "2026-11-11": 1,
   "2026-11-12": 4,
   "2026-11-13": 3,
-  "2026-11-14": 4
+  "2026-11-14": 4,
+  "2026-11-15": 3
  }
 }
