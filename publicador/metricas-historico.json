@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-16T19:15:50.236Z",
+ "gerado_em": "2026-11-17T18:11:34.973Z",
  "conta": {
   "username": "neuralupdate",
   "seguidores": 1301,
-  "publicacoes": 1085
+  "publicacoes": 1088
  },
- "total_listado": 1085,
- "com_tempo_assistido": 545,
+ "total_listado": 1088,
+ "com_tempo_assistido": 548,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-18",
-     "ate": "2026-11-15",
+     "de": "2026-10-19",
+     "ate": "2026-11-16",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 2,
-         "end_time": "2026-10-19T07:00:00+0000"
-        },
         {
          "value": 3,
          "end_time": "2026-10-20T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 3,
          "end_time": "2026-11-15T08:00:00+0000"
+        },
+        {
+         "value": 0,
+         "end_time": "2026-11-16T08:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -322,7 +322,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-16",
+     "ate": "2026-11-17",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -590,7 +590,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-16",
+     "ate": "2026-11-17",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -599,7 +599,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 4283
+        "value": 4541
        }
       },
       {
@@ -609,7 +609,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 6887
+        "value": 7420
        }
       },
       {
@@ -619,7 +619,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 147
+        "value": 162
        }
       },
       {
@@ -629,7 +629,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 324
+        "value": 344
        }
       }
      ]
@@ -656,15 +656,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 20744
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 224
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20744
            }
           ]
          }
@@ -730,15 +730,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 685
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 30185
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 685
            }
           ]
          }
@@ -767,15 +767,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 20920
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 654
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20920
            }
           ]
          }
@@ -823,7 +823,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-16",
+     "ate": "2026-11-17",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -832,7 +832,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 4283,
+        "value": 4541,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -841,15 +841,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 4120
+            "value": 160
            },
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 156
+            "value": 4357
            }
           ]
          }
@@ -900,7 +900,7 @@
             "dimension_values": [
              "35-44"
             ],
-            "value": 381
+            "value": 380
            },
            {
             "dimension_values": [
@@ -912,13 +912,13 @@
             "dimension_values": [
              "55-64"
             ],
-            "value": 172
+            "value": 173
            },
            {
             "dimension_values": [
              "65+"
             ],
-            "value": 104
+            "value": 106
            }
           ]
          }
@@ -953,7 +953,7 @@
             "dimension_values": [
              "M"
             ],
-            "value": 1026
+            "value": 1028
            },
            {
             "dimension_values": [
@@ -1042,7 +1042,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 1257
+            "value": 1259
            },
            {
             "dimension_values": [
@@ -1105,12 +1105,6 @@
           "results": [
            {
             "dimension_values": [
-             "São Caetano do Sul, São Paulo (state)"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Ribeirão Prêto, São Paulo (state)"
             ],
             "value": 8
@@ -1119,7 +1113,7 @@
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 94
+            "value": 96
            },
            {
             "dimension_values": [
@@ -1149,13 +1143,19 @@
             "dimension_values": [
              "Contagem, Minas Gerais"
             ],
-            "value": 7
+            "value": 8
            },
            {
             "dimension_values": [
              "Osasco, São Paulo (state)"
             ],
             "value": 6
+           },
+           {
+            "dimension_values": [
+             "Camaçari, Bahia"
+            ],
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1173,7 +1173,7 @@
             "dimension_values": [
              "Vila Velha, Espírito Santo"
             ],
-            "value": 6
+            "value": 7
            },
            {
             "dimension_values": [
@@ -1195,13 +1195,13 @@
            },
            {
             "dimension_values": [
-             "Uberaba, Minas Gerais"
+             "Gama, Federal District"
             ],
             "value": 5
            },
            {
             "dimension_values": [
-             "João Pessoa, Paraíba"
+             "Uberaba, Minas Gerais"
             ],
             "value": 5
            },
@@ -1221,7 +1221,7 @@
             "dimension_values": [
              "Recife, Pernambuco"
             ],
-            "value": 12
+            "value": 13
            },
            {
             "dimension_values": [
@@ -1281,7 +1281,7 @@
             "dimension_values": [
              "Goiânia, Goiás"
             ],
-            "value": 12
+            "value": 13
            },
            {
             "dimension_values": [
@@ -1323,7 +1323,7 @@
             "dimension_values": [
              "Joinville, Santa Catarina"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1335,19 +1335,19 @@
             "dimension_values": [
              "Belo Horizonte, Minas Gerais"
             ],
-            "value": 27
+            "value": 28
            },
            {
             "dimension_values": [
              "Santo André, São Paulo (state)"
             ],
-            "value": 10
+            "value": 8
            },
            {
             "dimension_values": [
              "Taguatinga, Federal District"
             ],
-            "value": 12
+            "value": 13
            },
            {
             "dimension_values": [
@@ -2653,13 +2653,37 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-16",
+    "janela": "2026-11-17",
     "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18138033031675111": [
+    {
+     "texto": "🇧🇷 Quem achou esse anel foi o Bruno Morgado, astrônomo da UFRJ. Você conhecia algum cientista brasileiro que descobriu coisa no espaço? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-17T17:11:00+0000",
+     "respostas": []
+    }
+   ],
+   "18139737508769969": [
+    {
+     "texto": "☄️ Se não foram os cometas, quem trouxe os ingredientes da vida: asteroide, raio, vulcão ou outra coisa? Deixa sua aposta 👇",
+     "curtidas": 0,
+     "quando": "2026-11-17T11:11:01+0000",
+     "respostas": []
+    }
+   ],
+   "18001995414010383": [
+    {
+     "texto": "☄️ Vai acordar pra ver? Volta aqui depois e conta de qual cidade você olhou e quantos riscos contou 👇",
+     "curtidas": 0,
+     "quando": "2026-11-16T21:11:17+0000",
+     "respostas": []
+    }
+   ],
    "18133470964694197": [
     {
      "texto": "⬡ Fala a verdade: você já sabia que Saturno tinha um hexágono no polo ou é a primeira vez que vê? 👇",
@@ -5467,25 +5491,91 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18138033031675111",
+   "quando": "2026-11-17T17:10:53+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Df2b3vrhHpV/",
+   "titulo": "Esse anel não devia existir, e quem achou foi um astrônomo brasileiro.",
+   "legenda": "Esse anel não devia existir, e quem achou foi um astrônomo brasileiro.\n\nEle fica em Quaoar, um mundo gelado de 1.100 km, depois de Netuno. Pela regra, anel longe do planeta vira lua: a poeira se junta. Só que o anel de Quaoar está a mais que o dobro dessa distância. Foi achado em 2023, vendo uma estrela piscar atrás de Quaoar.\n\nManda pra quem acha que brasileiro não faz ciência.\n\n📤 Manda pra quem acha que brasileiro não faz ciência.\n\n📚 Fonte: Morgado et al., Nature (08/02/2023) — anel denso de Quaoar fora do limite de Roche, detectado por ocultação estelar; liderado por Bruno Morgado (UFRJ).\n\n#astronomia #sistemasolar #ciencia #aula #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 12,
+   "reach": 3,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "ig_reels_avg_watch_time": 2636,
+   "ig_reels_video_view_total_time": 10547,
+   "reels_skip_rate": 25,
+   "reposts": 0
+  },
+  {
+   "id": "18139737508769969",
+   "quando": "2026-11-17T11:10:54+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Df1yrVghklx/",
+   "titulo": "Aprendemos que os cometas trouxeram os ingredientes da vida.",
+   "legenda": "Aprendemos que os cometas trouxeram os ingredientes da vida.\n\nUm estudo inglês diz que, na maioria das vezes, foi o contrário. Eles simularam 100 mil batidas de cometa na Terra jovem. Em mais da metade, o choque queimava tudo antes de chegar. Marte, com o ar mais fino, teria recebido melhor essa entrega.\n\nSe não foi o cometa, quem trouxe a receita da vida?\n\n💬 Se não foi o cometa, quem trouxe a receita da vida?\n\n📚 Fonte: Universidade de Cambridge, Scientific Reports (31/10/2026) — 100 mil simulações de impactos de cometas na Terra primitiva.\n\n#astronomia #espaco #ciencia #noticias #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 41,
+   "reach": 32,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "ig_reels_avg_watch_time": 3784,
+   "ig_reels_video_view_total_time": 136232,
+   "reels_skip_rate": 83.3,
+   "reposts": 0
+  },
+  {
+   "id": "18001995414010383",
+   "quando": "2026-11-16T21:11:11+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/Df0SkEEqn_u/",
+   "titulo": "Esta madrugada tem chuva de meteoros: as Leônidas.",
+   "legenda": "Esta madrugada tem chuva de meteoros: as Leônidas.\n\nOs riscos parecem sair de um ponto no nordeste, pertinho de Júpiter e Marte. Melhor hora: entre 3h e 5h. A Lua já vai ter se posto, então o céu fica escuro. Num lugar escuro, dá pra ver uns 10 por hora.\n\nCada risco é um grão de poeira de cometa pegando fogo.\n\n📤 Marca quem vai acordar com você de madrugada.\n\n📚 Posições calculadas para São Paulo (astronomy-engine): radiante das Leônidas a 32° de altura no nordeste às 4h de 17/11/2026; Lua se põe por volta da meia-noite.\n\n#astronomia #ceu #ciencia #brasil #neuralupdate",
+   "curtidas_campo": 9,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 253,
+   "reach": 205,
+   "likes": 9,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 7692,
+   "ig_reels_video_view_total_time": 1676931,
+   "reels_skip_rate": 53.2,
+   "reposts": 0
+  },
+  {
    "id": "18133470964694197",
    "quando": "2026-11-16T17:12:08+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/Dfz3MIfgKPi/",
    "titulo": "No polo norte de Saturno tem uma tempestade de seis lados, igual favo de mel.",
    "legenda": "No polo norte de Saturno tem uma tempestade de seis lados, igual favo de mel.\n\nCada lado é maior que a Terra inteira. É um vento correndo em volta do polo a mais de 300 km/h. Foi visto em 1981, e continua lá até hoje. Em laboratório, girando um tanque de água, dá pra criar formas assim.\n\nSeis lados de vento girando no topo de um planeta.\n\n🔖 Salva pra mostrar pra alguém que não acredita.\n\n📚 Fonte: NASA Science — Saturn's hexagon (Voyager, 1981; Cassini, 2004–2017); Barbosa Aguiar et al., Icarus (2010), formas poligonais em fluido girando.\n\n#astronomia #sistemasolar #ciencia #aula #neuralupdate",
-   "curtidas_campo": 3,
+   "curtidas_campo": 9,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 113,
-   "reach": 96,
-   "likes": 3,
+   "views": 308,
+   "reach": 260,
+   "likes": 9,
    "comments": 1,
    "shares": 0,
-   "saved": 0,
-   "total_interactions": 4,
-   "ig_reels_avg_watch_time": 8442,
-   "ig_reels_video_view_total_time": 877987,
-   "reels_skip_rate": 53.3,
+   "saved": 1,
+   "total_interactions": 11,
+   "ig_reels_avg_watch_time": 12122,
+   "ig_reels_video_view_total_time": 3357803,
+   "reels_skip_rate": 49.1,
    "reposts": 0
   },
   {
@@ -5498,16 +5588,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 95,
-   "reach": 79,
+   "views": 130,
+   "reach": 107,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 6963,
-   "ig_reels_video_view_total_time": 591894,
-   "reels_skip_rate": 62.4,
+   "ig_reels_avg_watch_time": 6628,
+   "ig_reels_video_view_total_time": 788767,
+   "reels_skip_rate": 60.2,
    "reposts": 1
   },
   {
@@ -5520,16 +5610,16 @@
    "curtidas_campo": 32,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1373,
-   "reach": 1122,
+   "views": 1382,
+   "reach": 1131,
    "likes": 32,
    "comments": 1,
    "shares": 3,
    "saved": 1,
    "total_interactions": 39,
-   "ig_reels_avg_watch_time": 17208,
-   "ig_reels_video_view_total_time": 19859043,
-   "reels_skip_rate": 40.8,
+   "ig_reels_avg_watch_time": 17064,
+   "ig_reels_video_view_total_time": 19879864,
+   "reels_skip_rate": 41.2,
    "reposts": 2
   },
   {
@@ -5542,16 +5632,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 279,
-   "reach": 256,
+   "views": 280,
+   "reach": 257,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 10094,
-   "ig_reels_video_view_total_time": 2634624,
-   "reels_skip_rate": 49.8,
+   "ig_reels_avg_watch_time": 10181,
+   "ig_reels_video_view_total_time": 2667449,
+   "reels_skip_rate": 49.6,
    "reposts": 0
   },
   {
@@ -5564,16 +5654,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 153,
+   "views": 154,
    "reach": 138,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 6,
-   "ig_reels_avg_watch_time": 8770,
-   "ig_reels_video_view_total_time": 1219166,
-   "reels_skip_rate": 56.1,
+   "ig_reels_avg_watch_time": 8929,
+   "ig_reels_video_view_total_time": 1250188,
+   "reels_skip_rate": 55.7,
    "reposts": 0
   },
   {
@@ -5586,16 +5676,16 @@
    "curtidas_campo": 11,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 363,
+   "views": 365,
    "reach": 300,
    "likes": 11,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 16,
-   "ig_reels_avg_watch_time": 11566,
-   "ig_reels_video_view_total_time": 3550860,
-   "reels_skip_rate": 54.1,
+   "ig_reels_avg_watch_time": 11550,
+   "ig_reels_video_view_total_time": 3557488,
+   "reels_skip_rate": 53.9,
    "reposts": 3
   },
   {
@@ -5696,16 +5786,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 163,
-   "reach": 137,
+   "views": 165,
+   "reach": 138,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 9394,
-   "ig_reels_video_view_total_time": 1409154,
-   "reels_skip_rate": 46,
+   "ig_reels_avg_watch_time": 9597,
+   "ig_reels_video_view_total_time": 1449225,
+   "reels_skip_rate": 46.4,
    "reposts": 0
   },
   {
@@ -5718,15 +5808,15 @@
    "curtidas_campo": 38,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1851,
-   "reach": 1448,
+   "views": 1853,
+   "reach": 1450,
    "likes": 38,
    "comments": 1,
    "shares": 43,
    "saved": 3,
    "total_interactions": 87,
-   "ig_reels_avg_watch_time": 11064,
-   "ig_reels_video_view_total_time": 17658270,
+   "ig_reels_avg_watch_time": 11072,
+   "ig_reels_video_view_total_time": 17693166,
    "reels_skip_rate": 34,
    "reposts": 2
   },
@@ -5891,19 +5981,19 @@
    "link": "https://www.instagram.com/reel/DfjxLQVTZ_d/",
    "titulo": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do asteroide Riúgu, trazida por uma",
    "legenda": "Num pedaço de asteroide de quatro bilhões e meio de anos, acharam as cinco letras do DNA. A amostra veio do asteroide Riúgu, trazida por uma sonda japonesa em dois mil e vinte. São só cinco gramas e meio de poeira. E dentro deles estão as cinco bases que formam o DNA e o RNA de todo ser vivo. Isso reforça a ideia de que os ingredientes da vida chegaram na Terra a bordo de asteroides.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: Nature Astronomy (2026), via The Conversation / ScienceDaily, 02/11/2026; amostras da missão Hayabusa2 (JAXA)\nImagens: cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
-   "curtidas_campo": 0,
+   "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 21,
+   "views": 22,
    "reach": 17,
-   "likes": 0,
+   "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 1,
-   "ig_reels_avg_watch_time": 11235,
-   "ig_reels_video_view_total_time": 202237,
-   "reels_skip_rate": 44.4,
+   "total_interactions": 2,
+   "ig_reels_avg_watch_time": 12636,
+   "ig_reels_video_view_total_time": 240102,
+   "reels_skip_rate": 42.1,
    "reposts": 0
   },
   {
@@ -6004,16 +6094,16 @@
    "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 287,
-   "reach": 267,
+   "views": 288,
+   "reach": 268,
    "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 7,
-   "ig_reels_avg_watch_time": 11002,
-   "ig_reels_video_view_total_time": 2992746,
-   "reels_skip_rate": 43,
+   "ig_reels_avg_watch_time": 10972,
+   "ig_reels_video_view_total_time": 2995380,
+   "reels_skip_rate": 43.2,
    "reposts": 0
   },
   {
@@ -7126,16 +7216,16 @@
    "curtidas_campo": 15,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 343,
-   "reach": 259,
+   "views": 345,
+   "reach": 260,
    "likes": 15,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 18,
-   "ig_reels_avg_watch_time": 16954,
-   "ig_reels_video_view_total_time": 4747327,
-   "reels_skip_rate": 49.6,
+   "ig_reels_avg_watch_time": 16914,
+   "ig_reels_video_view_total_time": 4753109,
+   "reels_skip_rate": 49.5,
    "reposts": 1
   },
   {
