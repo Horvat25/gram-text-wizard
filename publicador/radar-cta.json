@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-17T18:20:22.386Z",
+ "gerado_em": "2026-11-18T17:55:02.391Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2568132,
+   "seguidores": 2568293,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.018,
+   "comentarios_por_curtida_sem_pedido": 0.017,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17630,
+   "seguidores": 17635,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,26 +44,13 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 591628,
+   "seguidores": 591968,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
-   "palavras": {
-    "COMO": 1
-   },
-   "comentarios_por_curtida_com_pedido": 0.042,
-   "comentarios_por_curtida_sem_pedido": 0.039,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-11-16",
-     "tipo": "REELS",
-     "pede": true,
-     "palavra": "COMO",
-     "trecho": "📲 Murilo Rabusky, especialista em tecnologia financeira e CMO da fintech Lina Open X, comenta como o Pix transformou a nossa maneira de faz",
-     "comentarios": 1,
-     "curtidas": 24,
-     "link": "https://www.instagram.com/reel/Dfzbmy-BMrZ/"
-    }
-   ]
+   "pct_posts_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.04,
+   "melhores_pedidos": []
   },
   {
    "usuario": "achadinhospromo15",
@@ -159,7 +146,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057488,
+   "seguidores": 1057544,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
@@ -175,7 +162,7 @@
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
      "comentarios": 112,
-     "curtidas": 4581,
+     "curtidas": 4630,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
