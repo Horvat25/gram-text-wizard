@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-17T18:39:44.582Z",
+  "gerado_em": "2026-11-18T00:10:41.991Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -625,7 +625,7 @@
     },
     {
       "d": "2026-11-17",
-      "views": 610
+      "views": 889
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1111,6 +1111,19 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "4192705441028093",
+      "quando": "2026-11-17T21:11:03+0000",
+      "titulo": "A Lua nascendo parece enorme, mas ela não aumentou nada.",
+      "link": "https://www.facebook.com/reel/4192705441028093/",
+      "segundos": 34.041,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 228,
+      "alcance": null,
+      "tempo_medio_ms": 7456,
+      "interacoes": 0
+    },
+    {
       "id": "1635810534949674",
       "quando": "2026-11-17T17:11:03+0000",
       "titulo": "Esse anel não devia existir, e quem achou foi um astrônomo brasileiro.",
@@ -1118,9 +1131,9 @@
       "segundos": 38.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 230,
+      "views": 244,
       "alcance": null,
-      "tempo_medio_ms": 5446,
+      "tempo_medio_ms": 6381,
       "interacoes": 0
     },
     {
@@ -1131,9 +1144,9 @@
       "segundos": 41.541,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 307,
+      "views": 314,
       "alcance": null,
-      "tempo_medio_ms": 3637,
+      "tempo_medio_ms": 3847,
       "interacoes": 0
     },
     {
@@ -1144,9 +1157,9 @@
       "segundos": 34.88,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 315,
+      "views": 320,
       "alcance": null,
-      "tempo_medio_ms": 6654,
+      "tempo_medio_ms": 6597,
       "interacoes": 0
     },
     {
@@ -1157,9 +1170,9 @@
       "segundos": 35.833,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 318,
+      "views": 320,
       "alcance": null,
-      "tempo_medio_ms": 7130,
+      "tempo_medio_ms": 7087,
       "interacoes": 0
     },
     {
@@ -1170,9 +1183,9 @@
       "segundos": 41.708,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 334,
+      "views": 335,
       "alcance": null,
-      "tempo_medio_ms": 5378,
+      "tempo_medio_ms": 5361,
       "interacoes": 0
     },
     {
@@ -1181,11 +1194,11 @@
       "titulo": "Marte encosta em Júpiter. Amanhã, antes do sol nascer.",
       "link": "https://www.facebook.com/reel/989208417070438/",
       "segundos": 39.791,
-      "curtidas": 23,
+      "curtidas": 24,
       "comentarios": 0,
-      "views": 2533,
+      "views": 2556,
       "alcance": null,
-      "tempo_medio_ms": 13083,
+      "tempo_medio_ms": 13075,
       "interacoes": 1
     },
     {
@@ -1339,9 +1352,9 @@
       "segundos": 12,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 1905,
+      "tempo_medio_ms": 3419,
       "interacoes": 0
     },
     {
@@ -1430,9 +1443,9 @@
       "segundos": 34.125,
       "curtidas": 12,
       "comentarios": 0,
-      "views": 534,
+      "views": 535,
       "alcance": null,
-      "tempo_medio_ms": 8819,
+      "tempo_medio_ms": 8805,
       "interacoes": 3
     },
     {
@@ -1456,9 +1469,9 @@
       "segundos": 33.51,
       "curtidas": 35,
       "comentarios": 0,
-      "views": 2067,
+      "views": 2068,
       "alcance": null,
-      "tempo_medio_ms": 9028,
+      "tempo_medio_ms": 9023,
       "interacoes": 0
     },
     {
@@ -1469,9 +1482,9 @@
       "segundos": 36.75,
       "curtidas": 70,
       "comentarios": 0,
-      "views": 5266,
+      "views": 5267,
       "alcance": null,
-      "tempo_medio_ms": 6500,
+      "tempo_medio_ms": 6498,
       "interacoes": 1
     },
     {
@@ -1495,7 +1508,7 @@
       "segundos": 44.866,
       "curtidas": 50,
       "comentarios": 0,
-      "views": 6161,
+      "views": 6162,
       "alcance": null,
       "tempo_medio_ms": 7641,
       "interacoes": 0
@@ -1508,7 +1521,7 @@
       "segundos": 40.791,
       "curtidas": 99,
       "comentarios": 0,
-      "views": 6795,
+      "views": 6796,
       "alcance": null,
       "tempo_medio_ms": 7116,
       "interacoes": 1
@@ -1547,9 +1560,9 @@
       "segundos": 36.666,
       "curtidas": 87,
       "comentarios": 0,
-      "views": 9085,
+      "views": 9086,
       "alcance": null,
-      "tempo_medio_ms": 6589,
+      "tempo_medio_ms": 6588,
       "interacoes": 1
     },
     {
@@ -1820,9 +1833,9 @@
       "segundos": 35.416,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 30296,
+      "tempo_medio_ms": 25445,
       "interacoes": 0
     },
     {
@@ -2314,9 +2327,9 @@
       "segundos": 39.5,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 4760,
+      "tempo_medio_ms": 2407,
       "interacoes": 0
     },
     {
