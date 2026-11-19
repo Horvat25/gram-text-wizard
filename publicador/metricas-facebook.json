@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-19T12:22:22.989Z",
+  "gerado_em": "2026-11-19T12:25:05.397Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
@@ -633,7 +633,7 @@
     },
     {
       "d": "2026-11-19",
-      "views": 248
+      "views": 285
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1139,7 +1139,7 @@
       "segundos": 41.333,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 282,
+      "views": 290,
       "alcance": null,
       "tempo_medio_ms": 5940,
       "interacoes": 0
@@ -1154,7 +1154,7 @@
       "comentarios": 0,
       "views": 344,
       "alcance": null,
-      "tempo_medio_ms": 6872,
+      "tempo_medio_ms": 6851,
       "interacoes": 0
     },
     {
