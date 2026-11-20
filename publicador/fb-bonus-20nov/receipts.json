@@ -388,6 +388,27 @@
   "viral-encelado-pequeno-com-oceano": {
     "quando": "2026-11-20T14:24:00.000Z",
     "video_id": "2287118958499493",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "upload_complete",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 9858987
+        },
+        "processing_phase": {
+          "status": "not_started"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-20T14:24:00+0000",
+      "id": "2287118958499493"
+    }
   }
 }
