@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 concurrency:
   group: fb-bonus-20nov
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   publish:
     runs-on: ubuntu-latest

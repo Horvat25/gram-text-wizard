@@ -58,7 +58,7 @@ for (const item of items) {
         continue;
       } catch (e) {
         console.log('agendamento recusado, mudo pra publicar na hora:', e.message);
-        r.recusa_agendar = e.message; modo = 'na-hora';
+        r.recusa_agendar = e.message; modo = 'na-hora'; persist(item.slug + ' agendamento recusado, publica na hora');
       }
     }
     while (Date.now() < slot) await sleep(Math.min(20000, slot - Date.now()));
