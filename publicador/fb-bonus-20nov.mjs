@@ -88,4 +88,11 @@ for (const item of naHora.sort((a, b) => a.quando.localeCompare(b.quando))) {
     persist(item.slug + ' ' + r.state); console.log(r.state, item.slug, new Date().toISOString());
   } catch (e) { r.state = 'FALHOU'; r.error = e.message; persist(item.slug + ' falhou'); console.log('FALHOU', item.slug, e.message); }
 }
+// Conferência (rodada 4): depois do último horário, lê cada Reel na Página e grava se saiu publicado.
+if (Date.now() > Date.parse('2026-11-20T15:00:00Z')) {
+  const conf = {};
+  for (const [k, v] of Object.entries(receipts)) { if (!v.video_id || !items.some(i => i.slug === k)) continue;
+    try { const d = await get(v.video_id, 'published,permalink_url,status', tk); v.confere = { published: d.published, permalink: d.permalink_url, video_status: d.status?.video_status, em: new Date().toISOString() }; conf[k] = d.published; } catch (e) { v.confere = { erro: e.message }; conf[k] = 'erro'; } }
+  persist('conferencia final'); console.log('CONFERE', JSON.stringify(conf));
+}
 console.log('FIM', JSON.stringify(Object.fromEntries(Object.entries(receipts).map(([k, v]) => [k, v.state]))));
