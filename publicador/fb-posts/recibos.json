@@ -1,0 +1,13 @@
+{
+  "20nov-pilares-da-criacao": {
+    "quando": "2026-11-20T18:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122161995219153806",
+    "foto_id": "122161995219153806",
+    "readback": {
+      "erro": "(#100) Tried accessing nonexisting field (is_published)"
+    },
+    "state": "AGENDADO"
+  }
+}
