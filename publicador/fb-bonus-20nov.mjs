@@ -28,7 +28,9 @@ async function sobe(item, r) {
   const ini = await post(PAGE + '/video_reels', { upload_phase: 'start' }, tk);
   if (!ini.video_id) throw Error('sem video_id');
   r.video_id = ini.video_id; r.state = 'SUBINDO'; persist(item.slug + ' start');
-  const up = await (await fetch(`https://rupload.facebook.com/video-upload/v21.0/${r.video_id}`, { method: 'POST', headers: { Authorization: `OAuth ${tk}`, file_url: item.url } })).json();
+  // Rodada 4: arquivo recusado pelo link hospedado sobe em bytes, direto do repositório.
+  const hdr = item.arquivo ? { Authorization: `OAuth ${tk}`, offset: '0', file_size: String(fs.statSync(item.arquivo).size) } : { Authorization: `OAuth ${tk}`, file_url: item.url };
+  const up = await (await fetch(`https://rupload.facebook.com/video-upload/v21.0/${r.video_id}`, { method: 'POST', headers: hdr, body: item.arquivo ? fs.readFileSync(item.arquivo) : undefined })).json();
   if (!up.success) throw Error('upload ' + JSON.stringify(up).slice(0, 200));
   for (let j = 0; j < 30; j++) {
     const st = (await get(r.video_id, 'status', tk)).status || {};

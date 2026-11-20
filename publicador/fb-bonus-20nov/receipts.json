@@ -242,15 +242,6 @@
       "id": "1887107266067039"
     }
   },
-  "viral-pan-tamanho-pequeno": {
-    "quando": "2026-11-20T12:48:00.000Z",
-    "state": "FALHOU",
-    "recusa_agendar": "Unsupported get request. Object with ID '2360723038016503' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api",
-    "video_id_antigo": "1817603376225723",
-    "reenviado": true,
-    "video_id": "2360723038016503",
-    "error": "There was a problem uploading your video file. Please try again with another file."
-  },
   "viral-hiperion-espaco-vazio": {
     "quando": "2026-11-20T13:04:00.000Z",
     "video_id": "3398725160316312",
@@ -465,5 +456,14 @@
       "scheduled_publish_time": "2026-11-20T14:56:00+0000",
       "id": "1188223283527700"
     }
+  },
+  "viral-pan-tamanho-pequeno-rodada3": {
+    "quando": "2026-11-20T12:48:00.000Z",
+    "state": "FALHOU",
+    "recusa_agendar": "Unsupported get request. Object with ID '2360723038016503' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api",
+    "video_id_antigo": "1817603376225723",
+    "reenviado": true,
+    "video_id": "2360723038016503",
+    "error": "There was a problem uploading your video file. Please try again with another file."
   }
 }
