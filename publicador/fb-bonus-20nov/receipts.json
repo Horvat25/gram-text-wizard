@@ -361,6 +361,28 @@
   "viral-apofis-tamanho": {
     "quando": "2026-11-20T14:08:00.000Z",
     "video_id": "2996122127413572",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 2543219
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-20T14:08:00+0000",
+      "id": "2996122127413572"
+    }
   }
 }
