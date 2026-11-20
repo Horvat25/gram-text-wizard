@@ -164,6 +164,28 @@
   "viral-caronte-metade-plutao": {
     "quando": "2026-11-20T12:00:00.000Z",
     "video_id": "29411060051836226",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3402122
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-20T12:00:00+0000",
+      "id": "29411060051836226"
+    }
   }
 }
