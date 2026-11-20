@@ -137,6 +137,28 @@
   "viral-urano-ano-longo": {
     "quando": "2026-11-20T11:44:00.000Z",
     "video_id": "1494430645948088",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3297703
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-20T11:44:00+0000",
+      "id": "1494430645948088"
+    }
   }
 }
