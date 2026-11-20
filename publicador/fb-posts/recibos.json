@@ -162,5 +162,16 @@
       "id": "962589380261249_122161996269153806"
     },
     "state": "AGENDADO"
+  },
+  "21nov-nebulosa-de-orion": {
+    "quando": "2026-11-22T00:00:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122161996305153806",
+    "foto_id": "122161996305153806",
+    "readback": {
+      "erro": "(#100) Tried accessing nonexisting field (is_published)"
+    },
+    "state": "AGENDADO"
   }
 }
