@@ -123,5 +123,19 @@
       "erro": "(#100) Tried accessing nonexisting field (is_published)"
     },
     "state": "AGENDADO"
+  },
+  "21nov-guia-do-ceu-fim-de-semana": {
+    "quando": "2026-11-21T18:30:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122161996179153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795285800,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122161996179153806",
+      "created_time": "2026-11-21T18:30:00+0000",
+      "id": "962589380261249_122161996179153806"
+    },
+    "state": "AGENDADO"
   }
 }
