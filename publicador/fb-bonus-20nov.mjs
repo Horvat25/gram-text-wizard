@@ -23,7 +23,6 @@ const tk = (await get(PAGE, 'access_token', process.env.IG_TOKEN)).access_token;
 if (!tk) throw Error('PAGE_TOKEN_MISSING');
 console.log('PAGINA', JSON.stringify(await get(PAGE, 'id,name', tk)));
 const LIMITE = Date.parse('2026-11-20T15:30:00Z');   // nada sai depois de 12h30 BRT
-let modo = 'agendar';
 
 async function sobe(item, r) {
   const ini = await post(PAGE + '/video_reels', { upload_phase: 'start' }, tk);
@@ -40,27 +39,44 @@ async function sobe(item, r) {
   throw Error('upload não completou em 5 min');
 }
 
+// Rodada 3 (20/11): erro de UM arquivo não muda o modo dos outros. Quem falhar no agendamento ganha 1 envio novo;
+// se falhar de novo, vai pra lista "na hora" e é publicado no horário dele depois que todos os outros estiverem agendados.
+async function agenda(item, r) {
+  const slot = Date.parse(item.quando);
+  const fim = await post(PAGE + '/video_reels', { upload_phase: 'finish', video_id: r.video_id, video_state: 'SCHEDULED', scheduled_publish_time: String(Math.floor(slot / 1000)), description: item.caption }, tk);
+  if (!fim.success) throw Error('finish ' + JSON.stringify(fim));
+  const rb = await get(r.video_id, 'status,published,scheduled_publish_time', tk);
+  r.readback = rb; r.state = 'AGENDADO'; persist(item.slug + ' agendado');
+  console.log('AGENDADO', item.slug, item.quando, JSON.stringify(rb).slice(0, 200));
+}
+const naHora = [];
 for (const item of items) {
   let r = receipts[item.slug];
   if (r && ['AGENDADO', 'PUBLICADO', 'ACEITO'].includes(r.state)) { console.log(item.slug, 'JA', r.state); continue; }
   if (r && r.state === 'FALHOU') { console.log(item.slug, 'FALHOU ANTES, nao repete', r.error); continue; }
   r = receipts[item.slug] = r || { quando: item.quando };
   try {
-    if (!r.video_id || r.state === 'SUBINDO') await sobe(item, r);
-    const slot = Date.parse(item.quando);
-    if (modo === 'agendar') {
-      try {
-        const fim = await post(PAGE + '/video_reels', { upload_phase: 'finish', video_id: r.video_id, video_state: 'SCHEDULED', scheduled_publish_time: String(Math.floor(slot / 1000)), description: item.caption }, tk);
-        if (!fim.success) throw Error('finish ' + JSON.stringify(fim));
-        const rb = await get(r.video_id, 'status,published,scheduled_publish_time', tk);
-        r.readback = rb; r.state = 'AGENDADO'; persist(item.slug + ' agendado');
-        console.log('AGENDADO', item.slug, item.quando, JSON.stringify(rb).slice(0, 200));
-        continue;
-      } catch (e) {
-        console.log('agendamento recusado, mudo pra publicar na hora:', e.message);
-        r.recusa_agendar = e.message; modo = 'na-hora'; persist(item.slug + ' agendamento recusado, publica na hora');
-      }
+    if (r.recusa_agendar && !r.reenviado) {   // arquivo recusado antes: manda de novo, do zero (URL do manifest pode ter mudado)
+      r.video_id_antigo = r.video_id; delete r.video_id; r.reenviado = true; r.state = 'REENVIANDO'; persist(item.slug + ' reenviando');
     }
+    if (!r.video_id || r.state === 'SUBINDO') await sobe(item, r);
+    try { await agenda(item, r); continue; }
+    catch (e1) {
+      console.log('agendamento recusado (1):', item.slug, e1.message);
+      r.recusa_agendar = e1.message;
+      if (!r.reenviado) {
+        r.video_id_antigo = r.video_id; delete r.video_id; r.reenviado = true; persist(item.slug + ' recusado, reenviando');
+        await sobe(item, r);
+        try { await agenda(item, r); continue; } catch (e2) { r.recusa_agendar = e2.message; console.log('agendamento recusado (2):', item.slug, e2.message); }
+      }
+      r.state = 'NA_HORA'; persist(item.slug + ' vai publicar na hora'); naHora.push(item);
+    }
+  } catch (e) { r.state = 'FALHOU'; r.error = e.message; persist(item.slug + ' falhou'); console.log('FALHOU', item.slug, e.message); }
+}
+for (const item of naHora.sort((a, b) => a.quando.localeCompare(b.quando))) {
+  const r = receipts[item.slug];
+  try {
+    const slot = Date.parse(item.quando);
     while (Date.now() < slot) await sleep(Math.min(20000, slot - Date.now()));
     if (Date.now() > LIMITE) throw Error('passou do limite de 12h30 BRT');
     const fim = await post(PAGE + '/video_reels', { upload_phase: 'finish', video_id: r.video_id, video_state: 'PUBLISHED', description: item.caption }, tk);
