@@ -6542,15 +6542,6 @@
     "id_facebook": "1492194992777957"
   },
   {
-    "quando": "2026-11-20T21:00:00.000Z",
-    "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/b0f4ed2a-3fb2-4456-930e-e95d7edcaf3a.mp4",
-    "legenda": "Se o Sol virasse buraco negro agora, a Terra não seria sugada.\n\nIa continuar dando a volta, na mesma órbita: a gravidade depende da massa, e a massa seria a mesma. O Sol inteiro caberia numa bola de uns 6 km. A gente só ia notar 8 minutos depois, quando a luz parasse de chegar. E aí o problema não seria ser sugado. Seria o frio.\n\nCalma: o Sol não tem massa pra virar buraco negro.\n\n📤 Manda pra quem morre de medo de buraco negro.\n\n📚 Física: raio de Schwarzschild do Sol ≈ 3 km; a luz do Sol leva ≈ 8 min 20 s até a Terra (NASA Science).\n\n#astronomia #buraconegro #ciencia #espaco #neuralupdate",
-    "slug": "viral-se-o-sol-virasse-buraco-negro",
-    "status": "agendado",
-    "comentario": "🕳️ Antes do vídeo, você achava que a Terra ia ser sugada? Conta aqui 👇"
-  },
-  {
     "quando": "2026-11-20T18:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -6579,6 +6570,15 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Você sabia que a luz demorava tanto pra sair do Sol? 👇"
+  },
+  {
+    "quando": "2026-11-20T21:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/b0f4ed2a-3fb2-4456-930e-e95d7edcaf3a.mp4",
+    "legenda": "Se o Sol virasse buraco negro agora, a Terra não seria sugada.\n\nIa continuar dando a volta, na mesma órbita: a gravidade depende da massa, e a massa seria a mesma. O Sol inteiro caberia numa bola de uns 6 km. A gente só ia notar 8 minutos depois, quando a luz parasse de chegar. E aí o problema não seria ser sugado. Seria o frio.\n\nCalma: o Sol não tem massa pra virar buraco negro.\n\n📤 Manda pra quem morre de medo de buraco negro.\n\n📚 Física: raio de Schwarzschild do Sol ≈ 3 km; a luz do Sol leva ≈ 8 min 20 s até a Terra (NASA Science).\n\n#astronomia #buraconegro #ciencia #espaco #neuralupdate",
+    "slug": "viral-se-o-sol-virasse-buraco-negro",
+    "status": "agendado",
+    "comentario": "🕳️ Antes do vídeo, você achava que a Terra ia ser sugada? Conta aqui 👇"
   },
   {
     "quando": "2026-11-20T22:30:00.000Z",
