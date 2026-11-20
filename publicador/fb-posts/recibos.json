@@ -23,5 +23,16 @@
       "id": "962589380261249_122161995255153806"
     },
     "state": "AGENDADO"
+  },
+  "20nov-supernova-antes-depois": {
+    "quando": "2026-11-20T22:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122161995303153806",
+    "foto_id": "122161995303153806",
+    "readback": {
+      "erro": "(#100) Tried accessing nonexisting field (is_published)"
+    },
+    "state": "AGENDADO"
   }
 }
