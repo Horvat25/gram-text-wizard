@@ -1,0 +1,31 @@
+name: Facebook posts de foto e texto
+on:
+  push:
+    branches: [main]
+    paths: [publicador/fb-posts/fila.json]
+  schedule:
+    - cron: '40 10 * * *'
+    - cron: '40 19 * * *'
+  workflow_dispatch:
+concurrency:
+  group: fb-posts
+  cancel-in-progress: false
+jobs:
+  publica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Agenda os posts da fila na Pagina
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          git config user.name 'FB posts publisher'
+          git config user.email 'publisher@users.noreply.github.com'
+          git pull --rebase origin main
+          node publicador/fb-posts.mjs
