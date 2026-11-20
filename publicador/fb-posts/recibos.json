@@ -87,5 +87,16 @@
       "id": "962589380261249_122161995597153806"
     },
     "state": "AGENDADO"
+  },
+  "21nov-campo-ultraprofundo": {
+    "quando": "2026-11-21T12:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122161995639153806",
+    "foto_id": "122161995639153806",
+    "readback": {
+      "erro": "(#100) Tried accessing nonexisting field (is_published)"
+    },
+    "state": "AGENDADO"
   }
 }
