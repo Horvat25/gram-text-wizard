@@ -273,6 +273,19 @@ async function esperaProcessar(videoId, tk) {
   throw new Error('upload nao completou em 5min - nao publicando incompleto');
 }
 
+// 13/11/2026 (Direção): comentário próprio na Página, logo depois do Reel. Só existe se o item trouxer
+// `fb_comentario`: campo vazio = NÃO posta nada (nunca cai em texto padrão de venda, diferente do IG).
+// Até 3 tentativas (uma por rodada): o Reel recém-publicado às vezes ainda não aceita comentário.
+const pendenteFbComentario = i => Boolean(PAGINA_FB) && Boolean(String(i.fb_comentario || '').trim())
+  && Boolean(i.id_facebook) && !i.id_fb_comentario && (i.tentativas_fb_comentario || 0) < 3;
+
+async function comentaNoFacebook(videoId, texto) {
+  const tk = await tokenDaPagina();
+  const r = await post(`${API}/${videoId}/comments`, { message: texto, access_token: tk });
+  if (!r.id) throw new Error(`comentário FB: ${JSON.stringify(r).slice(0, 200)}`);
+  return r.id;
+}
+
 // 17/09/2026: nunca mandar pro Facebook o MESMO arquivo (bytes identicos) que acabou de sair
 // no Insta minutos antes - conteudo repostado identico entre redes e fator que reduz
 // distribuicao organica (doc oficial da Meta + guias de crescimento). O lote semanal gera uma
@@ -354,11 +367,12 @@ if (!SECO) {
 console.log(`fila: ${fila.length} · vencidos agora: ${vencidos.length}`);
 // Sai cedo quando não há nada vencido — mas se o cron ficou horas fora do ar, o job
 // precisa FALHAR mesmo assim, senão o e-mail de alerta não chega.
-if (!vencidos.length && !fila.some(pendenteFb)) process.exit(gapAviso ? 1 : 0);
+if (!vencidos.length && !fila.some(pendenteFb) && !fila.some(pendenteFbComentario)) process.exit(gapAviso ? 1 : 0);
 
 if (SECO) {
   for (const i of vencidos) console.log(`[seco] ${i.quando} ${i.tipo} ${String([].concat(i.midia)[0]).slice(0, 60)}…`);
   for (const i of fila.filter(pendenteFb)) console.log(`[seco] facebook: ${i.slug}`);
+  for (const i of fila.filter(pendenteFbComentario)) console.log(`[seco] comentario facebook: ${i.slug}`);
   process.exit(0);
 }
 
@@ -430,6 +444,19 @@ for (const item of fila.filter(pendenteFb)) {
   } catch (e) {
     item.erro_facebook = String(e.message || e).slice(0, 300);
     console.error(`  ⚠️ Facebook falhou (o Reel do Insta está no ar): ${item.erro_facebook}`);
+  }
+  mudou = true;
+}
+
+// Comentário da Página (só quem tem `fb_comentario`). Falha aqui nunca derruba nada: o Reel já está no ar.
+for (const item of fila.filter(pendenteFbComentario)) {
+  try {
+    item.id_fb_comentario = await comentaNoFacebook(item.id_facebook, String(item.fb_comentario).trim());
+    console.log(`  COMENTADO NO FACEBOOK: ${item.slug} → ${item.id_fb_comentario}`);
+  } catch (e) {
+    item.tentativas_fb_comentario = (item.tentativas_fb_comentario || 0) + 1;
+    item.erro_fb_comentario = String(e.message || e).slice(0, 300);
+    console.error(`  ⚠️ comentário no Facebook falhou (tentativa ${item.tentativas_fb_comentario}/3): ${item.erro_fb_comentario}`);
   }
   mudou = true;
 }
