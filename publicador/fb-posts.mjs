@@ -57,10 +57,18 @@ for (const p of fila.sort((a, b) => a.quando.localeCompare(b.quando))) {
     if (p.tipo === 'foto') d = await post(PAGE + '/photos', { url: RAW + p.imagem, message: p.texto, ...quando }, tk);
     else d = await post(PAGE + '/feed', { message: p.texto, ...quando }, tk);
     r.id = d.post_id || d.id; r.foto_id = p.tipo === 'foto' ? d.id : undefined;
-    try { r.readback = await get(r.id, 'is_published,scheduled_publish_time,permalink_url,created_time', tk); } catch (e) { r.readback = { erro: e.message }; }
+    try { r.readback = p.tipo === 'foto' ? await get(d.id, 'created_time,link', tk) : await get(r.id, 'is_published,scheduled_publish_time,permalink_url,created_time', tk); } catch (e) { r.readback = { erro: e.message }; }
     r.state = agendar ? 'AGENDADO' : 'PUBLICADO'; delete r.error;
   } catch (e) { r.state = 'FALHOU'; r.error = e.message; }
   persist(p.slug + ' ' + r.state); resumo[p.slug] = r.state;
   console.log(r.state, p.quando, p.tipo, p.slug, r.error || r.id);
 }
+// Conferência: o que a Página tem agendado e o que saiu nas últimas horas (prova de que foto agendada não saiu antes da hora).
+try {
+  const ag = await get(PAGE + '/scheduled_posts', 'id,message,scheduled_publish_time', tk);
+  const pub = await get(PAGE + '/posts', 'id,created_time,message', tk);
+  const corta = x => ({ id: x.id, quando: x.scheduled_publish_time ? new Date(x.scheduled_publish_time * 1000).toISOString() : x.created_time, inicio: (x.message || '').slice(0, 50) });
+  fs.writeFileSync(DIR + '/conferencia.json', JSON.stringify({ em: new Date().toISOString(), agendados: (ag.data || []).map(corta), ultimos_publicados: (pub.data || []).slice(0, 12).map(corta) }, null, 2) + '\n');
+  execFileSync('git', ['add', DIR + '/conferencia.json']); persist('conferencia');
+} catch (e) { console.log('conferencia falhou:', e.message); }
 console.log('FIM', JSON.stringify(resumo));
