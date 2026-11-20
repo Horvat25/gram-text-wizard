@@ -137,5 +137,16 @@
       "id": "962589380261249_122161996179153806"
     },
     "state": "AGENDADO"
+  },
+  "21nov-pale-blue-dot": {
+    "quando": "2026-11-21T20:00:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122161996227153806",
+    "foto_id": "122161996227153806",
+    "readback": {
+      "erro": "(#100) Tried accessing nonexisting field (is_published)"
+    },
+    "state": "AGENDADO"
   }
 }
