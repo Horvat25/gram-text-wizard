@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-19T18:06:06.374Z",
+ "gerado_em": "2026-11-20T17:41:07.710Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2568316,
+   "seguidores": 2568582,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17627,
+   "seguidores": 17630,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,12 +44,12 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 592154,
+   "seguidores": 592300,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.025,
+   "comentarios_por_curtida_sem_pedido": 0.029,
    "melhores_pedidos": []
   },
   {
@@ -146,7 +146,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1057885,
+   "seguidores": 1058154,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
@@ -162,7 +162,7 @@
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
      "comentarios": 112,
-     "curtidas": 4651,
+     "curtidas": 4679,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -181,13 +181,79 @@
   },
   {
    "hashtag": "achadosshopee",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.5,
+   "palavras": {
+    "LINK": 1,
+    "CASA": 1,
+    "ACHADOS": 1,
+    "QUERO": 1,
+    "TERMÔMETRO": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.708,
+   "comentarios_por_curtida_sem_pedido": 0.724,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": "LINK",
+     "trecho": "Comenta LINK que envio 🤍",
+     "comentarios": 11103,
+     "curtidas": 15526,
+     "link": "https://www.instagram.com/p/DdFJBBNlish/"
+    },
+    {
+     "pede": true,
+     "palavra": "CASA",
+     "trecho": "Já siga casadeliso pra ficar por dentro de tudo e comenta “CASA” que te envio os Links (tem que seguir o perfil pra receber direitinho) ✨",
+     "comentarios": 2771,
+     "curtidas": 7092,
+     "link": "https://www.instagram.com/p/DeUWbMrkZJ-/"
+    },
+    {
+     "pede": true,
+     "palavra": "QUERO",
+     "trecho": "Se quiser os links, tamanhos e cupons, comente “QUERO” ✨",
+     "comentarios": 1736,
+     "curtidas": 1210,
+     "link": "https://www.instagram.com/p/DX9uFf1DurH/"
+    },
+    {
+     "pede": true,
+     "palavra": "ACHADOS",
+     "trecho": "🍊 Siga suacasalaranja e comente ACHADOS para receber os links 🛍️✨",
+     "comentarios": 1441,
+     "curtidas": 2151,
+     "link": "https://www.instagram.com/p/DdPmBoFj22S/"
+    },
+    {
+     "pede": true,
+     "palavra": "TERMÔMETRO",
+     "trecho": "Toda mamãe precisa disso 🥹✨ Segue larii.indica pra receber o link . O link é enviado automaticamente, se você não segue tem que ir nas configurações do seu ins",
+     "comentarios": 169,
+     "curtidas": 516,
+     "link": "https://www.instagram.com/p/DeNgZ25gpXb/"
+    }
+   ]
   },
   {
    "hashtag": "projetorgalaxia",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.1,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_sem_pedido": 0.012,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": null,
+     "trecho": "👉 Curtiu? Então chama no direct para garantir o seu com condição especial!",
+     "comentarios": 0,
+     "curtidas": 1,
+     "link": "https://www.instagram.com/p/DKpEXXeRLld/"
+    }
+   ]
   },
   {
    "hashtag": "astronomia",
