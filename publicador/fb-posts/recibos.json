@@ -98,5 +98,19 @@
       "erro": "(#100) Tried accessing nonexisting field (is_published)"
     },
     "state": "AGENDADO"
+  },
+  "21nov-por-que-o-ceu-e-azul": {
+    "quando": "2026-11-21T14:00:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122161995681153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795269600,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122161995681153806",
+      "created_time": "2026-11-21T14:00:00+0000",
+      "id": "962589380261249_122161995681153806"
+    },
+    "state": "AGENDADO"
   }
 }
