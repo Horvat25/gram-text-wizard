@@ -245,6 +245,7 @@
   "viral-pan-tamanho-pequeno": {
     "quando": "2026-11-20T12:48:00.000Z",
     "video_id": "1817603376225723",
-    "state": "SUBIU"
+    "state": "SUBIU",
+    "recusa_agendar": "There was a problem uploading your video file. Please try again with another file."
   }
 }
