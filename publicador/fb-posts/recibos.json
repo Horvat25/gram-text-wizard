@@ -241,5 +241,18 @@
       "id": "962589380261249_122162118879153806"
     },
     "state": "AGENDADO"
+  },
+  "22nov-pegada-na-lua": {
+    "quando": "2026-11-22T18:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122162118927153806",
+    "foto_id": "122162118927153806",
+    "readback": {
+      "created_time": "2026-11-21T19:50:29+0000",
+      "link": "https://www.facebook.com/photo.php?fbid=122162118927153806&set=p.122162118927153806&type=3",
+      "id": "122162118927153806"
+    },
+    "state": "AGENDADO"
   }
 }
