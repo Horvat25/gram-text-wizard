@@ -29,12 +29,12 @@ const slugs = new Set();
 for (const p of fila) {
   if (!p.slug || slugs.has(p.slug)) erros.push('slug vazio/duplicado: ' + p.slug); slugs.add(p.slug);
   if (isNaN(Date.parse(p.quando)) || !p.quando.endsWith('Z')) erros.push(p.slug + ': quando inválido (ISO com Z)');
-  if (!['foto', 'texto'].includes(p.tipo)) erros.push(p.slug + ': tipo deve ser foto ou texto');
-  if (!p.texto || p.texto.length < 40) erros.push(p.slug + ': texto curto demais');
-  if (/https?:\/\//.test(p.texto)) erros.push(p.slug + ': link no texto derruba alcance (link vai no comentário)');
-  if (p.tipo === 'foto' && (!p.imagem || !fs.existsSync(p.imagem))) erros.push(p.slug + ': imagem não existe no repo: ' + p.imagem);
+  if (!['foto', 'texto', 'story'].includes(p.tipo)) erros.push(p.slug + ': tipo deve ser foto, texto ou story');
+  if (p.tipo !== 'story' && (!p.texto || p.texto.length < 40)) erros.push(p.slug + ': texto curto demais');
+  if (/https?:\/\//.test(p.texto || '')) erros.push(p.slug + ': link no texto derruba alcance (link vai no comentário)');
+  if (p.tipo !== 'texto' && (!p.imagem || !fs.existsSync(p.imagem))) erros.push(p.slug + ': imagem não existe no repo: ' + p.imagem);
 }
-const horas = fila.map(p => p.quando).sort();
+const horas = fila.filter(p => p.tipo !== 'story').map(p => p.quando).sort();
 for (let i = 1; i < horas.length; i++) if (Date.parse(horas[i]) - Date.parse(horas[i - 1]) < 30 * 60e3) erros.push('dois posts a menos de 30 min: ' + horas[i - 1] + ' e ' + horas[i]);
 if (erros.length) { console.log('FILA COM ERRO:\n' + erros.join('\n')); process.exit(1); }
 console.log('fila ok:', fila.length, 'posts');
@@ -43,17 +43,28 @@ if (SECO) { for (const p of fila) console.log(p.quando, p.tipo, p.slug, rec[p.sl
 const tk = (await get(PAGE, 'access_token', process.env.IG_TOKEN)).access_token;
 if (!tk) throw Error('PAGE_TOKEN_MISSING');
 const resumo = {};
+let mudou = false;
 for (const p of fila.sort((a, b) => a.quando.localeCompare(b.quando))) {
-  const r = rec[p.slug] = rec[p.slug] || { quando: p.quando, tipo: p.tipo };
-  if (['AGENDADO', 'PUBLICADO', 'PERDIDO'].includes(r.state)) { resumo[p.slug] = r.state; continue; }
-  if (r.state === 'FALHOU' && r.tentativas >= 2) { resumo[p.slug] = 'FALHOU'; continue; }
+  const r0 = rec[p.slug];
+  if (r0 && ['AGENDADO', 'PUBLICADO', 'PERDIDO'].includes(r0.state)) { resumo[p.slug] = r0.state; continue; }
+  if (r0 && r0.state === 'FALHOU' && r0.tentativas >= 2) { resumo[p.slug] = 'FALHOU'; continue; }
   const slot = Date.parse(p.quando), agora = Date.now();
-  if (agora - slot > 2 * 3600e3) { r.state = 'PERDIDO'; persist(p.slug + ' perdido'); resumo[p.slug] = 'PERDIDO'; continue; }
+  // Story (21/11/2026): o Facebook não agenda Story pela API; o robô roda de hora em hora e publica quando o horário chega.
+  if (p.tipo === 'story' && slot - agora > 5 * 60e3) { resumo[p.slug] = 'AGUARDANDO'; continue; }
+  const r = rec[p.slug] = r0 || { quando: p.quando, tipo: p.tipo };
+  mudou = true;
+  if (agora - slot > (p.tipo === 'story' ? 3 : 2) * 3600e3) { r.state = 'PERDIDO'; persist(p.slug + ' perdido'); resumo[p.slug] = 'PERDIDO'; continue; }
   const agendar = slot - agora > 12 * 60e3;
   const quando = agendar ? { published: 'false', scheduled_publish_time: String(Math.floor(slot / 1000)) } : {};
   try {
     r.tentativas = (r.tentativas || 0) + 1;
     let d;
+    if (p.tipo === 'story') {
+      const foto = await post(PAGE + '/photos', { url: RAW + p.imagem, published: 'false' }, tk);
+      d = await post(PAGE + '/photo_stories', { photo_id: foto.id }, tk);
+      r.id = d.post_id || d.id; r.state = 'PUBLICADO'; delete r.error;
+      persist(p.slug + ' story'); resumo[p.slug] = r.state; console.log('STORY', p.slug, r.id); continue;
+    }
     if (p.tipo === 'foto') d = await post(PAGE + '/photos', { url: RAW + p.imagem, message: p.texto, ...quando }, tk);
     else d = await post(PAGE + '/feed', { message: p.texto, ...quando }, tk);
     r.id = d.post_id || d.id; r.foto_id = p.tipo === 'foto' ? d.id : undefined;
@@ -64,7 +75,7 @@ for (const p of fila.sort((a, b) => a.quando.localeCompare(b.quando))) {
   console.log(r.state, p.quando, p.tipo, p.slug, r.error || r.id);
 }
 // Conferência: o que a Página tem agendado e o que saiu nas últimas horas (prova de que foto agendada não saiu antes da hora).
-try {
+if (mudou) try {   // só quando algo mudou nesta rodada (o cron é de hora em hora)
   const ag = await get(PAGE + '/scheduled_posts', 'id,message,scheduled_publish_time', tk);
   const pub = await get(PAGE + '/posts', 'id,created_time,message', tk);
   const corta = x => ({ id: x.id, quando: x.scheduled_publish_time ? new Date(x.scheduled_publish_time * 1000).toISOString() : x.created_time, inicio: (x.message || '').slice(0, 50) });

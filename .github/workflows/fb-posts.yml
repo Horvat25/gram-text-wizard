@@ -4,8 +4,7 @@ on:
     branches: [main]
     paths: [publicador/fb-posts/fila.json]
   schedule:
-    - cron: '40 10 * * *'
-    - cron: '40 19 * * *'
+    - cron: '7 * * * *'   # de hora em hora: Story do Facebook não tem agendamento nativo
   workflow_dispatch:
 concurrency:
   group: fb-posts
