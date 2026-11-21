@@ -6949,6 +6949,15 @@
     "comentario": "Qual parte você mostraria pra alguém? 👇"
   },
   {
+    "quando": "2026-11-22T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/3fc5ab90-4830-458f-9a9d-3576187ce3fc.mp4",
+    "legenda": "A NASA encostou num asteroide e o braço AFUNDOU (era uma piscina de bolinhas) ☄️\n\nEm 20/10/2020, a sonda OSIRIS-REx, da NASA, encostou o braço no asteroide Bennu, de uns 490 metros, pra recolher poeira. O chão não ofereceu quase nenhuma resistência: as pedras soltas espirraram como numa piscina de bolinhas. Segundo a NASA, se a sonda não tivesse ligado os motores logo em seguida pra se afastar, teria afundado no asteroide. Em 24/09/2023, a cápsula caiu no deserto de Utah com 121,6 gramas de Bennu, a maior amostra de asteroide já trazida pra Terra.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA — OSIRIS-REx (toque em 20/10/2020; cápsula em Utah em 24/09/2023; 121,6 g); Lauretta et al. e Walsh et al., Science (2022), sobre a superfície de Bennu se comportar como fluido.\n\n#asteroide #astronomia #nasa #neuralupdate",
+    "slug": "pl109-bennu-o-asteroide-que-engoliu-o-braco",
+    "status": "agendado",
+    "comentario": "☄️ Você achava que asteroide era uma pedra maciça? 👇"
+  },
+  {
     "quando": "2026-11-22T18:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7598,6 +7607,15 @@
     "comentario": "Você já sabia disso? Conta aqui 👇"
   },
   {
+    "quando": "2026-11-26T17:00:00.000Z",
+    "tipo": "reels",
+    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/dc9f801e-69ad-4df1-a05a-f1bf1c7eb2fe.mp4",
+    "legenda": "Uma nave passou UM minuto ao lado desse asteroide (e Saturno apareceu na foto) 🪐\n\nEm 10/07/2010, a sonda europeia Rosetta passou a 3.162 km do asteroide 21 Lutécia (121 × 101 × 75 km), a 15 km/s. O sobrevoo de perto durou cerca de um minuto, o suficiente pra mapear crateras e sulcos numa superfície de uns 3,6 bilhões de anos. Numa das fotos, Saturno aparece ao fundo. Segundo a ESA, Lutécia provavelmente é um planetesimal primordial, um bloco que sobrou da formação dos planetas.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: ESA — Rosetta, sobrevoo de 21 Lutetia (10/07/2010, 3.162 km); Sierks et al. e Pätzold et al., Science (2011).\n\n#asteroide #esa #aula #neuralupdate",
+    "slug": "pl113-lutecia-o-asteroide-com-saturno-na-foto",
+    "status": "agendado",
+    "comentario": "🪐 Você conseguiu achar Saturno na foto? 👇"
+  },
+  {
     "quando": "2026-11-26T18:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7670,23 +7688,5 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇"
-  },
-  {
-    "quando": "2026-11-22T17:00:00.000Z",
-    "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/3fc5ab90-4830-458f-9a9d-3576187ce3fc.mp4",
-    "legenda": "A NASA encostou num asteroide e o braço AFUNDOU (era uma piscina de bolinhas) ☄️\n\nEm 20/10/2020, a sonda OSIRIS-REx, da NASA, encostou o braço no asteroide Bennu, de uns 490 metros, pra recolher poeira. O chão não ofereceu quase nenhuma resistência: as pedras soltas espirraram como numa piscina de bolinhas. Segundo a NASA, se a sonda não tivesse ligado os motores logo em seguida pra se afastar, teria afundado no asteroide. Em 24/09/2023, a cápsula caiu no deserto de Utah com 121,6 gramas de Bennu, a maior amostra de asteroide já trazida pra Terra.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA — OSIRIS-REx (toque em 20/10/2020; cápsula em Utah em 24/09/2023; 121,6 g); Lauretta et al. e Walsh et al., Science (2022), sobre a superfície de Bennu se comportar como fluido.\n\n#asteroide #astronomia #nasa #neuralupdate",
-    "slug": "pl109-bennu-o-asteroide-que-engoliu-o-braco",
-    "status": "agendado",
-    "comentario": "☄️ Você achava que asteroide era uma pedra maciça? 👇"
-  },
-  {
-    "quando": "2026-11-26T17:00:00.000Z",
-    "tipo": "reels",
-    "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/dc9f801e-69ad-4df1-a05a-f1bf1c7eb2fe.mp4",
-    "legenda": "Uma nave passou UM minuto ao lado desse asteroide (e Saturno apareceu na foto) 🪐\n\nEm 10/07/2010, a sonda europeia Rosetta passou a 3.162 km do asteroide 21 Lutécia (121 × 101 × 75 km), a 15 km/s. O sobrevoo de perto durou cerca de um minuto, o suficiente pra mapear crateras e sulcos numa superfície de uns 3,6 bilhões de anos. Numa das fotos, Saturno aparece ao fundo. Segundo a ESA, Lutécia provavelmente é um planetesimal primordial, um bloco que sobrou da formação dos planetas.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: ESA — Rosetta, sobrevoo de 21 Lutetia (10/07/2010, 3.162 km); Sierks et al. e Pätzold et al., Science (2011).\n\n#asteroide #esa #aula #neuralupdate",
-    "slug": "pl113-lutecia-o-asteroide-com-saturno-na-foto",
-    "status": "agendado",
-    "comentario": "🪐 Você conseguiu achar Saturno na foto? 👇"
   }
 ]
