@@ -349,5 +349,18 @@
       "id": "962589380261249_122162119497153806"
     },
     "state": "AGENDADO"
+  },
+  "23nov-olympus-mons": {
+    "quando": "2026-11-23T22:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122162119605153806",
+    "foto_id": "122162119605153806",
+    "readback": {
+      "created_time": "2026-11-21T19:50:52+0000",
+      "link": "https://www.facebook.com/photo.php?fbid=122162119605153806&set=p.122162119605153806&type=3",
+      "id": "122162119605153806"
+    },
+    "state": "AGENDADO"
   }
 }
