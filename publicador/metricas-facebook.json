@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-20T17:54:58.337Z",
+  "gerado_em": "2026-11-21T14:50:13.486Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 124,
-    "curtidas": 124
+    "seguidores": 121,
+    "curtidas": 121
   },
   "pagina_diaria": [
     {
@@ -637,7 +637,11 @@
     },
     {
       "d": "2026-11-20",
-      "views": 2009
+      "views": 2173
+    },
+    {
+      "d": "2026-11-21",
+      "views": 8
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1129,14 +1133,32 @@
     },
     {
       "d": "2026-11-20",
+      "valor": 0.01,
+      "moeda": null
+    },
+    {
+      "d": "2026-11-21",
       "valor": 0,
       "moeda": null
     }
   ],
   "ganhos_metrica": "monetization_approximate_earnings",
   "ganhos_resposta_crua": 0.001374,
-  "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_social_actions,post_video_likes_by_reaction_type",
+  "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1227840310198647",
+      "quando": "2026-11-20T21:13:02+0000",
+      "titulo": "Se o Sol virasse buraco negro agora, a Terra não seria sugada.",
+      "link": "https://www.facebook.com/reel/1227840310198647/",
+      "segundos": 37.458,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 3,
+      "alcance": null,
+      "tempo_medio_ms": 2215,
+      "interacoes": 0
+    },
     {
       "id": "1492194992777957",
       "quando": "2026-11-20T17:12:00+0000",
@@ -1145,9 +1167,9 @@
       "segundos": 37.791,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 2291,
       "interacoes": 0
     },
     {
@@ -1210,11 +1232,10 @@
       "segundos": 13.71,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 195,
+      "interacoes": 0
     },
     {
       "id": "2996122127413572",
@@ -1250,9 +1271,9 @@
       "segundos": 13.041,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 15669,
+      "tempo_medio_ms": 6825,
       "interacoes": 0
     },
     {
@@ -1352,11 +1373,11 @@
       "titulo": "O aniversário em Urano DEMORA 🪐",
       "link": "https://www.facebook.com/reel/1494430645948088/",
       "segundos": 12.21,
-      "curtidas": 1,
+      "curtidas": 2,
       "comentarios": 0,
-      "views": 274,
+      "views": 360,
       "alcance": null,
-      "tempo_medio_ms": 4000,
+      "tempo_medio_ms": 3876,
       "interacoes": 0
     },
     {
@@ -1365,11 +1386,11 @@
       "titulo": "Haumea gira e fica ESTICADO 🥚",
       "link": "https://www.facebook.com/reel/2406504496790456/",
       "segundos": 12.833,
-      "curtidas": 6,
+      "curtidas": 7,
       "comentarios": 0,
-      "views": 553,
+      "views": 585,
       "alcance": null,
-      "tempo_medio_ms": 4806,
+      "tempo_medio_ms": 4900,
       "interacoes": 0
     },
     {
@@ -1380,9 +1401,9 @@
       "segundos": 11.791,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 449,
+      "views": 450,
       "alcance": null,
-      "tempo_medio_ms": 4694,
+      "tempo_medio_ms": 4683,
       "interacoes": 0
     },
     {
@@ -1406,9 +1427,9 @@
       "segundos": 13.291,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 332,
+      "views": 335,
       "alcance": null,
-      "tempo_medio_ms": 3425,
+      "tempo_medio_ms": 3418,
       "interacoes": 0
     },
     {
@@ -1417,11 +1438,11 @@
       "titulo": "A Lua apagada também BRILHA 🌙",
       "link": "https://www.facebook.com/reel/929021270176933/",
       "segundos": 13.67,
-      "curtidas": 2,
+      "curtidas": 3,
       "comentarios": 0,
-      "views": 361,
+      "views": 384,
       "alcance": null,
-      "tempo_medio_ms": 5281,
+      "tempo_medio_ms": 5568,
       "interacoes": 0
     },
     {
@@ -1445,9 +1466,9 @@
       "segundos": 36.791,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 265,
+      "views": 266,
       "alcance": null,
-      "tempo_medio_ms": 5697,
+      "tempo_medio_ms": 5702,
       "interacoes": 0
     },
     {
@@ -1471,9 +1492,9 @@
       "segundos": 36.38,
       "curtidas": 6,
       "comentarios": 0,
-      "views": 352,
+      "views": 356,
       "alcance": null,
-      "tempo_medio_ms": 6856,
+      "tempo_medio_ms": 6936,
       "interacoes": 0
     },
     {
@@ -1692,11 +1713,10 @@
       "segundos": 12,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 6,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 4742,
+      "interacoes": 0
     },
     {
       "id": "1826705551711362",
@@ -1797,9 +1817,9 @@
       "segundos": 40.625,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 320,
+      "views": 321,
       "alcance": null,
-      "tempo_medio_ms": 5869,
+      "tempo_medio_ms": 5852,
       "interacoes": 0
     },
     {
@@ -1823,11 +1843,10 @@
       "segundos": 39.125,
       "curtidas": 5,
       "comentarios": 0,
-      "views": null,
+      "views": 362,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 9454,
+      "interacoes": 0
     },
     {
       "id": "1006779125115405",
@@ -1861,7 +1880,7 @@
       "titulo": "Na madrugada de terça pra quarta, dia dezessete, tem chuva de meteoros. São as Leônidas: pedaços de um cometa ",
       "link": "https://www.facebook.com/reel/1130067386542232/",
       "segundos": 33.51,
-      "curtidas": 34,
+      "curtidas": 33,
       "comentarios": 0,
       "views": 2072,
       "alcance": null,
@@ -1874,11 +1893,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Ma",
       "link": "https://www.facebook.com/reel/1843147703497460/",
       "segundos": 36.75,
-      "curtidas": 69,
+      "curtidas": 68,
       "comentarios": 0,
-      "views": 5274,
+      "views": 5276,
       "alcance": null,
-      "tempo_medio_ms": 6490,
+      "tempo_medio_ms": 6488,
       "interacoes": 1
     },
     {
@@ -1900,7 +1919,7 @@
       "titulo": "Hoje, logo depois do pôr do sol, a Lua volta pro céu, fininha. Ela vai estar só sete por cento acesa, baixinha",
       "link": "https://www.facebook.com/reel/2042179853150041/",
       "segundos": 44.866,
-      "curtidas": 49,
+      "curtidas": 47,
       "comentarios": 0,
       "views": 6166,
       "alcance": null,
@@ -1913,11 +1932,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Um mundo gelado tirou Plutão da lista dos planetas. É Éris",
       "link": "https://www.facebook.com/reel/2185042108781347/",
       "segundos": 40.791,
-      "curtidas": 98,
+      "curtidas": 97,
       "comentarios": 0,
-      "views": 6800,
+      "views": 6801,
       "alcance": null,
-      "tempo_medio_ms": 7117,
+      "tempo_medio_ms": 7116,
       "interacoes": 1
     },
     {
@@ -1926,7 +1945,7 @@
       "titulo": "A sonda que vai investigar a cena de um crime espacial já está chegando. Em dois mil e vinte e dois, a NASA jo",
       "link": "https://www.facebook.com/reel/29260134300285811/",
       "segundos": 43.681,
-      "curtidas": 29,
+      "curtidas": 28,
       "comentarios": 1,
       "views": 2435,
       "alcance": null,
@@ -1939,11 +1958,11 @@
       "titulo": "Esse montinho de estrelas que aparece no céu de novembro tem nome: Sete-Estrelo. São as Plêiades, um grupo de ",
       "link": "https://www.facebook.com/reel/1056296934099260/",
       "segundos": 43.868,
-      "curtidas": 12,
+      "curtidas": 11,
       "comentarios": 0,
-      "views": 1391,
+      "views": 1392,
       "alcance": null,
-      "tempo_medio_ms": 6290,
+      "tempo_medio_ms": 6285,
       "interacoes": 0
     },
     {
@@ -1952,7 +1971,7 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Plutão e a lua dele vivem se encarando, sem nunca virar a ",
       "link": "https://www.facebook.com/reel/1151516210667823/",
       "segundos": 36.666,
-      "curtidas": 87,
+      "curtidas": 85,
       "comentarios": 0,
       "views": 9088,
       "alcance": null,
@@ -2292,9 +2311,9 @@
       "segundos": 41.84,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 19323,
+      "tempo_medio_ms": 14512,
       "interacoes": 0
     },
     {
@@ -2513,11 +2532,10 @@
       "segundos": 45.466,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 3622,
+      "interacoes": 0
     },
     {
       "id": "1154948800371216",
@@ -2553,9 +2571,9 @@
       "segundos": 42.58,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 4105,
+      "tempo_medio_ms": 4707,
       "interacoes": 0
     },
     {
@@ -2566,11 +2584,10 @@
       "segundos": 35.208,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 33386,
+      "interacoes": 0
     },
     {
       "id": "39656203103995567",
@@ -2580,11 +2597,10 @@
       "segundos": 39.7,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 20009,
+      "interacoes": 0
     },
     {
       "id": "2033447123981579",
@@ -2594,9 +2610,9 @@
       "segundos": 42.266,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 36490,
+      "tempo_medio_ms": 18761,
       "interacoes": 0
     },
     {
@@ -2711,11 +2727,10 @@
       "segundos": 38.67,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 57410,
+      "interacoes": 0
     },
     {
       "id": "4482635972010150",
@@ -2985,11 +3000,10 @@
       "segundos": 35.67,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 0,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 0,
+      "interacoes": 0
     },
     {
       "id": "28944313978496703",
@@ -3012,11 +3026,10 @@
       "segundos": 35.25,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 1810,
+      "interacoes": 0
     },
     {
       "id": "1677352427333272",
@@ -3091,11 +3104,10 @@
       "segundos": 34.42,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 0,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 0,
+      "interacoes": 0
     },
     {
       "id": "3114474072240811",
@@ -3144,11 +3156,10 @@
       "segundos": 40.625,
       "curtidas": 0,
       "comentarios": 0,
-      "views": null,
+      "views": 0,
       "alcance": null,
-      "tempo_medio_ms": null,
-      "interacoes": null,
-      "_erro": "An error has occurred. No further information is available."
+      "tempo_medio_ms": 0,
+      "interacoes": 0
     },
     {
       "id": "1185788243770752",
@@ -3733,19 +3744,6 @@
       "views": 1,
       "alcance": null,
       "tempo_medio_ms": 6752,
-      "interacoes": 0
-    },
-    {
-      "id": "1592204112604764",
-      "quando": "2026-09-17T11:11:18+0000",
-      "titulo": "O que segura o vento solar não é o ar da Terra. 🛡️",
-      "link": "https://www.facebook.com/reel/1592204112604764/",
-      "segundos": 42.666,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
       "interacoes": 0
     }
   ],
