@@ -389,5 +389,19 @@
       "id": "122162119845153806"
     },
     "state": "AGENDADO"
+  },
+  "24nov-observatorio-nacional": {
+    "quando": "2026-11-24T12:30:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162119893153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795523400,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162119893153806",
+      "created_time": "2026-11-24T12:30:00+0000",
+      "id": "962589380261249_122162119893153806"
+    },
+    "state": "AGENDADO"
   }
 }
