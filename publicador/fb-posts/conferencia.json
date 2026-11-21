@@ -1,33 +1,138 @@
 {
-  "em": "2026-11-21T17:45:03.908Z",
+  "em": "2026-11-21T19:52:00.619Z",
   "agendados": [
     {
-      "id": "962589380261249_122161996479153806",
-      "quando": "2026-11-22T01:30:00.000Z",
-      "inicio": "O ferro do seu sangue veio de estrelas que morrera"
+      "id": "962589380261249_122162122413153806",
+      "quando": "2026-11-27T00:00:00.000Z",
+      "inicio": "Esse grupo de galáxias está sorrindo pra você. E o"
     },
     {
-      "id": "962589380261249_122161996305153806",
-      "quando": "2026-11-22T00:00:00.000Z",
-      "inicio": "Essa é a Nebulosa de Órion, fotografada pelo Hubbl"
+      "id": "962589380261249_122162122317153806",
+      "quando": "2026-11-26T22:30:00.000Z",
+      "inicio": "Em Urano, cada polo passa 42 anos seguidos de dia "
     },
     {
-      "id": "962589380261249_122161996269153806",
-      "quando": "2026-11-21T22:30:00.000Z",
-      "inicio": "Se o Sol fosse do tamanho de uma bola de futebol, "
+      "id": "962589380261249_122162122173153806",
+      "quando": "2026-11-26T18:30:00.000Z",
+      "inicio": "Repara no pontinho embaixo, à esquerda da estrela "
     },
     {
-      "id": "962589380261249_122161996227153806",
-      "quando": "2026-11-21T20:00:00.000Z",
-      "inicio": "No raio de luz da direita tem um pontinho azul-cla"
+      "id": "962589380261249_122162122119153806",
+      "quando": "2026-11-26T15:30:00.000Z",
+      "inicio": "O maior meteorito já encontrado no Brasil pesa 5,3"
     },
     {
-      "id": "962589380261249_122161996179153806",
-      "quando": "2026-11-21T18:30:00.000Z",
-      "inicio": "Guia rápido do céu deste fim de semana, visto do B"
+      "id": "962589380261249_122162122059153806",
+      "quando": "2026-11-26T14:00:00.000Z",
+      "inicio": "Isso não é uma galáxia. É uma bola com até 10 milh"
+    },
+    {
+      "id": "962589380261249_122162121861153806",
+      "quando": "2026-11-26T12:30:00.000Z",
+      "inicio": "O maior observatório astronômico em território bra"
+    },
+    {
+      "id": "962589380261249_122162121609153806",
+      "quando": "2026-11-26T10:00:00.000Z",
+      "inicio": "A Lua é mais estreita que o Brasil.\n\nEla tem 3.475"
+    },
+    {
+      "id": "962589380261249_122162121369153806",
+      "quando": "2026-11-26T00:00:00.000Z",
+      "inicio": "Sua cabeça envelhece um pouquinho mais rápido que "
+    },
+    {
+      "id": "962589380261249_122162121327153806",
+      "quando": "2026-11-25T22:30:00.000Z",
+      "inicio": "Repara no centro da foto: aquele montinho de ponto"
+    },
+    {
+      "id": "962589380261249_122162121111153806",
+      "quando": "2026-11-25T18:30:00.000Z",
+      "inicio": "Aquele grupinho apertado de estrelas que parece um"
+    },
+    {
+      "id": "962589380261249_122162121057153806",
+      "quando": "2026-11-25T15:30:00.000Z",
+      "inicio": "Plutão ainda não completou nem uma volta em torno "
+    },
+    {
+      "id": "962589380261249_122162120943153806",
+      "quando": "2026-11-25T14:00:00.000Z",
+      "inicio": "Se a história do universo fosse o Brasil de ponta "
+    },
+    {
+      "id": "962589380261249_122162120907153806",
+      "quando": "2026-11-25T12:30:00.000Z",
+      "inicio": "Esse é o primeiro brasileiro a ir pro espaço, trab"
+    },
+    {
+      "id": "962589380261249_122162120619153806",
+      "quando": "2026-11-25T10:00:00.000Z",
+      "inicio": "Todos os planetas do Sistema Solar cabem, lado a l"
+    },
+    {
+      "id": "962589380261249_122162120463153806",
+      "quando": "2026-11-25T00:00:00.000Z",
+      "inicio": "É assim que uma estrela parecida com o Sol termina"
+    },
+    {
+      "id": "962589380261249_122162120421153806",
+      "quando": "2026-11-24T22:30:00.000Z",
+      "inicio": "Tem uma estrela que já serviu de bússola pra sonda"
+    },
+    {
+      "id": "962589380261249_122162120145153806",
+      "quando": "2026-11-24T18:30:00.000Z",
+      "inicio": "Parece uma cordilheira ao luar. Mas são nuvens de "
+    },
+    {
+      "id": "962589380261249_122162120073153806",
+      "quando": "2026-11-24T15:30:00.000Z",
+      "inicio": "Hoje tem superlua. E o melhor momento pra ver é lo"
+    },
+    {
+      "id": "962589380261249_122162120019153806",
+      "quando": "2026-11-24T14:00:00.000Z",
+      "inicio": "Essa linha escura atravessando o Sol é mais compri"
+    },
+    {
+      "id": "962589380261249_122162119893153806",
+      "quando": "2026-11-24T12:30:00.000Z",
+      "inicio": "O horário oficial do Brasil é medido num morro do "
+    },
+    {
+      "id": "962589380261249_122162119845153806",
+      "quando": "2026-11-24T10:00:00.000Z",
+      "inicio": "Repara embaixo, à direita da cidade: uma faixa esc"
+    },
+    {
+      "id": "962589380261249_122162119731153806",
+      "quando": "2026-11-24T00:00:00.000Z",
+      "inicio": "Aquela estrela cadente que você viu riscar o céu p"
+    },
+    {
+      "id": "962589380261249_122162119605153806",
+      "quando": "2026-11-23T22:30:00.000Z",
+      "inicio": "Esse é o maior vulcão do Sistema Solar. A base del"
+    },
+    {
+      "id": "962589380261249_122162119497153806",
+      "quando": "2026-11-23T18:30:00.000Z",
+      "inicio": "Procurou o Cruzeiro do Sul à noite e não achou? Nã"
+    },
+    {
+      "id": "962589380261249_122162119455153806",
+      "quando": "2026-11-23T15:30:00.000Z",
+      "inicio": "Debaixo dessa casca de gelo pode ter mais água do "
     }
   ],
   "ultimos_publicados": [
+    {
+      "id": "962589380261249_122161996179153806",
+      "quando": "2026-11-21T18:30:01+0000",
+      "inicio": "Guia rápido do céu deste fim de semana, visto do B"
+    },
     {
       "id": "962589380261249_122162107371153806",
       "quando": "2026-11-21T17:14:17+0000",
@@ -82,11 +187,6 @@
       "id": "962589380261249_122162012727153806",
       "quando": "2026-11-20T21:13:32+0000",
       "inicio": "Se o Sol virasse buraco negro agora, a Terra não s"
-    },
-    {
-      "id": "962589380261249_122161995255153806",
-      "quando": "2026-11-20T20:00:04+0000",
-      "inicio": "A luz do Sol que está batendo na sua janela agora "
     }
   ]
 }
