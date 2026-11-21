@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-20T17:41:07.710Z",
+ "gerado_em": "2026-11-21T16:41:55.803Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2568582,
+   "seguidores": 2568907,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.019,
+   "comentarios_por_curtida_sem_pedido": 0.018,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17630,
+   "seguidores": 17632,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,7 +44,7 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 592300,
+   "seguidores": 592400,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -117,7 +117,7 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 29,
+   "seguidores": 30,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
@@ -146,7 +146,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1058154,
+   "seguidores": 1058289,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
@@ -161,8 +161,8 @@
      "pede": true,
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
-     "comentarios": 112,
-     "curtidas": 4679,
+     "comentarios": 113,
+     "curtidas": 4728,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -183,23 +183,31 @@
    "hashtag": "achadosshopee",
    "ok": true,
    "posts": 10,
-   "pct_pedindo": 0.5,
+   "pct_pedindo": 0.6,
    "palavras": {
     "LINK": 1,
     "CASA": 1,
     "ACHADOS": 1,
-    "QUERO": 1,
+    "QUERO": 2,
     "TERMÔMETRO": 1
    },
-   "comentarios_por_curtida_com_pedido": 0.708,
-   "comentarios_por_curtida_sem_pedido": 0.724,
+   "comentarios_por_curtida_com_pedido": 0.723,
+   "comentarios_por_curtida_sem_pedido": 0.905,
    "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": "QUERO",
+     "trecho": "🚨SEGUE ANTES DE COMENTAR PARA OS LINKS CHEGAREM SEM ERROS🚨",
+     "comentarios": 17012,
+     "curtidas": 21273,
+     "link": "https://www.instagram.com/p/DczYRhIAJRg/"
+    },
     {
      "pede": true,
      "palavra": "LINK",
      "trecho": "Comenta LINK que envio 🤍",
-     "comentarios": 11103,
-     "curtidas": 15526,
+     "comentarios": 11105,
+     "curtidas": 15527,
      "link": "https://www.instagram.com/p/DdFJBBNlish/"
     },
     {
@@ -207,7 +215,7 @@
      "palavra": "CASA",
      "trecho": "Já siga casadeliso pra ficar por dentro de tudo e comenta “CASA” que te envio os Links (tem que seguir o perfil pra receber direitinho) ✨",
      "comentarios": 2771,
-     "curtidas": 7092,
+     "curtidas": 7091,
      "link": "https://www.instagram.com/p/DeUWbMrkZJ-/"
     },
     {
@@ -223,7 +231,7 @@
      "palavra": "ACHADOS",
      "trecho": "🍊 Siga suacasalaranja e comente ACHADOS para receber os links 🛍️✨",
      "comentarios": 1441,
-     "curtidas": 2151,
+     "curtidas": 2152,
      "link": "https://www.instagram.com/p/DdPmBoFj22S/"
     },
     {
@@ -257,8 +265,13 @@
   },
   {
    "hashtag": "astronomia",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.017,
+   "melhores_pedidos": []
   },
   {
    "hashtag": "livros",
