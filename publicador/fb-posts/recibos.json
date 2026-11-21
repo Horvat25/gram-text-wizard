@@ -268,5 +268,18 @@
       "id": "962589380261249_122162118969153806"
     },
     "state": "AGENDADO"
+  },
+  "22nov-buraco-negro-m87": {
+    "quando": "2026-11-23T00:00:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122162118999153806",
+    "foto_id": "122162118999153806",
+    "readback": {
+      "created_time": "2026-11-21T19:50:35+0000",
+      "link": "https://www.facebook.com/photo.php?fbid=122162118999153806&set=p.122162118999153806&type=3",
+      "id": "122162118999153806"
+    },
+    "state": "AGENDADO"
   }
 }
