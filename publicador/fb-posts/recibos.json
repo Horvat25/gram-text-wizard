@@ -497,5 +497,19 @@
       "id": "122162120907153806"
     },
     "state": "AGENDADO"
+  },
+  "25nov-universo-do-caburai-ao-chui": {
+    "quando": "2026-11-25T14:00:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162120943153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795615200,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162120943153806",
+      "created_time": "2026-11-25T14:00:00+0000",
+      "id": "962589380261249_122162120943153806"
+    },
+    "state": "AGENDADO"
   }
 }
