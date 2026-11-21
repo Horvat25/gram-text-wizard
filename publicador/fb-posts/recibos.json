@@ -416,5 +416,19 @@
       "id": "122162120019153806"
     },
     "state": "AGENDADO"
+  },
+  "24nov-superlua-como-ver": {
+    "quando": "2026-11-24T15:30:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162120073153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795534200,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162120073153806",
+      "created_time": "2026-11-24T15:30:00+0000",
+      "id": "962589380261249_122162120073153806"
+    },
+    "state": "AGENDADO"
   }
 }
