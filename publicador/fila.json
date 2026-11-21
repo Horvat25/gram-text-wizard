@@ -6792,9 +6792,12 @@
     ],
     "legenda": "No raio de luz da direita tem um pontinho azul-claro. Aquele pontinho é a Terra.\n\nA foto foi feita pela sonda Voyager 1 em 14 de fevereiro de 1990, a uns 6 bilhões de quilômetros daqui, quando ela já estava saindo do Sistema Solar. Foi a última vez que a Voyager olhou pra trás: logo depois, as câmeras foram desligadas pra sempre.\n\nOs raios de luz são reflexos do Sol dentro da câmera. Por acaso, a Terra ficou bem no meio de um deles.\n\nEssa versão foi reprocessada pela NASA em 2020, nos 30 anos da foto.\n\nE a Voyager 1 continua indo. Esta semana ela chegou a um dia-luz da Terra: um sinal de rádio dela leva 24 horas pra chegar aqui. É o objeto feito por humanos mais distante que existe. 💙\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA/JPL-Caltech\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-21nov-pale-blue-dot",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "O que essa foto te faz pensar? 👇"
+    "comentario": "O que essa foto te faz pensar? 👇",
+    "id_instagram": "18134139373756434",
+    "publicado_em": "2026-11-21T21:10:39.574Z",
+    "id_comentario": "18456744127120591"
   },
   {
     "quando": "2026-11-21T21:00:00.000Z",
@@ -6802,8 +6805,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/545dae26-ec92-4d1d-958c-747035ca6c71.mp4",
     "legenda": "AMANHÃ antes do Sol nascer: 4 planetas no céu ao mesmo tempo 🪐\n\nDomingo (22/11), lá pelas 4h40, olha pro leste. Vênus é o ponto mais brilhante, baixinho. Mais alto, à esquerda, Júpiter e Marte quase encostados. E rente ao horizonte, abaixo de Vênus, Mercúrio, que quase nunca aparece. Precisa de horizonte livre no leste.\n\n⏰ Salva pra não esquecer o despertador.\n📤 Manda pra quem acorda cedo.\n\n📚 Posições calculadas para São Paulo (astronomy-engine); no resto do Brasil fica bem parecido.\n\n#planetas #ceu #astronomia #mercurio #neuralupdate",
     "slug": "viral-amanha-4-planetas-antes-do-sol",
-    "status": "agendado",
-    "comentario": "🪐 Vai acordar pra ver? Conta de qual cidade 👇"
+    "status": "publicado",
+    "comentario": "🪐 Vai acordar pra ver? Conta de qual cidade 👇",
+    "id_instagram": "18155163235550151",
+    "publicado_em": "2026-11-21T21:11:31.340Z",
+    "id_comentario": "18108137981638482",
+    "erro_facebook": "Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
   },
   {
     "quando": "2026-11-21T22:30:00.000Z",
@@ -6819,6 +6826,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Você imaginava que o vazio era tão grande assim? 👇"
+  },
+  {
+    "quando": "2026-11-21T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-21.jpg",
+    "legenda": "",
+    "slug": "story-pergunta-2026-11-21",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-22T00:00:00.000Z",
@@ -6865,6 +6880,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "O que mais te surpreendeu aqui? 👇"
+  },
+  {
+    "quando": "2026-11-22T11:05:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-22.jpg",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-22",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-22T12:30:00.000Z",
@@ -6933,6 +6956,14 @@
     "comentario": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇"
   },
   {
+    "quando": "2026-11-22T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-22.jpg",
+    "legenda": "",
+    "slug": "story-aula-2026-11-22",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-22T22:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -6947,6 +6978,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "O que mais te surpreendeu aqui? 👇"
+  },
+  {
+    "quando": "2026-11-22T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-22.jpg",
+    "legenda": "",
+    "slug": "story-pergunta-2026-11-22",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-23T00:00:00.000Z",
@@ -6980,6 +7019,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "De qual cidade você acompanha o céu? 👇"
+  },
+  {
+    "quando": "2026-11-23T11:05:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-23.jpg",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-23",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-23T12:30:00.000Z",
@@ -7047,6 +7094,14 @@
     "comentario": "Você já sabia disso? Conta aqui 👇"
   },
   {
+    "quando": "2026-11-23T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-23.jpg",
+    "legenda": "",
+    "slug": "story-aula-2026-11-23",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-23T22:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7062,6 +7117,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "De qual cidade você acompanha o céu? 👇"
+  },
+  {
+    "quando": "2026-11-23T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-23.jpg",
+    "legenda": "",
+    "slug": "story-pergunta-2026-11-23",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-24T00:00:00.000Z",
@@ -7094,6 +7157,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇"
+  },
+  {
+    "quando": "2026-11-24T11:05:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-24.jpg",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-24",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-24T12:30:00.000Z",
@@ -7161,6 +7232,14 @@
     "comentario": "Qual parte você mostraria pra alguém? 👇"
   },
   {
+    "quando": "2026-11-24T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-24.jpg",
+    "legenda": "",
+    "slug": "story-aula-2026-11-24",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-24T22:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7175,6 +7254,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇"
+  },
+  {
+    "quando": "2026-11-24T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-24.jpg",
+    "legenda": "",
+    "slug": "story-pergunta-2026-11-24",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-25T00:00:00.000Z",
@@ -7207,6 +7294,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Você já sabia disso? Conta aqui 👇"
+  },
+  {
+    "quando": "2026-11-25T11:05:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-25.jpg",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-25",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-25T12:30:00.000Z",
@@ -7272,6 +7367,14 @@
     "comentario": "O que mais te surpreendeu aqui? 👇"
   },
   {
+    "quando": "2026-11-25T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-25.jpg",
+    "legenda": "",
+    "slug": "story-aula-2026-11-25",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-25T22:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7287,6 +7390,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Você já sabia disso? Conta aqui 👇"
+  },
+  {
+    "quando": "2026-11-25T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-25.jpg",
+    "legenda": "",
+    "slug": "story-pergunta-2026-11-25",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-26T00:00:00.000Z",
@@ -7320,6 +7431,14 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Qual parte você mostraria pra alguém? 👇"
+  },
+  {
+    "quando": "2026-11-26T11:05:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-26.jpg",
+    "legenda": "",
+    "slug": "story-noticia-2026-11-26",
+    "status": "agendado"
   },
   {
     "quando": "2026-11-26T12:30:00.000Z",
@@ -7387,6 +7506,14 @@
     "comentario": "De qual cidade você acompanha o céu? 👇"
   },
   {
+    "quando": "2026-11-26T19:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-26.jpg",
+    "legenda": "",
+    "slug": "story-aula-2026-11-26",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-26T22:30:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7404,6 +7531,14 @@
     "comentario": "Qual parte você mostraria pra alguém? 👇"
   },
   {
+    "quando": "2026-11-26T23:00:00.000Z",
+    "tipo": "story",
+    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-26.jpg",
+    "legenda": "",
+    "slug": "story-pergunta-2026-11-26",
+    "status": "agendado"
+  },
+  {
     "quando": "2026-11-27T00:00:00.000Z",
     "tipo": "carrossel",
     "midia": [
@@ -7418,133 +7553,5 @@
     "status": "agendado",
     "origem": "carrossel/de-facebook.js",
     "comentario": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇"
-  },
-  {
-    "quando": "2026-11-21T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-21.jpg",
-    "legenda": "",
-    "slug": "story-pergunta-2026-11-21",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-22T11:05:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-22.jpg",
-    "legenda": "",
-    "slug": "story-noticia-2026-11-22",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-22T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-22.jpg",
-    "legenda": "",
-    "slug": "story-pergunta-2026-11-22",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-23T11:05:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-23.jpg",
-    "legenda": "",
-    "slug": "story-noticia-2026-11-23",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-23T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-23.jpg",
-    "legenda": "",
-    "slug": "story-pergunta-2026-11-23",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-24T11:05:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-24.jpg",
-    "legenda": "",
-    "slug": "story-noticia-2026-11-24",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-24T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-24.jpg",
-    "legenda": "",
-    "slug": "story-pergunta-2026-11-24",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-25T11:05:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-25.jpg",
-    "legenda": "",
-    "slug": "story-noticia-2026-11-25",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-25T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-25.jpg",
-    "legenda": "",
-    "slug": "story-pergunta-2026-11-25",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-26T11:05:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-26.jpg",
-    "legenda": "",
-    "slug": "story-noticia-2026-11-26",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-26T23:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-26.jpg",
-    "legenda": "",
-    "slug": "story-pergunta-2026-11-26",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-22T19:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-22.jpg",
-    "legenda": "",
-    "slug": "story-aula-2026-11-22",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-23T19:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-23.jpg",
-    "legenda": "",
-    "slug": "story-aula-2026-11-23",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-24T19:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-24.jpg",
-    "legenda": "",
-    "slug": "story-aula-2026-11-24",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-25T19:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-25.jpg",
-    "legenda": "",
-    "slug": "story-aula-2026-11-25",
-    "status": "agendado"
-  },
-  {
-    "quando": "2026-11-26T19:00:00.000Z",
-    "tipo": "story",
-    "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-26.jpg",
-    "legenda": "",
-    "slug": "story-aula-2026-11-26",
-    "status": "agendado"
   }
 ]
