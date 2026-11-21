@@ -605,5 +605,19 @@
       "id": "122162122059153806"
     },
     "state": "AGENDADO"
+  },
+  "26nov-meteorito-bendego": {
+    "quando": "2026-11-26T15:30:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162122119153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795707000,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162122119153806",
+      "created_time": "2026-11-26T15:30:00+0000",
+      "id": "962589380261249_122162122119153806"
+    },
+    "state": "AGENDADO"
   }
 }
