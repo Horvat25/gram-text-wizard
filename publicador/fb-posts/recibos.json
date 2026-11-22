@@ -666,5 +666,10 @@
     "tentativas": 1,
     "id": "1071435672584051",
     "state": "PUBLICADO"
+  },
+  "fb-story-noticia-2026-11-22": {
+    "quando": "2026-11-22T11:05:00.000Z",
+    "tipo": "story",
+    "state": "PERDIDO"
   }
 }
