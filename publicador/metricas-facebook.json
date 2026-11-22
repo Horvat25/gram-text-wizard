@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-21T16:52:47.210Z",
+  "gerado_em": "2026-11-22T17:16:35.852Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 121,
-    "curtidas": 121
+    "seguidores": 126,
+    "curtidas": 126
   },
   "pagina_diaria": [
     {
@@ -641,7 +641,11 @@
     },
     {
       "d": "2026-11-21",
-      "views": 10
+      "views": 1222
+    },
+    {
+      "d": "2026-11-22",
+      "views": 380
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1138,7 +1142,12 @@
     },
     {
       "d": "2026-11-21",
-      "valor": 0,
+      "valor": 0.02,
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-22",
+      "valor": 0.01,
       "moeda": "USD"
     }
   ],
@@ -1150,6 +1159,71 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "1177195661398542",
+      "quando": "2026-11-22T17:13:02+0000",
+      "titulo": "A NASA encostou num asteroide e o braço AFUNDOU (era uma piscina de bolinhas) ☄️",
+      "link": "https://www.facebook.com/reel/1177195661398542/",
+      "segundos": 41.291,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1979991809627560",
+      "quando": "2026-11-22T11:11:58+0000",
+      "titulo": "A nave mais DISTANTE da Terra parou de mandar dados (mas ainda dá sinal) 📡",
+      "link": "https://www.facebook.com/reel/1979991809627560/",
+      "segundos": 42.708,
+      "curtidas": 3,
+      "comentarios": 0,
+      "views": 348,
+      "alcance": null,
+      "tempo_medio_ms": 10211,
+      "interacoes": 0
+    },
+    {
+      "id": "1152118963872582",
+      "quando": "2026-11-21T21:11:32+0000",
+      "titulo": "AMANHÃ antes do Sol nascer: 4 planetas no céu ao mesmo tempo 🪐",
+      "link": "https://www.facebook.com/reel/1152118963872582/",
+      "segundos": 38.75,
+      "curtidas": 13,
+      "comentarios": 0,
+      "views": 547,
+      "alcance": null,
+      "tempo_medio_ms": 11393,
+      "interacoes": 0
+    },
+    {
+      "id": "1185608067369453",
+      "quando": "2026-11-21T17:13:42+0000",
+      "titulo": "Uma estrela pode ter ENGOLIDO a outra, e o James Webb chegou 47 dias depois 💥",
+      "link": "https://www.facebook.com/reel/1185608067369453/",
+      "segundos": 43.958,
+      "curtidas": 3,
+      "comentarios": 1,
+      "views": 334,
+      "alcance": null,
+      "tempo_medio_ms": 8883,
+      "interacoes": 1
+    },
+    {
+      "id": "1566665155523132",
+      "quando": "2026-11-21T17:13:31+0000",
+      "titulo": "Esse asteroide tem formato de pião, e o Japão trouxe um pedaço dele pra Terra 🪀",
+      "link": "https://www.facebook.com/reel/1566665155523132/",
+      "segundos": 42.833,
+      "curtidas": 3,
+      "comentarios": 0,
+      "views": 333,
+      "alcance": null,
+      "tempo_medio_ms": 7286,
+      "interacoes": 0
+    },
+    {
       "id": "1227840310198647",
       "quando": "2026-11-20T21:13:02+0000",
       "titulo": "Se o Sol virasse buraco negro agora, a Terra não seria sugada.",
@@ -1157,9 +1231,9 @@
       "segundos": 37.458,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 3,
+      "views": 4,
       "alcance": null,
-      "tempo_medio_ms": 2215,
+      "tempo_medio_ms": 2099,
       "interacoes": 0
     },
     {
@@ -1170,9 +1244,9 @@
       "segundos": 37.791,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 2291,
+      "tempo_medio_ms": 13304,
       "interacoes": 0
     },
     {
@@ -1183,9 +1257,9 @@
       "segundos": 12.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 6213,
+      "tempo_medio_ms": 4223,
       "interacoes": 0
     },
     {
@@ -1196,9 +1270,9 @@
       "segundos": 42,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 17,
+      "views": 18,
       "alcance": null,
-      "tempo_medio_ms": 38137,
+      "tempo_medio_ms": 38274,
       "interacoes": 0
     },
     {
@@ -1209,9 +1283,9 @@
       "segundos": 13.92,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 76,
+      "tempo_medio_ms": 860,
       "interacoes": 0
     },
     {
@@ -1222,9 +1296,9 @@
       "segundos": 13.88,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 4182,
+      "tempo_medio_ms": 2710,
       "interacoes": 0
     },
     {
@@ -1235,9 +1309,9 @@
       "segundos": 13.71,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 195,
+      "tempo_medio_ms": 613,
       "interacoes": 0
     },
     {
@@ -1248,9 +1322,9 @@
       "segundos": 14.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 7473,
+      "tempo_medio_ms": 5898,
       "interacoes": 0
     },
     {
@@ -1261,9 +1335,9 @@
       "segundos": 11.583,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 6645,
+      "tempo_medio_ms": 3910,
       "interacoes": 0
     },
     {
@@ -1274,9 +1348,9 @@
       "segundos": 13.041,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 4,
+      "views": 5,
       "alcance": null,
-      "tempo_medio_ms": 6825,
+      "tempo_medio_ms": 5423,
       "interacoes": 0
     },
     {
@@ -1287,9 +1361,9 @@
       "segundos": 12.208,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 6418,
       "interacoes": 0
     },
     {
@@ -1300,9 +1374,9 @@
       "segundos": 12.71,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 1932,
       "interacoes": 0
     },
     {
@@ -1313,9 +1387,9 @@
       "segundos": 12.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 1365,
       "interacoes": 0
     },
     {
@@ -1326,9 +1400,9 @@
       "segundos": 12.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 1970,
+      "tempo_medio_ms": 1181,
       "interacoes": 0
     },
     {
@@ -1339,9 +1413,9 @@
       "segundos": 13.75,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 2,
+      "views": 3,
       "alcance": null,
-      "tempo_medio_ms": 8196,
+      "tempo_medio_ms": 5515,
       "interacoes": 0
     },
     {
@@ -1352,9 +1426,9 @@
       "segundos": 11.63,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 1,
+      "views": 2,
       "alcance": null,
-      "tempo_medio_ms": 4740,
+      "tempo_medio_ms": 2997,
       "interacoes": 0
     },
     {
@@ -1378,9 +1452,9 @@
       "segundos": 12.21,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 361,
+      "views": 362,
       "alcance": null,
-      "tempo_medio_ms": 3871,
+      "tempo_medio_ms": 3860,
       "interacoes": 0
     },
     {
@@ -1443,9 +1517,9 @@
       "segundos": 13.67,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 384,
+      "views": 385,
       "alcance": null,
-      "tempo_medio_ms": 5568,
+      "tempo_medio_ms": 5552,
       "interacoes": 0
     },
     {
@@ -1469,9 +1543,9 @@
       "segundos": 36.791,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 266,
+      "views": 267,
       "alcance": null,
-      "tempo_medio_ms": 5702,
+      "tempo_medio_ms": 5687,
       "interacoes": 0
     },
     {
@@ -1573,9 +1647,9 @@
       "segundos": 34.88,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 320,
+      "views": 321,
       "alcance": null,
-      "tempo_medio_ms": 6597,
+      "tempo_medio_ms": 6578,
       "interacoes": 0
     },
     {
@@ -1872,9 +1946,9 @@
       "segundos": 39.625,
       "curtidas": 6,
       "comentarios": 0,
-      "views": 347,
+      "views": 348,
       "alcance": null,
-      "tempo_medio_ms": 7579,
+      "tempo_medio_ms": 7559,
       "interacoes": 0
     },
     {
@@ -1898,9 +1972,9 @@
       "segundos": 36.75,
       "curtidas": 68,
       "comentarios": 0,
-      "views": 5276,
+      "views": 5279,
       "alcance": null,
-      "tempo_medio_ms": 6488,
+      "tempo_medio_ms": 6485,
       "interacoes": 1
     },
     {
@@ -3224,9 +3298,9 @@
       "segundos": 36.13,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 0,
+      "views": 1,
       "alcance": null,
-      "tempo_medio_ms": 0,
+      "tempo_medio_ms": 198,
       "interacoes": 0
     },
     {
@@ -3682,71 +3756,6 @@
       "views": 0,
       "alcance": null,
       "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2338951183511786",
-      "quando": "2026-09-25T21:11:16+0000",
-      "titulo": "Uma faixa de estrelas atravessando o céu inteiro ainda existe — mesmo quando a luz das cidades impede a gente ",
-      "link": "https://www.facebook.com/reel/2338951183511786/",
-      "segundos": 36.916,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1074161441877192",
-      "quando": "2026-09-25T17:11:08+0000",
-      "titulo": "Um buraco negro não é um buraco vazio: é matéria concentrada a ponto de criar uma região da qual nem a luz esc",
-      "link": "https://www.facebook.com/reel/1074161441877192/",
-      "segundos": 41.583,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2073105243312134",
-      "quando": "2026-09-25T11:11:13+0000",
-      "titulo": "Um círculo de 25 quilômetros ficou escondido na floresta do Canadá até aparecer num mapa de celular. Um astrôn",
-      "link": "https://www.facebook.com/reel/2073105243312134/",
-      "segundos": 38,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1321801833226566",
-      "quando": "2026-09-25T00:10:57+0000",
-      "titulo": "O Departamento de Defesa dos EUA publicou um novo lote de arquivos sobre fenômenos anômalos não identificados.",
-      "link": "https://www.facebook.com/reel/1321801833226566/",
-      "segundos": 40.291,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2597475740676544",
-      "quando": "2026-09-24T21:11:12+0000",
-      "titulo": "Tem poeira do espaço no telhado da sua casa. 🏠",
-      "link": "https://www.facebook.com/reel/2597475740676544/",
-      "segundos": 43.083,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 1,
-      "alcance": null,
-      "tempo_medio_ms": 6752,
       "interacoes": 0
     }
   ],
