@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-22T16:12:21.024Z",
+  "em": "2026-11-22T22:25:02.657Z",
   "agendados": [
     {
       "id": "962589380261249_122162122413153806",
@@ -129,6 +129,21 @@
   ],
   "ultimos_publicados": [
     {
+      "id": "962589380261249_122162269047153806",
+      "quando": "2026-11-22T21:12:16+0000",
+      "inicio": "Tem mais ÁRVORE na Terra do que ESTRELA na nossa g"
+    },
+    {
+      "id": "962589380261249_122162118927153806",
+      "quando": "2026-11-22T18:30:01+0000",
+      "inicio": "Essa pegada tem 57 anos. E deve continuar exatamen"
+    },
+    {
+      "id": "962589380261249_122162251017153806",
+      "quando": "2026-11-22T17:13:36+0000",
+      "inicio": "A NASA encostou num asteroide e o braço AFUNDOU (e"
+    },
+    {
       "id": "962589380261249_122162118879153806",
       "quando": "2026-11-22T15:30:00+0000",
       "inicio": "Um cubinho de açúcar feito desse material pesaria "
@@ -172,21 +187,6 @@
       "id": "962589380261249_122162128803153806",
       "quando": "2026-11-21T21:12:06+0000",
       "inicio": "AMANHÃ antes do Sol nascer: 4 planetas no céu ao m"
-    },
-    {
-      "id": "962589380261249_122161996227153806",
-      "quando": "2026-11-21T20:00:21+0000",
-      "inicio": "No raio de luz da direita tem um pontinho azul-cla"
-    },
-    {
-      "id": "962589380261249_122161996179153806",
-      "quando": "2026-11-21T18:30:01+0000",
-      "inicio": "Guia rápido do céu deste fim de semana, visto do B"
-    },
-    {
-      "id": "962589380261249_122162107371153806",
-      "quando": "2026-11-21T17:14:17+0000",
-      "inicio": "Uma estrela pode ter ENGOLIDO a outra, e o James W"
     }
   ]
 }
