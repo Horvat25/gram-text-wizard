@@ -1322,9 +1322,18 @@
    "ultimo_retrato": "2026-11-13T19:38:54.837Z",
    "_metricas": null,
    "_erro": "(#10) Not enough viewers for the media to show insights"
+  },
+  "18122002484064726": {
+   "id": "18122002484064726",
+   "quando": "2026-11-22T00:11:00+0000",
+   "tipo": "IMAGE",
+   "legenda": "",
+   "ultimo_retrato": "2026-11-22T06:42:58.699Z",
+   "_metricas": null,
+   "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-11-21T19:11:39.768Z",
+ "gerado_em": "2026-11-22T06:42:58.914Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -2021,6 +2030,10 @@
   "2026-11-21T19": {
    "seguidores": 1302,
    "publicacoes": 1120
+  },
+  "2026-11-22T06": {
+   "seguidores": 1303,
+   "publicacoes": 1131
   }
  },
  "ganhos_por_dia": {
