@@ -6888,9 +6888,12 @@
     ],
     "legenda": "Repara: essa é a Terra nascendo no horizonte da Lua.\n\nA foto foi feita em 24 de dezembro de 1968 pelo astronauta Bill Anders, da Apollo 8, a primeira missão a levar gente até a Lua. A nave estava dando voltas em torno dela quando a Terra apareceu por trás do horizonte. A foto nem estava no roteiro: a tripulação correu atrás de um filme colorido pra não perder o momento.\n\nA Terra aparece pela metade porque, do lado escuro, já era noite. Segundo a NASA, as Américas estavam ali, escondidas debaixo das nuvens. O Brasil inteiro cabe nessa bolinha azul.\n\nEla estava a uns 386 mil quilômetros dos astronautas.\n\nEles viajaram até lá pra estudar a Lua. E a foto mais famosa da viagem acabou sendo a da Terra. 🌍\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA (Bill Anders, Apollo 8)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-22nov-nascer-da-terra",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "O que mais te surpreendeu aqui? 👇"
+    "comentario": "O que mais te surpreendeu aqui? 👇",
+    "id_instagram": "17916070389472561",
+    "publicado_em": "2026-11-22T11:11:07.325Z",
+    "id_comentario": "18135823486840919"
   },
   {
     "quando": "2026-11-22T11:00:00.000Z",
@@ -6898,8 +6901,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/b033ff20-eac4-4ce7-a891-4c67a1c0a827.mp4",
     "legenda": "A nave mais DISTANTE da Terra parou de mandar dados (mas ainda dá sinal) 📡\n\nA Voyager 1 chegou a um dia-luz da Terra em 18/11/2026: uns 25,9 bilhões de quilômetros, depois de 49 anos de viagem. Mas, segundo a NASA, desde 14/11 a equipe não recebe dados científicos nem de engenharia da nave; a marca de um dia-luz foi confirmada pelo sinal portador e pelo cálculo da trajetória. A NASA está investigando. A nave perde uns 4 watts de energia por ano.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: NASA, release 26-098 (19/11/2026): \"NASA's Voyager 1 Makes History Reaching One Light-Day from Earth\"; NASA SVS 15120.\n\n#voyager #nasa #espaco #neuralupdate",
     "slug": "nw-voyager-1-parou-de-mandar-dados",
-    "status": "agendado",
-    "comentario": "📡 A Voyager 1 saiu da Terra em 1977. Você torce pra ela voltar a mandar dados? 👇"
+    "status": "publicado",
+    "comentario": "📡 A Voyager 1 saiu da Terra em 1977. Você torce pra ela voltar a mandar dados? 👇",
+    "id_instagram": "17917297731560774",
+    "publicado_em": "2026-11-22T11:11:46.083Z",
+    "id_comentario": "18439901161144880",
+    "id_facebook": "1979991809627560"
   },
   {
     "quando": "2026-11-22T11:05:00.000Z",
@@ -6907,7 +6914,9 @@
     "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-22.jpg",
     "legenda": "",
     "slug": "story-noticia-2026-11-22",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17866920669697011",
+    "publicado_em": "2026-11-22T11:11:58.485Z"
   },
   {
     "quando": "2026-11-22T12:30:00.000Z",
