@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-21T16:41:55.803Z",
+ "gerado_em": "2026-11-22T17:00:28.086Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2568907,
+   "seguidores": 2569203,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17632,
+   "seguidores": 17638,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,7 +44,7 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 592400,
+   "seguidores": 592547,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -146,14 +146,14 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1058289,
+   "seguidores": 1058314,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
     "REM": 1
    },
    "comentarios_por_curtida_com_pedido": 0.024,
-   "comentarios_por_curtida_sem_pedido": 0.024,
+   "comentarios_por_curtida_sem_pedido": 0.023,
    "melhores_pedidos": [
     {
      "quando": "2026-11-12",
@@ -162,7 +162,7 @@
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
      "comentarios": 113,
-     "curtidas": 4728,
+     "curtidas": 4774,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -182,57 +182,48 @@
   {
    "hashtag": "achadosshopee",
    "ok": true,
-   "posts": 10,
-   "pct_pedindo": 0.6,
+   "posts": 9,
+   "pct_pedindo": 0.56,
    "palavras": {
     "LINK": 1,
     "CASA": 1,
-    "ACHADOS": 1,
-    "QUERO": 2,
+    "QUERO": 1,
     "TERMÔMETRO": 1
    },
-   "comentarios_por_curtida_com_pedido": 0.723,
-   "comentarios_por_curtida_sem_pedido": 0.905,
+   "comentarios_por_curtida_com_pedido": 0.945,
+   "comentarios_por_curtida_sem_pedido": 0.904,
    "melhores_pedidos": [
-    {
-     "pede": true,
-     "palavra": "QUERO",
-     "trecho": "🚨SEGUE ANTES DE COMENTAR PARA OS LINKS CHEGAREM SEM ERROS🚨",
-     "comentarios": 17012,
-     "curtidas": 21273,
-     "link": "https://www.instagram.com/p/DczYRhIAJRg/"
-    },
     {
      "pede": true,
      "palavra": "LINK",
      "trecho": "Comenta LINK que envio 🤍",
-     "comentarios": 11105,
-     "curtidas": 15527,
+     "comentarios": 11109,
+     "curtidas": 15530,
      "link": "https://www.instagram.com/p/DdFJBBNlish/"
     },
     {
      "pede": true,
      "palavra": "CASA",
      "trecho": "Já siga casadeliso pra ficar por dentro de tudo e comenta “CASA” que te envio os Links (tem que seguir o perfil pra receber direitinho) ✨",
-     "comentarios": 2771,
-     "curtidas": 7091,
+     "comentarios": 2773,
+     "curtidas": 7092,
      "link": "https://www.instagram.com/p/DeUWbMrkZJ-/"
+    },
+    {
+     "pede": true,
+     "palavra": null,
+     "trecho": "​C0mente “CABELO” que te envio o link direto no seu direct com o desconto aplicado! 🛒",
+     "comentarios": 2307,
+     "curtidas": 1243,
+     "link": "https://www.instagram.com/p/DfP8EIVmmgN/"
     },
     {
      "pede": true,
      "palavra": "QUERO",
      "trecho": "Se quiser os links, tamanhos e cupons, comente “QUERO” ✨",
      "comentarios": 1736,
-     "curtidas": 1210,
+     "curtidas": 1211,
      "link": "https://www.instagram.com/p/DX9uFf1DurH/"
-    },
-    {
-     "pede": true,
-     "palavra": "ACHADOS",
-     "trecho": "🍊 Siga suacasalaranja e comente ACHADOS para receber os links 🛍️✨",
-     "comentarios": 1441,
-     "curtidas": 2152,
-     "link": "https://www.instagram.com/p/DdPmBoFj22S/"
     },
     {
      "pede": true,
@@ -265,13 +256,8 @@
   },
   {
    "hashtag": "astronomia",
-   "ok": true,
-   "posts": 10,
-   "pct_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.017,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "livros",
