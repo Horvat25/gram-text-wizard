@@ -659,5 +659,12 @@
       "id": "122162122413153806"
     },
     "state": "AGENDADO"
+  },
+  "fb-story-pergunta-2026-11-21": {
+    "quando": "2026-11-21T23:00:00.000Z",
+    "tipo": "story",
+    "tentativas": 1,
+    "id": "1071435672584051",
+    "state": "PUBLICADO"
   }
 }
