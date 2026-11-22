@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-21T19:52:00.619Z",
+  "em": "2026-11-22T00:17:15.886Z",
   "agendados": [
     {
       "id": "962589380261249_122162122413153806",
@@ -129,6 +129,26 @@
   ],
   "ultimos_publicados": [
     {
+      "id": "962589380261249_122161996305153806",
+      "quando": "2026-11-22T00:00:04+0000",
+      "inicio": "Essa é a Nebulosa de Órion, fotografada pelo Hubbl"
+    },
+    {
+      "id": "962589380261249_122161996269153806",
+      "quando": "2026-11-21T22:30:01+0000",
+      "inicio": "Se o Sol fosse do tamanho de uma bola de futebol, "
+    },
+    {
+      "id": "962589380261249_122162128803153806",
+      "quando": "2026-11-21T21:12:06+0000",
+      "inicio": "AMANHÃ antes do Sol nascer: 4 planetas no céu ao m"
+    },
+    {
+      "id": "962589380261249_122161996227153806",
+      "quando": "2026-11-21T20:00:21+0000",
+      "inicio": "No raio de luz da direita tem um pontinho azul-cla"
+    },
+    {
       "id": "962589380261249_122161996179153806",
       "quando": "2026-11-21T18:30:01+0000",
       "inicio": "Guia rápido do céu deste fim de semana, visto do B"
@@ -167,26 +187,6 @@
       "id": "962589380261249_122161995489153806",
       "quando": "2026-11-21T02:30:01+0000",
       "inicio": "Em Vênus, um dia dura mais que um ano.\n\nVênus gira"
-    },
-    {
-      "id": "962589380261249_122161995393153806",
-      "quando": "2026-11-21T01:30:01+0000",
-      "inicio": "Procura um pontinho azul-claro do lado direito de "
-    },
-    {
-      "id": "962589380261249_122161995351153806",
-      "quando": "2026-11-21T00:00:08+0000",
-      "inicio": "Tem coisa no céu do Brasil que um europeu nunca vi"
-    },
-    {
-      "id": "962589380261249_122161995303153806",
-      "quando": "2026-11-20T22:30:01+0000",
-      "inicio": "Repara no círculo amarelo.\n\nNa foto da esquerda, d"
-    },
-    {
-      "id": "962589380261249_122162012727153806",
-      "quando": "2026-11-20T21:13:32+0000",
-      "inicio": "Se o Sol virasse buraco negro agora, a Terra não s"
     }
   ]
 }
