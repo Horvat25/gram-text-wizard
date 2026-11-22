@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-22T00:17:15.886Z",
+  "em": "2026-11-22T16:12:21.024Z",
   "agendados": [
     {
       "id": "962589380261249_122162122413153806",
@@ -129,6 +129,36 @@
   ],
   "ultimos_publicados": [
     {
+      "id": "962589380261249_122162118879153806",
+      "quando": "2026-11-22T15:30:00+0000",
+      "inicio": "Um cubinho de açúcar feito desse material pesaria "
+    },
+    {
+      "id": "962589380261249_122162118831153806",
+      "quando": "2026-11-22T14:00:00+0000",
+      "inicio": "Essa mancha laranja é uma tempestade. E ela é mais"
+    },
+    {
+      "id": "962589380261249_122162118801153806",
+      "quando": "2026-11-22T12:30:01+0000",
+      "inicio": "As estrelas da bandeira do Brasil não estão ali po"
+    },
+    {
+      "id": "962589380261249_122162218107153806",
+      "quando": "2026-11-22T11:12:37+0000",
+      "inicio": "A nave mais DISTANTE da Terra parou de mandar dado"
+    },
+    {
+      "id": "962589380261249_122162118765153806",
+      "quando": "2026-11-22T10:00:02+0000",
+      "inicio": "Repara: essa é a Terra nascendo no horizonte da Lu"
+    },
+    {
+      "id": "962589380261249_122161996479153806",
+      "quando": "2026-11-22T01:30:01+0000",
+      "inicio": "O ferro do seu sangue veio de estrelas que morrera"
+    },
+    {
       "id": "962589380261249_122161996305153806",
       "quando": "2026-11-22T00:00:04+0000",
       "inicio": "Essa é a Nebulosa de Órion, fotografada pelo Hubbl"
@@ -157,36 +187,6 @@
       "id": "962589380261249_122162107371153806",
       "quando": "2026-11-21T17:14:17+0000",
       "inicio": "Uma estrela pode ter ENGOLIDO a outra, e o James W"
-    },
-    {
-      "id": "962589380261249_122162107341153806",
-      "quando": "2026-11-21T17:14:13+0000",
-      "inicio": "Esse asteroide tem formato de pião, e o Japão trou"
-    },
-    {
-      "id": "962589380261249_122161995987153806",
-      "quando": "2026-11-21T15:30:00+0000",
-      "inicio": "Esse é um pôr do sol em Marte. E ele é azul.\n\nA fo"
-    },
-    {
-      "id": "962589380261249_122161995681153806",
-      "quando": "2026-11-21T14:00:05+0000",
-      "inicio": "Por que o céu é azul, se o espaço é preto?\n\nA luz "
-    },
-    {
-      "id": "962589380261249_122161995639153806",
-      "quando": "2026-11-21T12:30:05+0000",
-      "inicio": "Cada pontinho dessa foto é uma galáxia. Não uma es"
-    },
-    {
-      "id": "962589380261249_122161995597153806",
-      "quando": "2026-11-21T10:00:00+0000",
-      "inicio": "Bom dia. Enquanto você toma o café, está fazendo a"
-    },
-    {
-      "id": "962589380261249_122161995489153806",
-      "quando": "2026-11-21T02:30:01+0000",
-      "inicio": "Em Vênus, um dia dura mais que um ano.\n\nVênus gira"
     }
   ]
 }
