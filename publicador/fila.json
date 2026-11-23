@@ -7093,9 +7093,12 @@
     ],
     "legenda": "Nesta semana, em algumas cidades do Brasil, a sua sombra vai sumir perto do meio-dia.\n\nIsso acontece quando o Sol passa exatamente em cima da cabeça, a 90 graus. Só é possível entre os trópicos, e só em dois dias por ano em cada cidade.\n\nNeste fim de novembro, o Sol a pino está passando pelo Sudeste e pelo Centro-Oeste:\n\n☀️ Vitória (ES): 22 e 23/11, perto das 11h27 (horário de Brasília)\n☀️ Campo Grande (MS): hoje, 23/11, às 11h24 (horário local)\n☀️ São José do Rio Preto (SP): quarta, 25/11, às 12h04 (horário de Brasília)\n☀️ Ribeirão Preto (SP): sexta, 27/11, às 11h58 (horário de Brasília)\n\nNo Rio de Janeiro, a vez chega em 10 de dezembro e de novo em 2 de janeiro. Em Belo Horizonte, foi no sábado.\n\nE em São Paulo? Nunca. A capital fica um pouquinho ao sul do Trópico de Capricórnio. No dia mais alto do ano, 21 de dezembro, o Sol chega a 89,9 graus: quase, mas não exatamente.\n\nRepara que o horário não é meio-dia cravado no relógio. O \"meio-dia do Sol\" muda de cidade pra cidade, conforme a posição de cada uma no mapa.\n\nTeste fácil: põe uma garrafa no chão no horário certo e olha a sombra desaparecer embaixo dela. ☀️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-23nov-sombra-some-ao-meio-dia",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "De qual cidade você acompanha o céu? 👇"
+    "comentario": "De qual cidade você acompanha o céu? 👇",
+    "id_instagram": "18135273472682602",
+    "publicado_em": "2026-11-23T11:10:50.435Z",
+    "id_comentario": "18097475822188081"
   },
   {
     "quando": "2026-11-23T11:00:00.000Z",
@@ -7103,8 +7106,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/2bc07bf9-377a-4439-9e06-06adaae9cb24.mp4",
     "legenda": "Uma estrela MORTA manda um pulso de rádio a cada 8 minutos (e tem uma vizinha igual ao Sol) 📡\n\nAstrônomos da Curtin University (ICRAR, Austrália) ligaram pulsos de rádio que se repetem a cada 8 minutos a uma anã branca (o caroço que sobra de uma estrela) em par com uma estrela parecida com o Sol, a mais de 5.000 anos-luz. Foi a primeira vez que um par assim foi visto emitindo pulsos de rádio. Foram mais de 100 horas de observação com os radiotelescópios MWA (Austrália) e MeerKAT (África do Sul), com confirmação óptica do Keck. Só se conhece cerca de uma dúzia de \"transientes de período longo\" como esse.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: Curtin University / ICRAR (12/11/2026); McSweeney et al., \"A long-period transient with a Sun-like companion\", Nature Astronomy (2026), sistema GPM J071507−114153.\n\n#astronomia #radiotelescopio #espaco #neuralupdate",
     "slug": "nw-estrela-morta-pisca-em-radio-a-cada-8-minutos",
-    "status": "agendado",
-    "comentario": "📡 Um sinal a cada 8 minutos, a 5 mil anos-luz. Que explicação você daria pra um farol desses? 👇"
+    "status": "publicado",
+    "comentario": "📡 Um sinal a cada 8 minutos, a 5 mil anos-luz. Que explicação você daria pra um farol desses? 👇",
+    "id_instagram": "17946325314384559",
+    "publicado_em": "2026-11-23T11:11:34.322Z",
+    "id_comentario": "17969059893218381",
+    "id_facebook": "1007537751819896"
   },
   {
     "quando": "2026-11-23T11:05:00.000Z",
@@ -7112,7 +7119,9 @@
     "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-23.jpg",
     "legenda": "",
     "slug": "story-noticia-2026-11-23",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18124885562006537",
+    "publicado_em": "2026-11-23T11:11:52.253Z"
   },
   {
     "quando": "2026-11-23T12:30:00.000Z",
