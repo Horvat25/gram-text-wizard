@@ -676,5 +676,10 @@
     "quando": "2026-11-22T19:00:00.000Z",
     "tipo": "story",
     "state": "PERDIDO"
+  },
+  "fb-story-pergunta-2026-11-22": {
+    "quando": "2026-11-22T23:00:00.000Z",
+    "tipo": "story",
+    "state": "PERDIDO"
   }
 }
