@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-23T03:41:18.863Z",
+  "em": "2026-11-23T14:27:19.551Z",
   "agendados": [
     {
       "id": "962589380261249_122162122413153806",
@@ -129,6 +129,26 @@
   ],
   "ultimos_publicados": [
     {
+      "id": "962589380261249_122162119413153806",
+      "quando": "2026-11-23T14:00:03+0000",
+      "inicio": "Uma das teorias mais famosas da ciência foi confir"
+    },
+    {
+      "id": "962589380261249_122162119275153806",
+      "quando": "2026-11-23T12:30:07+0000",
+      "inicio": "Repara no aglomerado grande de luz no litoral, à d"
+    },
+    {
+      "id": "962589380261249_122162338191153806",
+      "quando": "2026-11-23T11:12:23+0000",
+      "inicio": "Uma estrela MORTA manda um pulso de rádio a cada 8"
+    },
+    {
+      "id": "962589380261249_122162119107153806",
+      "quando": "2026-11-23T10:00:20+0000",
+      "inicio": "Nesta semana, em algumas cidades do Brasil, a sua "
+    },
+    {
       "id": "962589380261249_122162118999153806",
       "quando": "2026-11-23T00:00:03+0000",
       "inicio": "Essa é a primeira foto de um buraco negro da histó"
@@ -167,26 +187,6 @@
       "id": "962589380261249_122162118801153806",
       "quando": "2026-11-22T12:30:01+0000",
       "inicio": "As estrelas da bandeira do Brasil não estão ali po"
-    },
-    {
-      "id": "962589380261249_122162218107153806",
-      "quando": "2026-11-22T11:12:37+0000",
-      "inicio": "A nave mais DISTANTE da Terra parou de mandar dado"
-    },
-    {
-      "id": "962589380261249_122162118765153806",
-      "quando": "2026-11-22T10:00:02+0000",
-      "inicio": "Repara: essa é a Terra nascendo no horizonte da Lu"
-    },
-    {
-      "id": "962589380261249_122161996479153806",
-      "quando": "2026-11-22T01:30:01+0000",
-      "inicio": "O ferro do seu sangue veio de estrelas que morrera"
-    },
-    {
-      "id": "962589380261249_122161996305153806",
-      "quando": "2026-11-22T00:00:04+0000",
-      "inicio": "Essa é a Nebulosa de Órion, fotografada pelo Hubbl"
     }
   ]
 }
