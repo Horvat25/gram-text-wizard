@@ -7057,7 +7057,9 @@
     "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-pergunta-2026-11-22.jpg",
     "legenda": "",
     "slug": "story-pergunta-2026-11-22",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18019921706976984",
+    "publicado_em": "2026-11-23T00:10:37.642Z"
   },
   {
     "quando": "2026-11-23T00:00:00.000Z",
@@ -7071,9 +7073,12 @@
     ],
     "legenda": "Essa é a primeira foto de um buraco negro da história.\n\nEle fica no centro da galáxia M87, a uns 55 milhões de anos-luz, e tem a massa de 6,5 bilhões de sóis. A imagem foi divulgada em 10 de abril de 2019 pelo Event Horizon Telescope, uma rede de radiotelescópios espalhados pelo mundo, trabalhando juntos como se fossem um telescópio do tamanho da Terra.\n\nRepara: o anel laranja não é o buraco negro. É gás quentíssimo girando em volta dele. A mancha escura no meio é a sombra, a região de onde nem a luz consegue sair.\n\nPra ter ideia de como um buraco negro é compacto: se a Terra inteira fosse espremida até virar um, ela teria menos de 2 centímetros de diâmetro, o tamanho de uma bolinha de gude. O Sol viraria uma bola de uns 6 km.\n\nPode ficar tranquilo: o Sol não tem massa suficiente pra virar buraco negro. Isso não vai acontecer com ele. ⚫\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 EHT Collaboration\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-22nov-buraco-negro-m87",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "Você já sabia disso? Conta aqui 👇"
+    "comentario": "Você já sabia disso? Conta aqui 👇",
+    "id_instagram": "18192528757415587",
+    "publicado_em": "2026-11-23T00:11:09.800Z",
+    "id_comentario": "17967007269216635"
   },
   {
     "quando": "2026-11-23T10:00:00.000Z",
