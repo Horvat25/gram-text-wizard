@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-23T04:50:06.648Z",
+  "gerado_em": "2026-11-23T16:52:29.523Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 128,
-    "curtidas": 128
+    "seguidores": 134,
+    "curtidas": 134
   },
   "pagina_diaria": [
     {
@@ -645,7 +645,11 @@
     },
     {
       "d": "2026-11-22",
-      "views": 1669
+      "views": 1681
+    },
+    {
+      "d": "2026-11-23",
+      "views": 382
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1147,7 +1151,12 @@
     },
     {
       "d": "2026-11-22",
-      "valor": 0.04,
+      "valor": 0.05,
+      "moeda": null
+    },
+    {
+      "d": "2026-11-23",
+      "valor": 0,
       "moeda": null
     }
   ],
@@ -1155,6 +1164,19 @@
   "ganhos_resposta_crua": 0.001374,
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "1007537751819896",
+      "quando": "2026-11-23T11:11:52+0000",
+      "titulo": "Uma estrela MORTA manda um pulso de rádio a cada 8 minutos (e tem uma vizinha igual ao Sol) 📡",
+      "link": "https://www.facebook.com/reel/1007537751819896/",
+      "segundos": 44,
+      "curtidas": 5,
+      "comentarios": 0,
+      "views": 362,
+      "alcance": null,
+      "tempo_medio_ms": 7751,
+      "interacoes": 1
+    },
     {
       "id": "4632021577077440",
       "quando": "2026-11-22T21:11:47+0000",
@@ -1176,9 +1198,9 @@
       "segundos": 41.291,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 1026,
+      "views": 1050,
       "alcance": null,
-      "tempo_medio_ms": 17378,
+      "tempo_medio_ms": 17313,
       "interacoes": 0
     },
     {
@@ -1189,9 +1211,9 @@
       "segundos": 42.708,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 351,
+      "views": 352,
       "alcance": null,
-      "tempo_medio_ms": 10124,
+      "tempo_medio_ms": 10093,
       "interacoes": 0
     },
     {
@@ -1202,9 +1224,9 @@
       "segundos": 38.75,
       "curtidas": 13,
       "comentarios": 0,
-      "views": 550,
+      "views": 553,
       "alcance": null,
-      "tempo_medio_ms": 11357,
+      "tempo_medio_ms": 11329,
       "interacoes": 0
     },
     {
@@ -1943,9 +1965,9 @@
       "segundos": 34.125,
       "curtidas": 12,
       "comentarios": 0,
-      "views": 539,
+      "views": 540,
       "alcance": null,
-      "tempo_medio_ms": 8779,
+      "tempo_medio_ms": 8766,
       "interacoes": 3
     },
     {
@@ -1969,7 +1991,7 @@
       "segundos": 33.51,
       "curtidas": 33,
       "comentarios": 0,
-      "views": 2072,
+      "views": 2073,
       "alcance": null,
       "tempo_medio_ms": 9012,
       "interacoes": 0
@@ -1982,9 +2004,9 @@
       "segundos": 36.75,
       "curtidas": 68,
       "comentarios": 0,
-      "views": 5279,
+      "views": 5281,
       "alcance": null,
-      "tempo_medio_ms": 6485,
+      "tempo_medio_ms": 6482,
       "interacoes": 1
     },
     {
@@ -3735,19 +3757,6 @@
       "titulo": "Em 1859, uma tempestade solar fez fios de telégrafo soltarem faíscas. Em julho de 2012, outra ejeção de força ",
       "link": "https://www.facebook.com/reel/1774042616979571/",
       "segundos": 38.458,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1495583502412867",
-      "quando": "2026-09-26T17:11:33+0000",
-      "titulo": "As estrelas nascem dentro de nuvens — e demoram milhões de anos pra acender. 🌌",
-      "link": "https://www.facebook.com/reel/1495583502412867/",
-      "segundos": 37.375,
       "curtidas": 0,
       "comentarios": 0,
       "views": 0,
