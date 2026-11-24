@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-23T21:01:27.107Z",
+ "gerado_em": "2026-11-24T20:03:38.460Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,7 +14,7 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2569514,
+   "seguidores": 2569375,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -26,7 +26,7 @@
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17641,
+   "seguidores": 17650,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,24 +44,13 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 592649,
+   "seguidores": 592759,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0.02,
+   "pct_posts_pedindo": 0,
    "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0,
-   "comentarios_por_curtida_sem_pedido": 0.036,
-   "melhores_pedidos": [
-    {
-     "quando": "2026-11-22",
-     "tipo": "FEED",
-     "pede": true,
-     "palavra": null,
-     "trecho": "Em fevereiro de 2025, autoridades de Singapura indiciaram Li e outros envolvidos sob a acusação de fraude em um caso ligado ao transbordo il",
-     "comentarios": 0,
-     "curtidas": 228,
-     "link": "https://www.instagram.com/p/DgDVQ2GjI0B/"
-    }
-   ]
+   "comentarios_por_curtida_com_pedido": null,
+   "comentarios_por_curtida_sem_pedido": 0.054,
+   "melhores_pedidos": []
   },
   {
    "usuario": "achadinhospromo15",
@@ -128,7 +117,7 @@
    "usuario": "dicasdelivros",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 30,
+   "seguidores": 31,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {},
@@ -157,14 +146,14 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1058392,
+   "seguidores": 1058500,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
     "REM": 1
    },
    "comentarios_por_curtida_com_pedido": 0.023,
-   "comentarios_por_curtida_sem_pedido": 0.026,
+   "comentarios_por_curtida_sem_pedido": 0.027,
    "melhores_pedidos": [
     {
      "quando": "2026-11-12",
@@ -173,7 +162,7 @@
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
      "comentarios": 113,
-     "curtidas": 4837,
+     "curtidas": 4895,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -197,32 +186,13 @@
   },
   {
    "hashtag": "projetorgalaxia",
-   "ok": true,
-   "posts": 10,
-   "pct_pedindo": 0.1,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": 0,
-   "comentarios_por_curtida_sem_pedido": 0.012,
-   "melhores_pedidos": [
-    {
-     "pede": true,
-     "palavra": null,
-     "trecho": "👉 Curtiu? Então chama no direct para garantir o seu com condição especial!",
-     "comentarios": 0,
-     "curtidas": 1,
-     "link": "https://www.instagram.com/p/DKpEXXeRLld/"
-    }
-   ]
+   "ok": false,
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "astronomia",
-   "ok": true,
-   "posts": 10,
-   "pct_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.019,
-   "melhores_pedidos": []
+   "ok": false,
+   "erro": "Please reduce the amount of data you're asking for, then retry your request"
   },
   {
    "hashtag": "livros",
