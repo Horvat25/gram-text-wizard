@@ -708,5 +708,12 @@
     "quando": "2026-11-24T19:00:00.000Z",
     "tipo": "story",
     "state": "PERDIDO"
+  },
+  "fb-story-pergunta-2026-11-24": {
+    "quando": "2026-11-24T23:00:00.000Z",
+    "tipo": "story",
+    "tentativas": 1,
+    "id": "1691999485869356",
+    "state": "PUBLICADO"
   }
 }
