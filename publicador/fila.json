@@ -7410,9 +7410,12 @@
     ],
     "legenda": "Parece uma cordilheira ao luar. Mas são nuvens de gás e poeira onde estão nascendo estrelas.\n\nEssa região é chamada de Penhascos Cósmicos. Ela fica na Nebulosa de Carina, a uns 7.600 anos-luz, e foi uma das primeiras imagens do telescópio James Webb, divulgada em julho de 2022.\n\nRepara no \"vapor\" que parece subir das montanhas. É gás quente sendo arrancado da nuvem pela radiação de estrelas jovens e muito massivas, que ficam acima da área da foto.\n\nOs picos mais altos têm uns 7 anos-luz de altura. A luz levaria sete anos pra ir da base até a ponta.\n\nE a Nebulosa de Carina é coisa do céu do sul. No Brasil, nesta época, ela aparece de madrugada: por volta das 4h, fica alta no sul-sudeste, um pouco acima do Cruzeiro do Sul. Num céu escuro, dá pra ver a nebulosa a olho nu, como uma mancha clara no meio da Via Láctea. ✨\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA, ESA, CSA, STScI (telescópio James Webb)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-24nov-penhascos-cosmicos",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "Qual parte você mostraria pra alguém? 👇"
+    "comentario": "Qual parte você mostraria pra alguém? 👇",
+    "id_instagram": "17973830694000011",
+    "publicado_em": "2026-11-24T20:32:33.363Z",
+    "id_comentario": "18470379397189340"
   },
   {
     "quando": "2026-11-24T19:00:00.000Z",
@@ -7420,7 +7423,8 @@
     "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-aula-2026-11-24.jpg",
     "legenda": "",
     "slug": "story-aula-2026-11-24",
-    "status": "agendado"
+    "status": "falhou",
+    "erro": "publish: {\"error\":{\"message\":\"The requested resource does not exist\",\"code\":24,\"type\":\"OAuthException\",\"error_subcode\":2207006,\"is_transient\":false,\"error_user_msg\":\"Não foi possível encontrar a mídia com 17.884.902.711.629.830.\",\"error_user_title\":\"Mídia não encontrada\",\"fbtrace_id\":\"AHWIdqsPACuSLPmVHvqlk2V\"}}"
   },
   {
     "quando": "2026-11-24T21:00:00.000Z",
