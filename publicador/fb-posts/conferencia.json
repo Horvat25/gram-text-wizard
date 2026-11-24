@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-24T13:32:34.221Z",
+  "em": "2026-11-24T23:27:10.421Z",
   "agendados": [
     {
       "id": "962589380261249_122162122413153806",
@@ -75,29 +75,39 @@
       "id": "962589380261249_122162120463153806",
       "quando": "2026-11-25T00:00:00.000Z",
       "inicio": "É assim que uma estrela parecida com o Sol termina"
-    },
+    }
+  ],
+  "ultimos_publicados": [
     {
       "id": "962589380261249_122162120421153806",
-      "quando": "2026-11-24T22:30:00.000Z",
+      "quando": "2026-11-24T22:30:00+0000",
       "inicio": "Tem uma estrela que já serviu de bússola pra sonda"
     },
     {
+      "id": "962589380261249_122162503461153806",
+      "quando": "2026-11-24T21:11:29+0000",
+      "inicio": "Essa estrela que você vê hoje é uma luz de ANTES d"
+    },
+    {
       "id": "962589380261249_122162120145153806",
-      "quando": "2026-11-24T18:30:00.000Z",
+      "quando": "2026-11-24T18:30:00+0000",
       "inicio": "Parece uma cordilheira ao luar. Mas são nuvens de "
     },
     {
+      "id": "962589380261249_122162484501153806",
+      "quando": "2026-11-24T17:13:15+0000",
+      "inicio": "A NASA POUSOU uma nave que não foi feita pra pousa"
+    },
+    {
       "id": "962589380261249_122162120073153806",
-      "quando": "2026-11-24T15:30:00.000Z",
+      "quando": "2026-11-24T15:30:02+0000",
       "inicio": "Hoje tem superlua. E o melhor momento pra ver é lo"
     },
     {
       "id": "962589380261249_122162120019153806",
-      "quando": "2026-11-24T14:00:00.000Z",
+      "quando": "2026-11-24T14:00:02+0000",
       "inicio": "Essa linha escura atravessando o Sol é mais compri"
-    }
-  ],
-  "ultimos_publicados": [
+    },
     {
       "id": "962589380261249_122162119893153806",
       "quando": "2026-11-24T12:30:02+0000",
@@ -127,36 +137,6 @@
       "id": "962589380261249_122162388069153806",
       "quando": "2026-11-23T21:12:21+0000",
       "inicio": "AMANHÃ tem SUPERLUA (e a do Natal vai ser ainda ma"
-    },
-    {
-      "id": "962589380261249_122162119497153806",
-      "quando": "2026-11-23T18:30:01+0000",
-      "inicio": "Procurou o Cruzeiro do Sul à noite e não achou? Nã"
-    },
-    {
-      "id": "962589380261249_122162367843153806",
-      "quando": "2026-11-23T17:11:42+0000",
-      "inicio": "Essa lua tem uma cratera do tamanho de quase METAD"
-    },
-    {
-      "id": "962589380261249_122162119455153806",
-      "quando": "2026-11-23T15:30:02+0000",
-      "inicio": "Debaixo dessa casca de gelo pode ter mais água do "
-    },
-    {
-      "id": "962589380261249_122162119413153806",
-      "quando": "2026-11-23T14:00:03+0000",
-      "inicio": "Uma das teorias mais famosas da ciência foi confir"
-    },
-    {
-      "id": "962589380261249_122162119275153806",
-      "quando": "2026-11-23T12:30:07+0000",
-      "inicio": "Repara no aglomerado grande de luz no litoral, à d"
-    },
-    {
-      "id": "962589380261249_122162338191153806",
-      "quando": "2026-11-23T11:12:23+0000",
-      "inicio": "Uma estrela MORTA manda um pulso de rádio a cada 8"
     }
   ]
 }
