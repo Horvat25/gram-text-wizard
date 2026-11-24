@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-23T21:32:07.341Z",
+  "gerado_em": "2026-11-24T12:21:35.275Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 135,
-    "curtidas": 135
+    "seguidores": 142,
+    "curtidas": 142
   },
   "pagina_diaria": [
     {
@@ -649,7 +649,11 @@
     },
     {
       "d": "2026-11-23",
-      "views": 682
+      "views": 1043
+    },
+    {
+      "d": "2026-11-24",
+      "views": 265
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1158,6 +1162,11 @@
       "d": "2026-11-23",
       "valor": 0.01,
       "moeda": "USD"
+    },
+    {
+      "d": "2026-11-24",
+      "valor": 0,
+      "moeda": "USD"
     }
   ],
   "ganhos_metrica": "content_monetization_earnings",
@@ -1168,17 +1177,30 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "1511604417747646",
+      "quando": "2026-11-24T11:12:19+0000",
+      "titulo": "Uma nave chegou pra ver o ESTRAGO no asteroide que a gente empurrou (amanhã tem foto ao vivo) ☄️",
+      "link": "https://www.facebook.com/reel/1511604417747646/",
+      "segundos": 42.25,
+      "curtidas": 6,
+      "comentarios": 0,
+      "views": 277,
+      "alcance": null,
+      "tempo_medio_ms": 9351,
+      "interacoes": 0
+    },
+    {
       "id": "2161014357955427",
       "quando": "2026-11-23T21:11:55+0000",
       "titulo": "AMANHÃ tem SUPERLUA (e a do Natal vai ser ainda maior) 🌕",
       "link": "https://www.facebook.com/reel/2161014357955427/",
       "segundos": 33.625,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
+      "curtidas": 2,
+      "comentarios": 1,
+      "views": 307,
       "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
+      "tempo_medio_ms": 5599,
+      "interacoes": 2
     },
     {
       "id": "918518311254477",
@@ -1186,11 +1208,11 @@
       "titulo": "Essa lua tem uma cratera do tamanho de quase METADE dela (e não se partiu) 🪐",
       "link": "https://www.facebook.com/reel/918518311254477/",
       "segundos": 37.083,
-      "curtidas": 3,
+      "curtidas": 4,
       "comentarios": 0,
-      "views": 273,
+      "views": 302,
       "alcance": null,
-      "tempo_medio_ms": 4561,
+      "tempo_medio_ms": 5016,
       "interacoes": 0
     },
     {
@@ -1201,9 +1223,9 @@
       "segundos": 44,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 371,
+      "views": 377,
       "alcance": null,
-      "tempo_medio_ms": 7797,
+      "tempo_medio_ms": 7741,
       "interacoes": 1
     },
     {
@@ -1214,9 +1236,9 @@
       "segundos": 35.291,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 250,
+      "views": 251,
       "alcance": null,
-      "tempo_medio_ms": 4430,
+      "tempo_medio_ms": 4454,
       "interacoes": 0
     },
     {
@@ -1227,9 +1249,9 @@
       "segundos": 41.291,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 1051,
+      "views": 1064,
       "alcance": null,
-      "tempo_medio_ms": 17283,
+      "tempo_medio_ms": 17208,
       "interacoes": 0
     },
     {
@@ -1240,9 +1262,9 @@
       "segundos": 42.708,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 353,
+      "views": 355,
       "alcance": null,
-      "tempo_medio_ms": 10073,
+      "tempo_medio_ms": 10019,
       "interacoes": 0
     },
     {
@@ -1253,9 +1275,9 @@
       "segundos": 38.75,
       "curtidas": 13,
       "comentarios": 0,
-      "views": 554,
+      "views": 559,
       "alcance": null,
-      "tempo_medio_ms": 11305,
+      "tempo_medio_ms": 11241,
       "interacoes": 0
     },
     {
@@ -1266,9 +1288,9 @@
       "segundos": 43.958,
       "curtidas": 3,
       "comentarios": 1,
-      "views": 335,
+      "views": 336,
       "alcance": null,
-      "tempo_medio_ms": 8856,
+      "tempo_medio_ms": 8836,
       "interacoes": 1
     },
     {
@@ -1682,9 +1704,9 @@
       "segundos": 38.125,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 260,
+      "views": 261,
       "alcance": null,
-      "tempo_medio_ms": 6747,
+      "tempo_medio_ms": 6722,
       "interacoes": 0
     },
     {
@@ -1979,7 +2001,7 @@
       "titulo": "Tem uma estrela que explode a cada 113 dias e continua viva.",
       "link": "https://www.facebook.com/reel/970815465710684/",
       "segundos": 39.125,
-      "curtidas": 5,
+      "curtidas": 4,
       "comentarios": 0,
       "views": 362,
       "alcance": null,
@@ -2020,9 +2042,9 @@
       "segundos": 33.51,
       "curtidas": 33,
       "comentarios": 0,
-      "views": 2073,
+      "views": 2074,
       "alcance": null,
-      "tempo_medio_ms": 9008,
+      "tempo_medio_ms": 9005,
       "interacoes": 0
     },
     {
@@ -3752,19 +3774,6 @@
       "views": 0,
       "alcance": null,
       "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2089651115007453",
-      "quando": "2026-09-27T17:11:46+0000",
-      "titulo": "Nem toda galáxia é aquela espiral bonita dos pôsteres. 🌌",
-      "link": "https://www.facebook.com/reel/2089651115007453/",
-      "segundos": 43.75,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 2,
-      "alcance": null,
-      "tempo_medio_ms": 2339,
       "interacoes": 0
     }
   ],
