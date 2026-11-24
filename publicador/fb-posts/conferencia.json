@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-24T02:08:43.552Z",
+  "em": "2026-11-24T13:32:34.221Z",
   "agendados": [
     {
       "id": "962589380261249_122162122413153806",
@@ -95,19 +95,24 @@
       "id": "962589380261249_122162120019153806",
       "quando": "2026-11-24T14:00:00.000Z",
       "inicio": "Essa linha escura atravessando o Sol é mais compri"
-    },
-    {
-      "id": "962589380261249_122162119893153806",
-      "quando": "2026-11-24T12:30:00.000Z",
-      "inicio": "O horário oficial do Brasil é medido num morro do "
-    },
-    {
-      "id": "962589380261249_122162119845153806",
-      "quando": "2026-11-24T10:00:00.000Z",
-      "inicio": "Repara embaixo, à direita da cidade: uma faixa esc"
     }
   ],
   "ultimos_publicados": [
+    {
+      "id": "962589380261249_122162119893153806",
+      "quando": "2026-11-24T12:30:02+0000",
+      "inicio": "O horário oficial do Brasil é medido num morro do "
+    },
+    {
+      "id": "962589380261249_122162455731153806",
+      "quando": "2026-11-24T11:12:49+0000",
+      "inicio": "Uma nave chegou pra ver o ESTRAGO no asteroide que"
+    },
+    {
+      "id": "962589380261249_122162119845153806",
+      "quando": "2026-11-24T10:00:01+0000",
+      "inicio": "Repara embaixo, à direita da cidade: uma faixa esc"
+    },
     {
       "id": "962589380261249_122162119731153806",
       "quando": "2026-11-24T00:00:01+0000",
@@ -152,21 +157,6 @@
       "id": "962589380261249_122162338191153806",
       "quando": "2026-11-23T11:12:23+0000",
       "inicio": "Uma estrela MORTA manda um pulso de rádio a cada 8"
-    },
-    {
-      "id": "962589380261249_122162119107153806",
-      "quando": "2026-11-23T10:00:20+0000",
-      "inicio": "Nesta semana, em algumas cidades do Brasil, a sua "
-    },
-    {
-      "id": "962589380261249_122162118999153806",
-      "quando": "2026-11-23T00:00:03+0000",
-      "inicio": "Essa é a primeira foto de um buraco negro da histó"
-    },
-    {
-      "id": "962589380261249_122162118969153806",
-      "quando": "2026-11-22T22:30:00+0000",
-      "inicio": "Hoje à noite dá pra ver Saturno a olho nu. Sem tel"
     }
   ]
 }
