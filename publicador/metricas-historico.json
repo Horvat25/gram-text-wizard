@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-23T20:52:41.950Z",
+ "gerado_em": "2026-11-24T19:57:31.955Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1311,
-  "publicacoes": 1158
+  "seguidores": 1315,
+  "publicacoes": 1175
  },
- "total_listado": 1132,
- "com_tempo_assistido": 566,
+ "total_listado": 1142,
+ "com_tempo_assistido": 569,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-25",
-     "ate": "2026-11-22",
+     "de": "2026-10-26",
+     "ate": "2026-11-23",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 2,
-         "end_time": "2026-10-26T07:00:00+0000"
-        },
         {
          "value": 0,
          "end_time": "2026-10-27T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 11,
          "end_time": "2026-11-22T08:00:00+0000"
+        },
+        {
+         "value": 1,
+         "end_time": "2026-11-23T08:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -322,7 +322,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-23",
+     "ate": "2026-11-24",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -341,13 +341,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 33
+            "value": 34
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 10
+            "value": 11
            }
           ]
          }
@@ -590,7 +590,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-23",
+     "ate": "2026-11-24",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -599,7 +599,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 8352
+        "value": 8597
        }
       },
       {
@@ -609,7 +609,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 14428
+        "value": 15282
        }
       },
       {
@@ -619,7 +619,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 307
+        "value": 323
        }
       },
       {
@@ -629,7 +629,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 579
+        "value": 631
        }
       }
      ]
@@ -730,15 +730,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 685
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 30185
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 685
            }
           ]
          }
@@ -767,15 +767,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 20920
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 654
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 20920
            }
           ]
          }
@@ -823,7 +823,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-23",
+     "ate": "2026-11-24",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -832,7 +832,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 8352,
+        "value": 8597,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -843,13 +843,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 237
+            "value": 249
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 8108
+            "value": 8344
            }
           ]
          }
@@ -888,7 +888,7 @@
             "dimension_values": [
              "18-24"
             ],
-            "value": 39
+            "value": 41
            },
            {
             "dimension_values": [
@@ -900,19 +900,19 @@
             "dimension_values": [
              "35-44"
             ],
-            "value": 382
+            "value": 385
            },
            {
             "dimension_values": [
              "45-54"
             ],
-            "value": 292
+            "value": 294
            },
            {
             "dimension_values": [
              "55-64"
             ],
-            "value": 175
+            "value": 176
            },
            {
             "dimension_values": [
@@ -953,13 +953,13 @@
             "dimension_values": [
              "M"
             ],
-            "value": 1028
+            "value": 1033
            },
            {
             "dimension_values": [
              "U"
             ],
-            "value": 160
+            "value": 163
            }
           ]
          }
@@ -1042,7 +1042,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 1260
+            "value": 1268
            },
            {
             "dimension_values": [
@@ -1107,13 +1107,13 @@
             "dimension_values": [
              "Ribeirão Prêto, São Paulo (state)"
             ],
-            "value": 8
+            "value": 9
            },
            {
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 98
+            "value": 99
            },
            {
             "dimension_values": [
@@ -1131,7 +1131,7 @@
             "dimension_values": [
              "Rio de Janeiro, Rio de Janeiro (state)"
             ],
-            "value": 50
+            "value": 51
            },
            {
             "dimension_values": [
@@ -1150,6 +1150,12 @@
              "Osasco, São Paulo (state)"
             ],
             "value": 6
+           },
+           {
+            "dimension_values": [
+             "Camaçari, Bahia"
+            ],
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1192,6 +1198,12 @@
              "Gama, Federal District"
             ],
             "value": 7
+           },
+           {
+            "dimension_values": [
+             "São Sebastião, Federal District"
+            ],
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1285,21 +1297,9 @@
            },
            {
             "dimension_values": [
-             "Ipatinga, Minas Gerais"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Nova Iguaçu, Rio de Janeiro (state)"
             ],
-            "value": 6
-           },
-           {
-            "dimension_values": [
-             "Maringá, Paraná"
-            ],
-            "value": 5
+            "value": 7
            },
            {
             "dimension_values": [
@@ -1365,7 +1365,7 @@
             "dimension_values": [
              "Belém, Pará"
             ],
-            "value": 12
+            "value": 11
            },
            {
             "dimension_values": [
@@ -2629,13 +2629,93 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-23",
+    "janela": "2026-11-24",
     "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18078089168759539": [
+    {
+     "texto": "☄️ Você arriscaria pousar uma nave que não foi feita pra isso? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T17:12:38+0000",
+     "respostas": []
+    }
+   ],
+   "17959098441281036": [
+    {
+     "texto": "De qual cidade você acompanha o céu? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T17:11:44+0000",
+     "respostas": []
+    }
+   ],
+   "18135086359795447": [
+    {
+     "texto": "Você já sabia disso? Conta aqui 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T17:11:15+0000",
+     "respostas": []
+    }
+   ],
+   "18040128425907523": [
+    {
+     "texto": "O que mais te surpreendeu aqui? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T17:10:49+0000",
+     "respostas": []
+    }
+   ],
+   "18185985526432597": [
+    {
+     "texto": "☄️ Palpite: a batida deixou uma cratera ou mudou o formato de Dimorfo? A live da ESA é amanhã (25/11) às 15h45 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T11:12:03+0000",
+     "respostas": []
+    }
+   ],
+   "18137452693594534": [
+    {
+     "texto": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T11:10:54+0000",
+     "respostas": []
+    }
+   ],
+   "18122302931062239": [
+    {
+     "texto": "Qual parte você mostraria pra alguém? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T00:11:52+0000",
+     "respostas": []
+    }
+   ],
+   "18021115760969015": [
+    {
+     "texto": "De qual cidade você acompanha o céu? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T00:11:05+0000",
+     "respostas": []
+    }
+   ],
+   "18018547715968600": [
+    {
+     "texto": "🌕 Amanhã (24/11) a Lua nasce às 18h57 em São Paulo, no leste. Tira uma foto e conta de qual cidade você viu 👇",
+     "curtidas": 0,
+     "quando": "2026-11-23T21:11:54+0000",
+     "respostas": []
+    }
+   ],
+   "18425332855156448": [
+    {
+     "texto": "Você já sabia disso? Conta aqui 👇",
+     "curtidas": 0,
+     "quando": "2026-11-23T21:10:55+0000",
+     "respostas": []
+    }
+   ],
    "18377422708246597": [
     {
      "texto": "🪐 Se você pudesse andar na borda dessa cratera, ia querer? 👇",
@@ -2977,7 +3057,13 @@
      "texto": "Anda mais rápido...",
      "curtidas": 1,
      "quando": "2026-11-18T12:15:15+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis, ela já anda a uns 61 mil km/h! 🚀 O caminho é que é enorme: levou 49 anos pra chegar a um dia-luz. E tem novidade: desde 14/11 ela parou de mandar dados, e a NASA tá investigando. Torce com a gente 🙏",
+       "quando": "2026-11-24T11:52:28+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "🛰️ Se você pudesse mandar UMA frase pra Voyager (ela leva um dia pra chegar), o que você escreveria? 👇",
@@ -3127,7 +3213,13 @@
      "texto": "Bem que eu desconfiava",
      "curtidas": 0,
      "quando": "2026-11-12T13:24:46+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis, você tava na frente da física 😄 Por enquanto é só uma possibilidade nas contas dos cientistas, ninguém viu acontecer ainda. Mas se acontecer, você já tinha avisado!",
+       "quando": "2026-11-24T11:52:37+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
@@ -3161,6 +3253,11 @@
       {
        "texto": "@cloviscbezerra vai ser taxado pelo Lula",
        "quando": "2026-11-11T23:08:57+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "Kkk, Clóvis, o 'criminoso' foi a própria NASA, que bateu a nave DART de propósito em 2022 😄 E a perícia chegou: amanhã (25/11), às 15h45, a agência europeia mostra ao vivo as primeiras fotos de perto da cena do crime 🔍",
+       "quando": "2026-11-24T11:52:45+0000",
        "curtidas": 0
       }
      ]
@@ -3390,6 +3487,11 @@
        "texto": "@osvaldino35 ❤️deus",
        "quando": "2026-11-02T12:44:30+0000",
        "curtidas": 0
+      },
+      {
+       "texto": "❤️ Valeu, Osvaldino! Tamo junto",
+       "quando": "2026-11-24T11:53:37+0000",
+       "curtidas": 0
       }
      ]
     },
@@ -3411,7 +3513,13 @@
      "texto": "Foi o susto",
      "curtidas": 0,
      "quando": "2026-10-31T22:18:09+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis 💀 Susto bom: a 'caveira' passou longe, sem perigo nenhum pra Terra. Valeu por estar sempre por aqui!",
+       "quando": "2026-11-24T11:52:54+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
@@ -3471,7 +3579,13 @@
      "texto": "Fico imaginando como descobriram isso",
      "curtidas": 1,
      "quando": "2026-10-30T03:17:39+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Boa pergunta! 🪐 Pela gravidade: olhando como as luas de Saturno giram em volta dele, os astrônomos calculam a massa do planeta. Depois medem o tamanho dele com telescópio. Dividindo um pelo outro, sai a densidade: 0,69 g/cm³, menor que a da água, que é 1. Por isso ele 'boiaria'.",
+       "quando": "2026-11-24T11:53:46+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Comenta ROTINA aqui que eu te explico como funciona (sem promessa de renda).",
@@ -3789,7 +3903,13 @@
      "texto": "Suspeito que alguém colocou ali",
      "curtidas": 1,
      "quando": "2026-10-17T23:19:25+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis, se alguém colocou, foi a batida 😄 A ideia mais aceita é que um planeta do tamanho de Marte acertou a Terra há uns 4,5 bilhões de anos, e os pedaços que voaram se juntaram e viraram a Lua 🌕",
+       "quando": "2026-11-24T11:53:03+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Comenta LIVRO aqui e eu te mando no direct o guia pra ler astronomia no celular 📚 (link de afiliado Amazon na página). Não chegou? Olha em solicitações de mensagem.",
@@ -3899,7 +4019,13 @@
      "texto": "Na parte das 8:30 da manhã em Marte tem um espectro estranho, parece alguma montagem",
      "curtidas": 0,
      "quando": "2026-10-15T02:31:07+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Bom olho, Paulo! É montagem no bom sentido: a NASA colou 6 fotos da câmera do robô, e dá pra notar as emendas. E deixou sem correção de cor, de propósito, pra mostrar a luz da manhã como ela é. Por isso o chão ficou azulado e a luz parece estranha. Não é falso, é Marte sem filtro 🔴",
+       "quando": "2026-11-24T11:53:55+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -3985,7 +4111,13 @@
      "texto": "Como que a Terra fica mais próxima do sol se a ela \"anda\" em círculo envolta do sol? Pode me explicar por favor?",
      "curtidas": 0,
      "quando": "2026-10-11T11:18:10+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Claro, Patrycia! O caminho da Terra não é um círculo perfeito, é levemente oval. No começo de janeiro ela passa mais perto do Sol, a uns 147 milhões de km, e no começo de julho mais longe, a uns 152 milhões. A diferença é pequena, só uns 3%, e por isso não é ela que faz as estações. Quem faz é a inclinação da Terra: tanto que em janeiro, mais perto do Sol, é verão aqui e inverno lá no norte ☀️",
+       "quando": "2026-11-24T11:54:04+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4127,7 +4259,13 @@
      "texto": "Que bicho vagaroso",
      "curtidas": 0,
      "quando": "2026-10-05T12:58:19+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis! Vagaroso a 28 mil km/h 😄 A estação fica só a uns 400 km de altura, mas a nave precisa 'alcançar' ela na órbita, então dá umas voltas na Terra antes de encostar. E 7h55 foi o recorde!",
+       "quando": "2026-11-24T11:53:12+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4165,7 +4303,18 @@
      "texto": "300 milhões de anos..até a imaginação tem dificuldade de desenhar. Como seremos kkkkk",
      "curtidas": 1,
      "quando": "2026-10-04T18:58:03+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Né, Rosilda? Pra ter ideia: 300 milhões de anos atrás nem dinossauro existia ainda 😄 Quem vai estar olhando o céu até lá, só o tempo dirá. E você, que é fotógrafa, já tentou fotografar Saturno? 🪐",
+       "quando": "2026-11-24T11:54:13+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@neuralupdate muitas nuvens noturnas fazendo carnaval noturno no céu de Salvador.",
+       "quando": "2026-11-24T16:02:31+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4227,7 +4376,13 @@
      "texto": "Ensinando que o eclipse não e em toda a terra não 👏👏👏👏😂😂😂",
      "curtidas": 0,
      "quando": "2026-10-01T19:52:09+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Valeu demais! 👏 Pois é: a sombra da Lua é pequena perto da Terra, então cada eclipse do Sol só aparece numa faixa do planeta. Por isso tem gente que viaja milhares de quilômetros pra ver um 😄",
+       "quando": "2026-11-24T11:54:22+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4321,7 +4476,13 @@
      "texto": "Isso e mentira! Tambem a terra vai se afastar do sol. Ai ta tudo certo",
      "curtidas": 0,
      "quando": "2026-09-29T00:16:08+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "É medido de verdade! Os astronautas da Apollo deixaram espelhos na Lua, e até hoje observatórios disparam laser daqui, cronometram a volta da luz e veem que ela se afasta uns 3,8 cm por ano. Mais ou menos o quanto a unha cresce 🌙",
+       "quando": "2026-11-24T11:54:31+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4551,7 +4712,13 @@
      "texto": "Um dia quando eu chegar lá eu descubro, mas não direi o que é",
      "curtidas": 1,
      "quando": "2026-09-21T11:30:50+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis, aí não vale! 😄 Se descobrir, conta pelo menos pra gente aqui do canal. Por enquanto os cientistas apostam em estrelas mortas ou buracos negros puxando gás 🔭",
+       "quando": "2026-11-24T11:53:20+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4621,7 +4788,13 @@
      "texto": "Se a gente for morar lá descobre",
      "curtidas": 1,
      "quando": "2026-09-19T14:18:52+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, Clóvis, só se for de balão: Saturno não tem chão, é quase tudo gás 😄 Mas o telescópio já tá de olho, e quando descobrirem o porquê dessa forma, a gente conta aqui!",
+       "quando": "2026-11-24T11:53:28+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -4915,7 +5088,18 @@
      "texto": "Tá ruído no vácuo oxi como",
      "curtidas": 0,
      "quando": "2026-09-10T23:21:27+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Boa pergunta, Ed! Na física quântica, o vácuo nunca fica totalmente parado: aparecem tremidinhas minúsculas de energia o tempo todo. Na inflação, o universo esticou tão rápido que essas tremidinhas viraram as sementes das galáxias 🌌",
+       "quando": "2026-11-24T11:54:40+0000",
+       "curtidas": 1
+      },
+      {
+       "texto": "Para virar alguma coisa temos que esplicar a gravidade e  não somente entender a gravidade",
+       "quando": "2026-11-24T12:31:14+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -5154,6 +5338,11 @@
        "texto": "@_bibbo_  se desintegra",
        "quando": "2026-09-02T23:56:27+0000",
        "curtidas": 0
+      },
+      {
+       "texto": "Boa, Bibbo! Eles não chegam a lugar nenhum: explodem nas nuvens e o material se mistura no gás e vai se desfazendo lá embaixo. Em 1994 a gente viu isso ao vivo: o cometa Shoemaker-Levy 9 se partiu em pedaços que bateram em Júpiter e deixaram manchas escuras maiores que a Terra 🪐",
+       "quando": "2026-11-24T11:54:49+0000",
+       "curtidas": 0
       }
      ]
     },
@@ -5177,13 +5366,25 @@
      "texto": "Nem pra lua o homem foi, kkkk imagina pra Marte kkkkkkkkkkkkk",
      "curtidas": 0,
      "quando": "2026-09-02T22:58:47+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Foi sim, Donisete 😄 Os astronautas da Apollo deixaram espelhos na Lua que observatórios usam até hoje com laser. E uma sonda da Índia, de outro país, já fotografou lá de cima os lugares onde eles pousaram. Pra Marte, por enquanto, só robô mesmo 🤖",
+       "quando": "2026-11-24T11:54:57+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Próxima fronteira de exploração mineral.",
      "curtidas": 0,
      "quando": "2026-09-02T15:50:18+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Pode ser, Ronnyere! Mas o que deve valer mais em Marte primeiro é a água congelada no chão, pra quem for morar lá. Pra mineração mesmo, os alvos mais falados são a Lua e os asteroides, que ficam mais perto da Terra ⛏️",
+       "quando": "2026-11-24T11:55:07+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -5252,6 +5453,11 @@
       {
        "texto": "@jcarlos_souza_1984  eu também acho, mas a gente não percebe isso por causa da relatividade.",
        "quando": "2026-09-01T18:35:39+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "Calma, J. Carlos 😄 Ele assusta, mas tem 'só' uns 4 milhões de vezes a massa do Sol, e a gente gira em volta dele a uns 26 mil anos-luz, numa órbita estável, como a Terra em volta do Sol. A gente não vai cair nele 🌌",
+       "quando": "2026-11-24T11:55:17+0000",
        "curtidas": 0
       }
      ]
@@ -5819,25 +6025,224 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "18078089168759539",
+   "quando": "2026-11-24T17:12:32+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgIdoInzbFv/",
+   "titulo": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️",
+   "legenda": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️\n\nA sonda NEAR Shoemaker entrou na órbita do asteroide Eros (34 km de comprimento) em 14/02/2000, a primeira a orbitar um asteroide. Em 12/02/2001, no fim da missão, a equipe decidiu descer até a superfície, mesmo a nave não tendo sido projetada pra pousar. Ela tocou o chão a uns 6 km/h (1,5 a 1,9 m/s), continuou funcionando e mandou dados por cerca de duas semanas. A última foto da descida, a 120 m de altura, saiu cortada pela perda de sinal no toque.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA — NEAR Shoemaker (órbita em 14/02/2000; pouso em 12/02/2001; último contato em 28/02/2001); NSSDC/NASA.\n\n#asteroide #nasa #aula #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 9,
+   "reach": 8,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "ig_reels_avg_watch_time": 6464,
+   "ig_reels_video_view_total_time": 45252,
+   "reels_skip_rate": 75,
+   "reposts": 0
+  },
+  {
+   "id": "17959098441281036",
+   "quando": "2026-11-24T17:11:40+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgIdkZ2Dw7-/",
+   "titulo": "Hoje tem superlua. E o melhor momento pra ver é logo depois do pôr do sol.",
+   "legenda": "Hoje tem superlua. E o melhor momento pra ver é logo depois do pôr do sol.\n\nA Lua fica cheia hoje às 11h54 (horário de Brasília), a 360.754 km da Terra. É a segunda Lua cheia mais perto de 2026. A mais perto de todas vem no mês que vem: a da véspera de Natal, em 24 de dezembro, a 356.729 km.\n\nComo ver, em São Paulo:\n\n🌇 O Sol se põe às 18h35.\n🌕 A Lua nasce às 18h57, no leste, 22 minutos depois.\n👀 Olha pro leste nos primeiros minutos depois que ela nascer. Rente ao horizonte, ela parece enorme e meio alaranjada.\n\nEm outras cidades, os horários mudam alguns minutos.\n\nEsse tamanho gigante perto do horizonte é, em boa parte, uma ilusão do cérebro, que compara a Lua com prédios e árvores. A diferença real de uma superlua pra uma Lua cheia comum existe, mas é pequena pro olho.\n\nE a Lua continua se aproximando: amanhã, às 18h02, ela passa pelo ponto mais perto da Terra no mês, a 359.335 km.\n\nSe o céu estiver nublado, calma: amanhã à noite ela ainda vai estar quase toda cheia. 🌕\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 6,
+   "reach": 2,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18135086359795447",
+   "quando": "2026-11-24T17:11:11+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgIdg_jjfdD/",
+   "titulo": "Essa linha escura atravessando o Sol é mais comprida que o dobro da distância entre a Terra e a Lua.",
+   "legenda": "Essa linha escura atravessando o Sol é mais comprida que o dobro da distância entre a Terra e a Lua.\n\nA foto é do observatório solar SDO, da NASA, em 10 de fevereiro de 2015. A linha é um filamento: uma faixa de material mais frio flutuando na atmosfera do Sol. Nessa imagem, o que é mais frio aparece escuro e o que é mais quente aparece claro.\n\nEsticado, esse filamento passaria de 850 mil quilômetros. Daria pra enfileirar 67 Terras ao longo dele. A Lua está a uns 384 mil km da gente.\n\nE mesmo assim ele é só um risco no Sol. O Sol tem 109 vezes a largura da Terra e concentra 99,8% de toda a massa do Sistema Solar. Planetas, luas, asteroides e a gente cabemos nos 0,2% que sobram.\n\nFilamentos assim podem ficar parados por dias. Às vezes, explodem e lançam nuvens de gás pro espaço. Quando uma dessas nuvens acerta a Terra, pode acender auroras no céu. ☀️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA/Goddard/SDO\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 8,
+   "reach": 5,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18040128425907523",
+   "quando": "2026-11-24T17:10:45+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgIddsbkXII/",
+   "titulo": "O horário oficial do Brasil é medido num morro do bairro de São Cristóvão, no Rio de Janeiro.",
+   "legenda": "O horário oficial do Brasil é medido num morro do bairro de São Cristóvão, no Rio de Janeiro.\n\nLá funciona o Observatório Nacional, uma das instituições científicas mais antigas do país. Ele foi criado por decreto de Dom Pedro I em 15 de outubro de 1827. No ano que vem, faz 200 anos.\n\nDesde 1913, por lei, é ele quem gera e distribui a Hora Legal Brasileira. Hoje ela sai de um conjunto de relógios atômicos de césio.\n\nNo começo, o observatório ficava no Morro do Castelo, no centro do Rio. Em 1922, mudou pro Morro de São Januário, em São Cristóvão, onde está até hoje.\n\nE ele tem um pé na história da física: o observatório ajudou a preparar a observação do eclipse de 1919 em Sobral, no Ceará, aquela que confirmou a teoria de Einstein.\n\nNa próxima vez que alguém falar em \"horário de Brasília\", lembra: quem cuida dele fica no Rio, há quase dois séculos. 🕰️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 9,
+   "reach": 3,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18185985526432597",
+   "quando": "2026-11-24T11:11:57+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgH0XJjyWaE/",
+   "titulo": "Uma nave chegou pra ver o ESTRAGO no asteroide que a gente empurrou (amanhã tem foto ao vivo) ☄️",
+   "legenda": "Uma nave chegou pra ver o ESTRAGO no asteroide que a gente empurrou (amanhã tem foto ao vivo) ☄️\n\nEm 26/09/2022, a nave DART, da NASA, bateu de propósito no asteroide Dimorfo. Agora a sonda europeia Hera chegou aos dois asteroides: já fotografou Didymos (780 m) e Dimorfo (151 m) a 60, 56 e cerca de 30 km. Na quarta, 25/11/2026, das 15h45 às 16h30 (Brasília), a ESA mostra ao vivo as primeiras imagens de perto de Dimorfo depois da batida.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: ESA — \"Watch live: Hera's first images of post-impact asteroid Dimorphos\" (19/11/2026) e \"Hera's first close-up view of Didymos asteroids\" (05/11/2026).\n\n#asteroide #esa #astronomia #neuralupdate",
+   "curtidas_campo": 5,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 188,
+   "reach": 161,
+   "likes": 5,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 6,
+   "ig_reels_avg_watch_time": 11218,
+   "ig_reels_video_view_total_time": 1851071,
+   "reels_skip_rate": 49.1,
+   "reposts": 0
+  },
+  {
+   "id": "18137452693594534",
+   "quando": "2026-11-24T11:10:50+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgH0RhTF7Z8/",
+   "titulo": "Repara embaixo, à direita da cidade: uma faixa escura e uma faixa marrom correndo juntas no mesmo rio, sem se misturar.",
+   "legenda": "Repara embaixo, à direita da cidade: uma faixa escura e uma faixa marrom correndo juntas no mesmo rio, sem se misturar.\n\nÉ o Encontro das Águas, em Manaus, fotografado da Estação Espacial Internacional em 7 de julho de 2004. A mancha clara no meio da floresta é a cidade.\n\nO rio barrento é o Solimões. A cor vem da lama que ele arranca da Cordilheira dos Andes e carrega por milhares de quilômetros. O rio escuro é o Negro: ele nasce em terras baixas, com pouca erosão, e ganha a cor de chá preto da matéria orgânica que cai da floresta.\n\nQuando os dois se encontram, seguem lado a lado antes de se misturar de vez, porque têm temperatura, velocidade e densidade diferentes. Segundo a NASA, a zona de mistura vai por centenas de quilômetros rio abaixo. A partir dali, o rio passa a se chamar Amazonas.\n\nDá pra ver a fronteira entre as duas águas da janela de um barco. E, pelo visto, também do espaço, a 400 km de altura. 🌊\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA (Estação Espacial Internacional, Expedição 9)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 31,
+   "reach": 15,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18122302931062239",
+   "quando": "2026-11-24T00:11:47+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgGo2GXFy1v/",
+   "titulo": "Aquela estrela cadente que você viu riscar o céu provavelmente era do tamanho de um grão de areia.",
+   "legenda": "Aquela estrela cadente que você viu riscar o céu provavelmente era do tamanho de um grão de areia.\n\nEstrela cadente não é estrela. É um pedacinho de rocha ou poeira do espaço, muitas vezes deixado para trás por um cometa, que entra na atmosfera a dezenas de milhares de quilômetros por hora.\n\nNessa velocidade, o ar na frente dele é esmagado e esquenta tanto que o grão vira um risco de luz e some em um segundo, lá no alto, bem longe do chão.\n\nSegundo a NASA, a maior parte desses fragmentos tem entre o tamanho de um grão de areia e o de uma ervilha.\n\nE são muitos. A NASA estima que caem na Terra cerca de 44 toneladas de material do espaço por dia, quase tudo em forma de poeira fininha, que vai parar no mar, no mato e nos telhados.\n\nOu seja: a Terra fica um pouquinho mais pesada todo dia, com poeira que viajou bilhões de quilômetros até aqui. ☄️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 21,
+   "reach": 10,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18021115760969015",
+   "quando": "2026-11-24T00:11:01+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgGowihl4Yj/",
+   "titulo": "Esse é o maior vulcão do Sistema Solar. A base dele ocuparia quase o Rio Grande do Sul inteiro.",
+   "legenda": "Esse é o maior vulcão do Sistema Solar. A base dele ocuparia quase o Rio Grande do Sul inteiro.\n\nÉ o Monte Olimpo, em Marte, numa montagem de imagens feitas da órbita do planeta.\n\nEle tem uns 22 km de altura em relação ao nível médio de Marte. Isso é duas vezes e meia o Everest e mais de sete vezes o Pico da Neblina, o ponto mais alto do Brasil, com 2.995 metros.\n\nA base tem mais de 600 km de largura. A NASA compara a área dela à do estado americano do Arizona, que tem quase o mesmo tamanho do Rio Grande do Sul.\n\nRepara na borda: em volta do vulcão tem um paredão de até 6 km de altura, que cai de uma vez até as planícies.\n\nE ele é tão largo e de subida tão suave que quem estivesse no chão de Marte não conseguiria ver o vulcão inteiro, nem de longe. A própria curvatura do planeta esconderia uma parte dele. 🌋\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA/JPL/USGS\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 49,
+   "reach": 25,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18018547715968600",
+   "quando": "2026-11-23T21:11:48+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgGUNwMRwMo/",
+   "titulo": "AMANHÃ tem SUPERLUA (e a do Natal vai ser ainda maior) 🌕",
+   "legenda": "AMANHÃ tem SUPERLUA (e a do Natal vai ser ainda maior) 🌕\n\nTerça, 24/11/2026: Lua cheia às 11h54 (Brasília), a 360.754 km, um dia antes do perigeu (25/11, 359.335 km). Em São Paulo ela nasce às 18h57, uns 22 minutos depois do pôr do sol, no leste um pouco à esquerda. Fica cerca de 12% maior que a Lua cheia de 31/05, a mais distante do ano (406.126 km). E a Lua cheia de 24/12 (véspera de Natal) vai estar ainda mais perto: 356.729 km.\n\n📤 Manda pra alguém que ia gostar de saber disso.\n\n📚 Cálculo (astronomy-engine): Lua cheia em 24/11/2026 14:54 UTC a 360.754 km; perigeu 25/11 21:02 UTC a 359.335 km; Lua cheia de 31/05/2026 a 406.126 km; de 24/12/2026 a 356.729 km; nascer da Lua em São Paulo 24/11 às 18h57.\n\n#superlua #luacheia #astronomia #neuralupdate",
+   "curtidas_campo": 8,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 224,
+   "reach": 178,
+   "likes": 8,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 9,
+   "ig_reels_avg_watch_time": 10286,
+   "ig_reels_video_view_total_time": 1975044,
+   "reels_skip_rate": 60.9,
+   "reposts": 0
+  },
+  {
+   "id": "18425332855156448",
+   "quando": "2026-11-23T21:10:51+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgGUIxPjb1q/",
+   "titulo": "Procurou o Cruzeiro do Sul à noite e não achou? Não é você. Nesta época ele está escondido.",
+   "legenda": "Procurou o Cruzeiro do Sul à noite e não achou? Não é você. Nesta época ele está escondido.\n\nEm novembro, no começo da noite, o Cruzeiro fica abaixo do horizonte em São Paulo. Ele só nasce perto das 22h, no sul-sudeste, e vai subindo de madrugada. Às 4h, já está a uns 33 graus de altura, mais ou menos um terço do caminho entre o horizonte e o ponto acima da sua cabeça, ainda meio deitado.\n\nComo reconhecer:\n\n✝️ Quatro estrelas formando uma cruz pequena, mais uma estrelinha fraca fora do lugar, a \"Intrometida\".\n⚠️ Cuidado com o Falso Cruzeiro, mais alto e um pouco à direita: é uma cruz maior, mais espaçada, mais apagada e sem a Intrometida.\n\nE ele ainda ensina onde fica o sul. Pega o braço comprido da cruz, do topo até o pé, e prolonga umas quatro vezes e meia na mesma direção. Ali fica o polo sul do céu. Desce reto dali até o horizonte: aquele ponto é o sul.\n\nA estrela do pé da cruz, a Estrela de Magalhães, é a que representa São Paulo na bandeira do Brasil. 🧭\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 24,
+   "reach": 7,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
    "id": "18377422708246597",
    "quando": "2026-11-23T17:10:59+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/DgF4psMvBKw/",
    "titulo": "Essa lua tem uma cratera do tamanho de quase METADE dela (e não se partiu) 🪐",
    "legenda": "Essa lua tem uma cratera do tamanho de quase METADE dela (e não se partiu) 🪐\n\nTétis é uma lua de Saturno com 1.062 km de diâmetro, quase a distância em linha reta de Brasília a Salvador. A cratera Odisseu tem 445 km: mais de 40% da largura da lua. Do outro lado, o cânion Ithaca Chasma se estende por uns 2.000 km. Tétis é feita quase toda de gelo de água e é um dos corpos mais brilhantes do Sistema Solar.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA Science — Tethys; USGS/IAU Gazetteer of Planetary Nomenclature (Odysseus, 445 km); NASA/JPL (Ithaca Chasma).\n\n#saturno #astronomia #aula #neuralupdate",
-   "curtidas_campo": 5,
+   "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 142,
-   "reach": 119,
-   "likes": 5,
+   "views": 205,
+   "reach": 175,
+   "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 6,
-   "ig_reels_avg_watch_time": 24679,
-   "ig_reels_video_view_total_time": 3084901,
-   "reels_skip_rate": 46.5,
+   "total_interactions": 8,
+   "ig_reels_avg_watch_time": 19250,
+   "ig_reels_video_view_total_time": 3599831,
+   "reels_skip_rate": 50,
    "reposts": 0
   },
   {
@@ -5850,8 +6255,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 18,
-   "reach": 10,
+   "views": 37,
+   "reach": 20,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -5869,8 +6274,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 13,
-   "reach": 4,
+   "views": 23,
+   "reach": 11,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -5888,8 +6293,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 12,
-   "reach": 3,
+   "views": 20,
+   "reach": 8,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -5904,19 +6309,19 @@
    "link": "https://www.instagram.com/reel/DgFPgaLCP2N/",
    "titulo": "Uma estrela MORTA manda um pulso de rádio a cada 8 minutos (e tem uma vizinha igual ao Sol) 📡",
    "legenda": "Uma estrela MORTA manda um pulso de rádio a cada 8 minutos (e tem uma vizinha igual ao Sol) 📡\n\nAstrônomos da Curtin University (ICRAR, Austrália) ligaram pulsos de rádio que se repetem a cada 8 minutos a uma anã branca (o caroço que sobra de uma estrela) em par com uma estrela parecida com o Sol, a mais de 5.000 anos-luz. Foi a primeira vez que um par assim foi visto emitindo pulsos de rádio. Foram mais de 100 horas de observação com os radiotelescópios MWA (Austrália) e MeerKAT (África do Sul), com confirmação óptica do Keck. Só se conhece cerca de uma dúzia de \"transientes de período longo\" como esse.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: Curtin University / ICRAR (12/11/2026); McSweeney et al., \"A long-period transient with a Sun-like companion\", Nature Astronomy (2026), sistema GPM J071507−114153.\n\n#astronomia #radiotelescopio #espaco #neuralupdate",
-   "curtidas_campo": 5,
+   "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 193,
-   "reach": 169,
-   "likes": 5,
+   "views": 264,
+   "reach": 221,
+   "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 6,
-   "ig_reels_avg_watch_time": 12092,
-   "ig_reels_video_view_total_time": 2116146,
-   "reels_skip_rate": 51.4,
+   "total_interactions": 9,
+   "ig_reels_avg_watch_time": 11818,
+   "ig_reels_video_view_total_time": 2753732,
+   "reels_skip_rate": 50,
    "reposts": 0
   },
   {
@@ -5929,8 +6334,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 10,
-   "reach": 6,
+   "views": 27,
+   "reach": 11,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -5948,8 +6353,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 65,
-   "reach": 34,
+   "views": 74,
+   "reach": 39,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -5967,8 +6372,8 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 21,
-   "reach": 9,
+   "views": 28,
+   "reach": 12,
    "likes": 1,
    "comments": 1,
    "shares": 0,
@@ -5983,20 +6388,20 @@
    "link": "https://www.instagram.com/reel/DgDvZS-Tdj9/",
    "titulo": "Tem mais ÁRVORE na Terra do que ESTRELA na nossa galáxia (e a Amazônia sozinha empata) 🌳✨",
    "legenda": "Tem mais ÁRVORE na Terra do que ESTRELA na nossa galáxia (e a Amazônia sozinha empata) 🌳✨\n\nA Via Láctea tem entre 100 e 400 bilhões de estrelas. A Terra tem cerca de 3 trilhões de árvores, segundo o maior levantamento já feito (Nature, 2015). E só a Amazônia tem cerca de 390 bilhões de árvores (Science, 2013): a floresta sozinha empata com a galáxia inteira.\n\n📤 Manda pra alguém que ia gostar de saber disso.\n\n📚 Fonte: Crowther et al., Nature (2015) — ~3,04 trilhões de árvores na Terra; ter Steege et al., Science (2013) — ~390 bilhões de árvores na Amazônia; NASA — a Via Láctea tem de 100 a 400 bilhões de estrelas.\n\n#amazonia #vialactea #curiosidades #neuralupdate",
-   "curtidas_campo": 4,
+   "curtidas_campo": 5,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 147,
-   "reach": 127,
-   "likes": 4,
+   "views": 154,
+   "reach": 132,
+   "likes": 5,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 5,
-   "ig_reels_avg_watch_time": 7345,
-   "ig_reels_video_view_total_time": 1028399,
-   "reels_skip_rate": 62.6,
-   "reposts": 0
+   "total_interactions": 7,
+   "ig_reels_avg_watch_time": 7399,
+   "ig_reels_video_view_total_time": 1072901,
+   "reels_skip_rate": 62.5,
+   "reposts": 1
   },
   {
    "id": "18114261008237349",
@@ -6008,8 +6413,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 46,
-   "reach": 23,
+   "views": 54,
+   "reach": 26,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6024,18 +6429,18 @@
    "link": "https://www.instagram.com/reel/DgDUE6ztus9/",
    "titulo": "A NASA encostou num asteroide e o braço AFUNDOU (era uma piscina de bolinhas) ☄️",
    "legenda": "A NASA encostou num asteroide e o braço AFUNDOU (era uma piscina de bolinhas) ☄️\n\nEm 20/10/2020, a sonda OSIRIS-REx, da NASA, encostou o braço no asteroide Bennu, de uns 490 metros, pra recolher poeira. O chão não ofereceu quase nenhuma resistência: as pedras soltas espirraram como numa piscina de bolinhas. Segundo a NASA, se a sonda não tivesse ligado os motores logo em seguida pra se afastar, teria afundado no asteroide. Em 24/09/2023, a cápsula caiu no deserto de Utah com 121,6 gramas de Bennu, a maior amostra de asteroide já trazida pra Terra.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA — OSIRIS-REx (toque em 20/10/2020; cápsula em Utah em 24/09/2023; 121,6 g); Lauretta et al. e Walsh et al., Science (2022), sobre a superfície de Bennu se comportar como fluido.\n\n#asteroide #astronomia #nasa #neuralupdate",
-   "curtidas_campo": 65,
+   "curtidas_campo": 66,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1984,
-   "reach": 1704,
-   "likes": 65,
+   "views": 1995,
+   "reach": 1715,
+   "likes": 66,
    "comments": 1,
    "shares": 0,
    "saved": 2,
-   "total_interactions": 68,
-   "ig_reels_avg_watch_time": 18980,
-   "ig_reels_video_view_total_time": 33330006,
+   "total_interactions": 69,
+   "ig_reels_avg_watch_time": 18974,
+   "ig_reels_video_view_total_time": 33509691,
    "reels_skip_rate": 35.1,
    "reposts": 0
   },
@@ -6049,8 +6454,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 22,
-   "reach": 9,
+   "views": 25,
+   "reach": 10,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6068,8 +6473,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 37,
-   "reach": 16,
+   "views": 41,
+   "reach": 18,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6087,8 +6492,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 28,
-   "reach": 12,
+   "views": 31,
+   "reach": 13,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6106,16 +6511,16 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 14,
-   "reach": 12,
+   "views": 15,
+   "reach": 13,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 5792,
-   "ig_reels_video_view_total_time": 75299,
-   "reels_skip_rate": 76.9,
+   "ig_reels_avg_watch_time": 7247,
+   "ig_reels_video_view_total_time": 101459,
+   "reels_skip_rate": 71.4,
    "reposts": 0
   },
   {
@@ -6128,8 +6533,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 16,
-   "reach": 7,
+   "views": 18,
+   "reach": 8,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6166,7 +6571,7 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 20,
+   "views": 21,
    "reach": 12,
    "likes": 1,
    "comments": 1,
@@ -6211,8 +6616,8 @@
    "shares": 1,
    "saved": 1,
    "total_interactions": 12,
-   "ig_reels_avg_watch_time": 10374,
-   "ig_reels_video_view_total_time": 3257684,
+   "ig_reels_avg_watch_time": 10346,
+   "ig_reels_video_view_total_time": 3259182,
    "reels_skip_rate": 52.7,
    "reposts": 0
   },
@@ -6226,8 +6631,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 89,
-   "reach": 45,
+   "views": 92,
+   "reach": 46,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6245,8 +6650,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 18,
-   "reach": 5,
+   "views": 20,
+   "reach": 6,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6286,16 +6691,16 @@
    "curtidas_campo": 24,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1380,
-   "reach": 1194,
+   "views": 1381,
+   "reach": 1196,
    "likes": 24,
    "comments": 1,
    "shares": 2,
    "saved": 1,
    "total_interactions": 28,
-   "ig_reels_avg_watch_time": 16549,
-   "ig_reels_video_view_total_time": 20306807,
-   "reels_skip_rate": 32.4,
+   "ig_reels_avg_watch_time": 16537,
+   "ig_reels_video_view_total_time": 20308313,
+   "reels_skip_rate": 32.5,
    "reposts": 0
   },
   {
@@ -6442,7 +6847,7 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
    "views": 61,
-   "reach": 29,
+   "reach": 30,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6672,15 +7077,15 @@
    "titulo": "Hoje de manhã, às 7h16, a Voyager 1 chegou a um dia-luz da Terra.",
    "legenda": "Hoje de manhã, às 7h16, a Voyager 1 chegou a um dia-luz da Terra.\n\nEla foi lançada em 1977. Um dia-luz é quase 26 bilhões de km. Uma mensagem leva um dia pra chegar lá, e outro pra resposta voltar. Ela está quase sem energia, mas segue mandando sinal.\n\n49 anos voando.\n\n💬 Que frase você mandaria pra Voyager?\n\n📚 Fonte: NASA/JPL — Voyager 1 a um dia-luz (≈25,9 bilhões de km) da Terra em 18/11/2026 às 10h16 UTC (7h16 de Brasília).\n\n#astronomia #espaco #ciencia #noticias #neuralupdate",
    "curtidas_campo": 8,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 211,
    "reach": 168,
    "likes": 8,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 12,
+   "total_interactions": 13,
    "ig_reels_avg_watch_time": 11333,
    "ig_reels_video_view_total_time": 2074035,
    "reels_skip_rate": 63.7,
@@ -6872,16 +7277,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 157,
-   "reach": 141,
+   "views": 158,
+   "reach": 142,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 6,
-   "ig_reels_avg_watch_time": 8964,
-   "ig_reels_video_view_total_time": 1281873,
-   "reels_skip_rate": 55.9,
+   "ig_reels_avg_watch_time": 8913,
+   "ig_reels_video_view_total_time": 1283536,
+   "reels_skip_rate": 56.3,
    "reposts": 0
   },
   {
@@ -7026,16 +7431,16 @@
    "curtidas_campo": 38,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1857,
+   "views": 1858,
    "reach": 1456,
    "likes": 38,
    "comments": 1,
    "shares": 43,
-   "saved": 3,
-   "total_interactions": 87,
-   "ig_reels_avg_watch_time": 11050,
-   "ig_reels_video_view_total_time": 17702445,
-   "reels_skip_rate": 34.1,
+   "saved": 2,
+   "total_interactions": 86,
+   "ig_reels_avg_watch_time": 11044,
+   "ig_reels_video_view_total_time": 17703899,
+   "reels_skip_rate": 34.2,
    "reposts": 2
   },
   {
@@ -7068,15 +7473,15 @@
    "titulo": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca se divide. Mas um estudo novo",
    "legenda": "Buracos negros podem se partir em dois. Até agora, a física dizia que isso era proibido: um buraco negro nunca se divide. Mas um estudo novo achou uma brecha: se ele girar quase no limite, a divisão fica possível. Os cientistas chamaram o formato de calça, porque um vira dois, como duas pernas. Ninguém viu isso acontecer ainda. A pista seria um brilho de raios gama vindo de pedaços minúsculos.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: University of Southern Denmark / Physical Review D (2026), via ScienceDaily, 02/11/2026\nImagens: EHT Collaboration (M87*); cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
    "curtidas_campo": 2,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 27,
    "reach": 16,
    "likes": 2,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 5,
+   "total_interactions": 6,
    "ig_reels_avg_watch_time": 12498,
    "ig_reels_video_view_total_time": 224966,
    "reels_skip_rate": 72.2,
@@ -7134,15 +7539,15 @@
    "titulo": "A sonda que vai investigar a cena de um crime espacial já está chegando. Em dois mil e vinte e dois, a NASA jogou uma nave contra o asteroid",
    "legenda": "A sonda que vai investigar a cena de um crime espacial já está chegando. Em dois mil e vinte e dois, a NASA jogou uma nave contra o asteroide Dimórfos, de propósito. A batida mudou a órbita dele: a volta ficou trinta e três minutos mais curta. Agora a sonda europeia Hera já enxerga os dois asteroides separados. As primeiras fotos de perto saem no dia vinte e cinco de novembro.\n\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: ESA — Hera (via ScienceDaily, 03/11/2026); NASA — DART (26/09/2022)\nImagens: NASA/Johns Hopkins APL; cenas geradas por IA (Flow).\n\nMusic: Kevin MacLeod (incompetech.com) — CC BY 4.0\n\n#astronomia #espaco #ciencia #neuralupdate",
    "curtidas_campo": 13,
-   "comentarios_campo": 3,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 595,
    "reach": 473,
    "likes": 13,
-   "comments": 3,
+   "comments": 4,
    "shares": 5,
    "saved": 2,
-   "total_interactions": 24,
+   "total_interactions": 25,
    "ig_reels_avg_watch_time": 13311,
    "ig_reels_video_view_total_time": 7054948,
    "reels_skip_rate": 46.2,
@@ -7202,16 +7607,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 26,
-   "reach": 20,
+   "views": 28,
+   "reach": 21,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 2,
-   "ig_reels_avg_watch_time": 10813,
-   "ig_reels_video_view_total_time": 248711,
-   "reels_skip_rate": 52.2,
+   "ig_reels_avg_watch_time": 11717,
+   "ig_reels_video_view_total_time": 281218,
+   "reels_skip_rate": 54.2,
    "reposts": 0
   },
   {
@@ -7686,16 +8091,16 @@
    "curtidas_campo": 74,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1540,
-   "reach": 1153,
+   "views": 1541,
+   "reach": 1154,
    "likes": 74,
    "comments": 1,
    "shares": 9,
    "saved": 5,
    "total_interactions": 90,
-   "ig_reels_avg_watch_time": 12981,
-   "ig_reels_video_view_total_time": 15642486,
-   "reels_skip_rate": 48.7,
+   "ig_reels_avg_watch_time": 12982,
+   "ig_reels_video_view_total_time": 15656304,
+   "reels_skip_rate": 48.6,
    "reposts": 1
   },
   {
@@ -7728,15 +8133,15 @@
    "titulo": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷",
    "legenda": "A poeira de Marte é tão fina que pode chegar até o sangue de um astronauta. 😷\n\nO robô Perseverance mediu isso pela primeira vez, lá mesmo, em Marte: ele levou pedacinhos de tecido de traje espacial e ficou vendo a poeira grudar neles por mais de 1.600 dias. Algumas partículas têm uns 100 nanômetros, centenas de vezes mais finas que um fio de cabelo, e a poeira tem substâncias que podem atrapalhar a tireoide.\n\n🔖 Salva pra lembrar do perigo da poeira de Marte.\n📤 Manda pra quem sonha em morar em Marte.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA, PNAS, 27/10/2026 — NASA's Perseverance Offers Clues to Protect Crews From Mars Dust\n\n#marte #perseverance #nasa #astronomia #ciencia #neuralupdate",
    "curtidas_campo": 40,
-   "comentarios_campo": 4,
+   "comentarios_campo": 5,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1314,
    "reach": 1098,
    "likes": 40,
-   "comments": 4,
+   "comments": 5,
    "shares": 2,
    "saved": 2,
-   "total_interactions": 48,
+   "total_interactions": 49,
    "ig_reels_avg_watch_time": 17156,
    "ig_reels_video_view_total_time": 20467588,
    "reels_skip_rate": 38.8,
@@ -7750,18 +8155,18 @@
    "titulo": "No Halloween de 2015, um asteroide com cara de caveira passou perto da Terra. 💀",
    "legenda": "No Halloween de 2015, um asteroide com cara de caveira passou perto da Terra. 💀\n\nEle tem uns 600 metros e passou a pouco mais que a distância da Lua. Quando os radares fotografaram, apareceu um crânio olhando pra gente. Os cientistas acham que ele é um cometa morto, que perdeu todo o gelo, e ele continua girando pelo Sistema Solar, voltando de tempos em tempos.\n\n🔖 Salva pra lembrar do asteroide caveira.\n📤 Manda pra quem curte Halloween.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA/JPL — asteroide 2015 TB145, passagem em 31/10/2015 (~1,3 distância lunar)\n\n#halloween #asteroide #astronomia #espaco #ciencia #neuralupdate",
    "curtidas_campo": 6,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 254,
+   "views": 255,
    "reach": 213,
    "likes": 6,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 9,
-   "ig_reels_avg_watch_time": 8432,
-   "ig_reels_video_view_total_time": 1956366,
-   "reels_skip_rate": 58.6,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 8429,
+   "ig_reels_video_view_total_time": 1964172,
+   "reels_skip_rate": 58.4,
    "reposts": 1
   },
   {
@@ -7774,16 +8179,16 @@
    "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 168,
-   "reach": 135,
+   "views": 170,
+   "reach": 136,
    "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 6,
-   "ig_reels_avg_watch_time": 12263,
-   "ig_reels_video_view_total_time": 1802690,
-   "reels_skip_rate": 46.3,
+   "ig_reels_avg_watch_time": 12441,
+   "ig_reels_video_view_total_time": 1841276,
+   "reels_skip_rate": 45.9,
    "reposts": 1
   },
   {
@@ -7882,15 +8287,15 @@
    "titulo": "Saturno é tão leve pro tamanho dele que flutuaria na água. 🛁",
    "legenda": "Saturno é tão leve pro tamanho dele que flutuaria na água. 🛁\n\nEle tem 95 vezes a massa da Terra, mas é feito quase só de hidrogênio e hélio, então cada pedaço dele pesa menos que a mesma quantidade de água. Claro, ia precisar de uma banheira maior que o próprio planeta, e ainda ia deixar um anel nela: os anéis dele são gelo e poeira.\n\n🔖 Salva pra lembrar do planeta que flutuaria.\n📤 Manda pra quem gosta de Saturno.\n👉 Segue @neuralupdate: toda semana tem astronomia aqui.\n💬 Comenta ROTINA que eu te explico como funciona (sem promessa de renda).\n\n📚 Fonte: NASA Science — Saturn Facts (densidade 0,687 g/cm³; 95 massas terrestres)\n\n#saturno #astronomia #espaco #ciencia #neuralupdate",
    "curtidas_campo": 11,
-   "comentarios_campo": 3,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1291,
    "reach": 1158,
    "likes": 11,
-   "comments": 3,
+   "comments": 4,
    "shares": 1,
    "saved": 2,
-   "total_interactions": 18,
+   "total_interactions": 19,
    "ig_reels_avg_watch_time": 13333,
    "ig_reels_video_view_total_time": 15973534,
    "reels_skip_rate": 32.4,
@@ -8674,15 +9079,15 @@
    "titulo": "De onde saiu a Lua? A ideia mais aceita é uma batida. 💥",
    "legenda": "De onde saiu a Lua? A ideia mais aceita é uma batida. 💥\n\nHá uns 4,5 bilhões de anos, um planeta do tamanho de Marte, chamado Teia, acertou a Terra. O choque jogou rocha derretida pro espaço, e esses pedaços se juntaram em volta da Terra. Por isso as rochas que os astronautas trouxeram da Lua são tão parecidas com as daqui.\n\n🔖 Salva pra lembrar de onde a Lua saiu.\n📤 Manda pra quem acha que a Lua sempre esteve aí.\n📖 Quer ir além do vídeo? Comenta LIVRO que eu te mando no direct um guia pra ler astronomia no celular.\n👉 Segue @neuralupdate: toda semana tem aula de astronomia aqui.\n\n📚 Fonte: NASA Science — Earth's Moon: formation\n\n#lua #formacaodalua #astronomia #sistemasolar #ciencia #neuralupdate",
    "curtidas_campo": 9,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 259,
    "reach": 213,
    "likes": 9,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 13,
+   "total_interactions": 14,
    "ig_reels_avg_watch_time": 10838,
    "ig_reels_video_view_total_time": 2416931,
    "reels_skip_rate": 59.7,
@@ -8894,15 +9299,15 @@
    "titulo": "Isso é o nascer do sol em Marte, visto por um robô. 🌅",
    "legenda": "Isso é o nascer do sol em Marte, visto por um robô. 🌅\n\nO Curiosity tirou o panorama às 8h30 no horário de Marte: seis fotos coladas, sem o ajuste de cor de sempre, o que deixou o chão azulado. No fundo, paredões esculpidos pelo vento, que se estendem por uns 16 km na montanha que o robô escala desde 2014.\n\n🔖 Salva pra ver de novo quando precisar de um respiro.\n📤 Manda pra quem ia querer acordar num lugar assim.\n👉 Segue @neuralupdate e responde: você ia querer?\n\n📚 Fonte: NASA, 06/10/2026 — Curiosity Rover Catches Stunning Martian Dawn\n\n#curiosity #marte #nasa #astronomia #ciencia #neuralupdate",
    "curtidas_campo": 5,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 301,
    "reach": 233,
    "likes": 5,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 7,
+   "total_interactions": 8,
    "ig_reels_avg_watch_time": 15009,
    "ig_reels_video_view_total_time": 3692318,
    "reels_skip_rate": 48.4,
@@ -9114,15 +9519,15 @@
    "titulo": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é ",
    "legenda": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é inverno. 🌍\n\nSe fosse a distância, o mundo todo teria verão junto. A diferença é só de uns 5 milhões de km (147 milhões em janeiro, 152 em julho). Quem manda nas estações é a inclinação da Terra, de uns 23 graus.\n\n🔖 Salva pra explicar isso na próxima vez que alguém falar de estação.\n📤 Manda pra quem achava que era a distância.\n👉 Segue @neuralupdate e conta nos comentários: você achava que era a distância?\n\n📚 Fonte: NASA Science — Earth Facts; distâncias calculadas por efemérides.\n\n#estacoes #terra #astronomia #ciencia #universo #neuralupdate",
    "curtidas_campo": 5,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 252,
    "reach": 205,
    "likes": 5,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 8,
+   "total_interactions": 9,
    "ig_reels_avg_watch_time": 9152,
    "ig_reels_video_view_total_time": 1967888,
    "reels_skip_rate": 59.6,
@@ -9488,15 +9893,15 @@
    "titulo": "7 horas e 55 minutos, do chão da Flórida até a Estação Espacial. 🚀",
    "legenda": "7 horas e 55 minutos, do chão da Flórida até a Estação Espacial. 🚀\n\nA Crew-13 fez a viagem mais curta de uma tripulação até a Estação, segundo a NASA. É menos que um voo de São Paulo pra Lisboa, e a cápsula precisa chegar a uns 28 mil km/h pra alcançar uma casa que dá a volta na Terra a cada hora e meia.\n\n🔖 Salva pra contar no próximo voo longo.\n📤 Manda pra quem reclama de 3 horas de estrada.\n👉 Segue @neuralupdate: hoje às 14h a aula é por que Vênus é mais quente que Mercúrio.\n\n📚 Fonte: NASA, 01/10/2026 — NASA's SpaceX Crew-13 launches to International Space Station\n\n#crew13 #estacaoespacial #nasa #astronomia #ciencia #neuralupdate",
    "curtidas_campo": 7,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 213,
    "reach": 161,
    "likes": 7,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 9,
+   "total_interactions": 10,
    "ig_reels_avg_watch_time": 10219,
    "ig_reels_video_view_total_time": 1757795,
    "reels_skip_rate": 58.2,
@@ -9576,18 +9981,18 @@
    "titulo": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐",
    "legenda": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐\n\nAquele ponto amarelado que quase não pisca é Saturno, no dia do ano em que ele fica mais perto da Terra e mais brilhante. Com uma lunetinha simples, já dá pra ver os anéis. E a luz que bate no seu olho saiu de lá há uns 70 minutos. Só que os anéis estão sumindo: em menos de 300 milhões de anos, essa vista acaba.\n\n🔖 Salva pra lembrar de olhar pro céu amanhã.\n📤 Manda pra alguém que gosta de olhar o céu.\n👉 Segue @neuralupdate pra saber o que tem no céu toda semana.\n\n📚 Fonte: oposição de Saturno em 4/10/2026 às 12h UTC; NASA Science (anéis de Saturno)\n\n#saturno #astronomia #ceu #ciencia #espaco #neuralupdate",
    "curtidas_campo": 25,
-   "comentarios_campo": 2,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1150,
+   "views": 1158,
    "reach": 872,
    "likes": 25,
-   "comments": 2,
+   "comments": 4,
    "shares": 8,
    "saved": 4,
-   "total_interactions": 42,
-   "ig_reels_avg_watch_time": 21214,
-   "ig_reels_video_view_total_time": 19495932,
-   "reels_skip_rate": 46.9,
+   "total_interactions": 44,
+   "ig_reels_avg_watch_time": 21281,
+   "ig_reels_video_view_total_time": 19621948,
+   "reels_skip_rate": 46.7,
    "reposts": 3
   },
   {
@@ -9730,15 +10135,15 @@
    "titulo": "A Lua passa na frente do Sol todo mês. Então por que não tem eclipse todo mês? 🌑",
    "legenda": "A Lua passa na frente do Sol todo mês. Então por que não tem eclipse todo mês? 🌑\n\nPorque a órbita da Lua é inclinada uns 5 graus em relação à da Terra. Na maioria dos meses, a sombra dela passa acima ou abaixo do planeta. O eclipse só acontece quando a Lua nova cai bem no ponto onde as duas órbitas se cruzam — de duas a cinco vezes por ano. E o eclipse total cobre só uma faixa estreita da Terra.\n\n🔖 Salva pra explicar isso no próximo eclipse.\n📤 Manda pra quem sempre perdeu um eclipse.\n👉 Segue @neuralupdate: sexta às 14h a aula é sobre por que todos os planetas giram no mesmo plano.\n\n📚 Fonte: NASA Science — https://science.nasa.gov/eclipses/\n\n#eclipse #lua #astronomia #ciencia #universo #neuralupdate",
    "curtidas_campo": 10,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 240,
    "reach": 201,
    "likes": 10,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 13,
+   "total_interactions": 14,
    "ig_reels_avg_watch_time": 10165,
    "ig_reels_video_view_total_time": 2094072,
    "reels_skip_rate": 46.3,
@@ -9972,15 +10377,15 @@
    "titulo": "Espelhos deixados na Lua pelas missões Apollo devolvem lasers disparados da Terra. Medindo o tempo de ida e volta da luz, cientistas descobr",
    "legenda": "Espelhos deixados na Lua pelas missões Apollo devolvem lasers disparados da Terra. Medindo o tempo de ida e volta da luz, cientistas descobriram que a Lua se afasta cerca de 3,8 centímetros por ano.\n\n#lua #eclipse #apollo #astronomia #ciencia #neuralupdate",
    "curtidas_campo": 66,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 4312,
    "reach": 3415,
    "likes": 66,
-   "comments": 2,
+   "comments": 3,
    "shares": 2,
    "saved": 5,
-   "total_interactions": 79,
+   "total_interactions": 80,
    "ig_reels_avg_watch_time": 18818,
    "ig_reels_video_view_total_time": 66747791,
    "reels_skip_rate": 29.3,
@@ -10567,15 +10972,15 @@
    "titulo": "O Chandra achou 84 fontes de raios X que não se encaixam em nada conhecido. 🔭",
    "legenda": "O Chandra achou 84 fontes de raios X que não se encaixam em nada conhecido. 🔭\n\nElas brilham nos raios X mais fracos e soltam ultravioleta forte, uma mistura sem classe definida.\nAs suspeitas: anãs brancas, estrelas de nêutrons ou buracos negros roubando gás de estrelas vizinhas.\nFicaram escondidas porque o gás entre as estrelas absorve justamente essa luz.\n\n💬 Chuta: o que você acha que são esses pontos? Comenta aqui embaixo 👇\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: NASA / observatório Chandra — chandra.harvard.edu\n\n#chandra #raiosx #astronomia #neuralupdate",
    "curtidas_campo": 7,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 250,
    "reach": 201,
    "likes": 7,
-   "comments": 2,
+   "comments": 3,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 11,
+   "total_interactions": 12,
    "ig_reels_avg_watch_time": 11116,
    "ig_reels_video_view_total_time": 2256748,
    "reels_skip_rate": 54.2,
@@ -10737,15 +11142,15 @@
    "titulo": "Saturno ganhou uma forma de DEZ lados no polo sul. 🪐",
    "legenda": "Saturno ganhou uma forma de DEZ lados no polo sul. 🪐\n\nImagens do Hubble mostraram uma onda de dez lados girando em volta do polo sul do planeta.\nOs primeiros sinais apareceram em 2023 e ela ficou mais forte em 2025.\nNo polo norte, Saturno já tinha o famoso hexágono, estável há mais de 40 anos.\n\n🔖 Salva pra mostrar pra alguém: o planeta dos anéis também desenha polígonos.\n\n👉 Segue @neuralupdate: ciência do espaço todo dia.\n\n📚 Fonte: Science Advances (02/09/2026) · NASA/ESA Hubble e Cassini\n\n#saturno #hubble #astronomia #neuralupdate",
    "curtidas_campo": 12,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 214,
    "reach": 177,
    "likes": 12,
-   "comments": 2,
+   "comments": 3,
    "shares": 2,
    "saved": 1,
-   "total_interactions": 19,
+   "total_interactions": 20,
    "ig_reels_avg_watch_time": 15621,
    "ig_reels_video_view_total_time": 2858748,
    "reels_skip_rate": 29.4,
@@ -11499,18 +11904,18 @@
    "titulo": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos microscópicos e os ampliou até vir",
    "legenda": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos microscópicos e os ampliou até virarem as regiões mais densas de onde nasceram as galáxias. O que hoje é uma galáxia inteira já foi uma ondulação menor que um átomo.\n\n#cosmologia #astronomia #neuralupdate",
    "curtidas_campo": 7,
-   "comentarios_campo": 2,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 317,
+   "views": 322,
    "reach": 264,
    "likes": 7,
-   "comments": 2,
+   "comments": 4,
    "shares": 1,
    "saved": 1,
-   "total_interactions": 11,
-   "ig_reels_avg_watch_time": 10816,
-   "ig_reels_video_view_total_time": 2888088,
-   "reels_skip_rate": 40.3,
+   "total_interactions": 13,
+   "ig_reels_avg_watch_time": 11779,
+   "ig_reels_video_view_total_time": 3156916,
+   "reels_skip_rate": 40.2,
    "reposts": 0
   },
   {
@@ -11983,15 +12388,15 @@
    "titulo": "Júpiter é uma esfera de gás sem superfície nenhuma. Descendo pelas nuvens a luz some e a pressão esmaga qualquer nave. A Grande Mancha Verme",
    "legenda": "Júpiter é uma esfera de gás sem superfície nenhuma. Descendo pelas nuvens a luz some e a pressão esmaga qualquer nave. A Grande Mancha Vermelha é uma tempestade maior que a Terra girando há séculos.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
    "curtidas_campo": 48,
-   "comentarios_campo": 3,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 942,
    "reach": 743,
    "likes": 48,
-   "comments": 3,
+   "comments": 4,
    "shares": 1,
    "saved": 6,
-   "total_interactions": 58,
+   "total_interactions": 59,
    "ig_reels_avg_watch_time": 46997,
    "ig_reels_video_view_total_time": 35765422,
    "reels_skip_rate": 35,
@@ -12027,15 +12432,15 @@
    "titulo": "Em 26 de agosto de 2026, o rover Curiosity da NASA completou um ganho de elevação de um quilômetro desde a cratera Gale, na subida do Monte ",
    "legenda": "Em 26 de agosto de 2026, o rover Curiosity da NASA completou um ganho de elevação de um quilômetro desde a cratera Gale, na subida do Monte Sharp em Marte. A missão, em atividade há 14 anos, registrou a vista com um mosaico de 323 imagens capturadas no início de agosto. A montanha tem cerca de cinco quilômetros de altura; o rover a escala desde 2014 para investigar as camadas geológicas que registram os antigos ambientes marcianos.\n\n#marte #nasa #neuralupdate",
    "curtidas_campo": 58,
-   "comentarios_campo": 3,
+   "comentarios_campo": 5,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1810,
    "reach": 1432,
    "likes": 58,
-   "comments": 3,
+   "comments": 5,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 62,
+   "total_interactions": 64,
    "ig_reels_avg_watch_time": 20742,
    "ig_reels_video_view_total_time": 30948253,
    "reels_skip_rate": 30.8,
@@ -12115,17 +12520,17 @@
    "titulo": "Sagitário A* tem 4 milhões de massas solares e faz estrelas dispararem ao redor — mas menos de 1% do gás que chega nele chega a cruzar o hor",
    "legenda": "Sagitário A* tem 4 milhões de massas solares e faz estrelas dispararem ao redor — mas menos de 1% do gás que chega nele chega a cruzar o horizonte de eventos. O resto escapa em clarões. Estamos a 26 mil anos-luz dele.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
    "curtidas_campo": 50,
-   "comentarios_campo": 6,
+   "comentarios_campo": 7,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1465,
+   "views": 1466,
    "reach": 1119,
    "likes": 50,
-   "comments": 6,
+   "comments": 7,
    "shares": 1,
    "saved": 2,
-   "total_interactions": 60,
-   "ig_reels_avg_watch_time": 18315,
-   "ig_reels_video_view_total_time": 21429054,
+   "total_interactions": 61,
+   "ig_reels_avg_watch_time": 18314,
+   "ig_reels_video_view_total_time": 21445990,
    "reels_skip_rate": 42.6,
    "reposts": 1
   },
@@ -15547,16 +15952,16 @@
    "link": "https://www.instagram.com/reel/DaxVV8KCv12/",
    "titulo": "O James Webb achou o buraco negro mais antigo já visto — grande demais para ter crescido tão cedo no universo bebê. Ninguém sabe como.",
    "legenda": "O James Webb achou o buraco negro mais antigo já visto — grande demais para ter crescido tão cedo no universo bebê. Ninguém sabe como.\n\n💬 Comenta \"COSMOS\" aqui embaixo que eu te mando na sua DM o PDF GRÁTIS com os 5 fenômenos mais assustadores do universo. 🎁\n\n#buraconegro #espaço #astronomia #ciência #neuralupdate #reels #cosmos #curiosidades\n\n#buraconegro #espaço #astronomia #ciência #neuralupdate #reels #cosmos #curiosidades\n\n##buraconegro ##espaço ##astronomia ##ciência ##neuralupdate ##reels ##cosmos ##curiosidades",
-   "curtidas_campo": 145,
+   "curtidas_campo": 144,
    "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1786,
    "reach": 1450,
-   "likes": 145,
+   "likes": 144,
    "comments": 4,
    "shares": 11,
    "saved": 13,
-   "total_interactions": 175,
+   "total_interactions": 174,
    "ig_reels_avg_watch_time": 25070,
    "ig_reels_video_view_total_time": 38558356,
    "reels_skip_rate": 29,
@@ -15739,16 +16144,16 @@
    "link": "https://www.instagram.com/reel/DasLxWajOzq/",
    "titulo": "O telescópio James Webb encontrou a galáxia mais distante já vista — a luz dela viajou 13 bilhões de anos, mostrando o universo recém-nascid",
    "legenda": "O telescópio James Webb encontrou a galáxia mais distante já vista — a luz dela viajou 13 bilhões de anos, mostrando o universo recém-nascido.\n\n🔭 Segue o perfil pra acompanhar a série \"O Universo em Números\" — a história do cosmos em ordem, do Big Bang ao infinito.\n\n#jameswebb #espaço #astronomia #ciência #neuralupdate #reels #cosmos #curiosidades\n\n#jameswebb #espaço #astronomia #ciência #neuralupdate #reels #cosmos #curiosidades\n\n##jameswebb ##espaço ##astronomia ##ciência ##neuralupdate ##reels ##cosmos ##curiosidades",
-   "curtidas_campo": 136,
+   "curtidas_campo": 135,
    "comentarios_campo": 0,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 2335,
    "reach": 1903,
-   "likes": 136,
+   "likes": 135,
    "comments": 0,
    "shares": 12,
    "saved": 4,
-   "total_interactions": 156,
+   "total_interactions": 155,
    "ig_reels_avg_watch_time": 22196,
    "ig_reels_video_view_total_time": 43060780,
    "reels_skip_rate": 38.4,
