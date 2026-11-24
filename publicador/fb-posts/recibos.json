@@ -703,5 +703,10 @@
     "tentativas": 1,
     "id": "1829315221724144",
     "state": "PUBLICADO"
+  },
+  "fb-story-aula-2026-11-24": {
+    "quando": "2026-11-24T19:00:00.000Z",
+    "tipo": "story",
+    "state": "PERDIDO"
   }
 }
