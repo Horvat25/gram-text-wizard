@@ -1,0 +1,57 @@
+name: Responder comentarios
+
+# POR QUE EXISTE (24/11/2026, relacionamento com o público): posta, como RESPOSTA ao comentário, só o que o Marcelo
+# aprovou uma por uma (Direção). O repositório é PÚBLICO: o arquivo de entrada só tem o ID do comentário + a NOSSA
+# resposta (que vira pública ao ser postada); nunca @ nem texto de gente. O workflow apaga o arquivo logo depois e
+# guarda só os IDs das respostas em publicador/respostas-publicadas.json.
+
+on:
+  push:
+    paths:
+      - 'publicador/respostas-pendentes.json'
+  workflow_dispatch:
+
+concurrency:
+  group: responde-comentarios
+  cancel-in-progress: false
+
+jobs:
+  responde:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Ensaio (nao posta nada)
+        run: node publicador/responde-comentarios.mjs --seco
+
+      - name: Responder
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: node publicador/responde-comentarios.mjs
+
+      - name: Guardar IDs e apagar o arquivo de entrada
+        if: always()
+        run: |
+          set -e
+          git config user.name  "publicador"
+          git config user.email "publicador@users.noreply.github.com"
+          cp publicador/respostas-publicadas.json /tmp/pub.json 2>/dev/null || echo '[]' > /tmp/pub.json
+          for tentativa in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --hard -q origin/main
+            cp /tmp/pub.json publicador/respostas-publicadas.json
+            git rm -q --ignore-unmatch publicador/respostas-pendentes.json
+            git add publicador/respostas-publicadas.json
+            if git diff --cached --quiet; then echo "nada a guardar"; exit 0; fi
+            git commit -q -m "respostas: IDs das respostas publicadas (entrada apagada) em $(date -u +%Y-%m-%dT%H:%MZ)"
+            if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
+            echo "push rejeitado; tentando de novo"
+            sleep 5
+          done
+          exit 1
