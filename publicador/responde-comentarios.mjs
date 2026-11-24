@@ -9,6 +9,11 @@
 //
 //   node publicador/responde-comentarios.mjs [--seco]
 //
+// RITMO (24/11, pedido do Marcelo: "responde intercalado pra nao sermos bloqueados"): 20 respostas em 3 minutos
+// parecem robô. Agora: no máximo RESPONDE_MAX (padrão 2) por rodada, com 3–8 min de pausa aleatória entre elas,
+// só de dia (08h–22h BRT), nunca duas seguidas pra mesma pessoa; o que sobra FICA no arquivo de entrada e sai nas
+// rodadas seguintes (o workflow roda de 30 em 30 min).
+//
 // Segurança: só posta item com `aprovado_em`; confere antes se o @neuralupdate já respondeu aquele
 // comentário (não duplica); depois de postar, confere que a resposta aparece embaixo do comentário.
 
@@ -38,6 +43,11 @@ const post = async (caminho, params) => {
   return (await fetch(u, { method: 'POST' })).json();
 };
 const dorme = ms => new Promise(r => setTimeout(r, ms));
+const MAX = Number(process.env.RESPONDE_MAX || 2);
+const PAUSA_MIN_S = Number(process.env.RESPONDE_PAUSA_MIN_S || 180);
+const PAUSA_MAX_S = Number(process.env.RESPONDE_PAUSA_MAX_S || 480);
+const FORCAR_HORARIO = process.env.RESPONDE_FORCAR === '1';
+const pausaAleatoria = () => (PAUSA_MIN_S + Math.random() * (PAUSA_MAX_S - PAUSA_MIN_S)) * 1000;
 
 if (!fs.existsSync(ENTRADA)) { console.log('sem arquivo de respostas pendentes: nada a fazer'); process.exit(0); }
 const entrada = JSON.parse(fs.readFileSync(ENTRADA, 'utf8'));
@@ -54,11 +64,39 @@ for (const x of fila) {
   if (/https?:\/\/|www\.|ROTINA|Kindle|amazon|comenta\s+\w+\s+que/i.test(t)) throw new Error('texto com link/venda bloqueado: ' + String(x.id_comentario));
   if (t.length > 2000) throw new Error('texto grande demais: ' + String(x.id_comentario));
 }
-if (SECO) { console.log('[seco] não posta nada. Postaria', fila.length, 'respostas.'); process.exit(0); }
+if (SECO) { console.log('[seco] não posta nada. Há', fila.length, 'aprovadas; por rodada saem no máx.', MAX); process.exit(0); }
+
+// só de dia no Brasil: 08h–22h BRT = 11h–01h UTC
+const hUTC = new Date().getUTCHours();
+if (!FORCAR_HORARIO && !(hUTC >= 11 || hUTC < 1)) { console.log('fora do horário (só 08h–22h BRT); ficam ' + fila.length + ' pendentes'); process.exit(0); }
+if (!fila.length) { console.log('nada aprovado pendente'); process.exit(0); }
+
+// nome de quem comentou só vive em memória (pra intercalar); nunca é gravado nem impresso
+const autor = {};
+for (const x of fila) {
+  try { const c = await get('/' + x.id_comentario, { fields: 'username' }); autor[String(x.id_comentario)] = (c.username || '').toLowerCase(); } catch { autor[String(x.id_comentario)] = ''; }
+}
+// intercala: pega primeiro de quem tem menos itens na fila, sem repetir o mesmo autor em seguida
+const grupos = new Map();
+for (const x of fila) { const a = autor[String(x.id_comentario)] || ('_' + x.id_comentario); if (!grupos.has(a)) grupos.set(a, []); grupos.get(a).push(x); }
+const ordem = [];
+let ultimo = null;
+while ([...grupos.values()].some(g => g.length)) {
+  const cand = [...grupos.entries()].filter(([, g]) => g.length).sort((a, b) => (b[1].length - a[1].length));
+  const esc = cand.find(([a]) => a !== ultimo) || cand[0];
+  ordem.push(esc[1].shift()); ultimo = esc[0];
+}
+const lote = ordem.slice(0, MAX);
+console.log('desta rodada: ' + lote.length + ' (ficam ' + (ordem.length - lote.length) + ' para as próximas)');
+// jitter de início pra não cair sempre no minuto cheio
+await dorme(Math.random() * 60000);
 
 const resultado = [];
 let erros = 0;
-for (const x of fila) {
+let primeiro = true;
+for (const x of lote) {
+  if (!primeiro) await dorme(pausaAleatoria());
+  primeiro = false;
   const id = String(x.id_comentario);
   try {
     // já respondido por nós? (não duplica)
@@ -79,10 +117,14 @@ for (const x of fila) {
     console.error(`falhou ${id}: ${String(e.message || e).slice(0, 200)}`);
     resultado.push({ id_comentario: id, erro: String(e.message || e).slice(0, 200), em: new Date().toISOString() });
   }
-  await dorme(3000);
 }
 
 const guardar = [...ja, ...resultado.filter(r => r.id_resposta)];
 fs.writeFileSync(SAIDA, JSON.stringify(guardar, null, 2) + '\n', 'utf8');
+// o que NÃO foi postado agora continua na entrada; o que foi (ou já existia) sai dela
+const postados = new Set(resultado.filter(r => r.id_resposta).map(r => String(r.id_comentario)));
+const resta = entrada.filter(x => !postados.has(String(x.id_comentario)) && !feitos.has(String(x.id_comentario)));
+if (resta.length) fs.writeFileSync(ENTRADA, JSON.stringify(resta, null, 2) + '\n', 'utf8'); else fs.rmSync(ENTRADA, { force: true });
+console.log('restam na entrada: ' + resta.length);
 console.log(`\nresumo: ${resultado.filter(r => r.id_resposta).length} ok · ${resultado.filter(r => r.erro).length} com erro · ${resultado.filter(r => r.id_resposta && !r.verificada).length} nao confirmadas`);
 if (erros) process.exit(1);

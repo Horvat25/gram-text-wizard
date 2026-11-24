@@ -2,13 +2,19 @@ name: Responder comentarios
 
 # POR QUE EXISTE (24/11/2026, relacionamento com o público): posta, como RESPOSTA ao comentário, só o que o Marcelo
 # aprovou uma por uma (Direção). O repositório é PÚBLICO: o arquivo de entrada só tem o ID do comentário + a NOSSA
-# resposta (que vira pública ao ser postada); nunca @ nem texto de gente. O workflow apaga o arquivo logo depois e
-# guarda só os IDs das respostas em publicador/respostas-publicadas.json.
+# resposta (que vira pública ao ser postada); nunca @ nem texto de gente. Guarda só os IDs das respostas em
+# publicador/respostas-publicadas.json.
+#
+# RITMO (pedido do Marcelo, 24/11): intercalado pra não sermos bloqueados. No máximo 2 respostas por rodada, pausa
+# aleatória de 3–8 min entre elas, só 08h–22h BRT, rodada de 30 em 30 min enquanto houver item na entrada. O que
+# sobra fica no arquivo de entrada; quando acaba, o workflow apaga o arquivo.
 
 on:
   push:
     paths:
       - 'publicador/respostas-pendentes.json'
+  schedule:
+    - cron: '7,37 11-23,0 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -18,38 +24,49 @@ concurrency:
 jobs:
   responde:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v5
 
+      - name: Tem entrada?
+        id: tem
+        run: |
+          if [ -s publicador/respostas-pendentes.json ]; then echo "sim=1" >> "$GITHUB_OUTPUT"; else echo "sem arquivo de respostas pendentes: nada a fazer"; fi
+
       - uses: actions/setup-node@v5
+        if: steps.tem.outputs.sim == '1'
         with:
           node-version: '22'
 
       - name: Ensaio (nao posta nada)
+        if: steps.tem.outputs.sim == '1'
         run: node publicador/responde-comentarios.mjs --seco
 
       - name: Responder
+        if: steps.tem.outputs.sim == '1'
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          RESPONDE_MAX: '2'
         run: node publicador/responde-comentarios.mjs
 
-      - name: Guardar IDs e apagar o arquivo de entrada
-        if: always()
+      - name: Guardar IDs e atualizar a entrada
+        if: always() && steps.tem.outputs.sim == '1'
         run: |
           set -e
           git config user.name  "publicador"
           git config user.email "publicador@users.noreply.github.com"
           cp publicador/respostas-publicadas.json /tmp/pub.json 2>/dev/null || echo '[]' > /tmp/pub.json
+          if [ -s publicador/respostas-pendentes.json ]; then cp publicador/respostas-pendentes.json /tmp/pend.json; else rm -f /tmp/pend.json; fi
           for tentativa in 1 2 3 4 5; do
             git fetch -q origin main
             git reset --hard -q origin/main
             cp /tmp/pub.json publicador/respostas-publicadas.json
-            git rm -q --ignore-unmatch publicador/respostas-pendentes.json
-            git add publicador/respostas-publicadas.json
+            if [ -f /tmp/pend.json ]; then cp /tmp/pend.json publicador/respostas-pendentes.json; else git rm -q --ignore-unmatch publicador/respostas-pendentes.json; fi
+            git add -A publicador/respostas-publicadas.json publicador/respostas-pendentes.json
             if git diff --cached --quiet; then echo "nada a guardar"; exit 0; fi
-            git commit -q -m "respostas: IDs das respostas publicadas (entrada apagada) em $(date -u +%Y-%m-%dT%H:%MZ)"
+            git commit -q -m "respostas: estado da rodada em $(date -u +%Y-%m-%dT%H:%MZ)"
             if git push -q origin HEAD:main; then echo "salvo (tentativa $tentativa)"; exit 0; fi
             echo "push rejeitado; tentando de novo"
             sleep 5
