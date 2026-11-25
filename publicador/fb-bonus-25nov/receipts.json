@@ -28,10 +28,32 @@
   },
   "fbb-tritao-contramao": {
     "quando": "2026-11-25T23:50:00.000Z",
-    "state": "SUBIU",
+    "state": "AGENDADO",
     "recusa_agendar": "Unsupported get request. Object with ID '1200453192417836' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api",
     "video_id_antigo": "1200453192417836",
     "reenviado": true,
-    "video_id": "1836072704180730"
+    "video_id": "1836072704180730",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3361968
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-25T23:50:00+0000",
+      "id": "1836072704180730"
+    }
   }
 }
