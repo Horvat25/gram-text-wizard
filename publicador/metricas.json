@@ -1,8 +1,8 @@
 {
-  "gerado_em": "2026-11-25T18:09:10.482Z",
+  "gerado_em": "2026-11-25T19:23:42.697Z",
   "conta": {
     "username": "neuralupdate",
-    "seguidores": 1316,
+    "seguidores": 1317,
     "publicacoes": 1191
   },
   "conta_diaria": [
@@ -775,7 +775,7 @@
       "views": 815
     }
   ],
-  "conta_diaria_modo": "total por dia",
+  "conta_diaria_modo": null,
   "conta_diaria_erro": "(#100) The following metrics (views) should be specified with parameter metric_type=total_value",
   "itens": [
     {
@@ -785,19 +785,19 @@
       "link": "https://www.instagram.com/reel/DgLCbpYO-Mu/",
       "titulo": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️",
       "pede_quero": false,
-      "views": 23,
-      "reach": 9,
-      "likes": 0,
+      "views": 58,
+      "reach": 49,
+      "likes": 1,
       "comments": 1,
       "shares": 0,
       "saved": 0,
-      "total_interactions": 1,
+      "total_interactions": 2,
       "pedidos_dm": 0,
-      "ig_reels_avg_watch_time": 4274,
-      "ig_reels_video_view_total_time": 38474,
-      "reels_skip_rate": 13,
+      "ig_reels_avg_watch_time": 6566,
+      "ig_reels_video_view_total_time": 328331,
+      "reels_skip_rate": 40.4,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17958373854327391",
@@ -822,7 +822,7 @@
       "link": "https://www.instagram.com/p/DgKuqLCCYqn/",
       "titulo": "Se a história do universo fosse o Brasil de ponta a ponta, onde a gente apareceria?",
       "pede_quero": false,
-      "views": 14,
+      "views": 18,
       "reach": 8,
       "likes": 0,
       "comments": 1,
@@ -854,19 +854,19 @@
       "link": "https://www.instagram.com/reel/DgKZJZJIGQl/",
       "titulo": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐",
       "pede_quero": false,
-      "views": 81,
-      "reach": 62,
-      "likes": 3,
+      "views": 124,
+      "reach": 101,
+      "likes": 5,
       "comments": 1,
       "shares": 0,
       "saved": 0,
-      "total_interactions": 4,
+      "total_interactions": 6,
       "pedidos_dm": 0,
-      "ig_reels_avg_watch_time": 10301,
-      "ig_reels_video_view_total_time": 669572,
-      "reels_skip_rate": 54.9,
+      "ig_reels_avg_watch_time": 10105,
+      "ig_reels_video_view_total_time": 1081339,
+      "reels_skip_rate": 57.8,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18096479948765013",
@@ -892,7 +892,7 @@
       "titulo": "É assim que uma estrela parecida com o Sol termina a vida.",
       "pede_quero": false,
       "views": 28,
-      "reach": 13,
+      "reach": 14,
       "likes": 0,
       "comments": 1,
       "shares": 0,
@@ -923,7 +923,7 @@
       "link": "https://www.instagram.com/reel/DgI46POtFBM/",
       "titulo": "Essa estrela que você vê hoje é uma luz de ANTES de Cabral chegar ao Brasil ⭐",
       "pede_quero": false,
-      "views": 147,
+      "views": 148,
       "reach": 114,
       "likes": 3,
       "comments": 1,
@@ -933,9 +933,9 @@
       "pedidos_dm": 0,
       "ig_reels_avg_watch_time": 11921,
       "ig_reels_video_view_total_time": 1418697,
-      "reels_skip_rate": 61.3,
+      "reels_skip_rate": 60.8,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17973830694000011",
@@ -972,7 +972,7 @@
       "ig_reels_video_view_total_time": 709414,
       "reels_skip_rate": 57.3,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17959098441281036",
@@ -1041,7 +1041,7 @@
       "ig_reels_video_view_total_time": 2456847,
       "reels_skip_rate": 48.2,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18137452693594534",
@@ -1110,7 +1110,7 @@
       "ig_reels_video_view_total_time": 2022608,
       "reels_skip_rate": 60.8,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18425332855156448",
@@ -1147,7 +1147,7 @@
       "ig_reels_video_view_total_time": 3603644,
       "reels_skip_rate": 49.7,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18023421344949273",
@@ -1216,7 +1216,7 @@
       "ig_reels_video_view_total_time": 2755868,
       "reels_skip_rate": 50.4,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18135273472682602",
@@ -1285,7 +1285,7 @@
       "ig_reels_video_view_total_time": 1072901,
       "reels_skip_rate": 62.5,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18114261008237349",
@@ -1322,7 +1322,7 @@
       "ig_reels_video_view_total_time": 33584665,
       "reels_skip_rate": 35.1,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z"
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18135815347774354",
@@ -2142,7 +2142,7 @@
       "link": "https://www.instagram.com/p/DZ9-BXAjkkW/",
       "titulo": "💡 IA para RH e Recrutamento Brasil 2026: Ferramentas e Riscos da LGPD não é só mais um movimento isolado no r",
       "views": 13,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 7,
       "shares": 0,
       "likes": 0,
@@ -2156,7 +2156,7 @@
       "link": "https://www.instagram.com/p/DZ-nOJxDgme/",
       "titulo": "💡 OpenAI lan�a Jalape�o, seu primeiro chip pr�prio para IA não é só mais um movimento isolado no radar da tec",
       "views": 11,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 5,
       "shares": 0,
       "likes": 0,
@@ -2170,7 +2170,7 @@
       "link": "https://www.instagram.com/reel/DZ-6NlIEk9I/",
       "titulo": "E se um buraco negro não fosse o fim de tudo, mas uma porta? Alguns físicos acreditam que lá dentro pode exist",
       "views": 1153,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 807,
       "shares": 11,
       "likes": 59,
@@ -2189,7 +2189,7 @@
       "link": "https://www.instagram.com/p/DZ_Qa2-lz0d/",
       "titulo": "💡 Drone para Iniciantes Brasil 2026: Guia Completo de Compra e Regras da ANAC não é só uma manchete solta: é ",
       "views": 7,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 5,
       "shares": 0,
       "likes": 0,
@@ -2203,7 +2203,7 @@
       "link": "https://www.instagram.com/reel/DaAaTvSjGlp/",
       "titulo": "O experimento da dupla fenda é o mais perturbador da física quântica: partículas se comportam como onda... até",
       "views": 1586,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 1285,
       "shares": 5,
       "likes": 42,
@@ -2222,7 +2222,7 @@
       "link": "https://www.instagram.com/p/DaAi0RAjvVR/",
       "titulo": "💡 Alibaba é acusado de tentar “copiar” IA da Anthropic não é só uma manchete solta: é um sinal de como infrae",
       "views": 9,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 6,
       "shares": 0,
       "likes": 0,
@@ -2236,7 +2236,7 @@
       "link": "https://www.instagram.com/reel/DaBDhVwEle3/",
       "titulo": "Você imagina o fim do universo como um colapso silencioso? Existe uma teoria que diz o contrário: o Big Rip. A",
       "views": 160,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 143,
       "shares": 0,
       "likes": 2,
@@ -2255,7 +2255,7 @@
       "link": "https://www.instagram.com/p/DaBMD8iDYzo/",
       "titulo": "🔥 AGENTES DE IA NO TRABALHO:",
       "views": 9,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 2,
       "shares": 0,
       "likes": 0,
@@ -2269,7 +2269,7 @@
       "link": "https://www.instagram.com/reel/DaBe_atDwQ1/",
       "titulo": "O emaranhamento quântico liga duas partículas: mexa em uma e a outra responde na mesma hora, mesmo a anos-luz ",
       "views": 125,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 101,
       "shares": 0,
       "likes": 6,
@@ -2288,7 +2288,7 @@
       "link": "https://www.instagram.com/p/DaB1Nt-FX5o/",
       "titulo": "💡 OpenAI Academy: por que cursos de IA viraram parte da estratégia das big techs não é só mais um movimento i",
       "views": 8,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 4,
       "shares": 0,
       "likes": 0,
@@ -2302,7 +2302,7 @@
       "link": "https://www.instagram.com/reel/DaC_C5SCYiY/",
       "titulo": "O tempo não corre igual pra todo mundo. Quanto mais rápido você se move, mais lento ele passa pra você — e iss",
       "views": 463,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 351,
       "shares": 2,
       "likes": 15,
@@ -2321,7 +2321,7 @@
       "link": "https://www.instagram.com/p/DaDHnUbireq/",
       "titulo": "💡 Agentes em óculos de realidade aumentada: a próxima interface da IA não é só mais um movimento isolado no r",
       "views": 12,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 8,
       "shares": 0,
       "likes": 0,
@@ -2335,7 +2335,7 @@
       "link": "https://www.instagram.com/reel/DaDoPYqiaCI/",
       "titulo": "Você acha que cair num buraco negro vai te esmagar de uma vez. Não é bem assim — a gravidade desigual estica s",
       "views": 1588,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 1180,
       "shares": 1,
       "likes": 44,
@@ -2354,7 +2354,7 @@
       "link": "https://www.instagram.com/p/DaDwz4LiPq_/",
       "titulo": "💡 Você iria não é só mais um movimento isolado no radar da tecnologia. É um sinal de como infraestrutura, ace",
       "views": 19,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 13,
       "shares": 0,
       "likes": 1,
@@ -5707,7 +5707,7 @@
       "likes": 9,
       "saved": 2,
       "comments": 0,
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 13895,
       "ig_reels_video_view_total_time": 5363761,
       "reels_skip_rate": 48,
@@ -5726,7 +5726,7 @@
       "saved": 5,
       "comments": 0,
       "likes": 22,
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 16969,
       "ig_reels_video_view_total_time": 7449502,
       "reels_skip_rate": 42.2,
@@ -5745,7 +5745,7 @@
       "saved": 4,
       "comments": 0,
       "likes": 9,
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 11449,
       "ig_reels_video_view_total_time": 3652533,
       "reels_skip_rate": 53.5,
@@ -5764,7 +5764,7 @@
       "saved": 2,
       "comments": 0,
       "likes": 25,
-      "retencao_atualizado": "2026-10-29T16:13:48.150Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 14888,
       "ig_reels_video_view_total_time": 9052234,
       "reels_skip_rate": 39.2,
@@ -5967,7 +5967,7 @@
       "link": "https://www.instagram.com/reel/DcMlJa7FbUd/",
       "titulo": "A Via Láctea tem entre 100 e 400 bilhões de estrelas. O corpo humano carrega cerca de 38 trilhões de bactérias",
       "views": 403,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 347,
       "shares": 0,
       "saved": 1,
@@ -5986,7 +5986,7 @@
       "link": "https://www.instagram.com/reel/DcOB_vdgYHE/",
       "titulo": "Pesquisadores da Texas A&M, liderados por Weida Hu e Casey Papovich, encontraram o \"Quinteto do JWST\": pelo me",
       "views": 602,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 516,
       "shares": 0,
       "saved": 3,
@@ -6005,7 +6005,7 @@
       "link": "https://www.instagram.com/reel/DcOrVE3lKlR/",
       "titulo": "Quarta parte da escada cósmica. A idade do universo não foi chutada: ela sai da taxa de expansão medida hoje, ",
       "views": 1888,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 1526,
       "shares": 3,
       "saved": 13,
@@ -6024,7 +6024,7 @@
       "link": "https://www.instagram.com/reel/DcPGrd7lDIb/",
       "titulo": "A expansão do universo não tem um centro. Cada observador vê tudo se afastando dele, em todas as direções, na ",
       "views": 146,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 115,
       "shares": 1,
       "saved": 0,
@@ -6043,7 +6043,7 @@
       "link": "https://www.instagram.com/reel/DcQnEOugGCL/",
       "titulo": "Pesquisadores da Universidade Monash reconstruíram a posição original de 21 crateras de impacto do período Ord",
       "views": 566,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 475,
       "shares": 0,
       "saved": 5,
@@ -6062,7 +6062,7 @@
       "link": "https://www.instagram.com/reel/DcRQmMnDwCD/",
       "titulo": "A frase de que todas as estrelas que você vê no céu já morreram é falsa: quase todas as estrelas visíveis a ol",
       "views": 440,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 369,
       "shares": 0,
       "saved": 2,
@@ -6081,7 +6081,7 @@
       "link": "https://www.instagram.com/reel/DcRrxhcAuzV/",
       "titulo": "A atmosfera pesa. A coluna de ar acima dos seus ombros exerce uma força equivalente a cerca de uma tonelada, o",
       "views": 196,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 158,
       "shares": 0,
       "saved": 2,
@@ -6100,7 +6100,7 @@
       "link": "https://www.instagram.com/reel/DcTMBgAEZEU/",
       "titulo": "Buraco negro disfarçado de estrela: publicado na Nature em 12 de agosto de 2026, o objeto MoM-BH*-1 brilha com",
       "views": 1411,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 1105,
       "shares": 0,
       "saved": 2,
@@ -6119,7 +6119,7 @@
       "link": "https://www.instagram.com/reel/DcT5EcBEWXs/",
       "titulo": "Antes do Big Bang o que existia? AULA da escola Universo do Zero. A pergunta parece simples, mas carrega um de",
       "views": 923,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 721,
       "shares": 0,
       "saved": 2,
@@ -6138,7 +6138,7 @@
       "link": "https://www.instagram.com/reel/DcUQX-pFIro/",
       "titulo": "A Voyager vai continuar voando depois que o Sol morrer. As duas sondas já saíram da bolha do Sol e seguem em l",
       "views": 673,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 490,
       "shares": 1,
       "saved": 3,
@@ -6157,7 +6157,7 @@
       "link": "https://www.instagram.com/reel/DcVwVlHkaf9/",
       "titulo": "Água foi detectada a apenas 0,55 ano-luz do buraco negro supermassivo do centro da Via Láctea. Divulgado pela ",
       "views": 1579,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 1260,
       "shares": 3,
       "saved": 5,
@@ -6176,7 +6176,7 @@
       "link": "https://www.instagram.com/reel/DcWZm06kZ-i/",
       "titulo": "Inflação cósmica é o instante em que o universo cresceu mais rápido que a luz. AULA da escola Universo do Zero",
       "views": 619,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 527,
       "shares": 3,
       "saved": 1,
@@ -6195,7 +6195,7 @@
       "link": "https://www.instagram.com/reel/DcW4iWfFG8j/",
       "titulo": "Os dinossauros viam a mesma face da Lua que você vê hoje. A Lua está com a rotação travada pela gravidade da T",
       "views": 1313,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 1098,
       "shares": 0,
       "saved": 2,
@@ -6214,7 +6214,7 @@
       "link": "https://www.instagram.com/reel/DcYVKWXCau6/",
       "titulo": "O Sol tem redemoinhos minúsculos de plasma girando por toda a superfície, alguns com apenas 20 quilômetros de ",
       "views": 330,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 292,
       "shares": 0,
       "saved": 0,
@@ -6233,7 +6233,7 @@
       "link": "https://www.instagram.com/reel/DcY-mrtAiSC/",
       "titulo": "Antimatéria deveria existir na mesma quantidade que a matéria, e não existe. AULA da escola Universo do Zero. ",
       "views": 1249,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 974,
       "shares": 7,
       "saved": 8,
@@ -6252,7 +6252,7 @@
       "link": "https://www.instagram.com/reel/DcZdPYtj3P8/",
       "titulo": "O vento de Netuno chega a cerca de 2.100 quilômetros por hora, os mais rápidos já medidos no sistema solar. É ",
       "views": 1164,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "reach": 870,
       "shares": 0,
       "saved": 0,
@@ -6884,7 +6884,7 @@
       "likes": 36,
       "saved": 4,
       "comments": 1,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-20T17:52:46.409Z",
       "ig_reels_avg_watch_time": 16002,
       "ig_reels_video_view_total_time": 16866611,
@@ -7874,7 +7874,7 @@
       "likes": 4,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-18T18:09:40.732Z",
       "ig_reels_avg_watch_time": 12933,
       "ig_reels_video_view_total_time": 2159851,
@@ -8319,7 +8319,7 @@
       "likes": 7,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-11-19T18:21:29.834Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-23T21:30:22.634Z",
       "ig_reels_avg_watch_time": 14430,
       "ig_reels_video_view_total_time": 3679745,
@@ -8429,7 +8429,7 @@
       "saved": 4,
       "comments": 1,
       "atualizado": "2026-11-20T17:52:46.409Z",
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 11799,
       "ig_reels_video_view_total_time": 14100578,
       "reels_skip_rate": 35.9,
@@ -8462,7 +8462,7 @@
       "saved": 0,
       "comments": 1,
       "atualizado": "2026-11-21T14:47:27.064Z",
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 9743,
       "ig_reels_video_view_total_time": 2231194,
       "reels_skip_rate": 56.7,
@@ -8481,10 +8481,10 @@
       "saved": 5,
       "comments": 2,
       "atualizado": "2026-11-21T16:50:08.747Z",
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
-      "ig_reels_avg_watch_time": 18829,
-      "ig_reels_video_view_total_time": 66713957,
-      "reels_skip_rate": 29.3,
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
+      "ig_reels_avg_watch_time": 18814,
+      "ig_reels_video_view_total_time": 66752881,
+      "reels_skip_rate": 29.2,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     },
     {
@@ -8879,7 +8879,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-09T19:54:01.101Z",
       "ig_reels_avg_watch_time": 2929,
       "ig_reels_video_view_total_time": 46875,
@@ -8897,8 +8897,8 @@
       "shares": 0,
       "likes": 7,
       "saved": 0,
-      "comments": 2,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "comments": 3,
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-10T17:06:22.721Z",
       "ig_reels_avg_watch_time": 10219,
       "ig_reels_video_view_total_time": 1757795,
@@ -9487,7 +9487,7 @@
       "likes": 2,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-18T12:20:02.036Z",
       "ig_reels_avg_watch_time": 81418,
       "ig_reels_video_view_total_time": 10258669,
@@ -9506,7 +9506,7 @@
       "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-18T12:20:02.036Z",
       "ig_reels_avg_watch_time": 6861,
       "ig_reels_video_view_total_time": 144082,
@@ -9525,7 +9525,7 @@
       "likes": 24,
       "saved": 0,
       "comments": 3,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-19T12:23:04.537Z",
       "ig_reels_avg_watch_time": 12856,
       "ig_reels_video_view_total_time": 14836254,
@@ -9544,7 +9544,7 @@
       "likes": 6,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-19T12:23:04.537Z",
       "ig_reels_avg_watch_time": 8483,
       "ig_reels_video_view_total_time": 1467601,
@@ -10134,10 +10134,10 @@
       "saved": 1,
       "comments": 1,
       "atualizado": "2026-11-20T17:52:46.409Z",
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
-      "ig_reels_avg_watch_time": 6716,
-      "ig_reels_video_view_total_time": 1007495,
-      "reels_skip_rate": 64.4,
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
+      "ig_reels_avg_watch_time": 6694,
+      "ig_reels_video_view_total_time": 1010866,
+      "reels_skip_rate": 64.7,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     },
     {
@@ -10153,10 +10153,10 @@
       "saved": 0,
       "comments": 1,
       "atualizado": "2026-11-20T17:52:46.409Z",
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
-      "ig_reels_avg_watch_time": 8574,
-      "ig_reels_video_view_total_time": 1560602,
-      "reels_skip_rate": 56.7,
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
+      "ig_reels_avg_watch_time": 8498,
+      "ig_reels_video_view_total_time": 1563753,
+      "reels_skip_rate": 57.1,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     },
     {
@@ -10172,10 +10172,10 @@
       "saved": 0,
       "comments": 1,
       "atualizado": "2026-11-21T14:47:27.064Z",
-      "retencao_atualizado": "2026-10-30T16:00:05.424Z",
-      "ig_reels_avg_watch_time": 5533,
-      "ig_reels_video_view_total_time": 663968,
-      "reels_skip_rate": 77.8,
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
+      "ig_reels_avg_watch_time": 5435,
+      "ig_reels_video_view_total_time": 668601,
+      "reels_skip_rate": 78.3,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     },
     {
@@ -10450,13 +10450,13 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DfNquWbxXfA/",
       "titulo": "Só quem mora no hemisfério sul consegue ver essas duas galáxias a olho nu. 🌌",
-      "views": 1540,
-      "reach": 1153,
+      "views": 1541,
+      "reach": 1154,
       "shares": 9,
       "likes": 74,
       "saved": 5,
       "comments": 1,
-      "atualizado": "2026-11-19T12:23:04.537Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-04T17:20:05.905Z",
       "ig_reels_avg_watch_time": 12903,
       "ig_reels_video_view_total_time": 15355177,
@@ -11557,7 +11557,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18109733945210090",
@@ -11571,7 +11571,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18112857023218407",
@@ -11585,7 +11585,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17946277233386616",
@@ -11599,7 +11599,7 @@
       "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18117494156025609",
@@ -11613,7 +11613,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17981508711140451",
@@ -11627,7 +11627,7 @@
       "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18120198412807976",
@@ -11641,7 +11641,7 @@
       "likes": 24,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-24T12:19:42.584Z",
       "ig_reels_avg_watch_time": 16549,
       "ig_reels_video_view_total_time": 20306807,
@@ -11660,7 +11660,7 @@
       "likes": 2,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-24T20:12:42.491Z",
       "ig_reels_avg_watch_time": 9387,
       "ig_reels_video_view_total_time": 159586,
@@ -11679,7 +11679,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18134139373756434",
@@ -11693,7 +11693,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18155163235550151",
@@ -11707,7 +11707,7 @@
       "likes": 9,
       "saved": 1,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-24T20:12:42.491Z",
       "ig_reels_avg_watch_time": 10346,
       "ig_reels_video_view_total_time": 3259182,
@@ -11726,7 +11726,7 @@
       "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18205782430382276",
@@ -11740,7 +11740,7 @@
       "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18119596862019780",
@@ -11754,7 +11754,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17916070389472561",
@@ -11768,7 +11768,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17917297731560774",
@@ -11782,7 +11782,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
       "retencao_atualizado": "2026-11-24T20:12:42.491Z",
       "ig_reels_avg_watch_time": 7247,
       "ig_reels_video_view_total_time": 101459,
@@ -11801,7 +11801,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17969074656216238",
@@ -11815,7 +11815,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18135815347774354",
@@ -11829,7 +11829,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18214349392366301",
@@ -11843,8 +11843,8 @@
       "likes": 66,
       "saved": 2,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 18985,
       "ig_reels_video_view_total_time": 33584665,
       "reels_skip_rate": 35.1,
@@ -11862,7 +11862,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18136206367682955",
@@ -11876,8 +11876,8 @@
       "likes": 5,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 7399,
       "ig_reels_video_view_total_time": 1072901,
       "reels_skip_rate": 62.5,
@@ -11895,7 +11895,7 @@
       "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18192528757415587",
@@ -11909,7 +11909,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18135273472682602",
@@ -11923,7 +11923,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17946325314384559",
@@ -11937,8 +11937,8 @@
       "likes": 8,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 11727,
       "ig_reels_video_view_total_time": 2755868,
       "reels_skip_rate": 50.4,
@@ -11956,7 +11956,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18034299020684307",
@@ -11970,7 +11970,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18023421344949273",
@@ -11984,7 +11984,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18377422708246597",
@@ -11998,8 +11998,8 @@
       "likes": 7,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 19168,
       "ig_reels_video_view_total_time": 3603644,
       "reels_skip_rate": 49.7,
@@ -12017,7 +12017,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18018547715968600",
@@ -12031,8 +12031,8 @@
       "likes": 8,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 10372,
       "ig_reels_video_view_total_time": 2022608,
       "reels_skip_rate": 60.8,
@@ -12050,7 +12050,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18122302931062239",
@@ -12064,7 +12064,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18137452693594534",
@@ -12078,7 +12078,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18185985526432597",
@@ -12092,8 +12092,8 @@
       "likes": 8,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 11269,
       "ig_reels_video_view_total_time": 2456847,
       "reels_skip_rate": 48.2,
@@ -12111,7 +12111,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18135086359795447",
@@ -12125,7 +12125,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17959098441281036",
@@ -12139,7 +12139,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18078089168759539",
@@ -12153,8 +12153,8 @@
       "likes": 3,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 8651,
       "ig_reels_video_view_total_time": 709414,
       "reels_skip_rate": 57.3,
@@ -12172,7 +12172,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18131551618636481",
@@ -12180,17 +12180,17 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DgI46POtFBM/",
       "titulo": "Essa estrela que você vê hoje é uma luz de ANTES de Cabral chegar ao Brasil ⭐",
-      "views": 147,
+      "views": 148,
       "reach": 114,
       "shares": 0,
       "likes": 3,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
       "ig_reels_avg_watch_time": 11921,
       "ig_reels_video_view_total_time": 1418697,
-      "reels_skip_rate": 61.3,
+      "reels_skip_rate": 60.8,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     },
     {
@@ -12205,7 +12205,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18131264965889525",
@@ -12214,12 +12214,12 @@
       "link": "https://www.instagram.com/p/DgJNoe6jxbt/",
       "titulo": "É assim que uma estrela parecida com o Sol termina a vida.",
       "views": 28,
-      "reach": 13,
+      "reach": 14,
       "shares": 0,
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18096479948765013",
@@ -12233,7 +12233,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18134685001768367",
@@ -12241,17 +12241,17 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DgKZJZJIGQl/",
       "titulo": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐",
-      "views": 81,
-      "reach": 62,
+      "views": 124,
+      "reach": 101,
       "shares": 0,
-      "likes": 3,
+      "likes": 5,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
-      "ig_reels_avg_watch_time": 10301,
-      "ig_reels_video_view_total_time": 669572,
-      "reels_skip_rate": 54.9,
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
+      "ig_reels_avg_watch_time": 10105,
+      "ig_reels_video_view_total_time": 1081339,
+      "reels_skip_rate": 57.8,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     },
     {
@@ -12266,7 +12266,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17883995970631677",
@@ -12274,13 +12274,13 @@
       "tipo": "FEED",
       "link": "https://www.instagram.com/p/DgKuqLCCYqn/",
       "titulo": "Se a história do universo fosse o Brasil de ponta a ponta, onde a gente apareceria?",
-      "views": 14,
+      "views": 18,
       "reach": 8,
       "shares": 0,
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "17958373854327391",
@@ -12294,7 +12294,7 @@
       "likes": 0,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z"
+      "atualizado": "2026-11-25T19:23:11.198Z"
     },
     {
       "id": "18101040026166829",
@@ -12302,17 +12302,17 @@
       "tipo": "REELS",
       "link": "https://www.instagram.com/reel/DgLCbpYO-Mu/",
       "titulo": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️",
-      "views": 23,
-      "reach": 9,
+      "views": 58,
+      "reach": 49,
       "shares": 0,
-      "likes": 0,
+      "likes": 1,
       "saved": 0,
       "comments": 1,
-      "atualizado": "2026-11-25T18:08:47.358Z",
-      "retencao_atualizado": "2026-11-25T18:08:47.358Z",
-      "ig_reels_avg_watch_time": 4274,
-      "ig_reels_video_view_total_time": 38474,
-      "reels_skip_rate": 13,
+      "atualizado": "2026-11-25T19:23:11.198Z",
+      "retencao_atualizado": "2026-11-25T19:23:11.198Z",
+      "ig_reels_avg_watch_time": 6566,
+      "ig_reels_video_view_total_time": 328331,
+      "reels_skip_rate": 40.4,
       "retencao_metricas": "ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate"
     }
   ],
