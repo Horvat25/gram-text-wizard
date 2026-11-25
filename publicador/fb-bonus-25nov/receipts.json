@@ -55,5 +55,10 @@
       "scheduled_publish_time": "2026-11-25T23:50:00+0000",
       "id": "1836072704180730"
     }
+  },
+  "fbb-ceres-sal": {
+    "quando": "2026-11-26T00:40:00.000Z",
+    "video_id": "1096662670099744",
+    "state": "SUBINDO"
   }
 }
