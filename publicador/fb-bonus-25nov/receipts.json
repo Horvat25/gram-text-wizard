@@ -28,7 +28,7 @@
   },
   "fbb-tritao-contramao": {
     "quando": "2026-11-25T23:50:00.000Z",
-    "state": "SUBINDO",
+    "state": "SUBIU",
     "recusa_agendar": "Unsupported get request. Object with ID '1200453192417836' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api",
     "video_id_antigo": "1200453192417836",
     "reenviado": true,
