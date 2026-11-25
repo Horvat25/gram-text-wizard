@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-24T20:15:05.399Z",
+  "gerado_em": "2026-11-25T18:10:43.626Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 143,
-    "curtidas": 143
+    "seguidores": 144,
+    "curtidas": 144
   },
   "pagina_diaria": [
     {
@@ -653,7 +653,11 @@
     },
     {
       "d": "2026-11-24",
-      "views": 798
+      "views": 1179
+    },
+    {
+      "d": "2026-11-25",
+      "views": 292
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -726,464 +730,511 @@
     {
       "d": "2026-08-28",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-08-29",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-08-30",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-08-31",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-01",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-02",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-03",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-04",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-05",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-06",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-07",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-08",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-09",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-10",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-11",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-12",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-13",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-14",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-15",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-16",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-17",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-18",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-19",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-20",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-21",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-22",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-23",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-24",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-25",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-26",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-27",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-28",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-29",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-09-30",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-01",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-02",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-03",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-04",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-05",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-06",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-07",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-08",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-09",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-10",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-11",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-12",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-13",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-14",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-15",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-16",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-17",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-18",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-19",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-20",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-21",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-22",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-23",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-24",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-25",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-26",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-27",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-28",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-29",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-30",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-10-31",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-01",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-02",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-03",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-04",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-05",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-06",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-07",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-08",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-09",
       "valor": 0.0014,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-10",
       "valor": 0.2243,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-11",
       "valor": 0.1402,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-12",
       "valor": 0.19,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-13",
       "valor": 0.0136,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-14",
       "valor": 0.0111,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-15",
       "valor": 0.07,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-16",
       "valor": 0.0111,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-17",
       "valor": 0.0101,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-18",
       "valor": 0,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-19",
       "valor": 0.01,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-20",
       "valor": 0.01,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-21",
       "valor": 0.02,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-22",
       "valor": 0.05,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-23",
       "valor": 0.01,
-      "moeda": null
+      "moeda": "USD"
     },
     {
       "d": "2026-11-24",
       "valor": 0.01,
-      "moeda": null
+      "moeda": "USD"
+    },
+    {
+      "d": "2026-11-25",
+      "valor": 0,
+      "moeda": "USD"
     }
   ],
-  "ganhos_metrica": "monetization_approximate_earnings",
-  "ganhos_resposta_crua": 0.001374,
+  "ganhos_metrica": "content_monetization_earnings",
+  "ganhos_resposta_crua": {
+    "currency": "USD",
+    "microAmount": 137400
+  },
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "28686959064316153",
+      "quando": "2026-11-25T17:12:59+0000",
+      "titulo": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️",
+      "link": "https://www.facebook.com/reel/28686959064316153/",
+      "segundos": 40.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 40,
+      "alcance": null,
+      "tempo_medio_ms": 4538,
+      "interacoes": 0
+    },
+    {
+      "id": "29123170984041340",
+      "quando": "2026-11-25T11:12:18+0000",
+      "titulo": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐",
+      "link": "https://www.facebook.com/reel/29123170984041340/",
+      "segundos": 42.291,
+      "curtidas": 4,
+      "comentarios": 0,
+      "views": 274,
+      "alcance": null,
+      "tempo_medio_ms": 9488,
+      "interacoes": 0
+    },
+    {
+      "id": "2676342569489294",
+      "quando": "2026-11-24T21:11:02+0000",
+      "titulo": "Essa estrela que você vê hoje é uma luz de ANTES de Cabral chegar ao Brasil ⭐",
+      "link": "https://www.facebook.com/reel/2676342569489294/",
+      "segundos": 33.958,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 241,
+      "alcance": null,
+      "tempo_medio_ms": 6214,
+      "interacoes": 0
+    },
     {
       "id": "2231538247741442",
       "quando": "2026-11-24T17:12:40+0000",
       "titulo": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️",
       "link": "https://www.facebook.com/reel/2231538247741442/",
       "segundos": 38.75,
-      "curtidas": 3,
+      "curtidas": 7,
       "comentarios": 0,
-      "views": 274,
+      "views": 382,
       "alcance": null,
-      "tempo_medio_ms": 8896,
+      "tempo_medio_ms": 9043,
       "interacoes": 0
     },
     {
@@ -1194,9 +1245,9 @@
       "segundos": 42.25,
       "curtidas": 8,
       "comentarios": 0,
-      "views": 488,
+      "views": 497,
       "alcance": null,
-      "tempo_medio_ms": 10289,
+      "tempo_medio_ms": 10200,
       "interacoes": 0
     },
     {
@@ -1207,9 +1258,9 @@
       "segundos": 33.625,
       "curtidas": 2,
       "comentarios": 1,
-      "views": 310,
+      "views": 313,
       "alcance": null,
-      "tempo_medio_ms": 5555,
+      "tempo_medio_ms": 5529,
       "interacoes": 2
     },
     {
@@ -1220,9 +1271,9 @@
       "segundos": 37.083,
       "curtidas": 4,
       "comentarios": 0,
-      "views": 304,
+      "views": 305,
       "alcance": null,
-      "tempo_medio_ms": 4990,
+      "tempo_medio_ms": 4975,
       "interacoes": 0
     },
     {
@@ -1233,9 +1284,9 @@
       "segundos": 44,
       "curtidas": 5,
       "comentarios": 0,
-      "views": 379,
+      "views": 382,
       "alcance": null,
-      "tempo_medio_ms": 7706,
+      "tempo_medio_ms": 7650,
       "interacoes": 1
     },
     {
@@ -1259,9 +1310,9 @@
       "segundos": 41.291,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 1076,
+      "views": 1094,
       "alcance": null,
-      "tempo_medio_ms": 17100,
+      "tempo_medio_ms": 16944,
       "interacoes": 0
     },
     {
@@ -1610,9 +1661,9 @@
       "segundos": 13.67,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 386,
+      "views": 387,
       "alcance": null,
-      "tempo_medio_ms": 5548,
+      "tempo_medio_ms": 5536,
       "interacoes": 0
     },
     {
@@ -2130,9 +2181,9 @@
       "segundos": 43.868,
       "curtidas": 11,
       "comentarios": 0,
-      "views": 1392,
+      "views": 1393,
       "alcance": null,
-      "tempo_medio_ms": 6285,
+      "tempo_medio_ms": 6310,
       "interacoes": 0
     },
     {
@@ -2169,9 +2220,9 @@
       "segundos": 33.635,
       "curtidas": 6,
       "comentarios": 1,
-      "views": 1160,
+      "views": 1161,
       "alcance": null,
-      "tempo_medio_ms": 6188,
+      "tempo_medio_ms": 6187,
       "interacoes": 2
     },
     {
@@ -2366,7 +2417,7 @@
       "comentarios": 0,
       "views": 848,
       "alcance": null,
-      "tempo_medio_ms": 8126,
+      "tempo_medio_ms": 8116,
       "interacoes": 0
     },
     {
@@ -3727,45 +3778,6 @@
       "titulo": "Um satélite do tamanho de uma caixa de sapatos quer aposentar um dos tanques. 🛰️",
       "link": "https://www.facebook.com/reel/2305657907057106/",
       "segundos": 41.75,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1458933929385570",
-      "quando": "2026-09-28T21:11:27+0000",
-      "titulo": "Um planeta inteiro de hidrogênio — e ele não pega fogo. 🔥",
-      "link": "https://www.facebook.com/reel/1458933929385570/",
-      "segundos": 36.041,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "973822025027120",
-      "quando": "2026-09-28T17:11:06+0000",
-      "titulo": "Tem planeta onde chove vidro de lado. E ele nem é o mais estranho. 🪐",
-      "link": "https://www.facebook.com/reel/973822025027120/",
-      "segundos": 40.083,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1110816548191555",
-      "quando": "2026-09-28T12:10:04+0000",
-      "titulo": "Um planeta de outra estrela mandou sinal de rádio — e não é ET. 📡",
-      "link": "https://www.facebook.com/reel/1110816548191555/",
-      "segundos": 38.625,
       "curtidas": 0,
       "comentarios": 0,
       "views": 0,
