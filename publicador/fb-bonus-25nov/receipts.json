@@ -301,5 +301,10 @@
       "scheduled_publish_time": "2026-11-26T14:15:00+0000",
       "id": "1896864187989091"
     }
+  },
+  "fbb-quaoar-anel-brasileiro": {
+    "quando": "2026-11-26T15:00:00.000Z",
+    "video_id": "1795050771748406",
+    "state": "SUBINDO"
   }
 }
