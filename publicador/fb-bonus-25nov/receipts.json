@@ -25,5 +25,10 @@
       "scheduled_publish_time": "2026-11-25T23:00:00+0000",
       "id": "1724495619161625"
     }
+  },
+  "fbb-tritao-contramao": {
+    "quando": "2026-11-25T23:50:00.000Z",
+    "video_id": "1200453192417836",
+    "state": "SUBINDO"
   }
 }
