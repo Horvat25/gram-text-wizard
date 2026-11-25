@@ -649,5 +649,10 @@
       "scheduled_publish_time": "2026-11-26T18:45:00+0000",
       "id": "1025932317215812"
     }
+  },
+  "fbb-aneis-finos": {
+    "quando": "2026-11-26T20:15:00.000Z",
+    "video_id": "1613148923417977",
+    "state": "SUBINDO"
   }
 }
