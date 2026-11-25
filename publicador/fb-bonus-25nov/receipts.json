@@ -412,6 +412,28 @@
   "fbb-lua-nasceu-batida": {
     "quando": "2026-11-26T19:30:00.000Z",
     "video_id": "2206095246649556",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 6960390
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T19:30:00+0000",
+      "id": "2206095246649556"
+    }
   }
 }
