@@ -515,5 +515,10 @@
       "scheduled_publish_time": "2026-11-26T23:30:00+0000",
       "id": "1187356756961659"
     }
+  },
+  "fbb-cauda-cometa": {
+    "quando": "2026-11-27T00:15:00.000Z",
+    "video_id": "1165074529328716",
+    "state": "SUBINDO"
   }
 }
