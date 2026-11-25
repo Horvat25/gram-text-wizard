@@ -224,6 +224,28 @@
   "fbb-tita-chuva-metano": {
     "quando": "2026-11-26T12:45:00.000Z",
     "video_id": "2122921248334325",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 14294901
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T12:45:00+0000",
+      "id": "2122921248334325"
+    }
   }
 }
