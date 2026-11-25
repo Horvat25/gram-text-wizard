@@ -328,5 +328,10 @@
       "scheduled_publish_time": "2026-11-26T15:00:00+0000",
       "id": "1795050771748406"
     }
+  },
+  "fbb-itokawa-cascalho": {
+    "quando": "2026-11-26T15:45:00.000Z",
+    "video_id": "2145956956037172",
+    "state": "SUBINDO"
   }
 }
