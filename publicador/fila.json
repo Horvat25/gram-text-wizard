@@ -7499,9 +7499,12 @@
     ],
     "legenda": "Todos os planetas do Sistema Solar cabem, lado a lado, no espaço entre a Terra e a Lua. Mas não hoje.\n\nSomando a largura de Mercúrio, Vênus, Marte, Júpiter, Saturno, Urano e Netuno, dá uns 380 mil quilômetros.\n\nA distância até a Lua muda, porque a órbita dela não é um círculo perfeito. No dia 13 deste mês, no ponto mais longe, o vão entre a superfície da Terra e a da Lua passava de 397 mil km. Os planetas cabiam com uns 17 mil km de folga.\n\nHoje, às 18h02 (horário de Brasília), a Lua passa pelo ponto mais perto da Terra no mês: 359.335 km de centro a centro. Tirando o raio da Terra e o da Lua, sobra um vão de uns 351 mil km. Aí os planetas não cabem: faltam uns 29 mil quilômetros, mais que duas Terras.\n\nÉ por isso que a Lua cheia de ontem foi uma superlua.\n\nEm 12 dias, a distância até a Lua encolheu mais de 46 mil km. E ninguém aqui embaixo sentiu nada. 🌕\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-25nov-planetas-entre-terra-e-lua",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "Você já sabia disso? Conta aqui 👇"
+    "comentario": "Você já sabia disso? Conta aqui 👇",
+    "id_instagram": "18096479948765013",
+    "publicado_em": "2026-11-25T11:10:50.886Z",
+    "id_comentario": "18124105855965223"
   },
   {
     "quando": "2026-11-25T11:00:00.000Z",
@@ -7509,8 +7512,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/6d2f0239-3477-4054-9876-6f39df389ea6.mp4",
     "legenda": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐\n\nWelopōʻai é um sistema de três estrelas a 28 anos-luz do Sol: duas anãs brancas (estrelas que já morreram) e uma anã vermelha. É o sistema triplo mais próximo conhecido com mais de uma anã branca; nada parecido existe num raio de 100 anos-luz. Os autores dizem que ele \"não deveria existir\" e que ainda não há explicação clara de como a estrela pequena sobreviveu quando a vizinha inchou antes de morrer.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: Institut Trottier de recherche sur les exoplanètes (iREx) / Université de Montréal (19/11/2026); Artigau et al., \"Welopōʻai: A peculiar triple system 8 pc from the Sun\", Astronomy & Astrophysics 715, A321 (2026).\n\n#estrelas #astronomia #espaco #neuralupdate",
     "slug": "nw-trio-de-estrelas-que-nao-deveria-existir",
-    "status": "agendado",
-    "comentario": "⭐ Como você acha que a estrela pequena sobreviveu? Deixa seu palpite 👇"
+    "status": "publicado",
+    "comentario": "⭐ Como você acha que a estrela pequena sobreviveu? Deixa seu palpite 👇",
+    "id_instagram": "18134685001768367",
+    "publicado_em": "2026-11-25T11:12:02.732Z",
+    "id_comentario": "18130983691879589",
+    "id_facebook": "29123170984041340"
   },
   {
     "quando": "2026-11-25T11:05:00.000Z",
@@ -7518,7 +7525,9 @@
     "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-25.jpg",
     "legenda": "",
     "slug": "story-noticia-2026-11-25",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "17946385962379268",
+    "publicado_em": "2026-11-25T11:12:18.132Z"
   },
   {
     "quando": "2026-11-25T12:30:00.000Z",
