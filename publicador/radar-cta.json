@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-24T20:03:38.460Z",
+ "gerado_em": "2026-11-25T19:03:50.397Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2569375,
+   "seguidores": 2569232,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.018,
+   "comentarios_por_curtida_sem_pedido": 0.014,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17650,
+   "seguidores": 17655,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,13 +44,26 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 592759,
+   "seguidores": 592896,
    "posts_lidos": 50,
-   "pct_posts_pedindo": 0,
-   "palavras": {},
-   "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.054,
-   "melhores_pedidos": []
+   "pct_posts_pedindo": 0.02,
+   "palavras": {
+    "RISTAS": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_sem_pedido": 0.046,
+   "melhores_pedidos": [
+    {
+     "quando": "2026-11-25",
+     "tipo": "FEED",
+     "pede": true,
+     "palavra": "RISTAS",
+     "trecho": "- Narradores, comentaristas e comunicadores;",
+     "comentarios": 0,
+     "curtidas": 44,
+     "link": "https://www.instagram.com/p/DgLGtMxoLMG/"
+    }
+   ]
   },
   {
    "usuario": "achadinhospromo15",
@@ -146,14 +159,14 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1058500,
+   "seguidores": 1058635,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
     "REM": 1
    },
    "comentarios_por_curtida_com_pedido": 0.023,
-   "comentarios_por_curtida_sem_pedido": 0.027,
+   "comentarios_por_curtida_sem_pedido": 0.023,
    "melhores_pedidos": [
     {
      "quando": "2026-11-12",
@@ -161,8 +174,8 @@
      "pede": true,
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
-     "comentarios": 113,
-     "curtidas": 4895,
+     "comentarios": 114,
+     "curtidas": 4937,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -181,13 +194,95 @@
   },
   {
    "hashtag": "achadosshopee",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.7,
+   "palavras": {
+    "LINK": 1,
+    "CASA": 1,
+    "CONFORTO": 1,
+    "QUERO": 2,
+    "TERMÔMETRO": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.991,
+   "comentarios_por_curtida_sem_pedido": 0.711,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": "QUERO",
+     "trecho": "🚨SEGUE ANTES DE COMENTAR PARA OS LINKS CHEGAREM SEM ERROS🚨",
+     "comentarios": 17012,
+     "curtidas": 21270,
+     "link": "https://www.instagram.com/p/DczYRhIAJRg/"
+    },
+    {
+     "pede": true,
+     "palavra": "LINK",
+     "trecho": "Comenta LINK que envio 🤍",
+     "comentarios": 11125,
+     "curtidas": 15533,
+     "link": "https://www.instagram.com/p/DdFJBBNlish/"
+    },
+    {
+     "pede": true,
+     "palavra": "CASA",
+     "trecho": "Já siga casadeliso pra ficar por dentro de tudo e comenta “CASA” que te envio os Links (tem que seguir o perfil pra receber direitinho) ✨",
+     "comentarios": 2774,
+     "curtidas": 7092,
+     "link": "https://www.instagram.com/p/DeUWbMrkZJ-/"
+    },
+    {
+     "pede": true,
+     "palavra": null,
+     "trecho": "​C0mente “CABELO” que te envio o link direto no seu direct com o desconto aplicado! 🛒",
+     "comentarios": 2309,
+     "curtidas": 1244,
+     "link": "https://www.instagram.com/p/DfP8EIVmmgN/"
+    },
+    {
+     "pede": true,
+     "palavra": "QUERO",
+     "trecho": "Se quiser os links, tamanhos e cupons, comente “QUERO” ✨",
+     "comentarios": 1736,
+     "curtidas": 1211,
+     "link": "https://www.instagram.com/p/DX9uFf1DurH/"
+    },
+    {
+     "pede": true,
+     "palavra": "CONFORTO",
+     "trecho": "Comente CONFORTO que eu te mando os links no direct 👇",
+     "comentarios": 743,
+     "curtidas": 525,
+     "link": "https://www.instagram.com/p/DgF0oZ3kX9w/"
+    },
+    {
+     "pede": true,
+     "palavra": "TERMÔMETRO",
+     "trecho": "Toda mamãe precisa disso 🥹✨ Segue larii.indica pra receber o link . O link é enviado automaticamente, se você não segue tem que ir nas configurações do seu ins",
+     "comentarios": 169,
+     "curtidas": 515,
+     "link": "https://www.instagram.com/p/DeNgZ25gpXb/"
+    }
+   ]
   },
   {
    "hashtag": "projetorgalaxia",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.1,
+   "palavras": {},
+   "comentarios_por_curtida_com_pedido": 0,
+   "comentarios_por_curtida_sem_pedido": 0.012,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": null,
+     "trecho": "👉 Curtiu? Então chama no direct para garantir o seu com condição especial!",
+     "comentarios": 0,
+     "curtidas": 1,
+     "link": "https://www.instagram.com/p/DKpEXXeRLld/"
+    }
+   ]
   },
   {
    "hashtag": "astronomia",
