@@ -572,6 +572,28 @@
   "fbb-lua-fugindo": {
     "quando": "2026-11-27T01:45:00.000Z",
     "video_id": "1186859653670345",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 7229769
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-27T01:45:00+0000",
+      "id": "1186859653670345"
+    }
   }
 }
