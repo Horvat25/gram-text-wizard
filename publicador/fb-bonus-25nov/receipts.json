@@ -546,6 +546,27 @@
   "fbb-voyager-oort": {
     "quando": "2026-11-27T01:00:00.000Z",
     "video_id": "1167495032424320",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "upload_complete",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 9660620
+        },
+        "processing_phase": {
+          "status": "not_started"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-27T01:00:00+0000",
+      "id": "1167495032424320"
+    }
   }
 }
