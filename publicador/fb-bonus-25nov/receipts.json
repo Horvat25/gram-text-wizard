@@ -86,6 +86,28 @@
   "fbb-mercurio-dia-dois-anos": {
     "quando": "2026-11-26T01:30:00.000Z",
     "video_id": "1824016712486683",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 3142586
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T01:30:00+0000",
+      "id": "1824016712486683"
+    }
   }
 }
