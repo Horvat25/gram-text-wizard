@@ -542,5 +542,10 @@
       "scheduled_publish_time": "2026-11-27T00:15:00+0000",
       "id": "1165074529328716"
     }
+  },
+  "fbb-voyager-oort": {
+    "quando": "2026-11-27T01:00:00.000Z",
+    "video_id": "1167495032424320",
+    "state": "SUBINDO"
   }
 }
