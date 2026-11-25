@@ -720,5 +720,12 @@
     "quando": "2026-11-25T11:05:00.000Z",
     "tipo": "story",
     "state": "PERDIDO"
+  },
+  "fb-story-aula-2026-11-25": {
+    "quando": "2026-11-25T19:00:00.000Z",
+    "tipo": "story",
+    "tentativas": 1,
+    "id": "1241743238183775",
+    "state": "PUBLICADO"
   }
 }
