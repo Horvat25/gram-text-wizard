@@ -251,6 +251,28 @@
   "fbb-mimas-estrela-da-morte": {
     "quando": "2026-11-26T13:30:00.000Z",
     "video_id": "2258272505069099",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 8530885
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T13:30:00+0000",
+      "id": "2258272505069099"
+    }
   }
 }
