@@ -493,6 +493,27 @@
   "fbb-sol-coroa": {
     "quando": "2026-11-26T23:30:00.000Z",
     "video_id": "1187356756961659",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "upload_complete",
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 11200248
+        },
+        "processing_phase": {
+          "status": "not_started"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T23:30:00+0000",
+      "id": "1187356756961659"
+    }
   }
 }
