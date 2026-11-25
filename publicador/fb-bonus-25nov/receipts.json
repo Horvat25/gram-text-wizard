@@ -278,6 +278,28 @@
   "fbb-japeto-duas-cores": {
     "quando": "2026-11-26T14:15:00.000Z",
     "video_id": "1896864187989091",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 4924125
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T14:15:00+0000",
+      "id": "1896864187989091"
+    }
   }
 }
