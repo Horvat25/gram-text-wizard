@@ -381,5 +381,10 @@
       "scheduled_publish_time": "2026-11-26T16:20:00+0000",
       "id": "1170193482201710"
     }
+  },
+  "fbb-jupiter-mancha": {
+    "quando": "2026-11-26T18:00:00.000Z",
+    "video_id": "1179954127877279",
+    "state": "SUBINDO"
   }
 }
