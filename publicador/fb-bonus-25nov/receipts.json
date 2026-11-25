@@ -163,5 +163,10 @@
       "scheduled_publish_time": "2026-11-26T09:30:00+0000",
       "id": "1143167748470716"
     }
+  },
+  "fbb-miranda-queda-12-min": {
+    "quando": "2026-11-26T10:15:00.000Z",
+    "video_id": "1866743671191006",
+    "state": "SUBINDO"
   }
 }
