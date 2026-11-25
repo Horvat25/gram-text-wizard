@@ -595,5 +595,10 @@
       "scheduled_publish_time": "2026-11-27T01:45:00+0000",
       "id": "1186859653670345"
     }
+  },
+  "fbb-netuno-no-papel": {
+    "quando": "2026-11-27T02:30:00.000Z",
+    "video_id": "4631244610355621",
+    "state": "SUBINDO"
   }
 }
