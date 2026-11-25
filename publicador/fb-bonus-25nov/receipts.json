@@ -193,5 +193,10 @@
       "scheduled_publish_time": "2026-11-26T10:15:00+0000",
       "id": "29905128739113339"
     }
+  },
+  "fbb-ganimedes-aurora": {
+    "quando": "2026-11-26T12:00:00.000Z",
+    "video_id": "1519546460109289",
+    "state": "SUBINDO"
   }
 }
