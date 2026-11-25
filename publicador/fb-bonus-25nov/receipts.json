@@ -332,6 +332,28 @@
   "fbb-itokawa-cascalho": {
     "quando": "2026-11-26T15:45:00.000Z",
     "video_id": "2145956956037172",
-    "state": "SUBIU"
+    "state": "AGENDADO",
+    "readback": {
+      "status": {
+        "video_status": "processing",
+        "processing_progress": 0,
+        "uploading_phase": {
+          "status": "complete",
+          "bytes_transferred": 2166193
+        },
+        "processing_phase": {
+          "status": "in_progress"
+        },
+        "publishing_phase": {
+          "status": "not_started"
+        },
+        "copyright_check_status": {
+          "status": "in_progress"
+        }
+      },
+      "published": false,
+      "scheduled_publish_time": "2026-11-26T15:45:00+0000",
+      "id": "2145956956037172"
+    }
   }
 }
