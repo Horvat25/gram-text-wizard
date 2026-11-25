@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-24T19:57:31.955Z",
+ "gerado_em": "2026-11-25T19:10:44.281Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1315,
-  "publicacoes": 1175
+  "seguidores": 1316,
+  "publicacoes": 1191
  },
- "total_listado": 1142,
- "com_tempo_assistido": 569,
+ "total_listado": 1152,
+ "com_tempo_assistido": 572,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-26",
-     "ate": "2026-11-23",
+     "de": "2026-10-27",
+     "ate": "2026-11-24",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 0,
-         "end_time": "2026-10-27T07:00:00+0000"
-        },
         {
          "value": 0,
          "end_time": "2026-10-28T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 1,
          "end_time": "2026-11-23T08:00:00+0000"
+        },
+        {
+         "value": 6,
+         "end_time": "2026-11-24T08:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -322,7 +322,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-24",
+     "ate": "2026-11-25",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -341,13 +341,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 34
+            "value": 40
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 11
+            "value": 12
            }
           ]
          }
@@ -590,7 +590,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-24",
+     "ate": "2026-11-25",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -599,7 +599,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 8597
+        "value": 8719
        }
       },
       {
@@ -609,7 +609,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 15282
+        "value": 15974
        }
       },
       {
@@ -619,7 +619,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 323
+        "value": 330
        }
       },
       {
@@ -629,7 +629,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 631
+        "value": 658
        }
       }
      ]
@@ -767,15 +767,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 654
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 20920
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 654
            }
           ]
          }
@@ -804,15 +804,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 404
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 18410
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 404
            }
           ]
          }
@@ -823,7 +823,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-24",
+     "ate": "2026-11-25",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -832,7 +832,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 8597,
+        "value": 8719,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -843,13 +843,13 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 249
+            "value": 258
            },
            {
             "dimension_values": [
              "NON_FOLLOWER"
             ],
-            "value": 8344
+            "value": 8444
            }
           ]
          }
@@ -894,7 +894,7 @@
             "dimension_values": [
              "25-34"
             ],
-            "value": 300
+            "value": 301
            },
            {
             "dimension_values": [
@@ -959,7 +959,7 @@
             "dimension_values": [
              "U"
             ],
-            "value": 163
+            "value": 164
            }
           ]
          }
@@ -1042,7 +1042,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 1268
+            "value": 1269
            },
            {
             "dimension_values": [
@@ -1153,12 +1153,6 @@
            },
            {
             "dimension_values": [
-             "Camaçari, Bahia"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Maceió, Alagoas"
             ],
             "value": 10
@@ -1207,12 +1201,6 @@
            },
            {
             "dimension_values": [
-             "Uberaba, Minas Gerais"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Londrina, Paraná"
             ],
             "value": 9
@@ -1228,6 +1216,12 @@
              "Recife, Pernambuco"
             ],
             "value": 13
+           },
+           {
+            "dimension_values": [
+             "Brasília, Federal District"
+            ],
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1300,6 +1294,12 @@
              "Nova Iguaçu, Rio de Janeiro (state)"
             ],
             "value": 7
+           },
+           {
+            "dimension_values": [
+             "Maringá, Paraná"
+            ],
+            "value": 5
            },
            {
             "dimension_values": [
@@ -2629,13 +2629,93 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-24",
-    "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
+    "janela": "2026-11-25",
+    "erro": "(#100) since param is not valid. Metrics data is available for the last 2 years"
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "18101040026166829": [
+    {
+     "texto": "❄️ Já imaginou uma nevasca no espaço? O que mais te surpreendeu nesse cometa? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T17:12:57+0000",
+     "respostas": []
+    }
+   ],
+   "17958373854327391": [
+    {
+     "texto": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T17:11:11+0000",
+     "respostas": []
+    }
+   ],
+   "17883995970631677": [
+    {
+     "texto": "Qual parte você mostraria pra alguém? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T14:19:39+0000",
+     "respostas": []
+    }
+   ],
+   "17898470298437054": [
+    {
+     "texto": "De qual cidade você acompanha o céu? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T14:19:06+0000",
+     "respostas": []
+    }
+   ],
+   "18134685001768367": [
+    {
+     "texto": "⭐ Como você acha que a estrela pequena sobreviveu? Deixa seu palpite 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T11:12:02+0000",
+     "respostas": []
+    }
+   ],
+   "18096479948765013": [
+    {
+     "texto": "Você já sabia disso? Conta aqui 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T11:10:50+0000",
+     "respostas": []
+    }
+   ],
+   "18131264965889525": [
+    {
+     "texto": "O que mais te surpreendeu aqui? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T00:11:51+0000",
+     "respostas": []
+    }
+   ],
+   "18050035724820242": [
+    {
+     "texto": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T00:11:04+0000",
+     "respostas": []
+    }
+   ],
+   "18131551618636481": [
+    {
+     "texto": "⭐ Achou Betelgeuse? É a estrela avermelhada perto das Três Marias, no leste depois das 21h. Conta de onde 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T21:11:00+0000",
+     "respostas": []
+    }
+   ],
+   "17973830694000011": [
+    {
+     "texto": "Qual parte você mostraria pra alguém? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-24T20:32:33+0000",
+     "respostas": []
+    }
+   ],
    "18078089168759539": [
     {
      "texto": "☄️ Você arriscaria pousar uma nave que não foi feita pra isso? 👇",
@@ -4115,6 +4195,11 @@
       {
        "texto": "Claro, Patrycia! O caminho da Terra não é um círculo perfeito, é levemente oval. No começo de janeiro ela passa mais perto do Sol, a uns 147 milhões de km, e no começo de julho mais longe, a uns 152 milhões. A diferença é pequena, só uns 3%, e por isso não é ela que faz as estações. Quem faz é a inclinação da Terra: tanto que em janeiro, mais perto do Sol, é verão aqui e inverno lá no norte ☀️",
        "quando": "2026-11-24T11:54:04+0000",
+       "curtidas": 1
+      },
+      {
+       "texto": "@neuralupdate obrigado  pela explicação... na verdade a gente esquece que ela é  inclinada e nossa posição  super influencia neh?",
+       "quando": "2026-11-25T14:03:15+0000",
        "curtidas": 0
       }
      ]
@@ -6025,25 +6110,224 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
-   "id": "18078089168759539",
-   "quando": "2026-11-24T17:12:32+0000",
+   "id": "18101040026166829",
+   "quando": "2026-11-25T17:12:41+0000",
    "tipo": "REELS",
-   "link": "https://www.instagram.com/reel/DgIdoInzbFv/",
-   "titulo": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️",
-   "legenda": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️\n\nA sonda NEAR Shoemaker entrou na órbita do asteroide Eros (34 km de comprimento) em 14/02/2000, a primeira a orbitar um asteroide. Em 12/02/2001, no fim da missão, a equipe decidiu descer até a superfície, mesmo a nave não tendo sido projetada pra pousar. Ela tocou o chão a uns 6 km/h (1,5 a 1,9 m/s), continuou funcionando e mandou dados por cerca de duas semanas. A última foto da descida, a 120 m de altura, saiu cortada pela perda de sinal no toque.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA — NEAR Shoemaker (órbita em 14/02/2000; pouso em 12/02/2001; último contato em 28/02/2001); NSSDC/NASA.\n\n#asteroide #nasa #aula #neuralupdate",
-   "curtidas_campo": 0,
+   "link": "https://www.instagram.com/reel/DgLCbpYO-Mu/",
+   "titulo": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️",
+   "legenda": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️\n\nEm 04/11/2010, a sonda EPOXI (a antiga Deep Impact, da NASA) passou a 694 km do cometa 103P/Hartley 2, a 12,3 km/s. O núcleo tem uns 2,3 km e formato de amendoim: o menor cometa já visitado por uma nave até então. Jatos de gás carbônico saem da ponta e arrancam blocos de gelo que vão do tamanho de uma bola de golfe ao de uma bola de basquete, numa espécie de nevasca em volta do cometa.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA/JPL — EPOXI (sobrevoo de 04/11/2010 a 694 km); A'Hearn et al., Science (2011).\n\n#cometa #nasa #aula #neuralupdate",
+   "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 9,
+   "views": 46,
+   "reach": 37,
+   "likes": 1,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 2,
+   "ig_reels_avg_watch_time": 5700,
+   "ig_reels_video_view_total_time": 205205,
+   "reels_skip_rate": 37.2,
+   "reposts": 0
+  },
+  {
+   "id": "17958373854327391",
+   "quando": "2026-11-25T17:11:06+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgLCSc_EzSt/",
+   "titulo": "Plutão ainda não completou nem uma volta em torno do Sol desde que foi descoberto.",
+   "legenda": "Plutão ainda não completou nem uma volta em torno do Sol desde que foi descoberto.\n\nEle foi encontrado em 18 de fevereiro de 1930 pelo americano Clyde Tombaugh. Uma volta completa de Plutão leva 248 anos. A primeira volta inteira desde a descoberta só termina em 2178.\n\nEssa foto é da sonda New Horizons, que passou por ele em 14 de julho de 2015, depois de mais de nove anos de viagem. As cores foram realçadas pela NASA pra destacar as diferenças do terreno.\n\nRepara no coração claro, à direita. Ele leva o nome de Tombaugh, o descobridor, e a metade esquerda dele é uma planície enorme de gelo de nitrogênio.\n\nE o tamanho: Plutão tem uns 2.377 km de diâmetro. É mais estreito que o Brasil, que tem 4.319 km de leste a oeste. Mesmo assim, a superfície inteira dele tem área parecida com a da Rússia.\n\nPequeno, gelado e longe. E mesmo assim tem montanhas de gelo, céu azulado e um coração. 🤍\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA/Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 3,
+   "reach": 2,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "17883995970631677",
+   "quando": "2026-11-25T14:19:34+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgKuqLCCYqn/",
+   "titulo": "Se a história do universo fosse o Brasil de ponta a ponta, onde a gente apareceria?",
+   "legenda": "Se a história do universo fosse o Brasil de ponta a ponta, onde a gente apareceria?\n\nDo Monte Caburaí, em Roraima, ao Arroio Chuí, no Rio Grande do Sul, são 4.394 km: a maior distância norte-sul do país. Agora estica os 13,8 bilhões de anos do universo nessa linha. O Big Bang fica lá em Roraima. O dia de hoje fica no Chuí.\n\nNessa escala, cada milhão de anos vale uns 320 metros.\n\n🌌 As primeiras estrelas: poucas dezenas de quilômetros depois da largada, ainda em Roraima.\n🌍 O Sol e a Terra: só se formam a uns 1.450 km do fim, mais ou menos na altura de Mato Grosso do Sul.\n🦖 Os dinossauros desaparecem a 21 km do Chuí.\n🧍 O ser humano moderno surge a menos de 100 metros da linha de chegada.\n⛵ A chegada dos portugueses, em 1500, fica a 17 centímetros do fim.\n⏳ Uma vida inteira de 80 anos: dois centímetros e meio.\n\nToda a história humana cabe no último passo de uma viagem do tamanho do Brasil. 🇧🇷\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 18,
    "reach": 8,
    "likes": 0,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 1,
-   "ig_reels_avg_watch_time": 6464,
-   "ig_reels_video_view_total_time": 45252,
-   "reels_skip_rate": 75,
+   "reposts": 0
+  },
+  {
+   "id": "17898470298437054",
+   "quando": "2026-11-25T14:19:01+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgKumGJCbOt/",
+   "titulo": "Esse é o primeiro brasileiro a ir pro espaço, trabalhando dentro da Estação Espacial Internacional.",
+   "legenda": "Esse é o primeiro brasileiro a ir pro espaço, trabalhando dentro da Estação Espacial Internacional.\n\nMarcos Pontes, nascido em Bauru (SP), era piloto de testes e tenente-coronel da Força Aérea. Ele decolou do Cazaquistão na noite de 29 de março de 2006 (horário de Brasília), a bordo da nave russa Soyuz TMA-8.\n\nA viagem foi batizada de Missão Centenário, em homenagem aos 100 anos do voo do 14-Bis, de Santos Dumont, em 1906.\n\nForam cerca de oito dias a bordo da estação, com oito experimentos científicos brasileiros. Ele voltou à Terra em 8 de abril de 2006.\n\nA foto é de 3 de abril de 2006. Repara no alto, em cima da escotilha: uma fileira de bandeiras dos países que participam da estação.\n\nUm menino de Bauru que virou piloto, astronauta e, por uns dias, morador da órbita da Terra. 🇧🇷\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 7,
+   "reach": 4,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18134685001768367",
+   "quando": "2026-11-25T11:11:55+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgKZJZJIGQl/",
+   "titulo": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐",
+   "legenda": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐\n\nWelopōʻai é um sistema de três estrelas a 28 anos-luz do Sol: duas anãs brancas (estrelas que já morreram) e uma anã vermelha. É o sistema triplo mais próximo conhecido com mais de uma anã branca; nada parecido existe num raio de 100 anos-luz. Os autores dizem que ele \"não deveria existir\" e que ainda não há explicação clara de como a estrela pequena sobreviveu quando a vizinha inchou antes de morrer.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: Institut Trottier de recherche sur les exoplanètes (iREx) / Université de Montréal (19/11/2026); Artigau et al., \"Welopōʻai: A peculiar triple system 8 pc from the Sun\", Astronomy & Astrophysics 715, A321 (2026).\n\n#estrelas #astronomia #espaco #neuralupdate",
+   "curtidas_campo": 4,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 109,
+   "reach": 85,
+   "likes": 4,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 10203,
+   "ig_reels_video_view_total_time": 928541,
+   "reels_skip_rate": 54.6,
+   "reposts": 0
+  },
+  {
+   "id": "18096479948765013",
+   "quando": "2026-11-25T11:10:46+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgKZEAtGIiA/",
+   "titulo": "Todos os planetas do Sistema Solar cabem, lado a lado, no espaço entre a Terra e a Lua. Mas não hoje.",
+   "legenda": "Todos os planetas do Sistema Solar cabem, lado a lado, no espaço entre a Terra e a Lua. Mas não hoje.\n\nSomando a largura de Mercúrio, Vênus, Marte, Júpiter, Saturno, Urano e Netuno, dá uns 380 mil quilômetros.\n\nA distância até a Lua muda, porque a órbita dela não é um círculo perfeito. No dia 13 deste mês, no ponto mais longe, o vão entre a superfície da Terra e a da Lua passava de 397 mil km. Os planetas cabiam com uns 17 mil km de folga.\n\nHoje, às 18h02 (horário de Brasília), a Lua passa pelo ponto mais perto da Terra no mês: 359.335 km de centro a centro. Tirando o raio da Terra e o da Lua, sobra um vão de uns 351 mil km. Aí os planetas não cabem: faltam uns 29 mil quilômetros, mais que duas Terras.\n\nÉ por isso que a Lua cheia de ontem foi uma superlua.\n\nEm 12 dias, a distância até a Lua encolheu mais de 46 mil km. E ninguém aqui embaixo sentiu nada. 🌕\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 18,
+   "reach": 6,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18131264965889525",
+   "quando": "2026-11-25T00:11:46+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgJNoe6jxbt/",
+   "titulo": "É assim que uma estrela parecida com o Sol termina a vida.",
+   "legenda": "É assim que uma estrela parecida com o Sol termina a vida.\n\nEssa é a Nebulosa do Anel do Sul, a uns 2.500 anos-luz, vista pelo telescópio James Webb em dois tipos de luz infravermelha: à esquerda, o infravermelho próximo; à direita, o infravermelho médio.\n\nNo centro tem duas estrelas. Uma delas é uma anã branca: o que sobrou de uma estrela que, ao longo de milhares de anos, foi soltando as camadas de fora. Essas camadas formam as conchas de gás em volta. Na imagem da direita, repara: a anã branca aparece como o ponto avermelhado bem no meio, coberta de poeira.\n\nO Sol deve passar por algo parecido daqui a uns 5 bilhões de anos. Vai inchar, virar uma gigante vermelha, soltar as camadas de fora e terminar como uma anã branca do tamanho da Terra, brilhando cada vez menos.\n\nO gás que ele soltar vai se espalhar pelo espaço e, um dia, pode virar parte de novas estrelas e planetas. Nada se perde. ✨\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA, ESA, CSA, STScI (telescópio James Webb)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 28,
+   "reach": 14,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18050035724820242",
+   "quando": "2026-11-25T00:10:59+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgJNjjmj2jM/",
+   "titulo": "Tem uma estrela que já serviu de bússola pra sondas espaciais. E ela está no céu do Brasil hoje à noite.",
+   "legenda": "Tem uma estrela que já serviu de bússola pra sondas espaciais. E ela está no céu do Brasil hoje à noite.\n\nÉ Canopus, a segunda estrela mais brilhante do céu noturno, atrás só de Sirius. Ela fica a uns 310 anos-luz e brilha milhares de vezes mais que o Sol.\n\nPor ser muito brilhante e ficar longe do caminho que o Sol faz no céu, Canopus virou referência de navegação no espaço. Desde os anos 1960, várias sondas usaram sensores apontados pra ela pra saber pra que lado estavam viradas.\n\nComo achar, em São Paulo:\n\n🌅 Ela nasce no sudeste por volta das 18h, ainda de dia.\n🕙 Às 22h, está a uns 33 graus de altura no sudeste: um ponto branco, forte e isolado.\n🕛 De madrugada, sobe ainda mais.\n\nDa maior parte da Europa e dos Estados Unidos, Canopus nunca aparece. É uma estrela do nosso céu: na bandeira do Brasil, ela representa Goiás. ✨\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 17,
+   "reach": 6,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18131551618636481",
+   "quando": "2026-11-24T21:10:54+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgI46POtFBM/",
+   "titulo": "Essa estrela que você vê hoje é uma luz de ANTES de Cabral chegar ao Brasil ⭐",
+   "legenda": "Essa estrela que você vê hoje é uma luz de ANTES de Cabral chegar ao Brasil ⭐\n\nBetelgeuse, a estrela avermelhada de Órion (perto das Três Marias), está a uns 550 a 700 anos-luz, segundo as medições mais recentes. A luz que chega hoje saiu de lá entre os anos 1300 e 1480, antes de Cabral chegar em 1500. Nesta época, ela aparece no leste depois das 21h. Se ela explodisse hoje, a gente só veria daqui a séculos.\n\n📤 Manda pra alguém que ia gostar de saber disso.\n\n📚 Distância de Betelgeuse: ~548 anos-luz (Joyce et al., ApJ 2020) a ~724 anos-luz (Harper et al., AJ 2017). Posição no céu calculada (astronomy-engine) para 24/11/2026 às 22h em São Paulo.\n\n#betelgeuse #orion #astronomia #neuralupdate",
+   "curtidas_campo": 3,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 147,
+   "reach": 114,
+   "likes": 3,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 11921,
+   "ig_reels_video_view_total_time": 1418697,
+   "reels_skip_rate": 61.3,
+   "reposts": 1
+  },
+  {
+   "id": "17973830694000011",
+   "quando": "2026-11-24T20:32:28+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgI0iOyCcq7/",
+   "titulo": "Parece uma cordilheira ao luar. Mas são nuvens de gás e poeira onde estão nascendo estrelas.",
+   "legenda": "Parece uma cordilheira ao luar. Mas são nuvens de gás e poeira onde estão nascendo estrelas.\n\nEssa região é chamada de Penhascos Cósmicos. Ela fica na Nebulosa de Carina, a uns 7.600 anos-luz, e foi uma das primeiras imagens do telescópio James Webb, divulgada em julho de 2022.\n\nRepara no \"vapor\" que parece subir das montanhas. É gás quente sendo arrancado da nuvem pela radiação de estrelas jovens e muito massivas, que ficam acima da área da foto.\n\nOs picos mais altos têm uns 7 anos-luz de altura. A luz levaria sete anos pra ir da base até a ponta.\n\nE a Nebulosa de Carina é coisa do céu do sul. No Brasil, nesta época, ela aparece de madrugada: por volta das 4h, fica alta no sul-sudeste, um pouco acima do Cruzeiro do Sul. Num céu escuro, dá pra ver a nebulosa a olho nu, como uma mancha clara no meio da Via Láctea. ✨\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA, ESA, CSA, STScI (telescópio James Webb)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 15,
+   "reach": 8,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18078089168759539",
+   "quando": "2026-11-24T17:12:32+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgIdoInzbFv/",
+   "titulo": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️",
+   "legenda": "A NASA POUSOU uma nave que não foi feita pra pousar (e ela sobreviveu) ☄️\n\nA sonda NEAR Shoemaker entrou na órbita do asteroide Eros (34 km de comprimento) em 14/02/2000, a primeira a orbitar um asteroide. Em 12/02/2001, no fim da missão, a equipe decidiu descer até a superfície, mesmo a nave não tendo sido projetada pra pousar. Ela tocou o chão a uns 6 km/h (1,5 a 1,9 m/s), continuou funcionando e mandou dados por cerca de duas semanas. A última foto da descida, a 120 m de altura, saiu cortada pela perda de sinal no toque.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA — NEAR Shoemaker (órbita em 14/02/2000; pouso em 12/02/2001; último contato em 28/02/2001); NSSDC/NASA.\n\n#asteroide #nasa #aula #neuralupdate",
+   "curtidas_campo": 3,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 94,
+   "reach": 79,
+   "likes": 3,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 4,
+   "ig_reels_avg_watch_time": 8651,
+   "ig_reels_video_view_total_time": 709414,
+   "reels_skip_rate": 57.3,
    "reposts": 0
   },
   {
@@ -6056,8 +6340,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 6,
-   "reach": 2,
+   "views": 19,
+   "reach": 9,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6075,8 +6359,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 8,
-   "reach": 5,
+   "views": 24,
+   "reach": 14,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6094,8 +6378,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 9,
-   "reach": 3,
+   "views": 31,
+   "reach": 13,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6110,19 +6394,19 @@
    "link": "https://www.instagram.com/reel/DgH0XJjyWaE/",
    "titulo": "Uma nave chegou pra ver o ESTRAGO no asteroide que a gente empurrou (amanhã tem foto ao vivo) ☄️",
    "legenda": "Uma nave chegou pra ver o ESTRAGO no asteroide que a gente empurrou (amanhã tem foto ao vivo) ☄️\n\nEm 26/09/2022, a nave DART, da NASA, bateu de propósito no asteroide Dimorfo. Agora a sonda europeia Hera chegou aos dois asteroides: já fotografou Didymos (780 m) e Dimorfo (151 m) a 60, 56 e cerca de 30 km. Na quarta, 25/11/2026, das 15h45 às 16h30 (Brasília), a ESA mostra ao vivo as primeiras imagens de perto de Dimorfo depois da batida.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: ESA — \"Watch live: Hera's first images of post-impact asteroid Dimorphos\" (19/11/2026) e \"Hera's first close-up view of Didymos asteroids\" (05/11/2026).\n\n#asteroide #esa #astronomia #neuralupdate",
-   "curtidas_campo": 5,
+   "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 188,
-   "reach": 161,
-   "likes": 5,
+   "views": 242,
+   "reach": 209,
+   "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 6,
-   "ig_reels_avg_watch_time": 11218,
-   "ig_reels_video_view_total_time": 1851071,
-   "reels_skip_rate": 49.1,
+   "total_interactions": 9,
+   "ig_reels_avg_watch_time": 11269,
+   "ig_reels_video_view_total_time": 2456847,
+   "reels_skip_rate": 48.2,
    "reposts": 0
   },
   {
@@ -6135,8 +6419,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 31,
-   "reach": 15,
+   "views": 42,
+   "reach": 19,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6154,8 +6438,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 21,
-   "reach": 10,
+   "views": 23,
+   "reach": 11,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6173,8 +6457,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 49,
-   "reach": 25,
+   "views": 59,
+   "reach": 28,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6192,16 +6476,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 224,
-   "reach": 178,
+   "views": 226,
+   "reach": 180,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 10286,
-   "ig_reels_video_view_total_time": 1975044,
-   "reels_skip_rate": 60.9,
+   "ig_reels_avg_watch_time": 10372,
+   "ig_reels_video_view_total_time": 2022608,
+   "reels_skip_rate": 60.8,
    "reposts": 0
   },
   {
@@ -6214,8 +6498,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 24,
-   "reach": 7,
+   "views": 25,
+   "reach": 8,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6233,16 +6517,16 @@
    "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 205,
+   "views": 206,
    "reach": 175,
    "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 19250,
-   "ig_reels_video_view_total_time": 3599831,
-   "reels_skip_rate": 50,
+   "ig_reels_avg_watch_time": 19168,
+   "ig_reels_video_view_total_time": 3603644,
+   "reels_skip_rate": 49.7,
    "reposts": 0
   },
   {
@@ -6255,8 +6539,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 37,
-   "reach": 20,
+   "views": 39,
+   "reach": 21,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6274,7 +6558,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 23,
+   "views": 24,
    "reach": 11,
    "likes": 0,
    "comments": 1,
@@ -6293,8 +6577,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 20,
-   "reach": 8,
+   "views": 26,
+   "reach": 11,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6312,16 +6596,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 264,
-   "reach": 221,
+   "views": 266,
+   "reach": 222,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 11818,
-   "ig_reels_video_view_total_time": 2753732,
-   "reels_skip_rate": 50,
+   "ig_reels_avg_watch_time": 11727,
+   "ig_reels_video_view_total_time": 2755868,
+   "reels_skip_rate": 50.4,
    "reposts": 0
   },
   {
@@ -6353,8 +6637,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 74,
-   "reach": 39,
+   "views": 76,
+   "reach": 41,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6372,8 +6656,8 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 28,
-   "reach": 12,
+   "views": 29,
+   "reach": 13,
    "likes": 1,
    "comments": 1,
    "shares": 0,
@@ -6413,8 +6697,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 54,
-   "reach": 26,
+   "views": 61,
+   "reach": 29,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6432,15 +6716,15 @@
    "curtidas_campo": 66,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1995,
-   "reach": 1715,
+   "views": 1997,
+   "reach": 1717,
    "likes": 66,
    "comments": 1,
    "shares": 0,
    "saved": 2,
    "total_interactions": 69,
-   "ig_reels_avg_watch_time": 18974,
-   "ig_reels_video_view_total_time": 33509691,
+   "ig_reels_avg_watch_time": 18985,
+   "ig_reels_video_view_total_time": 33584665,
    "reels_skip_rate": 35.1,
    "reposts": 0
   },
@@ -6454,8 +6738,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 25,
-   "reach": 10,
+   "views": 27,
+   "reach": 11,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6473,8 +6757,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 41,
-   "reach": 18,
+   "views": 42,
+   "reach": 19,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6492,8 +6776,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 31,
-   "reach": 13,
+   "views": 35,
+   "reach": 14,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6533,8 +6817,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 18,
-   "reach": 8,
+   "views": 22,
+   "reach": 10,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6609,16 +6893,16 @@
    "curtidas_campo": 9,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 379,
-   "reach": 295,
+   "views": 380,
+   "reach": 296,
    "likes": 9,
    "comments": 1,
    "shares": 1,
    "saved": 1,
    "total_interactions": 12,
-   "ig_reels_avg_watch_time": 10346,
-   "ig_reels_video_view_total_time": 3259182,
-   "reels_skip_rate": 52.7,
+   "ig_reels_avg_watch_time": 10319,
+   "ig_reels_video_view_total_time": 3261116,
+   "reels_skip_rate": 52.9,
    "reposts": 0
   },
   {
@@ -6691,16 +6975,16 @@
    "curtidas_campo": 24,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1381,
-   "reach": 1196,
+   "views": 1386,
+   "reach": 1198,
    "likes": 24,
    "comments": 1,
    "shares": 2,
    "saved": 1,
    "total_interactions": 28,
-   "ig_reels_avg_watch_time": 16537,
-   "ig_reels_video_view_total_time": 20308313,
-   "reels_skip_rate": 32.5,
+   "ig_reels_avg_watch_time": 16505,
+   "ig_reels_video_view_total_time": 20334597,
+   "reels_skip_rate": 32.4,
    "reposts": 0
   },
   {
@@ -6751,8 +7035,8 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 48,
-   "reach": 18,
+   "views": 50,
+   "reach": 19,
    "likes": 1,
    "comments": 1,
    "shares": 0,
@@ -6771,7 +7055,7 @@
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
    "views": 17,
-   "reach": 9,
+   "reach": 10,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6789,8 +7073,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 26,
-   "reach": 13,
+   "views": 27,
+   "reach": 15,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6808,8 +7092,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 54,
-   "reach": 32,
+   "views": 56,
+   "reach": 33,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6843,16 +7127,16 @@
    "link": "https://www.instagram.com/p/Df-6V6kjZro/",
    "titulo": "Repara no círculo amarelo.",
    "legenda": "Repara no círculo amarelo.\n\nNa foto da esquerda, de 2018, não tem nada ali. Na da direita, deste mês, apareceu um ponto azul brilhando no braço da galáxia.\n\nEsse ponto é uma estrela que explodiu: a supernova SN 2026ahvu, na galáxia NGC 1433, a uns 50 milhões de anos-luz. Ela foi descoberta no dia 2 de novembro e está chegando ao brilho máximo por estes dias.\n\nÉ uma supernova do tipo Ia. Uma anã branca, o que sobra de uma estrela parecida com o Sol, foi puxando gás de uma estrela vizinha até passar do limite e estourar inteira.\n\nE a melhor parte: essa galáxia fica no céu do sul. No Brasil ela passa alta perto da meia-noite, na constelação do Relógio. Da Europa, quase não aparece. Quem tem um telescópio de uns 20 cm e céu escuro já pode tentar achar.\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 International Gemini Observatory/NOIRLab/NSF/AURA e Dark Energy Survey/DOE/FNAL/DECam/CTIO/NOIRLab/NSF/AURA (CC BY 4.0). Comparação: Neural Update.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
-   "curtidas_campo": 0,
+   "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 61,
-   "reach": 30,
-   "likes": 0,
+   "views": 63,
+   "reach": 31,
+   "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 1,
+   "total_interactions": 2,
    "reposts": 0
   },
   {
@@ -6906,8 +7190,8 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 38,
-   "reach": 20,
+   "views": 42,
+   "reach": 21,
    "likes": 2,
    "comments": 1,
    "shares": 0,
@@ -6925,16 +7209,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 172,
-   "reach": 155,
+   "views": 173,
+   "reach": 156,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 8155,
-   "ig_reels_video_view_total_time": 1280386,
-   "reels_skip_rate": 61.1,
+   "ig_reels_avg_watch_time": 8111,
+   "ig_reels_video_view_total_time": 1281605,
+   "reels_skip_rate": 61.4,
    "reposts": 1
   },
   {
@@ -6947,16 +7231,16 @@
    "curtidas_campo": 15,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 307,
-   "reach": 261,
+   "views": 312,
+   "reach": 262,
    "likes": 15,
    "comments": 1,
    "shares": 1,
    "saved": 2,
    "total_interactions": 19,
-   "ig_reels_avg_watch_time": 15713,
-   "ig_reels_video_view_total_time": 4164135,
-   "reels_skip_rate": 40.9,
+   "ig_reels_avg_watch_time": 15693,
+   "ig_reels_video_view_total_time": 4174577,
+   "reels_skip_rate": 41.1,
    "reposts": 0
   },
   {
@@ -7013,16 +7297,16 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 26,
-   "reach": 13,
+   "views": 27,
+   "reach": 14,
    "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 9511,
-   "ig_reels_video_view_total_time": 199750,
-   "reels_skip_rate": 40,
+   "ig_reels_avg_watch_time": 9391,
+   "ig_reels_video_view_total_time": 206602,
+   "reels_skip_rate": 38.1,
    "reposts": 1
   },
   {
@@ -7255,16 +7539,16 @@
    "curtidas_campo": 6,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 286,
-   "reach": 263,
+   "views": 288,
+   "reach": 264,
    "likes": 6,
    "comments": 1,
    "shares": 0,
    "saved": 1,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 10124,
-   "ig_reels_video_view_total_time": 2713376,
-   "reels_skip_rate": 50,
+   "ig_reels_avg_watch_time": 10095,
+   "ig_reels_video_view_total_time": 2715676,
+   "reels_skip_rate": 50.2,
    "reposts": 0
   },
   {
@@ -7959,15 +8243,15 @@
    "curtidas_campo": 27,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1203,
-   "reach": 1067,
+   "views": 1204,
+   "reach": 1068,
    "likes": 27,
    "comments": 1,
    "shares": 0,
    "saved": 4,
    "total_interactions": 32,
-   "ig_reels_avg_watch_time": 32511,
-   "ig_reels_video_view_total_time": 35307176,
+   "ig_reels_avg_watch_time": 32481,
+   "ig_reels_video_view_total_time": 35307727,
    "reels_skip_rate": 26.5,
    "reposts": 0
   },
@@ -8883,16 +9167,16 @@
    "curtidas_campo": 14,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 216,
-   "reach": 167,
+   "views": 218,
+   "reach": 168,
    "likes": 14,
    "comments": 1,
    "shares": 1,
    "saved": 1,
    "total_interactions": 17,
-   "ig_reels_avg_watch_time": 8217,
-   "ig_reels_video_view_total_time": 1544822,
-   "reels_skip_rate": 65,
+   "ig_reels_avg_watch_time": 8180,
+   "ig_reels_video_view_total_time": 1546070,
+   "reels_skip_rate": 65.2,
    "reposts": 0
   },
   {
@@ -9519,18 +9803,18 @@
    "titulo": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é ",
    "legenda": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é inverno. 🌍\n\nSe fosse a distância, o mundo todo teria verão junto. A diferença é só de uns 5 milhões de km (147 milhões em janeiro, 152 em julho). Quem manda nas estações é a inclinação da Terra, de uns 23 graus.\n\n🔖 Salva pra explicar isso na próxima vez que alguém falar de estação.\n📤 Manda pra quem achava que era a distância.\n👉 Segue @neuralupdate e conta nos comentários: você achava que era a distância?\n\n📚 Fonte: NASA Science — Earth Facts; distâncias calculadas por efemérides.\n\n#estacoes #terra #astronomia #ciencia #universo #neuralupdate",
    "curtidas_campo": 5,
-   "comentarios_campo": 3,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 252,
+   "views": 254,
    "reach": 205,
    "likes": 5,
-   "comments": 3,
+   "comments": 4,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 9,
-   "ig_reels_avg_watch_time": 9152,
-   "ig_reels_video_view_total_time": 1967888,
-   "reels_skip_rate": 59.6,
+   "total_interactions": 10,
+   "ig_reels_avg_watch_time": 9516,
+   "ig_reels_video_view_total_time": 2064974,
+   "reels_skip_rate": 59.3,
    "reposts": 0
   },
   {
@@ -9990,8 +10274,8 @@
    "shares": 8,
    "saved": 4,
    "total_interactions": 44,
-   "ig_reels_avg_watch_time": 21281,
-   "ig_reels_video_view_total_time": 19621948,
+   "ig_reels_avg_watch_time": 21279,
+   "ig_reels_video_view_total_time": 19640676,
    "reels_skip_rate": 46.7,
    "reposts": 3
   },
@@ -10379,16 +10663,16 @@
    "curtidas_campo": 66,
    "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 4312,
-   "reach": 3415,
+   "views": 4314,
+   "reach": 3416,
    "likes": 66,
    "comments": 3,
    "shares": 2,
    "saved": 5,
    "total_interactions": 80,
-   "ig_reels_avg_watch_time": 18818,
-   "ig_reels_video_view_total_time": 66747791,
-   "reels_skip_rate": 29.3,
+   "ig_reels_avg_watch_time": 18814,
+   "ig_reels_video_view_total_time": 66752881,
+   "reels_skip_rate": 29.2,
    "reposts": 4
   },
   {
