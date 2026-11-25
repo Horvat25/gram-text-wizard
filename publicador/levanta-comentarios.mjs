@@ -93,14 +93,18 @@ async function main() {
   const comentarios = [];
   let ig_midias = 0;
   for (const m of midias.itens) {
-    const cs = await paginas(await get(`/${m.id}/comments`, { fields: 'id,text,username,timestamp,like_count,replies{id,username}', limit: '100' }), 10);
+    const cs = await paginas(await get(`/${m.id}/comments`, { fields: 'id,text,username,timestamp,like_count,replies.limit(50){id,username,text,timestamp}', limit: '100' }), 10);
     if (cs.erro) { erros.push('ig comentarios: ' + cs.erro); continue; }
     ig_midias++;
     for (const c of cs.itens) {
       const nome = (c.username || '').toLowerCase();
       if (!nome || nome === MEU) continue;
-      const respondido = (c.replies?.data || []).some(r => (r.username || '').toLowerCase() === MEU);
-      comentarios.push({ rede: 'ig', id: c.id, midia: m.id, tipo: m.media_product_type, video: slugPorId.get(m.id) || null, link: m.permalink, em: c.timestamp, quem: nome, texto: c.text || '', curtidas: c.like_count || 0, respondido });
+      const fio = (c.replies?.data || []).map(r => ({ id: r.id, quem: (r.username || '').toLowerCase(), texto: r.text || '', em: r.timestamp, nosso: (r.username || '').toLowerCase() === MEU }));
+      const respondido = fio.some(r => r.nosso);
+      // RÉPLICA (25/11): alguém escreveu no fio DEPOIS da nossa primeira resposta.
+      const nossa = fio.filter(r => r.nosso).sort((a, b) => (a.em < b.em ? -1 : 1))[0] || null;
+      const replicas = nossa ? fio.filter(r => !r.nosso && r.em > nossa.em) : [];
+      comentarios.push({ rede: 'ig', id: c.id, midia: m.id, tipo: m.media_product_type, video: slugPorId.get(m.id) || null, link: m.permalink, em: c.timestamp, quem: nome, texto: c.text || '', curtidas: c.like_count || 0, respondido, fio, nossa, replicas });
     }
   }
 

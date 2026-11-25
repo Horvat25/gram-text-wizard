@@ -52,9 +52,11 @@ const pausaAleatoria = () => (PAUSA_MIN_S + Math.random() * (PAUSA_MAX_S - PAUSA
 if (!fs.existsSync(ENTRADA)) { console.log('sem arquivo de respostas pendentes: nada a fazer'); process.exit(0); }
 const entrada = JSON.parse(fs.readFileSync(ENTRADA, 'utf8'));
 const ja = fs.existsSync(SAIDA) ? JSON.parse(fs.readFileSync(SAIDA, 'utf8')) : [];
-const feitos = new Set(ja.map(x => x.id_comentario));
+// chave de controle: resposta a comentário = id do comentário; resposta a RÉPLICA (25/11) = 'r:' + id da réplica
+const chaveDe = x => (x.id_replica ? 'r:' + x.id_replica : String(x.id_comentario));
+const feitos = new Set(ja.map(x => x.chave || String(x.id_comentario)));
 
-const fila = entrada.filter(x => x.id_comentario && String(x.resposta || '').trim() && x.aprovado_em && !x.publicado && !feitos.has(String(x.id_comentario)));
+const fila = entrada.filter(x => x.id_comentario && String(x.resposta || '').trim() && x.aprovado_em && !x.publicado && !feitos.has(chaveDe(x)));
 const recusados = entrada.filter(x => !x.aprovado_em).length;
 console.log(`respostas no arquivo: ${entrada.length} · aprovadas e pendentes: ${fila.length} · sem aprovação (ignoradas): ${recusados}`);
 
@@ -74,11 +76,11 @@ if (!fila.length) { console.log('nada aprovado pendente'); process.exit(0); }
 // nome de quem comentou só vive em memória (pra intercalar); nunca é gravado nem impresso
 const autor = {};
 for (const x of fila) {
-  try { const c = await get('/' + x.id_comentario, { fields: 'username' }); autor[String(x.id_comentario)] = (c.username || '').toLowerCase(); } catch { autor[String(x.id_comentario)] = ''; }
+  try { const c = await get('/' + (x.id_replica || x.id_comentario), { fields: 'username' }); autor[chaveDe(x)] = (c.username || '').toLowerCase(); } catch { autor[chaveDe(x)] = ''; }
 }
 // intercala: pega primeiro de quem tem menos itens na fila, sem repetir o mesmo autor em seguida
 const grupos = new Map();
-for (const x of fila) { const a = autor[String(x.id_comentario)] || ('_' + x.id_comentario); if (!grupos.has(a)) grupos.set(a, []); grupos.get(a).push(x); }
+for (const x of fila) { const a = autor[chaveDe(x)] || ('_' + chaveDe(x)); if (!grupos.has(a)) grupos.set(a, []); grupos.get(a).push(x); }
 const ordem = [];
 let ultimo = null;
 while ([...grupos.values()].some(g => g.length)) {
@@ -100,30 +102,38 @@ for (const x of lote) {
   const id = String(x.id_comentario);
   try {
     // já respondido por nós? (não duplica)
-    const antes = await get(`/${id}/replies`, { fields: 'id,username', limit: '50' });
+    const antes = await get(`/${id}/replies`, { fields: 'id,username,timestamp', limit: '50' });
     if (antes.error) throw new Error('lendo respostas: ' + String(antes.error.message).slice(0, 120));
-    const minha = (antes.data || []).find(r => (r.username || '').toLowerCase() === MEU);
-    if (minha) { console.log(`ja respondido: ${id} -> ${minha.id}`); resultado.push({ id_comentario: id, id_resposta: minha.id, em: new Date().toISOString(), origem: 'ja_existia', verificada: true }); continue; }
+    let minha;
+    if (x.id_replica) {
+      // réplica: só conta como "já respondida" se nós escrevemos DEPOIS dela
+      const rep = (antes.data || []).find(r => r.id === String(x.id_replica));
+      if (!rep) throw new Error('réplica não encontrada no fio (apagada?)');
+      minha = (antes.data || []).find(r => (r.username || '').toLowerCase() === MEU && r.timestamp > rep.timestamp);
+    } else {
+      minha = (antes.data || []).find(r => (r.username || '').toLowerCase() === MEU);
+    }
+    if (minha) { console.log(`ja respondido: ${id} -> ${minha.id}`); resultado.push({ id_comentario: id, chave: chaveDe(x), id_resposta: minha.id, em: new Date().toISOString(), origem: 'ja_existia', verificada: true }); continue; }
     const r = await post(`/${id}/replies`, { message: String(x.resposta) });
     if (!r.id) throw new Error('POST: ' + JSON.stringify(r).slice(0, 200));
     await dorme(2500);
     const depois = await get(`/${id}/replies`, { fields: 'id,username', limit: '50' });
     const achou = (depois.data || []).some(y => y.id === r.id && (y.username || '').toLowerCase() === MEU);
     console.log(`respondido: ${id} -> ${r.id} (aparece embaixo do comentario: ${achou ? 'sim' : 'NAO CONFIRMADO'})`);
-    resultado.push({ id_comentario: id, id_resposta: r.id, em: new Date().toISOString(), origem: 'postada_agora', verificada: achou });
+    resultado.push({ id_comentario: id, chave: chaveDe(x), id_resposta: r.id, em: new Date().toISOString(), origem: 'postada_agora', verificada: achou });
     if (!achou) erros++;
   } catch (e) {
     erros++;
     console.error(`falhou ${id}: ${String(e.message || e).slice(0, 200)}`);
-    resultado.push({ id_comentario: id, erro: String(e.message || e).slice(0, 200), em: new Date().toISOString() });
+    resultado.push({ id_comentario: id, chave: chaveDe(x), erro: String(e.message || e).slice(0, 200), em: new Date().toISOString() });
   }
 }
 
 const guardar = [...ja, ...resultado.filter(r => r.id_resposta)];
 fs.writeFileSync(SAIDA, JSON.stringify(guardar, null, 2) + '\n', 'utf8');
 // o que NÃO foi postado agora continua na entrada; o que foi (ou já existia) sai dela
-const postados = new Set(resultado.filter(r => r.id_resposta).map(r => String(r.id_comentario)));
-const resta = entrada.filter(x => !postados.has(String(x.id_comentario)) && !feitos.has(String(x.id_comentario)));
+const postados = new Set(resultado.filter(r => r.id_resposta).map(r => r.chave));
+const resta = entrada.filter(x => !postados.has(chaveDe(x)) && !feitos.has(chaveDe(x)));
 if (resta.length) fs.writeFileSync(ENTRADA, JSON.stringify(resta, null, 2) + '\n', 'utf8'); else fs.rmSync(ENTRADA, { force: true });
 console.log('restam na entrada: ' + resta.length);
 console.log(`\nresumo: ${resultado.filter(r => r.id_resposta).length} ok · ${resultado.filter(r => r.erro).length} com erro · ${resultado.filter(r => r.id_resposta && !r.verificada).length} nao confirmadas`);
