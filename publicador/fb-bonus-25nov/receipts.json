@@ -435,5 +435,10 @@
       "scheduled_publish_time": "2026-11-26T19:30:00+0000",
       "id": "2206095246649556"
     }
+  },
+  "fbb-cinturao-vazio": {
+    "quando": "2026-11-26T22:00:00.000Z",
+    "video_id": "1796341094813002",
+    "state": "SUBINDO"
   }
 }
