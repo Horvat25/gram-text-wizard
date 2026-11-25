@@ -622,5 +622,10 @@
       "scheduled_publish_time": "2026-11-27T02:30:00+0000",
       "id": "4631244610355621"
     }
+  },
+  "fbb-mercurio-encolhendo": {
+    "quando": "2026-11-26T18:45:00.000Z",
+    "video_id": "1025932317215812",
+    "state": "SUBINDO"
   }
 }
