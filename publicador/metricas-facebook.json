@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-26T12:23:43.718Z",
+  "gerado_em": "2026-11-26T19:08:38.584Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 147,
-    "curtidas": 147
+    "seguidores": 152,
+    "curtidas": 152
   },
   "pagina_diaria": [
     {
@@ -653,7 +653,7 @@
     },
     {
       "d": "2026-11-24",
-      "views": 1179
+      "views": 1180
     },
     {
       "d": "2026-11-25",
@@ -661,7 +661,7 @@
     },
     {
       "d": "2026-11-26",
-      "views": 160
+      "views": 593
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -1143,17 +1143,17 @@
     },
     {
       "d": "2026-11-18",
-      "valor": 0,
+      "valor": 0.0031,
       "moeda": "USD"
     },
     {
       "d": "2026-11-19",
-      "valor": 0.01,
+      "valor": 0.0101,
       "moeda": "USD"
     },
     {
       "d": "2026-11-20",
-      "valor": 0.01,
+      "valor": 0.0101,
       "moeda": "USD"
     },
     {
@@ -1195,16 +1195,133 @@
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
     {
+      "id": "2427937074621877",
+      "quando": "2026-11-26T17:12:42+0000",
+      "titulo": "Uma nave passou UM minuto ao lado desse asteroide (e Saturno apareceu na foto) 🪐",
+      "link": "https://www.facebook.com/reel/2427937074621877/",
+      "segundos": 41.083,
+      "curtidas": 1,
+      "comentarios": 0,
+      "views": 228,
+      "alcance": null,
+      "tempo_medio_ms": 7730,
+      "interacoes": 0
+    },
+    {
       "id": "1460166559651906",
       "quando": "2026-11-26T11:11:54+0000",
       "titulo": "Um telescópio soltou um mapa com mais de 1 BILHÃO de objetos (e essa galáxia dá pra ver daqui) 🌌",
       "link": "https://www.facebook.com/reel/1460166559651906/",
       "segundos": 39.708,
-      "curtidas": 5,
+      "curtidas": 7,
       "comentarios": 0,
-      "views": 252,
+      "views": 317,
       "alcance": null,
-      "tempo_medio_ms": 9575,
+      "tempo_medio_ms": 9180,
+      "interacoes": 0
+    },
+    {
+      "id": "1025932317215812",
+      "quando": "2026-11-25T22:37:24+0000",
+      "titulo": "Mercúrio está ENCOLHENDO 🪐",
+      "link": "https://www.facebook.com/reel/1025932317215812/",
+      "segundos": 15.38,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1179954127877279",
+      "quando": "2026-11-25T22:31:43+0000",
+      "titulo": "Essa tempestade é MAIOR que a Terra 🌀",
+      "link": "https://www.facebook.com/reel/1179954127877279/",
+      "segundos": 17.333,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 887,
+      "interacoes": 0
+    },
+    {
+      "id": "1170193482201710",
+      "quando": "2026-11-25T22:31:27+0000",
+      "titulo": "O lugar com MAIS VULCÃO não é a Terra 🌋",
+      "link": "https://www.facebook.com/reel/1170193482201710/",
+      "segundos": 17.88,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2145956956037172",
+      "quando": "2026-11-25T22:31:10+0000",
+      "titulo": "Esse asteroide é um MONTE DE PEDRA solta 🪨",
+      "link": "https://www.facebook.com/reel/2145956956037172/",
+      "segundos": 16.125,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 2,
+      "alcance": null,
+      "tempo_medio_ms": 586,
+      "interacoes": 0
+    },
+    {
+      "id": "1795050771748406",
+      "quando": "2026-11-25T22:30:50+0000",
+      "titulo": "Um anel que NÃO DEVIA existir (e um brasileiro achou) 💍",
+      "link": "https://www.facebook.com/reel/1795050771748406/",
+      "segundos": 21.38,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 1,
+      "alcance": null,
+      "tempo_medio_ms": 11400,
+      "interacoes": 0
+    },
+    {
+      "id": "1896864187989091",
+      "quando": "2026-11-25T22:30:31+0000",
+      "titulo": "Essa lua tem DUAS CORES ⚫⚪",
+      "link": "https://www.facebook.com/reel/1896864187989091/",
+      "segundos": 13.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2258272505069099",
+      "quando": "2026-11-25T21:46:26+0000",
+      "titulo": "Essa lua parece a ESTRELA DA MORTE 💀",
+      "link": "https://www.facebook.com/reel/2258272505069099/",
+      "segundos": 17.96,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "2122921248334325",
+      "quando": "2026-11-25T21:46:16+0000",
+      "titulo": "Outro lugar com CHUVA, rio e lago 🌧️",
+      "link": "https://www.facebook.com/reel/2122921248334325/",
+      "segundos": 18.75,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
       "interacoes": 0
     },
     {
@@ -1306,9 +1423,9 @@
       "segundos": 17.38,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 299,
+      "views": 301,
       "alcance": null,
-      "tempo_medio_ms": 4648,
+      "tempo_medio_ms": 4623,
       "interacoes": 0
     },
     {
@@ -1319,9 +1436,9 @@
       "segundos": 17.38,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 326,
+      "views": 332,
       "alcance": null,
-      "tempo_medio_ms": 5773,
+      "tempo_medio_ms": 5830,
       "interacoes": 0
     },
     {
@@ -1332,9 +1449,9 @@
       "segundos": 18.46,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 283,
+      "views": 284,
       "alcance": null,
-      "tempo_medio_ms": 5272,
+      "tempo_medio_ms": 5256,
       "interacoes": 0
     },
     {
@@ -1345,9 +1462,9 @@
       "segundos": 41.958,
       "curtidas": 4,
       "comentarios": 0,
-      "views": 253,
+      "views": 256,
       "alcance": null,
-      "tempo_medio_ms": 3545,
+      "tempo_medio_ms": 3541,
       "interacoes": 0
     },
     {
@@ -1397,9 +1514,9 @@
       "segundos": 38.75,
       "curtidas": 7,
       "comentarios": 0,
-      "views": 383,
+      "views": 385,
       "alcance": null,
-      "tempo_medio_ms": 9108,
+      "tempo_medio_ms": 9086,
       "interacoes": 0
     },
     {
@@ -1410,7 +1527,7 @@
       "segundos": 42.25,
       "curtidas": 8,
       "comentarios": 0,
-      "views": 497,
+      "views": 498,
       "alcance": null,
       "tempo_medio_ms": 10200,
       "interacoes": 0
@@ -1475,9 +1592,9 @@
       "segundos": 41.291,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 1095,
+      "views": 1097,
       "alcance": null,
-      "tempo_medio_ms": 16928,
+      "tempo_medio_ms": 16986,
       "interacoes": 0
     },
     {
@@ -1761,9 +1878,9 @@
       "segundos": 12.21,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 363,
+      "views": 364,
       "alcance": null,
-      "tempo_medio_ms": 3853,
+      "tempo_medio_ms": 3842,
       "interacoes": 0
     },
     {
@@ -1878,9 +1995,9 @@
       "segundos": 36.38,
       "curtidas": 6,
       "comentarios": 0,
-      "views": 358,
+      "views": 359,
       "alcance": null,
-      "tempo_medio_ms": 6896,
+      "tempo_medio_ms": 6876,
       "interacoes": 0
     },
     {
@@ -3670,123 +3787,6 @@
       "titulo": "Quando duas estrelas mortas batem, o flash dura menos de 1 segundo. Esse durou quase 10 minutos. 💥",
       "link": "https://www.facebook.com/reel/1091902520262536/",
       "segundos": 39,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1845611563544876",
-      "quando": "2026-10-05T21:36:02+0000",
-      "titulo": "Nesta terça (6/10), antes do sol nascer, olha pro leste. 🌙",
-      "link": "https://www.facebook.com/reel/1845611563544876/",
-      "segundos": 33.5,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2558617354635960",
-      "quando": "2026-10-05T17:11:00+0000",
-      "titulo": "Qual é o planeta mais quente? Não é o mais perto do Sol. É Vênus. 🔥",
-      "link": "https://www.facebook.com/reel/2558617354635960/",
-      "segundos": 43.38,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2135920353669195",
-      "quando": "2026-10-05T11:12:46+0000",
-      "titulo": "7 horas e 55 minutos, do chão da Flórida até a Estação Espacial. 🚀",
-      "link": "https://www.facebook.com/reel/2135920353669195/",
-      "segundos": 36.5,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1294549992778535",
-      "quando": "2026-10-04T21:11:21+0000",
-      "titulo": "Tudo que você está vendo agora já aconteceu. 👀",
-      "link": "https://www.facebook.com/reel/1294549992778535/",
-      "segundos": 38.25,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "28866487826308135",
-      "quando": "2026-10-04T17:11:09+0000",
-      "titulo": "Júpiter, Urano e Netuno também têm anéis. Por que só os de Saturno brilham assim? 🪐",
-      "link": "https://www.facebook.com/reel/28866487826308135/",
-      "segundos": 42.67,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2109895606267179",
-      "quando": "2026-10-04T11:11:13+0000",
-      "titulo": "A Lua que você vê de noite nasceu de uma batida. 💥",
-      "link": "https://www.facebook.com/reel/2109895606267179/",
-      "segundos": 39.88,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1076668438486401",
-      "quando": "2026-10-03T21:12:45+0000",
-      "titulo": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐",
-      "link": "https://www.facebook.com/reel/1076668438486401/",
-      "segundos": 39.333,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1574517007264292",
-      "quando": "2026-10-03T17:11:09+0000",
-      "titulo": "A Lua está caindo na Terra. E nunca chega. 🌕",
-      "link": "https://www.facebook.com/reel/1574517007264292/",
-      "segundos": 41.17,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 2,
-      "alcance": null,
-      "tempo_medio_ms": 41640,
-      "interacoes": 0
-    },
-    {
-      "id": "2037518846932941",
-      "quando": "2026-10-03T11:11:46+0000",
-      "titulo": "Marte é vermelho de poeira. Mas o gelo do polo norte é quase limpo. 🧊",
-      "link": "https://www.facebook.com/reel/2037518846932941/",
-      "segundos": 36.5,
       "curtidas": 0,
       "comentarios": 0,
       "views": 0,
