@@ -7702,9 +7702,12 @@
     ],
     "legenda": "A Lua é mais estreita que o Brasil.\n\nEla tem 3.475 km de diâmetro. O Brasil tem 4.319 km de largura, da Ponta do Seixas, na Paraíba, até a Serra da Contamana, no Acre. Se desse pra pôr a Lua em cima do mapa, sobrava Brasil dos dois lados.\n\nMas tem uma pegadinha: a Lua é uma bola, e o mapa é plano. Somando a superfície inteira dela, dá uns 38 milhões de km², quase quatro vezes e meia a área do Brasil.\n\nEssa imagem foi montada pela NASA com dados da sonda LRO, que está em órbita da Lua desde 2009.\n\nRepara nas manchas escuras. Os antigos acharam que eram mares, e o nome ficou. Mas lá não tem água: são planícies de lava que esfriou há bilhões de anos. As partes claras são terrenos mais antigos, cheios de crateras.\n\nPequena perto da Terra, grande perto do Brasil, e sempre mostrando a mesma face pra gente. 🌕\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA/Goddard (dados da sonda Lunar Reconnaissance Orbiter)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
     "slug": "fb-26nov-lua-menor-que-o-brasil",
-    "status": "agendado",
+    "status": "publicado",
     "origem": "carrossel/de-facebook.js",
-    "comentario": "Qual parte você mostraria pra alguém? 👇"
+    "comentario": "Qual parte você mostraria pra alguém? 👇",
+    "id_instagram": "18101755325404190",
+    "publicado_em": "2026-11-26T11:10:58.079Z",
+    "id_comentario": "18081281147458904"
   },
   {
     "quando": "2026-11-26T11:00:00.000Z",
@@ -7712,8 +7715,12 @@
     "midia": "https://d2ol7oe51mr4n9.cloudfront.net/user_3FEgp6kMSvGt3fNBef4FRA7wKUO/3c22b7ac-1673-479a-ba0c-33375a8e51c0.mp4",
     "legenda": "Um telescópio soltou um mapa com mais de 1 BILHÃO de objetos (e essa galáxia dá pra ver daqui) 🌌\n\nO telescópio espacial Euclid, da ESA, soltou seu primeiro grande pacote de dados (DR1-Foundation): mais de um bilhão de objetos, num mosaico de quase 500 gigapixels que cobre ~1.900 graus quadrados, 14% do céu que a missão vai mapear. A galáxia NGC 1291, em forma de anel, fica a ~33 milhões de anos-luz, no céu do sul. O objetivo da missão é mapear como a matéria escura e a energia escura moldaram o universo. O pacote completo sai em junho de 2027.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: ESA — Euclid DR1-Foundation (12/11/2026).\n\n#euclid #galaxias #astronomia #neuralupdate",
     "slug": "nw-euclid-mapa-de-um-bilhao-de-objetos",
-    "status": "agendado",
-    "comentario": "🌌 Qual pedaço do céu você ia querer ver de perto? 👇"
+    "status": "publicado",
+    "comentario": "🌌 Qual pedaço do céu você ia querer ver de perto? 👇",
+    "id_instagram": "17884112544546207",
+    "publicado_em": "2026-11-26T11:11:35.871Z",
+    "id_comentario": "18163240549507966",
+    "id_facebook": "1460166559651906"
   },
   {
     "quando": "2026-11-26T11:05:00.000Z",
@@ -7721,7 +7728,9 @@
     "midia": "https://raw.githubusercontent.com/Horvat25/gram-text-wizard/main/publicador/fb-posts/stories/story-noticia-2026-11-26.jpg",
     "legenda": "",
     "slug": "story-noticia-2026-11-26",
-    "status": "agendado"
+    "status": "publicado",
+    "id_instagram": "18647418667042684",
+    "publicado_em": "2026-11-26T11:11:53.706Z"
   },
   {
     "quando": "2026-11-26T12:30:00.000Z",
