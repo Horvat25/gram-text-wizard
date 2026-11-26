@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-11-25T19:25:24.259Z",
+  "gerado_em": "2026-11-26T03:48:28.440Z",
   "pagina": {
     "id": "962589380261249",
     "nome": "Neural Update",
-    "seguidores": 144,
-    "curtidas": 144
+    "seguidores": 145,
+    "curtidas": 145
   },
   "pagina_diaria": [
     {
@@ -657,7 +657,7 @@
     },
     {
       "d": "2026-11-25",
-      "views": 481
+      "views": 1716
     }
   ],
   "pagina_diaria_metrica": "page_media_view",
@@ -730,461 +730,549 @@
     {
       "d": "2026-08-28",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-08-29",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-08-30",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-08-31",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-01",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-02",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-03",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-04",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-05",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-06",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-07",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-08",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-09",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-10",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-11",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-12",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-13",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-14",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-15",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-16",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-17",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-18",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-19",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-20",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-21",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-22",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-23",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-24",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-25",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-26",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-27",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-28",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-29",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-09-30",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-01",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-02",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-03",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-04",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-05",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-06",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-07",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-08",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-09",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-10",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-11",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-12",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-13",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-14",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-15",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-16",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-17",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-18",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-19",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-20",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-21",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-22",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-23",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-24",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-25",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-26",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-27",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-28",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-29",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-30",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-10-31",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-01",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-02",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-03",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-04",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-05",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-06",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-07",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-08",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-09",
       "valor": 0.0014,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-10",
       "valor": 0.2243,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-11",
       "valor": 0.1402,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-12",
       "valor": 0.19,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-13",
       "valor": 0.0136,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-14",
       "valor": 0.0111,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-15",
       "valor": 0.07,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-16",
       "valor": 0.0111,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-17",
       "valor": 0.0101,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-18",
       "valor": 0,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-19",
       "valor": 0.01,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-20",
       "valor": 0.01,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-21",
       "valor": 0.02,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-22",
       "valor": 0.05,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-23",
       "valor": 0.01,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-24",
       "valor": 0.01,
-      "moeda": "USD"
+      "moeda": null
     },
     {
       "d": "2026-11-25",
-      "valor": 0,
-      "moeda": "USD"
+      "valor": 0.01,
+      "moeda": null
     }
   ],
-  "ganhos_metrica": "content_monetization_earnings",
-  "ganhos_resposta_crua": {
-    "currency": "USD",
-    "microAmount": 137400
-  },
+  "ganhos_metrica": "monetization_approximate_earnings",
+  "ganhos_resposta_crua": 0.001374,
   "metricas_usadas": "fb_reels_total_plays,blue_reels_play_count,fb_reels_replay_count,post_video_avg_time_watched,post_video_view_time,post_video_social_actions,post_video_likes_by_reaction_type",
   "itens": [
+    {
+      "id": "2133199791402984",
+      "quando": "2026-11-25T21:45:24+0000",
+      "titulo": "Essa lua tem MAIS ÁGUA que a Terra 🌊",
+      "link": "https://www.facebook.com/reel/2133199791402984/",
+      "segundos": 19.5,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1824016712486683",
+      "quando": "2026-11-25T21:45:13+0000",
+      "titulo": "Em Mercúrio, um dia dura DOIS ANOS ☀️",
+      "link": "https://www.facebook.com/reel/1824016712486683/",
+      "segundos": 17.67,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1096662670099744",
+      "quando": "2026-11-25T21:45:03+0000",
+      "titulo": "O ponto que BRILHA no cinturão de asteroides ✨",
+      "link": "https://www.facebook.com/reel/1096662670099744/",
+      "segundos": 18.083,
+      "curtidas": 0,
+      "comentarios": 0,
+      "views": 0,
+      "alcance": null,
+      "tempo_medio_ms": 0,
+      "interacoes": 0
+    },
+    {
+      "id": "1836072704180730",
+      "quando": "2026-11-25T21:44:53+0000",
+      "titulo": "Essa lua anda na CONTRAMÃO 🔵",
+      "link": "https://www.facebook.com/reel/1836072704180730/",
+      "segundos": 17.38,
+      "curtidas": 2,
+      "comentarios": 0,
+      "views": 290,
+      "alcance": null,
+      "tempo_medio_ms": 4629,
+      "interacoes": 0
+    },
+    {
+      "id": "1200453192417836",
+      "quando": "2026-11-25T21:44:43+0000",
+      "titulo": "Essa lua anda na CONTRAMÃO 🔵",
+      "link": "https://www.facebook.com/reel/1200453192417836/",
+      "segundos": 17.38,
+      "curtidas": 3,
+      "comentarios": 0,
+      "views": 305,
+      "alcance": null,
+      "tempo_medio_ms": 5888,
+      "interacoes": 0
+    },
+    {
+      "id": "1724495619161625",
+      "quando": "2026-11-25T21:44:31+0000",
+      "titulo": "Plutão tem um CORAÇÃO de gelo 🤍",
+      "link": "https://www.facebook.com/reel/1724495619161625/",
+      "segundos": 18.46,
+      "curtidas": 3,
+      "comentarios": 0,
+      "views": 281,
+      "alcance": null,
+      "tempo_medio_ms": 5301,
+      "interacoes": 0
+    },
+    {
+      "id": "1724657022694019",
+      "quando": "2026-11-25T21:11:27+0000",
+      "titulo": "Procurou o CRUZEIRO DO SUL hoje e NÃO achou? Ele não sumiu (só muda de hora) ✝️",
+      "link": "https://www.facebook.com/reel/1724657022694019/",
+      "segundos": 41.958,
+      "curtidas": 4,
+      "comentarios": 0,
+      "views": 252,
+      "alcance": null,
+      "tempo_medio_ms": 3556,
+      "interacoes": 0
+    },
     {
       "id": "28686959064316153",
       "quando": "2026-11-25T17:12:59+0000",
@@ -1193,9 +1281,9 @@
       "segundos": 40.333,
       "curtidas": 0,
       "comentarios": 0,
-      "views": 230,
+      "views": 245,
       "alcance": null,
-      "tempo_medio_ms": 4785,
+      "tempo_medio_ms": 4819,
       "interacoes": 0
     },
     {
@@ -1206,9 +1294,9 @@
       "segundos": 42.291,
       "curtidas": 4,
       "comentarios": 0,
-      "views": 278,
+      "views": 313,
       "alcance": null,
-      "tempo_medio_ms": 9400,
+      "tempo_medio_ms": 9106,
       "interacoes": 0
     },
     {
@@ -1219,9 +1307,9 @@
       "segundos": 33.958,
       "curtidas": 2,
       "comentarios": 0,
-      "views": 242,
+      "views": 245,
       "alcance": null,
-      "tempo_medio_ms": 6231,
+      "tempo_medio_ms": 6195,
       "interacoes": 0
     },
     {
@@ -1232,9 +1320,9 @@
       "segundos": 38.75,
       "curtidas": 7,
       "comentarios": 0,
-      "views": 382,
+      "views": 383,
       "alcance": null,
-      "tempo_medio_ms": 9043,
+      "tempo_medio_ms": 9108,
       "interacoes": 0
     },
     {
@@ -1271,9 +1359,9 @@
       "segundos": 37.083,
       "curtidas": 4,
       "comentarios": 0,
-      "views": 305,
+      "views": 306,
       "alcance": null,
-      "tempo_medio_ms": 4975,
+      "tempo_medio_ms": 4964,
       "interacoes": 0
     },
     {
@@ -1310,9 +1398,9 @@
       "segundos": 41.291,
       "curtidas": 1,
       "comentarios": 0,
-      "views": 1094,
+      "views": 1095,
       "alcance": null,
-      "tempo_medio_ms": 16944,
+      "tempo_medio_ms": 16928,
       "interacoes": 0
     },
     {
@@ -1609,9 +1697,9 @@
       "segundos": 12.833,
       "curtidas": 7,
       "comentarios": 0,
-      "views": 588,
+      "views": 589,
       "alcance": null,
-      "tempo_medio_ms": 4876,
+      "tempo_medio_ms": 4866,
       "interacoes": 0
     },
     {
@@ -1661,9 +1749,9 @@
       "segundos": 13.67,
       "curtidas": 3,
       "comentarios": 0,
-      "views": 387,
+      "views": 388,
       "alcance": null,
-      "tempo_medio_ms": 5536,
+      "tempo_medio_ms": 5519,
       "interacoes": 0
     },
     {
@@ -2114,7 +2202,7 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Esse mundo gelado tem nome de deus da Ilha de Páscoa. É Ma",
       "link": "https://www.facebook.com/reel/1843147703497460/",
       "segundos": 36.75,
-      "curtidas": 68,
+      "curtidas": 67,
       "comentarios": 0,
       "views": 5281,
       "alcance": null,
@@ -2153,11 +2241,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Um mundo gelado tirou Plutão da lista dos planetas. É Éris",
       "link": "https://www.facebook.com/reel/2185042108781347/",
       "segundos": 40.791,
-      "curtidas": 97,
+      "curtidas": 96,
       "comentarios": 0,
-      "views": 6801,
+      "views": 6802,
       "alcance": null,
-      "tempo_medio_ms": 7116,
+      "tempo_medio_ms": 7115,
       "interacoes": 1
     },
     {
@@ -2231,11 +2319,11 @@
       "titulo": "Escola de Astronomia Neural Update · Sistema Solar. Existe uma lua que parece uma esponja de lavar louça. É Hi",
       "link": "https://www.facebook.com/reel/1513211240897962/",
       "segundos": 38.5,
-      "curtidas": 52,
+      "curtidas": 51,
       "comentarios": 1,
-      "views": 5601,
+      "views": 5602,
       "alcance": null,
-      "tempo_medio_ms": 5968,
+      "tempo_medio_ms": 5967,
       "interacoes": 1
     },
     {
@@ -3687,97 +3775,6 @@
       "titulo": "A Lua passa na frente do Sol todo mês. Então por que não tem eclipse todo mês? 🌑",
       "link": "https://www.facebook.com/reel/3492798060884607/",
       "segundos": 41.88,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2126503587948549",
-      "quando": "2026-10-01T11:11:26+0000",
-      "titulo": "A NASA escolheu um telescópio pra ver o que nem o James Webb enxerga. 🌌",
-      "link": "https://www.facebook.com/reel/2126503587948549/",
-      "segundos": 42.875,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1409624841235687",
-      "quando": "2026-09-30T21:11:14+0000",
-      "titulo": "Astronautas voltam do espaço um pouquinho mais jovens. ⏳",
-      "link": "https://www.facebook.com/reel/1409624841235687/",
-      "segundos": 34.416,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1062257469898234",
-      "quando": "2026-09-30T17:11:12+0000",
-      "titulo": "O Big Bang não foi uma explosão. Foi o espaço esticando. 💫",
-      "link": "https://www.facebook.com/reel/1062257469898234/",
-      "segundos": 41.791,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2258985248279635",
-      "quando": "2026-09-30T11:11:53+0000",
-      "titulo": "O Hubble completou 200 mil voltas ao redor da Terra. 🔭",
-      "link": "https://www.facebook.com/reel/2258985248279635/",
-      "segundos": 40.291,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "1519555233234014",
-      "quando": "2026-09-29T21:11:15+0000",
-      "titulo": "Tem uma lua maior que um planeta. E ela esconde um oceano. 🌊",
-      "link": "https://www.facebook.com/reel/1519555233234014/",
-      "segundos": 39.625,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "4363839593926456",
-      "quando": "2026-09-29T17:11:26+0000",
-      "titulo": "Plutão foi planeta por 76 anos. Aí reprovou num teste. 🪐",
-      "link": "https://www.facebook.com/reel/4363839593926456/",
-      "segundos": 45.75,
-      "curtidas": 0,
-      "comentarios": 0,
-      "views": 0,
-      "alcance": null,
-      "tempo_medio_ms": 0,
-      "interacoes": 0
-    },
-    {
-      "id": "2305657907057106",
-      "quando": "2026-09-29T11:12:03+0000",
-      "titulo": "Um satélite do tamanho de uma caixa de sapatos quer aposentar um dos tanques. 🛰️",
-      "link": "https://www.facebook.com/reel/2305657907057106/",
-      "segundos": 41.75,
       "curtidas": 0,
       "comentarios": 0,
       "views": 0,
