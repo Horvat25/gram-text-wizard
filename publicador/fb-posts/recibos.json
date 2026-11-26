@@ -773,5 +773,19 @@
       "id": "122162730579153806"
     },
     "state": "AGENDADO"
+  },
+  "27nov-quantas-estrelas-voce-ve": {
+    "quando": "2026-11-27T14:00:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162730627153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795788000,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162730627153806",
+      "created_time": "2026-11-27T14:00:00+0000",
+      "id": "962589380261249_122162730627153806"
+    },
+    "state": "AGENDADO"
   }
 }
