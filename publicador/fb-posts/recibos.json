@@ -909,5 +909,18 @@
       "id": "962589380261249_122162731443153806"
     },
     "state": "AGENDADO"
+  },
+  "28nov-galaxia-barrada-ngc1300": {
+    "quando": "2026-11-28T22:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122162731479153806",
+    "foto_id": "122162731479153806",
+    "readback": {
+      "created_time": "2026-11-26T20:40:55+0000",
+      "link": "https://www.facebook.com/photo.php?fbid=122162731479153806&set=p.122162731479153806&type=3",
+      "id": "122162731479153806"
+    },
+    "state": "AGENDADO"
   }
 }
