@@ -732,5 +732,12 @@
     "quando": "2026-11-25T23:00:00.000Z",
     "tipo": "story",
     "state": "PERDIDO"
+  },
+  "fb-story-noticia-2026-11-26": {
+    "quando": "2026-11-26T11:05:00.000Z",
+    "tipo": "story",
+    "tentativas": 1,
+    "id": "1658839272389264",
+    "state": "PUBLICADO"
   }
 }
