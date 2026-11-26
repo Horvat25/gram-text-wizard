@@ -14,7 +14,8 @@ on:
     paths:
       - 'publicador/respostas-pendentes.json'
   schedule:
-    - cron: '7,37 11-23,0 * * *'
+    # a cada 10 min porque o cron do GitHub engole rodadas; o espaçamento real (>= 25 min) é garantido no script
+    - cron: '*/10 11-23,0 * * *'
   workflow_dispatch:
 
 concurrency:

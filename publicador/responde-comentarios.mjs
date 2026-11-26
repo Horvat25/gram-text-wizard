@@ -72,6 +72,11 @@ if (SECO) { console.log('[seco] não posta nada. Há', fila.length, 'aprovadas; 
 const hUTC = new Date().getUTCHours();
 if (!FORCAR_HORARIO && !(hUTC >= 11 || hUTC < 1)) { console.log('fora do horário (só 08h–22h BRT); ficam ' + fila.length + ' pendentes'); process.exit(0); }
 if (!fila.length) { console.log('nada aprovado pendente'); process.exit(0); }
+// TRAVA DE RITMO (26/11): o cron do GitHub falha muito (24→26/11 só 1 de ~12 rodadas disparou), então o workflow
+// acorda a cada 10 min e ESTE trava garante o espaçamento: só posta se a última resposta tem >= ESPACO_MIN min.
+const ESPACO_MIN = Number(process.env.RESPONDE_ESPACO_MIN || 25);
+const ultimaEm = ja.map(x => Date.parse(x.em)).filter(Number.isFinite).sort((a, b) => b - a)[0] || 0;
+if (!FORCAR_HORARIO && Date.now() - ultimaEm < ESPACO_MIN * 60000) { console.log('aguardando espaço: última resposta há ' + Math.round((Date.now() - ultimaEm) / 60000) + ' min (mínimo ' + ESPACO_MIN + ')'); process.exit(0); }
 
 // nome de quem comentou só vive em memória (pra intercalar); nunca é gravado nem impresso
 const autor = {};
