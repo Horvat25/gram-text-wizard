@@ -154,5 +154,21 @@
     "em": "2026-11-25T21:05:51.434Z",
     "origem": "postada_agora",
     "verificada": true
+  },
+  {
+    "id_comentario": "17883037377621250",
+    "chave": "r:18123133706050363",
+    "id_resposta": "18140652922639552",
+    "em": "2026-11-26T11:32:09.626Z",
+    "origem": "postada_agora",
+    "verificada": true
+  },
+  {
+    "id_comentario": "17956826298239143",
+    "chave": "17956826298239143",
+    "id_resposta": "18351803827250866",
+    "em": "2026-11-26T11:40:11.385Z",
+    "origem": "postada_agora",
+    "verificada": true
   }
 ]
