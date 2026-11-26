@@ -1,29 +1,25 @@
 {
- "gerado_em": "2026-11-25T19:10:44.281Z",
+ "gerado_em": "2026-11-26T18:57:24.812Z",
  "conta": {
   "username": "neuralupdate",
-  "seguidores": 1316,
-  "publicacoes": 1191
+  "seguidores": 1321,
+  "publicacoes": 1207
  },
- "total_listado": 1152,
- "com_tempo_assistido": 572,
+ "total_listado": 1162,
+ "com_tempo_assistido": 575,
  "sem_insights": 0,
  "conta_insights": {
   "series": {
    "seguidores_por_dia": [
     {
-     "de": "2026-10-27",
-     "ate": "2026-11-24",
+     "de": "2026-10-28",
+     "ate": "2026-11-25",
      "data": [
       {
        "id": "17841478894893058/insights/follower_count/day",
        "name": "follower_count",
        "period": "day",
        "values": [
-        {
-         "value": 0,
-         "end_time": "2026-10-28T07:00:00+0000"
-        },
         {
          "value": 2,
          "end_time": "2026-10-29T07:00:00+0000"
@@ -131,6 +127,10 @@
         {
          "value": 6,
          "end_time": "2026-11-24T08:00:00+0000"
+        },
+        {
+         "value": 3,
+         "end_time": "2026-11-25T08:00:00+0000"
         }
        ],
        "title": "Número de seguidores",
@@ -322,7 +322,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-25",
+     "ate": "2026-11-26",
      "data": [
       {
        "id": "17841478894893058/insights/follows_and_unfollows/day",
@@ -341,7 +341,7 @@
             "dimension_values": [
              "FOLLOWER"
             ],
-            "value": 40
+            "value": 43
            },
            {
             "dimension_values": [
@@ -590,7 +590,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-25",
+     "ate": "2026-11-26",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -599,7 +599,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 8719
+        "value": 8858
        }
       },
       {
@@ -609,7 +609,7 @@
        "title": "Visualizações",
        "description": "O número de vezes que seu conteúdo foi reproduzido ou exibido. O conteúdo inclui reels, posts e stories.",
        "total_value": {
-        "value": 15974
+        "value": 16746
        }
       },
       {
@@ -619,7 +619,7 @@
        "title": "Contas com engajamento",
        "description": "O número de contas que interagiram com seu conteúdo, inclusive em anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. As interações podem ser ações como curtir, salvar, comentar, compartilhar ou responder. Essas métricas são estimadas e estão em desenvolvimento.",
        "total_value": {
-        "value": 330
+        "value": 342
        }
       },
       {
@@ -629,7 +629,7 @@
        "title": "Interações com o conteúdo",
        "description": "O número total de interações com posts, stories, reels, vídeos e vídeos ao vivo, incluindo todas as interações em conteúdo turbinado.",
        "total_value": {
-        "value": 658
+        "value": 707
        }
       }
      ]
@@ -693,15 +693,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
-            ],
-            "value": 404
-           },
-           {
-            "dimension_values": [
              "NON_FOLLOWER"
             ],
             "value": 24395
+           },
+           {
+            "dimension_values": [
+             "FOLLOWER"
+            ],
+            "value": 404
            }
           ]
          }
@@ -804,15 +804,15 @@
           "results": [
            {
             "dimension_values": [
-             "NON_FOLLOWER"
-            ],
-            "value": 18410
-           },
-           {
-            "dimension_values": [
              "FOLLOWER"
             ],
             "value": 404
+           },
+           {
+            "dimension_values": [
+             "NON_FOLLOWER"
+            ],
+            "value": 18410
            }
           ]
          }
@@ -823,7 +823,7 @@
     },
     {
      "de": "2026-11-09",
-     "ate": "2026-11-25",
+     "ate": "2026-11-26",
      "data": [
       {
        "id": "17841478894893058/insights/reach/day",
@@ -832,7 +832,7 @@
        "title": "Contas alcançadas",
        "description": "O número de contas únicas que viram seu conteúdo pelo menos uma vez, inclusive anúncios. O conteúdo inclui posts, stories, reels, vídeos e vídeos ao vivo. O alcance é diferente das impressões, que podem incluir várias visualizações do seu conteúdo pelas mesmas contas. Essa métrica é estimada e está em desenvolvimento.",
        "total_value": {
-        "value": 8719,
+        "value": 8858,
         "breakdowns": [
          {
           "dimension_keys": [
@@ -841,15 +841,15 @@
           "results": [
            {
             "dimension_values": [
-             "FOLLOWER"
+             "NON_FOLLOWER"
             ],
-            "value": 258
+            "value": 8581
            },
            {
             "dimension_values": [
-             "NON_FOLLOWER"
+             "FOLLOWER"
             ],
-            "value": 8444
+            "value": 260
            }
           ]
          }
@@ -894,7 +894,7 @@
             "dimension_values": [
              "25-34"
             ],
-            "value": 301
+            "value": 303
            },
            {
             "dimension_values": [
@@ -906,7 +906,7 @@
             "dimension_values": [
              "45-54"
             ],
-            "value": 294
+            "value": 296
            },
            {
             "dimension_values": [
@@ -918,7 +918,7 @@
             "dimension_values": [
              "65+"
             ],
-            "value": 107
+            "value": 108
            }
           ]
          }
@@ -953,13 +953,13 @@
             "dimension_values": [
              "M"
             ],
-            "value": 1033
+            "value": 1039
            },
            {
             "dimension_values": [
              "U"
             ],
-            "value": 164
+            "value": 163
            }
           ]
          }
@@ -1042,7 +1042,7 @@
             "dimension_values": [
              "BR"
             ],
-            "value": 1269
+            "value": 1273
            },
            {
             "dimension_values": [
@@ -1078,7 +1078,7 @@
             "dimension_values": [
              "GF"
             ],
-            "value": 1
+            "value": 2
            }
           ]
          }
@@ -1113,7 +1113,7 @@
             "dimension_values": [
              "São Paulo, São Paulo (state)"
             ],
-            "value": 99
+            "value": 100
            },
            {
             "dimension_values": [
@@ -1135,21 +1135,15 @@
            },
            {
             "dimension_values": [
-             "São José dos Campos, São Paulo (state)"
-            ],
-            "value": 5
-           },
-           {
-            "dimension_values": [
              "Contagem, Minas Gerais"
             ],
-            "value": 7
+            "value": 9
            },
            {
             "dimension_values": [
-             "Osasco, São Paulo (state)"
+             "Camaçari, Bahia"
             ],
-            "value": 6
+            "value": 5
            },
            {
             "dimension_values": [
@@ -1191,13 +1185,19 @@
             "dimension_values": [
              "Gama, Federal District"
             ],
-            "value": 7
+            "value": 6
            },
            {
             "dimension_values": [
              "São Sebastião, Federal District"
             ],
             "value": 5
+           },
+           {
+            "dimension_values": [
+             "Uberaba, Minas Gerais"
+            ],
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1215,13 +1215,13 @@
             "dimension_values": [
              "Recife, Pernambuco"
             ],
-            "value": 13
+            "value": 12
            },
            {
             "dimension_values": [
              "Brasília, Federal District"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1237,15 +1237,15 @@
            },
            {
             "dimension_values": [
-             "Piracicaba, São Paulo (state)"
+             "São Bernardo do Campo, São Paulo (state)"
             ],
             "value": 7
            },
            {
             "dimension_values": [
-             "São Bernardo do Campo, São Paulo (state)"
+             "Piracicaba, São Paulo (state)"
             ],
-            "value": 8
+            "value": 7
            },
            {
             "dimension_values": [
@@ -1291,6 +1291,12 @@
            },
            {
             "dimension_values": [
+             "Ipatinga, Minas Gerais"
+            ],
+            "value": 5
+           },
+           {
+            "dimension_values": [
              "Nova Iguaçu, Rio de Janeiro (state)"
             ],
             "value": 7
@@ -1299,7 +1305,7 @@
             "dimension_values": [
              "Maringá, Paraná"
             ],
-            "value": 5
+            "value": 6
            },
            {
             "dimension_values": [
@@ -1329,13 +1335,7 @@
             "dimension_values": [
              "Belo Horizonte, Minas Gerais"
             ],
-            "value": 30
-           },
-           {
-            "dimension_values": [
-             "São José do Rio Prêto, São Paulo (state)"
-            ],
-            "value": 5
+            "value": 31
            },
            {
             "dimension_values": [
@@ -1353,7 +1353,7 @@
             "dimension_values": [
              "Curitiba, Paraná"
             ],
-            "value": 15
+            "value": 16
            },
            {
             "dimension_values": [
@@ -1365,7 +1365,7 @@
             "dimension_values": [
              "Belém, Pará"
             ],
-            "value": 11
+            "value": 12
            },
            {
             "dimension_values": [
@@ -2629,13 +2629,93 @@
   "erros": [
    {
     "pedido": "seguidores_por_dia",
-    "janela": "2026-11-25",
-    "erro": "(#100) since param is not valid. Metrics data is available for the last 2 years"
+    "janela": "2026-11-26",
+    "erro": "(#100) The parameter since cannot be a timestamp greater than the value provided in the parameter until."
    }
   ]
  },
  "comentarios": {
   "porMidia": {
+   "17914479864310735": [
+    {
+     "texto": "🪐 Você conseguiu achar Saturno na foto? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T17:12:41+0000",
+     "respostas": []
+    }
+   ],
+   "17869433085678192": [
+    {
+     "texto": "Você já sabia disso? Conta aqui 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T17:11:50+0000",
+     "respostas": []
+    }
+   ],
+   "18114515366621725": [
+    {
+     "texto": "O que mais te surpreendeu aqui? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T17:11:20+0000",
+     "respostas": []
+    }
+   ],
+   "17982088557138438": [
+    {
+     "texto": "Ficou alguma dúvida? Pergunta aqui que a gente responde 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T17:10:49+0000",
+     "respostas": []
+    }
+   ],
+   "17884112544546207": [
+    {
+     "texto": "🌌 Qual pedaço do céu você ia querer ver de perto? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T11:11:35+0000",
+     "respostas": []
+    }
+   ],
+   "18101755325404190": [
+    {
+     "texto": "Qual parte você mostraria pra alguém? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T11:10:58+0000",
+     "respostas": []
+    }
+   ],
+   "18141107779638858": [
+    {
+     "texto": "De qual cidade você acompanha o céu? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T00:12:06+0000",
+     "respostas": []
+    }
+   ],
+   "17900813673412189": [
+    {
+     "texto": "Você já sabia disso? Conta aqui 👇",
+     "curtidas": 0,
+     "quando": "2026-11-26T00:11:10+0000",
+     "respostas": []
+    }
+   ],
+   "18123848078066732": [
+    {
+     "texto": "✝️ Você já achou o Cruzeiro do Sul? Conta de qual cidade 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T21:11:26+0000",
+     "respostas": []
+    }
+   ],
+   "18118797713519277": [
+    {
+     "texto": "O que mais te surpreendeu aqui? 👇",
+     "curtidas": 0,
+     "quando": "2026-11-25T19:49:42+0000",
+     "respostas": []
+    }
+   ],
    "18101040026166829": [
     {
      "texto": "❄️ Já imaginou uma nevasca no espaço? O que mais te surpreendeu nesse cometa? 👇",
@@ -4201,6 +4281,21 @@
        "texto": "@neuralupdate obrigado  pela explicação... na verdade a gente esquece que ela é  inclinada e nossa posição  super influencia neh?",
        "quando": "2026-11-25T14:03:15+0000",
        "curtidas": 0
+      },
+      {
+       "texto": "Isso mesmo, Patrycia! 🌍 A inclinação é o segredo: quando o nosso lado da Terra aponta pro Sol, é verão aqui. E sua pergunta foi ótima. Você mora em que cidade? No Sul a diferença entre as estações é bem mais forte que no Norte.",
+       "quando": "2026-11-25T20:58:07+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@neuralupdate moro no interior de sampa.  Campinas",
+       "quando": "2026-11-25T21:25:41+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "Campinas! 🌞 Aí fica pertinho do Trópico de Capricórnio: no comecinho de dezembro e de janeiro, perto do meio-dia, o Sol passa quase a pino e sua sombra quase some. Já reparou?",
+       "quando": "2026-11-26T16:12:45+0000",
+       "curtidas": 0
       }
      ]
     },
@@ -4397,6 +4492,11 @@
       {
        "texto": "@neuralupdate muitas nuvens noturnas fazendo carnaval noturno no céu de Salvador.",
        "quando": "2026-11-24T16:02:31+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "Que lindo, Rosilda! ☁️✨ Céu de Salvador com nuvem dançando dá foto boa. Numa noite aberta, procura Saturno no começo da noite, bem alto: é o ponto amarelado que não pisca. Se fotografar, manda pra gente!",
+       "quando": "2026-11-25T21:05:46+0000",
        "curtidas": 0
       }
      ]
@@ -5183,6 +5283,11 @@
        "texto": "Para virar alguma coisa temos que esplicar a gravidade e  não somente entender a gravidade",
        "quando": "2026-11-24T12:31:14+0000",
        "curtidas": 0
+      },
+      {
+       "texto": "Concordo, Ed! Explicar a gravidade é um dos maiores desafios da física. Einstein descreveu como ela funciona (a massa curva o espaço), mas ninguém conseguiu ainda juntar a gravidade com a física quântica. Quem conseguir leva o Nobel 😄",
+       "quando": "2026-11-26T11:32:05+0000",
+       "curtidas": 0
       }
      ]
     },
@@ -5589,7 +5694,13 @@
      "texto": "Apertado = buraco negro! A anatomia do universo 🔥🔥🔥",
      "curtidas": 0,
      "quando": "2026-08-30T20:29:13+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Isso aí, Ricardo! 🔥 Aperta qualquer coisa o suficiente e vira buraco negro. A Terra inteira, espremida, caberia numa bolinha de gude. Você chutaria esse tamanho?",
+       "quando": "2026-11-26T11:40:07+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -5627,13 +5738,25 @@
      "texto": "👏👏👏",
      "curtidas": 0,
      "quando": "2026-08-30T10:31:01+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Valeu, Dionísio! 🙌 Obrigado por acompanhar a gente desde o começo.",
+       "quando": "2026-11-26T12:09:57+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Dia histórico",
      "curtidas": 1,
      "quando": "2026-08-30T01:32:06+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Né, Jones? 🔭 Valeu por acompanhar com a gente desde agosto!",
+       "quando": "2026-11-26T12:17:33+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -5663,7 +5786,13 @@
      "texto": "🔥🔥🔥 energia e matéria é a mesma coisa ,só depende do referencial",
      "curtidas": 0,
      "quando": "2026-08-28T22:57:10+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Boa, Carlos! 🔥 É o E=mc² do Einstein: massa e energia são duas formas da mesma coisa. Uma colher de matéria guarda energia pra iluminar uma cidade inteira por muito tempo.",
+       "quando": "2026-11-26T12:44:28+0000",
+       "curtidas": 1
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -5771,7 +5900,13 @@
      "texto": "Mas, a antimatéria não sumiu.",
      "curtidas": 0,
      "quando": "2026-08-23T22:20:51+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Boa, Toninho! Ela não sumiu toda mesmo: ainda aparece em raios cósmicos, em raios de tempestade e até nos exames de PET dos hospitais. O mistério é por que quase toda a antimatéria do começo do universo desapareceu e a matéria sobrou 🤔",
+       "quando": "2026-11-26T12:51:30+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "📚 Curtiu? Isso aqui vira livro: o primeiro mês do Kindle Unlimited é grátis. Depois vira assinatura paga — se não quiser continuar, é só cancelar antes de o mês acabar e você não paga nada. Link na bio.",
@@ -5865,7 +6000,13 @@
      "texto": "Mas, a velocidade não está aumentando ?",
      "curtidas": 0,
      "quando": "2026-08-19T23:12:01+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Tá sim, Iara! 🌌 Faz uns 5 bilhões de anos que a expansão do universo está acelerando. A descoberta ganhou o Nobel de Física de 2011. Quem empurra é a tal energia escura, que ninguém sabe ainda o que é.",
+       "quando": "2026-11-26T13:19:54+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "17990922171010519": [
@@ -5873,7 +6014,13 @@
      "texto": "👏🏾👏🏾👏🏾👏🏾",
      "curtidas": 0,
      "quando": "2026-08-19T11:32:28+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Valeu, Dionatan! 🙌 Essa foto do Quinteto pelo James Webb é de cair o queixo, né?",
+       "quando": "2026-11-26T13:24:21+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "17888937702672875": [
@@ -5881,7 +6028,13 @@
      "texto": "Nenhuma interação, mas será que existe a possibilidade de algum neutrino chocar em algum particula em nosso corpo???",
      "curtidas": 0,
      "quando": "2026-08-17T13:43:11+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Existe sim, Sinval! 🤯 Mas é raríssimo: de trilhões que atravessam seu corpo a cada segundo, em média só um bate em algum átomo seu na vida inteira. E não faz mal nenhum.",
+       "quando": "2026-11-26T13:54:46+0000",
+       "curtidas": 1
+      }
+     ]
     }
    ],
    "17964214080173175": [
@@ -5889,7 +6042,13 @@
      "texto": "eu fico pensando: sera que o universo pegou as vibrações de energia de alguma borboleta e recriou em tamanho colossal😂",
      "curtidas": 1,
      "quando": "2026-08-13T22:12:24+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, a ideia é linda! 🦋 Na real, a forma vem de uma estrela morrendo: ela solta gás pros dois lados e um anel de poeira no meio aperta a 'cintura' da borboleta.",
+       "quando": "2026-11-26T14:28:23+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "18554784130072364": [
@@ -5897,7 +6056,13 @@
      "texto": "As árvores tocam um sinfonia e tmbm não ouvimos ... Tudo na natureza, tanto na Terra quando foram dela tem melodia ...",
      "curtidas": 1,
      "quando": "2026-08-14T01:33:50+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Que bonito isso 🌳🎶 E tem ciência nisso: cientistas gravaram plantas fazendo estalos de ultrassom quando falta água, num som que a gente não escuta. A natureza está sempre tocando alguma coisa.",
+       "quando": "2026-11-26T13:59:24+0000",
+       "curtidas": 1
+      }
+     ]
     }
    ],
    "18352045810172206": [
@@ -5905,7 +6070,18 @@
      "texto": "A primeira luz do universo começou a aparecer 270 anos após o Big Bang",
      "curtidas": 0,
      "quando": "2026-08-10T02:17:05+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Boa, Marci! Depende de qual luz: a luz mais antiga que dá pra ver saiu uns 380 mil anos depois do Big Bang, e as primeiras estrelas acenderam lá pelos 200 a 300 milhões de anos, segundo a NASA. Você quis dizer milhões? 🌌",
+       "quando": "2026-11-26T15:00:59+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@neuralupdate 380 mil anos luz foi detectado radiação cósmica de fundo em micro ondas ondas (\"primeira luz\") quando o universo esfriou o suficiente para que os fótons viajasse livremente e forem detectados pelo JAMES WEEB",
+       "quando": "2026-11-26T15:10:55+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "18107783800850975": [
@@ -5921,13 +6097,30 @@
      "texto": "Teoria das cordas transformar as partículas em nós",
      "curtidas": 0,
      "quando": "2026-08-10T01:02:13+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Isso, Diego! Na teoria das cordas cada partícula seria uma cordinha vibrando, e o jeito que ela vibra decide se é elétron, fóton… O desafio é que ninguém conseguiu testar ainda 🎻",
+       "quando": "2026-11-26T15:06:55+0000",
+       "curtidas": 0
+      }
+     ]
     },
     {
      "texto": "Os sófons?",
      "curtidas": 0,
      "quando": "2026-08-09T11:11:46+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Kkk, fã de O Problema dos 3 Corpos! 🛸 Os sófons são ficção, mas a ideia de partícula com dimensões extras 'dobradas' vem mesmo da teoria das cordas.",
+       "quando": "2026-11-26T15:35:12+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@neuralupdate exatamente! A descrição do livro é sensacional!",
+       "quando": "2026-11-26T15:48:43+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "18089441510647219": [
@@ -5960,7 +6153,13 @@
      "texto": "UAU !!!isto é fantastico",
      "curtidas": 1,
      "quando": "2026-07-19T17:25:49+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Né, Cissa? 🤩 Obrigado! Qual assunto do espaço você mais quer ver por aqui?",
+       "quando": "2026-11-26T15:42:31+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "18159310426472056": [
@@ -6030,10 +6229,27 @@
    ],
    "18079282760310168": [
     {
+     "texto": "... então nós estamos no centro do universo ? Se essa luz tem a mesma medida em todas as direções.  Estamos no centro do universo e essa luz é a casca ? E o que essa casca empurrou ? Se tudo se concentra em um ponto?",
+     "curtidas": 0,
+     "quando": "2026-11-26T18:27:54+0000",
+     "respostas": []
+    },
+    {
      "texto": "Mas se o lugar já existisse ? E se esse lugar fosse um campo Quantico que sofre cisalhamento e toda matéria surgisse desse momento, levando bilhões e bilhões de anos para vermos nesse momento o resultado da coagulação desse cisalhamento, nesse contexto não há necessidade de um big Bang por conseguinte não precisamos de uma expansão acelerada.",
      "curtidas": 0,
      "quando": "2026-08-11T04:17:33+0000",
-     "respostas": []
+     "respostas": [
+      {
+       "texto": "Ideia criativa, Sebastião! O que segura o Big Bang hoje são as provas: a luz que sobrou do começo do universo (a radiação cósmica de fundo) e as galáxias se afastando umas das outras. Se um modelo novo explicar tudo isso melhor, a ciência muda. É assim que ela anda 🔭",
+       "quando": "2026-11-26T14:32:48+0000",
+       "curtidas": 0
+      },
+      {
+       "texto": "@neuralupdate então nós estamos no centro do universo ? Se essa luz tem a mesma medida em todas as direções.  Estamos no centro do universo e essa luz é a casca ? E o que essa casca empurrou ? Se tudo se concentra em um ponto?",
+       "quando": "2026-11-26T18:30:00+0000",
+       "curtidas": 0
+      }
+     ]
     }
    ],
    "18126432442656546": [],
@@ -6110,25 +6326,224 @@
  "nota": "ig_reels_avg_watch_time vem em milissegundos. Dividir pela duração do Reel dá a retenção média.",
  "itens": [
   {
+   "id": "17914479864310735",
+   "quando": "2026-11-26T17:12:35+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgNnMkjvR7o/",
+   "titulo": "Uma nave passou UM minuto ao lado desse asteroide (e Saturno apareceu na foto) 🪐",
+   "legenda": "Uma nave passou UM minuto ao lado desse asteroide (e Saturno apareceu na foto) 🪐\n\nEm 10/07/2010, a sonda europeia Rosetta passou a 3.162 km do asteroide 21 Lutécia (121 × 101 × 75 km), a 15 km/s. O sobrevoo de perto durou cerca de um minuto, o suficiente pra mapear crateras e sulcos numa superfície de uns 3,6 bilhões de anos. Numa das fotos, Saturno aparece ao fundo. Segundo a ESA, Lutécia provavelmente é um planetesimal primordial, um bloco que sobrou da formação dos planetas.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: ESA — Rosetta, sobrevoo de 21 Lutetia (10/07/2010, 3.162 km); Sierks et al. e Pätzold et al., Science (2011).\n\n#asteroide #esa #aula #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 55,
+   "reach": 10,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 3,
+   "ig_reels_avg_watch_time": 15750,
+   "ig_reels_video_view_total_time": 141754,
+   "reels_skip_rate": 40,
+   "reposts": 0
+  },
+  {
+   "id": "17869433085678192",
+   "quando": "2026-11-26T17:11:45+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgNnKsoD-pn/",
+   "titulo": "O maior meteorito já encontrado no Brasil pesa 5,36 toneladas e sobreviveu até a um incêndio.",
+   "legenda": "O maior meteorito já encontrado no Brasil pesa 5,36 toneladas e sobreviveu até a um incêndio.\n\nÉ o Bendegó, um bloco de ferro e níquel que caiu do espaço no sertão da Bahia. Ele foi achado em 1784 por um menino que cuidava do gado, perto de onde hoje é a cidade de Monte Santo.\n\nTirar ele de lá foi uma saga. Na primeira tentativa, ainda em 1784, o carro de boi perdeu o freio e o meteorito foi parar num riacho, onde ficou por mais de cem anos. Só em 1888 uma expedição conseguiu levá-lo até o litoral e, de navio, até o Rio de Janeiro.\n\nDesde então, ele está no Museu Nacional, na Quinta da Boa Vista. Em 2 de setembro de 2018, o museu pegou fogo e boa parte do acervo foi perdida. O Bendegó continuou lá, inteiro.\n\nQuando foi encontrado, era o segundo maior meteorito conhecido no mundo. Hoje se conhecem outros maiores, mas ele segue sendo o maior do Brasil.\n\nUma pedra que atravessou o espaço e caiu na Terra não ia se render a um incêndio. ☄️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 11,
+   "reach": 6,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18114515366621725",
+   "quando": "2026-11-26T17:11:16+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgNnHHZJadN/",
+   "titulo": "Isso não é uma galáxia. É uma bola com até 10 milhões de estrelas, dentro da nossa.",
+   "legenda": "Isso não é uma galáxia. É uma bola com até 10 milhões de estrelas, dentro da nossa.\n\nÉ Omega Centauri, o maior aglomerado globular da Via Láctea, a uns 17 mil anos-luz. A foto foi feita com o telescópio de 2,2 metros do observatório La Silla, do ESO, no Chile.\n\nMuitos astrônomos acham que ele é o que sobrou do núcleo de uma pequena galáxia engolida pela Via Láctea há muito tempo. Em 2024, um estudo com dados do Hubble encontrou sinais de um buraco negro de pelo menos 8.200 vezes a massa do Sol no centro dele.\n\nE dá pra ver daqui. A olho nu, num céu escuro, ele parece uma estrelinha meio borrada. Foi por isso que, na Antiguidade, ele entrou nos catálogos como estrela, e o nome ficou.\n\nNesta época, só de madrugada: em São Paulo, ele nasce perto da 1h30 e às 4h está a uns 25 graus de altura, no sudeste. ✨\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 ESO\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 7,
+   "reach": 3,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "17982088557138438",
+   "quando": "2026-11-26T17:10:45+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgNnDcikdYJ/",
+   "titulo": "O maior observatório astronômico em território brasileiro fica no alto de uma serra em Minas Gerais.",
+   "legenda": "O maior observatório astronômico em território brasileiro fica no alto de uma serra em Minas Gerais.\n\nÉ o Observatório do Pico dos Dias, em Brazópolis, no sul de Minas, a 1.864 metros de altitude, na Serra da Mantiqueira. Ele é operado pelo Laboratório Nacional de Astrofísica, que fica na cidade vizinha de Itajubá.\n\nO principal instrumento é um telescópio com espelho de 1,6 metro, que começou a funcionar em 1981. Ao lado dele há telescópios menores e, desde 2017, um telescópio russo de 75 cm que vigia lixo espacial.\n\nPor que tão alto? Quanto mais alto, menos ar, umidade e luz de cidade entre o telescópio e as estrelas.\n\nMesmo assim, o Sudeste tem muita nuvem. Por isso os astrônomos brasileiros também usam telescópios maiores no Chile, onde o céu é seco e limpo boa parte do ano. O Brasil é sócio do telescópio SOAR, de 4,1 metros, no Cerro Pachón, e do Observatório Gemini.\n\nCiência feita por brasileiros, com um pé na Mantiqueira e outro nos Andes. 🔭\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 6,
+   "reach": 2,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "17884112544546207",
+   "quando": "2026-11-26T11:11:30+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgM95lyOcNl/",
+   "titulo": "Um telescópio soltou um mapa com mais de 1 BILHÃO de objetos (e essa galáxia dá pra ver daqui) 🌌",
+   "legenda": "Um telescópio soltou um mapa com mais de 1 BILHÃO de objetos (e essa galáxia dá pra ver daqui) 🌌\n\nO telescópio espacial Euclid, da ESA, soltou seu primeiro grande pacote de dados (DR1-Foundation): mais de um bilhão de objetos, num mosaico de quase 500 gigapixels que cobre ~1.900 graus quadrados, 14% do céu que a missão vai mapear. A galáxia NGC 1291, em forma de anel, fica a ~33 milhões de anos-luz, no céu do sul. O objetivo da missão é mapear como a matéria escura e a energia escura moldaram o universo. O pacote completo sai em junho de 2027.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: ESA — Euclid DR1-Foundation (12/11/2026).\n\n#euclid #galaxias #astronomia #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 134,
+   "reach": 120,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 3,
+   "ig_reels_avg_watch_time": 9026,
+   "ig_reels_video_view_total_time": 1119297,
+   "reels_skip_rate": 57.3,
+   "reposts": 0
+  },
+  {
+   "id": "18101755325404190",
+   "quando": "2026-11-26T11:10:48+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgM93HDDivD/",
+   "titulo": "A Lua é mais estreita que o Brasil.",
+   "legenda": "A Lua é mais estreita que o Brasil.\n\nEla tem 3.475 km de diâmetro. O Brasil tem 4.319 km de largura, da Ponta do Seixas, na Paraíba, até a Serra da Contamana, no Acre. Se desse pra pôr a Lua em cima do mapa, sobrava Brasil dos dois lados.\n\nMas tem uma pegadinha: a Lua é uma bola, e o mapa é plano. Somando a superfície inteira dela, dá uns 38 milhões de km², quase quatro vezes e meia a área do Brasil.\n\nEssa imagem foi montada pela NASA com dados da sonda LRO, que está em órbita da Lua desde 2009.\n\nRepara nas manchas escuras. Os antigos acharam que eram mares, e o nome ficou. Mas lá não tem água: são planícies de lava que esfriou há bilhões de anos. As partes claras são terrenos mais antigos, cheios de crateras.\n\nPequena perto da Terra, grande perto do Brasil, e sempre mostrando a mesma face pra gente. 🌕\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA/Goddard (dados da sonda Lunar Reconnaissance Orbiter)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 30,
+   "reach": 14,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18141107779638858",
+   "quando": "2026-11-26T00:12:02+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgLydewFjxd/",
+   "titulo": "Sua cabeça envelhece um pouquinho mais rápido que os seus pés.",
+   "legenda": "Sua cabeça envelhece um pouquinho mais rápido que os seus pés.\n\nParece piada, mas é física. Einstein mostrou que a gravidade mexe com o tempo: quanto mais perto de uma massa grande, como a Terra, mais devagar o tempo passa.\n\nEm 2010, cientistas do NIST, nos Estados Unidos, mediram isso com relógios atômicos ultraprecisos. Bastou levantar um deles 33 centímetros pra ver que ele andava um pouco mais rápido que o de baixo.\n\nA diferença é ridícula: ao longo de uma vida de 79 anos, dá uns 90 bilionésimos de segundo. Mas é real.\n\nE não é só curiosidade de laboratório. Os satélites de GPS voam a uns 20 mil km de altura, onde a gravidade é mais fraca. Somando isso com a velocidade deles, os relógios lá em cima adiantam uns 38 milionésimos de segundo por dia. Se ninguém corrigisse, o GPS do celular erraria a sua posição em vários quilômetros por dia.\n\nOu seja: toda vez que você abre o mapa no celular, está usando a relatividade de Einstein. ⏱️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 27,
+   "reach": 10,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "17900813673412189",
+   "quando": "2026-11-26T00:11:06+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgLyWloFvdm/",
+   "titulo": "Repara no centro da foto: aquele montinho de pontos azuis são estrelas enormes e muito jovens. Foram elas que abriram esse buraco no gás.",
+   "legenda": "Repara no centro da foto: aquele montinho de pontos azuis são estrelas enormes e muito jovens. Foram elas que abriram esse buraco no gás.\n\nEssa é a Nebulosa da Tarântula, vista pelo telescópio James Webb em 2022. Ela fica a uns 161 mil anos-luz, na Grande Nuvem de Magalhães, uma galáxia vizinha da nossa.\n\nÉ a maior e mais brilhante região de nascimento de estrelas de todo o grupo de galáxias onde a Via Láctea está. O nome vem dos filamentos de gás, que lembram as pernas de uma aranha.\n\nO vento e a radiação das estrelas do centro empurram o gás e a poeira pra longe. Nas bordas, onde o material fica mais denso, novas estrelas continuam se formando.\n\nE essa galáxia é do nosso céu: a Grande Nuvem de Magalhães aparece a olho nu no Brasil, num lugar escuro. Nesta época, em São Paulo e no Sul, ela fica no sul-sudeste a noite toda. 🕷️\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA, ESA, CSA e STScI (telescópio James Webb)\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 17,
+   "reach": 9,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
+   "id": "18123848078066732",
+   "quando": "2026-11-25T21:11:19+0000",
+   "tipo": "REELS",
+   "link": "https://www.instagram.com/reel/DgLdtciKfXf/",
+   "titulo": "Procurou o CRUZEIRO DO SUL hoje e NÃO achou? Ele não sumiu (só muda de hora) ✝️",
+   "legenda": "Procurou o CRUZEIRO DO SUL hoje e NÃO achou? Ele não sumiu (só muda de hora) ✝️\n\nEm novembro, no começo da noite, o Cruzeiro do Sul fica abaixo do horizonte, no sul, pra quem está em São Paulo e boa parte do Brasil. Ele começa a aparecer perto da meia-noite, deitado, e às 4h da manhã já está alto (uns 33°). Em abril é o contrário: ele já aparece alto logo que escurece.\n\n📤 Manda pra alguém que ia gostar de saber disso.\n\n📚 Posições calculadas (astronomy-engine) para São Paulo em 25 e 26/11/2026: Acrux a −2,5° às 20h30, a ~8° à 0h e a ~33° às 4h.\n\n#cruzeirodosul #ceu #astronomia #neuralupdate",
+   "curtidas_campo": 2,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
+   "views": 118,
+   "reach": 104,
+   "likes": 2,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 3,
+   "ig_reels_avg_watch_time": 6365,
+   "ig_reels_video_view_total_time": 681129,
+   "reels_skip_rate": 72.9,
+   "reposts": 0
+  },
+  {
+   "id": "18118797713519277",
+   "quando": "2026-11-25T19:49:37+0000",
+   "tipo": "FEED",
+   "link": "https://www.instagram.com/p/DgLUbgyoJpV/",
+   "titulo": "Aquele grupinho apertado de estrelas que parece uma manchinha no céu de novembro tem nome: Plêiades.",
+   "legenda": "Aquele grupinho apertado de estrelas que parece uma manchinha no céu de novembro tem nome: Plêiades.\n\nTambém chamado de Sete-Estrelo, é um aglomerado de estrelas jovens, a uns 444 anos-luz, nascidas há cerca de 100 milhões de anos. Quando elas acenderam, os dinossauros ainda andavam pela Terra.\n\nComo achar (horários de São Paulo):\n\n🕘 Depois das 21h, olha pro nordeste.\n⭐ Procura um grupinho de estrelas azuladas, parecendo uma pequena concha. A olho nu dá pra contar umas seis ou sete.\n🕛 Perto da meia-noite, elas chegam ao ponto mais alto, no norte, a uns 42 graus de altura.\n\nDica: depois das 22h, as Três Marias já estão no leste. Siga a linha delas pra esquerda. Ela passa por uma estrela alaranjada, Aldebarã, e chega nas Plêiades.\n\nCom um binóculo, o grupinho vira dezenas de estrelas.\n\nNo Japão, esse aglomerado se chama Subaru, e é ele que aparece no logotipo da montadora. 🔭\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
+   "curtidas_campo": 0,
+   "comentarios_campo": 1,
+   "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
+   "views": 26,
+   "reach": 13,
+   "likes": 0,
+   "comments": 1,
+   "shares": 0,
+   "saved": 0,
+   "total_interactions": 1,
+   "reposts": 0
+  },
+  {
    "id": "18101040026166829",
    "quando": "2026-11-25T17:12:41+0000",
    "tipo": "REELS",
    "link": "https://www.instagram.com/reel/DgLCbpYO-Mu/",
    "titulo": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️",
    "legenda": "Esse cometa tem formato de AMENDOIM e faz uma nevasca no espaço ❄️\n\nEm 04/11/2010, a sonda EPOXI (a antiga Deep Impact, da NASA) passou a 694 km do cometa 103P/Hartley 2, a 12,3 km/s. O núcleo tem uns 2,3 km e formato de amendoim: o menor cometa já visitado por uma nave até então. Jatos de gás carbônico saem da ponta e arrancam blocos de gelo que vão do tamanho de uma bola de golfe ao de uma bola de basquete, numa espécie de nevasca em volta do cometa.\n\n🔖 Salva essa aula.\n👉 Segue pra aula de astronomia todo dia.\n\n📚 Fonte: NASA/JPL — EPOXI (sobrevoo de 04/11/2010 a 694 km); A'Hearn et al., Science (2011).\n\n#cometa #nasa #aula #neuralupdate",
-   "curtidas_campo": 1,
+   "curtidas_campo": 4,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 46,
-   "reach": 37,
-   "likes": 1,
+   "views": 133,
+   "reach": 119,
+   "likes": 4,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 2,
-   "ig_reels_avg_watch_time": 5700,
-   "ig_reels_video_view_total_time": 205205,
-   "reels_skip_rate": 37.2,
+   "total_interactions": 5,
+   "ig_reels_avg_watch_time": 7443,
+   "ig_reels_video_view_total_time": 893214,
+   "reels_skip_rate": 45,
    "reposts": 0
   },
   {
@@ -6141,8 +6556,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 3,
-   "reach": 2,
+   "views": 33,
+   "reach": 17,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6160,8 +6575,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 18,
-   "reach": 8,
+   "views": 42,
+   "reach": 18,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6176,16 +6591,16 @@
    "link": "https://www.instagram.com/p/DgKumGJCbOt/",
    "titulo": "Esse é o primeiro brasileiro a ir pro espaço, trabalhando dentro da Estação Espacial Internacional.",
    "legenda": "Esse é o primeiro brasileiro a ir pro espaço, trabalhando dentro da Estação Espacial Internacional.\n\nMarcos Pontes, nascido em Bauru (SP), era piloto de testes e tenente-coronel da Força Aérea. Ele decolou do Cazaquistão na noite de 29 de março de 2006 (horário de Brasília), a bordo da nave russa Soyuz TMA-8.\n\nA viagem foi batizada de Missão Centenário, em homenagem aos 100 anos do voo do 14-Bis, de Santos Dumont, em 1906.\n\nForam cerca de oito dias a bordo da estação, com oito experimentos científicos brasileiros. Ele voltou à Terra em 8 de abril de 2006.\n\nA foto é de 3 de abril de 2006. Repara no alto, em cima da escotilha: uma fileira de bandeiras dos países que participam da estação.\n\nUm menino de Bauru que virou piloto, astronauta e, por uns dias, morador da órbita da Terra. 🇧🇷\n\n🔖 Salva pra mostrar pra alguém depois.\n📤 Manda pra quem curte céu.\n\n📷 NASA\n\n#astronomia #espaco #ciencia #universo #neuralupdate",
-   "curtidas_campo": 0,
+   "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 7,
-   "reach": 4,
-   "likes": 0,
+   "views": 27,
+   "reach": 13,
+   "likes": 1,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 1,
+   "total_interactions": 2,
    "reposts": 0
   },
   {
@@ -6195,19 +6610,19 @@
    "link": "https://www.instagram.com/reel/DgKZJZJIGQl/",
    "titulo": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐",
    "legenda": "Acharam um trio de estrelas que NÃO deveria existir (e fica aqui do lado) ⭐\n\nWelopōʻai é um sistema de três estrelas a 28 anos-luz do Sol: duas anãs brancas (estrelas que já morreram) e uma anã vermelha. É o sistema triplo mais próximo conhecido com mais de uma anã branca; nada parecido existe num raio de 100 anos-luz. Os autores dizem que ele \"não deveria existir\" e que ainda não há explicação clara de como a estrela pequena sobreviveu quando a vizinha inchou antes de morrer.\n\n👉 Segue pra notícia de astronomia todo dia.\n\n📚 Fonte: Institut Trottier de recherche sur les exoplanètes (iREx) / Université de Montréal (19/11/2026); Artigau et al., \"Welopōʻai: A peculiar triple system 8 pc from the Sun\", Astronomy & Astrophysics 715, A321 (2026).\n\n#estrelas #astronomia #espaco #neuralupdate",
-   "curtidas_campo": 4,
+   "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 109,
-   "reach": 85,
-   "likes": 4,
+   "views": 140,
+   "reach": 116,
+   "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 0,
-   "total_interactions": 5,
-   "ig_reels_avg_watch_time": 10203,
-   "ig_reels_video_view_total_time": 928541,
-   "reels_skip_rate": 54.6,
+   "total_interactions": 8,
+   "ig_reels_avg_watch_time": 10247,
+   "ig_reels_video_view_total_time": 1260447,
+   "reels_skip_rate": 58.5,
    "reposts": 0
   },
   {
@@ -6220,8 +6635,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 18,
-   "reach": 6,
+   "views": 28,
+   "reach": 12,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6239,8 +6654,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 28,
-   "reach": 14,
+   "views": 34,
+   "reach": 17,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6258,8 +6673,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 17,
-   "reach": 6,
+   "views": 25,
+   "reach": 9,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6277,16 +6692,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 147,
-   "reach": 114,
+   "views": 153,
+   "reach": 117,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 11921,
-   "ig_reels_video_view_total_time": 1418697,
-   "reels_skip_rate": 61.3,
+   "ig_reels_avg_watch_time": 11837,
+   "ig_reels_video_view_total_time": 1467896,
+   "reels_skip_rate": 59.7,
    "reposts": 1
   },
   {
@@ -6299,8 +6714,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 15,
-   "reach": 8,
+   "views": 18,
+   "reach": 9,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6318,16 +6733,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 94,
-   "reach": 79,
+   "views": 98,
+   "reach": 81,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 4,
-   "ig_reels_avg_watch_time": 8651,
-   "ig_reels_video_view_total_time": 709414,
-   "reels_skip_rate": 57.3,
+   "ig_reels_avg_watch_time": 8597,
+   "ig_reels_video_view_total_time": 730786,
+   "reels_skip_rate": 57.6,
    "reposts": 0
   },
   {
@@ -6340,8 +6755,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 19,
-   "reach": 9,
+   "views": 26,
+   "reach": 10,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6359,8 +6774,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 24,
-   "reach": 14,
+   "views": 26,
+   "reach": 15,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6378,8 +6793,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 31,
-   "reach": 13,
+   "views": 35,
+   "reach": 14,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6397,16 +6812,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 242,
-   "reach": 209,
+   "views": 244,
+   "reach": 211,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 11269,
-   "ig_reels_video_view_total_time": 2456847,
-   "reels_skip_rate": 48.2,
+   "ig_reels_avg_watch_time": 11258,
+   "ig_reels_video_view_total_time": 2465525,
+   "reels_skip_rate": 48.4,
    "reposts": 0
   },
   {
@@ -6419,8 +6834,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 42,
-   "reach": 19,
+   "views": 49,
+   "reach": 21,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6438,7 +6853,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 23,
+   "views": 25,
    "reach": 11,
    "likes": 0,
    "comments": 1,
@@ -6457,8 +6872,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 59,
-   "reach": 28,
+   "views": 66,
+   "reach": 30,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6498,7 +6913,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 25,
+   "views": 26,
    "reach": 8,
    "likes": 0,
    "comments": 1,
@@ -6517,16 +6932,16 @@
    "curtidas_campo": 7,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 206,
+   "views": 207,
    "reach": 175,
    "likes": 7,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 8,
-   "ig_reels_avg_watch_time": 19168,
-   "ig_reels_video_view_total_time": 3603644,
-   "reels_skip_rate": 49.7,
+   "ig_reels_avg_watch_time": 19073,
+   "ig_reels_video_view_total_time": 3604798,
+   "reels_skip_rate": 50,
    "reposts": 0
   },
   {
@@ -6539,8 +6954,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 39,
-   "reach": 21,
+   "views": 43,
+   "reach": 22,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6558,8 +6973,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 24,
-   "reach": 11,
+   "views": 27,
+   "reach": 12,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6577,8 +6992,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 26,
-   "reach": 11,
+   "views": 28,
+   "reach": 12,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6596,16 +7011,16 @@
    "curtidas_campo": 8,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 266,
-   "reach": 222,
+   "views": 267,
+   "reach": 223,
    "likes": 8,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 9,
-   "ig_reels_avg_watch_time": 11727,
-   "ig_reels_video_view_total_time": 2755868,
-   "reels_skip_rate": 50.4,
+   "ig_reels_avg_watch_time": 11684,
+   "ig_reels_video_view_total_time": 2757624,
+   "reels_skip_rate": 50.6,
    "reposts": 0
   },
   {
@@ -6656,7 +7071,7 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 29,
+   "views": 31,
    "reach": 13,
    "likes": 1,
    "comments": 1,
@@ -6697,8 +7112,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 61,
-   "reach": 29,
+   "views": 64,
+   "reach": 30,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6716,16 +7131,16 @@
    "curtidas_campo": 66,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1997,
-   "reach": 1717,
+   "views": 2001,
+   "reach": 1720,
    "likes": 66,
    "comments": 1,
    "shares": 0,
    "saved": 2,
    "total_interactions": 69,
-   "ig_reels_avg_watch_time": 18985,
-   "ig_reels_video_view_total_time": 33584665,
-   "reels_skip_rate": 35.1,
+   "ig_reels_avg_watch_time": 18995,
+   "ig_reels_video_view_total_time": 33659799,
+   "reels_skip_rate": 35,
    "reposts": 0
   },
   {
@@ -6738,7 +7153,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 27,
+   "views": 30,
    "reach": 11,
    "likes": 0,
    "comments": 1,
@@ -6757,7 +7172,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 42,
+   "views": 44,
    "reach": 19,
    "likes": 0,
    "comments": 1,
@@ -6836,8 +7251,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 25,
-   "reach": 16,
+   "views": 27,
+   "reach": 17,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6855,7 +7270,7 @@
    "curtidas_campo": 1,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 21,
+   "views": 22,
    "reach": 12,
    "likes": 1,
    "comments": 1,
@@ -6915,8 +7330,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 92,
-   "reach": 46,
+   "views": 93,
+   "reach": 47,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -6953,16 +7368,16 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 20,
+   "views": 21,
    "reach": 17,
    "likes": 2,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 3,
-   "ig_reels_avg_watch_time": 9387,
-   "ig_reels_video_view_total_time": 159586,
-   "reels_skip_rate": 64.7,
+   "ig_reels_avg_watch_time": 9481,
+   "ig_reels_video_view_total_time": 170665,
+   "reels_skip_rate": 61.1,
    "reposts": 0
   },
   {
@@ -6997,8 +7412,8 @@
    "curtidas_campo": 2,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 39,
-   "reach": 18,
+   "views": 41,
+   "reach": 19,
    "likes": 2,
    "comments": 1,
    "shares": 0,
@@ -7092,7 +7507,7 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 56,
+   "views": 57,
    "reach": 33,
    "likes": 0,
    "comments": 1,
@@ -7171,8 +7586,8 @@
    "curtidas_campo": 0,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,reposts",
-   "views": 29,
-   "reach": 13,
+   "views": 31,
+   "reach": 14,
    "likes": 0,
    "comments": 1,
    "shares": 0,
@@ -7209,16 +7624,16 @@
    "curtidas_campo": 3,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 173,
-   "reach": 156,
+   "views": 174,
+   "reach": 157,
    "likes": 3,
    "comments": 1,
    "shares": 0,
    "saved": 0,
    "total_interactions": 5,
-   "ig_reels_avg_watch_time": 8111,
-   "ig_reels_video_view_total_time": 1281605,
-   "reels_skip_rate": 61.4,
+   "ig_reels_avg_watch_time": 8080,
+   "ig_reels_video_view_total_time": 1284854,
+   "reels_skip_rate": 61,
    "reposts": 1
   },
   {
@@ -8243,15 +8658,15 @@
    "curtidas_campo": 27,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1204,
-   "reach": 1068,
+   "views": 1205,
+   "reach": 1069,
    "likes": 27,
    "comments": 1,
    "shares": 0,
    "saved": 4,
    "total_interactions": 32,
-   "ig_reels_avg_watch_time": 32481,
-   "ig_reels_video_view_total_time": 35307727,
+   "ig_reels_avg_watch_time": 32455,
+   "ig_reels_video_view_total_time": 35311857,
    "reels_skip_rate": 26.5,
    "reposts": 0
   },
@@ -9803,18 +10218,18 @@
    "titulo": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é ",
    "legenda": "Em janeiro a Terra está mais perto do Sol do que em julho. E mesmo assim, aqui no Brasil é verão, enquanto na Europa e nos Estados Unidos é inverno. 🌍\n\nSe fosse a distância, o mundo todo teria verão junto. A diferença é só de uns 5 milhões de km (147 milhões em janeiro, 152 em julho). Quem manda nas estações é a inclinação da Terra, de uns 23 graus.\n\n🔖 Salva pra explicar isso na próxima vez que alguém falar de estação.\n📤 Manda pra quem achava que era a distância.\n👉 Segue @neuralupdate e conta nos comentários: você achava que era a distância?\n\n📚 Fonte: NASA Science — Earth Facts; distâncias calculadas por efemérides.\n\n#estacoes #terra #astronomia #ciencia #universo #neuralupdate",
    "curtidas_campo": 5,
-   "comentarios_campo": 4,
+   "comentarios_campo": 7,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 254,
+   "views": 257,
    "reach": 205,
    "likes": 5,
-   "comments": 4,
+   "comments": 7,
    "shares": 0,
    "saved": 1,
-   "total_interactions": 10,
-   "ig_reels_avg_watch_time": 9516,
-   "ig_reels_video_view_total_time": 2064974,
-   "reels_skip_rate": 59.3,
+   "total_interactions": 13,
+   "ig_reels_avg_watch_time": 9881,
+   "ig_reels_video_view_total_time": 2154185,
+   "reels_skip_rate": 59.1,
    "reposts": 0
   },
   {
@@ -10265,15 +10680,15 @@
    "titulo": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐",
    "legenda": "Amanhã, domingo (4/10), olha pro leste depois do pôr do sol. 🪐\n\nAquele ponto amarelado que quase não pisca é Saturno, no dia do ano em que ele fica mais perto da Terra e mais brilhante. Com uma lunetinha simples, já dá pra ver os anéis. E a luz que bate no seu olho saiu de lá há uns 70 minutos. Só que os anéis estão sumindo: em menos de 300 milhões de anos, essa vista acaba.\n\n🔖 Salva pra lembrar de olhar pro céu amanhã.\n📤 Manda pra alguém que gosta de olhar o céu.\n👉 Segue @neuralupdate pra saber o que tem no céu toda semana.\n\n📚 Fonte: oposição de Saturno em 4/10/2026 às 12h UTC; NASA Science (anéis de Saturno)\n\n#saturno #astronomia #ceu #ciencia #espaco #neuralupdate",
    "curtidas_campo": 25,
-   "comentarios_campo": 4,
+   "comentarios_campo": 5,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1158,
    "reach": 872,
    "likes": 25,
-   "comments": 4,
+   "comments": 5,
    "shares": 8,
    "saved": 4,
-   "total_interactions": 44,
+   "total_interactions": 45,
    "ig_reels_avg_watch_time": 21279,
    "ig_reels_video_view_total_time": 19640676,
    "reels_skip_rate": 46.7,
@@ -11129,16 +11544,16 @@
    "link": "https://www.instagram.com/reel/DdmPaRkgMDL/",
    "titulo": "A hipernova não é só uma supernova maior. ⚡",
    "legenda": "A hipernova não é só uma supernova maior. ⚡\n\nSérie A MORTE DAS ESTRELAS · episódio 3 de 6.\nEla vem de estrelas gigantes girando muito rápido, com dez vezes mais energia que uma supernova.\nDois jatos quase na velocidade da luz furam a estrela, e quando um aponta pra Terra vemos uma rajada de raios gama.\n\n💬 Você sabia que existia algo mais forte que uma supernova? Comenta aqui 👇\n\n👉 Segue @neuralupdate: episódio 4 amanhã, às 14h.\n\n📚 Fonte: NASA Science (Gamma-ray Bursts)\n\n#hipernova #raiosgama #astronomia #neuralupdate",
-   "curtidas_campo": 23,
+   "curtidas_campo": 22,
    "comentarios_campo": 1,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 500,
    "reach": 390,
-   "likes": 23,
+   "likes": 22,
    "comments": 1,
    "shares": 0,
    "saved": 5,
-   "total_interactions": 31,
+   "total_interactions": 30,
    "ig_reels_avg_watch_time": 19969,
    "ig_reels_video_view_total_time": 8047516,
    "reels_skip_rate": 40.5,
@@ -12188,15 +12603,15 @@
    "titulo": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos microscópicos e os ampliou até vir",
    "legenda": "AULA da escola Universo do Zero. A inflação cósmica não só esticou o espaço: ela pegou tremores quânticos microscópicos e os ampliou até virarem as regiões mais densas de onde nasceram as galáxias. O que hoje é uma galáxia inteira já foi uma ondulação menor que um átomo.\n\n#cosmologia #astronomia #neuralupdate",
    "curtidas_campo": 7,
-   "comentarios_campo": 4,
+   "comentarios_campo": 5,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 322,
    "reach": 264,
    "likes": 7,
-   "comments": 4,
+   "comments": 5,
    "shares": 1,
    "saved": 1,
-   "total_interactions": 13,
+   "total_interactions": 14,
    "ig_reels_avg_watch_time": 11779,
    "ig_reels_video_view_total_time": 3156916,
    "reels_skip_rate": 40.2,
@@ -12892,15 +13307,15 @@
    "titulo": "AULA da escola Universo do Zero. Buraco negro não é uma coisa pesada, é uma coisa apertada. Para cada massa existe um raio crítico: se ela c",
    "legenda": "AULA da escola Universo do Zero. Buraco negro não é uma coisa pesada, é uma coisa apertada. Para cada massa existe um raio crítico: se ela couber dentro dele, nada mais escapa. O da Terra tem cerca de nove milímetros; o do Sol, cerca de três quilômetros.\n\n#buraconegro #física #neuralupdate",
    "curtidas_campo": 87,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 3289,
    "reach": 2698,
    "likes": 87,
-   "comments": 2,
+   "comments": 3,
    "shares": 8,
    "saved": 14,
-   "total_interactions": 114,
+   "total_interactions": 115,
    "ig_reels_avg_watch_time": 21538,
    "ig_reels_video_view_total_time": 58433278,
    "reels_skip_rate": 21.6,
@@ -12980,17 +13395,17 @@
    "titulo": "O Nancy Grace Roman Space Telescope deixa a Terra para nunca mais voltar. O espelho dele veio de um satélite de espionagem que olhava para b",
    "legenda": "O Nancy Grace Roman Space Telescope deixa a Terra para nunca mais voltar. O espelho dele veio de um satélite de espionagem que olhava para baixo. Ele não enxerga mais fundo que o Hubble — enxerga cem vezes mais largo, e deve medir a luz de um bilhão de galáxias.\n\n#espaço #astronomia #ciência #universo #neuralupdate",
    "curtidas_campo": 88,
-   "comentarios_campo": 3,
+   "comentarios_campo": 5,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1706,
+   "views": 1708,
    "reach": 1335,
    "likes": 88,
-   "comments": 3,
+   "comments": 5,
    "shares": 8,
    "saved": 4,
-   "total_interactions": 110,
-   "ig_reels_avg_watch_time": 19146,
-   "ig_reels_video_view_total_time": 27321596,
+   "total_interactions": 112,
+   "ig_reels_avg_watch_time": 19127,
+   "ig_reels_video_view_total_time": 27333299,
    "reels_skip_rate": 43,
    "reposts": 7
   },
@@ -13045,19 +13460,19 @@
    "link": "https://www.instagram.com/reel/Dcl5gvGgXO6/",
    "titulo": "AULA da escola Universo do Zero. O tempo não é igual para todos: ele depende da velocidade de quem mede. Quanto mais rápido alguém se move, ",
    "legenda": "AULA da escola Universo do Zero. O tempo não é igual para todos: ele depende da velocidade de quem mede. Quanto mais rápido alguém se move, mais devagar o relógio dele anda — já foi medido com relógios atômicos em avião. Na velocidade da luz o tempo pararia, mas nada com massa chega lá. Quem chega é a própria luz, e para ela o tempo não passa.\n\n#relatividade #física #neuralupdate",
-   "curtidas_campo": 18,
-   "comentarios_campo": 2,
+   "curtidas_campo": 19,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 385,
+   "views": 387,
    "reach": 307,
-   "likes": 18,
-   "comments": 2,
+   "likes": 19,
+   "comments": 3,
    "shares": 4,
    "saved": 4,
-   "total_interactions": 29,
-   "ig_reels_avg_watch_time": 12066,
-   "ig_reels_video_view_total_time": 3969981,
-   "reels_skip_rate": 57.3,
+   "total_interactions": 31,
+   "ig_reels_avg_watch_time": 12216,
+   "ig_reels_video_view_total_time": 4031554,
+   "reels_skip_rate": 57.1,
    "reposts": 1
   },
   {
@@ -13310,15 +13725,15 @@
    "titulo": "Antimatéria deveria existir na mesma quantidade que a matéria, e não existe. AULA da escola Universo do Zero. No começo, cada partícula nasc",
    "legenda": "Antimatéria deveria existir na mesma quantidade que a matéria, e não existe. AULA da escola Universo do Zero. No começo, cada partícula nascia junto com sua antipartícula, e as duas se aniquilavam ao se encontrar. Sobrou uma pequena diferença a favor da matéria, e tudo que existe hoje é esse resto.\n\n📩 Manda pra quem acha que antimatéria é invenção de ficção científica.\n\n📚 Gosta desses assuntos? O primeiro mês do Kindle Unlimited é grátis (depois vira assinatura paga, e dá pra cancelar antes de acabar o mês) — link na bio.\n\n🎥 As aulas e os documentários completos ficam no nosso canal do YouTube: Neural Update.\n\n#antimatéria #cosmologia #neuralupdate",
    "curtidas_campo": 77,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1249,
    "reach": 974,
    "likes": 77,
-   "comments": 2,
+   "comments": 3,
    "shares": 7,
    "saved": 8,
-   "total_interactions": 99,
+   "total_interactions": 100,
    "ig_reels_avg_watch_time": 16355,
    "ig_reels_video_view_total_time": 16732086,
    "reels_skip_rate": 37.7,
@@ -13574,15 +13989,15 @@
    "titulo": "Quarta parte da escada cósmica. A idade do universo não foi chutada: ela sai da taxa de expansão medida hoje, rodada de trás pra frente, e é",
    "legenda": "Quarta parte da escada cósmica. A idade do universo não foi chutada: ela sai da taxa de expansão medida hoje, rodada de trás pra frente, e é confirmada de forma independente pela radiação cósmica de fundo. Duas estradas diferentes chegando no mesmo número.\n\n👇 O que não coube no vídeo\nOs dois métodos não batem perfeitamente: a expansão medida hoje dá um valor, e a radiação do Big Bang dá outro um pouco diferente. Isso se chama tensão de Hubble e é um dos maiores problemas em aberto da cosmologia.\n\n🔬 Fonte: Missão Planck (ESA) e medições da constante de Hubble\n\n📤 Manda pro amigo que acha que sabe tudo sobre o universo.\n\n#astronomia #aula #cosmologia #universo #neuralupdate",
    "curtidas_campo": 74,
-   "comentarios_campo": 1,
+   "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 1888,
    "reach": 1526,
    "likes": 74,
-   "comments": 1,
+   "comments": 2,
    "shares": 3,
    "saved": 13,
-   "total_interactions": 91,
+   "total_interactions": 92,
    "ig_reels_avg_watch_time": 17350,
    "ig_reels_video_view_total_time": 27309794,
    "reels_skip_rate": 32.7,
@@ -13596,15 +14011,15 @@
    "titulo": "Pesquisadores da Texas A&M, liderados por Weida Hu e Casey Papovich, encontraram o \"Quinteto do JWST\": pelo menos cinco galáxias em colisão ",
    "legenda": "Pesquisadores da Texas A&M, liderados por Weida Hu e Casey Papovich, encontraram o \"Quinteto do JWST\": pelo menos cinco galáxias em colisão num redshift de 6,71 — cerca de 800 milhões de anos depois do Big Bang. Elas formam estrelas a uma taxa de aproximadamente 250 massas solares por ano. Fusões com tantas galáxias não eram esperadas tão cedo.\n\n👇 O que não coube no vídeo\nFormar 250 massas solares por ano é um ritmo absurdo: a Via Láctea inteira, hoje, produz o equivalente a uma ou duas estrelas como o Sol por ano.\n\n🔬 Fonte: Weida Hu e Casey Papovich, Texas A&M University, com o James Webb\n\n📤 Manda pro amigo que acha que sabe tudo sobre o universo.\n\n#jameswebb #galáxias #astronomia #ciência #neuralupdate",
    "curtidas_campo": 16,
-   "comentarios_campo": 1,
+   "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 602,
    "reach": 516,
    "likes": 16,
-   "comments": 1,
+   "comments": 2,
    "shares": 0,
    "saved": 3,
-   "total_interactions": 20,
+   "total_interactions": 21,
    "ig_reels_avg_watch_time": 17234,
    "ig_reels_video_view_total_time": 9220324,
    "reels_skip_rate": 39,
@@ -13750,18 +14165,18 @@
    "titulo": "Neutrinos produzidos no núcleo do Sol atravessam a Terra inteira e o seu corpo sem interagir com quase nada. São cerca de 100 trilhões por s",
    "legenda": "Neutrinos produzidos no núcleo do Sol atravessam a Terra inteira e o seu corpo sem interagir com quase nada. São cerca de 100 trilhões por segundo, de dia e de noite — à noite eles chegam atravessando o planeta por baixo.\n\n👇 O que não coube no vídeo\nPara capturar neutrinos, o Super-Kamiokande usa um tanque com 50 mil toneladas de água ultrapura, a mil metros de profundidade dentro de uma montanha. Mesmo assim, detecta só algumas dezenas por dia.\n\n🔬 Fonte: Detecções do Super-Kamiokande (Japão) e do SNO (Canadá)\n\n📤 Manda pro amigo que acha que sabe tudo sobre o universo.\n📩 Comenta COSMOS que eu te mando o PDF grátis com 5 fenômenos do universo.\n\n#neutrinos #sol #física #ciência #neuralupdate",
    "curtidas_campo": 9,
-   "comentarios_campo": 2,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 325,
+   "views": 326,
    "reach": 263,
    "likes": 9,
-   "comments": 2,
+   "comments": 3,
    "shares": 4,
    "saved": 4,
-   "total_interactions": 21,
-   "ig_reels_avg_watch_time": 11487,
-   "ig_reels_video_view_total_time": 3124477,
-   "reels_skip_rate": 49.1,
+   "total_interactions": 22,
+   "ig_reels_avg_watch_time": 11558,
+   "ig_reels_video_view_total_time": 3155469,
+   "reels_skip_rate": 48.9,
    "reposts": 2
   },
   {
@@ -14014,17 +14429,17 @@
    "titulo": "A Nebulosa da Borboleta, NGC 6302, ganhou novas imagens de Hubble e James Webb em luz visível e infravermelha. As duas asas são o gás expeli",
    "legenda": "A Nebulosa da Borboleta, NGC 6302, ganhou novas imagens de Hubble e James Webb em luz visível e infravermelha. As duas asas são o gás expelido por uma estrela em agonia, e no centro há uma das estrelas mais quentes conhecidas — escondida atrás de um anel de poeira.\n\n🔭 Segue o @neuralupdate pra não perder — ciência de verdade, sem enrolação.\n\n#nebulosa #jameswebb #astronomia #ciência #neuralupdate #neuralupdate",
    "curtidas_campo": 78,
-   "comentarios_campo": 1,
+   "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1579,
+   "views": 1580,
    "reach": 1258,
    "likes": 78,
-   "comments": 1,
+   "comments": 2,
    "shares": 6,
    "saved": 6,
-   "total_interactions": 92,
-   "ig_reels_avg_watch_time": 17507,
-   "ig_reels_video_view_total_time": 22304342,
+   "total_interactions": 93,
+   "ig_reels_avg_watch_time": 17510,
+   "ig_reels_video_view_total_time": 22326276,
    "reels_skip_rate": 29.2,
    "reposts": 1
   },
@@ -14058,18 +14473,18 @@
    "titulo": "No aglomerado de Perseu, um buraco negro supermassivo empurra o gás quente ao redor e cria ondas de pressão — som de verdade, propagando num",
    "legenda": "No aglomerado de Perseu, um buraco negro supermassivo empurra o gás quente ao redor e cria ondas de pressão — som de verdade, propagando num meio. A nota corresponde a um si bemol cerca de 57 oitavas abaixo do dó central do piano: um trilhão de vezes mais grave do que o ouvido humano alcança.\n\n🔭 Segue o @neuralupdate pra não perder — ciência de verdade, sem enrolação.\n\n#som #buraconegro #astronomia #ciência #neuralupdate #neuralupdate",
    "curtidas_campo": 63,
-   "comentarios_campo": 1,
+   "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1664,
-   "reach": 1369,
+   "views": 1666,
+   "reach": 1370,
    "likes": 63,
-   "comments": 1,
+   "comments": 2,
    "shares": 8,
    "saved": 6,
-   "total_interactions": 79,
-   "ig_reels_avg_watch_time": 19058,
-   "ig_reels_video_view_total_time": 26281557,
-   "reels_skip_rate": 33.4,
+   "total_interactions": 80,
+   "ig_reels_avg_watch_time": 19085,
+   "ig_reels_video_view_total_time": 26337985,
+   "reels_skip_rate": 33.3,
    "reposts": 1
   },
   {
@@ -14234,17 +14649,17 @@
    "titulo": "São quasares: buracos negros gigantes devorando matéria com tanta violência que brilham mais que galáxias inteiras. Astrônomos localizaram 3",
    "legenda": "São quasares: buracos negros gigantes devorando matéria com tanta violência que brilham mais que galáxias inteiras. Astrônomos localizaram 31 de uma vez, e dois deles são os mais antigos já vistos — a luz saiu quando o universo tinha apenas 670 milhões de anos. O que ninguém explica é o tamanho: buracos negros levam bilhões de anos para engordar assim.\n\n🔭 Segue o @neuralupdate pra não perder — ciência de verdade, sem enrolação.\n\n#quasar #buraconegro #astronomia #ciência #neuralupdate",
    "curtidas_campo": 94,
-   "comentarios_campo": 1,
+   "comentarios_campo": 3,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1544,
+   "views": 1546,
    "reach": 1162,
    "likes": 94,
-   "comments": 1,
+   "comments": 3,
    "shares": 1,
    "saved": 9,
-   "total_interactions": 109,
-   "ig_reels_avg_watch_time": 15625,
-   "ig_reels_video_view_total_time": 18891485,
+   "total_interactions": 111,
+   "ig_reels_avg_watch_time": 15622,
+   "ig_reels_video_view_total_time": 18903103,
    "reels_skip_rate": 42.4,
    "reposts": 4
   },
@@ -14278,18 +14693,18 @@
    "titulo": "Einstein chamou de \"ação fantasmagórica à distância\" e passou a vida tentando provar que era erro. Você separa duas partículas emaranhadas, ",
    "legenda": "Einstein chamou de \"ação fantasmagórica à distância\" e passou a vida tentando provar que era erro. Você separa duas partículas emaranhadas, manda uma pro outro lado do planeta, e mede: no instante da medida, a outra assume o estado oposto. Sem sinal, sem espera.\n\nEm 2022 o Nobel de Física foi para quem provou que ele estava errado. A realidade não é local.\n\n📕 O ebook \"O Lado Sombrio do Universo\" — 21 fenômenos ilustrados, 7 dias de garantia. Link na bio.\n\n#emaranhamento #fisicaquantica #einstein #ciência #universo #neuralupdate",
    "curtidas_campo": 61,
-   "comentarios_campo": 2,
+   "comentarios_campo": 5,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 1807,
+   "views": 1809,
    "reach": 1432,
    "likes": 61,
-   "comments": 2,
+   "comments": 5,
    "shares": 2,
    "saved": 8,
-   "total_interactions": 75,
-   "ig_reels_avg_watch_time": 24909,
-   "ig_reels_video_view_total_time": 36616605,
-   "reels_skip_rate": 30.1,
+   "total_interactions": 78,
+   "ig_reels_avg_watch_time": 24924,
+   "ig_reels_video_view_total_time": 36663967,
+   "reels_skip_rate": 30,
    "reposts": 2
   },
   {
@@ -15642,15 +16057,15 @@
    "titulo": "AULA da escola Universo do Zero: a energia escura — 70% do universo, descoberta em 1998 acelerando a expansão, e ninguém sabe o que é.",
    "legenda": "AULA da escola Universo do Zero: a energia escura — 70% do universo, descoberta em 1998 acelerando a expansão, e ninguém sabe o que é.\n\n🔭 Segue o perfil pra acompanhar a série \"O Universo em Números\" — a história do cosmos em ordem, do Big Bang ao infinito.\n\n#energiaescura #astronomia #ciência #universo #neuralupdate #reels #espaço #cosmos #curiosidades\n\n#energiaescura #astronomia #ciência #universo #neuralupdate #reels #espaço #cosmos #curiosidades\n\n##energiaescura ##astronomia ##ciência ##universo ##neuralupdate ##reels ##espaço ##cosmos ##curiosidades",
    "curtidas_campo": 10,
-   "comentarios_campo": 1,
+   "comentarios_campo": 2,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 176,
    "reach": 145,
    "likes": 10,
-   "comments": 1,
+   "comments": 2,
    "shares": 0,
    "saved": 3,
-   "total_interactions": 14,
+   "total_interactions": 15,
    "ig_reels_avg_watch_time": 23226,
    "ig_reels_video_view_total_time": 3530429,
    "reels_skip_rate": 49,
@@ -16428,16 +16843,16 @@
    "link": "https://www.instagram.com/reel/DasLxWajOzq/",
    "titulo": "O telescópio James Webb encontrou a galáxia mais distante já vista — a luz dela viajou 13 bilhões de anos, mostrando o universo recém-nascid",
    "legenda": "O telescópio James Webb encontrou a galáxia mais distante já vista — a luz dela viajou 13 bilhões de anos, mostrando o universo recém-nascido.\n\n🔭 Segue o perfil pra acompanhar a série \"O Universo em Números\" — a história do cosmos em ordem, do Big Bang ao infinito.\n\n#jameswebb #espaço #astronomia #ciência #neuralupdate #reels #cosmos #curiosidades\n\n#jameswebb #espaço #astronomia #ciência #neuralupdate #reels #cosmos #curiosidades\n\n##jameswebb ##espaço ##astronomia ##ciência ##neuralupdate ##reels ##cosmos ##curiosidades",
-   "curtidas_campo": 135,
+   "curtidas_campo": 134,
    "comentarios_campo": 0,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
    "views": 2335,
    "reach": 1903,
-   "likes": 135,
+   "likes": 134,
    "comments": 0,
    "shares": 12,
    "saved": 4,
-   "total_interactions": 155,
+   "total_interactions": 154,
    "ig_reels_avg_watch_time": 22196,
    "ig_reels_video_view_total_time": 43060780,
    "reels_skip_rate": 38.4,
@@ -16470,18 +16885,18 @@
    "titulo": "No instante t = 0 não existia espaço nem tempo: o Big Bang não aconteceu num lugar — ele CRIOU o lugar. Toda a energia do universo cabia num",
    "legenda": "No instante t = 0 não existia espaço nem tempo: o Big Bang não aconteceu num lugar — ele CRIOU o lugar. Toda a energia do universo cabia num ponto menor que um átomo.\n\n🔭 Segue o perfil pra acompanhar a série \"O Universo em Números\" — a história do cosmos em ordem, do Big Bang ao infinito.\n\n#bigbang #universo #ciência #astronomia #neuralupdate #reels #espaço #cosmos #curiosidades\n\n#bigbang #universo #ciência #astronomia #neuralupdate #reels #espaço #cosmos #curiosidades\n\n##bigbang ##universo ##ciência ##astronomia ##neuralupdate ##reels ##espaço ##cosmos ##curiosidades",
    "curtidas_campo": 25,
-   "comentarios_campo": 1,
+   "comentarios_campo": 4,
    "_metricas": "views,reach,likes,comments,shares,saved,total_interactions,ig_reels_avg_watch_time,ig_reels_video_view_total_time,reels_skip_rate,reposts",
-   "views": 488,
+   "views": 493,
    "reach": 371,
    "likes": 25,
-   "comments": 1,
+   "comments": 4,
    "shares": 12,
    "saved": 3,
-   "total_interactions": 41,
-   "ig_reels_avg_watch_time": 16033,
-   "ig_reels_video_view_total_time": 6333039,
-   "reels_skip_rate": 53.8,
+   "total_interactions": 44,
+   "ig_reels_avg_watch_time": 16198,
+   "ig_reels_video_view_total_time": 6414752,
+   "reels_skip_rate": 53.7,
    "reposts": 0
   },
   {
