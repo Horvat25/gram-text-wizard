@@ -739,5 +739,12 @@
     "tentativas": 1,
     "id": "1658839272389264",
     "state": "PUBLICADO"
+  },
+  "fb-story-aula-2026-11-26": {
+    "quando": "2026-11-26T19:00:00.000Z",
+    "tipo": "story",
+    "tentativas": 1,
+    "id": "1157376309997274",
+    "state": "PUBLICADO"
   }
 }
