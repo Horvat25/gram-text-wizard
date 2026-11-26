@@ -800,5 +800,19 @@
       "id": "122162730669153806"
     },
     "state": "AGENDADO"
+  },
+  "27nov-estrela-pisca-planeta-nao": {
+    "quando": "2026-11-27T18:30:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162730711153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795804200,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162730711153806",
+      "created_time": "2026-11-27T18:30:00+0000",
+      "id": "962589380261249_122162730711153806"
+    },
+    "state": "AGENDADO"
   }
 }
