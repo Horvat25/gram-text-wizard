@@ -814,5 +814,18 @@
       "id": "962589380261249_122162730711153806"
     },
     "state": "AGENDADO"
+  },
+  "27nov-galaxia-sombrero": {
+    "quando": "2026-11-27T22:30:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122162730825153806",
+    "foto_id": "122162730825153806",
+    "readback": {
+      "created_time": "2026-11-26T20:40:30+0000",
+      "link": "https://www.facebook.com/photo.php?fbid=122162730825153806&set=p.122162730825153806&type=3",
+      "id": "122162730825153806"
+    },
+    "state": "AGENDADO"
   }
 }
