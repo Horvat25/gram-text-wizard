@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-26T02:45:40.765Z",
+  "em": "2026-11-26T12:15:15.334Z",
   "agendados": [
     {
       "id": "962589380261249_122162629215153806",
@@ -115,19 +115,39 @@
       "id": "962589380261249_122162121861153806",
       "quando": "2026-11-26T12:30:00.000Z",
       "inicio": "O maior observatório astronômico em território bra"
-    },
-    {
-      "id": "962589380261249_122162623377153806",
-      "quando": "2026-11-26T12:00:00.000Z",
-      "inicio": "A lua que é MAIOR que um planeta 🌕\n\nEscola de Ast"
-    },
-    {
-      "id": "962589380261249_122162623215153806",
-      "quando": "2026-11-26T10:15:00.000Z",
-      "inicio": "Uma queda de 12 MINUTOS 🧗\n\nEscola de Astronomia N"
     }
   ],
   "ultimos_publicados": [
+    {
+      "id": "962589380261249_122162623377153806",
+      "quando": "2026-11-26T12:00:04+0000",
+      "inicio": "A lua que é MAIOR que um planeta 🌕\n\nEscola de Ast"
+    },
+    {
+      "id": "962589380261249_122162688567153806",
+      "quando": "2026-11-26T11:12:25+0000",
+      "inicio": "Um telescópio soltou um mapa com mais de 1 BILHÃO "
+    },
+    {
+      "id": "962589380261249_122162623179153806",
+      "quando": "2026-11-26T10:15:01+0000",
+      "inicio": "Uma queda de 12 MINUTOS 🧗\n\nEscola de Astronomia N"
+    },
+    {
+      "id": "962589380261249_122162623215153806",
+      "quando": "2026-11-26T10:15:01+0000",
+      "inicio": "Uma queda de 12 MINUTOS 🧗\n\nEscola de Astronomia N"
+    },
+    {
+      "id": "962589380261249_122162121609153806",
+      "quando": "2026-11-26T10:00:08+0000",
+      "inicio": "A Lua é mais estreita que o Brasil.\n\nEla tem 3.475"
+    },
+    {
+      "id": "962589380261249_122162623053153806",
+      "quando": "2026-11-26T09:30:00+0000",
+      "inicio": "Uma das superfícies MAIS VELHAS do Sistema Solar \ud83c"
+    },
     {
       "id": "962589380261249_122162622969153806",
       "quando": "2026-11-26T02:20:01+0000",
@@ -157,36 +177,6 @@
       "id": "962589380261249_122162622603153806",
       "quando": "2026-11-25T23:50:00+0000",
       "inicio": "Essa lua anda na CONTRAMÃO 🔵\n\nEscola de Astronomi"
-    },
-    {
-      "id": "962589380261249_122162622567153806",
-      "quando": "2026-11-25T23:00:01+0000",
-      "inicio": "Plutão tem um CORAÇÃO de gelo 🤍\n\nEscola de Astron"
-    },
-    {
-      "id": "962589380261249_122162121327153806",
-      "quando": "2026-11-25T22:30:01+0000",
-      "inicio": "Repara no centro da foto: aquele montinho de ponto"
-    },
-    {
-      "id": "962589380261249_122162620431153806",
-      "quando": "2026-11-25T21:11:59+0000",
-      "inicio": "Procurou o CRUZEIRO DO SUL hoje e NÃO achou? Ele n"
-    },
-    {
-      "id": "962589380261249_122162121111153806",
-      "quando": "2026-11-25T18:30:00+0000",
-      "inicio": "Aquele grupinho apertado de estrelas que parece um"
-    },
-    {
-      "id": "962589380261249_122162598297153806",
-      "quando": "2026-11-25T17:13:42+0000",
-      "inicio": "Esse cometa tem formato de AMENDOIM e faz uma neva"
-    },
-    {
-      "id": "962589380261249_122162121057153806",
-      "quando": "2026-11-25T15:30:00+0000",
-      "inicio": "Plutão ainda não completou nem uma volta em torno "
     }
   ]
 }
