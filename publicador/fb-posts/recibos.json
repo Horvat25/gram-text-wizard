@@ -868,5 +868,19 @@
       "id": "122162730987153806"
     },
     "state": "AGENDADO"
+  },
+  "28nov-quanto-voce-pesaria": {
+    "quando": "2026-11-28T14:00:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162731275153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795874400,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162731275153806",
+      "created_time": "2026-11-28T14:00:00+0000",
+      "id": "962589380261249_122162731275153806"
+    },
+    "state": "AGENDADO"
   }
 }
