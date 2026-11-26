@@ -922,5 +922,18 @@
       "id": "122162731479153806"
     },
     "state": "AGENDADO"
+  },
+  "28nov-lua-encosta-em-jupiter": {
+    "quando": "2026-11-29T00:00:00Z",
+    "tipo": "foto",
+    "tentativas": 1,
+    "id": "122162731767153806",
+    "foto_id": "122162731767153806",
+    "readback": {
+      "created_time": "2026-11-26T20:40:58+0000",
+      "link": "https://www.facebook.com/photo.php?fbid=122162731767153806&set=p.122162731767153806&type=3",
+      "id": "122162731767153806"
+    },
+    "state": "AGENDADO"
   }
 }
