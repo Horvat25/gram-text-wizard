@@ -895,5 +895,19 @@
       "id": "122162731323153806"
     },
     "state": "AGENDADO"
+  },
+  "28nov-via-lactea-andromeda-50": {
+    "quando": "2026-11-28T18:30:00Z",
+    "tipo": "texto",
+    "tentativas": 1,
+    "id": "962589380261249_122162731443153806",
+    "readback": {
+      "is_published": false,
+      "scheduled_publish_time": 1795890600,
+      "permalink_url": "https://www.facebook.com/122161167519153806/posts/122162731443153806",
+      "created_time": "2026-11-28T18:30:00+0000",
+      "id": "962589380261249_122162731443153806"
+    },
+    "state": "AGENDADO"
   }
 }
