@@ -25,9 +25,10 @@ concurrency:
 jobs:
   responde:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v5
 
@@ -73,3 +74,17 @@ jobs:
             sleep 5
           done
           exit 1
+
+      # ENCADEIA a próxima rodada (26/11): o cron do GitHub falhou a noite toda e a manhã de 26/11, então, se ainda
+      # há resposta pendente e estamos na janela 08h–22h BRT, espera ~26 min (ritmo espaçado) e dispara a próxima
+      # rodada. workflow_dispatch feito com o GITHUB_TOKEN é permitido (só o push do token não re-dispara).
+      - name: Encadear proxima rodada
+        if: always() && steps.tem.outputs.sim == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch -q origin main
+          if ! git show origin/main:publicador/respostas-pendentes.json >/dev/null 2>&1; then echo "fila vazia: fim da cadeia"; exit 0; fi
+          sleep $((26*60 + RANDOM % 240))
+          h=$(date -u +%H)
+          if [ "$h" -ge 11 ] || [ "$h" -lt 1 ]; then gh workflow run responde-comentarios.yml --ref main && echo "proxima rodada disparada"; else echo "fora da janela: cadeia encerrada (cron/push retomam amanha)"; fi
