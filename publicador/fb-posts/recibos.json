@@ -727,5 +727,10 @@
     "tentativas": 1,
     "id": "1241743238183775",
     "state": "PUBLICADO"
+  },
+  "fb-story-pergunta-2026-11-25": {
+    "quando": "2026-11-25T23:00:00.000Z",
+    "tipo": "story",
+    "state": "PERDIDO"
   }
 }
