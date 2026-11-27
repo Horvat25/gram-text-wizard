@@ -935,5 +935,10 @@
       "id": "122162731767153806"
     },
     "state": "AGENDADO"
+  },
+  "fb-story-pergunta-2026-11-26": {
+    "quando": "2026-11-26T23:00:00.000Z",
+    "tipo": "story",
+    "state": "PERDIDO"
   }
 }
