@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-26T20:41:04.927Z",
+  "em": "2026-11-27T04:56:26.781Z",
   "agendados": [
     {
       "id": "962589380261249_122162731767153806",
@@ -70,54 +70,59 @@
       "id": "962589380261249_122162730549153806",
       "quando": "2026-11-27T10:00:00.000Z",
       "inicio": "Os dias mais longos do ano estão chegando, e quem "
-    },
+    }
+  ],
+  "ultimos_publicados": [
     {
       "id": "962589380261249_122162629215153806",
-      "quando": "2026-11-27T02:30:00.000Z",
+      "quando": "2026-11-27T02:30:01+0000",
       "inicio": "Netuno foi achado NO PAPEL antes do telescópio 📜\n"
     },
     {
       "id": "962589380261249_122162629101153806",
-      "quando": "2026-11-27T01:45:00.000Z",
+      "quando": "2026-11-27T01:45:00+0000",
       "inicio": "A Lua está FUGINDO da Terra 🌙\n\nEscola de Astronom"
     },
     {
       "id": "962589380261249_122162629011153806",
-      "quando": "2026-11-27T01:00:00.000Z",
+      "quando": "2026-11-27T01:00:02+0000",
       "inicio": "A nave mais distante AINDA NÃO SAIU do Sistema Sol"
     },
     {
       "id": "962589380261249_122162628933153806",
-      "quando": "2026-11-27T00:15:00.000Z",
+      "quando": "2026-11-27T00:15:00+0000",
       "inicio": "A cauda do cometa NÃO fica pra trás ☄️\n\nEscola de "
     },
     {
       "id": "962589380261249_122162122413153806",
-      "quando": "2026-11-27T00:00:00.000Z",
+      "quando": "2026-11-27T00:00:01+0000",
       "inicio": "Esse grupo de galáxias está sorrindo pra você. E o"
     },
     {
       "id": "962589380261249_122162628867153806",
-      "quando": "2026-11-26T23:30:00.000Z",
+      "quando": "2026-11-26T23:30:00+0000",
       "inicio": "A atmosfera do Sol é MAIS QUENTE que a superfície "
     },
     {
       "id": "962589380261249_122162628753153806",
-      "quando": "2026-11-26T22:45:00.000Z",
+      "quando": "2026-11-26T22:45:00+0000",
       "inicio": "Marte PERDEU o ar 🔴\n\nEscola de Astronomia Neural "
     },
     {
       "id": "962589380261249_122162122317153806",
-      "quando": "2026-11-26T22:30:00.000Z",
+      "quando": "2026-11-26T22:30:01+0000",
       "inicio": "Em Urano, cada polo passa 42 anos seguidos de dia "
     },
     {
       "id": "962589380261249_122162628675153806",
-      "quando": "2026-11-26T22:00:00.000Z",
+      "quando": "2026-11-26T22:00:02+0000",
       "inicio": "O cinturão de asteroides é quase VAZIO ☄️\n\nEscola "
-    }
-  ],
-  "ultimos_publicados": [
+    },
+    {
+      "id": "962589380261249_122162734743153806",
+      "quando": "2026-11-26T21:11:26+0000",
+      "inicio": "O ano já teve 400 DIAS (e a culpa é da Lua) 🌍🌙\n\n"
+    },
     {
       "id": "962589380261249_122162629491153806",
       "quando": "2026-11-26T20:15:01+0000",
@@ -127,56 +132,6 @@
       "id": "962589380261249_122162628573153806",
       "quando": "2026-11-26T19:30:00+0000",
       "inicio": "A Lua nasceu de uma BATIDA 💥\n\nEscola de Astronomi"
-    },
-    {
-      "id": "962589380261249_122162629467153806",
-      "quando": "2026-11-26T18:45:01+0000",
-      "inicio": "Mercúrio está ENCOLHENDO 🪐\n\nEscola de Astronomia "
-    },
-    {
-      "id": "962589380261249_122162122173153806",
-      "quando": "2026-11-26T18:30:00+0000",
-      "inicio": "Repara no pontinho embaixo, à esquerda da estrela "
-    },
-    {
-      "id": "962589380261249_122162628459153806",
-      "quando": "2026-11-26T18:00:01+0000",
-      "inicio": "Essa tempestade é MAIOR que a Terra 🌀\n\nEscola de "
-    },
-    {
-      "id": "962589380261249_122162715111153806",
-      "quando": "2026-11-26T17:13:24+0000",
-      "inicio": "Uma nave passou UM minuto ao lado desse asteroide "
-    },
-    {
-      "id": "962589380261249_122162628351153806",
-      "quando": "2026-11-26T16:20:01+0000",
-      "inicio": "O lugar com MAIS VULCÃO não é a Terra 🌋\n\nEscola d"
-    },
-    {
-      "id": "962589380261249_122162628267153806",
-      "quando": "2026-11-26T15:45:00+0000",
-      "inicio": "Esse asteroide é um MONTE DE PEDRA solta 🪨\n\nEscol"
-    },
-    {
-      "id": "962589380261249_122162122119153806",
-      "quando": "2026-11-26T15:30:01+0000",
-      "inicio": "O maior meteorito já encontrado no Brasil pesa 5,3"
-    },
-    {
-      "id": "962589380261249_122162628159153806",
-      "quando": "2026-11-26T15:00:01+0000",
-      "inicio": "Um anel que NÃO DEVIA existir (e um brasileiro ach"
-    },
-    {
-      "id": "962589380261249_122162628087153806",
-      "quando": "2026-11-26T14:15:01+0000",
-      "inicio": "Essa lua tem DUAS CORES ⚫⚪\n\nEscola de Astronomia N"
-    },
-    {
-      "id": "962589380261249_122162122059153806",
-      "quando": "2026-11-26T14:00:08+0000",
-      "inicio": "Isso não é uma galáxia. É uma bola com até 10 milh"
     }
   ]
 }
