@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-27T04:56:26.781Z",
+  "em": "2026-11-27T14:55:57.599Z",
   "agendados": [
     {
       "id": "962589380261249_122162731767153806",
@@ -55,24 +55,24 @@
       "id": "962589380261249_122162730669153806",
       "quando": "2026-11-27T15:30:00.000Z",
       "inicio": "Netuno tem anéis. Fazia mais de 30 anos que ningué"
-    },
+    }
+  ],
+  "ultimos_publicados": [
     {
       "id": "962589380261249_122162730627153806",
-      "quando": "2026-11-27T14:00:00.000Z",
+      "quando": "2026-11-27T14:00:00+0000",
       "inicio": "Num céu bem escuro, longe de qualquer cidade, dá p"
     },
     {
       "id": "962589380261249_122162730579153806",
-      "quando": "2026-11-27T12:30:00.000Z",
+      "quando": "2026-11-27T12:30:00+0000",
       "inicio": "Mercúrio não tem essas cores. Essa é uma foto \"pin"
     },
     {
       "id": "962589380261249_122162730549153806",
-      "quando": "2026-11-27T10:00:00.000Z",
+      "quando": "2026-11-27T10:00:02+0000",
       "inicio": "Os dias mais longos do ano estão chegando, e quem "
-    }
-  ],
-  "ultimos_publicados": [
+    },
     {
       "id": "962589380261249_122162629215153806",
       "quando": "2026-11-27T02:30:01+0000",
@@ -117,21 +117,6 @@
       "id": "962589380261249_122162628675153806",
       "quando": "2026-11-26T22:00:02+0000",
       "inicio": "O cinturão de asteroides é quase VAZIO ☄️\n\nEscola "
-    },
-    {
-      "id": "962589380261249_122162734743153806",
-      "quando": "2026-11-26T21:11:26+0000",
-      "inicio": "O ano já teve 400 DIAS (e a culpa é da Lua) 🌍🌙\n\n"
-    },
-    {
-      "id": "962589380261249_122162629491153806",
-      "quando": "2026-11-26T20:15:01+0000",
-      "inicio": "Os anéis de Saturno são FINÍSSIMOS 💍\n\nEscola de A"
-    },
-    {
-      "id": "962589380261249_122162628573153806",
-      "quando": "2026-11-26T19:30:00+0000",
-      "inicio": "A Lua nasceu de uma BATIDA 💥\n\nEscola de Astronomi"
     }
   ]
 }
