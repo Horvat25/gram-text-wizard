@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-11-26T18:55:28.351Z",
+ "gerado_em": "2026-11-27T18:47:10.096Z",
  "contas_lidas": 7,
  "contas_invalidas": [
   "canaldoschwarza: Invalid user id",
@@ -14,19 +14,19 @@
    "usuario": "spacetoday",
    "grupo": "astronomia-grande",
    "ok": true,
-   "seguidores": 2568875,
+   "seguidores": 2568846,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0,
    "palavras": {},
    "comentarios_por_curtida_com_pedido": null,
-   "comentarios_por_curtida_sem_pedido": 0.014,
+   "comentarios_por_curtida_sem_pedido": 0.016,
    "melhores_pedidos": []
   },
   {
    "usuario": "cienciatododia",
    "grupo": "ciencia-grande",
    "ok": true,
-   "seguidores": 17690,
+   "seguidores": 17709,
    "posts_lidos": 0,
    "pct_posts_pedindo": 0,
    "palavras": {},
@@ -44,24 +44,24 @@
    "usuario": "olhardigital",
    "grupo": "ciencia-tech",
    "ok": true,
-   "seguidores": 592953,
+   "seguidores": 593077,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
-    "RISTAS": 1
+    "DETALHES": 1
    },
-   "comentarios_por_curtida_com_pedido": 0,
-   "comentarios_por_curtida_sem_pedido": 0.037,
+   "comentarios_por_curtida_com_pedido": 0.076,
+   "comentarios_por_curtida_sem_pedido": 0.04,
    "melhores_pedidos": [
     {
-     "quando": "2026-11-25",
+     "quando": "2026-11-27",
      "tipo": "FEED",
      "pede": true,
-     "palavra": "RISTAS",
-     "trecho": "- Narradores, comentaristas e comunicadores;",
-     "comentarios": 0,
-     "curtidas": 118,
-     "link": "https://www.instagram.com/p/DgLGtMxoLMG/"
+     "palavra": "DETALHES",
+     "trecho": "A invasão foi descoberta há cerca de um mês, durante trabalhos de atualização, segundo dois relatos. A identificação do problema provocou a ",
+     "comentarios": 41,
+     "curtidas": 540,
+     "link": "https://www.instagram.com/p/DgQKDfxll_4/"
     }
    ]
   },
@@ -159,7 +159,7 @@
    "usuario": "intrinseca",
    "grupo": "livros",
    "ok": true,
-   "seguidores": 1058637,
+   "seguidores": 1058722,
    "posts_lidos": 50,
    "pct_posts_pedindo": 0.02,
    "palavras": {
@@ -175,7 +175,7 @@
      "palavra": "REM",
      "trecho": "O Goodreads é uma plataforma on-line feita especialmente para os leitores avaliarem e comentarem suas leituras. Uma vez por ano, os usuários",
      "comentarios": 114,
-     "curtidas": 4963,
+     "curtidas": 4964,
      "link": "https://www.instagram.com/p/DfpHUjCFOsi/"
     }
    ]
@@ -218,13 +218,53 @@
   },
   {
    "hashtag": "astronomia",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.1,
+   "palavras": {
+    "EU": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.031,
+   "comentarios_por_curtida_sem_pedido": 0.014,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": "EU",
+     "trecho": "Às vezes, a gente se preocupa tanto com o amanhã que acaba esquecendo de admirar o que está diante dos nossos olhos.",
+     "comentarios": 317,
+     "curtidas": 10141,
+     "link": "https://www.instagram.com/p/Df3PpEToL6b/"
+    }
+   ]
   },
   {
    "hashtag": "livros",
-   "ok": false,
-   "erro": "Please reduce the amount of data you're asking for, then retry your request"
+   "ok": true,
+   "posts": 10,
+   "pct_pedindo": 0.2,
+   "palavras": {
+    "LIVRO": 1
+   },
+   "comentarios_por_curtida_com_pedido": 0.444,
+   "comentarios_por_curtida_sem_pedido": 0.027,
+   "melhores_pedidos": [
+    {
+     "pede": true,
+     "palavra": null,
+     "trecho": "",
+     "comentarios": 8474,
+     "curtidas": 20411,
+     "link": "https://www.instagram.com/p/DgFRvwhGGVV/"
+    },
+    {
+     "pede": true,
+     "palavra": "LIVRO",
+     "trecho": "Comenta LIVRO que eu te envio no DM.",
+     "comentarios": 345,
+     "curtidas": 729,
+     "link": "https://www.instagram.com/p/DgDzTmVo5m9/"
+    }
+   ]
   }
  ]
 }
