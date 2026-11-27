@@ -1458,12 +1458,12 @@
    "quando": "2026-11-27T00:11:11+0000",
    "tipo": "IMAGE",
    "legenda": "",
-   "ultimo_retrato": "2026-11-27T08:23:58.261Z",
+   "ultimo_retrato": "2026-11-27T21:14:10.434Z",
    "_metricas": null,
    "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-11-27T08:24:01.017Z",
+ "gerado_em": "2026-11-27T21:14:11.248Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -2204,6 +2204,10 @@
   "2026-11-27T08": {
    "seguidores": 1321,
    "publicacoes": 1214
+  },
+  "2026-11-27T21": {
+   "seguidores": 1322,
+   "publicacoes": 1214
   }
  },
  "ganhos_por_dia": {
@@ -2299,6 +2303,6 @@
   "2026-11-23": 1,
   "2026-11-24": 6,
   "2026-11-25": 3,
-  "2026-11-26": 0
+  "2026-11-26": 3
  }
 }
