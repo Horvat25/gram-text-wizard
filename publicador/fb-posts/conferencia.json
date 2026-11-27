@@ -1,5 +1,5 @@
 {
-  "em": "2026-11-27T14:55:57.599Z",
+  "em": "2026-11-27T23:23:31.380Z",
   "agendados": [
     {
       "id": "962589380261249_122162731767153806",
@@ -40,24 +40,24 @@
       "id": "962589380261249_122162730867153806",
       "quando": "2026-11-28T00:00:00.000Z",
       "inicio": "Marte é vermelho pelo mesmo motivo que um portão v"
-    },
+    }
+  ],
+  "ultimos_publicados": [
     {
       "id": "962589380261249_122162730825153806",
-      "quando": "2026-11-27T22:30:00.000Z",
+      "quando": "2026-11-27T22:30:01+0000",
       "inicio": "Essa é a Galáxia do Sombrero, fotografada pelo tel"
     },
     {
       "id": "962589380261249_122162730711153806",
-      "quando": "2026-11-27T18:30:00.000Z",
+      "quando": "2026-11-27T18:30:00+0000",
       "inicio": "Um jeito simples de saber se aquele ponto brilhant"
     },
     {
       "id": "962589380261249_122162730669153806",
-      "quando": "2026-11-27T15:30:00.000Z",
+      "quando": "2026-11-27T15:30:01+0000",
       "inicio": "Netuno tem anéis. Fazia mais de 30 anos que ningué"
-    }
-  ],
-  "ultimos_publicados": [
+    },
     {
       "id": "962589380261249_122162730627153806",
       "quando": "2026-11-27T14:00:00+0000",
@@ -102,21 +102,6 @@
       "id": "962589380261249_122162628867153806",
       "quando": "2026-11-26T23:30:00+0000",
       "inicio": "A atmosfera do Sol é MAIS QUENTE que a superfície "
-    },
-    {
-      "id": "962589380261249_122162628753153806",
-      "quando": "2026-11-26T22:45:00+0000",
-      "inicio": "Marte PERDEU o ar 🔴\n\nEscola de Astronomia Neural "
-    },
-    {
-      "id": "962589380261249_122162122317153806",
-      "quando": "2026-11-26T22:30:01+0000",
-      "inicio": "Em Urano, cada polo passa 42 anos seguidos de dia "
-    },
-    {
-      "id": "962589380261249_122162628675153806",
-      "quando": "2026-11-26T22:00:02+0000",
-      "inicio": "O cinturão de asteroides é quase VAZIO ☄️\n\nEscola "
     }
   ]
 }
