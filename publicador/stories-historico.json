@@ -1463,7 +1463,7 @@
    "_erro": "(#10) Not enough viewers for the media to show insights"
   }
  },
- "gerado_em": "2026-11-27T21:14:11.248Z",
+ "gerado_em": "2026-11-28T07:43:59.184Z",
  "seguidores": {
   "2026-09-23T17": {
    "seguidores": 1201,
@@ -2207,6 +2207,10 @@
   },
   "2026-11-27T21": {
    "seguidores": 1322,
+   "publicacoes": 1214
+  },
+  "2026-11-28T07": {
+   "seguidores": 1321,
    "publicacoes": 1214
   }
  },
